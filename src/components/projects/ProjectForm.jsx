@@ -576,1089 +576,165 @@ export default function ProjectForm({ project, faixas, regionais, user, onSave, 
 
       {!isCartaTraco && (
         <>
-          <Card>
-            <CardHeader>
-              <CardTitle>Especificação Granulométrica</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="faixa_granulometrica_id">Faixa de Referência (Especificação) *</Label>
-                <Select 
-                  value={formData.faixa_granulometrica_id} 
-                  onValueChange={(value) => handleInputChange('faixa_granulometrica_id', value)} 
-                  required
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione a faixa granulométrica" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {faixasFiltradas?.map(faixa => (
-                      <SelectItem key={faixa.id} value={faixa.id}>
-                        <div className="flex items-center gap-2">
-                          <Badge className={
-                           faixa.tipo === 'CAUQ' ? 'bg-blue-500' :
-                           faixa.tipo === 'MRAF' ? 'bg-green-500' :
-                           faixa.tipo === 'BGS' ? 'bg-purple-500' :
-                           'bg-amber-500'
-                          }>
-                           {faixa.tipo}
-                          </Badge>
-                          <span>{faixa.nome} ({faixa.orgao} - {faixa.especificacao})</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {faixasFiltradas.length === 0 && (
-                  <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                    <p className="text-xs text-amber-800 font-medium">
-                      ⚠️ Nenhuma faixa granulométrica do tipo <Badge className={
-                        formData.tipo_projeto === 'CAUQ' ? 'bg-blue-500 text-white' :
-                        formData.tipo_projeto === 'MRAF' ? 'bg-green-500 text-white' :
-                        'bg-purple-500 text-white'
-                      }>{formData.tipo_projeto}</Badge> encontrada.
-                    </p>
-                    <p className="text-xs text-amber-700 mt-1">
-                      Crie uma faixa compatível na página de Faixas Granulométricas antes de continuar.
-                    </p>
-                  </div>
-                )}
-                {faixasFiltradas.length > 0 && (
-                  <p className="text-xs text-slate-500 mt-1">
-                    Mostrando apenas faixas do tipo {formData.tipo_projeto} ({faixasFiltradas.length} disponível{faixasFiltradas.length !== 1 ? 'is' : ''})
-                  </p>
-                )}
-              </div>
+          <ProjectFormSpecification
+            formData={formData}
+            faixasFiltradas={faixasFiltradas}
+            faixaSelecionada={faixaSelecionada}
+            peneirasCarregadas={peneirasCarregadas}
+            peneirasDisponiveis={peneirasDisponiveis}
+            onFaixaChange={(value) => handleInputChange('faixa_granulometrica_id', value)}
+            onEquivalenteChange={(value) => handleInputChange("equivalente_areia_minimo", value)}
+          />
 
-              <div>
-                <Label htmlFor="equivalente_areia_minimo">Equivalente de Areia Mínimo (%) *</Label>
-                <Input
-                  id="equivalente_areia_minimo"
-                  type="number"
-                  step="0.1"
-                  value={formData.equivalente_areia_minimo}
-                  onChange={(e) => handleInputChange("equivalente_areia_minimo", e.target.value)}
-                  placeholder="Ex: 55"
-                  required
-                />
-                <p className="text-xs text-slate-500 mt-1">
-                  Limite mínimo de equivalente de areia exigido para este projeto
-                </p>
-              </div>
-
-              {faixaSelecionada && peneirasCarregadas && (
-                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm font-semibold text-blue-900 mb-2">Limites de Especificação ({peneirasDisponiveis.length} peneiras PADRONIZADAS):</p>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full text-xs">
-                      <thead className="bg-blue-100">
-                        <tr>
-                          <th className="px-2 py-1 text-left">ASTM</th>
-                          <th className="px-2 py-1 text-left">Abertura</th>
-                          <th className="px-2 py-1 text-center">Mín (%)</th>
-                          <th className="px-2 py-1 text-center">Máx (%)</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {peneirasDisponiveis.map((peneira, idx) => (
-                          <tr key={idx} className="border-t border-blue-200">
-                            <td className="px-2 py-1 font-semibold">{peneira.astm}</td>
-                            <td className="px-2 py-1">{peneira.nome}</td>
-                            <td className="px-2 py-1 text-center">{peneira.especificacao_min}</td>
-                            <td className="px-2 py-1 text-center">{peneira.especificacao_max}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {isCauq && (
-            <>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Ligante Asfáltico</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label>Tipo de Ligante</Label>
-                      <Input
-                        value={formData.ligante.tipo}
-                        onChange={(e) => setFormData(prev => ({
-                          ...prev,
-                          ligante: { ...prev.ligante, tipo: e.target.value }
-                        }))}
-                        placeholder="Ex: CAP 50/70"
-                      />
-                    </div>
-                    <div>
-                      <Label>Fornecedor</Label>
-                      <Input
-                        value={formData.ligante.fornecedor}
-                        onChange={(e) => setFormData(prev => ({
-                          ...prev,
-                          ligante: { ...prev.ligante, fornecedor: e.target.value }
-                        }))}
-                        placeholder="Ex: Petrobras"
-                      />
-                    </div>
-                    <div>
-                      <Label>Densidade (g/cm³)</Label>
-                      <Input
-                        type="number"
-                        step="0.001"
-                        value={formData.ligante.densidade}
-                        onChange={(e) => setFormData(prev => ({
-                          ...prev,
-                          ligante: { ...prev.ligante, densidade: e.target.value === '' ? '' : parseFloat(e.target.value) }
-                        }))}
-                        placeholder="Ex: 1.015"
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {peneirasCarregadas ? (
-                <AgregadosForm
-                  agregados={formData.agregados}
-                  peneirasDisponiveis={peneirasDisponiveis}
-                  onAdd={adicionarAgregado}
-                  onRemove={removerAgregado}
-                  onChange={handleAgregadoChange}
-                  onGranChange={handleAgregadoGranChange}
-                />
-              ) : (
-                <Card className="bg-amber-50 border-amber-200">
-                  <CardContent className="p-6 text-center">
-                    <p className="text-amber-800">
-                      ⚠️ Selecione uma faixa granulométrica primeiro.
-                    </p>
-                  </CardContent>
-                </Card>
+          {!isCartaTraco && isCauq && (
+              <ProjectFormCAUQ
+                formData={formData}
+                peneirasCarregadas={peneirasCarregadas}
+                peneirasDisponiveis={peneirasDisponiveis}
+                agregados={formData.agregados}
+                onLiganteChange={(field, value) => setFormData(prev => ({
+                  ...prev,
+                  ligante: { ...prev.ligante, [field]: field === 'densidade' && value !== '' ? parseFloat(value) : value }
+                }))}
+                onAgregadoAdd={adicionarAgregado}
+                onAgregadoRemove={removerAgregado}
+                onAgregadoChange={handleAgregadoChange}
+                onAgregadoGranChange={handleAgregadoGranChange}
+                onFaixaTrabalhoChange={(key, type, value) => {
+                  const faixaType = `faixa_trabalho${type === 'min' ? '_min' : type === 'max' ? '_max' : ''}`;
+                  setFormData(prev => ({
+                    ...prev,
+                    [faixaType]: { ...prev[faixaType], [key]: value === '' ? '' : parseFloat(value) }
+                  }));
+                }}
+                onTemperaturaChange={(group, field, value) => handleDeepNestedInputChange('temperaturas', group, field, value)}
+                onNestedChange={handleNestedInputChange}
+                onInputChange={handleInputChange}
+              />
               )}
 
-              {peneirasCarregadas && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Faixa de Trabalho (Graduação da Mistura) - PADRONIZADA DNIT/ASTM</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-slate-600 mb-4">
-                      Limites mínimo, ótimo e máximo da faixa de trabalho (% passante)
-                    </p>
-                    
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full border-collapse border border-slate-300">
-                        <thead className="bg-slate-100">
-                          <tr>
-                            <th className="border border-slate-300 px-3 py-2 text-left text-sm font-medium sticky left-0 bg-slate-100 z-10">
-                              Peneira
-                            </th>
-                            {peneirasDisponiveis.map(peneira => (
-                              <th key={peneira.key} className="border border-slate-300 px-3 py-2 text-center text-sm font-medium min-w-[100px]">
-                                <div className="font-bold">{peneira.astm}</div>
-                                <div className="text-xs text-gray-600">{peneira.nome}</div>
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td className="border border-slate-300 px-3 py-2 font-medium bg-slate-50 sticky left-0 z-10">
-                              Mínimo (%)
-                            </td>
-                            {peneirasDisponiveis.map(peneira => (
-                              <td key={peneira.key} className="border border-slate-300 px-2 py-1">
-                                <Input
-                                  type="number"
-                                  step="0.1"
-                                  value={formData.faixa_trabalho_min[peneira.key] ?? ""}
-                                  onChange={(e) => {
-                                    const value = e.target.value === '' ? '' : parseFloat(e.target.value);
-                                    setFormData(prev => ({
-                                      ...prev,
-                                      faixa_trabalho_min: {
-                                        ...prev.faixa_trabalho_min,
-                                        [peneira.key]: value
-                                      }
-                                    }));
-                                  }}
-                                  placeholder="Min"
-                                  className="text-sm text-center"
-                                />
-                              </td>
-                            ))}
-                          </tr>
-
-                          <tr className="bg-blue-50">
-                            <td className="border border-slate-300 px-3 py-2 font-medium bg-blue-100 sticky left-0 z-10">
-                              Ótimo/Projeto (%)
-                            </td>
-                            {peneirasDisponiveis.map(peneira => (
-                              <td key={peneira.key} className="border border-slate-300 px-2 py-1 bg-blue-50">
-                                <Input
-                                  type="number"
-                                  step="0.1"
-                                  value={formData.faixa_trabalho[peneira.key] ?? ""}
-                                  onChange={(e) => {
-                                    const value = e.target.value === '' ? '' : parseFloat(e.target.value);
-                                    setFormData(prev => ({
-                                      ...prev,
-                                      faixa_trabalho: {
-                                        ...prev.faixa_trabalho,
-                                        [peneira.key]: value
-                                      }
-                                    }));
-                                  }}
-                                  placeholder="Ótimo"
-                                  className="text-sm text-center font-semibold"
-                                />
-                              </td>
-                            ))}
-                          </tr>
-
-                          <tr>
-                            <td className="border border-slate-300 px-3 py-2 font-medium bg-slate-50 sticky left-0 z-10">
-                              Máximo (%)
-                            </td>
-                            {peneirasDisponiveis.map(peneira => (
-                              <td key={peneira.key} className="border border-slate-300 px-2 py-1">
-                                <Input
-                                  type="number"
-                                  step="0.1"
-                                  value={formData.faixa_trabalho_max[peneira.key] ?? ""}
-                                  onChange={(e) => {
-                                    const value = e.target.value === '' ? '' : parseFloat(e.target.value);
-                                    setFormData(prev => ({
-                                      ...prev,
-                                      faixa_trabalho_max: {
-                                        ...prev.faixa_trabalho_max,
-                                        [peneira.key]: value
-                                      }
-                                    }));
-                                  }}
-                                  placeholder="Max"
-                                  className="text-sm text-center"
-                                />
-                              </td>
-                            ))}
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </CardContent>
-                </Card>
+              {!isCartaTraco && isMraf && (
+              <ProjectFormMRAF
+                formData={formData}
+                peneirasCarregadas={peneirasCarregadas}
+                peneirasDisponiveis={peneirasDisponiveis}
+                agregados={formData.agregados}
+                onFaixaTrabalhoChange={(key, type, value) => {
+                  const faixaType = `faixa_trabalho${type === 'min' ? '_min' : type === 'max' ? '_max' : ''}`;
+                  setFormData(prev => ({
+                    ...prev,
+                    [faixaType]: { ...prev[faixaType], [key]: value === '' ? '' : parseFloat(value) }
+                  }));
+                }}
+                onInputChange={handleInputChange}
+                onNestedChange={handleNestedInputChange}
+                onAgregadoAdd={adicionarAgregado}
+                onAgregadoRemove={removerAgregado}
+                onAgregadoChange={handleAgregadoChange}
+                onAgregadoGranChange={handleAgregadoGranChange}
+              />
               )}
 
-              <Card>
+              {!isCartaTraco && isBgs && (
+              <Card className="bg-slate-50">
                 <CardHeader>
-                  <CardTitle>Temperaturas de Controle (°C)</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="space-y-2">
-                      <Label className="font-semibold">Mistura</Label>
-                      <div className="flex gap-2">
-                        <div className="flex-1">
-                          <Label className="text-xs">Mín</Label>
-                          <Input
-                            type="number"
-                            value={formData.temperaturas.mistura.min}
-                            onChange={(e) => handleDeepNestedInputChange('temperaturas', 'mistura', 'min', e.target.value)}
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <Label className="text-xs">Máx</Label>
-                          <Input
-                            type="number"
-                            value={formData.temperaturas.mistura.max}
-                            onChange={(e) => handleDeepNestedInputChange('temperaturas', 'mistura', 'max', e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="font-semibold">Compactação</Label>
-                      <div className="flex gap-2">
-                        <div className="flex-1">
-                          <Label className="text-xs">Mín</Label>
-                          <Input
-                            type="number"
-                            value={formData.temperaturas.compactacao.min}
-                            onChange={(e) => handleDeepNestedInputChange('temperaturas', 'compactacao', 'min', e.target.value)}
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <Label className="text-xs">Máx</Label>
-                          <Input
-                            type="number"
-                            value={formData.temperaturas.compactacao.max}
-                            onChange={(e) => handleDeepNestedInputChange('temperaturas', 'compactacao', 'max', e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="font-semibold">Espalhamento</Label>
-                      <div className="flex gap-2">
-                        <div className="flex-1">
-                          <Label className="text-xs">Mín</Label>
-                          <Input
-                            type="number"
-                            value={formData.temperaturas.espalhamento.min}
-                            onChange={(e) => handleDeepNestedInputChange('temperaturas', 'espalhamento', 'min', e.target.value)}
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <Label className="text-xs">Máx</Label>
-                          <Input
-                            type="number"
-                            value={formData.temperaturas.espalhamento.max}
-                            onChange={(e) => handleDeepNestedInputChange('temperaturas', 'espalhamento', 'max', e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-5 h-5 text-blue-500" />
+                    <CardTitle className="text-lg">
+                      Projeto {formData.tipo_projeto} - Configuração Simplificada
+                    </CardTitle>
                   </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Parâmetros de Dosagem Marshall</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="p-4 border rounded-lg">
-                    <Label className="font-semibold">Teor de Ligante (%)</Label>
-                    <div className="grid grid-cols-3 gap-4 mt-2">
-                      <div>
-                        <Label className="text-xs">Mínimo</Label>
-                        <Input type="number" step="0.01" placeholder="Mínimo" value={formData.teor_ligante.min} onChange={(e) => handleNestedInputChange('teor_ligante', 'min', e.target.value)} />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Máximo</Label>
-                        <Input type="number" step="0.01" placeholder="Máximo" value={formData.teor_ligante.max} onChange={(e) => handleNestedInputChange('teor_ligante', 'max', e.target.value)} />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Ótimo (Projeto)</Label>
-                        <Input type="number" step="0.01" placeholder="Ótimo" value={formData.teor_ligante.otimo} onChange={(e) => handleNestedInputChange('teor_ligante', 'otimo', e.target.value)} />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 border rounded-lg">
-                      <Label className="font-semibold">Massa Específica Aparente (g/cm³)</Label>
-                      <Input
-                        type="number"
-                        step="0.001"
-                        placeholder="Ex: 2.450"
-                        className="mt-2"
-                        value={formData.massa_especifica_aparente}
-                        onChange={(e) => handleInputChange('massa_especifica_aparente', e.target.value === '' ? '' : parseFloat(e.target.value))}
-                      />
-                    </div>
-                    <div className="p-4 border rounded-lg">
-                      <Label className="font-semibold">Densidade Máxima Medida - RICE (g/cm³)</Label>
-                      <Input
-                        type="number"
-                        step="0.001"
-                        placeholder="Ex: 2.550"
-                        className="mt-2"
-                        value={formData.densidade_maxima_medida}
-                        onChange={(e) => handleInputChange('densidade_maxima_medida', e.target.value === '' ? '' : parseFloat(e.target.value))}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="p-4 border rounded-lg">
-                    <Label className="font-semibold">Volume de Vazios (%)</Label>
-                    <div className="grid grid-cols-3 gap-4 mt-2">
-                      <div>
-                        <Label className="text-xs">Mínimo</Label>
-                        <Input type="number" step="0.1" placeholder="Mínimo" value={formData.volume_vazios.min} onChange={(e) => handleNestedInputChange('volume_vazios', 'min', e.target.value)} />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Máximo</Label>
-                        <Input type="number" step="0.1" placeholder="Máximo" value={formData.volume_vazios.max} onChange={(e) => handleNestedInputChange('volume_vazios', 'max', e.target.value)} />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Ótimo (Projeto)</Label>
-                        <Input type="number" step="0.1" placeholder="Ótimo" value={formData.volume_vazios.otimo} onChange={(e) => handleNestedInputChange('volume_vazios', 'otimo', e.target.value)} />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 border rounded-lg">
-                    <Label className="font-semibold">Estabilidade Marshall (N)</Label>
-                    <div className="grid grid-cols-2 gap-4 mt-2">
-                      <div>
-                        <Label className="text-xs">Mínimo</Label>
-                        <Input
-                          type="number"
-                          step="1"
-                          placeholder="Mínimo"
-                          value={formData.estabilidade.min}
-                          onChange={(e) => handleNestedInputChange('estabilidade', 'min', e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Projeto</Label>
-                        <Input
-                          type="number"
-                          step="1"
-                          placeholder="Projeto"
-                          value={formData.estabilidade.projeto}
-                          onChange={(e) => handleNestedInputChange('estabilidade', 'projeto', e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 border rounded-lg">
-                    <Label className="font-semibold">Fluência Marshall (mm)</Label>
-                    <div className="grid grid-cols-3 gap-4 mt-2">
-                      <div>
-                        <Label className="text-xs">Mínimo</Label>
-                        <Input type="number" step="0.1" placeholder="Mínimo" value={formData.fluencia.min} onChange={(e) => handleNestedInputChange('fluencia', 'min', e.target.value)} />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Máximo</Label>
-                        <Input type="number" step="0.1" placeholder="Máximo" value={formData.fluencia.max} onChange={(e) => handleNestedInputChange('fluencia', 'max', e.target.value)} />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Projeto</Label>
-                        <Input type="number" step="0.1" placeholder="Projeto" value={formData.fluencia.projeto} onChange={(e) => handleNestedInputChange('fluencia', 'projeto', e.target.value)} />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 border rounded-lg">
-                    <Label className="font-semibold">VAM - Vazios do Agregado Mineral (%)</Label>
-                    <div className="grid grid-cols-2 gap-4 mt-2">
-                      <div>
-                        <Label className="text-xs">Mínimo</Label>
-                        <Input
-                          type="number"
-                          step="0.1"
-                          placeholder="Mínimo"
-                          value={formData.vam.min}
-                          onChange={(e) => handleNestedInputChange('vam', 'min', e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Projeto</Label>
-                        <Input
-                          type="number"
-                          step="0.1"
-                          placeholder="Projeto"
-                          value={formData.vam.projeto}
-                          onChange={(e) => handleNestedInputChange('vam', 'projeto', e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 border rounded-lg">
-                    <Label className="font-semibold">RBV - Relação Betume/Vazios (%)</Label>
-                    <div className="grid grid-cols-3 gap-4 mt-2">
-                      <div>
-                        <Label className="text-xs">Mínimo</Label>
-                        <Input type="number" step="0.1" placeholder="Mínimo" value={formData.rbv.min} onChange={(e) => handleNestedInputChange('rbv', 'min', e.target.value)} />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Máximo</Label>
-                        <Input type="number" step="0.1" placeholder="Máximo" value={formData.rbv.max} onChange={(e) => handleNestedInputChange('rbv', 'max', e.target.value)} />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Projeto</Label>
-                        <Input type="number" step="0.1" placeholder="Projeto" value={formData.rbv.projeto} onChange={(e) => handleNestedInputChange('rbv', 'projeto', e.target.value)} />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 border rounded-lg">
-                    <Label className="font-semibold">RTCD Mínimo (MPa)</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      placeholder="Mínimo"
-                      className="mt-2"
-                      value={formData.rtcd.min}
-                      onChange={(e) => handleNestedInputChange('rtcd', 'min', e.target.value)}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            </>
-          )}
-
-          {isMraf && peneirasCarregadas && (
-            <>
-              {/* Faixa de Trabalho para MRAF */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Faixa de Trabalho (Graduação da Mistura) - PADRONIZADA DNIT/ASTM</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-slate-600 mb-4">
-                    Limites mínimo, ótimo e máximo da faixa de trabalho (% passante)
+                    Para projetos do tipo <strong>{formData.tipo_projeto}</strong>, os parâmetros técnicos específicos podem ser configurados conforme necessário. 
+                    O sistema já está preparado com a especificação granulométrica e o limite de equivalente de areia.
                   </p>
-                  
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full border-collapse border border-slate-300">
-                      <thead className="bg-slate-100">
-                        <tr>
-                          <th className="border border-slate-300 px-3 py-2 text-left text-sm font-medium sticky left-0 bg-slate-100 z-10">
-                            Peneira
-                          </th>
-                          {peneirasDisponiveis.map(peneira => (
-                            <th key={peneira.key} className="border border-slate-300 px-3 py-2 text-center text-sm font-medium min-w-[100px]">
-                              <div className="font-bold">{peneira.astm}</div>
-                              <div className="text-xs text-gray-600">{peneira.nome}</div>
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td className="border border-slate-300 px-3 py-2 font-medium bg-slate-50 sticky left-0 z-10">
-                            Mínimo (%)
-                          </td>
-                          {peneirasDisponiveis.map(peneira => (
-                            <td key={peneira.key} className="border border-slate-300 px-2 py-1">
-                              <Input
-                                type="number"
-                                step="0.1"
-                                value={formData.faixa_trabalho_min[peneira.key] ?? ""}
-                                onChange={(e) => {
-                                  const value = e.target.value === '' ? '' : parseFloat(e.target.value);
-                                  setFormData(prev => ({
-                                    ...prev,
-                                    faixa_trabalho_min: {
-                                      ...prev.faixa_trabalho_min,
-                                      [peneira.key]: value
-                                    }
-                                  }));
-                                }}
-                                placeholder="Min"
-                                className="text-sm text-center"
-                              />
-                            </td>
-                          ))}
-                        </tr>
 
-                        <tr className="bg-green-50">
-                          <td className="border border-slate-300 px-3 py-2 font-medium bg-green-100 sticky left-0 z-10">
-                            Ótimo/Projeto (%)
-                          </td>
-                          {peneirasDisponiveis.map(peneira => (
-                            <td key={peneira.key} className="border border-slate-300 px-2 py-1 bg-green-50">
-                              <Input
-                                type="number"
-                                step="0.1"
-                                value={formData.faixa_trabalho[peneira.key] ?? ""}
-                                onChange={(e) => {
-                                  const value = e.target.value === '' ? '' : parseFloat(e.target.value);
-                                  setFormData(prev => ({
-                                    ...prev,
-                                    faixa_trabalho: {
-                                      ...prev.faixa_trabalho,
-                                      [peneira.key]: value
-                                    }
-                                  }));
-                                }}
-                                placeholder="Ótimo"
-                                className="text-sm text-center font-semibold"
-                              />
-                            </td>
-                          ))}
-                        </tr>
-
-                        <tr>
-                          <td className="border border-slate-300 px-3 py-2 font-medium bg-slate-50 sticky left-0 z-10">
-                            Máximo (%)
-                          </td>
-                          {peneirasDisponiveis.map(peneira => (
-                            <td key={peneira.key} className="border border-slate-300 px-2 py-1">
-                              <Input
-                                type="number"
-                                step="0.1"
-                                value={formData.faixa_trabalho_max[peneira.key] ?? ""}
-                                onChange={(e) => {
-                                  const value = e.target.value === '' ? '' : parseFloat(e.target.value);
-                                  setFormData(prev => ({
-                                    ...prev,
-                                    faixa_trabalho_max: {
-                                      ...prev.faixa_trabalho_max,
-                                      [peneira.key]: value
-                                    }
-                                  }));
-                                }}
-                                placeholder="Max"
-                                className="text-sm text-center"
-                              />
-                            </td>
-                          ))}
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Parâmetros MRAF */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Parâmetros de Dosagem MRAF</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="p-4 border rounded-lg">
-                    <Label className="font-semibold">Emulsão Utilizada</Label>
-                    <Input
-                      type="text"
-                      placeholder="Ex: RL-1C"
-                      className="mt-2"
-                      value={formData.emulsao_utilizada}
-                      onChange={(e) => handleInputChange('emulsao_utilizada', e.target.value)}
-                    />
-                    <p className="text-xs text-slate-500 mt-1">
-                      Tipo de emulsão asfáltica utilizada no MRAF
-                    </p>
-                  </div>
-
-                  <div className="p-4 border rounded-lg">
-                    <Label className="font-semibold">Teor de Ligante Residual (%)</Label>
-                    <div className="grid grid-cols-3 gap-4 mt-2">
-                      <div>
-                        <Label className="text-xs">Mínimo</Label>
-                        <Input 
-                          type="number" 
-                          step="0.1" 
-                          placeholder="Mínimo" 
-                          value={formData.teor_ligante_residual.min}
-                          onChange={(e) => handleNestedInputChange('teor_ligante_residual', 'min', e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Máximo</Label>
-                        <Input 
-                          type="number" 
-                          step="0.1" 
-                          placeholder="Máximo" 
-                          value={formData.teor_ligante_residual.max}
-                          onChange={(e) => handleNestedInputChange('teor_ligante_residual', 'max', e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Ótimo (Projeto)</Label>
-                        <Input 
-                          type="number" 
-                          step="0.1" 
-                          placeholder="Ótimo" 
-                          value={formData.teor_ligante_residual.otimo}
-                          onChange={(e) => handleNestedInputChange('teor_ligante_residual', 'otimo', e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 border rounded-lg">
-                    <Label className="font-semibold">Percentual de Emulsão na Mistura (%)</Label>
-                    <Input
-                      type="number"
-                      step="0.1"
-                      placeholder="Ex: 12.5"
-                      className="mt-2"
-                      value={formData.percentual_emulsao}
-                      onChange={(e) => handleInputChange('percentual_emulsao', e.target.value)}
-                    />
-                    <p className="text-xs text-slate-500 mt-1">
-                      Percentual de emulsão asfáltica presente na mistura do MRAF
-                    </p>
-                  </div>
-
-                  <div className="p-4 border rounded-lg">
-                    <Label className="font-semibold">Taxa de Aplicação MRAF (kg/m²)</Label>
-                    <div className="grid grid-cols-3 gap-4 mt-2">
-                      <div>
-                        <Label className="text-xs">Mínimo</Label>
-                        <Input 
-                          type="number" 
-                          step="0.1" 
-                          placeholder="Mínimo" 
-                          value={formData.taxa_aplicacao_mraf.min} 
-                          onChange={(e) => handleNestedInputChange('taxa_aplicacao_mraf', 'min', e.target.value)} 
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Máximo</Label>
-                        <Input 
-                          type="number" 
-                          step="0.1" 
-                          placeholder="Máximo" 
-                          value={formData.taxa_aplicacao_mraf.max} 
-                          onChange={(e) => handleNestedInputChange('taxa_aplicacao_mraf', 'max', e.target.value)} 
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Ótimo (Projeto)</Label>
-                        <Input 
-                          type="number" 
-                          step="0.1" 
-                          placeholder="Ótimo" 
-                          value={formData.taxa_aplicacao_mraf.otimo} 
-                          onChange={(e) => handleNestedInputChange('taxa_aplicacao_mraf', 'otimo', e.target.value)} 
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 border rounded-lg">
-                    <Label className="font-semibold">Densidade da Mistura (g/cm³)</Label>
-                    <Input
-                      type="number"
-                      step="0.001"
-                      placeholder="Ex: 2.100"
-                      className="mt-2"
-                      value={formData.densidade_mistura_mraf}
-                      onChange={(e) => handleInputChange('densidade_mistura_mraf', e.target.value)}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Agregados para MRAF */}
-              {peneirasCarregadas ? (
-                <AgregadosForm
-                  agregados={formData.agregados}
-                  peneirasDisponiveis={peneirasDisponiveis}
-                  onAdd={adicionarAgregado}
-                  onRemove={removerAgregado}
-                  onChange={handleAgregadoChange}
-                  onGranChange={handleAgregadoGranChange}
-                />
-              ) : (
-                <Card className="bg-amber-50 border-amber-200">
-                  <CardContent className="p-6 text-center">
-                    <p className="text-amber-800">
-                      ⚠️ Selecione uma faixa granulométrica primeiro para cadastrar os agregados.
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-            </>
-          )}
-
-          {isBgs && peneirasCarregadas && (
-            <Card className="bg-slate-50">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5 text-blue-500" />
-                  <CardTitle className="text-lg">
-                    Projeto {formData.tipo_projeto} - Configuração Simplificada
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-slate-600 mb-4">
-                  Para projetos do tipo <strong>{formData.tipo_projeto}</strong>, os parâmetros técnicos específicos podem ser configurados conforme necessário. 
-                  O sistema já está preparado com a especificação granulométrica e o limite de equivalente de areia.
-                </p>
-                
-                <Card className="bg-white">
-                  <CardHeader>
-                    <CardTitle className="text-base">Agregados (Opcional)</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex justify-between items-center mb-4">
-                      <p className="text-sm text-slate-600">
-                        Adicione agregados se necessário para este projeto.
-                      </p>
-                      <Button type="button" onClick={adicionarAgregado} size="sm" className="bg-green-600 hover:bg-green-700">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Adicionar Agregado
-                      </Button>
-                    </div>
-
-                    {formData.agregados.length > 0 ? (
-                      <div className="space-y-4">
-                        {formData.agregados.map((agregado, index) => (
-                          <div key={index} className="p-4 border rounded-lg bg-slate-50">
-                            <div className="flex justify-between items-center mb-3">
-                              <h5 className="font-semibold text-sm">Agregado {index + 1}</h5>
-                              <Button
-                                type="button"
-                                onClick={() => removerAgregado(index)}
-                                size="sm"
-                                variant="ghost"
-                                className="text-red-500"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              <div>
-                                <Label className="text-xs">Nome/Tipo</Label>
-                                <Input
-                                  value={agregado.nome}
-                                  onChange={(e) => handleAgregadoChange(index, 'nome', e.target.value)}
-                                  placeholder="Ex: Areia natural"
-                                  className="text-sm"
-                                />
-                              </div>
-                              <div>
-                                <Label className="text-xs">Pedreira</Label>
-                                <Input
-                                  value={agregado.pedreira}
-                                  onChange={(e) => handleAgregadoChange(index, 'pedreira', e.target.value)}
-                                  placeholder="Ex: Pedreira Central"
-                                  className="text-sm"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-center text-slate-400 py-8 italic text-sm">
-                        Nenhum agregado adicionado ainda.
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-              </CardContent>
-            </Card>
-          )}
-
-          {isCamadasGranulares && (
-            <>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Especificação Granulométrica</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="faixa_granulometrica_id">Faixa de Referência (Especificação) *</Label>
-                    <Select 
-                      value={formData.faixa_granulometrica_id} 
-                      onValueChange={(value) => handleInputChange('faixa_granulometrica_id', value)} 
-                      required
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione a faixa granulométrica" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {faixasFiltradas?.map(faixa => (
-                          <SelectItem key={faixa.id} value={faixa.id}>
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-amber-500">
-                                {faixa.tipo}
-                              </Badge>
-                              <span>{faixa.nome} ({faixa.orgao} - {faixa.especificacao})</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {faixasFiltradas.length === 0 && (
-                      <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                        <p className="text-xs text-amber-800 font-medium">
-                          ⚠️ Nenhuma faixa granulométrica do tipo <Badge className="bg-amber-500 text-white">CAMADAS_GRANULARES</Badge> encontrada.
+                  <Card className="bg-white">
+                    <CardHeader>
+                      <CardTitle className="text-base">Agregados (Opcional)</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex justify-between items-center mb-4">
+                        <p className="text-sm text-slate-600">
+                          Adicione agregados se necessário para este projeto.
                         </p>
-                        <p className="text-xs text-amber-700 mt-1">
-                          Crie uma faixa compatível na página de Faixas Granulométricas antes de continuar.
-                        </p>
+                        <Button type="button" onClick={adicionarAgregado} size="sm" className="bg-green-600 hover:bg-green-700">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Adicionar Agregado
+                        </Button>
                       </div>
-                    )}
-                  </div>
 
-                  {faixaSelecionada && peneirasCarregadas && (
-                    <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                      <p className="text-sm font-semibold text-amber-900 mb-2">Limites de Especificação ({peneirasDisponiveis.length} peneiras):</p>
-                      <div className="overflow-x-auto">
-                        <table className="min-w-full text-xs">
-                          <thead className="bg-amber-100">
-                            <tr>
-                              <th className="px-2 py-1 text-left">ASTM</th>
-                              <th className="px-2 py-1 text-left">Abertura</th>
-                              <th className="px-2 py-1 text-center">Mín (%)</th>
-                              <th className="px-2 py-1 text-center">Máx (%)</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {peneirasDisponiveis.map((peneira, idx) => (
-                              <tr key={idx} className="border-t border-amber-200">
-                                <td className="px-2 py-1 font-semibold">{peneira.astm}</td>
-                                <td className="px-2 py-1">{peneira.nome}</td>
-                                <td className="px-2 py-1 text-center">{peneira.especificacao_min}</td>
-                                <td className="px-2 py-1 text-center">{peneira.especificacao_max}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  )}
+                      {formData.agregados.length > 0 ? (
+                        <div className="space-y-4">
+                          {formData.agregados.map((agregado, index) => (
+                            <div key={index} className="p-4 border rounded-lg bg-slate-50">
+                              <div className="flex justify-between items-center mb-3">
+                                <h5 className="font-semibold text-sm">Agregado {index + 1}</h5>
+                                <Button
+                                  type="button"
+                                  onClick={() => removerAgregado(index)}
+                                  size="sm"
+                                  variant="ghost"
+                                  className="text-red-500"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div>
+                                  <Label className="text-xs">Nome/Tipo</Label>
+                                  <Input
+                                    value={agregado.nome}
+                                    onChange={(e) => handleAgregadoChange(index, 'nome', e.target.value)}
+                                    placeholder="Ex: Areia natural"
+                                    className="text-sm"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs">Pedreira</Label>
+                                  <Input
+                                    value={agregado.pedreira}
+                                    onChange={(e) => handleAgregadoChange(index, 'pedreira', e.target.value)}
+                                    placeholder="Ex: Pedreira Central"
+                                    className="text-sm"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-center text-slate-400 py-8 italic text-sm">
+                          Nenhum agregado adicionado ainda.
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
                 </CardContent>
               </Card>
-
-              {peneirasCarregadas && (
-                <Card>
-                  <CardHeader>
-                    <div className="flex justify-between items-center">
-                      <CardTitle>Agregados Utilizados</CardTitle>
-                      <Button type="button" onClick={adicionarAgregado} size="sm" className="bg-green-600 hover:bg-green-700">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Adicionar Agregado
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {formData.agregados.map((agregado, index) => (
-                      <div key={index} className="p-4 border rounded-lg bg-slate-50 space-y-4">
-                        <div className="flex justify-between items-center">
-                          <h4 className="font-semibold">Agregado {index + 1}</h4>
-                          <Button
-                            type="button"
-                            onClick={() => removerAgregado(index)}
-                            size="sm"
-                            variant="ghost"
-                            className="text-red-500"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div>
-                            <Label>Nome/Tipo</Label>
-                            <Input
-                              value={agregado.nome}
-                              onChange={(e) => handleAgregadoChange(index, 'nome', e.target.value)}
-                              placeholder="Ex: Brita 1"
-                            />
-                          </div>
-                          <div>
-                            <Label>Pedreira</Label>
-                            <Input
-                              value={agregado.pedreira}
-                              onChange={(e) => handleAgregadoChange(index, 'pedreira', e.target.value)}
-                              placeholder="Ex: Pedreira São José"
-                            />
-                          </div>
-                          <div>
-                            <Label>% na Mistura</Label>
-                            <Input
-                              type="number"
-                              step="0.1"
-                              value={agregado.percentual_mistura}
-                              onChange={(e) => handleAgregadoChange(index, 'percentual_mistura', e.target.value)}
-                              placeholder="Ex: 30"
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <Label className="font-semibold mb-2 block">Granulometria Individual (% Passante)</Label>
-                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                            {peneirasDisponiveis.map(peneira => (
-                              <div key={peneira.key}>
-                                <Label className="text-xs font-semibold">{peneira.astm}</Label>
-                                <Label className="text-xs text-gray-500 block">{peneira.nome}</Label>
-                                <Input
-                                  type="number"
-                                  step="0.1"
-                                  value={agregado.granulometria?.[peneira.key] ?? ""}
-                                  onChange={(e) => handleAgregadoGranChange(index, peneira.key, e.target.value)}
-                                  placeholder="0-100"
-                                  className="text-sm"
-                                />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
-                    {formData.agregados.length === 0 && (
-                      <p className="text-center text-slate-500 py-4">
-                        Nenhum agregado adicionado.
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
               )}
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Parâmetros Técnicos</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="melhorador_utilizado">Melhorador Utilizado *</Label>
-                    <Input
-                      id="melhorador_utilizado"
-                      value={formData.camadas_granulares.melhorador_utilizado}
-                      onChange={(e) => handleCamadasGranularesChange('melhorador_utilizado', e.target.value)}
-                      placeholder="Ex: Cimento Portland, Cal Hidratada"
-                      required
-                    />
-                  </div>
+              {!isCartaTraco && isCamadasGranulares && (
+              <ProjectFormGranular
+                formData={formData}
+                peneirasCarregadas={peneirasCarregadas}
+                peneirasDisponiveis={peneirasDisponiveis}
+                faixasFiltradas={faixasFiltradas}
+                faixaSelecionada={faixaSelecionada}
+                agregados={formData.agregados}
+                onFaixaChange={(value) => handleInputChange('faixa_granulometrica_id', value)}
+                onAgregadoAdd={adicionarAgregado}
+                onAgregadoRemove={removerAgregado}
+                onAgregadoChange={handleAgregadoChange}
+                onAgregadoGranChange={handleAgregadoGranChange}
+                onInputChange={handleInputChange}
+                onCamadasGranularesChange={handleCamadasGranularesChange}
+              />
+              )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="umidade_otima">Umidade Ótima (%) *</Label>
-                      <Input
-                        id="umidade_otima"
-                        type="number"
-                        step="0.1"
-                        value={formData.camadas_granulares.umidade_otima}
-                        onChange={(e) => handleCamadasGranularesChange('umidade_otima', e.target.value)}
-                        placeholder="Ex: 5.5"
-                        required
-                      />
-                    </div>
 
-                    <div>
-                      <Label htmlFor="densidade_otima">Densidade Ótima (g/cm³) *</Label>
-                      <Input
-                        id="densidade_otima"
-                        type="number"
-                        step="0.001"
-                        value={formData.camadas_granulares.densidade_otima}
-                        onChange={(e) => handleCamadasGranularesChange('densidade_otima', e.target.value)}
-                        placeholder="Ex: 2.150"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="resistencia_mpa">Resistência (MPa) - Opcional</Label>
-                    <Input
-                      id="resistencia_mpa"
-                      type="number"
-                      step="0.01"
-                      value={formData.camadas_granulares.resistencia_mpa}
-                      onChange={(e) => handleCamadasGranularesChange('resistencia_mpa', e.target.value)}
-                      placeholder="Ex: 2.5"
-                    />
-                    <p className="text-xs text-slate-500 mt-1">
-                      Resistência à compressão ou tração (quando aplicável)
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </>
-          )}
         </>
       )}
 
