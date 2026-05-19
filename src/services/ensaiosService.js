@@ -92,6 +92,60 @@ export async function assinarEnsaio(ensaio, user) {
   return base44.entities[entityName].update(ensaio.id, signatureData);
 }
 
+export async function aprovarEnsaio(ensaio, user, obras) {
+  if (!ensaio?.id) {
+    throw new Error('Ensaio inválido');
+  }
+
+  const entityName = detectEntityName(ensaio);
+  const obra = obras?.find(o => o.id === ensaio.obra_id);
+
+  const approvalData = {
+    approved: true,
+    approved_by: user.email,
+    approved_date: new Date().toISOString(),
+    approver_details: {
+      name: user.full_name || user.laboratorista_name,
+      position: user.access_level || user.role,
+      crea_number: user.crea_number || ''
+    }
+  };
+
+  return base44.entities[entityName].update(ensaio.id, approvalData);
+}
+
+export async function reprovarEnsaio(ensaio, user, rejectionReason) {
+  if (!ensaio?.id) {
+    throw new Error('Ensaio inválido');
+  }
+
+  const entityName = detectEntityName(ensaio);
+
+  const rejectionData = {
+    approved: false,
+    approved_by: user.email,
+    approved_date: new Date().toISOString(),
+    rejection_reason: rejectionReason,
+    was_rejected: true,
+    approver_details: {
+      name: user.full_name || user.laboratorista_name,
+      position: user.access_level || user.role,
+      crea_number: user.crea_number || ''
+    }
+  };
+
+  return base44.entities[entityName].update(ensaio.id, rejectionData);
+}
+
+export async function excluirEnsaio(ensaio) {
+  if (!ensaio?.id) {
+    throw new Error('Ensaio inválido');
+  }
+
+  const entityName = detectEntityName(ensaio);
+  return base44.entities[entityName].delete(ensaio.id);
+}
+
 function detectEntityName(ensaio) {
   // Detectar tipo de entidade baseado nas propriedades presentes
   if (ensaio.faixa_trabalho) return 'EnsaioCAUQ';
