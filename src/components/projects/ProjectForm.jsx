@@ -16,6 +16,8 @@ import ProjectFormMRAF from "@/components/projects/ProjectFormMRAF";
 import ProjectFormConcrete from "@/components/projects/ProjectFormConcrete";
 import ProjectFormGranular from "@/components/projects/ProjectFormGranular";
 import ProjectFormUpload from "@/components/projects/ProjectFormUpload";
+import { sanitizeProjectData } from "@/utils/dataSanitization";
+import { filterRegionaisByAccessLevel } from "@/utils/regionalFilter";
 
 // ========================================
 // MAPEAMENTO FIXO E FINAL DE PENEIRAS DNIT/ASTM
@@ -152,33 +154,7 @@ export default function ProjectForm({ project, faixas, regionais, user, onSave, 
 
   // Filtrar regionais baseado no nível de acesso do usuário
   const regionaisFiltradas = React.useMemo(() => {
-    if (!regionais || !user) return [];
-    
-    const userAccessLevel = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
-    
-    if (userAccessLevel === 'admin') {
-      return regionais.filter(r => r.status === 'ativa');
-    }
-    
-    if (userAccessLevel === 'gestor_contrato') {
-      const emailUsuario = user.email.toLowerCase();
-      return regionais.filter(r => {
-        if (r.status !== 'ativa') return false;
-        const gestores = r.gestores_contrato_responsaveis || [];
-        return r.gestor_contrato_responsavel?.toLowerCase() === emailUsuario ||
-               gestores.some(email => email.toLowerCase() === emailUsuario);
-      });
-    }
-    
-    if (userAccessLevel === 'sala_tecnica_afirmaevias') {
-      return regionais.filter(r => {
-        if (r.status !== 'ativa') return false;
-        const salas = r.salas_tecnicas_responsaveis || [];
-        return salas.some(email => email.toLowerCase() === user.email.toLowerCase());
-      });
-    }
-    
-    return [];
+    return filterRegionaisByAccessLevel(regionais, user);
   }, [regionais, user]);
 
   useEffect(() => {
@@ -418,124 +394,9 @@ export default function ProjectForm({ project, faixas, regionais, user, onSave, 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    const sanitizeNumber = (value) => {
-      if (value === '' || value === null || value === undefined) return null;
-      const num = parseFloat(value);
-      return isNaN(num) ? null : num;
-    };
-    
-    const sanitizeNestedNumbers = (obj) => {
-      if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return obj;
-      const result = {};
-      for (const [key, value] of Object.entries(obj)) {
-        if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-          result[key] = sanitizeNestedNumbers(value);
-        } else {
-          result[key] = sanitizeNumber(value);
-        }
-      }
-      return result;
-    };
-
-    const isCartaTraco = formData.tipo_projeto === 'CARTA_TRACO_CONCRETO';
-    const isCamadasGranularesSubmit = formData.tipo_projeto === 'CAMADAS_GRANULARES';
-    
-    if (isCartaTraco) {
-      const dataToSave = {
-        tipo_projeto: 'CARTA_TRACO_CONCRETO',
-        regional_id: formData.regional_id || null,
-        name: formData.name,
-        client: formData.client,
-        location: formData.location || null,
-        description: formData.description || null,
-        status: formData.status,
-        fck: sanitizeNumber(formData.carta_traco_concreto.fck),
-        slump_projeto: sanitizeNumber(formData.carta_traco_concreto.slump_projeto),
-        slump_minimo: sanitizeNumber(formData.carta_traco_concreto.slump_minimo),
-        slump_maximo: sanitizeNumber(formData.carta_traco_concreto.slump_maximo),
-        consumo_agua: sanitizeNumber(formData.carta_traco_concreto.consumo_agua),
-        tipo_aditivo: formData.carta_traco_concreto.tipo_aditivo || null,
-        tipo_cimento: formData.carta_traco_concreto.tipo_cimento || null,
-        concreteira: formData.carta_traco_concreto.concreteira || null
-      };
-      
-      console.log('📤 Salvando Carta Traço:', dataToSave);
-      onSave(dataToSave);
-    } else if (isCamadasGranularesSubmit) {
-      const sanitizedAgregados = formData.agregados.map(agregado => ({
-        ...agregado,
-        percentual_mistura: sanitizeNumber(agregado.percentual_mistura),
-        granulometria: sanitizeNestedNumbers(agregado.granulometria)
-      }));
-
-      const dataToSave = {
-        tipo_projeto: 'CAMADAS_GRANULARES',
-        regional_id: formData.regional_id || null,
-        name: formData.name,
-        client: formData.client,
-        location: formData.location || null,
-        description: formData.description || null,
-        status: formData.status,
-        faixa_granulometrica_id: formData.faixa_granulometrica_id || null,
-        agregados: sanitizedAgregados,
-        melhorador_utilizado: formData.camadas_granulares.melhorador_utilizado || null,
-        umidade_otima: sanitizeNumber(formData.camadas_granulares.umidade_otima),
-        densidade_otima: sanitizeNumber(formData.camadas_granulares.densidade_otima),
-        resistencia_mpa: sanitizeNumber(formData.camadas_granulares.resistencia_mpa)
-      };
-
-      console.log('📤 Salvando Camadas Granulares:', dataToSave);
-      onSave(dataToSave);
-    } else {
-      // Para CAUQ/MRAF/BGS, salvar na estrutura original
-      const sanitizedAgregados = formData.agregados.map(agregado => ({
-        ...agregado,
-        percentual_mistura: sanitizeNumber(agregado.percentual_mistura),
-        granulometria: sanitizeNestedNumbers(agregado.granulometria)
-      }));
-      
-      const sanitizedLigante = {
-        tipo: formData.ligante.tipo || null,
-        fornecedor: formData.ligante.fornecedor || null,
-        densidade: sanitizeNumber(formData.ligante.densidade)
-      };
-      
-      const dataToSave = {
-        tipo_projeto: formData.tipo_projeto,
-        regional_id: formData.regional_id || null,
-        name: formData.name,
-        client: formData.client,
-        location: formData.location || null,
-        description: formData.description || null,
-        status: formData.status,
-        faixa_granulometrica_id: formData.faixa_granulometrica_id || null,
-        equivalente_areia_minimo: sanitizeNumber(formData.equivalente_areia_minimo),
-        agregados: sanitizedAgregados,
-        ligante: sanitizedLigante,
-        emulsao_utilizada: formData.emulsao_utilizada || null,
-        temperaturas: sanitizeNestedNumbers(formData.temperaturas),
-        faixa_trabalho: sanitizeNestedNumbers(formData.faixa_trabalho),
-        faixa_trabalho_min: sanitizeNestedNumbers(formData.faixa_trabalho_min),
-        faixa_trabalho_max: sanitizeNestedNumbers(formData.faixa_trabalho_max),
-        teor_ligante: sanitizeNestedNumbers(formData.teor_ligante),
-        teor_ligante_residual: sanitizeNestedNumbers(formData.teor_ligante_residual),
-        percentual_emulsao: sanitizeNumber(formData.percentual_emulsao),
-        taxa_aplicacao_mraf: sanitizeNestedNumbers(formData.taxa_aplicacao_mraf),
-        densidade_mistura_mraf: sanitizeNumber(formData.densidade_mistura_mraf),
-        massa_especifica_aparente: sanitizeNumber(formData.massa_especifica_aparente),
-        densidade_maxima_medida: sanitizeNumber(formData.densidade_maxima_medida),
-        volume_vazios: sanitizeNestedNumbers(formData.volume_vazios),
-        rtcd: sanitizeNestedNumbers(formData.rtcd),
-        estabilidade: sanitizeNestedNumbers(formData.estabilidade),
-        fluencia: sanitizeNestedNumbers(formData.fluencia),
-        vam: sanitizeNestedNumbers(formData.vam),
-        rbv: sanitizeNestedNumbers(formData.rbv)
-      };
-      
-      console.log('📤 Salvando projeto:', dataToSave);
-      onSave(dataToSave);
-    }
+    const dataToSave = sanitizeProjectData(formData, formData.tipo_projeto);
+    console.log('📤 Salvando projeto:', dataToSave);
+    onSave(dataToSave);
   };
 
   const peneirasCarregadas = peneirasDisponiveis.length > 0;
