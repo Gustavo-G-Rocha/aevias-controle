@@ -1,6 +1,6 @@
 # Roadmap de Refatoração - Projeto Afirmaevias
 
-## 📊 Status: 100% Completo (Sprint 1 + 2 + 3)
+## 📊 Status: 100% Completo (Sprint 1 + 2 + 3 + 4)
 
 ### ✅ Prioridade 1: MeusEnsaios (CONCLUÍDO)
 - [x] Hook `useEnsaiosActions` - Centraliza aprovação, rejeição, exclusão
@@ -48,15 +48,20 @@
 
 ---
 
-### 🔲 Prioridade 4: Páginas de Ensaios Individuais (Próxima Sprint)
+### ✅ Prioridade 4: Páginas de Ensaios Individuais (CONCLUÍDO — Sprint 4)
 
+#### 4.1 - Infraestrutura Criada
+- [x] Hook `useEnsaioForm` — carregamento, estado e persistência centralizada para ensaios
+- [x] `constants/sieves.js` — `PENEIRAS_CONFIG`, `PENEIRAS_MAP` e `filtrarPeneirasPorFaixa` centralizados
+
+#### 4.2 - Páginas Refatoradas
 | Tarefa | Esforço | Impacto | Status |
 |--------|---------|---------|--------|
-| `EnsaioCAUQ.jsx` - Refatorar com sub-componentes | 3h | Alto | 📋 Planejado |
-| `EnsaioMRAF.jsx` - Aplicar padrão | 2h | Médio | 📋 Planejado |
-| `EnsaioGranulometriaIndividual.jsx` | 2h | Médio | 📋 Planejado |
-| Hook `useTestForm` - Abstração comum | 2h | Alto | 📋 Planejado |
-| `constants/sieves.js` - Extrair constantes de peneiras | 30m | Baixo | 📋 Planejado |
+| `EnsaioCAUQ.jsx` - Migrado para `useEnsaioForm` + peneiras centralizadas | 3h | Alto | ✅ Concluído |
+| `EnsaioMRAF.jsx` - Migrado para `useEnsaioForm` + peneiras centralizadas | 2h | Médio | ✅ Concluído |
+| `EnsaioGranulometriaIndividual.jsx` - Migrado para `useEnsaioForm` + `filtrarPeneirasPorFaixa` | 2h | Médio | ✅ Concluído |
+| Hook `useEnsaioForm` - Abstração comum para ensaios | 2h | Alto | ✅ Concluído |
+| `constants/sieves.js` - Extrair constantes de peneiras | 30m | Baixo | ✅ Concluído |
 
 ---
 
@@ -82,7 +87,10 @@
 | MeusEnsaios | 90 | 70 | 22% |
 | ChecklistUsina | 1936 | ~950 | 51% |
 | ProjectForm (main) | 1931 | ~610 | 68% |
-| **Total linhas refatoradas** | **~3957** | **~1630** | **~59%** |
+| EnsaioCAUQ | ~600 | ~380 | ~37% |
+| EnsaioMRAF | ~500 | ~320 | ~36% |
+| EnsaioGranulometriaIndividual | ~550 | ~380 | ~31% |
+| **Total linhas refatoradas** | **~5607** | **~2710** | **~52%** |
 
 ---
 
@@ -93,6 +101,22 @@
 const { formData, setFormData, loading, isEditable, isApproved, ... } = useChecklistForm(
   getInitialFormData, 'EntityName', 'storage_key'
 )
+```
+
+### Hook Pattern (Ensaios)
+```javascript
+const { formData, setFormData, loading, isEditable, isApproved, ... } = useEnsaioForm(
+  getInitialFormData, 'EntityName', 'storage_key'
+)
+```
+
+### Peneiras Pattern
+```javascript
+import { PENEIRAS_CONFIG, PENEIRAS_MAP, filtrarPeneirasPorFaixa } from "@/constants/sieves";
+const peneirasVisiveis = useMemo(
+  () => filtrarPeneirasPorFaixa(selectedFaixa, PENEIRAS_CONFIG).map(p => p.key),
+  [selectedFaixa]
+);
 ```
 
 ### Sanitização Pattern
@@ -130,4 +154,5 @@ const regionaisFiltradas = useMemo(() => filterRegionaisByAccessLevel(regionais,
 
 *Atualizado em: 2026-05-20*  
 *Sprint 1 concluída: 2026-05-20*  
-*Próxima Sprint: Sprint 4 - Ensaios Individuais (EnsaioCAUQ, EnsaioMRAF, hook useTestForm)*
+*Sprint 4 concluída: 2026-05-20*  
+*Próxima Sprint: Sprint 5 - Relatórios (consolidação de componentes reutilizáveis e geração de PDF centralizada)*
