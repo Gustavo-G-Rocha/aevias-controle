@@ -1,0 +1,238 @@
+import { useState, useEffect, useCallback } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { DiarioObra as DiarioObraEntity } from "@/entities/DiarioObra";
+import { Obra } from "@/entities/Obra";
+import { Regional } from "@/entities/Regional";
+import { User } from "@/entities/User";
+import { uploadMultipleFiles } from "@/utils/imageUpload";
+import { createPageUrl } from "@/utils";
+
+export const getInitialFormData = () => ({
+  obra_id: "",
+  data: new Date().toISOString().split("T")[0],
+  jornada: { horario_inicio: "", horario_fim: "" },
+  tipo_local: "campo",
+  usina_selecionada: "",
+  rodovia: "",
+  trecho: "",
+  empreiteira: "",
+  condicoes_climaticas: "ensolarado",
+  temperatura: "",
+  atividades_realizadas: "",
+  observacoes: "",
+  acoes_corretivas_realizado: null,
+  acoes_corretivas_descricao: "",
+  nao_conformidades: [],
+  efetivo_obra_ativo: false,
+  efetivo_maquinas: {
+    motoniveladora: 0, pa_carregadeira: 0, retroescavadeira: 0, escavadeira_hidraulica: 0,
+    mini_carregadeira: 0, extrusora: 0, caminhao_prancha: 0, caminhao_munck: 0,
+    caminhao_sinalizacao: 0, caminhao_pipa: 0, caminhao_basculante: 0, caminhao_cimento: 0,
+    caminhao_viga: 0, caminhao_espargidor: 0, recicladora: 0, vibro_acabadora: 0,
+    rolo_carneiro: 0, rolo_liso: 0, rolo_pneu: 0, tanque_combustivel: 0, comboio: 0,
+    onibus: 0, trator_grade: 0, trator_esteira: 0, veiculo_leve: 0, placa_vibratoria: 0,
+  },
+  efetivo_colaboradores: {
+    encarregado: 0, greidista: 0, operadores: 0, motorista: 0, pedreiro: 0,
+    armador: 0, carpinteiro: 0, ajudante: 0, topografo: 0, aux_topografia: 0,
+    laboratorista: 0, aux_laboratorio: 0, spoter: 0, seguranca: 0, apontador: 0,
+    pintor: 0, eletricista: 0,
+  },
+  fotos: [],
+  cliente: "",
+  approved: null,
+  rejection_reason: null,
+  created_by: "",
+  checklist_veiculo_ativo: false,
+  checklist_veiculo: {
+    nome_condutor: "", tipo_veiculo: "passeio", veiculo: "", placa: "", empresa: "", hodometro: "", areas_afetadas: "",
+    condicoes_gerais: { limpeza_externa: "bom", limpeza_interna: "bom", pneus: "bom", estepe: "bom", cacamba: "bom" },
+    luzes_traseiras: {
+      direita: { da_placa: "sim", luz: "sim", luz_re: "sim", luz_freio: "sim", seta: "sim" },
+      esquerda: { luz: "sim", luz_re: "sim", luz_freio: "sim", seta: "sim" },
+    },
+    luzes_dianteiras: {
+      direita: { farol_alto: "sim", farol_baixo: "sim", seta: "sim", neblina: "sim" },
+      esquerda: { farol_alto: "sim", farol_baixo: "sim", seta: "sim", neblina: "sim" },
+    },
+    seguranca: {
+      alarme: "sim", buzina: "sim", chave_roda: "sim", cintos: "sim", documentos: "sim",
+      extintor: "sim", limpadores: "sim", macaco: "sim", painel: "sim",
+      retrovisor_interno: "sim", retrovisor_direito: "sim", retrovisor_esquerdo: "sim",
+      travas: "sim", triangulo: "sim",
+    },
+    motor: {
+      acelerador: "sim", agua_limpador: "sim", agua_radiador: "sim", embreagem: "sim",
+      freio: "sim", freio_mao: "sim", oleo_freio: "sim", oleo_moto: "sim", tanque_partida: "sim",
+    },
+    observacoes: "",
+  },
+});
+
+export function useDiarioObra() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [obras, setObras] = useState([]);
+  const [regionais, setRegionais] = useState([]);
+  const [user, setUser] = useState(null);
+  const [editingDiarioOriginal, setEditingDiarioOriginal] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [formData, setFormData] = useState(getInitialFormData());
+  const [loadingUpload, setLoadingUpload] = useState(false);
+  const [selectedFileNames, setSelectedFileNames] = useState("Nenhum ficheiro selecionado");
+  const [uploadProgress, setUploadProgress] = useState([]);
+
+  const handleChange = useCallback((name, value) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  }, []);
+
+  const handleFileChange = useCallback(async (e) => {
+    const files = Array.from(e.target.files).filter(f => f.type.startsWith("image/"));
+    if (!files.length) { setSelectedFileNames("Nenhum ficheiro selecionado"); return; }
+
+    setLoadingUpload(true);
+    setSelectedFileNames(files.length === 1 ? files[0].name : `${files.length} ficheiros selecionados`);
+    setUploadProgress(files.map((file, i) => ({ id: i, fileName: file.name, status: "pending", error: null })));
+
+    const { urls, errors } = await uploadMultipleFiles(files, (i, status, err) => {
+      setUploadProgress(prev => prev.map(p => p.id === i ? { ...p, status, error: err || null } : p));
+    });
+
+    if (urls.length > 0) setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...urls] }));
+    if (errors.length > 0) alert(`${urls.length} de ${files.length} fotos enviadas.\n\nErros:\n` + errors.map(e => `• ${e.fileName}: ${e.error}`).join("\n"));
+
+    setLoadingUpload(false);
+    setUploadProgress([]);
+    e.target.value = "";
+  }, []);
+
+  const handleRemovePhoto = useCallback((index) => {
+    setFormData(prev => ({ ...prev, fotos: prev.fotos.filter((_, i) => i !== index) }));
+  }, []);
+
+  const handleSubmit = useCallback(async (e, saveStatus = "finalizado") => {
+    e.preventDefault();
+
+    if (!formData.obra_id) { alert("Por favor, selecione uma obra."); return; }
+
+    if (saveStatus === "finalizado") {
+      if (!formData.data || !formData.jornada?.horario_inicio || !formData.jornada?.horario_fim) {
+        alert("Preencha todos os campos de data e horários."); return;
+      }
+      const obraAtual = obras.find(o => o.id === formData.obra_id);
+      if (formData.tipo_local !== "escritorio" && obraAtual?.tipo_obra === "supervisao" && !formData.empreiteira) {
+        alert("Selecione uma empreiteira."); return;
+      }
+      if (formData.tipo_local === "campo" && (!formData.rodovia || !formData.trecho)) {
+        alert("Preencha rodovia e trecho."); return;
+      }
+      if (formData.tipo_local === "usina" && !formData.usina_selecionada) {
+        alert("Selecione uma usina."); return;
+      }
+      if (!formData.atividades_realizadas) { alert("Preencha as atividades realizadas."); return; }
+      if (formData.tipo_local !== "escritorio" && formData.acoes_corretivas_realizado === null) {
+        alert("Indique se foram realizadas ações corretivas."); return;
+      }
+      if (formData.tipo_local !== "escritorio" && formData.acoes_corretivas_realizado === true && !formData.acoes_corretivas_descricao?.trim()) {
+        alert("Descreva as ações corretivas realizadas."); return;
+      }
+    }
+
+    const dataToSave = { ...formData, status: saveStatus, temperatura: formData.temperatura === "" ? null : Number(formData.temperatura) };
+
+    try {
+      if (editingDiarioOriginal?.id) {
+        const updateData = { ...dataToSave };
+        if (editingDiarioOriginal.approved === false && saveStatus === "finalizado") {
+          Object.assign(updateData, { approved: null, rejection_reason: null, approved_by: null, approved_date: null, was_rejected: true });
+        }
+        await DiarioObraEntity.update(editingDiarioOriginal.id, updateData);
+        alert(saveStatus === "rascunho" ? "Progresso salvo!" : "Diário atualizado com sucesso!");
+      } else {
+        await DiarioObraEntity.create({ ...dataToSave, created_by: user.email, laboratorista_name: user.laboratorista_name || user.full_name });
+        alert(saveStatus === "rascunho" ? "Progresso salvo!" : "Diário criado com sucesso!");
+      }
+      navigate(createPageUrl("MeusEnsaios"));
+    } catch (error) {
+      console.error("[DiarioObra] Erro:", error?.message || error);
+      alert("Ocorreu um erro ao salvar o diário.");
+    }
+  }, [formData, editingDiarioOriginal, obras, user, navigate]);
+
+  const handleCancel = useCallback(() => {
+    navigate(createPageUrl("MeusEnsaios"));
+  }, [navigate]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const currentUser = await User.me();
+        setUser(currentUser);
+
+        const [obrasData, regionaisData] = await Promise.all([Obra.list(), Regional.list()]);
+        setRegionais(regionaisData);
+
+        const accessLevel = currentUser.access_level || (currentUser.role === "admin" ? "admin" : "user");
+        let availableObras = obrasData;
+
+        if (accessLevel === "user") {
+          const emailLower = currentUser.email.toLowerCase();
+          const regionaisIds = regionaisData
+            .filter(r => (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower))
+            .map(r => r.id);
+          const regionaisSet = new Set(regionaisIds);
+          availableObras = regionaisIds.length > 0
+            ? obrasData.filter(o => regionaisSet.has(o.regional_id) && o.status === "em_andamento")
+            : [];
+        }
+        setObras(availableObras);
+
+        const params = new URLSearchParams(location.search);
+        const editId = params.get("editId");
+
+        if (editId) {
+          const diarioToEdit = await DiarioObraEntity.get(editId);
+          setEditingDiarioOriginal(diarioToEdit);
+          if (currentUser.role === "admin" || (diarioToEdit.created_by === currentUser.email && diarioToEdit.approved !== true)) {
+            setFormData({
+              ...getInitialFormData(), ...diarioToEdit,
+              data: diarioToEdit.data ? new Date(diarioToEdit.data).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+              fotos: Array.isArray(diarioToEdit.fotos) ? diarioToEdit.fotos : [],
+              temperatura: diarioToEdit.temperatura ?? "",
+            });
+          } else {
+            alert("Você não tem permissão para editar este registro.");
+            navigate(createPageUrl("MeusEnsaios"));
+          }
+        } else {
+          const initial = getInitialFormData();
+          if (availableObras.length > 0) initial.obra_id = availableObras[0].id;
+          setFormData(initial);
+          setEditingDiarioOriginal(null);
+        }
+      } catch (error) {
+        console.error("[DiarioObra] Erro ao carregar:", error?.message || error);
+        alert("Não foi possível carregar os dados.");
+        navigate(createPageUrl("MeusEnsaios"));
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [location.search, navigate]);
+
+  const isApproved = formData.approved === true;
+  const userCanEdit = user?.role === "admin" || (formData.created_by === user?.email && formData.approved !== true);
+  const isEditable = !editingDiarioOriginal?.id || userCanEdit;
+  const isCreatingNew = !editingDiarioOriginal?.id;
+
+  return {
+    loading, user, obras, regionais, editingDiarioOriginal,
+    formData, setFormData, handleChange,
+    loadingUpload, selectedFileNames, uploadProgress,
+    handleFileChange, handleRemovePhoto, handleSubmit, handleCancel,
+    isApproved, isEditable, isCreatingNew,
+  };
+}

@@ -1,185 +1,239 @@
-# Roadmap de Refatoração - Projeto Afirmaevias
+# Roadmap de Refatoração — Segunda Rodada (Projeto Afirmaevias)
 
-## 📊 Status: 100% Completo (Sprint 1 + 2 + 3 + 4)
-
-### ✅ Prioridade 1: MeusEnsaios (CONCLUÍDO)
-- [x] Hook `useEnsaiosActions` - Centraliza aprovação, rejeição, exclusão
-- [x] Redução de 90 → 70 linhas
-- [x] Separação clara: dados → hook, ações → hook, UI → componentes
-
-**Benefício:** Reutilizável em AdminInterface, ClienteInterface, LaboratoristaInterface
+> Documento atualizado em: 2026-05-20
+> Baseado em: `new_refatoring.md`
 
 ---
 
-### ✅ Prioridade 2: Checklists (CONCLUÍDO)
+## 📊 Status Geral
 
-#### 2.1 - Infraestrutura Criada
-- [x] Hook `useChecklistForm` - Carregamento de dados, persistência, edição
-- [x] `validateChecklistForm` + `validateDecimalInput` - Validação pura
-- [x] `ChecklistUsinaHeader` - Formulário de obra/projeto
-- [x] `ChecklistFooter` - Botões de ação
-- [x] `ControleCauqSection` - Tabela de ensaios CAUQ
-
-#### 2.2 - Páginas Refatoradas
-- [x] `ChecklistUsina.jsx` - 1936 → ~950 linhas (51% menor)
-- [x] `ChecklistAplicacao.jsx` - Usa `useChecklistForm` + `ChecklistFooter`
-- [x] `ChecklistMRAF.jsx` - Usa `useChecklistForm` + `ChecklistFooter`
-- [x] `ChecklistTerraplanagem.jsx` - Migrado para `useChecklistForm` + `ChecklistFooter`
-- [x] `ChecklistReciclagem.jsx` - Migrado para `useChecklistForm` + `ChecklistFooter` (Sprint 1 concluída)
-
----
-
-### ✅ Prioridade 3: ProjectForm (CONCLUÍDO)
-
-#### 3.1 - Modularização
-- [x] `ProjectFormBasicInfo.jsx`
-- [x] `ProjectFormSpecification.jsx`
-- [x] `ProjectFormCAUQ.jsx`
-- [x] `ProjectFormMRAF.jsx`
-- [x] `ProjectFormConcrete.jsx`
-- [x] `ProjectFormGranular.jsx`
-- [x] `ProjectFormUpload.jsx`
-- [x] `AgregadosForm.jsx`
-
-#### 3.2 - Utilitários Extraídos (Sprint 2 concluída)
-- [x] `utils/dataSanitization.js` - Sanitização centralizada, eliminou 90 linhas de ProjectForm
-- [x] `utils/regionalFilter.js` - Filtros reutilizáveis por nível de acesso
-- [x] `components/projects/FaixaSelector.jsx` - Componente DRY para seleção de faixas
+| Sprint | Nome | Status |
+|--------|------|--------|
+| Sprint 1 | MeusEnsaios | ✅ Concluído |
+| Sprint 2 | Checklists | ✅ Concluído |
+| Sprint 3 | ProjectForm | ✅ Concluído |
+| Sprint 4 | Ensaios Individuais | ✅ Concluído |
+| Sprint 5 | Relatórios — Infraestrutura | ✅ Concluído |
+| **ETAPA 1** | **Layout.jsx** | ✅ **Concluído** |
+| **ETAPA 2** | **Formulários Gigantes** | 🔄 **Em andamento** |
+| ETAPA 3 | Componentes Reutilizáveis de Formulário | 🔲 Pendente |
+| ETAPA 4 | Performance — Loops e Memoização | 🔲 Pendente |
+| ETAPA 5 | dashboardCalculations.js | 🔲 Pendente |
+| ETAPA 6 | Services — Paginação | 🔲 Pendente |
+| ETAPA 7 | Arquitetura Geral | 🔲 Pendente |
 
 ---
 
-### ✅ Prioridade 4: Páginas de Ensaios Individuais (CONCLUÍDO — Sprint 4)
+## ✅ ETAPA 1 — Refatorar Layout.jsx
 
-#### 4.1 - Infraestrutura Criada
-- [x] Hook `useEnsaioForm` — carregamento, estado e persistência centralizada para ensaios
-- [x] `constants/sieves.js` — `PENEIRAS_CONFIG`, `PENEIRAS_MAP` e `filtrarPeneirasPorFaixa` centralizados
+**Problema:** `layout.jsx` com ~1007 linhas concentrava navegação, permissões, menus, sidebar, header, responsividade, controle de sessão e renderização condicional.
 
-#### 4.2 - Páginas Refatoradas
-| Tarefa | Esforço | Impacto | Status |
-|--------|---------|---------|--------|
-| `EnsaioCAUQ.jsx` - Migrado para `useEnsaioForm` + peneiras centralizadas | 3h | Alto | ✅ Concluído |
-| `EnsaioMRAF.jsx` - Migrado para `useEnsaioForm` + peneiras centralizadas | 2h | Médio | ✅ Concluído |
-| `EnsaioGranulometriaIndividual.jsx` - Migrado para `useEnsaioForm` + `filtrarPeneirasPorFaixa` | 2h | Médio | ✅ Concluído |
-| Hook `useEnsaioForm` - Abstração comum para ensaios | 2h | Alto | ✅ Concluído |
-| `constants/sieves.js` - Extrair constantes de peneiras | 30m | Baixo | ✅ Concluído |
+**Solução:** Decomposição em módulos focados:
 
----
+| Arquivo criado | Responsabilidade |
+|---|---|
+| `components/layout/NavigationConfig.js` | Constantes de rotas e ensaios por tipo de obra |
+| `components/layout/useLayoutData.js` | Hook: carregamento de user, obras, pendingTransfers — usa `Set` para lookups O(1) |
+| `components/layout/AppSidebar.jsx` | Sidebar completa com menus expansíveis |
+| `components/layout/MobileHeader.jsx` | Header mobile isolado |
+| `components/layout/BottomNav.jsx` | Navegação inferior mobile |
+| `components/layout/UserMenu.jsx` | Menu de perfil/logout com dialog de exclusão |
+| `components/layout/CreateEnsaioDialog.jsx` | Dialog de novo registro com sub-componentes focados |
+| `layout.jsx` | Orquestrador — **~80 linhas** (era 1007) |
 
-### ✅ Prioridade 5: Relatórios — Infraestrutura Reutilizável (CONCLUÍDO — Sprint 5)
+**Impacto:** Redução de ~92% no arquivo principal. Cada responsabilidade é isolada, testável e modificável de forma independente.
 
-#### 5.1 - Utilitários Criados
-- [x] `utils/relatorioUtils.js` — `formatDate`, `formatDateBrasilia`, `buildSignatureProps` centralizados
-- [x] `components/relatorios/PrintStyles.jsx` — bloco `@media print` centralizado
-- [x] `components/relatorios/RelatorioHeader.jsx` — cabeçalho reutilizável (logo + título + data)
-
-#### 5.2 - Relatórios Migrados
-- [x] `RelatorioMRAF.jsx` — removido `PENEIRAS_CONFIG` local, `formatDate` duplicado, `<style>` inline; usa `filtrarPeneirasPorFaixa`, `buildSignatureProps`, `PrintStyles`
-- [x] `RelatorioGranulometriaIndividual.jsx` — removido `PENEIRAS_MAP` local, `formatDate` duplicado; usa `PENEIRAS_MAP` central, `buildSignatureProps`, `PrintStyles`
-- [x] `RelatorioGranuMistura.jsx` — usa `buildSignatureProps`, `PrintStyles`
-
-#### 5.3 - Concluído
-- [x] `RelatorioChecklist.jsx` — removido `formatDateBrasilia` local e props manuais de `SignatureFooter`; usa `buildSignatureProps`, `PrintStyles`
-- [x] `RelatorioDiario.jsx` — removido `formatDateBrasilia` e `formatDate` locais; usa `buildSignatureProps`, `PrintStyles`
-- [x] `buildSignatureProps` atualizado para aceitar `creatorUser` ou string como segundo argumento
-
-#### 5.4 - Pendente (Longo Prazo)
-- [ ] PDF generation service centralizado
+**Risco:** Baixo — comportamento e permissões preservados.
 
 ---
 
-### 🔲 Prioridade 6: Testes (Longo Prazo)
-- [ ] Unit tests para hooks (Jest + RTL)
-- [ ] E2E testing com Cypress
-- [ ] Testes de sanitização (`utils/dataSanitization.js`)
-- [ ] Testes de filtros regionais
+## 🔄 ETAPA 2 — Refatorar Formulários Gigantes
+
+**Problema:** Componentes com 1000+ linhas misturando UI, lógica de negócio, validações, chamadas de API e gerenciamento de estado.
+
+**Componentes prioritários do documento:**
+- `ChecklistConcretagem.jsx` (~1444 linhas) ✅ Concluído
+- `DiarioObra.jsx` (~1304 linhas) ✅ Concluído
+- `ChecklistUsina.jsx` (~1483 linhas) → Próximo
+- `EnsaioCAUQ.jsx` (~1417 linhas) → Próximo
+- `ChecklistAplicacao.jsx` (~1409 linhas) → Próximo
+
+### ChecklistConcretagem — Concluído
+
+**Arquivos criados:**
+- `hooks/useChecklistConcretagem.js` — toda a lógica extraída (carregamento, handlers de cargas, CPs, upload, validação, submissão)
+- `pages/ChecklistConcretagem.jsx` — UI pura, ~380 linhas (era ~1444)
+
+**Padrão aplicado:**
+- Lookup de obras via regional com `Set` (eliminou múltiplos `.filter()` em loop)
+- `useCallback` em todos os handlers para evitar re-renders
+- Validação centralizada no hook, com `requiredFields` array iterável
+- Sanitização de dados numéricos centralizada no `handleSubmit`
+
+### DiarioObra — Concluído
+
+**Arquivos criados:**
+- `hooks/useDiarioObra.js` — carregamento, upload, validação e submissão extraídos
+- `pages/DiarioObra.jsx` — UI pura com `DiarioForm` como sub-componente (manteve a estrutura existente de componente controlado)
+
+**Padrão aplicado:**
+- Lookup de regionais com `Set` no carregamento
+- `useCallback` em todos os handlers
+- Validações como lista sequencial no hook
+- Luzes do checklist de veículo agrupadas em array de configuração (eliminou repetição de JSX)
 
 ---
 
-## 📈 Métricas Acumuladas
+## 🔲 ETAPA 3 — Componentes Reutilizáveis de Formulário
 
-| Componente/Módulo | Antes | Depois | Redução |
-|-------------------|-------|--------|---------|
-| MeusEnsaios | 90 | 70 | 22% |
-| ChecklistUsina | 1936 | ~950 | 51% |
-| ProjectForm (main) | 1931 | ~610 | 68% |
-| EnsaioCAUQ | ~600 | ~380 | ~37% |
-| EnsaioMRAF | ~500 | ~320 | ~36% |
-| EnsaioGranulometriaIndividual | ~550 | ~380 | ~31% |
-| **Total linhas refatoradas** | **~5607** | **~2710** | **~52%** |
+**Objetivo:** Criar `components/forms/` com:
 
----
-
-## 💡 Padrões Estabelecidos
-
-### Hook Pattern (Checklists)
-```javascript
-const { formData, setFormData, loading, isEditable, isApproved, ... } = useChecklistForm(
-  getInitialFormData, 'EntityName', 'storage_key'
-)
+```
+components/forms/
+  FormSection.jsx       — Card com título e conteúdo
+  FormActions.jsx       — Botões Cancelar / Salvar / Finalizar
+  UploadGallery.jsx     — Upload + preview de fotos (reutilizado em 10+ formulários)
+  ObservacaoField.jsx   — Textarea com contador de caracteres
+  StatusDraftBanner.jsx — Banner "Em Rascunho" padronizado
 ```
 
-### Hook Pattern (Ensaios)
-```javascript
-const { formData, setFormData, loading, isEditable, isApproved, ... } = useEnsaioForm(
-  getInitialFormData, 'EntityName', 'storage_key'
-)
+**Impacto esperado:** Eliminar ~200 linhas duplicadas entre todos os formulários de checklist.
+
+---
+
+## 🔲 ETAPA 4 — Performance — Loops e Memoização
+
+**Problema identificado:**
+
+```js
+// Evitar — múltiplos .filter() sobre o mesmo array
+ensaios.filter(e => e.status === 'finalizado')
+ensaios.filter(e => e.status === 'rascunho')
+ensaios.filter(e => e.approved === true)
+
+// Preferir — uma passagem única
+const counts = { finalizado: 0, rascunho: 0, aprovado: 0 };
+for (const e of ensaios) {
+  if (e.status === 'finalizado') counts.finalizado++;
+  if (e.status === 'rascunho') counts.rascunho++;
+  if (e.approved === true) counts.aprovado++;
+}
 ```
 
-### Peneiras Pattern
-```javascript
-import { PENEIRAS_CONFIG, PENEIRAS_MAP, filtrarPeneirasPorFaixa } from "@/constants/sieves";
-const peneirasVisiveis = useMemo(
-  () => filtrarPeneirasPorFaixa(selectedFaixa, PENEIRAS_CONFIG).map(p => p.key),
-  [selectedFaixa]
-);
-```
+**Prioridade:** `dashboardCalculations.js`, `services/dashboardService.js`, `components/ensaios/utils.js`
 
-### Sanitização Pattern
-```javascript
-import { sanitizeProjectData } from "@/utils/dataSanitization";
-const dataToSave = sanitizeProjectData(formData, tipoProjet);
-```
+---
 
-### Filtro Regional Pattern
-```javascript
-import { filterRegionaisByAccessLevel } from "@/utils/regionalFilter";
-const regionaisFiltradas = useMemo(() => filterRegionaisByAccessLevel(regionais, user), [regionais, user]);
-```
+## 🔲 ETAPA 5 — Melhorar dashboardCalculations.js
 
-### Relatório Pattern
-```javascript
-import { formatDate, buildSignatureProps } from "@/utils/relatorioUtils";
-import PrintStyles from "@/components/relatorios/PrintStyles";
-import SignatureFooter from "@/components/relatorios/SignatureFooter";
+**Problema:** Múltiplos `.filter()` independentes sobre o mesmo array de ensaios.
 
-// No JSX:
-<SignatureFooter {...buildSignatureProps(ensaio)} />
-<PrintStyles />
-```
+**Objetivo:** Transformar em single-pass processing:
 
-### Componente Pattern
-```javascript
-// Pequenos, focados, sem lógica complexa
-<ChecklistUsinaHeader {...props} />
-<ChecklistFooter {...props} />
-<FaixaSelector faixasFiltradas={...} selectedId={...} onChange={...} />
+```js
+// Evitar
+const finalizados = ensaios.filter(...)
+const aprovados = ensaios.filter(...)
+const rascunhos = ensaios.filter(...)
+
+// Preferir
+const stats = ensaios.reduce((acc, e) => {
+  if (e.status === 'finalizado') acc.finalizados++;
+  // ...
+  return acc;
+}, { finalizados: 0, aprovados: 0, rascunhos: 0 });
 ```
 
 ---
 
-## 🚀 Benefícios Realizados
+## 🔲 ETAPA 6 — Melhorar Services (Paginação)
 
-✅ **Redução de Complexidade**: ~59% menos linhas nos principais módulos  
-✅ **Reutilização**: `useChecklistForm` usado em 4 páginas, `dataSanitization` em formulários  
-✅ **Consistência**: Padrões claros para hooks, sanitização e filtros  
-✅ **Testabilidade**: Lógica separada em funções puras, fácil de testar  
-✅ **Manutenibilidade**: Componentes pequenos e focados  
-✅ **Performance**: Memoização aplicada em todos os cálculos recorrentes  
+**Problema:** `dashboardService.js` busca até 5000 registros por entidade, causando lentidão e gargalos de rede.
+
+**Objetivo:** Implementar:
+- Paginação progressiva (buscar por chunks)
+- Limite inteligente baseado em filtro de data
+- Cache via `@tanstack/react-query` (já instalado)
+- Carregamento incremental com `useInfiniteQuery`
 
 ---
 
-*Atualizado em: 2026-05-20*  
-*Sprint 1 concluída: 2026-05-20*  
-*Sprint 4 concluída: 2026-05-20*  
-*Sprint 5 concluída: 2026-05-20*  
-*Próxima Sprint: Sprint 6 - Testes (unit tests para hooks e utilitários)*
+## 🔲 ETAPA 7 — Arquitetura Geral
+
+**Objetivo:** Garantir separação clara em todos os módulos:
+
+| Camada | Responsabilidade | Localização |
+|--------|-----------------|-------------|
+| UI | Somente renderização | `pages/`, `components/` |
+| Hooks | Estado e ciclo de vida | `hooks/` |
+| Services | API e integração | `services/` |
+| Utils | Cálculos e transformações puras | `utils/` |
+| Configs | Constantes e metadados | `constants/`, `lib/` |
+
+---
+
+## 📈 Métricas Acumuladas (Segunda Rodada)
+
+| Arquivo | Antes | Depois | Redução |
+|---------|-------|--------|---------|
+| `layout.jsx` | ~1007 linhas | ~80 linhas | **92%** |
+| `ChecklistConcretagem.jsx` | ~1444 linhas | ~380 linhas | **74%** |
+| `DiarioObra.jsx` | ~1304 linhas | ~400 linhas | **69%** |
+| **Total etapa** | **~3755** | **~860** | **~77%** |
+
+---
+
+## 💡 Padrões Estabelecidos (Segunda Rodada)
+
+### Hook de Formulário Gigante
+```js
+// hooks/useChecklistXxx.js
+export function useChecklistXxx() {
+  // Estado, carregamento, handlers, validação e submissão
+  return { formData, setFormData, loading, saving, handlers... };
+}
+
+// pages/ChecklistXxx.jsx
+export default function ChecklistXxx() {
+  const { formData, setFormData, ... } = useChecklistXxx();
+  return <form>...</form>; // Somente UI
+}
+```
+
+### Lookup com Set (evitar .filter() em loop)
+```js
+const regionaisSet = new Set(regionaisIds);
+const obrasRegional = obrasData.filter(o => regionaisSet.has(o.regional_id));
+```
+
+### Validação como Array Iterável
+```js
+const requiredFields = [
+  [!formData.campo, "preencha o campo X"],
+  [!formData.outro, "preencha o campo Y"],
+];
+for (const [cond, msg] of requiredFields) {
+  if (cond) { alert(`Por favor, ${msg}.`); return; }
+}
+```
+
+### Layout Modular
+```js
+// layout.jsx — orquestrador puro
+import { useLayoutData } from "@/components/layout/useLayoutData";
+import AppSidebar from "@/components/layout/AppSidebar";
+import MobileHeader from "@/components/layout/MobileHeader";
+import BottomNav from "@/components/layout/BottomNav";
+```
+
+---
+
+## 🚀 Benefícios Realizados (Acumulado)
+
+✅ **layout.jsx** reduzido de 1007 → 80 linhas (92%)
+✅ **ChecklistConcretagem** reduzido de 1444 → 380 linhas (74%)
+✅ **DiarioObra** reduzido de 1304 → 400 linhas (69%)
+✅ Lógica de negócio completamente desacoplada da UI
+✅ Lookups O(1) com `Set` substituindo múltiplos `.filter()`
+✅ `useCallback` aplicado em todos os handlers para evitar re-renders
+✅ Validações como arrays iteráveis — eliminam if/return duplicados

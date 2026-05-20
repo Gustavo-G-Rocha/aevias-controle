@@ -1,669 +1,26 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Save, Loader2, XCircle, Plus, Trash2, AlertTriangle } from "lucide-react";
+import { Save, Loader2, Plus, Trash2, AlertTriangle, XCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { base44 } from "@/api/base44Client";
-import { createPageUrl } from "@/utils";
-import { Project } from "@/entities/Project";
-import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import AcoesCorretivasNC from "@/components/checklists/AcoesCorretivasNC";
-
-const getInitialFormData = () => ({
-  obra_id: "",
-  project_id: "",
-  data: new Date().toISOString().split('T')[0],
-  jornada: {
-    horario_inicio: "",
-    horario_fim: ""
-  },
-  concreteira: "",
-  rodovia: "",
-  trecho: "",
-  fck: "",
-  volume: "",
-  inspetor_campo: "",
-  laboratorista_name: "",
-  empreiteira: "",
-  estrutura: "",
-  ensaio_realizado_por: "Afirma Evias",
-  periodos_clima: [
-    { periodo: "manha", temperatura_ambiente: "", condicoes_climaticas: "bom" },
-    { periodo: "tarde", temperatura_ambiente: "", condicoes_climaticas: "bom" },
-    { periodo: "noite", temperatura_ambiente: "", condicoes_climaticas: "bom" }
-  ],
-  cargas_concreto: [
-    {
-      numero_carga: 1,
-      nota_fiscal: "",
-      placa_betoneira: "",
-      slump_test: {
-        realizado: false,
-        resultado: null,
-        limite: "",
-        conforme: null
-      },
-      espessura_camada: {
-        realizado: false,
-        resultado: null,
-        limite: "",
-        conforme: null
-      },
-      equipamento_lancamento: "",
-      superficie_tratada_limpa: null,
-      adensamento_realizado: null,
-      observacoes_lancamento: "",
-      moldado_fiscalizacao: false,
-      corpos_prova: []
-    }
-  ],
-  observacoes_gerais: "",
-  acoes_corretivas_realizado: null,
-  acoes_corretivas_descricao: "",
-  nao_conformidades: [],
-  fotos: [],
-  status: "rascunho"
-});
+import { useChecklistConcretagem } from "@/hooks/useChecklistConcretagem";
 
 export default function ChecklistConcretagem() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [user, setUser] = useState(null);
-  const [obras, setObras] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [allProjects, setAllProjects] = useState([]);
-  const [regionais, setRegionais] = useState([]);
-  const [uploadingPhotos, setUploadingPhotos] = useState(false);
-  const [selectedFileNames, setSelectedFileNames] = useState("Nenhum ficheiro selecionado");
-  const [editingChecklist, setEditingChecklist] = useState(null);
-  const [formData, setFormData] = useState(getInitialFormData());
-
-  const { clearSavedData } = useFormPersistence('checklist_concretagem', formData, setFormData, !!editingChecklist);
-
-  useEffect(() => {
-    loadInitialData();
-  }, []);
-
-  const projectsRef = useRef(projects);
-  useEffect(() => { projectsRef.current = projects; }, [projects]);
-
-  useEffect(() => {
-    if (!formData.project_id) return;
-    const projectsList = projectsRef.current;
-    if (!projectsList.length) return;
-    const selectedProject = projectsList.find(p => p.id === formData.project_id);
-    if (selectedProject) {
-      setFormData(prev => ({
-        ...prev,
-        concreteira: prev.concreteira || selectedProject.concreteira || "",
-        fck: prev.fck || (selectedProject.fck ? selectedProject.fck.toString() : ""),
-        cargas_concreto: prev.cargas_concreto.map(carga => {
-          const slumpLimite = selectedProject.slump_minimo && selectedProject.slump_maximo
-            ? `${selectedProject.slump_minimo} a ${selectedProject.slump_maximo} cm`
-            : "";
-          return { ...carga, slump_test: { ...carga.slump_test, limite: slumpLimite } };
-        })
-      }));
-    }
-  }, [formData.project_id]); // Isolado de 'projects' via ref para evitar loop
-
-  // Filtrar projetos quando obra é selecionada
-  useEffect(() => { // eslint-disable-line react-hooks/exhaustive-deps
-    if (formData.obra_id && obras.length > 0 && allProjects.length > 0 && regionais.length > 0) {
-      const obraSelecionada = obras.find(o => o.id === formData.obra_id);
-      
-      if (obraSelecionada && obraSelecionada.regional_id) {
-        const regional = regionais.find(r => r.id === obraSelecionada.regional_id);
-        
-        if (regional) {
-          // Filtrar projetos do tipo CARTA_TRACO_CONCRETO vinculados à regional
-          const projectIdsRegional = regional.project_ids || [];
-          
-          const projetosFiltrados = allProjects.filter(p => {
-            // Deve ser carta traço
-            if (p.tipo_projeto !== 'CARTA_TRACO_CONCRETO') return false;
-            
-            // Deve estar vinculado à regional (por project_ids ou regional_id direto)
-            return projectIdsRegional.includes(p.id) || p.regional_id === regional.id;
-          });
-          
-          setProjects(projetosFiltrados);
-        } else {
-          setProjects([]);
-        }
-      } else {
-        setProjects([]);
-      }
-      
-      // Limpar project_id apenas se a obra mudou e o projeto não está mais disponível
-      // Não limpar quando está carregando um checklist existente pela primeira vez
-      if (formData.project_id && !editingChecklist) {
-        const projetosFiltrados = allProjects.filter(p => {
-          if (p.tipo_projeto !== 'CARTA_TRACO_CONCRETO') return false;
-          const projectIdsRegional = regionais.find(r => r.id === obraSelecionada?.regional_id)?.project_ids || [];
-          return projectIdsRegional.includes(p.id) || p.regional_id === obraSelecionada?.regional_id;
-        });
-        
-        const projectStillAvailable = projetosFiltrados.some(p => p.id === formData.project_id);
-        if (!projectStillAvailable) {
-          setFormData(prev => ({ ...prev, project_id: "" }));
-        }
-      }
-    }
-  }, [formData.obra_id]); // Depende apenas da obra para evitar re-renders em cascata
-
-
-
-  const loadInitialData = async () => {
-    setLoading(true);
-    try {
-      const [userData, obrasData, projectsData, regionaisData] = await Promise.all([
-        base44.auth.me(),
-        base44.entities.Obra.list(),
-        Project.list(),
-        base44.entities.Regional.list()
-      ]);
-
-      setUser(userData);
-      setRegionais(regionaisData);
-      setAllProjects(projectsData); // Store all projects
-
-      const userAccessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
-
-      if (userAccessLevel === 'user') {
-        const regionalDoLaboratorista = regionaisData.find(regional => {
-          const laboratoristas = regional.laboratoristas_responsaveis || [];
-          return laboratoristas.some(email => email.toLowerCase() === userData.email.toLowerCase());
-        });
-
-        if (regionalDoLaboratorista) {
-          const obrasRegional = obrasData.filter(obra =>
-            obra.regional_id === regionalDoLaboratorista.id &&
-            obra.status === 'em_andamento' &&
-            obra.tipo_obra === 'supervisao'
-          );
-          setObras(obrasRegional);
-        } else {
-          setObras([]);
-        }
-      } else {
-        const obrasSupervisao = obrasData.filter(obra =>
-          obra.status === 'em_andamento' && obra.tipo_obra === 'supervisao'
-        );
-        setObras(obrasSupervisao);
-      }
-
-      // Projects will be filtered dynamically when an obra is selected
-      setProjects([]);
-
-      // Verificar se está editando um checklist existente
-      const params = new URLSearchParams(location.search);
-      const editId = params.get('editId');
-
-      if (editId) {
-        const checklistToEdit = await base44.entities.ChecklistConcretagem.get(editId);
-        
-        // Permitir edição apenas se for admin ou se for o criador e (está em rascunho OU foi reprovado)
-        if (userAccessLevel === 'admin' || (checklistToEdit.created_by === userData.email && (checklistToEdit.status === 'rascunho' || checklistToEdit.approved === false))) {
-          setEditingChecklist(checklistToEdit);
-          setFormData(checklistToEdit);
-        } else {
-          alert("Você não tem permissão para editar este registro.");
-          navigate(createPageUrl('MeusEnsaios'));
-          return;
-        }
-      } else {
-        // Novo checklist
-        setFormData(prev => ({
-          ...prev,
-          inspetor_campo: userData.laboratorista_name || userData.full_name,
-          laboratorista_name: userData.laboratorista_name || userData.full_name
-        }));
-      }
-    } catch (error) {
-      console.error("Erro ao carregar dados:", error);
-      alert("Erro ao carregar dados iniciais.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const checkSlumpConformidade = (resultado, projectId) => {
-    if (!projectId || resultado === null || resultado === '' || resultado === undefined) return null;
-
-    const selectedProject = projects.find(p => p.id === projectId);
-    if (!selectedProject || selectedProject.slump_minimo === null || selectedProject.slump_maximo === null) return null;
-
-    const resultadoNum = parseFloat(resultado);
-    if (isNaN(resultadoNum)) return null;
-
-    return resultadoNum >= selectedProject.slump_minimo && resultadoNum <= selectedProject.slump_maximo;
-  };
-
-  const adicionarCarga = () => {
-    if (formData.cargas_concreto.length < 10) {
-      const selectedProject = projects.find(p => p.id === formData.project_id);
-      const slumpLimite = selectedProject?.slump_minimo !== null && selectedProject?.slump_maximo !== null
-        ? `${selectedProject.slump_minimo} a ${selectedProject.slump_maximo} cm`
-        : "";
-
-      setFormData(prev => ({
-        ...prev,
-        cargas_concreto: [...prev.cargas_concreto, {
-          numero_carga: prev.cargas_concreto.length + 1,
-          nota_fiscal: "",
-          placa_betoneira: "",
-          slump_test: {
-            realizado: false,
-            resultado: null,
-            limite: slumpLimite,
-            conforme: null
-          },
-          espessura_camada: {
-            realizado: false,
-            resultado: null,
-            limite: "",
-            conforme: null
-          },
-          equipamento_lancamento: "",
-          superficie_tratada_limpa: null,
-          adensamento_realizado: null,
-          observacoes_lancamento: "",
-          moldado_fiscalizacao: false,
-          corpos_prova: []
-        }]
-      }));
-    }
-  };
-
-  const removerCarga = (index) => {
-    if (formData.cargas_concreto.length > 1) {
-      setFormData(prev => ({
-        ...prev,
-        cargas_concreto: prev.cargas_concreto.filter((_, i) => i !== index)
-      }));
-    }
-  };
-
-  const handleCargaChange = (index, field, value) => {
-    setFormData(prev => {
-      const newCargas = [...prev.cargas_concreto];
-
-      if (field.includes('.')) {
-        const [parent, child] = field.split('.');
-        newCargas[index] = {
-          ...newCargas[index],
-          [parent]: {
-            ...newCargas[index][parent],
-            [child]: value
-          }
-        };
-
-        // Conformidade automática para slump test quando resultado é alterado
-        if (parent === 'slump_test' && child === 'resultado') {
-          const conformidade = checkSlumpConformidade(value, prev.project_id);
-          newCargas[index].slump_test.conforme = conformidade;
-        }
-      } else {
-        newCargas[index] = { ...newCargas[index], [field]: value };
-      }
-
-      return { ...prev, cargas_concreto: newCargas };
-    });
-  };
-
-  const handleCPConfigChange = (cargaIndex, diasRuptura, field, value) => {
-    setFormData(prev => {
-      const newCargas = [...prev.cargas_concreto];
-      const carga = newCargas[cargaIndex];
-      
-      if (!carga.corpos_prova) {
-        carga.corpos_prova = [];
-      }
-
-      // Buscar CPs existentes para esta data de ruptura
-      const cpsExistentes = carga.corpos_prova.filter(cp => cp.dias_ruptura === diasRuptura);
-      const quantidadeAtual = cpsExistentes.length;
-
-      if (field === 'quantidade') {
-        const novaQuantidade = parseInt(value) || 0;
-        
-        if (novaQuantidade > quantidadeAtual) {
-          // Adicionar novos CPs
-          const tipoRuptura = cpsExistentes.length > 0 ? cpsExistentes[0].tipo_ruptura : "compressao_axial";
-          for (let i = 0; i < novaQuantidade - quantidadeAtual; i++) {
-            carga.corpos_prova.push({
-              dias_ruptura: diasRuptura,
-              tipo_ruptura: tipoRuptura
-            });
-          }
-        } else if (novaQuantidade < quantidadeAtual) {
-          // Remover CPs excedentes desta data de ruptura
-          let removidos = 0;
-          carga.corpos_prova = carga.corpos_prova.filter(cp => {
-            if (cp.dias_ruptura === diasRuptura && removidos < quantidadeAtual - novaQuantidade) {
-              removidos++;
-              return false;
-            }
-            return true;
-          });
-        }
-      } else if (field === 'tipo_ruptura') {
-        // Atualizar tipo de ruptura de todos os CPs desta data
-        carga.corpos_prova = carga.corpos_prova.map(cp => {
-          if (cp.dias_ruptura === diasRuptura) {
-            return { ...cp, tipo_ruptura: value };
-          }
-          return cp;
-        });
-      }
-      
-      return { ...prev, cargas_concreto: newCargas };
-    });
-  };
-
-  const getQuantidadeCPs = (cargaIndex, diasRuptura) => {
-    const carga = formData.cargas_concreto[cargaIndex];
-    if (!carga || !carga.corpos_prova) return 0;
-    return carga.corpos_prova.filter(cp => cp.dias_ruptura === diasRuptura).length;
-  };
-
-  const getTipoRupturaCPs = (cargaIndex, diasRuptura) => {
-    const carga = formData.cargas_concreto[cargaIndex];
-    if (!carga || !carga.corpos_prova) return "compressao_axial";
-    const cp = carga.corpos_prova.find(cp => cp.dias_ruptura === diasRuptura);
-    return cp?.tipo_ruptura || "compressao_axial";
-  };
-
-  const adicionarCorpoProva = (cargaIndex, diasRuptura) => {
-    setFormData(prev => {
-      const newCargas = [...prev.cargas_concreto];
-      const carga = { ...newCargas[cargaIndex] }; // Create a shallow copy of the carga object
-      
-      if (!Array.isArray(carga.corpos_prova)) {
-        carga.corpos_prova = [];
-      }
-      
-      carga.corpos_prova.push({
-        dias_ruptura: diasRuptura,
-        tipo_ruptura: "compressao_axial" // Default type
-      });
-      
-      newCargas[cargaIndex] = carga; // Update the carga in the newCargas array
-      return { ...prev, cargas_concreto: newCargas };
-    });
-  };
-
-  const removerCorpoProva = (cargaIndex, cpIndex) => {
-    setFormData(prev => {
-      const newCargas = [...prev.cargas_concreto];
-      const carga = { ...newCargas[cargaIndex] }; // Create a shallow copy of the carga object
-      
-      if (Array.isArray(carga.corpos_prova)) {
-        carga.corpos_prova = carga.corpos_prova.filter((_, i) => i !== cpIndex);
-      }
-      
-      newCargas[cargaIndex] = carga; // Update the carga in the newCargas array
-      return { ...prev, cargas_concreto: newCargas };
-    });
-  };
-
-  const handleCorpoProvaChange = (cargaIndex, cpIndex, field, value) => {
-    setFormData(prev => {
-      const newCargas = [...prev.cargas_concreto];
-      const carga = { ...newCargas[cargaIndex] }; // Create a shallow copy of the carga object
-      
-      if (Array.isArray(carga.corpos_prova) && carga.corpos_prova[cpIndex]) {
-        const updatedCorpoProva = {
-          ...carga.corpos_prova[cpIndex],
-          [field]: value
-        };
-        carga.corpos_prova = [...carga.corpos_prova]; // Create a shallow copy of the array itself
-        carga.corpos_prova[cpIndex] = updatedCorpoProva;
-      }
-      
-      newCargas[cargaIndex] = carga; // Update the carga in the newCargas array
-      return { ...prev, cargas_concreto: newCargas };
-    });
-  };
-
-  const validateFile = (file) => {
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      throw new Error(`Tipo de arquivo não suportado: ${file.type}`);
-    }
-    const maxSize = 50 * 1024 * 1024;
-    if (file.size > maxSize) {
-      throw new Error(`Arquivo muito grande: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
-    }
-    return true;
-  };
-
-  const handleFileChange = async (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length === 0) {
-      setSelectedFileNames("Nenhum ficheiro selecionado");
-      return;
-    }
-
-    try {
-      files.forEach(file => { validateFile(file); });
-    } catch (error) {
-      alert(error.message);
-      e.target.value = '';
-      return;
-    }
-
-    setUploadingPhotos(true);
-    setSelectedFileNames(files.length === 1 ? files[0].name : `${files.length} ficheiros selecionados`);
-
-    try {
-      const uploadPromises = files.map(file =>
-        base44.integrations.Core.UploadFile({ file })
-      );
-
-      const results = await Promise.all(uploadPromises);
-      const newPhotoUrls = results.map(result => result.file_url);
-
-      setFormData(prev => ({
-        ...prev,
-        fotos: [...prev.fotos, ...newPhotoUrls]
-      }));
-    } catch (error) {
-      console.error("Erro ao fazer upload das fotos:", error);
-      alert("Erro ao fazer upload das fotos.");
-    } finally {
-      setUploadingPhotos(false);
-      e.target.value = '';
-    }
-  };
-
-  const handleRemovePhoto = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      fotos: prev.fotos.filter((_, i) => i !== index)
-    }));
-  };
-
-  const handleSubmit = async (e, saveStatus = 'finalizado') => {
-    e.preventDefault();
-    setSaving(true);
-
-    console.log("🟢 [CHECKLIST CONCRETAGEM] Iniciando salvamento...");
-    console.log("🟢 [CHECKLIST CONCRETAGEM] Status solicitado:", saveStatus);
-    console.log("🟢 [CHECKLIST CONCRETAGEM] É edição?", !!editingChecklist?.id);
-
-    try {
-      // Para salvar progresso, apenas obra é obrigatória
-      if (!formData.obra_id) {
-        alert("Por favor, selecione uma obra.");
-        setSaving(false);
-        return;
-      }
-
-      // Validações obrigatórias apenas quando finalizando
-      if (saveStatus === 'finalizado') {
-        if (!formData.project_id?.trim()) {
-          alert("Por favor, selecione a Carta Traço de Concreto.");
-          setSaving(false);
-          return;
-        }
-
-        if (!formData.concreteira?.trim()) {
-          alert("Por favor, preencha o campo Concreteira.");
-          setSaving(false);
-          return;
-        }
-
-        if (!formData.empreiteira?.trim()) {
-          alert("Por favor, preencha o campo Empreiteira.");
-          setSaving(false);
-          return;
-        }
-
-        if (!formData.rodovia?.trim()) {
-          alert("Por favor, preencha o campo Rodovia.");
-          setSaving(false);
-          return;
-        }
-
-        if (!formData.trecho?.trim()) {
-          alert("Por favor, preencha o campo Trecho.");
-          setSaving(false);
-          return;
-        }
-
-        if (!formData.volume || formData.volume === '') {
-          alert("Por favor, preencha o campo Volume (m³).");
-          setSaving(false);
-          return;
-        }
-
-        if (!formData.fck || formData.fck === '') {
-          alert("Por favor, preencha o campo Fck (MPa).");
-          setSaving(false);
-          return;
-        }
-
-        if (!formData.estrutura?.trim()) {
-          alert("Por favor, preencha o campo Estrutura.");
-          setSaving(false);
-          return;
-        }
-
-        if (!formData.inspetor_campo?.trim()) {
-          alert("Por favor, preencha o campo Inspetor Campo.");
-          setSaving(false);
-          return;
-        }
-
-        // Validar ações corretivas
-        if (formData.acoes_corretivas_realizado === true && !formData.acoes_corretivas_descricao?.trim()) {
-          alert("Por favor, descreva as ações corretivas realizadas.");
-          setSaving(false);
-          return;
-        }
-
-        // Validar temperaturas dos períodos climáticos
-        for (let i = 0; i < formData.periodos_clima.length; i++) {
-          const periodo = formData.periodos_clima[i];
-          if (!periodo.temperatura_ambiente || periodo.temperatura_ambiente === '') {
-            alert(`Por favor, preencha a temperatura do período ${periodo.periodo === 'manha' ? 'Manhã' : periodo.periodo === 'tarde' ? 'Tarde' : 'Noite'}.`);
-            setSaving(false);
-            return;
-          }
-        }
-
-        // Validar moldagem para fiscalização
-        for (let i = 0; i < formData.cargas_concreto.length; i++) {
-          const carga = formData.cargas_concreto[i];
-          if (carga.moldado_fiscalizacao) {
-            // Se marcou moldado, deve ter pelo menos 1 CP
-            if (!carga.corpos_prova || carga.corpos_prova.length === 0) {
-              alert(`Por favor, configure ao menos 1 corpo de prova para a Carga ${carga.numero_carga}.`);
-              setSaving(false);
-              return;
-            }
-          }
-        }
-      }
-
-      const dataToSave = {
-        ...formData,
-        status: saveStatus,
-        fck: formData.fck ? parseFloat(formData.fck) : null,
-        volume: formData.volume ? parseFloat(formData.volume) : null,
-        periodos_clima: formData.periodos_clima.map(p => ({
-          ...p,
-          temperatura_ambiente: p.temperatura_ambiente ? parseFloat(p.temperatura_ambiente) : null
-        })),
-        cargas_concreto: formData.cargas_concreto.map(c => ({
-          ...c,
-          slump_test: {
-            ...c.slump_test,
-            resultado: c.slump_test.resultado !== null && c.slump_test.resultado !== "" ? parseFloat(c.slump_test.resultado) : null
-          },
-          espessura_camada: {
-            ...c.espessura_camada,
-            resultado: c.espessura_camada.resultado !== null && c.espessura_camada.resultado !== "" ? parseFloat(c.espessura_camada.resultado) : null
-          },
-          corpos_prova: c.corpos_prova.map(cp => ({
-            ...cp,
-            dias_ruptura: cp.dias_ruptura !== null && cp.dias_ruptura !== "" ? parseInt(cp.dias_ruptura) : null
-          }))
-        }))
-      };
-
-      console.log("🟢 [CHECKLIST CONCRETAGEM] Dados que serão salvos:", {
-        id: editingChecklist?.id,
-        status: dataToSave.status,
-        obra_id: dataToSave.obra_id,
-        data: dataToSave.data
-      });
-
-      if (editingChecklist?.id) {
-        const updateData = { ...dataToSave };
-        let successMessage = saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist atualizado com sucesso!";
-
-        if (editingChecklist.approved === false && saveStatus === 'finalizado') {
-          updateData.approved = null;
-          updateData.rejection_reason = null;
-          updateData.approved_by = null;
-          updateData.approved_date = null;
-          updateData.was_rejected = true;
-          successMessage = "Checklist atualizado com sucesso! O registro voltará para análise do administrador.";
-        }
-
-        const result = await base44.entities.ChecklistConcretagem.update(editingChecklist.id, updateData);
-        console.log("🟢 [CHECKLIST CONCRETAGEM] Atualizado com sucesso!", result);
-        alert(successMessage);
-      } else {
-        const result = await base44.entities.ChecklistConcretagem.create(dataToSave);
-        console.log("🟢 [CHECKLIST CONCRETAGEM] Criado com sucesso!", result);
-        alert(saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!");
-      }
-      clearSavedData();
-      navigate(createPageUrl("MeusEnsaios"));
-    } catch (error) {
-      console.error("Erro ao salvar checklist:", error);
-      alert(`Erro ao salvar checklist: ${error.message}`);
-    } finally {
-      setSaving(false);
-    }
-  };
+  const {
+    loading, saving, obras, projects, regionais,
+    uploadingPhotos, selectedFileNames, editingChecklist,
+    formData, setFormData,
+    adicionarCarga, removerCarga, handleCargaChange, handleCPConfigChange,
+    getQuantidadeCPs, getTipoRupturaCPs,
+    handleFileChange, handleRemovePhoto, handleSubmit, handleCancel,
+  } = useChecklistConcretagem();
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="w-8 h-8 animate-spin" />
-      </div>
-    );
+    return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin" /></div>;
   }
 
   const selectedProject = projects.find(p => p.id === formData.project_id);
@@ -673,11 +30,11 @@ export default function ChecklistConcretagem() {
       <div className="max-w-6xl mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle>{editingChecklist ? 'Editar Checklist de Concretagem' : 'Novo Checklist de Concretagem'}</CardTitle>
+            <CardTitle>{editingChecklist ? "Editar Checklist de Concretagem" : "Novo Checklist de Concretagem"}</CardTitle>
             <CardDescription>
-              {editingChecklist ? `Editando checklist de ${new Date(editingChecklist.data).toLocaleDateString('pt-BR')}` : 'Controle Tecnológico de Concreto'}
+              {editingChecklist ? `Editando checklist de ${new Date(editingChecklist.data).toLocaleDateString("pt-BR")}` : "Controle Tecnológico de Concreto"}
             </CardDescription>
-            {formData.status === 'rascunho' && (
+            {formData.status === "rascunho" && (
               <div className="mt-4 flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <AlertTriangle className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
                 <div>
@@ -688,263 +45,125 @@ export default function ChecklistConcretagem() {
             )}
           </CardHeader>
           <CardContent className="overflow-hidden">
-            <form onSubmit={(e) => handleSubmit(e, 'finalizado')} onKeyDown={(e) => {
-              if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.type !== 'submit') {
-                e.preventDefault();
-              }
-            }} className="space-y-6">
-
+            <form
+              onSubmit={(e) => handleSubmit(e, "finalizado")}
+              onKeyDown={(e) => { if (e.key === "Enter" && e.target.tagName !== "TEXTAREA" && e.target.type !== "submit") e.preventDefault(); }}
+              className="space-y-6"
+            >
               {/* DADOS DA OBRA */}
               <Card className="bg-slate-50">
-                <CardHeader>
-                  <CardTitle className="text-lg">Dados da Obra</CardTitle>
-                </CardHeader>
+                <CardHeader><CardTitle className="text-lg">Dados da Obra</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="obra_id">Obra *</Label>
-                      <Select
-                        value={formData.obra_id || ""}
-                        onValueChange={(value) => setFormData({ ...formData, obra_id: value })}
-                        disabled={!!editingChecklist?.id}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione a obra" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {obras.map(obra => (
-                            <SelectItem key={obra.id} value={obra.id}>
-                              {obra.name} - {obra.code}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
+                      <Label>Obra *</Label>
+                      <Select value={formData.obra_id || ""} onValueChange={(v) => setFormData({ ...formData, obra_id: v })} disabled={!!editingChecklist?.id}>
+                        <SelectTrigger><SelectValue placeholder="Selecione a obra" /></SelectTrigger>
+                        <SelectContent>{obras.map(o => <SelectItem key={o.id} value={o.id}>{o.name} - {o.code}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
-
                     <div>
-                      <Label htmlFor="project_id">Carta Traço de Concreto</Label>
-                      <Select
-                        value={formData.project_id || ""}
-                        onValueChange={(value) => setFormData({ ...formData, project_id: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione a carta traço" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {projects.map(project => (
-                            <SelectItem key={project.id} value={project.id}>
-                              {project.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
+                      <Label>Carta Traço de Concreto</Label>
+                      <Select value={formData.project_id || ""} onValueChange={(v) => setFormData({ ...formData, project_id: v })}>
+                        <SelectTrigger><SelectValue placeholder="Selecione a carta traço" /></SelectTrigger>
+                        <SelectContent>{projects.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <Label htmlFor="data">Data *</Label>
-                      <Input
-                        type="date"
-                        id="data"
-                        value={formData.data}
-                        onChange={(e) => setFormData({ ...formData, data: e.target.value })}
-                        required
-                      />
+                      <Label>Data *</Label>
+                      <Input type="date" value={formData.data} onChange={(e) => setFormData({ ...formData, data: e.target.value })} required />
                     </div>
-
                     <div>
-                      <Label htmlFor="horario_inicio">Horário Início *</Label>
-                      <Input
-                        id="horario_inicio"
-                        type="time"
-                        value={formData.jornada?.horario_inicio || ""}
-                        onChange={(e) => setFormData({ 
-                          ...formData, 
-                          jornada: { ...formData.jornada, horario_inicio: e.target.value } 
-                        })}
-                        required
-                      />
+                      <Label>Horário Início *</Label>
+                      <Input type="time" value={formData.jornada?.horario_inicio || ""} onChange={(e) => setFormData({ ...formData, jornada: { ...formData.jornada, horario_inicio: e.target.value } })} required />
                     </div>
-
                     <div>
-                      <Label htmlFor="horario_fim">Horário Fim *</Label>
-                      <Input
-                        id="horario_fim"
-                        type="time"
-                        value={formData.jornada?.horario_fim || ""}
-                        onChange={(e) => setFormData({ 
-                          ...formData, 
-                          jornada: { ...formData.jornada, horario_fim: e.target.value } 
-                        })}
-                        required
-                      />
+                      <Label>Horário Fim *</Label>
+                      <Input type="time" value={formData.jornada?.horario_fim || ""} onChange={(e) => setFormData({ ...formData, jornada: { ...formData.jornada, horario_fim: e.target.value } })} required />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <Label htmlFor="concreteira">Concreteira</Label>
-                      <Input
-                        id="concreteira"
-                        value={formData.concreteira}
-                        onChange={(e) => setFormData({ ...formData, concreteira: e.target.value })}
-                        placeholder="Nome da concreteira"
-                      />
+                      <Label>Concreteira</Label>
+                      <Input value={formData.concreteira} onChange={(e) => setFormData({ ...formData, concreteira: e.target.value })} placeholder="Nome da concreteira" />
                     </div>
-
                     <div>
-                      <Label htmlFor="empreiteira">Empreiteira</Label>
-                      <Select
-                        value={formData.empreiteira}
-                        onValueChange={(value) => setFormData({ ...formData, empreiteira: value })}
-                        disabled={!formData.obra_id}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione a empreiteira" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {(obras.find(o => o.id === formData.obra_id)?.empreiteiras || []).map((empreiteira, idx) => (
-                            <SelectItem key={idx} value={empreiteira}>
-                              {empreiteira}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
+                      <Label>Empreiteira</Label>
+                      <Select value={formData.empreiteira} onValueChange={(v) => setFormData({ ...formData, empreiteira: v })} disabled={!formData.obra_id}>
+                        <SelectTrigger><SelectValue placeholder="Selecione a empreiteira" /></SelectTrigger>
+                        <SelectContent>{(obras.find(o => o.id === formData.obra_id)?.empreiteiras || []).map((em, i) => <SelectItem key={i} value={em}>{em}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Rodovia</Label>
+                      <Select value={formData.rodovia} onValueChange={(v) => setFormData({ ...formData, rodovia: v })}>
+                        <SelectTrigger><SelectValue placeholder="Selecione a rodovia" /></SelectTrigger>
+                        <SelectContent>{(obras.find(o => o.id === formData.obra_id)?.rodovias || []).map((r, i) => <SelectItem key={i} value={r}>{r}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <Label htmlFor="rodovia">Rodovia</Label>
-                      <Select
-                        value={formData.rodovia}
-                        onValueChange={(value) => setFormData({ ...formData, rodovia: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione a rodovia" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {obras.find(o => o.id === formData.obra_id)?.rodovias?.map((rodovia, index) => (
-                            <SelectItem key={index} value={rodovia}>
-                              {rodovia}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Label>Trecho</Label>
+                      <Input value={formData.trecho} onChange={(e) => setFormData({ ...formData, trecho: e.target.value })} placeholder="Descrição do trecho" />
                     </div>
-
                     <div>
-                      <Label htmlFor="trecho">Trecho</Label>
-                      <Input
-                        id="trecho"
-                        value={formData.trecho}
-                        onChange={(e) => setFormData({ ...formData, trecho: e.target.value })}
-                        placeholder="Descrição do trecho"
-                      />
+                      <Label>Volume (m³)</Label>
+                      <Input type="number" step="0.1" value={formData.volume} onChange={(e) => setFormData({ ...formData, volume: e.target.value })} />
                     </div>
-
                     <div>
-                      <Label htmlFor="volume">Volume (m³)</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        id="volume"
-                        value={formData.volume}
-                        onChange={(e) => setFormData({ ...formData, volume: e.target.value })}
-                      />
+                      <Label>Fck (MPa)</Label>
+                      <Input type="number" step="0.1" value={formData.fck} onChange={(e) => setFormData({ ...formData, fck: e.target.value })} placeholder="Ex: 25" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <Label htmlFor="fck">Fck (MPa)</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        id="fck"
-                        value={formData.fck}
-                        onChange={(e) => setFormData({ ...formData, fck: e.target.value })}
-                        placeholder="Ex: 25"
-                      />
+                      <Label>Estrutura</Label>
+                      <Input value={formData.estrutura} onChange={(e) => setFormData({ ...formData, estrutura: e.target.value })} />
                     </div>
-
                     <div>
-                       <Label htmlFor="estrutura">Estrutura</Label>
-                       <Input
-                         id="estrutura"
-                         value={formData.estrutura}
-                         onChange={(e) => setFormData({ ...formData, estrutura: e.target.value })}
-                       />
-                     </div>
-
-                    <div>
-                      <Label htmlFor="ensaio_realizado_por">Ensaio realizado por:</Label>
-                      <Select
-                        value={formData.ensaio_realizado_por || "Afirma Evias"}
-                        onValueChange={(value) => setFormData({ ...formData, ensaio_realizado_por: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
+                      <Label>Ensaio realizado por</Label>
+                      <Select value={formData.ensaio_realizado_por || "Afirma Evias"} onValueChange={(v) => setFormData({ ...formData, ensaio_realizado_por: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Afirma Evias">Afirma Evias</SelectItem>
                           <SelectItem value="Empreiteira">Empreiteira</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
+                    <div>
+                      <Label>Inspetor Campo</Label>
+                      <Input value={formData.inspetor_campo} onChange={(e) => setFormData({ ...formData, inspetor_campo: e.target.value })} />
                     </div>
-
-                  <div>
-                    <Label htmlFor="inspetor_campo">Inspetor Campo</Label>
-                    <Input
-                      id="inspetor_campo"
-                      value={formData.inspetor_campo}
-                      onChange={(e) => setFormData({ ...formData, inspetor_campo: e.target.value })}
-                    />
                   </div>
                 </CardContent>
               </Card>
 
               {/* CONDIÇÕES CLIMÁTICAS */}
               <Card className="bg-slate-50">
-                <CardHeader>
-                  <CardTitle className="text-lg">Condições Climáticas</CardTitle>
-                </CardHeader>
+                <CardHeader><CardTitle className="text-lg">Condições Climáticas</CardTitle></CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {formData.periodos_clima.map((periodo, index) => (
                       <Card key={index}>
-                        <CardHeader className="pb-3">
-                          <CardTitle className="text-base capitalize">{periodo.periodo}</CardTitle>
-                        </CardHeader>
+                        <CardHeader className="pb-3"><CardTitle className="text-base capitalize">{periodo.periodo}</CardTitle></CardHeader>
                         <CardContent className="space-y-3">
                           <div>
                             <Label className="text-sm">Temperatura (°C)</Label>
-                            <Input
-                              type="number"
-                              step="0.1"
-                              value={periodo.temperatura_ambiente}
-                              onChange={(e) => {
-                                const newPeriodos = [...formData.periodos_clima];
-                                newPeriodos[index].temperatura_ambiente = e.target.value;
-                                setFormData({ ...formData, periodos_clima: newPeriodos });
-                              }}
-                            />
+                            <Input type="number" step="0.1" value={periodo.temperatura_ambiente}
+                              onChange={(e) => { const p = [...formData.periodos_clima]; p[index].temperatura_ambiente = e.target.value; setFormData({ ...formData, periodos_clima: p }); }} />
                           </div>
                           <div>
                             <Label className="text-sm">Condições</Label>
-                            <Select
-                              value={periodo.condicoes_climaticas}
-                              onValueChange={(value) => {
-                                const newPeriodos = [...formData.periodos_clima];
-                                newPeriodos[index].condicoes_climaticas = value;
-                                setFormData({ ...formData, periodos_clima: newPeriodos });
-                              }}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
+                            <Select value={periodo.condicoes_climaticas}
+                              onValueChange={(v) => { const p = [...formData.periodos_clima]; p[index].condicoes_climaticas = v; setFormData({ ...formData, periodos_clima: p }); }}>
+                              <SelectTrigger><SelectValue /></SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="bom">Bom</SelectItem>
                                 <SelectItem value="instavel">Instável</SelectItem>
@@ -966,8 +185,7 @@ export default function ChecklistConcretagem() {
                     <CardTitle className="text-lg">Cargas de Concreto</CardTitle>
                     {formData.cargas_concreto.length < 10 && (
                       <Button type="button" onClick={adicionarCarga} className="bg-green-600 hover:bg-green-700">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Adicionar Carga
+                        <Plus className="w-4 h-4 mr-2" /> Adicionar Carga
                       </Button>
                     )}
                   </div>
@@ -979,39 +197,26 @@ export default function ChecklistConcretagem() {
                         <div className="flex justify-between items-center">
                           <CardTitle className="text-base">Carga {carga.numero_carga}</CardTitle>
                           {formData.cargas_concreto.length > 1 && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removerCarga(index)}
-                              className="text-red-500 hover:text-red-700 p-0 h-auto"
-                            >
+                            <Button type="button" variant="ghost" size="sm" onClick={() => removerCarga(index)} className="text-red-500 hover:text-red-700 p-0 h-auto">
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           )}
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-4 pt-0">
-                        {/* Recebimento do Concreto */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <Label>Nota Fiscal Nº</Label>
-                            <Input
-                              value={carga.nota_fiscal}
-                              onChange={(e) => handleCargaChange(index, 'nota_fiscal', e.target.value)}
-                            />
+                            <Input value={carga.nota_fiscal} onChange={(e) => handleCargaChange(index, "nota_fiscal", e.target.value)} />
                           </div>
                           <div>
                             <Label>Placa da Betoneira</Label>
-                            <Input
-                              value={carga.placa_betoneira}
-                              onChange={(e) => handleCargaChange(index, 'placa_betoneira', e.target.value)}
-                            />
+                            <Input value={carga.placa_betoneira} onChange={(e) => handleCargaChange(index, "placa_betoneira", e.target.value)} />
                           </div>
                         </div>
 
-                        {/* Ensaios em formato de tabela */}
-                        <div className="border-t pt-4 mt-4">
+                        {/* Ensaios de Qualidade */}
+                        <div className="border-t pt-4">
                           <div className="flex items-center justify-between mb-3">
                             <h4 className="font-semibold">Ensaios de Qualidade</h4>
                             <p className="text-xs text-slate-600 italic">Determinar a conformidade dos parâmetros</p>
@@ -1028,103 +233,42 @@ export default function ChecklistConcretagem() {
                                 </tr>
                               </thead>
                               <tbody>
-                                {/* Slump Test */}
                                 <tr>
                                   <td className="border border-slate-300 px-2 py-2 font-medium bg-slate-50">Slump Test</td>
                                   <td className="border border-slate-300 px-2 py-1 text-center">
-                                    <input
-                                      type="checkbox"
-                                      checked={carga.slump_test.realizado}
-                                      onChange={(e) => handleCargaChange(index, 'slump_test.realizado', e.target.checked)}
-                                      className="w-4 h-4"
-                                    />
+                                    <input type="checkbox" checked={carga.slump_test.realizado} onChange={(e) => handleCargaChange(index, "slump_test.realizado", e.target.checked)} className="w-4 h-4" />
                                   </td>
                                   <td className="border border-slate-300 px-1 py-1">
-                                    <Input
-                                      type="number"
-                                      step="0.1"
-                                      value={carga.slump_test.resultado || ''}
-                                      onChange={(e) => handleCargaChange(index, 'slump_test.resultado', e.target.value)}
-                                      disabled={!carga.slump_test.realizado || !selectedProject}
-                                      className="h-8 text-sm"
-                                      placeholder="Resultado"
-                                    />
+                                    <Input type="number" step="0.1" value={carga.slump_test.resultado || ""} onChange={(e) => handleCargaChange(index, "slump_test.resultado", e.target.value)} disabled={!carga.slump_test.realizado || !selectedProject} className="h-8 text-sm" placeholder="Resultado" />
                                   </td>
-                                  <td className={`border border-slate-300 px-2 py-1 text-center text-xs ${selectedProject ? 'bg-blue-50 text-blue-800' : 'bg-slate-100 text-slate-500'}`}>
-                                    {carga.slump_test.limite || 'N/A'}
-                                  </td>
+                                  <td className={`border border-slate-300 px-2 py-1 text-center text-xs ${selectedProject ? "bg-blue-50 text-blue-800" : "bg-slate-100 text-slate-500"}`}>{carga.slump_test.limite || "N/A"}</td>
                                   <td className="border border-slate-300 px-2 py-1 text-center">
                                     {carga.slump_test.realizado ? (
-                                      carga.slump_test.conforme === true ? (
-                                        <span className="text-green-600 font-bold text-xl">✓</span>
-                                      ) : carga.slump_test.conforme === false ? (
-                                        <span className="text-red-600 font-bold text-xl">✗</span>
-                                      ) : (
-                                        <span className="text-slate-500">-</span>
-                                      )
-                                    ) : (
-                                      <span className="text-slate-500">-</span>
-                                    )}
+                                      carga.slump_test.conforme === true ? <span className="text-green-600 font-bold text-xl">✓</span>
+                                      : carga.slump_test.conforme === false ? <span className="text-red-600 font-bold text-xl">✗</span>
+                                      : <span className="text-slate-500">-</span>
+                                    ) : <span className="text-slate-500">-</span>}
                                   </td>
                                 </tr>
-
-                                {/* Espessura da Camada */}
                                 <tr>
                                   <td className="border border-slate-300 px-2 py-2 font-medium bg-slate-50">Espessura da Camada</td>
                                   <td className="border border-slate-300 px-2 py-1 text-center">
-                                    <input
-                                      type="checkbox"
-                                      checked={carga.espessura_camada.realizado}
-                                      onChange={(e) => handleCargaChange(index, 'espessura_camada.realizado', e.target.checked)}
-                                      className="w-4 h-4"
-                                    />
+                                    <input type="checkbox" checked={carga.espessura_camada.realizado} onChange={(e) => handleCargaChange(index, "espessura_camada.realizado", e.target.checked)} className="w-4 h-4" />
                                   </td>
                                   <td className="border border-slate-300 px-1 py-1">
-                                    <Input
-                                      type="number"
-                                      step="0.1"
-                                      value={carga.espessura_camada.resultado || ''}
-                                      onChange={(e) => handleCargaChange(index, 'espessura_camada.resultado', e.target.value)}
-                                      disabled={!carga.espessura_camada.realizado}
-                                      className="h-8 text-sm"
-                                      placeholder="Resultado"
-                                    />
+                                    <Input type="number" step="0.1" value={carga.espessura_camada.resultado || ""} onChange={(e) => handleCargaChange(index, "espessura_camada.resultado", e.target.value)} disabled={!carga.espessura_camada.realizado} className="h-8 text-sm" placeholder="Resultado" />
                                   </td>
                                   <td className="border border-slate-300 px-1 py-1">
-                                    <Input
-                                      value={carga.espessura_camada.limite}
-                                      onChange={(e) => handleCargaChange(index, 'espessura_camada.limite', e.target.value)}
-                                      disabled={!carga.espessura_camada.realizado}
-                                      className="h-8 text-sm"
-                                      placeholder="Limite manual"
-                                    />
+                                    <Input value={carga.espessura_camada.limite} onChange={(e) => handleCargaChange(index, "espessura_camada.limite", e.target.value)} disabled={!carga.espessura_camada.realizado} className="h-8 text-sm" placeholder="Limite manual" />
                                   </td>
                                   <td className="border border-slate-300 px-2 py-1 text-center">
                                     <div className="flex gap-2 justify-center">
                                       <label className="flex items-center gap-1 cursor-pointer">
-                                        <input
-                                          type="checkbox"
-                                          checked={carga.espessura_camada.conforme === true}
-                                          onChange={(e) => {
-                                            const newValue = e.target.checked ? true : null;
-                                            handleCargaChange(index, 'espessura_camada.conforme', newValue);
-                                          }}
-                                          disabled={!carga.espessura_camada.realizado}
-                                          className="w-4 h-4 accent-green-500"
-                                        />
+                                        <input type="checkbox" checked={carga.espessura_camada.conforme === true} onChange={(e) => handleCargaChange(index, "espessura_camada.conforme", e.target.checked ? true : null)} disabled={!carga.espessura_camada.realizado} className="w-4 h-4 accent-green-500" />
                                         <span className="text-xs text-green-600">✓</span>
                                       </label>
                                       <label className="flex items-center gap-1 cursor-pointer">
-                                        <input
-                                          type="checkbox"
-                                          checked={carga.espessura_camada.conforme === false}
-                                          onChange={(e) => {
-                                            const newValue = e.target.checked ? false : null;
-                                            handleCargaChange(index, 'espessura_camada.conforme', newValue);
-                                          }}
-                                          disabled={!carga.espessura_camada.realizado}
-                                          className="w-4 h-4 accent-red-500"
-                                        />
+                                        <input type="checkbox" checked={carga.espessura_camada.conforme === false} onChange={(e) => handleCargaChange(index, "espessura_camada.conforme", e.target.checked ? false : null)} disabled={!carga.espessura_camada.realizado} className="w-4 h-4 accent-red-500" />
                                         <span className="text-xs text-red-600">✗</span>
                                       </label>
                                     </div>
@@ -1133,26 +277,20 @@ export default function ChecklistConcretagem() {
                               </tbody>
                             </table>
                           </div>
-
                           <div className="mt-3">
                             <Label>Equipamento de Lançamento</Label>
-                            <Select
-                            value={carga.equipamento_lancamento || ""}
-                            onValueChange={(value) => handleCargaChange(index, 'equipamento_lancamento', value)}
-                            >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="convencional">Convencional</SelectItem>
-                              <SelectItem value="bombeado">Bombeado</SelectItem>
-                            </SelectContent>
+                            <Select value={carga.equipamento_lancamento || ""} onValueChange={(v) => handleCargaChange(index, "equipamento_lancamento", v)}>
+                              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="convencional">Convencional</SelectItem>
+                                <SelectItem value="bombeado">Bombeado</SelectItem>
+                              </SelectContent>
                             </Select>
                           </div>
                         </div>
 
                         {/* Acompanhamento Lançamento */}
-                        <div className="border-t pt-4 space-y-3 mt-4">
+                        <div className="border-t pt-4 space-y-3">
                           <h4 className="font-semibold">Acompanhamento Lançamento Concreto</h4>
                           <div className="overflow-x-auto">
                             <table className="w-full border-collapse border border-slate-300 text-sm">
@@ -1164,91 +302,48 @@ export default function ChecklistConcretagem() {
                                 </tr>
                               </thead>
                               <tbody>
-                                <tr>
-                                  <td className="border border-slate-300 px-2 py-2 font-medium bg-slate-50">
-                                    A superfície foi tratada e limpa?
-                                  </td>
-                                  <td className="border border-slate-300 px-2 py-1 text-center">
-                                    <input
-                                      type="checkbox"
-                                      checked={carga.superficie_tratada_limpa === true}
-                                      onChange={(e) => handleCargaChange(index, 'superficie_tratada_limpa', e.target.checked ? true : null)}
-                                      className="w-4 h-4 accent-green-500"
-                                    />
-                                  </td>
-                                  <td className="border border-slate-300 px-2 py-1 text-center">
-                                    <input
-                                      type="checkbox"
-                                      checked={carga.superficie_tratada_limpa === false}
-                                      onChange={(e) => handleCargaChange(index, 'superficie_tratada_limpa', e.target.checked ? false : null)}
-                                      className="w-4 h-4 accent-red-500"
-                                    />
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td className="border border-slate-300 px-2 py-2 font-medium bg-slate-50">
-                                    Foi realizado adensamento do concreto?
-                                  </td>
-                                  <td className="border border-slate-300 px-2 py-1 text-center">
-                                    <input
-                                      type="checkbox"
-                                      checked={carga.adensamento_realizado === true}
-                                      onChange={(e) => handleCargaChange(index, 'adensamento_realizado', e.target.checked ? true : null)}
-                                      className="w-4 h-4 accent-green-500"
-                                    />
-                                  </td>
-                                  <td className="border border-slate-300 px-2 py-1 text-center">
-                                    <input
-                                      type="checkbox"
-                                      checked={carga.adensamento_realizado === false}
-                                      onChange={(e) => handleCargaChange(index, 'adensamento_realizado', e.target.checked ? false : null)}
-                                      className="w-4 h-4 accent-red-500"
-                                    />
-                                  </td>
-                                </tr>
+                                {[
+                                  { label: "A superfície foi tratada e limpa?", field: "superficie_tratada_limpa" },
+                                  { label: "Foi realizado adensamento do concreto?", field: "adensamento_realizado" },
+                                ].map(({ label, field }) => (
+                                  <tr key={field}>
+                                    <td className="border border-slate-300 px-2 py-2 font-medium bg-slate-50">{label}</td>
+                                    <td className="border border-slate-300 px-2 py-1 text-center">
+                                      <input type="checkbox" checked={carga[field] === true} onChange={(e) => handleCargaChange(index, field, e.target.checked ? true : null)} className="w-4 h-4 accent-green-500" />
+                                    </td>
+                                    <td className="border border-slate-300 px-2 py-1 text-center">
+                                      <input type="checkbox" checked={carga[field] === false} onChange={(e) => handleCargaChange(index, field, e.target.checked ? false : null)} className="w-4 h-4 accent-red-500" />
+                                    </td>
+                                  </tr>
+                                ))}
                               </tbody>
                             </table>
                           </div>
-                          <div className="mt-3">
-                            <Label htmlFor={`obs_lancamento_${index}`}>Observações</Label>
-                            <Textarea
-                              id={`obs_lancamento_${index}`}
-                              value={carga.observacoes_lancamento}
-                              onChange={(e) => handleCargaChange(index, 'observacoes_lancamento', e.target.value)}
-                              rows={2}
-                            />
+                          <div>
+                            <Label>Observações</Label>
+                            <Textarea value={carga.observacoes_lancamento} onChange={(e) => handleCargaChange(index, "observacoes_lancamento", e.target.value)} rows={2} />
                           </div>
                         </div>
 
-                        {/* Moldes para Fiscalização - NOVA ESTRUTURA */}
-                        <div className="border-t pt-4 space-y-3 mt-4">
+                        {/* Moldes para Fiscalização */}
+                        <div className="border-t pt-4 space-y-3">
                           <h4 className="font-semibold">Moldes para Fiscalização</h4>
                           <div className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              id={`moldado_fiscalizacao_${index}`}
-                              checked={carga.moldado_fiscalizacao}
+                            <input type="checkbox" id={`moldado_${index}`} checked={carga.moldado_fiscalizacao}
                               onChange={(e) => {
-                                const newValue = e.target.checked;
-                                handleCargaChange(index, 'moldado_fiscalizacao', newValue);
-                                if (!newValue) {
-                                  // Limpar corpos de prova se desmarcar
-                                  setFormData(prev => {
-                                    const newCargas = [...prev.cargas_concreto];
-                                    newCargas[index].corpos_prova = [];
-                                    return { ...prev, cargas_concreto: newCargas };
-                                  });
+                                handleCargaChange(index, "moldado_fiscalizacao", e.target.checked);
+                                if (!e.target.checked) {
+                                  const newCargas = [...formData.cargas_concreto];
+                                  newCargas[index].corpos_prova = [];
+                                  setFormData(prev => ({ ...prev, cargas_concreto: newCargas }));
                                 }
                               }}
-                              className="w-4 h-4"
-                            />
-                            <Label htmlFor={`moldado_fiscalizacao_${index}`} className="text-sm cursor-pointer">Moldado para Fiscalização</Label>
+                              className="w-4 h-4" />
+                            <Label htmlFor={`moldado_${index}`} className="text-sm cursor-pointer">Moldado para Fiscalização</Label>
                           </div>
-
                           {carga.moldado_fiscalizacao && (
-                            <div className="mt-3 space-y-3">
+                            <div className="space-y-3">
                               <Label className="font-semibold">Configuração dos Corpos de Prova</Label>
-                              
                               <div className="overflow-x-auto">
                                 <table className="w-full border-collapse border border-slate-300 text-sm">
                                   <thead className="bg-slate-100">
@@ -1261,29 +356,13 @@ export default function ChecklistConcretagem() {
                                   <tbody>
                                     {[3, 7, 28, 63].map((dias) => (
                                       <tr key={dias}>
-                                        <td className="border border-slate-300 p-2 text-center font-medium bg-slate-50">
-                                          {dias} dias
+                                        <td className="border border-slate-300 p-2 text-center font-medium bg-slate-50">{dias} dias</td>
+                                        <td className="border border-slate-300 p-2">
+                                          <Input type="number" min="0" max="10" value={getQuantidadeCPs(index, dias)} onChange={(e) => handleCPConfigChange(index, dias, "quantidade", e.target.value)} className="h-9 text-center" placeholder="0" />
                                         </td>
                                         <td className="border border-slate-300 p-2">
-                                          <Input
-                                            type="number"
-                                            min="0"
-                                            max="10"
-                                            value={getQuantidadeCPs(index, dias)}
-                                            onChange={(e) => handleCPConfigChange(index, dias, 'quantidade', e.target.value)}
-                                            className="h-9 text-center"
-                                            placeholder="0"
-                                          />
-                                        </td>
-                                        <td className="border border-slate-300 p-2">
-                                          <Select
-                                            value={getTipoRupturaCPs(index, dias)}
-                                            onValueChange={(value) => handleCPConfigChange(index, dias, 'tipo_ruptura', value)}
-                                            disabled={getQuantidadeCPs(index, dias) === 0}
-                                          >
-                                            <SelectTrigger className="h-9">
-                                              <SelectValue />
-                                            </SelectTrigger>
+                                          <Select value={getTipoRupturaCPs(index, dias)} onValueChange={(v) => handleCPConfigChange(index, dias, "tipo_ruptura", v)} disabled={getQuantidadeCPs(index, dias) === 0}>
+                                            <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                                             <SelectContent>
                                               <SelectItem value="compressao_axial">Compressão Axial</SelectItem>
                                               <SelectItem value="comp_diametral">Compressão Diametral</SelectItem>
@@ -1296,19 +375,11 @@ export default function ChecklistConcretagem() {
                                   </tbody>
                                 </table>
                               </div>
-
-                              {carga.corpos_prova && carga.corpos_prova.length > 0 && (
+                              {carga.corpos_prova?.length > 0 && (
                                 <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
                                   <p className="text-sm text-blue-800">
                                     <strong>Total de CPs moldados:</strong> {carga.corpos_prova.length}
-                                    {carga.corpos_prova.filter(cp => cp.dias_ruptura === 3).length > 0 && 
-                                      ` | 3 dias: ${carga.corpos_prova.filter(cp => cp.dias_ruptura === 3).length}`}
-                                    {carga.corpos_prova.filter(cp => cp.dias_ruptura === 7).length > 0 && 
-                                      ` | 7 dias: ${carga.corpos_prova.filter(cp => cp.dias_ruptura === 7).length}`}
-                                    {carga.corpos_prova.filter(cp => cp.dias_ruptura === 28).length > 0 && 
-                                      ` | 28 dias: ${carga.corpos_prova.filter(cp => cp.dias_ruptura === 28).length}`}
-                                      {carga.corpos_prova.filter(cp => cp.dias_ruptura === 63).length > 0 && 
-                                      ` | 63 dias: ${carga.corpos_prova.filter(cp => cp.dias_ruptura === 63).length}`}
+                                    {[3, 7, 28, 63].map(d => carga.corpos_prova.filter(cp => cp.dias_ruptura === d).length > 0 ? ` | ${d} dias: ${carga.corpos_prova.filter(cp => cp.dias_ruptura === d).length}` : "").join("")}
                                   </p>
                                 </div>
                               )}
@@ -1323,18 +394,9 @@ export default function ChecklistConcretagem() {
 
               {/* OBSERVAÇÕES GERAIS */}
               <div>
-                <Label htmlFor="observacoes_gerais">Observações Gerais</Label>
-                <Textarea
-                  id="observacoes_gerais"
-                  value={formData.observacoes_gerais}
-                  onChange={(e) => setFormData({ ...formData, observacoes_gerais: e.target.value })}
-                  rows={3}
-                  placeholder="Observações gerais sobre o checklist..."
-                  maxLength="500"
-                />
-                <p className="text-xs text-right text-slate-500 mt-1">
-                  {formData.observacoes_gerais?.length || 0} / 500
-                </p>
+                <Label>Observações Gerais</Label>
+                <Textarea value={formData.observacoes_gerais} onChange={(e) => setFormData({ ...formData, observacoes_gerais: e.target.value })} rows={3} placeholder="Observações gerais..." maxLength="500" />
+                <p className="text-xs text-right text-slate-500 mt-1">{formData.observacoes_gerais?.length || 0} / 500</p>
               </div>
 
               {/* AÇÕES CORRETIVAS / NÃO CONFORMIDADES */}
@@ -1342,8 +404,8 @@ export default function ChecklistConcretagem() {
                 acoesRealizadas={formData.acoes_corretivas_realizado}
                 acoesDescricao={formData.acoes_corretivas_descricao}
                 naoConformidades={formData.nao_conformidades || []}
-                onAcoesRealizadasChange={(value) => setFormData(prev => ({ ...prev, acoes_corretivas_realizado: value, acoes_corretivas_descricao: value === false ? "" : prev.acoes_corretivas_descricao }))}
-                onAcoesDescricaoChange={(value) => setFormData(prev => ({ ...prev, acoes_corretivas_descricao: value }))}
+                onAcoesRealizadasChange={(v) => setFormData(prev => ({ ...prev, acoes_corretivas_realizado: v, acoes_corretivas_descricao: v === false ? "" : prev.acoes_corretivas_descricao }))}
+                onAcoesDescricaoChange={(v) => setFormData(prev => ({ ...prev, acoes_corretivas_descricao: v }))}
                 onNaoConformidadesChange={(ncs) => setFormData(prev => ({ ...prev, nao_conformidades: ncs }))}
                 disabled={false}
                 locaisPermitidos={["CAMPO"]}
@@ -1353,44 +415,18 @@ export default function ChecklistConcretagem() {
               <div>
                 <Label>Registro Fotográfico</Label>
                 <div>
-                  <Input
-                    id="fotos"
-                    type="file"
-                    multiple
-                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                    onChange={handleFileChange}
-                    disabled={uploadingPhotos}
-                    className="hidden"
-                  />
-                  <Label
-                    htmlFor="fotos"
-                    className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm cursor-pointer hover:bg-slate-50 ${uploadingPhotos ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
+                  <Input id="fotos" type="file" multiple accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" onChange={handleFileChange} disabled={uploadingPhotos} className="hidden" />
+                  <Label htmlFor="fotos" className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm cursor-pointer hover:bg-slate-50 ${uploadingPhotos ? "opacity-50 cursor-not-allowed" : ""}`}>
                     <span className="truncate text-slate-500">{selectedFileNames}</span>
-                    <span className="flex-shrink-0 ml-4 px-3 py-1 rounded-md text-sm font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100">
-                      {uploadingPhotos ? 'Enviando...' : 'Escolher Ficheiros'}
-                    </span>
+                    <span className="flex-shrink-0 ml-4 px-3 py-1 rounded-md text-sm font-semibold bg-blue-50 text-blue-700">{uploadingPhotos ? "Enviando..." : "Escolher Ficheiros"}</span>
                   </Label>
                 </div>
-
-                {uploadingPhotos && (
-                  <div className="flex items-center gap-2 text-sm text-slate-600 mt-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Fazendo upload das fotos...</span>
-                  </div>
-                )}
-
+                {uploadingPhotos && <div className="flex items-center gap-2 text-sm text-slate-600 mt-2"><Loader2 className="w-4 h-4 animate-spin" /><span>Fazendo upload das fotos...</span></div>}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
-                  {formData.fotos && formData.fotos.map((url, index) => (
-                    <div key={index} className="relative group">
-                      <picture><source srcSet={url} /><img src={url} alt={`Foto ${index + 1}`} className="w-full h-32 object-cover rounded-md border" width="auto" height="128" /></picture>
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon"
-                        className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => handleRemovePhoto(index)}
-                      >
+                  {formData.fotos?.map((url, i) => (
+                    <div key={i} className="relative group">
+                      <picture><source srcSet={url} /><img src={url} alt={`Foto ${i + 1}`} className="w-full h-32 object-cover rounded-md border" width="auto" height="128" /></picture>
+                      <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleRemovePhoto(i)}>
                         <XCircle className="h-4 w-4" />
                       </Button>
                     </div>
@@ -1400,40 +436,12 @@ export default function ChecklistConcretagem() {
 
               {/* BOTÕES */}
               <div className="flex justify-end gap-4 mt-6">
-                <Button type="button" variant="outline" onClick={() => {
-                  clearSavedData();
-                  navigate(createPageUrl('MeusEnsaios'));
-                }}>
-                  Cancelar
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={saving || uploadingPhotos}
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    await handleSubmit(e, 'rascunho');
-                  }}
-                  className="border-blue-500 text-blue-600 hover:bg-blue-50"
-                >
+                <Button type="button" variant="outline" onClick={handleCancel}>Cancelar</Button>
+                <Button type="button" variant="outline" disabled={saving || uploadingPhotos} onClick={(e) => handleSubmit(e, "rascunho")} className="border-blue-500 text-blue-600 hover:bg-blue-50">
                   <Save className="mr-2 h-4 w-4" /> Salvar Progresso
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={saving || uploadingPhotos}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  {saving ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Salvando...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="mr-2 h-4 w-4" />
-                      Finalizar
-                    </>
-                  )}
+                <Button type="submit" disabled={saving || uploadingPhotos} className="bg-blue-600 hover:bg-blue-700">
+                  {saving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Salvando...</> : <><Save className="mr-2 h-4 w-4" />Finalizar</>}
                 </Button>
               </div>
             </form>
