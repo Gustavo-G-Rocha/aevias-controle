@@ -1,30 +1,9 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
-const PENEIRAS_MAP = {
-  "peneira_75_0mm": { astm: "3\"", mm: "75,0" },
-  "peneira_63_0mm": { astm: "2 1/2\"", mm: "63,0" },
-  "peneira_50_0mm": { astm: "2\"", mm: "50,0" },
-  "peneira_38_1mm": { astm: "1 1/2\"", mm: "38,1" },
-  "peneira_37_5mm": { astm: "1 1/2\"", mm: "37,5" },
-  "peneira_25_0mm": { astm: "1\"", mm: "25,0" },
-  "peneira_19_0mm": { astm: "3/4\"", mm: "19,0" },
-  "peneira_16_0mm": { astm: "5/8\"", mm: "16,0" },
-  "peneira_12_5mm": { astm: "1/2\"", mm: "12,5" },
-  "peneira_9_5mm": { astm: "3/8\"", mm: "9,5" },
-  "peneira_4_75mm": { astm: "#4", mm: "4,75" },
-  "peneira_2_36mm": { astm: "#8", mm: "2,36" },
-  "peneira_2_0mm": { astm: "#10", mm: "2,0" },
-  "peneira_1_18mm": { astm: "#16", mm: "1,18" },
-  "peneira_0_6mm": { astm: "#30", mm: "0,6" },
-  "peneira_0_42mm": { astm: "#40", mm: "0,42" },
-  "peneira_0_3mm": { astm: "#50", mm: "0,3" },
-  "peneira_0_18mm": { astm: "#100", mm: "0,18" },
-  "peneira_0_15mm": { astm: "#100", mm: "0,15" },
-  "peneira_0_075mm": { astm: "#200", mm: "0,075" }
-};
-
+import { PENEIRAS_MAP } from '@/constants/sieves';
+import { formatDate, buildSignatureProps } from '@/utils/relatorioUtils';
 import SignatureFooter from './SignatureFooter';
+import PrintStyles from './PrintStyles';
 
 export default function RelatorioGranulometriaIndividual({ ensaio, obra, project, user, regional }) {
   if (!ensaio) {
@@ -40,24 +19,6 @@ export default function RelatorioGranulometriaIndividual({ ensaio, obra, project
 
   const handleDownloadPDF = () => {
     window.print();
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
-  };
-
-  const formatDateBrasilia = (dateString) => {
-    if (!dateString) return 'N/A';
-    let normalizedDate = dateString;
-    if (!dateString.endsWith('Z') && !dateString.includes('+') && !dateString.includes('-', 10)) {
-      normalizedDate = dateString + 'Z';
-    }
-    return new Date(normalizedDate).toLocaleString('pt-BR', {
-      timeZone: 'America/Sao_Paulo',
-      dateStyle: 'short',
-      timeStyle: 'medium'
-    });
   };
 
   const peneirasVisiveis = project?.faixa_trabalho 
@@ -304,24 +265,10 @@ export default function RelatorioGranulometriaIndividual({ ensaio, obra, project
 
       {/* Assinaturas */}
       <footer className="mt-6 pt-6 print:break-inside-avoid">
-        <SignatureFooter
-          labName={ensaio.laboratorista_name}
-          labEmail={ensaio.created_by}
-          labCreatedDate={ensaio.created_date}
-          labPosition="Laboratorista"
-          approverName={ensaio.approver_details?.name}
-          approverEmail={ensaio.approved_by}
-          approverPosition={ensaio.approver_details?.position}
-          approverCREA={ensaio.approver_details?.crea_number}
-          approverDate={ensaio.approved_date}
-          clientName={ensaio.client_signature?.engineer_name}
-          clientEmail={ensaio.client_signature?.signed_by}
-          clientPosition={ensaio.client_signature?.position}
-          clientCREA={ensaio.client_signature?.crea_number}
-          clientDate={ensaio.client_signature?.signed_date}
-        />
-        </footer>
-        </div>
+        <SignatureFooter {...buildSignatureProps(ensaio)} />
+      </footer>
+      </div>
+      <PrintStyles />
     </>
   );
 }

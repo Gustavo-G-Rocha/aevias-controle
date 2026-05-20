@@ -1,46 +1,12 @@
 import React, { useState } from 'react';
-
-const PENEIRAS_CONFIG = [
-  { label: 'Nº 3"', abertura: '75,0', key: 'peneira_75_0mm' },
-  { label: 'Nº 2½"', abertura: '63,0', key: 'peneira_63_0mm' },
-  { label: 'Nº 2"', abertura: '50,0', key: 'peneira_50_0mm' },
-  { label: 'Nº 1½"', abertura: '37,5', key: 'peneira_37_5mm' },
-  { label: 'Nº 1"', abertura: '25,0', key: 'peneira_25_0mm' },
-  { label: 'Nº ¾"', abertura: '19,0', key: 'peneira_19_0mm' },
-  { label: 'Nº ⅝"', abertura: '16,0', key: 'peneira_16_0mm' },
-  { label: 'Nº ½"', abertura: '12,5', key: 'peneira_12_5mm' },
-  { label: 'Nº ⅜"', abertura: '9,5', key: 'peneira_9_5mm' },
-  { label: 'Nº 4', abertura: '4,75', key: 'peneira_4_75mm' },
-  { label: 'Nº 8', abertura: '2,36', key: 'peneira_2_36mm' },
-  { label: 'Nº 10', abertura: '2,0', key: 'peneira_2_0mm' },
-  { label: 'Nº 16', abertura: '1,18', key: 'peneira_1_18mm' },
-  { label: 'Nº 30', abertura: '0,6', key: 'peneira_0_6mm' },
-  { label: 'Nº 40', abertura: '0,42', key: 'peneira_0_42mm' },
-  { label: 'Nº 50', abertura: '0,3', key: 'peneira_0_3mm' },
-  { label: 'Nº 80', abertura: '0,18', key: 'peneira_0_18mm' },
-  { label: 'Nº 100', abertura: '0,15', key: 'peneira_0_15mm' },
-  { label: 'Nº 200', abertura: '0,075', key: 'peneira_0_075mm' }
-];
-
+import { PENEIRAS_CONFIG, filtrarPeneirasPorFaixa } from '@/constants/sieves';
+import { formatDate, formatDateBrasilia, buildSignatureProps } from '@/utils/relatorioUtils';
 import SignatureFooter from './SignatureFooter';
+import PrintStyles from './PrintStyles';
 
 export default function RelatorioMRAF({ ensaio, obra, project, user, regional, faixaGranulometrica }) {
   const [hoveredPoint, setHoveredPoint] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    return new Date(dateString).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
-  };
-
-  const formatDateBrasilia = (dateString) => {
-    if (!dateString) return 'N/A';
-    let normalizedDate = dateString;
-    if (!dateString.endsWith('Z') && !dateString.includes('+') && !dateString.includes('-', 10)) {
-      normalizedDate = dateString + 'Z';
-    }
-    return new Date(normalizedDate).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'medium' });
-  };
 
   const calcularGranulometria = () => {
     if (!ensaio?.granulometria?.peso_retido_peneiras) return [];
@@ -48,17 +14,7 @@ export default function RelatorioMRAF({ ensaio, obra, project, user, regional, f
     const pesosRetidos = ensaio.granulometria.peso_retido_peneiras;
     const pesoInicial = ensaio.extracao_ligante?.amostra_sem_ligante || 0;
     
-    let peneirasRelevantes = PENEIRAS_CONFIG;
-    
-    if (faixaGranulometrica?.peneiras && faixaGranulometrica.peneiras.length > 0) {
-      peneirasRelevantes = PENEIRAS_CONFIG.filter(peneira => {
-        return faixaGranulometrica.peneiras.some(p => {
-          const aberturaFaixa = p.abertura.toString().replace(/mm/gi, '').replace(',', '.').trim();
-          const aberturaConfig = peneira.abertura.replace(',', '.').trim();
-          return parseFloat(aberturaFaixa) === parseFloat(aberturaConfig);
-        });
-      });
-    }
+    const peneirasRelevantes = filtrarPeneirasPorFaixa(faixaGranulometrica, PENEIRAS_CONFIG);
     
     let acumuladoRetido = 0;
     
@@ -540,60 +496,11 @@ export default function RelatorioMRAF({ ensaio, obra, project, user, regional, f
 
         {/* Footer com assinaturas */}
         <footer className="px-3 print:break-inside-avoid print:px-2 mt-4 print:mt-3">
-          <SignatureFooter
-            labName={ensaio?.laboratorista_name}
-            labEmail={ensaio?.created_by}
-            labCreatedDate={ensaio?.created_date}
-            labPosition="Laboratorista"
-            approverName={ensaio?.approver_details?.name}
-            approverEmail={ensaio?.approved_by}
-            approverPosition={ensaio?.approver_details?.position}
-            approverCREA={ensaio?.approver_details?.crea_number}
-            approverDate={ensaio?.approved_date}
-            clientName={ensaio?.client_signature?.engineer_name}
-            clientEmail={ensaio?.client_signature?.signed_by}
-            clientPosition={ensaio?.client_signature?.position}
-            clientCREA={ensaio?.client_signature?.crea_number}
-            clientDate={ensaio?.client_signature?.signed_date}
-            sizePrint={true}
-          />
+          <SignatureFooter {...buildSignatureProps(ensaio)} sizePrint={true} />
         </footer>
       </div>
 
-      {/* Estilos para impressão */}
-      <style>{`
-        @media print {
-          @page {
-            size: A4 portrait;
-            margin: 0;
-          }
-          body {
-            print-color-adjust: exact;
-            -webkit-print-color-adjust: exact;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-          header {
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-            display: grid !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            position: relative !important;
-            margin-top: 0 !important;
-          }
-          aside, nav, [data-sidebar], [role="navigation"] {
-            display: none !important;
-          }
-          ::-webkit-scrollbar {
-            display: none !important;
-          }
-          * {
-            scrollbar-width: none !important;
-            -ms-overflow-style: none !important;
-          }
-        }
-      `}</style>
+      <PrintStyles />
     </div>
   );
 }

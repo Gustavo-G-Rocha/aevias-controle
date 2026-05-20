@@ -65,10 +65,21 @@
 
 ---
 
-### 🔲 Prioridade 5: Relatórios (Longo Prazo)
-- [ ] Consolidar relatórios em componentes reutilizáveis
+### ✅ Prioridade 5: Relatórios — Infraestrutura Reutilizável (CONCLUÍDO — Sprint 5)
+
+#### 5.1 - Utilitários Criados
+- [x] `utils/relatorioUtils.js` — `formatDate`, `formatDateBrasilia`, `buildSignatureProps` centralizados
+- [x] `components/relatorios/PrintStyles.jsx` — bloco `@media print` centralizado
+- [x] `components/relatorios/RelatorioHeader.jsx` — cabeçalho reutilizável (logo + título + data)
+
+#### 5.2 - Relatórios Migrados
+- [x] `RelatorioMRAF.jsx` — removido `PENEIRAS_CONFIG` local, `formatDate` duplicado, `<style>` inline; usa `filtrarPeneirasPorFaixa`, `buildSignatureProps`, `PrintStyles`
+- [x] `RelatorioGranulometriaIndividual.jsx` — removido `PENEIRAS_MAP` local, `formatDate` duplicado; usa `PENEIRAS_MAP` central, `buildSignatureProps`, `PrintStyles`
+- [x] `RelatorioGranuMistura.jsx` — usa `buildSignatureProps`, `PrintStyles`
+
+#### 5.3 - Pendente (Longo Prazo)
+- [ ] Migrar demais relatórios para `buildSignatureProps` e `PrintStyles` (RelatorioChecklist, RelatorioDiario, etc.)
 - [ ] PDF generation service centralizado
-- [ ] Assinatura digital centralizada
 
 ---
 
@@ -131,6 +142,17 @@ import { filterRegionaisByAccessLevel } from "@/utils/regionalFilter";
 const regionaisFiltradas = useMemo(() => filterRegionaisByAccessLevel(regionais, user), [regionais, user]);
 ```
 
+### Relatório Pattern
+```javascript
+import { formatDate, buildSignatureProps } from "@/utils/relatorioUtils";
+import PrintStyles from "@/components/relatorios/PrintStyles";
+import SignatureFooter from "@/components/relatorios/SignatureFooter";
+
+// No JSX:
+<SignatureFooter {...buildSignatureProps(ensaio)} />
+<PrintStyles />
+```
+
 ### Componente Pattern
 ```javascript
 // Pequenos, focados, sem lógica complexa
@@ -155,4 +177,5 @@ const regionaisFiltradas = useMemo(() => filterRegionaisByAccessLevel(regionais,
 *Atualizado em: 2026-05-20*  
 *Sprint 1 concluída: 2026-05-20*  
 *Sprint 4 concluída: 2026-05-20*  
-*Próxima Sprint: Sprint 5 - Relatórios (consolidação de componentes reutilizáveis e geração de PDF centralizada)*
+*Sprint 5 concluída: 2026-05-20*  
+*Próxima Sprint: Sprint 6 - Testes (unit tests para hooks e utilitários)*
