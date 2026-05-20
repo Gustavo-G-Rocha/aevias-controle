@@ -16,6 +16,7 @@
 | **ETAPA 5** | dashboardCalculations.js | ✅ **Concluído** |
 | **ETAPA 6** | Services — Paginação e Limites Inteligentes | ✅ **Concluído** |
 | **ETAPA 7** | Arquitetura Geral — Eliminação de Duplicação | ✅ **Concluído** |
+| **ETAPA 8** | Tabelas de Ensaios — Deduplicação e O(1) Lookups | ✅ **Concluído** |
 
 ---
 
@@ -390,7 +391,10 @@ import BottomNav from "@/components/layout/BottomNav";
 ✅ Validações como arrays iteráveis  
 ✅ `dashboardCalculations.js` single-pass (80% menos iterações)  
 ✅ Inventário completo dos formulários — identificação de quais JÁ estavam adequados  
-✅ **Segunda rodada completa — todas as 7 ETAPAs concluídas**
+✅ **Segunda rodada completa — todas as 7 ETAPAs concluídas**  
+✅ `EnsaiosTableHeader.jsx` criado — ~50 linhas JSX de `<thead>` duplicadas eliminadas  
+✅ Lookups O(1) em `AdminInterface`, `ClienteInterface`, `LaboratoristaInterface` e `useTableFilters`  
+✅ Filtros de tabela: keypress 25.000 → 500 comparações (com 500 ensaios e 50 obras)
 
 ---
 
@@ -409,7 +413,43 @@ O componente já tinha `useChecklistForm` para carregamento. O que faltava era:
 
 ---
 
-## 🗓️ Terceira Rodada — Oportunidades Identificadas
+## ✅ ETAPA 8 (Terceira Rodada) — Eliminação de Duplicação nas Tabelas de Ensaios
+
+**Problema identificado:** `AdminInterface.jsx` e `ClienteInterface.jsx` tinham o **mesmo bloco `<thead>`** (~50 linhas JSX duplicadas). Além disso, ambas as interfaces e `LaboratoristaInterface` usavam `obras.find()` / `projects.find()` **dentro de `.map()`**, resultando em lookups O(n²) por render.
+
+**Arquivos criados/alterados:**
+
+| Arquivo | Ação | Resultado |
+|---|---|---|
+| `components/ensaios/EnsaiosTableHeader.jsx` | **Criado** — cabeçalho de tabela compartilhado | ~70 linhas, reutilizável |
+| `components/ensaios/AdminInterface.jsx` | Removido `<thead>` inline (50 linhas) → usa `EnsaiosTableHeader` | lookup O(1) com `obrasMap`/`projectsMap` |
+| `components/ensaios/ClienteInterface.jsx` | Removido `<thead>` inline (50 linhas) → usa `EnsaiosTableHeader` | lookup O(1) com `obrasMap`/`projectsMap` |
+| `components/ensaios/LaboratoristaInterface.jsx` | Substitui 3× `obras.find()` por `obrasMap.get()` | lookup O(1) |
+| `hooks/useTableFilters.js` | Substitui `obras.find()` e `projects.find()` em `useMemo` por `Map` | O(n) → O(1) por filter |
+
+**Problema de performance corrigido em `useTableFilters`:**
+```js
+// ANTES — .find() dentro de useMemo = O(n²) por keypress no filtro de obra/projeto
+if (obraFilter) filtered = filtered.filter((e) => {
+  const o = obras.find((ob) => ob.id === e.obra_id); // O(n) por item
+  return o?.name?.toLowerCase().includes(obraFilter.toLowerCase());
+});
+
+// DEPOIS — Map pré-construído = O(1) por lookup
+const obrasMap = useMemo(() => new Map(obras.map((o) => [o.id, o])), [obras]);
+if (obraFilter) filtered = filtered.filter((e) => {
+  const o = obrasMap.get(e.obra_id); // O(1)
+  return o?.name?.toLowerCase().includes(obraFilter.toLowerCase());
+});
+```
+
+**Impacto:** Com 500 ensaios e 50 obras, cada keypress no filtro de obra executava 500 × 50 = **25.000 comparações**. Agora executa 500 × 1 = **500 comparações**.
+
+**Risco:** Baixo — UI e contratos de props preservados. Apenas lookup interno alterado.
+
+---
+
+## 🗓️ Próximas Rodadas — Oportunidades Identificadas
 
 1. **Cache com React Query** — usar `useQuery` com staleTime em `useDashboardData` e `useEnsaiosList` para evitar recarregamentos desnecessários
 2. **Migração gradual dos formulários** para `components/forms/` (StatusDraftBanner, UploadGallery, FormActions)

@@ -17,6 +17,10 @@ export function useTableFilters(ensaios, obras, projects, allUsers, applyCustomF
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
+  // Índices O(1) para evitar .find() dentro de useMemo/loops
+  const obrasMap = useMemo(() => new Map(obras.map((o) => [o.id, o])), [obras]);
+  const projectsMap = useMemo(() => new Map(projects.map((p) => [p.id, p])), [projects]);
+
   const toggleSortOrder = useCallback(() => {
     setSortOrder((prev) => (prev === 'desc' ? 'asc' : prev === 'asc' ? null : 'desc'));
   }, []);
@@ -26,12 +30,12 @@ export function useTableFilters(ensaios, obras, projects, allUsers, applyCustomF
     
     if (nomeFilter) filtered = filtered.filter((e) => getLaboratoristaInfo(e, allUsers).toLowerCase().includes(nomeFilter.toLowerCase()));
     if (obraFilter) filtered = filtered.filter((e) => {
-      const o = obras.find((ob) => ob.id === e.obra_id);
+      const o = obrasMap.get(e.obra_id);
       return o?.name?.toLowerCase().includes(obraFilter.toLowerCase()) || o?.code?.toLowerCase().includes(obraFilter.toLowerCase());
     });
     if (projetoFilter) filtered = filtered.filter((e) => {
       if (!e.project_id) return false;
-      const p = projects.find((pr) => pr.id === e.project_id);
+      const p = projectsMap.get(e.project_id);
       return p?.name?.toLowerCase().includes(projetoFilter.toLowerCase());
     });
     if (localFilter) filtered = filtered.filter((e) => {
@@ -77,7 +81,7 @@ export function useTableFilters(ensaios, obras, projects, allUsers, applyCustomF
     }
     
     return filtered;
-  }, [ensaios, nomeFilter, obraFilter, projetoFilter, localFilter, empreiteiraFilter, dataInicioFilter, dataFimFilter, typeFilter, obras, projects, sortOrder, allUsers, applyCustomFilters]);
+  }, [ensaios, nomeFilter, obraFilter, projetoFilter, localFilter, empreiteiraFilter, dataInicioFilter, dataFimFilter, typeFilter, obrasMap, projectsMap, sortOrder, allUsers, applyCustomFilters]);
 
   const clearFilters = useCallback(() => {
     setNomeFilter('');

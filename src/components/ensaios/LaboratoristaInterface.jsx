@@ -1,11 +1,14 @@
 // Interface de visualização para laboratoristas (cards por status)
-import React, { useMemo } from "react";
+import React, { useMemo, memo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { FileText, CheckCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import EnsaioCard from "./EnsaioCard";
 
 const LaboratoristaInterface = React.memo(({ ensaios, obras, user, allUsers }) => {
+  // O(1) lookup — evita obras.find() dentro dos três .map() das tabs
+  const obrasMap = useMemo(() => new Map(obras.map((o) => [o.id, o])), [obras]);
+
   const emExecucao = useMemo(() =>
     ensaios.filter((e) => (e.status === 'rascunho' || e.approved === false) && !e.client_signature?.signed_by),
     [ensaios]
@@ -54,21 +57,21 @@ const LaboratoristaInterface = React.memo(({ ensaios, obras, user, allUsers }) =
 
         <TabsContent value="emExecucao" className="mt-4 space-y-4">
           {emExecucao.length > 0
-            ? emExecucao.map((ensaio) => <EnsaioCard key={ensaio.id} ensaio={ensaio} obra={obras.find((o) => o.id === ensaio.obra_id)} user={user} allUsers={allUsers} />)
+            ? emExecucao.map((ensaio) => <EnsaioCard key={ensaio.id} ensaio={ensaio} obra={obrasMap.get(ensaio.obra_id)} user={user} allUsers={allUsers} />)
             : <EmptyState icon={FileText} title="Nenhum registro em execução" subtitle="Comece criando um novo registro ou finalize os em rascunho." />
           }
         </TabsContent>
 
         <TabsContent value="pendentes" className="mt-4 space-y-4">
           {pendentes.length > 0
-            ? pendentes.map((ensaio) => <EnsaioCard key={ensaio.id} ensaio={ensaio} obra={obras.find((o) => o.id === ensaio.obra_id)} user={user} allUsers={allUsers} />)
+            ? pendentes.map((ensaio) => <EnsaioCard key={ensaio.id} ensaio={ensaio} obra={obrasMap.get(ensaio.obra_id)} user={user} allUsers={allUsers} />)
             : <EmptyState icon={FileText} title="Nenhum registro pendente" subtitle="Todos os ensaios e diários estão aprovados ou não há registros." />
           }
         </TabsContent>
 
         <TabsContent value="aprovados" className="mt-4 space-y-4">
           {aprovados.length > 0
-            ? aprovados.map((ensaio) => <EnsaioCard key={ensaio.id} ensaio={ensaio} obra={obras.find((o) => o.id === ensaio.obra_id)} user={user} allUsers={allUsers} />)
+            ? aprovados.map((ensaio) => <EnsaioCard key={ensaio.id} ensaio={ensaio} obra={obrasMap.get(ensaio.obra_id)} user={user} allUsers={allUsers} />)
             : <EmptyState icon={CheckCircle} title="Nenhum registro aprovado ainda" subtitle="Aguarde a aprovação dos ensaios pelo administrador." />
           }
         </TabsContent>
