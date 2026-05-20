@@ -1,5 +1,5 @@
 // Interface de visualização para laboratoristas (cards por status)
-import React, { useMemo, memo } from "react";
+import React, { useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { FileText, CheckCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
