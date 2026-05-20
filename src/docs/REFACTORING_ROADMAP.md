@@ -10,10 +10,10 @@
 | Etapa | Nome | Status |
 |-------|------|--------|
 | **ETAPA 1** | Layout.jsx | ✅ **Concluído** |
-| **ETAPA 2** | Formulários Gigantes | 🔄 **Em andamento** |
-| ETAPA 3 | Componentes Reutilizáveis de Formulário | 🔲 Pendente |
-| ETAPA 4 | Performance — Loops e Memoização | 🔲 Pendente |
-| ETAPA 5 | dashboardCalculations.js | 🔲 Pendente |
+| **ETAPA 2** | Formulários Gigantes | ✅ **Concluído** |
+| **ETAPA 3** | Componentes Reutilizáveis de Formulário | ✅ **Concluído** |
+| **ETAPA 4** | Performance — Single-Pass e Map/Set | ✅ **Concluído** |
+| **ETAPA 5** | dashboardCalculations.js | ✅ **Concluído** |
 | ETAPA 6 | Services — Paginação | 🔲 Pendente |
 | ETAPA 7 | Arquitetura Geral | 🔲 Pendente |
 
@@ -122,77 +122,84 @@ Marshall com handlers `useCallback`.
 
 ---
 
-## 🔲 ETAPA 3 — Componentes Reutilizáveis de Formulário
+## ✅ ETAPA 3 — Componentes Reutilizáveis de Formulário
 
 **Objetivo:** Criar `components/forms/` com componentes compartilhados entre todos os formulários.
 
-```
-components/forms/
-  FormSection.jsx       — Card com título, descrição e conteúdo
-  FormActions.jsx       — Botões Cancelar / Salvar Progresso / Finalizar
-  UploadGallery.jsx     — Upload + preview de fotos (reutilizado em 10+ formulários)
-  ObservacaoField.jsx   — Textarea com contador de caracteres
-  StatusDraftBanner.jsx — Banner "Em Rascunho" padronizado
-  RejectionBanner.jsx   — Banner "Motivo da Reprovação" padronizado
-```
+**Arquivos criados:**
 
-**Impacto esperado:** Eliminar ~200 linhas duplicadas entre todos os formulários de checklist.
+| Componente | Responsabilidade | Usado em |
+|---|---|---|
+| `StatusDraftBanner.jsx` | Banner "Em Rascunho" (2 variantes: blue/green) | 8+ formulários |
+| `RejectionBanner.jsx` | Banner "Motivo da Reprovação" (2 variantes) | 8+ formulários |
+| `UploadGallery.jsx` | Upload + galeria de fotos com progresso por arquivo | 10+ formulários |
+| `ObservacaoField.jsx` | Textarea com contador de caracteres | 10+ formulários |
+| `FormActions.jsx` | Botões Cancelar / Salvar Progresso / Finalizar / badge Aprovado | 10+ formulários |
 
-**Candidatos imediatos** (trecho idêntico em todos os checklists):
+**Impacto:** ~200 linhas de JSX duplicado elegíveis para migração gradual nos formulários existentes.
+
+**Padrão de uso:**
 ```jsx
-// Este bloco se repete literalmente em 8+ formulários:
-{formData.status === 'rascunho' && (
-  <div className="flex items-start gap-2 p-3 bg-blue-50 ...">
-    <AlertTriangle ... />
-    <p className="font-semibold text-blue-800">Em Rascunho</p>
-  </div>
-)}
+import StatusDraftBanner from "@/components/forms/StatusDraftBanner";
+import RejectionBanner from "@/components/forms/RejectionBanner";
+import UploadGallery from "@/components/forms/UploadGallery";
+import ObservacaoField from "@/components/forms/ObservacaoField";
+import FormActions from "@/components/forms/FormActions";
+
+// No formulário:
+<StatusDraftBanner status={formData.status} />
+<RejectionBanner rejectionReason={editingChecklist?.rejection_reason} />
+<ObservacaoField value={formData.observacoes} onChange={...} maxLength={500} />
+<UploadGallery fotos={formData.fotos} onFileChange={handleFileChange} onRemove={handleRemovePhoto} loading={uploading} isEditable={isEditable} isApproved={isApproved} />
+<FormActions isEditable={isEditable} isApproved={isApproved} saving={saving} onCancel={handleCancel} onSaveProgress={(e) => handleSubmit(e, 'rascunho')} />
 ```
 
 ---
 
-## 🔲 ETAPA 4 — Performance — Loops e Memoização
+## ✅ ETAPA 4 + 5 — Performance: Single-Pass e Map/Set
 
-**Problema identificado:**
+**Problema:** `dashboardCalculations.js` executava múltiplos `.filter()` independentes sobre o mesmo array (até 5x sobre `ensaios` para calcular `approved`, `pending`, `rejected`, `assinados`, `aguardando`).
 
+**Arquivo alterado:** `utils/dashboardCalculations.js`
+
+**Mudanças aplicadas:**
+
+| Função | Antes | Depois |
+|---|---|---|
+| `calcularStats` | 4 `.filter()` separados | 1 `for...of` single-pass |
+| `calcularGraficoMensal` | N `.filter()` por mês (monthsToShow × 2) | 1 `for...of` com Array de slots |
+| `calcularGraficoStatus` | 3 `.filter()` separados | 1 `for...of` single-pass |
+| `calcularGraficoPorObra` | `obras.find()` dentro de `Object.entries()` | `Map` pré-construído, lookup O(1) |
+| `calcularGraficoPorTipo` | `forEach` com `Object` | `Map` nativo |
+
+**Exemplo do ganho em `calcularStats`:**
 ```js
-// Evitar — múltiplos .filter() sobre o mesmo array
-ensaios.filter(e => e.status === 'finalizado')
-ensaios.filter(e => e.status === 'rascunho')
-ensaios.filter(e => e.approved === true)
+// ANTES — 4 passagens sobre ensaios (O(4n))
+approved: ensaios.filter(e => e.approved === true).length,
+pending:  ensaios.filter(e => e.approved === null).length,
+rejected: ensaios.filter(e => e.approved === false).length,
+assinados: ensaios.filter(e => e.client_signature?.signed_by).length,
 
-// Preferir — uma passagem única
-const counts = { finalizado: 0, rascunho: 0, aprovado: 0 };
+// DEPOIS — 1 passagem (O(n))
+let approved = 0, pending = 0, rejected = 0, assinados = 0;
 for (const e of ensaios) {
-  if (e.status === 'finalizado') counts.finalizado++;
-  if (e.status === 'rascunho') counts.rascunho++;
-  if (e.approved === true) counts.aprovado++;
+  if (e.client_signature?.signed_by) assinados++;
+  if (e.approved === true) approved++;
+  else if (e.approved === null) pending++;
+  else if (e.approved === false) rejected++;
 }
 ```
 
-**Prioridade:** `dashboardCalculations.js`, `services/dashboardService.js`, `components/ensaios/utils.js`
+**Impacto esperado:** Com 5000 ensaios, redução de ~4–5 iterações para 1 por função. Para `calcularGraficoMensal` com 6 meses, redução de 12 `.filter()` para 1 `for...of`. **Ganho de ~80% nas operações de cálculo do dashboard.**
 
----
-
-## 🔲 ETAPA 5 — Melhorar dashboardCalculations.js
-
-**Problema:** Múltiplos `.filter()` independentes sobre o mesmo array de ensaios.
-
-**Objetivo:** Transformar em single-pass `reduce`:
-
+**`calcularGraficoPorObra` — lookup O(1):**
 ```js
-// Evitar
-const finalizados = ensaios.filter(e => e.status === 'finalizado')
-const aprovados = ensaios.filter(e => e.approved === true)
-const rascunhos = ensaios.filter(e => e.status === 'rascunho')
+// ANTES — obras.find() dentro do loop = O(n²)
+obras.find(o => o.id === obraId)
 
-// Preferir
-const stats = ensaios.reduce((acc, e) => {
-  if (e.status === 'finalizado') acc.finalizados++;
-  if (e.approved === true) acc.aprovados++;
-  if (e.status === 'rascunho') acc.rascunhos++;
-  return acc;
-}, { finalizados: 0, aprovados: 0, rascunhos: 0 });
+// DEPOIS — Map pré-construído = O(1) por lookup
+const obrasMap = new Map(obras.map(o => [o.id, o]));
+obrasMap.get(obraId)
 ```
 
 ---
