@@ -1,17 +1,16 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Save, Loader2, XCircle, AlertTriangle } from "lucide-react";
+import { Loader2, XCircle, AlertTriangle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
-import { Project } from "@/entities/Project";
-import { useFormPersistence } from "@/components/hooks/useFormPersistence";
+import { useChecklistForm } from "@/hooks/useChecklistForm";
 import AcoesCorretivasNC from "@/components/checklists/AcoesCorretivasNC";
+import ChecklistFooter from "@/components/checklists/ChecklistFooter";
 
 const SectionTitle = ({ children }) => (
   <CardHeader>
@@ -51,23 +50,9 @@ const CheckboxGroup = ({ value, onChange }) => (
   </div>
 );
 
-export default function ChecklistTerraplanagem() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [user, setUser] = useState(null);
-  const [obras, setObras] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [allProjects, setAllProjects] = useState([]);
-  const [regionais, setRegionais] = useState([]);
-  const [uploadingPhotos, setUploadingPhotos] = useState(false);
-  const [selectedFileNames, setSelectedFileNames] = useState("Nenhum ficheiro selecionado");
-  const [editingChecklist, setEditingChecklist] = useState(null);
-
-  const getInitialFormData = () => {
-    const today = new Date().toISOString().split('T')[0];
-    return {
+const getInitialFormData = () => {
+  const today = new Date().toISOString().split('T')[0];
+  return {
     obra_id: "",
     project_id: "",
     data: today,
@@ -149,12 +134,19 @@ export default function ChecklistTerraplanagem() {
     nao_conformidades: [],
     fotos: [],
     status: "rascunho"
-    };
   };
+};
 
-  const [formData, setFormData] = useState(getInitialFormData);
+export default function ChecklistTerraplanagem() {
+  const {
+    obras, regionais, projects, user, editingChecklist,
+    loading, formData, setFormData, obraSelecionada,
+    isApproved, isEditable, clearSavedData, navigate,
+  } = useChecklistForm(getInitialFormData, 'ChecklistTerraplanagem', 'checklist_terraplanagem');
 
-  const { clearSavedData } = useFormPersistence('checklist_terraplanagem', formData, setFormData, !!editingChecklist);
+  const [saving, setSaving] = useState(false);
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
+  const [selectedFileNames, setSelectedFileNames] = useState("Nenhum ficheiro selecionado");
 
   // Cálculos automáticos
   const variacaoUmidade = (() => {
@@ -172,95 +164,6 @@ export default function ChecklistTerraplanagem() {
     if (isNaN(densInSitu) || isNaN(densProctor) || densProctor === 0) return null;
     return ((densInSitu / densProctor) * 100).toFixed(2);
   })();
-
-  const loadInitialData = async () => {
-    setLoading(true);
-    try {
-      const [userData, obrasData, projectsData, regionaisData] = await Promise.all([
-        base44.auth.me(),
-        base44.entities.Obra.list(),
-        Project.list(),
-        base44.entities.Regional.list()
-      ]);
-
-      setUser(userData);
-      setRegionais(regionaisData);
-      setAllProjects(projectsData);
-
-      const userAccessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
-
-      if (userAccessLevel === 'user') {
-        const regionalDoLaboratorista = regionaisData.find(regional => {
-          const laboratoristas = regional.laboratoristas_responsaveis || [];
-          return laboratoristas.some(email => email.toLowerCase() === userData.email.toLowerCase());
-        });
-
-        if (regionalDoLaboratorista) {
-          const obrasRegional = obrasData.filter(obra =>
-            obra.regional_id === regionalDoLaboratorista.id &&
-            obra.status === 'em_andamento' &&
-            obra.tipo_obra === 'supervisao'
-          );
-          setObras(obrasRegional);
-        } else {
-          setObras([]);
-        }
-      } else {
-        const obrasSupervisao = obrasData.filter(obra =>
-          obra.status === 'em_andamento' && obra.tipo_obra === 'supervisao'
-        );
-        setObras(obrasSupervisao);
-      }
-
-      setProjects([]);
-
-      // Verificar se está editando
-      const params = new URLSearchParams(location.search);
-      const editId = params.get('editId');
-
-      if (editId) {
-        const checklistToEdit = await base44.entities.ChecklistTerraplanagem.get(editId);
-        
-        if (userAccessLevel === 'admin' || (checklistToEdit.created_by === userData.email && (checklistToEdit.status === 'rascunho' || checklistToEdit.approved === false))) {
-          setEditingChecklist(checklistToEdit);
-          // Normalizar resultados: string "a, b" → array para uso no form
-          const ensaiosNorm = {};
-          Object.entries(checklistToEdit.ensaios_empreiteira || {}).forEach(([key, val]) => {
-            if (val && typeof val === 'object' && !Array.isArray(val)) {
-              const r = val.resultados;
-              const arr = Array.isArray(r) ? r
-                : (typeof r === 'string' && r.trim() !== '') ? r.split('|').map(s => s.trim())
-                : (r !== null && r !== undefined && r !== '') ? [String(r)]
-                : [];
-              ensaiosNorm[key] = { ...val, resultados: arr, quantidade: arr.length || (val.quantidade || 0) };
-            } else {
-              ensaiosNorm[key] = val;
-            }
-          });
-          setFormData({ ...checklistToEdit, ensaios_empreiteira: { ...checklistToEdit.ensaios_empreiteira, ...ensaiosNorm } });
-        } else {
-          alert("Você não tem permissão para editar este registro.");
-          navigate(createPageUrl('MeusEnsaios'));
-          return;
-        }
-      } else {
-        setFormData(prev => ({
-          ...prev,
-          inspetor_fiscal: userData.laboratorista_name || userData.full_name,
-          laboratorista_name: userData.laboratorista_name || userData.full_name
-        }));
-      }
-    } catch (error) {
-      console.error("Erro ao carregar dados:", error);
-      alert("Erro ao carregar dados iniciais.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadInitialData();
-  }, [location.search]); // re-run when URL changes (e.g. editId param)
 
   const handleCheckboxChange = (section, field, option) => {
     setFormData(prev => ({
@@ -725,7 +628,7 @@ export default function ChecklistTerraplanagem() {
                           <SelectValue placeholder="Selecione a rodovia" />
                         </SelectTrigger>
                         <SelectContent>
-                          {(obras.find(o => o.id === formData.obra_id)?.rodovias || []).map((rodovia, idx) => (
+                          {(obraSelecionada?.rodovias || []).map((rodovia, idx) => (
                             <SelectItem key={idx} value={rodovia}>
                               {rodovia}
                             </SelectItem>
@@ -746,7 +649,7 @@ export default function ChecklistTerraplanagem() {
                           <SelectValue placeholder="Selecione a empreiteira" />
                         </SelectTrigger>
                         <SelectContent>
-                          {(obras.find(o => o.id === formData.obra_id)?.empreiteiras || []).map((empreiteira, idx) => (
+                          {(obraSelecionada?.empreiteiras || []).map((empreiteira, idx) => (
                             <SelectItem key={idx} value={empreiteira}>
                               {empreiteira}
                             </SelectItem>
@@ -1397,44 +1300,14 @@ export default function ChecklistTerraplanagem() {
                 </div>
               </div>
 
-              {/* BOTÕES */}
-              <div className="flex justify-end gap-4 mt-6">
-                <Button type="button" variant="outline" onClick={() => {
-                  clearSavedData();
-                  navigate(createPageUrl('MeusEnsaios'));
-                }}>
-                  Cancelar
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={saving || uploadingPhotos}
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    await handleSubmit(e, 'rascunho');
-                  }}
-                  className="border-blue-500 text-blue-600 hover:bg-blue-50"
-                >
-                  <Save className="mr-2 h-4 w-4" /> Salvar Progresso
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={saving || uploadingPhotos}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  {saving ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Salvando...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="mr-2 h-4 w-4" />
-                      Finalizar
-                    </>
-                  )}
-                </Button>
-              </div>
+              <ChecklistFooter
+                isEditable={isEditable}
+                isApproved={isApproved}
+                loadingUpload={saving || uploadingPhotos}
+                onCancel={() => { clearSavedData(); navigate(createPageUrl('MeusEnsaios')); }}
+                onSaveProgress={async (e) => { e.preventDefault(); await handleSubmit(e, 'rascunho'); }}
+                onFinalize={() => {}}
+              />
             </form>
           </CardContent>
         </Card>
