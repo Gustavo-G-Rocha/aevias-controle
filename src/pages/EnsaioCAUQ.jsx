@@ -5,39 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Save, AlertTriangle, Loader2, CheckCircle, Plus, Trash2, Clock } from "lucide-react";
+import { AlertTriangle, Loader2, CheckCircle, Plus, Trash2, Clock, Save } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { Obra } from "@/entities/Obra";
-import { Regional } from "@/entities/Regional";
-import { User } from "@/entities/User";
-import { Project } from "@/entities/Project";
-import { FaixaGranulometrica } from "@/entities/FaixaGranulometrica";
-import { useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { useFormPersistence } from "@/components/hooks/useFormPersistence";
+import { useEnsaioForm } from "@/hooks/useEnsaioForm";
+import { PENEIRAS_CONFIG, filtrarPeneirasPorFaixa } from "@/constants/sieves";
 
-const peneirasConfig = [
-  { key: "peneira_75_0mm", label: '3"', abertura: "75,0" },
-  { key: "peneira_63_0mm", label: '2.1/2"', abertura: "63,0" },
-  { key: "peneira_50_0mm", label: '2"', abertura: "50,0" },
-  { key: "peneira_37_5mm", label: '1.1/2"', abertura: "37,5" },
-  { key: "peneira_25_0mm", label: '1"', abertura: "25,0" },
-  { key: "peneira_19_0mm", label: '3/4"', abertura: "19,0" },
-  { key: "peneira_16_0mm", label: '5/8"', abertura: "16,0" },
-  { key: "peneira_12_5mm", label: '1/2"', abertura: "12,5" },
-  { key: "peneira_9_5mm", label: '3/8"', abertura: "9,5" },
-  { key: "peneira_6_3mm", label: '1/4"', abertura: "6,3" },
-  { key: "peneira_4_75mm", label: 'Nº 4', abertura: "4,75" },
-  { key: "peneira_2_36mm", label: 'Nº 8', abertura: "2,36" },
-  { key: "peneira_2_0mm", label: 'Nº 10', abertura: "2,0" },
-  { key: "peneira_1_18mm", label: 'Nº 16', abertura: "1,18" },
-  { key: "peneira_0_6mm", label: 'Nº 30', abertura: "0,6" },
-  { key: "peneira_0_42mm", label: 'Nº 40', abertura: "0,42" },
-  { key: "peneira_0_3mm", label: 'Nº 50', abertura: "0,3" },
-  { key: "peneira_0_18mm", label: 'Nº 80', abertura: "0,18" },
-  { key: "peneira_0_15mm", label: 'Nº 100', abertura: "0,15" },
-  { key: "peneira_0_075mm", label: 'Nº 200', abertura: "0,075" }
-];
+
 
 const getInitialFormData = () => ({
   obra_id: "",
@@ -88,20 +62,15 @@ const getInitialFormData = () => ({
 });
 
 export default function EnsaioCAUQPage() {
-  const [obras, setObras] = useState([]);
-  const [regionais, setRegionais] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [faixas, setFaixas] = useState([]);
-  const [user, setUser] = useState(null);
-  const [editingEnsaio, setEditingEnsaio] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const {
+    obras, regionais, projects, faixas, user,
+    editingEnsaio, setEditingEnsaio,
+    loading, formData, setFormData,
+    obraSelecionada, regionalSelecionada, projetosDisponiveis,
+    isApproved, isEditable, clearSavedData, navigate,
+  } = useEnsaioForm(getInitialFormData, 'EnsaioCAUQ', 'ensaio_cauq');
+
   const [saving, setSaving] = useState(false);
-  const [formData, setFormData] = useState(getInitialFormData());
-
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const { clearSavedData } = useFormPersistence('ensaio_cauq', formData, setFormData, !!editingEnsaio);
 
   const selectedProject = useMemo(() =>
     projects.find(p => p.id === formData.project_id),
@@ -113,19 +82,7 @@ export default function EnsaioCAUQPage() {
     return faixas.find(f => f.id === selectedProject.faixa_granulometrica_id);
   }, [selectedProject, faixas]);
 
-  const peneirasDoProjecto = useMemo(() => {
-    if (!selectedFaixa || !selectedFaixa.peneiras || selectedFaixa.peneiras.length === 0) {
-      return peneirasConfig;
-    }
-
-    return peneirasConfig.filter(peneira => {
-      const aberturaConfig = parseFloat(peneira.abertura.replace(',', '.'));
-      return selectedFaixa.peneiras.some(p => {
-        const aberturaFaixa = parseFloat(p.abertura.toString().replace(/mm/gi, '').replace(',', '.'));
-        return aberturaConfig === aberturaFaixa;
-      });
-    });
-  }, [selectedFaixa]);
+  const peneirasDoProjecto = useMemo(() => filtrarPeneirasPorFaixa(selectedFaixa, PENEIRAS_CONFIG), [selectedFaixa]);
 
   const handleChange = useCallback((field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -457,17 +414,10 @@ export default function EnsaioCAUQPage() {
     }
   };
 
-  const obraSelecionada = useMemo(() => obras.find(o => o.id === formData.obra_id), [obras, formData.obra_id]);
-  const regionalSelecionada = useMemo(() => obraSelecionada ? regionais.find(r => r.id === obraSelecionada.regional_id) : null, [obraSelecionada, regionais]);
-  const projetosDisponiveis = useMemo(() => {
-    if (!regionalSelecionada || !projects) return [];
-    const regionalProjectIds = regionalSelecionada.project_ids || [];
-    return projects.filter(p =>
-      regionalProjectIds.includes(p.id) &&
-      p.status === 'ativo' &&
-      p.tipo_projeto === 'CAUQ'
-    );
-  }, [regionalSelecionada, projects]);
+  const projetosCAUQ = useMemo(() =>
+    projetosDisponiveis.filter(p => p.tipo_projeto === 'CAUQ'),
+    [projetosDisponiveis]
+  );
 
   const usinasDisponiveis = useMemo(() => {
     if (!obraSelecionada) return [];
@@ -479,101 +429,7 @@ export default function EnsaioCAUQPage() {
     return obraSelecionada.rodovias || [];
   }, [obraSelecionada]);
 
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const userData = await User.me();
-        setUser(userData);
 
-        const currentUserAccessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
-
-        let faixasData = [];
-        try {
-          faixasData = await FaixaGranulometrica.list();
-        } catch (faixasError) {
-          console.warn("[EnsaioCAUQ] Faixas granulométricas indisponíveis, continuando sem elas:", faixasError?.message || faixasError);
-        }
-
-        const [obrasData, regionaisData, projectsData] = await Promise.all([
-          Obra.list(),
-          Regional.list(),
-          Project.list()
-        ]);
-
-        setRegionais(regionaisData);
-        setProjects(projectsData);
-        setFaixas(faixasData);
-
-        let availableObras = obrasData;
-
-        if (currentUserAccessLevel === 'user') {
-          const regionalDoLaboratorista = regionaisData.find(regional => {
-            const laboratoristas = regional.laboratoristas_responsaveis || [];
-            return laboratoristas.some(email => email.toLowerCase() === userData.email.toLowerCase());
-          });
-
-          if (regionalDoLaboratorista) {
-            availableObras = obrasData.filter(obra =>
-              obra.regional_id === regionalDoLaboratorista.id &&
-              obra.status === 'em_andamento'
-            );
-          } else {
-            availableObras = [];
-          }
-        }
-        setObras(availableObras);
-
-        const params = new URLSearchParams(location.search);
-        const editId = params.get('editId');
-
-        if (editId) {
-          const ensaioToEdit = await base44.entities.EnsaioCAUQ.get(editId);
-          setEditingEnsaio(ensaioToEdit);
-
-          if (userData.role === 'admin' || (ensaioToEdit.created_by === userData.email && (ensaioToEdit.status === 'rascunho' || ensaioToEdit.approved === false))) {
-            setFormData({
-              ...getInitialFormData(),
-              ...ensaioToEdit,
-              data_ensaio: ensaioToEdit.data_ensaio ? new Date(ensaioToEdit.data_ensaio).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-              realizar_ensaio_umidade: ensaioToEdit.realizar_ensaio_umidade ?? false,
-              extracao_ligante: { ...getInitialFormData().extracao_ligante, ...(ensaioToEdit.extracao_ligante || {}) },
-              granulometria: { ...getInitialFormData().granulometria, ...(ensaioToEdit.granulometria || {}) },
-              realizar_densidade_rice: ensaioToEdit.realizar_densidade_rice ?? false,
-              densidade_rice: { ...getInitialFormData().densidade_rice, ...(ensaioToEdit.densidade_rice || {}) },
-              realizar_marshall: ensaioToEdit.realizar_marshall ?? false,
-              corpos_prova_marshall: ensaioToEdit.corpos_prova_marshall || []
-            });
-          } else {
-            alert("Você não tem permissão para editar este registro.");
-            navigate(createPageUrl('MeusEnsaios'));
-            return;
-          }
-        } else {
-          const initialNewFormData = getInitialFormData();
-          if (availableObras.length > 0) {
-            initialNewFormData.obra_id = availableObras[0].id;
-          }
-          initialNewFormData.realizar_densidade_rice = false;
-          initialNewFormData.realizar_ensaio_umidade = false;
-          initialNewFormData.realizar_marshall = false;
-          setFormData(initialNewFormData);
-          setEditingEnsaio(null);
-        }
-      } catch (error) {
-        console.error("[EnsaioCAUQ] Erro ao carregar dados:", error?.message || error);
-        alert("Não foi possível carregar os dados.");
-        navigate(createPageUrl('MeusEnsaios'));
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, [location.search, navigate]);
-
-  const isApproved = formData.approved === true;
-  const userCanEdit = user?.role === 'admin' || (formData.created_by === user?.email && (formData.status === 'rascunho' || formData.approved === false));
-  const isEditable = !editingEnsaio?.id || userCanEdit;
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin" /></div>;
@@ -652,7 +508,7 @@ export default function EnsaioCAUQPage() {
                         className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
                       >
                         <option value="">Selecione um projeto</option>
-                        {projetosDisponiveis.map(proj => (
+                        {projetosCAUQ.map(proj => (
                           <option key={proj.id} value={proj.id}>
                             {proj.name}
                           </option>
@@ -660,6 +516,7 @@ export default function EnsaioCAUQPage() {
                       </select>
                     </div>
                   </div>
+
 
                   {regionalSelecionada && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-2">

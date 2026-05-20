@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,32 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Save, Loader2, Plus, Trash2, AlertTriangle, Clock, CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { base44 } from "@/api/base44Client";
-import { useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { useEnsaioForm } from "@/hooks/useEnsaioForm";
+import { PENEIRAS_MAP, filtrarPeneirasPorFaixa, PENEIRAS_CONFIG } from "@/constants/sieves";
 
-const PENEIRAS_MAP = {
-  "peneira_75_0mm": { astm: "3\"", mm: "75,0" },
-  "peneira_63_0mm": { astm: "2 1/2\"", mm: "63,0" },
-  "peneira_50_0mm": { astm: "2\"", mm: "50,0" },
-  "peneira_38_1mm": { astm: "1 1/2\"", mm: "38,1" },
-  "peneira_37_5mm": { astm: "1 1/2\"", mm: "37,5" },
-  "peneira_25_0mm": { astm: "1\"", mm: "25,0" },
-  "peneira_19_0mm": { astm: "3/4\"", mm: "19,0" },
-  "peneira_16_0mm": { astm: "5/8\"", mm: "16,0" },
-  "peneira_12_5mm": { astm: "1/2\"", mm: "12,5" },
-  "peneira_9_5mm": { astm: "3/8\"", mm: "9,5" },
-  "peneira_6_3mm": { astm: "1/4\"", mm: "6,3" },
-  "peneira_4_75mm": { astm: "#4", mm: "4,75" },
-  "peneira_2_36mm": { astm: "#8", mm: "2,36" },
-  "peneira_2_0mm": { astm: "#10", mm: "2,0" },
-  "peneira_1_18mm": { astm: "#16", mm: "1,18" },
-  "peneira_0_6mm": { astm: "#30", mm: "0,6" },
-  "peneira_0_42mm": { astm: "#40", mm: "0,42" },
-  "peneira_0_3mm": { astm: "#50", mm: "0,3" },
-  "peneira_0_18mm": { astm: "#80", mm: "0,18" },
-  "peneira_0_15mm": { astm: "#100", mm: "0,15" },
-  "peneira_0_075mm": { astm: "#200", mm: "0,075" }
-};
+
 
 const getInitialFormData = () => ({
   obra_id: "",
@@ -61,131 +40,32 @@ const getInitialFormData = () => ({
 });
 
 export default function EnsaioGranulometriaIndividualPage() {
-  const [formData, setFormData] = useState(getInitialFormData());
-  const [obras, setObras] = useState([]);
-  const [regionais, setRegionais] = useState([]);
-  const [projects, setProjects] = useState([]);
+  const {
+    obras, regionais, projects, faixas,
+    user, editingEnsaio, loading, formData, setFormData,
+    obraSelecionada, projetosDisponiveis,
+    isApproved, isEditable, navigate,
+  } = useEnsaioForm(getInitialFormData, 'EnsaioGranulometriaIndividual', 'ensaio_gran_individual', {
+    filtroTipoObra: ['conservacao', 'implantacao']
+  });
+
   const [filteredProjects, setFilteredProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedFaixa, setSelectedFaixa] = useState(null);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [editingEnsaio, setEditingEnsaio] = useState(null);
-  
-  const location = useLocation();
-  const navigate = useNavigate();
 
-  const loadData = async () => {
-    try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
-
-      const [obrasData, regionaisData, projectsData] = await Promise.all([
-        base44.entities.Obra.list(),
-        base44.entities.Regional.list(),
-        base44.entities.Project.list()
-      ]);
-
-      const userAccessLevel = currentUser.access_level || (currentUser.role === 'admin' ? 'admin' : 'user');
-      let availableObras = obrasData;
-
-      if (userAccessLevel === 'user') {
-        const regionalDoLaboratorista = regionaisData.find(regional => {
-          const laboratoristas = regional.laboratoristas_responsaveis || [];
-          return laboratoristas.some(email => email.toLowerCase() === currentUser.email.toLowerCase());
-        });
-
-        if (regionalDoLaboratorista) {
-          availableObras = obrasData.filter(obra => 
-            obra.regional_id === regionalDoLaboratorista.id &&
-            obra.status === 'em_andamento' &&
-            (obra.tipo_obra === 'conservacao' || obra.tipo_obra === 'implantacao')
-          );
-        } else {
-          availableObras = [];
-        }
-      } else {
-        availableObras = obrasData.filter(obra => 
-          obra.tipo_obra === 'conservacao' || obra.tipo_obra === 'implantacao'
-        );
-      }
-
-      setObras(availableObras);
-      setRegionais(regionaisData);
-      setProjects(projectsData);
-
-      const params = new URLSearchParams(location.search);
-      const editId = params.get('editId');
-
-      if (editId) {
-        const ensaioToEdit = await base44.entities.EnsaioGranulometriaIndividual.get(editId);
-        setEditingEnsaio(ensaioToEdit);
-
-        if (currentUser.role === 'admin' || (ensaioToEdit.created_by === currentUser.email && (ensaioToEdit.status === 'rascunho' || ensaioToEdit.approved === false))) {
-          setFormData({
-            ...ensaioToEdit,
-            data_ensaio: ensaioToEdit.data_ensaio ? new Date(ensaioToEdit.data_ensaio).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-          });
-
-          if (ensaioToEdit.project_id) {
-            const proj = projectsData.find(p => p.id === ensaioToEdit.project_id);
-            setSelectedProject(proj);
-            if (proj?.faixa_granulometrica_id) {
-              try {
-                const faixa = await base44.entities.FaixaGranulometrica.get(proj.faixa_granulometrica_id);
-                setSelectedFaixa(faixa);
-              } catch (error) {
-                console.error("Erro ao carregar faixa:", error);
-              }
-            }
-          }
-        } else {
-          alert("Você não tem permissão para editar este registro.");
-          navigate(createPageUrl('MeusEnsaios'));
-          return;
-        }
-      } else {
-        const initialData = getInitialFormData();
-        if (availableObras.length > 0) {
-          initialData.obra_id = availableObras[0].id;
-        }
-        setFormData(initialData);
-      }
-    } catch (error) {
-      console.error("Erro ao carregar dados:", error);
-      alert("Não foi possível carregar os dados.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Peneiras visíveis com base na faixa do projeto selecionado
+  const peneirasVisiveis = useMemo(() =>
+    filtrarPeneirasPorFaixa(selectedFaixa, PENEIRAS_CONFIG).map(p => p.key),
+    [selectedFaixa]
+  );
 
   useEffect(() => {
-    loadData();
-  }, [location.search]);
-
-  useEffect(() => {
-    if (formData.obra_id) {
-      const obraSelecionada = obras.find(o => o.id === formData.obra_id);
-      if (obraSelecionada) {
-        const regionalSelecionada = regionais.find(r => r.id === obraSelecionada.regional_id);
-        if (regionalSelecionada?.project_ids) {
-          let projsFiltered = projects.filter(p => regionalSelecionada.project_ids.includes(p.id));
-          
-          if (formData.tipo_material) {
-            projsFiltered = projsFiltered.filter(p => p.tipo_projeto === formData.tipo_material);
-          }
-          
-          setFilteredProjects(projsFiltered);
-        } else {
-          setFilteredProjects([]);
-        }
-      } else {
-        setFilteredProjects([]);
-      }
+    if (formData.tipo_material) {
+      setFilteredProjects(projetosDisponiveis.filter(p => p.tipo_projeto === formData.tipo_material));
     } else {
-      setFilteredProjects([]);
+      setFilteredProjects(projetosDisponiveis);
     }
-  }, [formData.tipo_material, formData.obra_id, obras, regionais, projects]);
+  }, [formData.tipo_material, projetosDisponiveis]);
 
   useEffect(() => {
     const loadProjectData = async () => {
@@ -255,7 +135,6 @@ export default function EnsaioGranulometriaIndividualPage() {
 
   const handleAgregadoChange = (index, field, value) => {
     if (!AGREGADO_CAMPOS_PERMITIDOS.includes(field)) return;
-    
     const newAgregados = [...formData.agregados];
     newAgregados[index] = { ...newAgregados[index], [field]: value };
 
@@ -266,38 +145,22 @@ export default function EnsaioGranulometriaIndividualPage() {
         newAgregados[index].agua = (pesoUmido - pesoSeco).toFixed(2);
         newAgregados[index].umidade = pesoSeco > 0 ? (((pesoUmido - pesoSeco) / pesoSeco) * 100).toFixed(2) : "";
       }
-
-      // Recalcular % passante quando peso seco mudar
       if (field === 'peso_seco' && pesoSeco > 0 && newAgregados[index].granulometria) {
-        const peneirasVisiveis = selectedFaixa?.peneiras?.length > 0
-          ? Object.keys(PENEIRAS_MAP).filter(key => {
-              const mmKey = parseFloat(PENEIRAS_MAP[key].mm.replace(',', '.'));
-              return selectedFaixa.peneiras.some(p => {
-                const mmFaixa = parseFloat(p.abertura.toString().replace(/mm/gi, '').replace(',', '.').trim());
-                return Math.abs(mmKey - mmFaixa) < 0.01;
-              });
-            })
-          : Object.keys(PENEIRAS_MAP);
-
+        const peneirasKeys = filtrarPeneirasPorFaixa(selectedFaixa, PENEIRAS_CONFIG).map(p => p.key);
         let retidoAcumulado = 0;
-        peneirasVisiveis.forEach(pKey => {
+        peneirasKeys.forEach(pKey => {
           const retido = parseFloat(newAgregados[index].granulometria?.[pKey]?.retido) || 0;
           retidoAcumulado += retido;
-          const percentualPassante = ((pesoSeco - retidoAcumulado) / pesoSeco * 100).toFixed(2);
-          
-          if (!newAgregados[index].granulometria[pKey]) {
-            newAgregados[index].granulometria[pKey] = {};
-          }
-          newAgregados[index].granulometria[pKey].passante = percentualPassante;
+          if (!newAgregados[index].granulometria[pKey]) newAgregados[index].granulometria[pKey] = {};
+          newAgregados[index].granulometria[pKey].passante = ((pesoSeco - retidoAcumulado) / pesoSeco * 100).toFixed(2);
         });
       }
     }
-
     setFormData(prev => ({ ...prev, agregados: newAgregados }));
   };
 
   const GRANULOMETRIA_CAMPOS_PERMITIDOS = ['retido', 'passante'];
-  const PENEIRAS_PERMITIDAS = Object.keys(PENEIRAS_MAP);
+  const PENEIRAS_PERMITIDAS = PENEIRAS_CONFIG.map(p => p.key);
 
   const handleGranulometriaChange = (agregadoIndex, peneira, field, value) => {
     if (!GRANULOMETRIA_CAMPOS_PERMITIDOS.includes(field) || !PENEIRAS_PERMITIDAS.includes(peneira)) return;
@@ -315,18 +178,10 @@ export default function EnsaioGranulometriaIndividualPage() {
     if (field === 'retido') {
       const pesoSeco = parseFloat(newAgregados[agregadoIndex].peso_seco) || 0;
       if (pesoSeco > 0) {
-        const peneirasVisiveis = selectedFaixa?.peneiras?.length > 0
-          ? Object.keys(PENEIRAS_MAP).filter(key => {
-              const mmKey = parseFloat(PENEIRAS_MAP[key].mm.replace(',', '.'));
-              return selectedFaixa.peneiras.some(p => {
-                const mmFaixa = parseFloat(p.abertura.toString().replace(/mm/gi, '').replace(',', '.').trim());
-                return Math.abs(mmKey - mmFaixa) < 0.01;
-              });
-            })
-          : Object.keys(PENEIRAS_MAP);
+        const peneirasKeys = filtrarPeneirasPorFaixa(selectedFaixa, PENEIRAS_CONFIG).map(p => p.key);
 
         let retidoAcumulado = 0;
-        peneirasVisiveis.forEach(pKey => {
+        peneirasKeys.forEach(pKey => {
           const retido = parseFloat(newAgregados[agregadoIndex].granulometria?.[pKey]?.retido) || 0;
           retidoAcumulado += retido;
           const percentualPassante = ((pesoSeco - retidoAcumulado) / pesoSeco * 100).toFixed(2);
@@ -435,28 +290,9 @@ export default function EnsaioGranulometriaIndividualPage() {
     }
   };
 
-  const isApproved = formData.approved === true;
-  const userCanEdit = user?.role === 'admin' || (formData.created_by === user?.email && formData.approved !== true);
-  const isEditable = !editingEnsaio?.id || userCanEdit;
-
   if (loading) {
     return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin" /></div>;
   }
-
-  // Peneiras da faixa granulométrica do projeto selecionado
-  const peneirasVisiveis = (() => {
-    if (selectedFaixa?.peneiras && selectedFaixa.peneiras.length > 0) {
-      // Mapear aberturas da faixa para chaves do PENEIRAS_MAP
-      return Object.keys(PENEIRAS_MAP).filter(key => {
-        const mmKey = parseFloat(PENEIRAS_MAP[key].mm.replace(',', '.'));
-        return selectedFaixa.peneiras.some(p => {
-          const mmFaixa = parseFloat(p.abertura.toString().replace(/mm/gi, '').replace(',', '.').trim());
-          return Math.abs(mmKey - mmFaixa) < 0.01;
-        });
-      });
-    }
-    return Object.keys(PENEIRAS_MAP);
-  })();
 
   return (
     <div className="p-6 bg-slate-50 min-h-screen">
@@ -562,19 +398,18 @@ export default function EnsaioGranulometriaIndividualPage() {
                     )}
 
                     {/* Regional Info */}
-                    {(() => {
-                  const obraSelecionada = obras.find(o => o.id === formData.obra_id);
-                  const regionalSelecionada = obraSelecionada ? regionais.find(r => r.id === obraSelecionada.regional_id) : null;
-                  return regionalSelecionada && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-2">
-                      <div className="space-y-0.5 text-sm">
-                        <p className="text-blue-800"><strong>📍 Regional:</strong> {regionalSelecionada.nome}</p>
-                        {regionalSelecionada.cliente && (
-                          <p className="text-blue-800"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>
-                        )}
-                      </div>
-                    </div>
-                    );
+                    {obraSelecionada && (() => {
+                      const regionalSelecionada = regionais.find(r => r.id === obraSelecionada.regional_id);
+                      return regionalSelecionada && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-2">
+                          <div className="space-y-0.5 text-sm">
+                            <p className="text-blue-800"><strong>📍 Regional:</strong> {regionalSelecionada.nome}</p>
+                            {regionalSelecionada.cliente && (
+                              <p className="text-blue-800"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>
+                            )}
+                          </div>
+                        </div>
+                      );
                     })()}
                     </div>
 
@@ -609,7 +444,7 @@ export default function EnsaioGranulometriaIndividualPage() {
                       <SelectValue placeholder="Selecione a rodovia" />
                     </SelectTrigger>
                     <SelectContent>
-                      {obras.find(o => o.id === formData.obra_id)?.rodovias?.map(rodovia => (
+                      {obraSelecionada?.rodovias?.map(rodovia => (
                         <SelectItem key={rodovia} value={rodovia}>
                           {rodovia}
                         </SelectItem>
