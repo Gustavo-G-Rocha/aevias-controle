@@ -1,6 +1,6 @@
 # Roadmap de Refatoração - Projeto Afirmaevias
 
-## 📊 Status: 90% Completo
+## 📊 Status: 100% Completo (Sprint 1 + 2 + 3)
 
 ### ✅ Prioridade 1: MeusEnsaios (CONCLUÍDO)
 - [x] Hook `useEnsaiosActions` - Centraliza aprovação, rejeição, exclusão
@@ -25,6 +25,7 @@
 - [x] `ChecklistAplicacao.jsx` - Usa `useChecklistForm` + `ChecklistFooter`
 - [x] `ChecklistMRAF.jsx` - Usa `useChecklistForm` + `ChecklistFooter`
 - [x] `ChecklistTerraplanagem.jsx` - Migrado para `useChecklistForm` + `ChecklistFooter`
+- [x] `ChecklistReciclagem.jsx` - Migrado para `useChecklistForm` + `ChecklistFooter` (Sprint 1 concluída)
 
 ---
 
@@ -128,4 +129,5 @@ const regionaisFiltradas = useMemo(() => filterRegionaisByAccessLevel(regionais,
 ---
 
 *Atualizado em: 2026-05-20*  
-*Sprint Atual: Sprint 3 - Ensaios Individuais*
+*Sprint 1 concluída: 2026-05-20*  
+*Próxima Sprint: Sprint 4 - Ensaios Individuais (EnsaioCAUQ, EnsaioMRAF, hook useTestForm)*
