@@ -77,8 +77,12 @@
 - [x] `RelatorioGranulometriaIndividual.jsx` — removido `PENEIRAS_MAP` local, `formatDate` duplicado; usa `PENEIRAS_MAP` central, `buildSignatureProps`, `PrintStyles`
 - [x] `RelatorioGranuMistura.jsx` — usa `buildSignatureProps`, `PrintStyles`
 
-#### 5.3 - Pendente (Longo Prazo)
-- [ ] Migrar demais relatórios para `buildSignatureProps` e `PrintStyles` (RelatorioChecklist, RelatorioDiario, etc.)
+#### 5.3 - Concluído
+- [x] `RelatorioChecklist.jsx` — removido `formatDateBrasilia` local e props manuais de `SignatureFooter`; usa `buildSignatureProps`, `PrintStyles`
+- [x] `RelatorioDiario.jsx` — removido `formatDateBrasilia` e `formatDate` locais; usa `buildSignatureProps`, `PrintStyles`
+- [x] `buildSignatureProps` atualizado para aceitar `creatorUser` ou string como segundo argumento
+
+#### 5.4 - Pendente (Longo Prazo)
 - [ ] PDF generation service centralizado
 
 ---

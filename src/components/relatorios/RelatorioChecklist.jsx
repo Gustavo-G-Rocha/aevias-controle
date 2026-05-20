@@ -1,5 +1,7 @@
 import React from 'react';
 import SignatureFooter from './SignatureFooter';
+import PrintStyles from './PrintStyles';
+import { buildSignatureProps, formatDateBrasilia } from '@/utils/relatorioUtils';
 
 const Checkmark = ({ checked }) => {
   if (checked === null || typeof checked === 'undefined') {
@@ -203,23 +205,8 @@ const ReportPrintHeader = ({ checklist, obra, regional, project }) => (
   </div>
 );
 
-const ReportFooter = ({ checklist, formatDateBrasilia, creatorUser }) => (
-  <SignatureFooter
-    labName={checklist.laboratorista_name}
-    labEmail={checklist.created_by}
-    labCreatedDate={checklist.created_date}
-    labPosition={creatorUser?.position || 'Laboratorista'}
-    approverName={checklist.approver_details?.name}
-    approverEmail={checklist.approved_by}
-    approverPosition={checklist.approver_details?.position}
-    approverCREA={checklist.approver_details?.crea_number}
-    approverDate={checklist.approved_date}
-    clientName={checklist.client_signature?.engineer_name}
-    clientEmail={checklist.client_signature?.signed_by}
-    clientPosition={checklist.client_signature?.position}
-    clientCREA={checklist.client_signature?.crea_number}
-    clientDate={checklist.client_signature?.signed_date}
-  />
+const ReportFooter = ({ checklist, creatorUser }) => (
+  <SignatureFooter {...buildSignatureProps(checklist, creatorUser)} />
 );
 
 
@@ -300,15 +287,6 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
   
   const photoChunks = chunkArray(compressedPhotos, 6);
 
-  const formatDateBrasilia = (dateString) => {
-    if (!dateString) return 'N/A';
-    let normalizedDate = dateString;
-    if (!dateString.endsWith('Z') && !dateString.includes('+') && !dateString.includes('-', 10)) {
-      normalizedDate = dateString + 'Z';
-    }
-    return new Date(normalizedDate).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'medium' });
-  };
-  
   const temAcoesCorretivas = checklist.acoes_corretivas_realizado === true && checklist.acoes_corretivas_descricao;
   const temControleLigante = checklist.controle_ligante_ativo === true;
   const temMedicaoUsina = (checklist.medicoes_usina?.cargas?.length || 0) > 0;
@@ -316,6 +294,7 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
 
   return (
     <div className="bg-white font-sans">
+      <PrintStyles />
       {/* --- Página 1: Agregados & Produção --- */}
       <div className="p-8 print:p-8 flex flex-col page-container min-h-screen">
         <div className="w-full max-w-[190mm] mx-auto flex-grow flex flex-col">
@@ -386,7 +365,7 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
             <TabelaControleCAUQ controle_cauq={checklist.controle_cauq} project={project} />
             <div className="mt-2"><strong className="font-medium">Observações Gerais:</strong> {checklist.observacoes?.substring(0, 500) || 'N/A'}</div>
           </main>
-          <ReportFooter checklist={checklist} formatDateBrasilia={formatDateBrasilia} creatorUser={creatorUser} />
+          <ReportFooter checklist={checklist} creatorUser={creatorUser} />
           <footer className="mt-auto pt-2 text-center text-sm print:text-xs text-gray-400">
              Página 2 de {totalPages}
           </footer>
@@ -539,7 +518,7 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
                 </tbody>
               </table>
             </main>
-            <ReportFooter checklist={checklist} formatDateBrasilia={formatDateBrasilia} creatorUser={creatorUser} />
+            <ReportFooter checklist={checklist} creatorUser={creatorUser} />
             <footer className="pt-1 text-center text-sm print:text-xs text-gray-400">
               Página 3 de {totalPages}
             </footer>
@@ -582,7 +561,7 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
                 </div>
               )}
             </main>
-            <ReportFooter checklist={checklist} formatDateBrasilia={formatDateBrasilia} creatorUser={creatorUser} />
+            <ReportFooter checklist={checklist} creatorUser={creatorUser} />
             <footer className="mt-auto pt-2 text-center text-sm print:text-xs text-gray-400">
               Página {temControleLigante ? 4 : 3} de {totalPages}
             </footer>
@@ -668,7 +647,7 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
                 </table>
               </main>
 
-              <ReportFooter checklist={checklist} formatDateBrasilia={formatDateBrasilia} creatorUser={creatorUser} />
+              <ReportFooter checklist={checklist} creatorUser={creatorUser} />
               <footer className="mt-2 pt-1 text-center text-sm print:text-xs text-gray-400">
                 Página {pageNum} de {totalPages}
               </footer>

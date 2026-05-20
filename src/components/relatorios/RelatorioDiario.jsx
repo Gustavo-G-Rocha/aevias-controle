@@ -1,5 +1,7 @@
 import React from 'react';
 import SignatureFooter from './SignatureFooter';
+import PrintStyles from './PrintStyles';
+import { buildSignatureProps, formatDateBrasilia as formatDateBrasiliaUtil, formatDate as formatDateUtil } from '@/utils/relatorioUtils';
 
 export default function RelatorioDiario({ diario, obra, project, user, regional, creatorUser }) {
   const [compressedPhotos, setCompressedPhotos] = React.useState([]);
@@ -81,21 +83,6 @@ export default function RelatorioDiario({ diario, obra, project, user, regional,
     neblina: "🌫️ Neblina"
   };
 
-  const formatDateBrasilia = (dateString) => {
-    if (!dateString) return 'N/A';
-    
-    let normalizedDate = dateString;
-    if (!dateString.endsWith('Z') && !dateString.includes('+') && !dateString.includes('-', 10)) {
-      normalizedDate = dateString + 'Z';
-    }
-    
-    return new Date(normalizedDate).toLocaleString('pt-BR', { 
-      timeZone: 'America/Sao_Paulo',
-      dateStyle: 'short',
-      timeStyle: 'medium'
-    });
-  };
-
   const tipoLocal = diario.tipo_local || "campo";
   const rodovia = tipoLocal === "usina" ? (diario.usina_selecionada || "N/A") : (diario.rodovia || "N/A");
   const trecho = diario.trecho || "N/A";
@@ -122,16 +109,14 @@ export default function RelatorioDiario({ diario, obra, project, user, regional,
   const photoChunks = compressedPhotos.length > 0 ? chunkArray(compressedPhotos, 6) : [];
   const hasChecklistVeiculo = diario?.checklist_veiculo_ativo === true;
   
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
-  };
+  const formatDate = formatDateUtil;
 
   const tipoVeiculo = diario.checklist_veiculo?.tipo_veiculo || 'passeio';
   const tituloVeiculo = tipoVeiculo === 'picape' ? 'Picape' : 'Veículo de Passeio';
 
   return (
     <div className="bg-white font-sans">
+      <PrintStyles />
       {/* Primeira Página - Dados do Diário */}
       <div className="p-8 print:p-8 min-h-[29.7cm] flex flex-col">
         <header className="grid grid-cols-3 items-center border-b-2 border-slate-900 pb-4">
@@ -273,22 +258,7 @@ export default function RelatorioDiario({ diario, obra, project, user, regional,
         </main>
 
         <footer className="mt-auto pt-4 flex-shrink-0">
-          <SignatureFooter 
-            labName={diario.laboratorista_name}
-            labEmail={diario.created_by}
-            labCreatedDate={diario.created_date}
-            labPosition={creatorUser?.position || 'Laboratorista'}
-            approverName={diario.approver_details?.name}
-            approverEmail={diario.approved_by}
-            approverPosition={diario.approver_details?.position}
-            approverCREA={diario.approver_details?.crea_number}
-            approverDate={diario.approved_date}
-            clientName={diario.client_signature?.engineer_name}
-            clientEmail={diario.client_signature?.signed_by}
-            clientPosition={diario.client_signature?.position}
-            clientCREA={diario.client_signature?.crea_number}
-            clientDate={diario.client_signature?.signed_date}
-          />
+          <SignatureFooter {...buildSignatureProps(diario, creatorUser)} />
         </footer>
       </div>
 

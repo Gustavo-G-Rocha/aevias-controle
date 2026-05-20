@@ -33,7 +33,10 @@ export function formatDateBrasilia(dateString) {
  * Constrói o objeto de props para SignatureFooter a partir de um registro
  * (ensaio, checklist, etc.) com os campos padrão de aprovação.
  */
-export function buildSignatureProps(record, labPosition = 'Laboratorista') {
+export function buildSignatureProps(record, creatorUserOrPosition = 'Laboratorista') {
+  const labPosition = typeof creatorUserOrPosition === 'string'
+    ? creatorUserOrPosition
+    : (creatorUserOrPosition?.position || 'Laboratorista');
   return {
     labName: record?.laboratorista_name,
     labEmail: record?.created_by,
