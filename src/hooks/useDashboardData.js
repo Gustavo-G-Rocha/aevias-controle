@@ -1,10 +1,9 @@
-// Hook customizado que encapsula toda a lógica do Dashboard
+// useDashboardData.js — Hook do Dashboard migrado para React Query
+// Cache compartilhado com useEnsaiosList: dados não são recarregados ao navegar entre páginas
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import { subMonths } from 'date-fns';
-import { base44 } from '@/api/base44Client';
-import { loadDashboardData } from '@/services/dashboardService';
-import { isCliente, isEngenheiroCliente } from '@/utils/accessControl';
+import { getUserAccessLevel, filterRegionaisByUser, isCliente, isEngenheiroCliente } from '@/utils/accessControl';
 import {
   calcularStats,
   calcularGraficoMensal,
@@ -13,6 +12,7 @@ import {
   calcularGraficoPorTipo,
   calcularApprovalPercentage,
 } from '@/utils/dashboardCalculations';
+import { useCurrentUser, useAuxData, useAllRecords } from '@/hooks/useQueryData';
 
 const DEFAULT_FILTERS = {
   obraId: null,
@@ -22,35 +22,50 @@ const DEFAULT_FILTERS = {
 };
 
 export function useDashboardData() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [rawData, setRawData] = useState({ obras: [], projects: [], ensaios: [], regionais: [] });
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
-  // Carregar dados na montagem
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      setLoading(true);
-      try {
-        const userData = await base44.auth.me();
-        if (cancelled) return;
-        setUser(userData);
-        const data = await loadDashboardData(userData);
-        if (cancelled) return;
-        setRawData(data);
-      } catch (err) {
-        console.error('[useDashboardData] Erro:', err?.message || err);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
+  const { data: user, isLoading: loadingUser } = useCurrentUser();
+  const userAccessLevel = getUserAccessLevel(user);
+  const needsRegionais = ['cliente', 'sala_tecnica_afirmaevias', 'gestor_contrato'].includes(userAccessLevel);
+
+  const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais });
+  const { data: allRecords = [], isLoading: loadingRecords } = useAllRecords('dashboard');
+
+  const loading = loadingUser || loadingAux || loadingRecords;
+
+  // Aplicar filtros de acesso
+  const { obras, projects, ensaios } = useMemo(() => {
+    if (!user || !auxData || !allRecords.length) {
+      return { obras: auxData?.obras ?? [], projects: auxData?.projects ?? [], ensaios: [] };
+    }
+
+    const isClienteUser = isCliente(user);
+    let filteredObras = auxData.obras;
+    let filteredProjects = auxData.projects;
+    let filteredEnsaios = allRecords;
+
+    if (userAccessLevel === 'user') {
+      filteredEnsaios = filteredEnsaios.filter(e => e.created_by === user.email);
+    } else if (needsRegionais) {
+      const regionaisDoUsuario = filterRegionaisByUser(auxData.regionais ?? [], user);
+      const regionaisIds = new Set(regionaisDoUsuario.map(r => r.id));
+
+      filteredObras = auxData.obras.filter(o => regionaisIds.has(o.regional_id));
+
+      const projectIdsPermitidos = new Set(regionaisDoUsuario.flatMap(r => r.project_ids || []));
+      filteredProjects = auxData.projects.filter(p => projectIdsPermitidos.has(p.id));
+
+      const obrasIds = new Set(filteredObras.map(o => o.id));
+      filteredEnsaios = isClienteUser
+        ? filteredEnsaios.filter(e => obrasIds.has(e.obra_id) && (e.approved === true || e.client_signature?.signed_by))
+        : filteredEnsaios.filter(e => obrasIds.has(e.obra_id));
+    }
+
+    return { obras: filteredObras, projects: filteredProjects, ensaios: filteredEnsaios };
+  }, [user, auxData, allRecords, userAccessLevel, needsRegionais]);
 
   // Filtrar ensaios de acordo com os filtros ativos
   const filteredEnsaios = useMemo(() => {
-    let filtered = rawData.ensaios;
     const now = new Date();
     const startDate = filters.periodo === '1mes'
       ? subMonths(now, 1)
@@ -58,7 +73,7 @@ export function useDashboardData() {
         ? subMonths(now, 3)
         : subMonths(now, 6);
 
-    filtered = filtered.filter(e => new Date(e.created_date) >= startDate);
+    let filtered = ensaios.filter(e => new Date(e.created_date) >= startDate);
     if (filters.obraId) filtered = filtered.filter(e => e.obra_id === filters.obraId);
     if (filters.status === 'approved') filtered = filtered.filter(e => e.approved === true);
     else if (filters.status === 'pending') filtered = filtered.filter(e => e.approved === null);
@@ -66,23 +81,22 @@ export function useDashboardData() {
     if (filters.tipoRegistro) filtered = filtered.filter(e => e.entityType === filters.tipoRegistro);
 
     return filtered;
-  }, [rawData.ensaios, filters]);
+  }, [ensaios, filters]);
 
-  // Dados derivados como useMemo — sem useState desnecessário
   const isClienteUser = useMemo(() => isCliente(user), [user]);
   const isEngenheiroUser = useMemo(() => isEngenheiroCliente(user), [user]);
 
   const stats = useMemo(
-    () => calcularStats(filteredEnsaios, rawData.obras, rawData.projects, isClienteUser, isEngenheiroUser),
-    [filteredEnsaios, rawData.obras, rawData.projects, isClienteUser, isEngenheiroUser]
+    () => calcularStats(filteredEnsaios, obras, projects, isClienteUser, isEngenheiroUser),
+    [filteredEnsaios, obras, projects, isClienteUser, isEngenheiroUser]
   );
 
   const charts = useMemo(() => ({
     monthly: calcularGraficoMensal(filteredEnsaios, filters.periodo, isClienteUser),
     status: calcularGraficoStatus(filteredEnsaios, isClienteUser, isEngenheiroUser),
-    porObra: calcularGraficoPorObra(filteredEnsaios, rawData.obras),
+    porObra: calcularGraficoPorObra(filteredEnsaios, obras),
     porTipo: calcularGraficoPorTipo(filteredEnsaios),
-  }), [filteredEnsaios, filters.periodo, rawData.obras, isClienteUser, isEngenheiroUser]);
+  }), [filteredEnsaios, filters.periodo, obras, isClienteUser, isEngenheiroUser]);
 
   const approvalPercentage = useMemo(
     () => calcularApprovalPercentage(stats, isClienteUser),
@@ -121,7 +135,7 @@ export function useDashboardData() {
     stats,
     charts,
     approvalPercentage,
-    obras: rawData.obras,
+    obras,
     isClienteUser,
     isEngenheiroUser,
     hasActiveFilters: Boolean(filters.obraId || filters.status || filters.tipoRegistro),

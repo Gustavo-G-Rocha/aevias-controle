@@ -1,53 +1,67 @@
-// Hook que encapsula carregamento de ensaios e filtragem por nível de acesso
+// useEnsaiosList.js — Hook de MeusEnsaios migrado para React Query
+// Cache compartilhado com useDashboardData: mesma query key = zero recarregamentos ao navegar
 
-import { useState, useEffect, useCallback } from 'react';
-import { loadAllData } from '@/components/ensaios/dataLoader';
+import { useMemo, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { getUserAccessLevel } from '@/utils/accessControl';
+import { useCurrentUser, useAuxData, useAllRecords, QUERY_KEYS } from '@/hooks/useQueryData';
+import { getDataEnsaio } from '@/components/ensaios/ensaioMappers';
+
+function sortByEnsaioDate(records) {
+  return [...records].sort((a, b) => {
+    const dateA = new Date(getDataEnsaio(a));
+    const dateB = new Date(getDataEnsaio(b));
+    const aValid = !isNaN(dateA.getTime());
+    const bValid = !isNaN(dateB.getTime());
+    if (aValid && bValid) {
+      const diff = dateB.getTime() - dateA.getTime();
+      return diff !== 0 ? diff : new Date(b.updated_date).getTime() - new Date(a.updated_date).getTime();
+    }
+    return aValid ? -1 : 1;
+  });
+}
 
 function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccessLevel, obrasData, regionaisData) {
-  if (currentUserAccessLevel === 'admin') {
-    return combinedEnsaios;
-  }
+  if (currentUserAccessLevel === 'admin') return combinedEnsaios;
 
   if (currentUserAccessLevel === 'sala_tecnica_afirmaevias') {
-    const regionaisDoUsuario = regionaisData.filter((r) =>
-      (r.salas_tecnicas_responsaveis || []).some((e) => e.toLowerCase() === currentUser.email.toLowerCase())
+    const regionaisDoUsuario = regionaisData.filter(r =>
+      (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === currentUser.email.toLowerCase())
     );
     const obrasIds = new Set(
-      obrasData.filter((o) => regionaisDoUsuario.some((r) => r.id === o.regional_id)).map((o) => o.id)
+      obrasData.filter(o => regionaisDoUsuario.some(r => r.id === o.regional_id)).map(o => o.id)
     );
-    return combinedEnsaios.filter((e) => obrasIds.has(e.obra_id));
+    return combinedEnsaios.filter(e => obrasIds.has(e.obra_id));
   }
 
   if (currentUserAccessLevel === 'gestor_contrato') {
-    const regionaisDoUsuario = regionaisData.filter((r) => {
+    const regionaisDoUsuario = regionaisData.filter(r => {
       const gestores = r.gestores_contrato_responsaveis || [];
       return (
         r.gestor_contrato_responsavel?.toLowerCase() === currentUser.email.toLowerCase() ||
-        gestores.some((e) => e.toLowerCase() === currentUser.email.toLowerCase())
+        gestores.some(e => e.toLowerCase() === currentUser.email.toLowerCase())
       );
     });
     const obrasIds = new Set(
-      obrasData.filter((o) => regionaisDoUsuario.some((r) => r.id === o.regional_id)).map((o) => o.id)
+      obrasData.filter(o => regionaisDoUsuario.some(r => r.id === o.regional_id)).map(o => o.id)
     );
-    return combinedEnsaios.filter((e) => obrasIds.has(e.obra_id));
+    return combinedEnsaios.filter(e => obrasIds.has(e.obra_id));
   }
 
   if (currentUserAccessLevel === 'cliente') {
-    const regionaisDoUsuario = regionaisData.filter((r) =>
-      (r.clientes_responsaveis || []).some((e) => e.toLowerCase() === currentUser.email.toLowerCase())
+    const regionaisDoUsuario = regionaisData.filter(r =>
+      (r.clientes_responsaveis || []).some(e => e.toLowerCase() === currentUser.email.toLowerCase())
     );
     const obrasIds = new Set(
-      obrasData.filter((o) => regionaisDoUsuario.some((r) => r.id === o.regional_id)).map((o) => o.id)
+      obrasData.filter(o => regionaisDoUsuario.some(r => r.id === o.regional_id)).map(o => o.id)
     );
-    // Cliente vê apenas aprovados ou assinados
     return combinedEnsaios.filter(
-      (e) => obrasIds.has(e.obra_id) && (e.approved === true || e.client_signature?.signed_by)
+      e => obrasIds.has(e.obra_id) && (e.approved === true || e.client_signature?.signed_by)
     );
   }
 
   // Laboratorista: próprios registros
-  return combinedEnsaios.filter((e) => {
+  return combinedEnsaios.filter(e => {
     const emailMatch = e.created_by?.toLowerCase() === currentUser.email?.toLowerCase();
     const nameMatch =
       currentUser.laboratorista_name &&
@@ -57,49 +71,45 @@ function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccessLevel, 
 }
 
 export function useEnsaiosList() {
-  const [ensaios, setEnsaios] = useState([]);
-  const [obras, setObras] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [allUsers, setAllUsers] = useState([]);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { data: user, isLoading: loadingUser } = useCurrentUser();
+  const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true, needsUsers: true });
+  const { data: allRecords = [], isLoading: loadingRecords } = useAllRecords('list');
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const {
-        currentUser,
-        allUsers: loadedUsers,
-        currentUserAccessLevel,
-        obrasData,
-        regionaisData,
-        projectsData,
-        combinedEnsaios,
-      } = await loadAllData();
+  // Invalida o cache de registros para forçar recarregamento após ações (aprovar/excluir)
+  const reload = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords('list') });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords('dashboard') });
+  }, [queryClient]);
 
-      setUser(currentUser);
-      setAllUsers(loadedUsers);
-      setObras(obrasData);
-      setProjects(projectsData);
+  const loading = loadingUser || loadingAux || loadingRecords;
 
-      const ensaiosFiltrados = filtrarPorAcesso(
-        combinedEnsaios,
-        currentUser,
-        currentUserAccessLevel,
-        obrasData,
-        regionaisData
-      );
-      setEnsaios(ensaiosFiltrados);
-    } catch (error) {
-      console.error('[useEnsaiosList] Erro ao carregar dados:', error?.message || error);
-    } finally {
-      setLoading(false);
+  const { ensaios, obras, projects, allUsers } = useMemo(() => {
+    if (!user || !auxData || !allRecords.length) {
+      return {
+        ensaios: [],
+        obras: auxData?.obras ?? [],
+        projects: auxData?.projects ?? [],
+        allUsers: auxData?.users ?? [],
+      };
     }
-  }, []);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+    const currentUserAccessLevel = getUserAccessLevel(user);
+    const filtered = filtrarPorAcesso(
+      allRecords,
+      user,
+      currentUserAccessLevel,
+      auxData.obras,
+      auxData.regionais ?? []
+    );
 
-  return { ensaios, obras, projects, allUsers, user, loading, reload: loadData };
+    return {
+      ensaios: sortByEnsaioDate(filtered),
+      obras: auxData.obras,
+      projects: auxData.projects,
+      allUsers: auxData.users ?? [],
+    };
+  }, [user, auxData, allRecords]);
+
+  return { ensaios, obras, projects, allUsers, user, loading, reload };
 }
