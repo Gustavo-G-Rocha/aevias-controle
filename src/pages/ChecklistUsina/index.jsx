@@ -1,12 +1,11 @@
-import React, { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
-import { ChecklistUsina as ChecklistUsinaEntity } from "@/entities/ChecklistUsina";
+import { base44 } from "@/api/base44Client";
 import { uploadMultipleFiles } from "@/utils/imageUpload";
 import { createPageUrl } from "@/utils";
 import { useChecklistForm } from "@/hooks/useChecklistForm";
 import { validateChecklistForm } from "@/utils/checklistValidation";
-import AcoesCorretivasNC from "@/components/checklists/AcoesCorretivasNC";
 import MedicaoUsina from "@/components/checklists/MedicaoUsina";
 import ChecklistUsinaHeader from "@/components/checklists/ChecklistUsinaHeader";
 import ChecklistFooter from "@/components/checklists/ChecklistFooter";
@@ -149,10 +148,10 @@ export default function ChecklistUsinaPage() {
           updateData.was_rejected = true;
           msg = "Checklist atualizado com sucesso! O registro voltará para análise do administrador.";
         }
-        await ChecklistUsinaEntity.update(editingChecklist.id, updateData);
+        await base44.entities.ChecklistUsina.update(editingChecklist.id, updateData);
         alert(msg);
       } else {
-        await ChecklistUsinaEntity.create({ ...dataToSave, laboratorista_name: user?.laboratorista_name || user?.full_name });
+        await base44.entities.ChecklistUsina.create({ ...dataToSave, laboratorista_name: user?.laboratorista_name || user?.full_name });
         alert(saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!");
       }
       clearSavedData();
