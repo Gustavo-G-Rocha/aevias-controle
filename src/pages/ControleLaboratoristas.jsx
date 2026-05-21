@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,7 +16,7 @@ export default function ControleLaboratoristas() {
   const [filtroNome, setFiltroNome] = useState('');
   const [filtroObra, setFiltroObra] = useState('todas');
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const userData = await base44.auth.me();
@@ -93,11 +93,11 @@ export default function ControleLaboratoristas() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     loadData();
-  }, [loadData]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [loadData]);
 
   const estatisticasLaboratoristas = useMemo(() => {
     const stats = {};
