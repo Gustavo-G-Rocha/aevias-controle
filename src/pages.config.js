@@ -58,7 +58,7 @@ import ChecklistTerraplanagem from './pages/ChecklistTerraplanagem/index';
 import ChecklistUsina from './pages/ChecklistUsina/index';
 import ControleLaboratoristas from './pages/ControleLaboratoristas';
 import Dashboard from './pages/Dashboard';
-import DiarioObra from './pages/DiarioObra';
+import DiarioObra from './pages/DiarioObra/index';
 import EditarNC from './pages/EditarNC';
 import EnsaioCAUQ from './pages/EnsaioCAUQ/index';
 import EnsaioDensidade from './pages/EnsaioDensidade';
