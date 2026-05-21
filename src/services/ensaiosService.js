@@ -147,11 +147,22 @@ export async function excluirEnsaio(ensaio) {
 }
 
 function detectEntityName(ensaio) {
-  // Detectar tipo de entidade baseado nas propriedades presentes
-  if (ensaio.faixa_trabalho) return 'EnsaioCAUQ';
-  if (ensaio.teor_ligante_residual) return 'EnsaioMRAF';
-  if (ensaio.peneiras) return 'EnsaioGranulometriaIndividual';
-  if (ensaio.pesos) return 'EnsaioDensidade';
-  if (ensaio.corpos_prova_marshall) return 'EnsaioCAUQ';
-  throw new Error('Não foi possível determinar o tipo de ensaio');
+  // Usar o campo entityType adicionado pelo recordsService (fonte primária)
+  if (ensaio.entityType) return ensaio.entityType;
+
+  // Fallbacks por propriedades características
+  if (ensaio.corpos_prova_marshall !== undefined) return 'EnsaioCAUQ';
+  if (ensaio.extracao_ligante !== undefined) return 'EnsaioCAUQ';
+  if (ensaio.teor_ligante_residual !== undefined) return 'EnsaioMRAF';
+  if (ensaio.pesos !== undefined) return 'EnsaioDensidade';
+  if (ensaio.agregados !== undefined && ensaio.tipo_material !== undefined) return 'EnsaioGranulometriaIndividual';
+  if (ensaio.peneiras !== undefined) return 'EnsaioGranMistura';
+  if (ensaio.cargas !== undefined) return 'AcompanhamentoCarga';
+  if (ensaio.rodadas_producao !== undefined) return 'ChecklistUsina';
+  if (ensaio.cargas_concreto !== undefined) return 'ChecklistConcretagem';
+  if (ensaio.acompanhamento_execucao !== undefined && ensaio.empreiteira !== undefined) return 'ChecklistTerraplanagem';
+  if (ensaio.controle_aplicacao !== undefined) return 'ChecklistAplicacao';
+  if (ensaio.atividades_realizadas !== undefined) return 'DiarioObra';
+
+  throw new Error(`Não foi possível determinar o tipo do registro (id: ${ensaio.id})`);
 }
