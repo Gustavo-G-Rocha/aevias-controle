@@ -32,6 +32,17 @@ export const PENEIRAS_MAP = Object.fromEntries(
 );
 
 /**
+ * PENEIRAS_ORDENADAS — alias para uso em tabelas do ProjectDetails.
+ * Inclui campos: key, astm (número ASTM), abertura (string), label (abertura+ASTM).
+ */
+export const PENEIRAS_ORDENADAS = PENEIRAS_CONFIG.map(p => ({
+  key: p.key,
+  astm: p.label,
+  abertura: p.abertura + ' mm',
+  label: `${p.abertura} mm (${p.label})`,
+}));
+
+/**
  * Filtra peneiras de acordo com a faixa granulométrica do projeto.
  * Se não houver faixa definida, retorna todas as peneiras.
  */

@@ -449,9 +449,33 @@ if (obraFilter) filtered = filtered.filter((e) => {
 
 ---
 
+## ✅ ETAPA 9 (Quarta Rodada) — ProjectDetails.jsx
+
+**Problema:** 869 linhas em único arquivo com 8 sub-componentes inline: `DetailSection`, `DetailItem`, `DetailRange`, `AgregadosList`, `LiganteInfo`, `TemperaturasControl`, `FaixaEspecificacaoTable`, `FaixaTrabalhoTable`, `TabelaMarshall`, `GraficoGranulometriaProject`, `CartaTracoSection`.
+
+**Arquivos criados:**
+
+| Arquivo | Responsabilidade |
+|---|---|
+| `details/DetailPrimitives.jsx` | `DetailSection`, `DetailItem`, `DetailRange` — primitivos reutilizáveis |
+| `details/AgregadosList.jsx` | Tabela granulométrica dos agregados (usa `PENEIRAS_ORDENADAS`) |
+| `details/LiganteInfo.jsx` | Card de ligante asfáltico (CAUQ) |
+| `details/TemperaturasControl.jsx` | Temperaturas de controle (CAUQ) |
+| `details/FaixaEspecificacaoTable.jsx` | Tabela de faixa de especificação |
+| `details/FaixaTrabalhoTable.jsx` | Tabela de faixa de trabalho mín/mistura/máx |
+| `details/GraficoGranulometriaProject.jsx` | Gráfico Recharts em escala log |
+| `details/TabelaMarshall.jsx` | Parâmetros Marshall com supressão de linhas vazias |
+| `details/CartaTracoSection.jsx` | Seção completa para CARTA_TRACO_CONCRETO |
+| `ProjectDetails.jsx` | Orquestrador puro — **~130 linhas** (era 869, -85%) |
+
+**Bônus:** `PENEIRAS_ORDENADAS` adicionado ao `constants/sieves.js` (alias com campos `astm`, `abertura`, `label`), evitando duplicação do array de peneiras que já existia inline em `AgregadosList` e `FaixaTrabalhoTable`.
+
+**Redução:** 869 → ~130 linhas no orquestrador (**-85%**).
+
+---
+
 ## 🗓️ Próximas Rodadas — Oportunidades Identificadas
 
 1. **Cache com React Query** — usar `useQuery` com staleTime em `useDashboardData` e `useEnsaiosList` para evitar recarregamentos desnecessários
 2. **Migração gradual dos formulários** para `components/forms/` (StatusDraftBanner, UploadGallery, FormActions)
-3. **Paginação server-side em MeusEnsaios** — `loadRecordsByObra` já disponível no `recordsService`
-4. **`ProjectDetails.jsx`** (~868 linhas) — candidato à modularização com hooks e seções extraídas
+3. **Paginação server-side em MeusEnsaios** — `loadRecordsByObra` já disponível no `recordsService
