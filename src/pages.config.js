@@ -53,7 +53,7 @@ import BoletimSondagem from './pages/BoletimSondagem';
 import ChecklistAplicacao from './pages/ChecklistAplicacao/index';
 import ChecklistConcretagem from './pages/ChecklistConcretagem';
 import ChecklistMRAF from './pages/ChecklistMRAF';
-import ChecklistReciclagem from './pages/ChecklistReciclagem';
+import ChecklistReciclagem from './pages/ChecklistReciclagem/index';
 import ChecklistTerraplanagem from './pages/ChecklistTerraplanagem/index';
 import ChecklistUsina from './pages/ChecklistUsina/index';
 import ControleLaboratoristas from './pages/ControleLaboratoristas';
