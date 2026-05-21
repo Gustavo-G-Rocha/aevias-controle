@@ -51,7 +51,7 @@ import AcompanhamentoCarga from './pages/AcompanhamentoCarga';
 import AcompanhamentoUsinagem from './pages/AcompanhamentoUsinagem';
 import BoletimSondagem from './pages/BoletimSondagem';
 import ChecklistAplicacao from './pages/ChecklistAplicacao/index';
-import ChecklistConcretagem from './pages/ChecklistConcretagem';
+import ChecklistConcretagem from './pages/ChecklistConcretagem/index';
 import ChecklistMRAF from './pages/ChecklistMRAF';
 import ChecklistReciclagem from './pages/ChecklistReciclagem/index';
 import ChecklistTerraplanagem from './pages/ChecklistTerraplanagem/index';
