@@ -60,7 +60,7 @@ import ControleLaboratoristas from './pages/ControleLaboratoristas';
 import Dashboard from './pages/Dashboard';
 import DiarioObra from './pages/DiarioObra';
 import EditarNC from './pages/EditarNC';
-import EnsaioCAUQ from './pages/EnsaioCAUQ';
+import EnsaioCAUQ from './pages/EnsaioCAUQ/index';
 import EnsaioDensidade from './pages/EnsaioDensidade';
 import EnsaioDensidadeInSitu from './pages/EnsaioDensidadeInSitu';
 import EnsaioGranulometriaIndividual from './pages/EnsaioGranulometriaIndividual';
