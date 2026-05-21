@@ -54,7 +54,7 @@ import ChecklistAplicacao from './pages/ChecklistAplicacao/index';
 import ChecklistConcretagem from './pages/ChecklistConcretagem';
 import ChecklistMRAF from './pages/ChecklistMRAF';
 import ChecklistReciclagem from './pages/ChecklistReciclagem';
-import ChecklistTerraplanagem from './pages/ChecklistTerraplanagem';
+import ChecklistTerraplanagem from './pages/ChecklistTerraplanagem/index';
 import ChecklistUsina from './pages/ChecklistUsina/index';
 import ControleLaboratoristas from './pages/ControleLaboratoristas';
 import Dashboard from './pages/Dashboard';
