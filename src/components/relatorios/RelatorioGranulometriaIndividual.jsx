@@ -42,11 +42,11 @@ export default function RelatorioGranulometriaIndividual({ ensaio, obra, project
     <>
       <style>{`
         @media print {
-          body { margin: 0; padding: 0; }
+          body { margin: 1; padding: 0; }
           .no-print { display: none !important; }
           #report-content {
             max-width: 100% !important;
-            margin: 0 !important;
+            margin: 1 !important;
             padding: 0 !important;
             box-shadow: none !important;
             border-radius: 0 !important;
