@@ -102,7 +102,7 @@ import RelatorioSondagem from './pages/RelatorioSondagem';
 import RelatorioTaxaMRAF from './pages/RelatorioTaxaMRAF';
 import RelatorioTaxaPinturaImprimacao from './pages/RelatorioTaxaPinturaImprimacao';
 import RelatorioVigaBenkelman from './pages/RelatorioVigaBenkelman';
-import ResumosPersonalizados from './pages/ResumosPersonalizados';
+import ResumosPersonalizados from './pages/ResumosPersonalizados/index';
 import SolicitacoesTransferencia from './pages/SolicitacoesTransferencia';
 import Users from './pages/Users';
 import RelatorioBoletimSondagem from './pages/RelatorioBoletimSondagem';
