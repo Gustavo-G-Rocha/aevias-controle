@@ -87,8 +87,8 @@ export function useDashboardData() {
   const isEngenheiroUser = useMemo(() => isEngenheiroCliente(user), [user]);
 
   const stats = useMemo(
-    () => calcularStats(filteredEnsaios, obras, projects, isClienteUser, isEngenheiroUser),
-    [filteredEnsaios, obras, projects, isClienteUser, isEngenheiroUser]
+    () => calcularStats(filteredEnsaios, obras, projects, isClienteUser, isEngenheiroUser, ensaios),
+    [filteredEnsaios, obras, projects, isClienteUser, isEngenheiroUser, ensaios]
   );
 
   const charts = useMemo(() => ({
