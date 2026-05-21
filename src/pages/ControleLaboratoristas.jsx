@@ -30,24 +30,10 @@ export default function ControleLaboratoristas() {
       const obrasData = await base44.entities.Obra.list();
       setObras(obrasData);
 
-      // Buscar todos os registros de todas as entidades
+      // Buscar registros em lotes para evitar rate limit
       const [
-        diariosObra,
-        checklistsUsina,
-        checklistsAplicacao,
-        checklistsMRAF,
-        checklistsConcretagem,
-        checklistsTerraplanagem,
-        checklistsReciclagem,
-        ensaiosSondagem,
-        ensaiosDensidadeInSitu,
-        ensaiosTaxaPintura,
-        ensaiosCAUQ,
-        ensaiosMRAF,
-        ensaiosDensidade,
-        ensaiosGranAreia,
-        ensaiosGranIndividual,
-        acompanhamentosUsinagem
+        diariosObra, checklistsUsina, checklistsAplicacao, checklistsMRAF,
+        checklistsConcretagem, checklistsTerraplanagem, checklistsReciclagem, ensaiosCAUQ
       ] = await Promise.all([
         base44.entities.DiarioObra.list("-created_date", 500),
         base44.entities.ChecklistUsina.list("-created_date", 500),
@@ -56,35 +42,44 @@ export default function ControleLaboratoristas() {
         base44.entities.ChecklistConcretagem.list("-created_date", 500),
         base44.entities.ChecklistTerraplanagem.list("-created_date", 500),
         base44.entities.ChecklistReciclagem.list("-created_date", 500),
-        base44.entities.EnsaioSondagem.list("-created_date", 500),
-        base44.entities.EnsaioDensidadeInSitu.list("-created_date", 500),
-        base44.entities.EnsaioTaxaPinturaImprimacao.list("-created_date", 500),
         base44.entities.EnsaioCAUQ.list("-created_date", 500),
+      ]);
+
+      const [
+        ensaiosMRAF, ensaiosDensidade, ensaiosDensidadeInSitu, ensaiosSondagem,
+        ensaiosTaxaPintura, ensaiosGranIndividual, ensaiosManchaPendulo, ensaiosVigaBenkelman
+      ] = await Promise.all([
         base44.entities.EnsaioMRAF.list("-created_date", 500),
         base44.entities.EnsaioDensidade.list("-created_date", 500),
-        base44.entities.EnsaioGranAreia.list("-created_date", 500),
+        base44.entities.EnsaioDensidadeInSitu.list("-created_date", 500),
+        base44.entities.EnsaioSondagem.list("-created_date", 500),
+        base44.entities.EnsaioTaxaPinturaImprimacao.list("-created_date", 500),
         base44.entities.EnsaioGranulometriaIndividual.list("-created_date", 500),
-        base44.entities.AcompanhamentoUsinagem.list("-created_date", 500)
+        base44.entities.EnsaioManchaPendulo.list("-created_date", 500),
+        base44.entities.EnsaioVigaBenkelman.list("-created_date", 500),
+      ]);
+
+      const [
+        acompanhamentosUsinagem, acompanhamentosCarga, ensaiosProctor,
+        ensaiosRompimento, ensaiosTaxaMRAF, granuMisturas
+      ] = await Promise.all([
+        base44.entities.AcompanhamentoUsinagem.list("-created_date", 500),
+        base44.entities.AcompanhamentoCarga.list("-created_date", 500),
+        base44.entities.EnsaioProctor.list("-created_date", 500),
+        base44.entities.EnsaioRompimentoConcreto.list("-created_date", 500),
+        base44.entities.EnsaioTaxaMRAF.list("-created_date", 500),
+        base44.entities.GranuMistura.list("-created_date", 500),
       ]);
 
       // Combinar todos os registros
       const todosRegistros = [
-        ...diariosObra,
-        ...checklistsUsina,
-        ...checklistsAplicacao,
-        ...checklistsMRAF,
-        ...checklistsConcretagem,
-        ...checklistsTerraplanagem,
-        ...checklistsReciclagem,
-        ...ensaiosSondagem,
-        ...ensaiosDensidadeInSitu,
-        ...ensaiosTaxaPintura,
-        ...ensaiosCAUQ,
-        ...ensaiosMRAF,
-        ...ensaiosDensidade,
-        ...ensaiosGranAreia,
-        ...ensaiosGranIndividual,
-        ...acompanhamentosUsinagem
+        ...diariosObra, ...checklistsUsina, ...checklistsAplicacao, ...checklistsMRAF,
+        ...checklistsConcretagem, ...checklistsTerraplanagem, ...checklistsReciclagem,
+        ...ensaiosCAUQ, ...ensaiosMRAF, ...ensaiosDensidade, ...ensaiosDensidadeInSitu,
+        ...ensaiosSondagem, ...ensaiosTaxaPintura, ...ensaiosGranIndividual,
+        ...ensaiosManchaPendulo, ...ensaiosVigaBenkelman, ...acompanhamentosUsinagem,
+        ...acompanhamentosCarga, ...ensaiosProctor, ...ensaiosRompimento,
+        ...ensaiosTaxaMRAF, ...granuMisturas
       ];
 
       setRegistros(todosRegistros);
