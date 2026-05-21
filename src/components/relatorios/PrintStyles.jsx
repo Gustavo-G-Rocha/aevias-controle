@@ -8,7 +8,7 @@ export default function PrintStyles() {
       @media print {
         @page {
           size: A4 portrait;
-          margin: 0;
+          margin: 15mm 12mm;
         }
         body {
           print-color-adjust: exact;
