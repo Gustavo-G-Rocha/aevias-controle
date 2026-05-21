@@ -47,7 +47,7 @@ export default function RelatorioGranulometriaIndividual({ ensaio, obra, project
           .no-print { display: none !important; }
           #report-content {
             max-width: 100% !important;
-            margin: 0 !important;
+            margin: 15 !important;
             padding: 0 !important;
             box-shadow: none !important;
             border-radius: 0 !important;
