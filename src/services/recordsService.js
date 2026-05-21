@@ -5,32 +5,32 @@
 import { base44 } from '@/api/base44Client';
 
 // ─── Mapa canônico de todas as entidades de registro ──────────────────────────
-// [ entityType, pageSizeForDashboard, pageSizeForList ]
+// Limite único por entidade — cache unificado entre Dashboard e MeusEnsaios
 export const ALL_RECORD_ENTITIES = [
-  ['DiarioObra',                    200, 500],
-  ['EnsaioCAUQ',                    200, 500],
-  ['EnsaioMRAF',                    200, 500],
-  ['EnsaioDensidade',               200, 500],
-  ['EnsaioDensidadeInSitu',         200, 500],
-  ['EnsaioTaxaPinturaImprimacao',   200, 500],
-  ['ChecklistUsina',                200, 500],
-  ['ChecklistAplicacao',            200, 500],
-  ['ChecklistMRAF',                 200, 500],
-  ['ChecklistConcretagem',          200, 500],
-  ['ChecklistTerraplanagem',        200, 500],
-  ['ChecklistReciclagem',           200, 500],
-  ['EnsaioSondagem',                200, 500],
-  ['EnsaioGranulometriaIndividual', 200, 500],
-  ['AcompanhamentoUsinagem',        200, 500],
-  ['AcompanhamentoCarga',           200, 500],
-  ['EnsaioManchaPendulo',           200, 500],
-  ['EnsaioVigaBenkelman',           200, 500],
-  ['EnsaioTaxaMRAF',                200, 500],
-  ['BoletimSondagem',               200, 500],
-  ['BoletimSondagemTrado',          200, 500],
-  ['EnsaioProctor',                 200, 500],
-  ['EnsaioRompimentoConcreto',      200, 500],
-  ['GranuMistura',                  200, 500],
+  'DiarioObra',
+  'EnsaioCAUQ',
+  'EnsaioMRAF',
+  'EnsaioDensidade',
+  'EnsaioDensidadeInSitu',
+  'EnsaioTaxaPinturaImprimacao',
+  'ChecklistUsina',
+  'ChecklistAplicacao',
+  'ChecklistMRAF',
+  'ChecklistConcretagem',
+  'ChecklistTerraplanagem',
+  'ChecklistReciclagem',
+  'EnsaioSondagem',
+  'EnsaioGranulometriaIndividual',
+  'AcompanhamentoUsinagem',
+  'AcompanhamentoCarga',
+  'EnsaioManchaPendulo',
+  'EnsaioVigaBenkelman',
+  'EnsaioTaxaMRAF',
+  'BoletimSondagem',
+  'BoletimSondagemTrado',
+  'EnsaioProctor',
+  'EnsaioRompimentoConcreto',
+  'GranuMistura',
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -41,9 +41,11 @@ export const ALL_RECORD_ENTITIES = [
  * @param {number} limit
  * @returns {Promise<object[]>}
  */
-async function loadEntity(entityType, limit) {
+const RECORD_PAGE_SIZE = 500;
+
+async function loadEntity(entityType) {
   try {
-    return await base44.entities[entityType].list('-created_date', limit);
+    return await base44.entities[entityType].list('-created_date', RECORD_PAGE_SIZE);
   } catch (e) {
     console.error(`[recordsService] Falha ao carregar ${entityType}:`, e?.message || e);
     return [];
@@ -68,6 +70,16 @@ export function normalizeRecords(results, entityTypes) {
   return out;
 }
 
+// Deduplicação por ID — evita registros duplicados em caso de race conditions
+export function deduplicateRecords(records) {
+  const seen = new Set();
+  return records.filter(r => {
+    if (seen.has(r.id)) return false;
+    seen.add(r.id);
+    return true;
+  });
+}
+
 // ─── Carregamento em lote ─────────────────────────────────────────────────────
 
 /**
@@ -75,15 +87,11 @@ export function normalizeRecords(results, entityTypes) {
  * @param {'dashboard' | 'list'} mode - controla o limite por entidade
  * @returns {Promise<object[]>} array normalizado com `entityType`
  */
-export async function loadAllRecords(mode = 'list') {
-  const limitIndex = mode === 'dashboard' ? 1 : 2;
-  const entityTypes = ALL_RECORD_ENTITIES.map(([type]) => type);
-  const promises = ALL_RECORD_ENTITIES.map(([type, dashLimit, listLimit]) =>
-    loadEntity(type, limitIndex === 1 ? dashLimit : listLimit)
-  );
-
+export async function loadAllRecords() {
+  const promises = ALL_RECORD_ENTITIES.map(type => loadEntity(type));
   const results = await Promise.all(promises);
-  return normalizeRecords(results, entityTypes);
+  const normalized = normalizeRecords(results, ALL_RECORD_ENTITIES);
+  return deduplicateRecords(normalized);
 }
 
 /**
@@ -93,10 +101,9 @@ export async function loadAllRecords(mode = 'list') {
  * @returns {Promise<object[]>}
  */
 export async function loadRecordsByObra(obraId) {
-  const entityTypes = ALL_RECORD_ENTITIES.map(([type]) => type);
-  const promises = ALL_RECORD_ENTITIES.map(([type]) =>
+  const promises = ALL_RECORD_ENTITIES.map(type =>
     base44.entities[type]
-      .filter({ obra_id: obraId }, '-created_date', 500)
+      .filter({ obra_id: obraId }, '-created_date', RECORD_PAGE_SIZE)
       .catch(e => {
         console.error(`[recordsService] Falha ao filtrar ${type} por obra:`, e?.message || e);
         return [];
@@ -104,7 +111,8 @@ export async function loadRecordsByObra(obraId) {
   );
 
   const results = await Promise.all(promises);
-  return normalizeRecords(results, entityTypes);
+  const normalized = normalizeRecords(results, ALL_RECORD_ENTITIES);
+  return deduplicateRecords(normalized);
 }
 
 /**

@@ -8,10 +8,10 @@ import { loadAllRecords, loadAuxData } from '@/services/recordsService';
 
 // ─── Query Keys canônicas ──────────────────────────────────────────────────────
 export const QUERY_KEYS = {
-  currentUser:    ['currentUser'],
-  auxData:        (opts = {}) => ['auxData', opts],
-  allRecords:     (mode) => ['allRecords', mode],
-  recordsByObra:  (obraId) => ['recordsByObra', obraId],
+  currentUser:   ['currentUser'],
+  auxData:       (opts = {}) => ['auxData', opts],
+  allRecords:    ['allRecords'],          // única key — cache compartilhado entre Dashboard e MeusEnsaios
+  recordsByObra: (obraId) => ['recordsByObra', obraId],
 };
 
 // ─── Usuário autenticado ───────────────────────────────────────────────────────
@@ -32,11 +32,11 @@ export function useAuxData({ needsRegionais = true, needsUsers = false } = {}) {
   });
 }
 
-// ─── Todos os registros (modo dashboard ou lista completa) ─────────────────────
-export function useAllRecords(mode = 'list') {
+// ─── Todos os registros — cache único compartilhado ───────────────────────────
+export function useAllRecords() {
   return useQuery({
-    queryKey: QUERY_KEYS.allRecords(mode),
-    queryFn: () => loadAllRecords(mode),
+    queryKey: QUERY_KEYS.allRecords,
+    queryFn: () => loadAllRecords(),
     staleTime: 3 * 60 * 1000,
   });
 }
