@@ -98,7 +98,7 @@ export default function EnsaioTaxaMRAFPage() {
   const isApproved = editingEnsaio?.approved === true;
   const isEditable = !isApproved;
 
-  const loadInitialData = async () => {
+  const loadInitialData = useCallback(async () => {
     setLoading(true);
     try {
       const currentUser = await base44.auth.me();
@@ -150,7 +150,7 @@ export default function EnsaioTaxaMRAFPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { loadInitialData(); }, [loadInitialData]); // eslint-disable-line react-hooks/exhaustive-deps
 
