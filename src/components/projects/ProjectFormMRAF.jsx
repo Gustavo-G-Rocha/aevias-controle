@@ -2,18 +2,21 @@ import React from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import AgregadosForm from "@/components/projects/AgregadosForm";
 
 export default function ProjectFormMRAF({
   formData,
-  tipoProjetoAtual,
-  onInputChange
+  peneirasCarregadas,
+  peneirasDisponiveis,
+  agregados,
+  onFaixaTrabalhoChange,
+  onInputChange,
+  onNestedChange,
+  onAgregadoAdd,
+  onAgregadoRemove,
+  onAgregadoChange,
+  onAgregadoGranChange,
 }) {
-  if (tipoProjetoAtual !== 'MRAF') return null;
-
-  const updateNested = (section, field, value) => {
-    onInputChange(section, { ...formData[section], [field]: value });
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -21,107 +24,113 @@ export default function ProjectFormMRAF({
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <Label htmlFor="emulsao_utilizada">Emulsão Utilizada</Label>
+          <Label>Emulsão Utilizada</Label>
           <Input
-            id="emulsao_utilizada"
             value={formData.emulsao_utilizada || ''}
             onChange={(e) => onInputChange('emulsao_utilizada', e.target.value)}
           />
         </div>
 
         <div>
-          <Label htmlFor="percentual_emulsao">Percentual de Emulsão (%)</Label>
+          <Label>Percentual de Emulsão (%)</Label>
           <Input
-            id="percentual_emulsao"
-            type="number"
-            step="0.1"
+            type="number" step="0.1"
             value={formData.percentual_emulsao || ''}
-            onChange={(e) => onInputChange('percentual_emulsao', parseFloat(e.target.value))}
+            onChange={(e) => onInputChange('percentual_emulsao', e.target.value === '' ? '' : parseFloat(e.target.value))}
           />
         </div>
 
         <div>
-          <Label htmlFor="densidade_mistura_mraf">Densidade da Mistura (g/cm³)</Label>
+          <Label>Densidade da Mistura (g/cm³)</Label>
           <Input
-            id="densidade_mistura_mraf"
-            type="number"
-            step="0.01"
+            type="number" step="0.01"
             value={formData.densidade_mistura_mraf || ''}
-            onChange={(e) => onInputChange('densidade_mistura_mraf', parseFloat(e.target.value))}
+            onChange={(e) => onInputChange('densidade_mistura_mraf', e.target.value === '' ? '' : parseFloat(e.target.value))}
           />
         </div>
 
         <div>
           <h4 className="font-semibold mb-3 text-sm">Teor de Ligante Residual</h4>
           <div className="grid grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="teor_residual_min">Mínimo (%)</Label>
-              <Input
-                id="teor_residual_min"
-                type="number"
-                step="0.1"
-                value={formData.teor_ligante_residual?.min || ''}
-                onChange={(e) => updateNested('teor_ligante_residual', 'min', parseFloat(e.target.value))}
-              />
-            </div>
-            <div>
-              <Label htmlFor="teor_residual_max">Máximo (%)</Label>
-              <Input
-                id="teor_residual_max"
-                type="number"
-                step="0.1"
-                value={formData.teor_ligante_residual?.max || ''}
-                onChange={(e) => updateNested('teor_ligante_residual', 'max', parseFloat(e.target.value))}
-              />
-            </div>
-            <div>
-              <Label htmlFor="teor_residual_otimo">Ótimo (%)</Label>
-              <Input
-                id="teor_residual_otimo"
-                type="number"
-                step="0.1"
-                value={formData.teor_ligante_residual?.otimo || ''}
-                onChange={(e) => updateNested('teor_ligante_residual', 'otimo', parseFloat(e.target.value))}
-              />
-            </div>
+            {['min', 'max', 'otimo'].map(f => (
+              <div key={f}>
+                <Label>{f === 'min' ? 'Mínimo (%)' : f === 'max' ? 'Máximo (%)' : 'Ótimo (%)'}</Label>
+                <Input type="number" step="0.1"
+                  value={formData.teor_ligante_residual?.[f] || ''}
+                  onChange={(e) => onNestedChange('teor_ligante_residual', f, e.target.value)} />
+              </div>
+            ))}
           </div>
         </div>
 
         <div>
           <h4 className="font-semibold mb-3 text-sm">Taxa de Aplicação</h4>
           <div className="grid grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="taxa_aplicacao_min">Mínima (l/m²)</Label>
-              <Input
-                id="taxa_aplicacao_min"
-                type="number"
-                step="0.1"
-                value={formData.taxa_aplicacao_mraf?.min || ''}
-                onChange={(e) => updateNested('taxa_aplicacao_mraf', 'min', parseFloat(e.target.value))}
-              />
-            </div>
-            <div>
-              <Label htmlFor="taxa_aplicacao_max">Máxima (l/m²)</Label>
-              <Input
-                id="taxa_aplicacao_max"
-                type="number"
-                step="0.1"
-                value={formData.taxa_aplicacao_mraf?.max || ''}
-                onChange={(e) => updateNested('taxa_aplicacao_mraf', 'max', parseFloat(e.target.value))}
-              />
-            </div>
-            <div>
-              <Label htmlFor="taxa_aplicacao_otima">Ótima (l/m²)</Label>
-              <Input
-                id="taxa_aplicacao_otima"
-                type="number"
-                step="0.1"
-                value={formData.taxa_aplicacao_mraf?.otimo || ''}
-                onChange={(e) => updateNested('taxa_aplicacao_mraf', 'otimo', parseFloat(e.target.value))}
-              />
-            </div>
+            {['min', 'max', 'otimo'].map(f => (
+              <div key={f}>
+                <Label>{f === 'min' ? 'Mínima (l/m²)' : f === 'max' ? 'Máxima (l/m²)' : 'Ótima (l/m²)'}</Label>
+                <Input type="number" step="0.1"
+                  value={formData.taxa_aplicacao_mraf?.[f] || ''}
+                  onChange={(e) => onNestedChange('taxa_aplicacao_mraf', f, e.target.value)} />
+              </div>
+            ))}
           </div>
         </div>
+
+        {/* Faixa de trabalho */}
+        {peneirasCarregadas && (
+          <div className="space-y-2">
+            <h4 className="font-semibold text-sm">Faixa de Trabalho</h4>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr className="bg-slate-100">
+                    <th className="border px-2 py-1 text-left">Peneira</th>
+                    <th className="border px-2 py-1">Esp. Mín (%)</th>
+                    <th className="border px-2 py-1">Esp. Máx (%)</th>
+                    <th className="border px-2 py-1">Trabalho Mín (%)</th>
+                    <th className="border px-2 py-1">Trabalho Ótimo (%)</th>
+                    <th className="border px-2 py-1">Trabalho Máx (%)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {peneirasDisponiveis.map(p => (
+                    <tr key={p.key} className="hover:bg-slate-50">
+                      <td className="border px-2 py-1 font-medium">{p.nome} ({p.astm})</td>
+                      <td className="border px-1 py-1 text-center text-slate-500">{p.especificacao_min ?? '-'}</td>
+                      <td className="border px-1 py-1 text-center text-slate-500">{p.especificacao_max ?? '-'}</td>
+                      <td className="border px-1 py-1">
+                        <Input type="number" step="0.1" className="h-7 text-xs px-1"
+                          value={formData.faixa_trabalho_min?.[p.key] ?? ''}
+                          onChange={(e) => onFaixaTrabalhoChange(p.key, 'min', e.target.value)} />
+                      </td>
+                      <td className="border px-1 py-1">
+                        <Input type="number" step="0.1" className="h-7 text-xs px-1"
+                          value={formData.faixa_trabalho?.[p.key] ?? ''}
+                          onChange={(e) => onFaixaTrabalhoChange(p.key, 'otimo', e.target.value)} />
+                      </td>
+                      <td className="border px-1 py-1">
+                        <Input type="number" step="0.1" className="h-7 text-xs px-1"
+                          value={formData.faixa_trabalho_max?.[p.key] ?? ''}
+                          onChange={(e) => onFaixaTrabalhoChange(p.key, 'max', e.target.value)} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        <AgregadosForm
+          agregados={agregados}
+          peneirasDisponiveis={peneirasDisponiveis}
+          peneirasCarregadas={peneirasCarregadas}
+          onAdd={onAgregadoAdd}
+          onRemove={onAgregadoRemove}
+          onChange={onAgregadoChange}
+          onGranChange={onAgregadoGranChange}
+        />
       </CardContent>
     </Card>
   );

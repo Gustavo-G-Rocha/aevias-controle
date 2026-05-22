@@ -3,18 +3,23 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AgregadosForm from "@/components/projects/AgregadosForm";
 
 export default function ProjectFormCAUQ({
   formData,
-  tipoProjetoAtual,
-  onInputChange
+  peneirasCarregadas,
+  peneirasDisponiveis,
+  agregados,
+  onLiganteChange,
+  onAgregadoAdd,
+  onAgregadoRemove,
+  onAgregadoChange,
+  onAgregadoGranChange,
+  onFaixaTrabalhoChange,
+  onTemperaturaChange,
+  onNestedChange,
+  onInputChange,
 }) {
-  if (tipoProjetoAtual !== 'CAUQ') return null;
-
-  const updateNested = (section, field, value) => {
-    onInputChange(section, { ...formData[section], [field]: value });
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -29,166 +34,229 @@ export default function ProjectFormCAUQ({
             <TabsTrigger value="marshall">Marshall</TabsTrigger>
           </TabsList>
 
+          {/* Ligante */}
           <TabsContent value="ligante" className="space-y-4 mt-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="ligante_tipo">Tipo de Ligante</Label>
+                <Label>Tipo de Ligante</Label>
                 <Input
-                  id="ligante_tipo"
                   value={formData.ligante?.tipo || ''}
-                  onChange={(e) => updateNested('ligante', 'tipo', e.target.value)}
+                  onChange={(e) => onLiganteChange('tipo', e.target.value)}
                 />
               </div>
               <div>
-                <Label htmlFor="ligante_fornecedor">Fornecedor</Label>
+                <Label>Fornecedor</Label>
                 <Input
-                  id="ligante_fornecedor"
                   value={formData.ligante?.fornecedor || ''}
-                  onChange={(e) => updateNested('ligante', 'fornecedor', e.target.value)}
+                  onChange={(e) => onLiganteChange('fornecedor', e.target.value)}
                 />
               </div>
               <div>
-                <Label htmlFor="ligante_densidade">Densidade (g/cm³)</Label>
+                <Label>Densidade (g/cm³)</Label>
                 <Input
-                  id="ligante_densidade"
                   type="number"
                   step="0.01"
                   value={formData.ligante?.densidade || ''}
-                  onChange={(e) => updateNested('ligante', 'densidade', parseFloat(e.target.value))}
+                  onChange={(e) => onLiganteChange('densidade', e.target.value)}
                 />
               </div>
             </div>
+
+            {/* Agregados */}
+            <AgregadosForm
+              agregados={agregados}
+              peneirasDisponiveis={peneirasDisponiveis}
+              peneirasCarregadas={peneirasCarregadas}
+              onAdd={onAgregadoAdd}
+              onRemove={onAgregadoRemove}
+              onChange={onAgregadoChange}
+              onGranChange={onAgregadoGranChange}
+            />
+
+            {/* Faixa de trabalho */}
+            {peneirasCarregadas && (
+              <div className="space-y-2">
+                <h4 className="font-semibold text-sm">Faixa de Trabalho</h4>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm border-collapse">
+                    <thead>
+                      <tr className="bg-slate-100">
+                        <th className="border px-2 py-1 text-left">Peneira</th>
+                        <th className="border px-2 py-1">Esp. Mín (%)</th>
+                        <th className="border px-2 py-1">Esp. Máx (%)</th>
+                        <th className="border px-2 py-1">Trabalho Mín (%)</th>
+                        <th className="border px-2 py-1">Trabalho Ótimo (%)</th>
+                        <th className="border px-2 py-1">Trabalho Máx (%)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {peneirasDisponiveis.map(p => (
+                        <tr key={p.key} className="hover:bg-slate-50">
+                          <td className="border px-2 py-1 font-medium">{p.nome} ({p.astm})</td>
+                          <td className="border px-1 py-1 text-center text-slate-500">{p.especificacao_min ?? '-'}</td>
+                          <td className="border px-1 py-1 text-center text-slate-500">{p.especificacao_max ?? '-'}</td>
+                          <td className="border px-1 py-1">
+                            <Input type="number" step="0.1" className="h-7 text-xs px-1"
+                              value={formData.faixa_trabalho_min?.[p.key] ?? ''}
+                              onChange={(e) => onFaixaTrabalhoChange(p.key, 'min', e.target.value)} />
+                          </td>
+                          <td className="border px-1 py-1">
+                            <Input type="number" step="0.1" className="h-7 text-xs px-1"
+                              value={formData.faixa_trabalho?.[p.key] ?? ''}
+                              onChange={(e) => onFaixaTrabalhoChange(p.key, 'otimo', e.target.value)} />
+                          </td>
+                          <td className="border px-1 py-1">
+                            <Input type="number" step="0.1" className="h-7 text-xs px-1"
+                              value={formData.faixa_trabalho_max?.[p.key] ?? ''}
+                              onChange={(e) => onFaixaTrabalhoChange(p.key, 'max', e.target.value)} />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </TabsContent>
 
+          {/* Temperaturas */}
           <TabsContent value="temperaturas" className="space-y-4 mt-4">
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">Mistura (°C)</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="temp_mistura_min">Mín.</Label>
-                  <Input
-                    id="temp_mistura_min"
-                    type="number"
-                    value={formData.temperaturas?.mistura?.min || ''}
-                    onChange={(e) => updateNested('temperaturas', 'mistura', { ...formData.temperaturas?.mistura, min: parseFloat(e.target.value) })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="temp_mistura_max">Máx.</Label>
-                  <Input
-                    id="temp_mistura_max"
-                    type="number"
-                    value={formData.temperaturas?.mistura?.max || ''}
-                    onChange={(e) => updateNested('temperaturas', 'mistura', { ...formData.temperaturas?.mistura, max: parseFloat(e.target.value) })}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">Compactação (°C)</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="temp_compactacao_min">Mín.</Label>
-                  <Input
-                    id="temp_compactacao_min"
-                    type="number"
-                    value={formData.temperaturas?.compactacao?.min || ''}
-                    onChange={(e) => updateNested('temperaturas', 'compactacao', { ...formData.temperaturas?.compactacao, min: parseFloat(e.target.value) })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="temp_compactacao_max">Máx.</Label>
-                  <Input
-                    id="temp_compactacao_max"
-                    type="number"
-                    value={formData.temperaturas?.compactacao?.max || ''}
-                    onChange={(e) => updateNested('temperaturas', 'compactacao', { ...formData.temperaturas?.compactacao, max: parseFloat(e.target.value) })}
-                  />
+            {[
+              { key: 'mistura', label: 'Mistura (°C)' },
+              { key: 'compactacao', label: 'Compactação (°C)' },
+              { key: 'espalhamento', label: 'Espalhamento (°C)' },
+            ].map(({ key, label }) => (
+              <div key={key}>
+                <h4 className="font-semibold mb-3 text-sm">{label}</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Mín.</Label>
+                    <Input type="number"
+                      value={formData.temperaturas?.[key]?.min || ''}
+                      onChange={(e) => onTemperaturaChange(key, 'min', e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>Máx.</Label>
+                    <Input type="number"
+                      value={formData.temperaturas?.[key]?.max || ''}
+                      onChange={(e) => onTemperaturaChange(key, 'max', e.target.value)} />
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">Espalhamento (°C)</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="temp_espalhamento_min">Mín.</Label>
-                  <Input
-                    id="temp_espalhamento_min"
-                    type="number"
-                    value={formData.temperaturas?.espalhamento?.min || ''}
-                    onChange={(e) => updateNested('temperaturas', 'espalhamento', { ...formData.temperaturas?.espalhamento, min: parseFloat(e.target.value) })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="temp_espalhamento_max">Máx.</Label>
-                  <Input
-                    id="temp_espalhamento_max"
-                    type="number"
-                    value={formData.temperaturas?.espalhamento?.max || ''}
-                    onChange={(e) => updateNested('temperaturas', 'espalhamento', { ...formData.temperaturas?.espalhamento, max: parseFloat(e.target.value) })}
-                  />
-                </div>
-              </div>
-            </div>
+            ))}
           </TabsContent>
 
+          {/* Teor de Ligante */}
           <TabsContent value="teor" className="space-y-4 mt-4">
             <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="teor_ligante_min">Mínimo (%)</Label>
-                <Input
-                  id="teor_ligante_min"
-                  type="number"
-                  step="0.1"
-                  value={formData.teor_ligante?.min || ''}
-                  onChange={(e) => updateNested('teor_ligante', 'min', parseFloat(e.target.value))}
-                />
+              {['min', 'max', 'otimo'].map(f => (
+                <div key={f}>
+                  <Label>{f === 'min' ? 'Mínimo (%)' : f === 'max' ? 'Máximo (%)' : 'Ótimo (%)'}</Label>
+                  <Input type="number" step="0.1"
+                    value={formData.teor_ligante?.[f] || ''}
+                    onChange={(e) => onNestedChange('teor_ligante', f, e.target.value)} />
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="font-semibold text-sm">Massa Específica Aparente</h4>
+              <Input type="number" step="0.001"
+                value={formData.massa_especifica_aparente || ''}
+                onChange={(e) => onInputChange('massa_especifica_aparente', e.target.value === '' ? '' : parseFloat(e.target.value))} />
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-semibold text-sm">Densidade Máxima Medida (RICE)</h4>
+              <Input type="number" step="0.001"
+                value={formData.densidade_maxima_medida || ''}
+                onChange={(e) => onInputChange('densidade_maxima_medida', e.target.value === '' ? '' : parseFloat(e.target.value))} />
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-sm mb-2">Volume de Vazios (%)</h4>
+              <div className="grid grid-cols-3 gap-4">
+                {['min', 'max', 'otimo'].map(f => (
+                  <div key={f}>
+                    <Label>{f === 'min' ? 'Mínimo' : f === 'max' ? 'Máximo' : 'Ótimo'}</Label>
+                    <Input type="number" step="0.1"
+                      value={formData.volume_vazios?.[f] || ''}
+                      onChange={(e) => onNestedChange('volume_vazios', f, e.target.value)} />
+                  </div>
+                ))}
               </div>
-              <div>
-                <Label htmlFor="teor_ligante_max">Máximo (%)</Label>
-                <Input
-                  id="teor_ligante_max"
-                  type="number"
-                  step="0.1"
-                  value={formData.teor_ligante?.max || ''}
-                  onChange={(e) => updateNested('teor_ligante', 'max', parseFloat(e.target.value))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="teor_ligante_otimo">Ótimo (%)</Label>
-                <Input
-                  id="teor_ligante_otimo"
-                  type="number"
-                  step="0.1"
-                  value={formData.teor_ligante?.otimo || ''}
-                  onChange={(e) => updateNested('teor_ligante', 'otimo', parseFloat(e.target.value))}
-                />
-              </div>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-sm mb-2">RTCD Mínimo (MPa)</h4>
+              <Input type="number" step="0.001"
+                value={formData.rtcd?.min || ''}
+                onChange={(e) => onNestedChange('rtcd', 'min', e.target.value)} />
             </div>
           </TabsContent>
 
+          {/* Marshall */}
           <TabsContent value="marshall" className="space-y-4 mt-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="estabilidade_min">Estabilidade Mínima (kgf)</Label>
-                <Input
-                  id="estabilidade_min"
-                  type="number"
-                  value={formData.estabilidade?.min || ''}
-                  onChange={(e) => updateNested('estabilidade', 'min', parseFloat(e.target.value))}
-                />
+            <div>
+              <h4 className="font-semibold text-sm mb-2">Estabilidade (kgf)</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Mínima</Label>
+                  <Input type="number"
+                    value={formData.estabilidade?.min || ''}
+                    onChange={(e) => onNestedChange('estabilidade', 'min', e.target.value)} />
+                </div>
+                <div>
+                  <Label>Projeto</Label>
+                  <Input type="number"
+                    value={formData.estabilidade?.projeto || ''}
+                    onChange={(e) => onNestedChange('estabilidade', 'projeto', e.target.value)} />
+                </div>
               </div>
-              <div>
-                <Label htmlFor="vam_min">VAM Mínimo (%)</Label>
-                <Input
-                  id="vam_min"
-                  type="number"
-                  step="0.1"
-                  value={formData.vam?.min || ''}
-                  onChange={(e) => updateNested('vam', 'min', parseFloat(e.target.value))}
-                />
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-sm mb-2">Fluência (mm)</h4>
+              <div className="grid grid-cols-3 gap-4">
+                {['min', 'max', 'projeto'].map(f => (
+                  <div key={f}>
+                    <Label>{f === 'min' ? 'Mínima' : f === 'max' ? 'Máxima' : 'Projeto'}</Label>
+                    <Input type="number" step="0.1"
+                      value={formData.fluencia?.[f] || ''}
+                      onChange={(e) => onNestedChange('fluencia', f, e.target.value)} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-sm mb-2">VAM (%)</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Mínimo</Label>
+                  <Input type="number" step="0.1"
+                    value={formData.vam?.min || ''}
+                    onChange={(e) => onNestedChange('vam', 'min', e.target.value)} />
+                </div>
+                <div>
+                  <Label>Projeto</Label>
+                  <Input type="number" step="0.1"
+                    value={formData.vam?.projeto || ''}
+                    onChange={(e) => onNestedChange('vam', 'projeto', e.target.value)} />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-sm mb-2">RBV (%)</h4>
+              <div className="grid grid-cols-3 gap-4">
+                {['min', 'max', 'projeto'].map(f => (
+                  <div key={f}>
+                    <Label>{f === 'min' ? 'Mínimo' : f === 'max' ? 'Máximo' : 'Projeto'}</Label>
+                    <Input type="number" step="0.1"
+                      value={formData.rbv?.[f] || ''}
+                      onChange={(e) => onNestedChange('rbv', f, e.target.value)} />
+                  </div>
+                ))}
               </div>
             </div>
           </TabsContent>
