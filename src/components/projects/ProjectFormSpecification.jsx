@@ -10,7 +10,7 @@ export default function ProjectFormSpecification({
   tipoProjetoAtual,
   onInputChange
 }) {
-  const faixasFiltradas = faixasGranulometricas.filter(
+  const faixasFiltradas = (faixasGranulometricas || []).filter(
     f => f.tipo === tipoProjetoAtual && f.status === 'ativo'
   );
 
