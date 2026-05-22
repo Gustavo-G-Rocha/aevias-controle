@@ -7,7 +7,7 @@ import { Plus, Search, Edit, Eye, Trash2, Loader2 } from "lucide-react";
 import { Project } from "@/entities/Project";
 import { User } from "@/entities/User";
 import { FaixaGranulometrica } from "@/entities/FaixaGranulometrica";
-import { Regional } from "@/entities/Regional"; // Added import
+import { Regional } from "@/entities/Regional";
 import {
   Dialog,
   DialogContent,
@@ -20,7 +20,7 @@ import ProjectDetails from "../components/projects/ProjectDetails";
 export default function Projects() {
   const [projects, setProjects] = useState([]);
   const [faixas, setFaixas] = useState([]);
-  const [regionais, setRegionais] = useState([]); // Added state
+  const [regionais, setRegionais] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [tipoFilter, setTipoFilter] = useState("all");
   const [selectedProject, setSelectedProject] = useState(null);
@@ -32,16 +32,16 @@ export default function Projects() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [userData, projectsData, faixasData, regionaisData] = await Promise.all([ // Added regionaisData
+      const [userData, projectsData, faixasData, regionaisData] = await Promise.all([
         User.me(),
         Project.list("-created_date", 500),
         FaixaGranulometrica.list(),
-        Regional.list() // Added Regional.list()
+        Regional.list()
       ]);
       
       setUser(userData);
       setFaixas(faixasData);
-      setRegionais(regionaisData); // Set regionais state
+      setRegionais(regionaisData);
 
       const userAccessLevel = userData.access_level || (userData.role === 'admin' ? 'admin' : 'user');
       
@@ -82,8 +82,7 @@ export default function Projects() {
       } else {
         setProjects(projectsData);
       }
-    } catch (error) {
-      console.error("Erro ao carregar dados:", error);
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -145,7 +144,6 @@ export default function Projects() {
       setEditingProject(null);
       loadData();
     } catch (error) {
-      console.error("Erro ao salvar projeto:", error);
       alert(`Erro ao salvar: ${error.message || 'Erro desconhecido'}`);
     }
   }, [editingProject, loadData, regionais]);
@@ -160,8 +158,7 @@ export default function Projects() {
       try {
         await Project.delete(project.id);
         loadData();
-      } catch (error) {
-        console.error("Erro ao excluir projeto:", error);
+      } catch {
       }
     }
   }, [loadData]);
@@ -273,7 +270,7 @@ export default function Projects() {
           {filteredProjects.map((project) => {
             const faixa = faixas.find(f => f.id === project.faixa_granulometrica_id);
             const tipoLabel = tipoProjetoLabels[project.tipo_projeto] || project.tipo_projeto || 'CAUQ';
-            const regionalNome = getRegionalNome(project.regional_id); // Get regional name
+            const regionalNome = getRegionalNome(project.regional_id);
             
             return (
               <Card key={project.id} className="bg-white/20 backdrop-blur-lg border border-white/20 text-[#00233B] hover:border-white/40 transition-all">
@@ -283,11 +280,11 @@ export default function Projects() {
                       <CardTitle className="text-lg font-semibold text-[#00233B] line-clamp-1">
                         {project.name}
                       </CardTitle>
-                      <div className="flex items-center gap-2 mt-1 flex-wrap"> {/* Added flex-wrap */}
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
                         <Badge className={tipoProjetoColors[project.tipo_projeto || 'CAUQ']}>
                           {tipoLabel}
                         </Badge>
-                        {regionalNome && ( // Display regional name badge if available
+                        {regionalNome && (
                           <Badge variant="outline" className="bg-white/50 text-[#00233B] text-xs">
                             {regionalNome}
                           </Badge>

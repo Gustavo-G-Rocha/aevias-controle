@@ -13,8 +13,6 @@ export default function ProjectFormSpecification({
   tipoProjetoAtual,
   onFaixaChange,
   onEquivalenteChange,
-  // legado — ignorado
-  faixasGranulometricas,
   onInputChange,
 }) {
   const tipo = tipoProjetoAtual || formData?.tipo_projeto;
