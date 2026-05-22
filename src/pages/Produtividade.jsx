@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
@@ -24,16 +24,18 @@ export default function ProdutividadePage() {
     loadData,
   } = useProdutividadeData(currentMonth);
 
-  const previousMonth = () =>
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+  const previousMonth = useCallback(() =>
+    setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1)), []);
 
-  const nextMonth = () =>
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+  const nextMonth = useCallback(() =>
+    setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1)), []);
 
-  const userCanEdit = user?.role === 'admin' ||
+  const userCanEdit = useMemo(() =>
+    user?.role === 'admin' ||
     user?.access_level === 'admin' ||
     user?.access_level === 'gestor_contrato' ||
-    user?.access_level === 'sala_tecnica_afirmaevias';
+    user?.access_level === 'sala_tecnica_afirmaevias',
+  [user]);
 
   const handleSaveEmpreiteiraOuUsina = useCallback(async (novoValor, tipo) => {
     if (!editDialog.registro) return;
@@ -59,6 +61,21 @@ export default function ProdutividadePage() {
     marcadoresDiaRef.current[key] = status;
     setDiaDialog({ open: false, laborista: null, dia: null });
   };
+
+  const handleEditClick = useCallback((reg) => setEditDialog({ open: true, registro: reg }), []);
+  const handleMarkerClick = useCallback((email, dia) => setDiaDialog({ open: true, laborista: email, dia }), []);
+
+  const { days, isFutureDay } = useMemo(() => {
+    const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
+    const daysArr = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+    const today = new Date();
+    const isCurrentMonth = currentMonth.getFullYear() === today.getFullYear() &&
+      currentMonth.getMonth() === today.getMonth();
+    return {
+      days: daysArr,
+      isFutureDay: (day) => isCurrentMonth && day > today.getDate(),
+    };
+  }, [currentMonth]);
 
   const handleSaveCache = async () => {
     if (Object.keys(cacheDias).length === 0) { alert("Nenhuma alteração para salvar"); return; }
@@ -94,13 +111,6 @@ export default function ProdutividadePage() {
     );
   }
 
-  const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
-  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-  const today = new Date();
-  const isCurrentMonth = currentMonth.getFullYear() === today.getFullYear() &&
-    currentMonth.getMonth() === today.getMonth();
-  const isFutureDay = (day) => isCurrentMonth && day > today.getDate();
-
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-[95vw] mx-auto">
@@ -122,8 +132,8 @@ export default function ProdutividadePage() {
               currentMonth={currentMonth}
               isFutureDay={isFutureDay}
               userCanEdit={userCanEdit}
-              onEditClick={(reg) => setEditDialog({ open: true, registro: reg })}
-              onMarkerClick={(email, dia) => setDiaDialog({ open: true, laborista: email, dia })}
+              onEditClick={handleEditClick}
+              onMarkerClick={handleMarkerClick}
             />
           </CardContent>
         </Card>

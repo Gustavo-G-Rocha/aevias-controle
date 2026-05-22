@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo, useMemo } from "react";
 import { Edit2 } from "lucide-react";
 
 const ENSAIO_LABELS = {
@@ -28,7 +28,7 @@ const ENSAIO_LABELS = {
   BoletimSondagemTrado: 'Boletim Trado',
 };
 
-function DayCell({ registros, markedStatus, futureDay, userCanEdit, onEditClick, onMarkerClick }) {
+const DayCell = memo(function DayCell({ registros, markedStatus, futureDay, userCanEdit, onEditClick, onMarkerClick }) {
   if (futureDay) return null;
 
   if (registros.length > 0) {
@@ -86,7 +86,7 @@ function DayCell({ registros, markedStatus, futureDay, userCanEdit, onEditClick,
       -
     </button>
   );
-}
+});
 
 export default function ProdutividadeTable({
   laboratoristas,
@@ -99,10 +99,11 @@ export default function ProdutividadeTable({
   onEditClick,
   onMarkerClick,
 }) {
-  const getDayOfWeek = (day) => {
-    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    return date.toLocaleDateString('pt-BR', { weekday: 'short' });
-  };
+  const getDayOfWeek = useMemo(() => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    return (day) => new Date(year, month, day).toLocaleDateString('pt-BR', { weekday: 'short' });
+  }, [currentMonth]);
 
   return (
     <div className="overflow-x-auto">
