@@ -6,15 +6,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function ProjectFormSpecification({
   formData,
-  faixasGranulometricas,
+  faixasFiltradas = [],
+  faixaSelecionada,
+  peneirasCarregadas,
+  peneirasDisponiveis,
   tipoProjetoAtual,
-  onInputChange
+  onFaixaChange,
+  onEquivalenteChange,
+  // legado — ignorado
+  faixasGranulometricas,
+  onInputChange,
 }) {
-  const faixasFiltradas = (faixasGranulometricas || []).filter(
-    f => f.tipo === tipoProjetoAtual && f.status === 'ativo'
-  );
-
-  const temFaixa = ['CAUQ', 'MRAF', 'BGS', 'CAMADAS_GRANULARES'].includes(tipoProjetoAtual);
+  const tipo = tipoProjetoAtual || formData?.tipo_projeto;
+  const temFaixa = ['CAUQ', 'MRAF', 'BGS', 'CAMADAS_GRANULARES'].includes(tipo);
 
   if (!temFaixa) return null;
 
@@ -26,9 +30,9 @@ export default function ProjectFormSpecification({
       <CardContent className="space-y-4">
         <div>
           <Label htmlFor="faixa_granulometrica_id">Faixa Granulométrica *</Label>
-          <Select 
-            value={formData.faixa_granulometrica_id} 
-            onValueChange={(value) => onInputChange('faixa_granulometrica_id', value)}
+          <Select
+            value={formData.faixa_granulometrica_id || ""}
+            onValueChange={onFaixaChange || ((value) => onInputChange?.('faixa_granulometrica_id', value))}
             required
           >
             <SelectTrigger>
@@ -47,15 +51,18 @@ export default function ProjectFormSpecification({
           </Select>
         </div>
 
-        {['CAUQ', 'MRAF', 'BGS'].includes(tipoProjetoAtual) && (
+        {['CAUQ', 'MRAF', 'BGS'].includes(tipo) && (
           <div>
             <Label htmlFor="equivalente_areia_minimo">Equivalente de Areia Mínimo (%)</Label>
             <Input
               id="equivalente_areia_minimo"
               type="number"
               step="0.1"
-              value={formData.equivalente_areia_minimo}
-              onChange={(e) => onInputChange('equivalente_areia_minimo', parseFloat(e.target.value))}
+              value={formData.equivalente_areia_minimo || ""}
+              onChange={(e) => {
+                const val = e.target.value === '' ? '' : parseFloat(e.target.value);
+                onEquivalenteChange ? onEquivalenteChange(val) : onInputChange?.('equivalente_areia_minimo', val);
+              }}
             />
             <p className="text-xs text-slate-500 mt-1">
               Limite mínimo aceitável para ensaios
