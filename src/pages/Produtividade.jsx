@@ -1,12 +1,11 @@
 import React, { useState, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, ChevronLeft, ChevronRight, Loader2, Edit2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 import { useProdutividadeData } from "@/hooks/useProdutividadeData";
+import ProdutividadeHeader from "@/components/produtividade/ProdutividadeHeader";
+import ProdutividadeTable from "@/components/produtividade/ProdutividadeTable";
+import { EditRegistroDialog, MarcaDiaDialog } from "@/components/produtividade/ProdutividadeModals";
 
 export default function ProdutividadePage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -25,57 +24,16 @@ export default function ProdutividadePage() {
     loadData,
   } = useProdutividadeData(currentMonth);
 
-  function getDaysInMonth(date) {
-    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-  }
-
-  const getMonthName = (date) => {
-    return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-  };
-
-  const previousMonth = () => {
+  const previousMonth = () =>
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
-  };
 
-  const nextMonth = () => {
+  const nextMonth = () =>
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
-  };
 
-  const ENSAIO_LABELS = {
-    DiarioObra: 'Diário de Obra',
-    ChecklistUsina: 'CL Usina',
-    ChecklistAplicacao: 'CL Aplicação',
-    ChecklistMRAF: 'CL MRAF',
-    ChecklistConcretagem: 'CL Concretagem',
-    ChecklistTerraplanagem: 'CL Terraplanagem',
-    ChecklistReciclagem: 'CL Reciclagem',
-    EnsaioCAUQ: 'Ensaio CAUQ',
-    EnsaioDensidade: 'Densidade CP',
-    EnsaioDensidadeInSitu: 'Dens. In Situ',
-    EnsaioSondagem: 'Sondagem',
-    EnsaioTaxaPinturaImprimacao: 'Taxa Pintura',
-    AcompanhamentoCarga: 'Ac. Carga',
-    EnsaioMRAF: 'Ensaio MRAF',
-    EnsaioManchaPendulo: 'Mancha+Pêndulo',
-    EnsaioVigaBenkelman: 'Viga Benkelman',
-    EnsaioTaxaMRAF: 'Taxa MRAF',
-    AcompanhamentoUsinagem: 'Ac. Usinagem',
-    EnsaioGranulometriaIndividual: 'Granu. Indiv.',
-    GranuMistura: 'Granu. Mistura',
-    EnsaioProctor: 'Proctor',
-    EnsaioRompimentoConcreto: 'Romp. Concreto',
-    BoletimSondagem: 'Boletim Sond.',
-    BoletimSondagemTrado: 'Boletim Trado',
-  };
-
-  const getDayOfWeek = (day) => {
-    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    return date.toLocaleDateString('pt-BR', { weekday: 'short' });
-  };
-
-  const handleEditClick = (registro) => {
-    setEditDialog({ open: true, registro });
-  };
+  const userCanEdit = user?.role === 'admin' ||
+    user?.access_level === 'admin' ||
+    user?.access_level === 'gestor_contrato' ||
+    user?.access_level === 'sala_tecnica_afirmaevias';
 
   const handleSaveEmpreiteiraOuUsina = useCallback(async (novoValor, tipo) => {
     if (!editDialog.registro) return;
@@ -95,38 +53,21 @@ export default function ProdutividadePage() {
 
   const handleSaveDiaStatus = (status) => {
     if (!diaDialog.laborista || !diaDialog.dia) return;
-    
     const key = `${diaDialog.laborista.toLowerCase()}_${diaDialog.dia}`;
     const dataStr = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}-${String(diaDialog.dia).padStart(2, '0')}`;
-    
-    const newCache = {
-      ...cacheDias,
-      [key]: { status, data: dataStr, laborista: diaDialog.laborista }
-    };
-    setCacheDias(newCache);
+    setCacheDias(prev => ({ ...prev, [key]: { status, data: dataStr, laborista: diaDialog.laborista } }));
     marcadoresDiaRef.current[key] = status;
-    
     setDiaDialog({ open: false, laborista: null, dia: null });
   };
 
-  const userCanEdit = user?.role === 'admin' || 
-                            user?.access_level === 'admin' || 
-                            user?.access_level === 'gestor_contrato' || 
-                            user?.access_level === 'sala_tecnica_afirmaevias';
-
   const handleSaveCache = async () => {
-    if (Object.keys(cacheDias).length === 0) {
-      alert("Nenhuma alteração para salvar");
-      return;
-    }
-
+    if (Object.keys(cacheDias).length === 0) { alert("Nenhuma alteração para salvar"); return; }
     try {
-      for (const [key, item] of Object.entries(cacheDias)) {
+      for (const [, item] of Object.entries(cacheDias)) {
         const existente = await base44.entities.ProdutividadeDiaria.filter({
           laboratorista_email: item.laborista,
           data: item.data
         });
-
         if (existente.length > 0) {
           await base44.entities.ProdutividadeDiaria.update(existente[0].id, { status: item.status });
         } else {
@@ -137,7 +78,6 @@ export default function ProdutividadePage() {
           });
         }
       }
-
       setCacheDias({});
       alert("Dados salvos com sucesso!");
     } catch (error) {
@@ -154,252 +94,56 @@ export default function ProdutividadePage() {
     );
   }
 
-  const daysInMonth = getDaysInMonth(currentMonth);
+  const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-
-  // Hoje em hora local — para marcar dias futuros no mês atual
   const today = new Date();
   const isCurrentMonth = currentMonth.getFullYear() === today.getFullYear() &&
-                          currentMonth.getMonth() === today.getMonth();
+    currentMonth.getMonth() === today.getMonth();
   const isFutureDay = (day) => isCurrentMonth && day > today.getDate();
 
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-[95vw] mx-auto">
         <Card className="bg-card border-border">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Calendar className="w-6 h-6 text-[#BFCF99]" />
-                <CardTitle className="text-2xl text-foreground">
-                  Produtividade dos Laboratoristas
-                </CardTitle>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={previousMonth}
-                  className="border-[#BFCF99]/30 hover:bg-[#BFCF99]/10"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-                <span className="text-lg font-semibold text-[#00233B] min-w-[200px] text-center capitalize">
-                  {getMonthName(currentMonth)}
-                </span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={nextMonth}
-                  className="border-[#BFCF99]/30 hover:bg-[#BFCF99]/10"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-                {Object.keys(cacheDias).length > 0 && userCanEdit && (
-                  <Button
-                    onClick={handleSaveCache}
-                    className="bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90 ml-4"
-                  >
-                    Salvar {Object.keys(cacheDias).length} alterações
-                  </Button>
-                )}
-              </div>
-            </div>
-          </CardHeader>
+          <ProdutividadeHeader
+            currentMonth={currentMonth}
+            onPreviousMonth={previousMonth}
+            onNextMonth={nextMonth}
+            cacheDiasCount={Object.keys(cacheDias).length}
+            userCanEdit={userCanEdit}
+            onSaveCache={handleSaveCache}
+          />
           <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-primary">
-                    <th className="border border-border p-2 text-left text-primary-foreground font-semibold sticky left-0 bg-primary z-10 min-w-[200px]">
-                      Laboratorista
-                    </th>
-                    {days.map(day => (
-                      <th
-                        key={day}
-                        className="border border-border p-2 text-center text-primary-foreground font-medium min-w-[50px]"
-                      >
-                        <div className="text-xs">{getDayOfWeek(day)}</div>
-                        <div className="text-sm font-bold">{day}</div>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {laboratoristas.map((lab, index) => (
-                    <tr
-                      key={lab.email}
-                      className={index % 2 === 0 ? "bg-card" : "bg-muted/30"}
-                    >
-                      <td className="border border-border p-2 sticky left-0 z-10 bg-inherit">
-                        <div className="font-medium text-foreground">
-                          {lab.laboratorista_name || lab.full_name}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {lab.email}
-                        </div>
-                      </td>
-                      {days.map(day => {
-                       const registros = produtividade[lab.email.toLowerCase()]?.[day] || [];
-                       const hasRegistros = registros.length > 0;
-                       const markerKey = `${lab.email.toLowerCase()}_${day}`;
-                       const markedStatus = marcadoresDiaRef.current?.[markerKey];
-                       const futureDay = isFutureDay(day);
-
-                       return (
-                         <td
-                           key={day}
-                           className={`border border-border p-1 text-center align-middle ${futureDay ? 'bg-muted/20 opacity-40' : ''}`}
-                         >
-                           {futureDay ? null : hasRegistros ? (
-                              <div className="flex flex-col gap-0.5">
-                                {registros.map((reg, idx) => {
-                                   const temInfo = reg.empreiteira || reg.usina;
-                                   const info = reg.empreiteira || reg.usina;
-                                   return (
-                                     <button
-                                       key={idx}
-                                       type="button"
-                                       disabled={!userCanEdit}
-                                       className={`${temInfo ? 'bg-green-500' : 'bg-orange-500'} text-white text-[10px] px-1 py-0.5 rounded font-medium ${userCanEdit ? 'cursor-pointer hover:opacity-80' : ''} text-left w-full`}
-                                      title={`${reg.tipo}${temInfo ? ' - ' + info : ' - Sem empreiteira/usina'}`}
-                                      onClick={() => handleEditClick(reg)}
-                                     >
-                                      <div className="text-[9px] font-semibold opacity-90 truncate max-w-[60px]">
-                                        {ENSAIO_LABELS[reg.entityName] || reg.entityName}
-                                      </div>
-                                      <div className="font-bold flex items-center justify-center gap-1">
-                                        OK
-                                        {userCanEdit && !temInfo && <Edit2 className="w-2 h-2" />}
-                                      </div>
-                                      <div className="truncate max-w-[60px]">
-                                        {info || 'Definir'}
-                                      </div>
-                                     </button>
-                                   );
-                                 })}
-                              </div>
-                            ) : markedStatus ? (
-                              <button
-                                type="button"
-                                disabled={!userCanEdit}
-                                className={`text-white text-xs px-1 py-1 rounded font-bold ${markedStatus === 'N/A' ? 'bg-blue-400' : 'bg-green-500'} ${userCanEdit ? 'cursor-pointer hover:opacity-80' : ''} w-full`}
-                                onClick={() => setDiaDialog({ open: true, laborista: lab.email, dia: day })}
-                              >
-                                {markedStatus}
-                              </button>
-                            ) : (
-                              <button
-                                type="button"
-                                disabled={!userCanEdit}
-                                className="bg-yellow-400 text-[#00233B] text-xs px-1 py-1 rounded font-bold cursor-pointer hover:bg-yellow-500 transition-colors w-full"
-                                onClick={() => setDiaDialog({ open: true, laborista: lab.email, dia: day })}
-                              >
-                                -
-                              </button>
-                            )}
-                          </td>
-                        );
-                      })}
-
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            {laboratoristas.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">Nenhum laboratorista encontrado</p>
-              </div>
-            )}
+            <ProdutividadeTable
+              laboratoristas={laboratoristas}
+              produtividade={produtividade}
+              marcadoresDiaRef={marcadoresDiaRef}
+              days={days}
+              currentMonth={currentMonth}
+              isFutureDay={isFutureDay}
+              userCanEdit={userCanEdit}
+              onEditClick={(reg) => setEditDialog({ open: true, registro: reg })}
+              onMarkerClick={(email, dia) => setDiaDialog({ open: true, laborista: email, dia })}
+            />
           </CardContent>
         </Card>
       </div>
 
-      {/* Dialog para editar empreiteira ou usina */}
-      <Dialog open={editDialog.open} onOpenChange={(open) => !open && setEditDialog({ open: false, registro: null })}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Selecionar Empreiteira ou Usina</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <Label>Empreiteira Atendida</Label>
-              <Select
-                value={editDialog.registro?.empreiteira || ""}
-                onValueChange={(value) => handleSaveEmpreiteiraOuUsina(value, 'empreiteira')}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione a empreiteira" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={null}>Nenhuma</SelectItem>
-                  {empreiteiras.map(emp => (
-                    <SelectItem key={emp} value={emp}>
-                      {emp}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="flex items-center justify-center text-sm text-gray-500">
-              <span className="px-2">ou</span>
-            </div>
-            
-            <div>
-              <Label>Usina</Label>
-              <Select
-                value={editDialog.registro?.usina || ""}
-                onValueChange={(value) => handleSaveEmpreiteiraOuUsina(value, 'usina')}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione a usina" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={null}>Nenhuma</SelectItem>
-                  {usinas.map(usina => (
-                    <SelectItem key={usina} value={usina}>
-                      {usina}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setEditDialog({ open: false, registro: null })}>
-                Fechar
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <EditRegistroDialog
+        open={editDialog.open}
+        registro={editDialog.registro}
+        empreiteiras={empreiteiras}
+        usinas={usinas}
+        onSave={handleSaveEmpreiteiraOuUsina}
+        onClose={() => setEditDialog({ open: false, registro: null })}
+      />
 
-      {/* Dialog para marcar dia como N/A ou OK */}
-      <Dialog open={diaDialog.open} onOpenChange={(open) => !open && setDiaDialog({ open: false, laborista: null, dia: null })}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Marcar Dia {diaDialog.dia}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <p className="text-sm text-gray-600">
-              Nenhum registro encontrado para este dia. Marque como:
-            </p>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setDiaDialog({ open: false, laborista: null, dia: null })}>
-                Cancelar
-              </Button>
-              <Button variant="secondary" onClick={() => handleSaveDiaStatus('N/A')} className="bg-blue-400 hover:bg-blue-500 text-white">
-                N/A
-              </Button>
-              <Button onClick={() => handleSaveDiaStatus('OK')} className="bg-green-500 hover:bg-green-600 text-white">
-                OK
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <MarcaDiaDialog
+        open={diaDialog.open}
+        dia={diaDialog.dia}
+        onSave={handleSaveDiaStatus}
+        onClose={() => setDiaDialog({ open: false, laborista: null, dia: null })}
+      />
     </div>
   );
 }
