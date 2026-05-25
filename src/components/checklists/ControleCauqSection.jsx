@@ -99,13 +99,13 @@ export default function ControleCauqSection({
                     <td className="border border-slate-300 px-2 py-2 font-medium">{ensaio.label}</td>
                     <td className="border border-slate-300 px-2 py-1 text-center">
                       {('realizado' in (formData.controle_cauq[ensaio.key] ?? {})) && (
-                        <input
-                          type="checkbox"
-                          checked={formData.controle_cauq[ensaio.key]?.realizado || false}
-                          onChange={(e) => handleNestedChange(`controle_cauq.${ensaio.key}.realizado`, e.target.checked)}
-                          disabled={!isEditable || isApproved || !selectedProject}
-                          className="w-4 h-4"
-                        />
+                       <input
+                         type="checkbox"
+                         checked={formData.controle_cauq[ensaio.key]?.realizado || false}
+                         onChange={(e) => handleNestedChange(`controle_cauq.${ensaio.key}.realizado`, e.target.checked)}
+                         disabled={!isEditable || isApproved}
+                         className="w-4 h-4"
+                       />
                       )}
                     </td>
                     <td className="border border-slate-300 px-1 py-1">
@@ -116,7 +116,7 @@ export default function ControleCauqSection({
                           max="3"
                           value={formData.controle_cauq[ensaio.key]?.quantidade || ''}
                           onChange={(e) => handleNestedChange(`controle_cauq.${ensaio.key}.quantidade`, e.target.value ? parseInt(e.target.value) : 0)}
-                          disabled={!isEditable || isApproved || !selectedProject}
+                          disabled={!isEditable || isApproved}
                           className="h-8 text-sm"
                           placeholder="Qtde"
                         />
@@ -154,7 +154,7 @@ export default function ControleCauqSection({
                             const newValue = e.target.checked ? true : null;
                             handleNestedChange(`controle_cauq.${ensaio.key}.conforme`, newValue);
                           }}
-                          disabled={!isEditable || isApproved || !selectedProject || isAutoConformity}
+                          disabled={!isEditable || isApproved || isAutoConformity}
                           className="w-4 h-4 accent-green-500"
                           title={isAutoConformity ? "Conformidade automática" : ensaio.key === 'granulometria' ? "Sempre manual" : ""}
                         />
@@ -169,7 +169,7 @@ export default function ControleCauqSection({
                             const newValue = e.target.checked ? false : null;
                             handleNestedChange(`controle_cauq.${ensaio.key}.conforme`, newValue);
                           }}
-                          disabled={!isEditable || isApproved || !selectedProject || isAutoConformity}
+                          disabled={!isEditable || isApproved || isAutoConformity}
                           className="w-4 h-4 accent-red-500"
                           title={isAutoConformity ? "Conformidade automática" : ensaio.key === 'granulometria' ? "Sempre manual" : ""}
                         />
