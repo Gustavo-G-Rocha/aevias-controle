@@ -41,6 +41,7 @@ export function canSeeObraChart(user) {
 export function filterRegionaisByUser(regionais, user) {
   const level = getUserAccessLevel(user);
   return regionais.filter(regional => {
+    if (regional.status === 'inativa') return false;
     if (level === 'cliente') {
       return (regional.clientes_responsaveis || []).some(
         email => email.toLowerCase() === user.email.toLowerCase()
