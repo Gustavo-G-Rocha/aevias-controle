@@ -105,7 +105,7 @@ export default function ControleCauqSection({
                                 e.target.value,
                                 ensaio.decimals
                               )}
-                              disabled={!isEditable || isApproved || !selectedProject}
+                              disabled={!isEditable || isApproved}
                               className="h-8 text-sm"
                               style={{ width: quantidade > 1 ? '80px' : '100%' }}
                               placeholder={quantidade > 1 ? `R${resultIndex + 1}` : 'Resultado'}
