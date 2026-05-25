@@ -309,7 +309,6 @@ export default function EnsaioGranulometriaIndividualPage() {
       } else {
         await base44.entities.EnsaioGranulometriaIndividual.create({ 
           ...dataToSave, 
-          created_by: user.email, 
           laboratorista_name: user.laboratorista_name || user.full_name 
         });
         alert(saveStatus === 'rascunho' ? "Progresso salvo!" : "Ensaio criado!");
