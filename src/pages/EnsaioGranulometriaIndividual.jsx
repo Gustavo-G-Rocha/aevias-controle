@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
 import { useEnsaioForm } from "@/hooks/useEnsaioForm";
+import { sanitizeAgregados, sanitizeEquivalenteAreia } from "@/utils/dataSanitization";
+import { validateGranulometriaIndividual } from "@/utils/ensaioValidation";
 import { PENEIRAS_MAP, filtrarPeneirasPorFaixa, PENEIRAS_CONFIG } from "@/constants/sieves";
 
 
@@ -252,42 +254,17 @@ export default function EnsaioGranulometriaIndividualPage() {
   const handleSubmit = async (e, saveStatus = 'finalizado') => {
     e.preventDefault();
 
-    if (saveStatus === 'finalizado') {
-      if (!formData.obra_id || !formData.tipo_material || !formData.data_ensaio) {
-        alert("Por favor, preencha todos os campos obrigatórios.");
-        return;
-      }
+    const validation = validateGranulometriaIndividual(formData, saveStatus);
+    if (!validation.valid) {
+      alert(validation.message);
+      return;
     }
-
-    // Sanitize: convert empty strings to null for number fields
-    const sanitizeAgregados = (agregados) => agregados.map(ag => ({
-      ...ag,
-      peso_umido: ag.peso_umido !== "" ? parseFloat(ag.peso_umido) || null : null,
-      peso_seco: ag.peso_seco !== "" ? parseFloat(ag.peso_seco) || null : null,
-      agua: ag.agua !== "" ? parseFloat(ag.agua) || null : null,
-      umidade: ag.umidade !== "" ? parseFloat(ag.umidade) || null : null,
-      granulometria: Object.fromEntries(
-        Object.entries(ag.granulometria || {}).map(([k, v]) => [k, {
-          retido: v && v.retido !== "" ? parseFloat(v.retido) || null : null,
-          passante: v && v.passante !== "" ? parseFloat(v.passante) || null : null,
-        }])
-      )
-    }));
-
-    const sanitizeEquivalente = (eq) => ({
-      medicoes: (eq.medicoes || []).map(m => ({
-        topo_argila: m.topo_argila !== "" ? parseFloat(m.topo_argila) || null : null,
-        topo_areia: m.topo_areia !== "" ? parseFloat(m.topo_areia) || null : null,
-        equivalente: m.equivalente !== "" ? parseFloat(m.equivalente) || null : null,
-      })),
-      media: eq.media !== "" ? parseFloat(eq.media) || null : null,
-    });
 
     const dataToSave = {
       ...formData,
       status: saveStatus,
       agregados: sanitizeAgregados(formData.agregados),
-      equivalente_areia: sanitizeEquivalente(formData.equivalente_areia),
+      equivalente_areia: sanitizeEquivalenteAreia(formData.equivalente_areia),
     };
 
     try {

@@ -15,6 +15,7 @@
 import { useCallback, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
+import { validateEnsaioCAUQ, validateEnsaioRascunho } from "@/utils/ensaioValidation";
 
 /** Tabela de correção de estabilidade Marshall por espessura (DNIT) */
 const TABELA_CORRECAO_ESTABILIDADE = [
@@ -247,7 +248,8 @@ export function useEnsaioCAUQForm({
 
   // ── salvar progresso (rascunho) ──────────────────────────────────────────────
   const handleSaveProgress = useCallback(async () => {
-    if (!formData.obra_id) { alert("Por favor, selecione uma obra para salvar o progresso."); return; }
+    const validation = validateEnsaioRascunho(formData);
+    if (!validation.valid) { alert(validation.message); return; }
 
     setSaving(true);
     try {
@@ -277,8 +279,8 @@ export function useEnsaioCAUQForm({
   // ── finalizar ensaio ─────────────────────────────────────────────────────────
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
-    if (!formData.obra_id) { alert("Por favor, selecione uma obra."); return; }
-    if (!formData.data_ensaio) { alert("Por favor, informe a data do ensaio."); return; }
+    const validation = validateEnsaioCAUQ(formData);
+    if (!validation.valid) { alert(validation.message); return; }
 
     setSaving(true);
     try {

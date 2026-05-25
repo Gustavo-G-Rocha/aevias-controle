@@ -23,6 +23,37 @@ export const sanitizeNestedNumbers = (obj) => {
   return result;
 };
 
+/**
+ * Sanitiza um array de agregados, convertendo campos numéricos vazios para null.
+ * Extraído de EnsaioGranulometriaIndividual.
+ */
+export const sanitizeAgregados = (agregados) => agregados.map(ag => ({
+  ...ag,
+  peso_umido: sanitizeNumber(ag.peso_umido),
+  peso_seco: sanitizeNumber(ag.peso_seco),
+  agua: sanitizeNumber(ag.agua),
+  umidade: sanitizeNumber(ag.umidade),
+  granulometria: Object.fromEntries(
+    Object.entries(ag.granulometria || {}).map(([k, v]) => [k, {
+      retido: v ? sanitizeNumber(v.retido) : null,
+      passante: v ? sanitizeNumber(v.passante) : null,
+    }])
+  ),
+}));
+
+/**
+ * Sanitiza o objeto de equivalente de areia, convertendo campos numéricos vazios para null.
+ * Extraído de EnsaioGranulometriaIndividual.
+ */
+export const sanitizeEquivalenteAreia = (eq) => ({
+  medicoes: (eq.medicoes || []).map(m => ({
+    topo_argila: sanitizeNumber(m.topo_argila),
+    topo_areia: sanitizeNumber(m.topo_areia),
+    equivalente: sanitizeNumber(m.equivalente),
+  })),
+  media: sanitizeNumber(eq.media),
+});
+
 export const sanitizeProjectData = (formData, tipoProject) => {
   const sanitizeString = (value) => value || null;
   
