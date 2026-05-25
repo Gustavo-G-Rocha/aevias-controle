@@ -20,7 +20,11 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
   const editLink = createPageUrl(`${ensaio.entityType}?editId=${ensaio.id}`);
   const isCliente = user?.access_level === 'cliente';
   const podeVerPDF = ensaio.approved === true || ensaio.client_signature?.signed_by;
-  const podeEditar = ensaio.created_by === user?.email && !isCliente && (ensaio.status === 'rascunho' || ensaio.approved === false) && !ensaio.client_signature?.signed_by;
+  const isOwner = (
+    (user?.email && ensaio.created_by?.toLowerCase() === user.email.toLowerCase()) ||
+    (user?.id && ensaio.created_by_id === user.id)
+  );
+  const podeEditar = isOwner && !isCliente && (ensaio.status === 'rascunho' || ensaio.approved === false) && !ensaio.client_signature?.signed_by;
   const podeAssinar = isCliente && ensaio.approved === true && !ensaio.client_signature?.signed_by;
   const jaAssinado = ensaio.client_signature?.signed_by === user?.email;
 

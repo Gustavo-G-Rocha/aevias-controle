@@ -157,6 +157,7 @@ function detectEntityName(ensaio) {
   if (ensaio.pesos !== undefined) return 'EnsaioDensidade';
   if (ensaio.agregados !== undefined && ensaio.tipo_material !== undefined) return 'EnsaioGranulometriaIndividual';
   if (ensaio.peneiras !== undefined) return 'EnsaioGranMistura';
+  if (ensaio.levantamentos !== undefined && ensaio.cte_viga !== undefined) return 'EnsaioVigaBenkelman';
   if (ensaio.cargas !== undefined) return 'AcompanhamentoCarga';
   if (ensaio.rodadas_producao !== undefined) return 'ChecklistUsina';
   if (ensaio.cargas_concreto !== undefined) return 'ChecklistConcretagem';

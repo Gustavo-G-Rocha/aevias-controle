@@ -366,7 +366,9 @@ export default function EnsaioVigaBenkelman() {
         levantamentos: levantamentos,
         observacoes: formData.observacoes,
         tem_deflexao_excessiva: temDeflexaoExcessiva,
-        status: asFinal ? 'finalizado' : 'rascunho'
+        status: asFinal ? 'finalizado' : 'rascunho',
+        // Ao finalizar após reprovação: resetar approved para null (pendente) mantendo was_rejected
+        ...(asFinal ? { approved: null } : {}),
       };
 
       if (editId) {
