@@ -167,14 +167,8 @@ export function useChecklistUsinaForm({ formData, setFormData, projects, faixas,
         while (testObject.resultados.length <= resultIndex) testObject.resultados.push(null);
         const novos = [...testObject.resultados];
 
-        const normalizedValue = typeof value === 'string' ? value.replace(',', '.') : value;
-        let parsedValue;
-        if (testKey === 'fluencia') {
-          parsedValue = normalizedValue !== '' ? String(normalizedValue) : null;
-        } else {
-          parsedValue = normalizedValue !== '' ? parseFloat(normalizedValue) : null;
-          if (parsedValue !== null && (isNaN(parsedValue) || parsedValue < 0)) return prev;
-        }
+        const normalizedValue = typeof value === 'string' ? value.replace(',', '.') : String(value ?? '');
+        const parsedValue = normalizedValue !== '' ? parseFloat(normalizedValue) : null;
         novos[resultIndex] = parsedValue;
         testObject.resultados = novos;
 

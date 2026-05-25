@@ -19,7 +19,13 @@ function ResultInput({ value, onCommit, disabled, placeholder, style }) {
       type="text"
       inputMode="decimal"
       defaultValue={value != null ? String(value) : ''}
-      onChange={(e) => onCommit(e.target.value)}
+      onChange={(e) => {
+        // Allow only numbers, comma, dot, and minus
+        const raw = e.target.value;
+        const filtered = raw.replace(/[^0-9.,\-]/g, '');
+        if (raw !== filtered) e.target.value = filtered;
+        onCommit(filtered);
+      }}
       disabled={disabled}
       className="h-8 text-sm flex w-full rounded-md border border-input bg-background px-3 py-1 shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
       style={style}
