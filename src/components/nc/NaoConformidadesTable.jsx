@@ -6,7 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { ClipboardList, Search, X, Eye, FileText } from "lucide-react";
 import { createPageUrl } from "@/utils";
-import { TIPOS_CHECKLIST, OUTROS_TIPOS_REGISTRO, RNC_PAGE } from "@/utils/naoConformidadesUtils";
+
+import { mapRncToRow, mapCncToRow, filterTableRows, formatDateBR } from "@/utils/ncComponentUtils";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -16,53 +17,19 @@ export default function NaoConformidadesTable({ rncsVisiveis, cncsVisiveis, tabe
   const [page, setPage] = useState(1);
 
   const tiposDisponiveis = useMemo(() => {
-    const s = new Set([
-      ...rncsVisiveis.map(() => 'Relatório NC'),
-      ...cncsVisiveis.map(nc => {
-        const t = [...TIPOS_CHECKLIST, ...OUTROS_TIPOS_REGISTRO].find(t => t.value === nc.tipo);
-        return t?.label || nc.tipo;
-      }),
-    ]);
+    const s = new Set(allRows.map(r => r.tipoLabel));
     return [...s].sort();
-  }, [rncsVisiveis, cncsVisiveis]);
+  }, [allRows]);
 
-  const allRows = useMemo(() => {
-    const rncRows = rncsVisiveis.map(r => ({
-      _kind: 'rnc', id: r.id, tipo: 'RNC', tipoLabel: 'Relatório NC',
-      criador: r.relatorio_criador || r.fiscal || '',
-      data: r.data_nc || '',
-      parametro: r.parametro_nc || r.categoria_nc || '',
-      rodovia: r.rodovia || '', usina: '',
-      empreiteira: r.executora || '', page: RNC_PAGE,
-    }));
-    const checklistRows = cncsVisiveis.map(nc => {
-      const t = [...TIPOS_CHECKLIST, ...OUTROS_TIPOS_REGISTRO].find(t => t.value === nc.tipo);
-      return {
-        _kind: 'checklist', id: nc.id, tipo: nc.tipo,
-        tipoLabel: t?.label || nc.tipo,
-        criador: nc.laboratorista_name || '', data: nc.data || '',
-        parametro: nc.parametro || '', rodovia: nc.rodovia || '',
-        usina: nc.usina || '', empreiteira: nc.empreiteira || '',
-        page: nc._page || t?.page || '',
-      };
-    });
-    return [...rncRows, ...checklistRows];
-  }, [rncsVisiveis, cncsVisiveis]);
+  const allRows = useMemo(() => [
+    ...rncsVisiveis.map(mapRncToRow),
+    ...cncsVisiveis.map(mapCncToRow),
+  ], [rncsVisiveis, cncsVisiveis]);
 
-  const filteredRows = useMemo(() => {
-    const b = busca.toLowerCase().trim();
-    let rows = allRows;
-    if (tipo !== '_all') rows = rows.filter(r => r.tipoLabel === tipo);
-    if (b) rows = rows.filter(r =>
-      r.tipoLabel.toLowerCase().includes(b) ||
-      r.criador.toLowerCase().includes(b) ||
-      r.parametro.toLowerCase().includes(b) ||
-      r.rodovia.toLowerCase().includes(b) ||
-      r.usina.toLowerCase().includes(b) ||
-      r.empreiteira.toLowerCase().includes(b)
-    );
-    return rows;
-  }, [allRows, busca, tipo]);
+  const filteredRows = useMemo(
+    () => filterTableRows(allRows, tipo, busca),
+    [allRows, tipo, busca]
+  );
 
   const total = filteredRows.length;
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
@@ -126,15 +93,7 @@ export default function NaoConformidadesTable({ rncsVisiveis, cncsVisiveis, tabe
                         </Badge>
                       </td>
                       <td className="py-2 px-3 text-[#00233B]/80 whitespace-nowrap">{row.criador || '—'}</td>
-                      <td className="py-2 px-3 text-[#00233B]/80 whitespace-nowrap">
-                        {(() => {
-                          if (!row.data) return '—';
-                          try {
-                            const date = new Date(row.data + 'T12:00:00');
-                            return isNaN(date.getTime()) ? '—' : date.toLocaleDateString('pt-BR');
-                          } catch { return '—'; }
-                        })()}
-                      </td>
+                      <td className="py-2 px-3 text-[#00233B]/80 whitespace-nowrap">{formatDateBR(row.data)}</td>
                       <td className="py-2 px-3 text-[#00233B] max-w-[180px] truncate">{row.parametro || '—'}</td>
                       <td className="py-2 px-3 text-[#00233B]/70 whitespace-nowrap">{row.rodovia || '—'}</td>
                       <td className="py-2 px-3 text-[#00233B]/70 whitespace-nowrap">{row.usina || '—'}</td>

@@ -1,15 +1,9 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-
-const KPI_CONFIG = (rncsVisiveis, cncsVisiveis) => [
-  { label: "Total de RNCs", value: rncsVisiveis.length, color: "text-[#00233B]" },
-  { label: "RNCs Abertas", value: rncsVisiveis.filter(r => r.status === 'aberta').length, color: "text-red-600" },
-  { label: "Em Tratativa", value: rncsVisiveis.filter(r => r.status === 'em_tratativa').length, color: "text-amber-600" },
-  { label: "NCs em Registros", value: cncsVisiveis.length, color: "text-blue-600" },
-];
+import { buildKpiItems } from "@/utils/ncComponentUtils";
 
 export default function NaoConformidadesKpis({ rncsVisiveis, cncsVisiveis }) {
-  const kpis = KPI_CONFIG(rncsVisiveis, cncsVisiveis);
+  const kpis = buildKpiItems(rncsVisiveis, cncsVisiveis);
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {kpis.map(kpi => (
