@@ -1,6 +1,37 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+
+// Wrapper that uses local state while typing, only commits on blur
+function ResultInput({ value, onCommit, disabled, placeholder, style }) {
+  const [localValue, setLocalValue] = useState(value != null ? String(value) : '');
+  const [focused, setFocused] = useState(false);
+
+  // Sync from parent only when not focused
+  React.useEffect(() => {
+    if (!focused) {
+      setLocalValue(value != null ? String(value) : '');
+    }
+  }, [value, focused]);
+
+  return (
+    <Input
+      type="text"
+      inputMode="decimal"
+      value={localValue}
+      onChange={(e) => setLocalValue(e.target.value)}
+      onFocus={() => setFocused(true)}
+      onBlur={() => {
+        setFocused(false);
+        onCommit(localValue);
+      }}
+      disabled={disabled}
+      className="h-8 text-sm"
+      style={style}
+      placeholder={placeholder}
+    />
+  );
+}
 
 export default function ControleCauqSection({
   formData,
@@ -94,18 +125,15 @@ export default function ControleCauqSection({
                       {!ensaio.noResult && ('resultados' in (formData.controle_cauq[ensaio.key] ?? {})) && quantidade > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {Array.from({ length: quantidade }).map((_, resultIndex) => (
-                            <Input
+                            <ResultInput
                               key={`result-${resultIndex}`}
-                              type="text"
-                              inputMode="decimal"
-                              value={resultados[resultIndex] ?? ''}
-                              onChange={(e) => handleNestedChange(
+                              value={resultados[resultIndex]}
+                              onCommit={(v) => handleNestedChange(
                                 `controle_cauq.${ensaio.key}.resultados.${resultIndex}`,
-                                e.target.value,
+                                v,
                                 ensaio.decimals
                               )}
                               disabled={!isEditable || isApproved}
-                              className="h-8 text-sm"
                               style={{ width: quantidade > 1 ? '80px' : '100%' }}
                               placeholder={quantidade > 1 ? `R${resultIndex + 1}` : 'Resultado'}
                             />
