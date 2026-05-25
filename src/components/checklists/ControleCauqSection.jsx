@@ -5,11 +5,9 @@ import { Input } from "@/components/ui/input";
 export default function ControleCauqSection({
   formData,
   selectedProject,
-  handleNestedChange,
+  onNestedChange: handleNestedChange,
   isEditable,
   isApproved,
-  validateDecimalInput,
-  checkConformidadeAutomatica,
 }) {
   const ensaios = [
     { key: 'extracao_ligante_rotarex', label: 'Ext. Ligante (Rotarex)', padrao: selectedProject?.teor_ligante ? `${selectedProject.teor_ligante.min} a ${selectedProject.teor_ligante.max} %` : 'N/A', decimals: 2 },
