@@ -111,9 +111,18 @@ export function useChecklistForm(getInitialFormData, entityName, storageName) {
           const isOwnerCheck = checklistToEdit.created_by?.toLowerCase() === userData.email?.toLowerCase() || checklistToEdit.created_by_id === userData.id;
           if (userData.role === 'admin' || (isOwnerCheck && (checklistToEdit.status === 'rascunho' || checklistToEdit.approved === false || checklistToEdit.approved === null))) {
             const initialForm = getInitialFormData();
-            const loadedFormData = {
+            // Deep-merge object fields so saved records don't lose keys added after initial save
+          const mergedObjectFields = {};
+          for (const key of Object.keys(initialForm)) {
+            if (initialForm[key] !== null && typeof initialForm[key] === 'object' && !Array.isArray(initialForm[key])) {
+              mergedObjectFields[key] = { ...initialForm[key], ...(checklistToEdit[key] || {}) };
+            }
+          }
+
+          const loadedFormData = {
               ...initialForm,
               ...checklistToEdit,
+              ...mergedObjectFields,
               data: checklistToEdit.data ? new Date(checklistToEdit.data).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
               fotos: Array.isArray(checklistToEdit.fotos) ? checklistToEdit.fotos : [],
             };
