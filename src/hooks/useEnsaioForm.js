@@ -90,7 +90,12 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
           const ensaioToEdit = await base44.entities[entityName].get(editId);
           setEditingEnsaio(ensaioToEdit);
 
-          if (userData.role === 'admin' || (ensaioToEdit.created_by === userData.email && (ensaioToEdit.status === 'rascunho' || ensaioToEdit.approved === false))) {
+          // Permite editar se: admin, ou criador com status rascunho/finalizado não aprovado, ou reprovado
+          const isCreator = ensaioToEdit.created_by === userData.email;
+          const canEditStatus = ensaioToEdit.status === 'rascunho' || ensaioToEdit.status === 'finalizado' || ensaioToEdit.approved === false;
+          const hasPermission = userData.role === 'admin' || (isCreator && canEditStatus);
+
+          if (hasPermission) {
             const initialForm = getInitialFormData();
             setFormData({
               ...initialForm,
@@ -134,7 +139,7 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
   }, [regionalSelecionada, projects]);
 
   const isApproved = formData.approved === true;
-  const userCanEdit = user?.role === 'admin' || (formData.created_by === user?.email && (formData.status === 'rascunho' || formData.approved === false));
+  const userCanEdit = user?.role === 'admin' || (formData.created_by === user?.email && (formData.status === 'rascunho' || formData.status === 'finalizado' || formData.approved === false));
   const isEditable = !editingEnsaio?.id || userCanEdit;
 
   return {
