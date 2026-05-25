@@ -204,7 +204,7 @@ export default function ChecklistAplicacaoPage() {
                 loadingUpload={saving || uploadingPhoto}
                 onCancel={() => { clearSavedData(); navigate(createPageUrl('MeusEnsaios')); }}
                 onSaveProgress={async (e) => { e.preventDefault(); await handlers.handleSubmit(e, 'rascunho'); }}
-                onFinalize={() => {}}
+                onFinalize={async (e) => { e.preventDefault(); await handlers.handleSubmit(e, 'finalizado'); }}
               />
             </form>
           </CardContent>

@@ -151,7 +151,7 @@ export default function ChecklistReciclagem() {
                 loadingUpload={saving || uploadingPhotos}
                 onCancel={() => { clearSavedData(); navigate(createPageUrl('MeusEnsaios')); }}
                 onSaveProgress={async (e) => { e.preventDefault(); await handleSubmit(e, 'rascunho'); }}
-                onFinalize={() => {}}
+                onFinalize={async (e) => { e.preventDefault(); await handleSubmit(e, 'finalizado'); }}
               />
             </form>
           </CardContent>
