@@ -1,32 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-// Wrapper that uses local state while typing, only commits on blur
+// Uncontrolled input — stores value locally, never resets from parent
 function ResultInput({ value, onCommit, disabled, placeholder, style }) {
-  const [localValue, setLocalValue] = useState(value != null ? String(value) : '');
-  const [focused, setFocused] = useState(false);
+  const inputRef = React.useRef(null);
 
-  // Sync from parent only when not focused
-  React.useEffect(() => {
-    if (!focused) {
-      setLocalValue(value != null ? String(value) : '');
+  // Set initial value only on mount
+  useEffect(() => {
+    if (inputRef.current && value != null && value !== '') {
+      inputRef.current.value = String(value);
     }
-  }, [value, focused]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <Input
+    <input
+      ref={inputRef}
       type="text"
       inputMode="decimal"
-      value={localValue}
-      onChange={(e) => setLocalValue(e.target.value)}
-      onFocus={() => setFocused(true)}
-      onBlur={() => {
-        setFocused(false);
-        onCommit(localValue);
-      }}
+      defaultValue={value != null ? String(value) : ''}
+      onChange={(e) => onCommit(e.target.value)}
       disabled={disabled}
-      className="h-8 text-sm"
+      className="h-8 text-sm flex w-full rounded-md border border-input bg-background px-3 py-1 shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
       style={style}
       placeholder={placeholder}
     />
