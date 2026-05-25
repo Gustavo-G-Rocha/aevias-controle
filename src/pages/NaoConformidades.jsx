@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,158 +8,18 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { base44 } from "@/api/base44Client";
-import { User } from "@/entities/User";
-import { Obra } from "@/entities/Obra";
-import { Regional } from "@/entities/Regional";
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
 import { createPageUrl } from "@/utils";
 
-// ---- Constants ----
-const TIPOS_CHECKLIST = [
-  { value: "ChecklistUsina", label: "Checklist de Usina", page: "RelatorioChecklist" },
-  { value: "ChecklistAplicacao", label: "Checklist de Aplicação", page: "RelatorioChecklistAplicacao" },
-  { value: "ChecklistMRAF", label: "Checklist MRAF", page: "RelatorioChecklistMRAF" },
-  { value: "ChecklistConcretagem", label: "Checklist de Concretagem", page: "RelatorioChecklistConcretagem" },
-  { value: "ChecklistTerraplanagem", label: "Checklist de Terraplanagem", page: "RelatorioChecklistTerraplanagem" },
-  { value: "ChecklistReciclagem", label: "Checklist de Reciclagem", page: "RelatorioChecklistReciclagem" },
-];
+import { useNaoConformidadesData } from "@/hooks/useNaoConformidadesData";
+import { useNaoConformidadesFilters } from "@/hooks/useNaoConformidadesFilters";
+import { useNaoConformidadesChartData } from "@/hooks/useNaoConformidadesChartData";
+import {
+  TIPOS_CHECKLIST, OUTROS_TIPOS_REGISTRO, RNC_PAGE,
+  STATUS_LABELS,
+} from "@/utils/naoConformidadesUtils";
 
-// Tipos que possuem campo nao_conformidades explícito
-const TIPOS_COM_NC_EXPLICITA = [
-  { value: "ChecklistUsina", label: "Checklist de Usina", page: "RelatorioChecklist" },
-  { value: "ChecklistAplicacao", label: "Checklist de Aplicação", page: "RelatorioChecklistAplicacao" },
-  { value: "ChecklistMRAF", label: "Checklist MRAF", page: "RelatorioChecklistMRAF" },
-  { value: "ChecklistConcretagem", label: "Checklist de Concretagem", page: "RelatorioChecklistConcretagem" },
-  { value: "ChecklistTerraplanagem", label: "Checklist de Terraplanagem", page: "RelatorioChecklistTerraplanagem" },
-  { value: "ChecklistReciclagem", label: "Checklist de Reciclagem", page: "RelatorioChecklistReciclagem" },
-  { value: "DiarioObra", label: "Diário de Obra", page: "RelatorioDiario" },
-];
-
-// RNC maps to RelatorioNC page
-const RNC_PAGE = "RelatorioNC";
-
-// Outros registros: NC = approved === false
-const OUTROS_TIPOS_REGISTRO = [
-  { value: "AcompanhamentoCarga", label: "Acomp. de Cargas", page: "RelatorioAcompanhamentoCarga" },
-  { value: "AcompanhamentoUsinagem", label: "Acomp. Usinagem", page: "RelatorioAcompanhamentoUsinagem" },
-  { value: "EnsaioCAUQ", label: "Ensaio CAUQ", page: "RelatorioCAUQ" },
-  { value: "EnsaioDensidade", label: "Ensaio de Densidade", page: "RelatorioEnsaio" },
-  { value: "EnsaioDensidadeInSitu", label: "Densidade In Situ", page: "RelatorioDensidadeInSitu" },
-  { value: "EnsaioGranAreia", label: "Granulometria + EA", page: "RelatorioEnsaio" },
-  { value: "EnsaioGranulometriaIndividual", label: "Gran. Individual", page: "RelatorioGranulometriaIndividual" },
-  { value: "EnsaioMRAF", label: "Ensaio MRAF", page: "RelatorioMRAF" },
-  { value: "EnsaioManchaPendulo", label: "Mancha + Pêndulo", page: "RelatorioManchaPendulo" },
-  { value: "EnsaioSondagem", label: "Sondagem", page: "RelatorioSondagem" },
-  { value: "EnsaioTaxaMRAF", label: "Taxa MRAF", page: "RelatorioTaxaMRAF" },
-  { value: "EnsaioTaxaPinturaImprimacao", label: "Taxa Pintura/Imprim.", page: "RelatorioTaxaPinturaImprimacao" },
-  { value: "EnsaioVigaBenkelman", label: "Viga Benkelman", page: "RelatorioVigaBenkelman" },
-  { value: "ChecklistReciclagem", label: "Checklist de Reciclagem", page: "RelatorioChecklistReciclagem" },
-];
-
-const STATUS_COLORS = { aberta: "#dc2626", em_tratativa: "#d97706", encerrada: "#16a34a", cancelada: "#6b7280" };
-const STATUS_LABELS = { aberta: "Aberta", em_tratativa: "Em Tratativa", encerrada: "Finalizada", cancelada: "Cancelada" };
-const PARAM_COLORS = ["#dc2626","#d97706","#2563eb","#7c3aed","#0891b2","#be185d","#065f46","#92400e","#1e3a5f","#6b21a8"];
-const CHART_COLORS = ["#00233B","#566E3D","#d97706","#0891b2","#7c3aed","#dc2626","#be185d","#065f46","#92400e","#4ade80","#fb923c","#1e3a5f"];
-const TIMELINE_COLORS = ["#3b82f6","#10b981","#f59e0b","#8b5cf6","#ec4899","#06b6d4","#f97316","#14b8a6","#6366f1","#ef4444","#84cc16","#d946ef"];
-
-// ---- Pure cross-filter functions ----
-// Each chart calls these with `skip = 'its_own_dimension'` so it shows distribution of itself
-function applyRncFilters(rncs, cncs, f, skip = null) {
-  let r = rncs;
-  if (skip !== 'obraId' && f.obraId) r = r.filter(x => x.obra_id === f.obraId);
-  if (skip !== 'status' && f.status) r = r.filter(x => x.status === f.status);
-  if (skip !== 'empreiteira' && f.empreiteira) r = r.filter(x => (x.executora || '') === f.empreiteira);
-  if (skip !== 'rodovia' && f.rodovia) r = r.filter(x => (x.rodovia || '') === f.rodovia);
-  if (skip !== 'parametro' && f.parametro) {
-    const ids = new Set(cncs.filter(nc => nc.parametro === f.parametro).map(nc => nc.obra_id));
-    r = r.filter(x => ids.has(x.obra_id));
-  }
-  if (skip !== 'data' && (f.dataInicial || f.dataFinal)) {
-    r = r.filter(x => {
-      if (!x.data_nc) return false;
-      const dataRnc = new Date(x.data_nc);
-      if (f.dataInicial && dataRnc < f.dataInicial) return false;
-      if (f.dataFinal) {
-        const dataFinalMidnight = new Date(f.dataFinal);
-        dataFinalMidnight.setHours(23, 59, 59, 999);
-        if (dataRnc > dataFinalMidnight) return false;
-      }
-      return true;
-    });
-  }
-  // usina not applicable to RNCs
-  return r;
-}
-
-function applyCncFilters(cncs, rncs, f, skip = null) {
-  let r = cncs;
-  if (skip !== 'obraId' && f.obraId) r = r.filter(nc => nc.obra_id === f.obraId);
-  if (skip !== 'parametro' && f.parametro) r = r.filter(nc => nc.parametro === f.parametro);
-  if (skip !== 'empreiteira' && f.empreiteira) r = r.filter(nc => (nc.empreiteira || '') === f.empreiteira);
-  if (skip !== 'rodovia' && f.rodovia) r = r.filter(nc => (nc.rodovia || '') === f.rodovia);
-  if (skip !== 'usina' && f.usina) r = r.filter(nc => (nc.usina || '') === f.usina);
-  if (skip !== 'status' && f.status) {
-    const ids = new Set(rncs.filter(x => x.status === f.status).map(x => x.obra_id));
-    r = r.filter(nc => ids.has(nc.obra_id));
-  }
-  if (skip !== 'data' && (f.dataInicial || f.dataFinal)) {
-    r = r.filter(nc => {
-      if (!nc.data) return false;
-      const dataNc = new Date(nc.data);
-      if (f.dataInicial && dataNc < f.dataInicial) return false;
-      if (f.dataFinal) {
-        const dataFinalMidnight = new Date(f.dataFinal);
-        dataFinalMidnight.setHours(23, 59, 59, 999);
-        if (dataNc > dataFinalMidnight) return false;
-      }
-      return true;
-    });
-  }
-  return r;
-}
-
-// ---- Checklist NC extractor ----
-function extrairNaoConformidadesChecklist(checklist, tipo) {
-  const ncs = [];
-  if (tipo === 'ChecklistUsina' && checklist.controle_cauq) {
-    ['extracao_ligante_rotarex','extracao_ligante_soxhlet','granulometria','volume_vazios','rbv','rtcd_25c','estabilidade','fluencia'].forEach(key => {
-      const e = checklist.controle_cauq[key];
-      if (e?.realizado && e.conforme === false) ncs.push(key.replace(/_/g,' '));
-    });
-    if (checklist.equivalente_areia_status === 'realizado') {
-      const limite = checklist.projeto_equivalente_areia_minimo || 55;
-      (checklist.equivalente_areia_resultados || []).forEach(r => { if (r < limite) ncs.push('Equivalente de Areia'); });
-    }
-  }
-  if (tipo === 'ChecklistAplicacao') {
-    if (checklist.pintura_ligacao?.taxa_pintura?.realizado && checklist.pintura_ligacao.taxa_pintura.conforme === false) ncs.push('Taxa de Pintura');
-    if (checklist.pintura_ligacao?.taxa_pintura_residual?.realizado && checklist.pintura_ligacao.taxa_pintura_residual.conforme === false) ncs.push('Taxa de Pintura Residual');
-    if (checklist.controle_aplicacao?.temp_aplicacao_cargas?.realizado && checklist.controle_aplicacao.temp_aplicacao_cargas.conforme === false) ncs.push('Temperatura de Aplicação');
-    if (checklist.controle_aplicacao?.espessura_camada?.realizado && checklist.controle_aplicacao.espessura_camada.conforme === false) ncs.push('Espessura da Camada');
-  }
-  if (tipo === 'ChecklistConcretagem') {
-    (checklist.cargas_concreto || []).forEach(carga => {
-      if (carga.slump_test?.realizado && carga.slump_test.conforme === false) ncs.push('Slump Test');
-      if (carga.espessura_camada?.realizado && carga.espessura_camada.conforme === false) ncs.push('Espessura (Concretagem)');
-    });
-  }
-  if (tipo === 'ChecklistTerraplanagem' && checklist.ensaios_empreiteira) {
-    ['compactacao_proctor','isc','umidade_frigideira','massa_especifica_in_situ','granulometria'].forEach(key => {
-      const d = checklist.ensaios_empreiteira[key];
-      if (d?.realizado && d.conforme === false) ncs.push(key.replace(/_/g,' '));
-    });
-  }
-  if (tipo === 'ChecklistMRAF' && checklist.acompanhamento_aplicacao) {
-    ['taxa_aplicacao','residuo_emulsao','espessura_camada'].forEach(key => {
-      const d = checklist.acompanhamento_aplicacao[key];
-      if (d?.realizado && d.conforme === false) ncs.push(key.replace(/_/g,' ') + ' (MRAF)');
-    });
-  }
-  return ncs;
-}
-
-// ---- Small reusable UI components ----
+// ---- Small reusable UI components (unchanged) ----
 const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
   if (percent < 0.04) return null;
   const RADIAN = Math.PI / 180;
@@ -195,374 +55,40 @@ const smallLegendFmt = (v) => <span style={{ color: '#00233B', fontSize: 11 }}>{
 
 // ---- Main Page ----
 export default function NaoConformidadesPage() {
-  const [loading, setLoading] = useState(true);
-  const [obras, setObras] = useState([]);
-  const [rncs, setRncs] = useState([]);
-  const [checklistNCs, setChecklistNCs] = useState([]);
-  const [filtroStatus, setFiltroStatus] = useState(null);
-  const [filtroParametro, setFiltroParametro] = useState(null);
-  const [filtroObraId, setFiltroObraId] = useState(null);
-  const [filtroEmpreiteira, setFiltroEmpreiteira] = useState(null);
-  const [filtroRodovia, setFiltroRodovia] = useState(null);
-  const [filtroUsina, setFiltroUsina] = useState(null);
-  const [filtroDataInicial, setFiltroDataInicial] = useState(null);
-  const [filtroDataFinal, setFiltroDataFinal] = useState(null);
+  const { loading, obras, rncs, checklistNCs } = useNaoConformidadesData();
+
+  const {
+    filtroStatus, setFiltroStatus,
+    filtroParametro, setFiltroParametro,
+    filtroObraId, setFiltroObraId,
+    filtroEmpreiteira, setFiltroEmpreiteira,
+    filtroRodovia, setFiltroRodovia,
+    filtroUsina, setFiltroUsina,
+    filtroDataInicial, setFiltroDataInicial,
+    filtroDataFinal, setFiltroDataFinal,
+    f, hasActiveFilter, clearFilters,
+    opcoesEmpreiteira, opcoesRodovia, opcoesUsina,
+    rncsVisiveis, cncsVisiveis,
+  } = useNaoConformidadesFilters(obras, rncs, checklistNCs);
+
+  const {
+    dadosStatusRNC, dadosParametros, dadosPorObra,
+    dadosPorEmpreiteira, dadosPorRodovia, dadosPorUsina,
+    dadosTemporais, tabelaResumo,
+  } = useNaoConformidadesChartData(obras, rncs, checklistNCs, f);
+
   const [tabelaBusca, setTabelaBusca] = useState('');
   const [tabelaTipo, setTabelaTipo] = useState('_all');
   const [tabelaPage, setTabelaPage] = useState(1);
   const tabelaItemsPerPage = 20;
 
-  const loadAll = useCallback(async () => {
-    setLoading(true);
-    try {
-      const userData = await User.me();
-      const userAccessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
-
-      const [obrasData, regionaisData, rncsData] = await Promise.all([
-        Obra.list(), Regional.list(),
-        base44.entities.RelatorioNC.list("-created_date", 1000)
-      ]);
-
-      let availableObras = obrasData;
-      if (userAccessLevel === 'cliente') {
-        const regs = regionaisData.filter(r => (r.clientes_responsaveis || []).some(e => e.toLowerCase() === userData.email.toLowerCase()));
-        const ids = new Set(regs.flatMap(r => obrasData.filter(o => o.regional_id === r.id).map(o => o.id)));
-        availableObras = obrasData.filter(o => ids.has(o.id));
-      } else if (userAccessLevel === 'sala_tecnica_afirmaevias') {
-        const regs = regionaisData.filter(r => (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === userData.email.toLowerCase()));
-        const ids = new Set(regs.flatMap(r => obrasData.filter(o => o.regional_id === r.id).map(o => o.id)));
-        availableObras = obrasData.filter(o => ids.has(o.id));
-      } else if (userAccessLevel === 'gestor_contrato') {
-        const regs = regionaisData.filter(r =>
-          r.gestor_contrato_responsavel?.toLowerCase() === userData.email.toLowerCase() ||
-          (r.gestores_contrato_responsaveis || []).some(e => e.toLowerCase() === userData.email.toLowerCase())
-        );
-        const ids = new Set(regs.flatMap(r => obrasData.filter(o => o.regional_id === r.id).map(o => o.id)));
-        availableObras = obrasData.filter(o => ids.has(o.id));
-      }
-
-      setObras(availableObras);
-      const availableIds = new Set(availableObras.map(o => o.id));
-      setRncs(rncsData.filter(r => availableIds.has(r.obra_id)));
-
-      const allCNCs = [];
-
-      // Buscar checklists e DiarioObra de uma só vez (sem repetição para NCs explícitas)
-      // TIPOS_COM_NC_EXPLICITA inclui os mesmos 6 checklists + DiarioObra
-      // Fazemos uma única requisição por tipo e aproveitamos para ambas as extrações
-      const [checklistResults, diarioData] = await Promise.all([
-        Promise.all(
-          TIPOS_CHECKLIST.map(t =>
-            base44.entities[t.value].list('-created_date', 1000)
-              .catch(() => [])
-              .then(res => res.filter(c => availableIds.has(c.obra_id)).map(c => ({ ...c, _tipo: t.value, _page: t.page })))
-          )
-        ),
-        base44.entities.DiarioObra.list('-created_date', 1000)
-          .catch(() => [])
-          .then(res => res.filter(c => availableIds.has(c.obra_id)))
-      ]);
-
-      // Extrair NCs automáticas dos checklists
-      checklistResults.flat().forEach(cl => {
-        extrairNaoConformidadesChecklist(cl, cl._tipo).forEach(param => {
-          allCNCs.push({
-            id: cl.id, obra_id: cl.obra_id,
-            parametro: param.charAt(0).toUpperCase() + param.slice(1),
-            tipo: cl._tipo, laboratorista_name: cl.laboratorista_name || '',
-            data: cl.data || '', empreiteira: cl.empreiteira || '',
-            rodovia: cl.rodovia || '', usina: cl.usina || cl.usina_selecionada || '',
-            _page: cl._page,
-          });
-        });
-
-        // NCs explícitas dos checklists
-        if (Array.isArray(cl.nao_conformidades) && cl.nao_conformidades.length > 0) {
-          const tipoInfo = TIPOS_CHECKLIST.find(t => t.value === cl._tipo);
-          cl.nao_conformidades.forEach(nc => {
-            const parametro = [nc.categoria_nc, nc.parametro_nc].filter(Boolean).join(' / ') || nc.descricao || 'NC';
-            const jaExiste = allCNCs.some(e => e.id === cl.id && e.parametro === parametro);
-            if (!jaExiste) {
-              allCNCs.push({
-                id: cl.id, obra_id: cl.obra_id, parametro,
-                tipo: cl._tipo, laboratorista_name: cl.laboratorista_name || '',
-                data: cl.data || '', empreiteira: cl.empreiteira || '',
-                rodovia: cl.rodovia || '', usina: cl.usina || cl.usina_selecionada || '',
-                _page: tipoInfo?.page || '', _ncLocal: nc.local_nc || '',
-              });
-            }
-          });
-        }
-      });
-
-      // NCs explícitas do Diário de Obra
-      diarioData.forEach(c => {
-        if (Array.isArray(c.nao_conformidades) && c.nao_conformidades.length > 0) {
-          c.nao_conformidades.forEach(nc => {
-            const parametro = [nc.categoria_nc, nc.parametro_nc].filter(Boolean).join(' / ') || nc.descricao || 'NC';
-            allCNCs.push({
-              id: c.id, obra_id: c.obra_id, parametro,
-              tipo: 'DiarioObra', laboratorista_name: c.laboratorista_name || '',
-              data: c.data || '', empreiteira: c.empreiteira || '',
-              rodovia: c.rodovia || '', usina: '',
-              _page: 'RelatorioDiario', _ncLocal: nc.local_nc || '',
-            });
-          });
-        }
-      });
-
-      // Outros tipos de registro (approved === false ou campo específico)
-      const outrosResults = await Promise.all(
-        OUTROS_TIPOS_REGISTRO.map(t =>
-          base44.entities[t.value].list('-created_date', 1000)
-            .catch(() => [])
-            .then(res => res
-              .filter(c => {
-                if (!availableIds.has(c.obra_id)) return false;
-                if (t.value === 'EnsaioManchaPendulo' || t.value === 'EnsaioVigaBenkelman') {
-                  return c.condicao_conformidade === 'NÃO CONFORME';
-                }
-                return c.approved === false;
-              })
-              .map(c => ({
-                id: c.id, obra_id: c.obra_id,
-                parametro: t.label, tipo: t.value,
-                laboratorista_name: c.laboratorista_name || '',
-                data: c.data || c.data_ensaio || c.extraction_date || c.collection_date || '',
-                empreiteira: c.empreiteira || '', rodovia: c.rodovia || '',
-                usina: c.usina || c.usina_fornecedora || c.usina_selecionada || '',
-                _page: t.page,
-              }))
-            )
-        )
-      );
-
-      outrosResults.flat().forEach(reg => { allCNCs.push(reg); });
-      setChecklistNCs(allCNCs);
-    } catch (error) {
-      console.error("[NaoConformidades] Erro ao carregar dados:", error?.message || error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { loadAll(); }, [loadAll]);
-
-  const supervisaoIds = useMemo(() => new Set(obras.filter(o => o.tipo_obra === 'supervisao').map(o => o.id)), [obras]);
-
-  // ---- Dropdown options (from full dataset) ----
-  const opcoesEmpreiteira = useMemo(() => {
-    const s = new Set([...checklistNCs.map(nc => nc.empreiteira), ...rncs.map(r => r.executora || '')].filter(Boolean));
-    return [...s].sort();
-  }, [checklistNCs, rncs]);
-
-  const opcoesRodovia = useMemo(() => {
-    const s = new Set([...checklistNCs.map(nc => nc.rodovia), ...rncs.map(r => r.rodovia || '')].filter(Boolean));
-    return [...s].sort();
-  }, [checklistNCs, rncs]);
-
-  const opcoesUsina = useMemo(() => {
-    const s = new Set(checklistNCs.map(nc => nc.usina).filter(Boolean));
-    return [...s].sort();
-  }, [checklistNCs]);
-
-  // ---- Cross-filtered chart data ----
-  // Each chart skips its own filter dimension so it shows its own distribution
-  const f = useMemo(() => ({
-    status: filtroStatus, parametro: filtroParametro, obraId: filtroObraId,
-    empreiteira: filtroEmpreiteira, rodovia: filtroRodovia, usina: filtroUsina,
-    dataInicial: filtroDataInicial, dataFinal: filtroDataFinal
-  }), [filtroStatus, filtroParametro, filtroObraId, filtroEmpreiteira, filtroRodovia, filtroUsina, filtroDataInicial, filtroDataFinal]);
-
-  const dadosStatusRNC = useMemo(() => {
-    const filtered = applyRncFilters(rncs, checklistNCs, f, 'status');
-    const counts = { aberta: 0, em_tratativa: 0, encerrada: 0, cancelada: 0 };
-    filtered.forEach(r => { if (counts[r.status] !== undefined) counts[r.status]++; });
-    return Object.entries(counts).filter(([,v]) => v > 0)
-      .map(([status, value]) => ({ name: STATUS_LABELS[status], statusKey: status, value, color: STATUS_COLORS[status] }));
-  }, [rncs, checklistNCs, f]);
-
-  const dadosParametros = useMemo(() => {
-    const filtered = applyCncFilters(checklistNCs, rncs, f, 'parametro');
-    const count = {};
-    filtered.forEach(nc => { count[nc.parametro] = (count[nc.parametro] || 0) + 1; });
-    return Object.entries(count).sort((a,b) => b[1]-a[1]).slice(0,10)
-      .map(([name, value], i) => ({ name, value, color: PARAM_COLORS[i % PARAM_COLORS.length] }));
-  }, [checklistNCs, rncs, f]);
-
-  const dadosPorObra = useMemo(() => {
-    const filteredR = applyRncFilters(rncs, checklistNCs, f, 'obraId');
-    const filteredC = applyCncFilters(checklistNCs, rncs, f, 'obraId');
-    const count = {};
-    filteredR.forEach(r => { count[r.obra_id] = (count[r.obra_id] || 0) + 1; });
-    filteredC.forEach(nc => { count[nc.obra_id] = (count[nc.obra_id] || 0) + 1; });
-    return Object.entries(count)
-      .map(([obraId, value], i) => ({ name: obras.find(o => o.id === obraId)?.name || obraId, obraId, value, color: CHART_COLORS[i % CHART_COLORS.length] }))
-      .sort((a,b) => b.value - a.value);
-  }, [rncs, checklistNCs, obras, f]);
-
-  const dadosPorEmpreiteira = useMemo(() => {
-    const filteredC = applyCncFilters(checklistNCs, rncs, f, 'empreiteira').filter(nc => supervisaoIds.has(nc.obra_id));
-    const filteredR = applyRncFilters(rncs, checklistNCs, f, 'empreiteira').filter(r => supervisaoIds.has(r.obra_id));
-    const count = {};
-    filteredC.forEach(nc => { if (nc.empreiteira) count[nc.empreiteira] = (count[nc.empreiteira] || 0) + 1; });
-    filteredR.forEach(r => { if (r.executora) count[r.executora] = (count[r.executora] || 0) + 1; });
-    return Object.entries(count).sort((a,b) => b[1]-a[1])
-      .map(([name, value], i) => ({ name, value, color: CHART_COLORS[i % CHART_COLORS.length] }));
-  }, [checklistNCs, rncs, supervisaoIds, f]);
-
-  const dadosPorRodovia = useMemo(() => {
-    const filteredC = applyCncFilters(checklistNCs, rncs, f, 'rodovia');
-    const filteredR = applyRncFilters(rncs, checklistNCs, f, 'rodovia');
-    const count = {};
-    filteredC.forEach(nc => { if (nc.rodovia) count[nc.rodovia] = (count[nc.rodovia] || 0) + 1; });
-    filteredR.forEach(r => { if (r.rodovia) count[r.rodovia] = (count[r.rodovia] || 0) + 1; });
-    return Object.entries(count).sort((a,b) => b[1]-a[1])
-      .map(([name, value], i) => ({ name, value, color: CHART_COLORS[i % CHART_COLORS.length] }));
-  }, [checklistNCs, rncs, f]);
-
-  const dadosPorUsina = useMemo(() => {
-    const filtered = applyCncFilters(checklistNCs, rncs, f, 'usina');
-    const count = {};
-    filtered.forEach(nc => { if (nc.usina) count[nc.usina] = (count[nc.usina] || 0) + 1; });
-    return Object.entries(count).sort((a,b) => b[1]-a[1])
-      .map(([name, value], i) => ({ name, value, color: CHART_COLORS[i % CHART_COLORS.length] }));
-  }, [checklistNCs, rncs, f]);
-
-  // ---- KPIs (all filters applied) ----
-  const rncsVisiveis = useMemo(() => applyRncFilters(rncs, checklistNCs, f), [rncs, checklistNCs, f]);
-  const cncsVisiveis = useMemo(() => applyCncFilters(checklistNCs, rncs, f), [checklistNCs, rncs, f]);
-
-  // ---- Timeline data: NCs por obra ao longo do tempo ----
-  const dadosTemporais = useMemo(() => {
-    // Apply all filters EXCEPT date for initial filtering
-    let filteredR = applyRncFilters(rncs, checklistNCs, { ...f, dataInicial: null, dataFinal: null }, null);
-    let filteredC = applyCncFilters(checklistNCs, rncs, { ...f, dataInicial: null, dataFinal: null }, null);
-
-    // Now apply date filter
-    if (f.dataInicial || f.dataFinal) {
-      filteredR = filteredR.filter(r => {
-        if (!r.data_nc) return false;
-        const dataRnc = new Date(r.data_nc);
-        if (f.dataInicial && dataRnc < f.dataInicial) return false;
-        if (f.dataFinal) {
-          const dataFinalMidnight = new Date(f.dataFinal);
-          dataFinalMidnight.setHours(23, 59, 59, 999);
-          if (dataRnc > dataFinalMidnight) return false;
-        }
-        return true;
-      });
-      filteredC = filteredC.filter(nc => {
-        if (!nc.data) return false;
-        const dataNc = new Date(nc.data);
-        if (f.dataInicial && dataNc < f.dataInicial) return false;
-        if (f.dataFinal) {
-          const dataFinalMidnight = new Date(f.dataFinal);
-          dataFinalMidnight.setHours(23, 59, 59, 999);
-          if (dataNc > dataFinalMidnight) return false;
-        }
-        return true;
-      });
-    }
-
-    // Collect all dates
-    const allDates = new Set();
-    filteredR.forEach(r => { if (r.data_nc) allDates.add(r.data_nc); });
-    filteredC.forEach(nc => { if (nc.data) allDates.add(nc.data); });
-
-    if (allDates.size === 0) return { data: [], maxValue: 0 };
-
-    // Sort dates
-    const sortedDates = [...allDates].sort();
-
-    // Get top obras by NC count
-    const obraCount = {};
-    filteredR.forEach(r => { obraCount[r.obra_id] = (obraCount[r.obra_id] || 0) + 1; });
-    filteredC.forEach(nc => { obraCount[nc.obra_id] = (obraCount[nc.obra_id] || 0) + 1; });
-    const topObras = Object.entries(obraCount)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 6)
-      .map(([id]) => id);
-
-    // Build time series
-    let maxValue = 0;
-    const data = sortedDates
-      .filter(date => {
-        // Validate date format
-        try {
-          const d = new Date(date + 'T12:00:00');
-          return !isNaN(d.getTime());
-        } catch {
-          return false;
-        }
-      })
-      .map(date => {
-        const point = { date: new Date(date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) };
-        let totalForDate = 0;
-        topObras.forEach(obraId => {
-          const obraNome = obras.find(o => o.id === obraId)?.name || obraId;
-          const count = filteredR.filter(r => r.obra_id === obraId && r.data_nc === date).length +
-                        filteredC.filter(nc => nc.obra_id === obraId && nc.data === date).length;
-          point[obraNome] = count;
-          totalForDate += count;
-        });
-        if (totalForDate > maxValue) maxValue = totalForDate;
-        return point;
-      });
-    return { data, maxValue };
-  }, [rncs, checklistNCs, obras, f]);
-
-  // ---- Table ----
-  const tabelaResumo = useMemo(() => {
-    return obras.map(obra => {
-      if (f.obraId && obra.id !== f.obraId) return null;
-
-      let rncsObra = rncs.filter(r => r.obra_id === obra.id);
-      if (f.status) rncsObra = rncsObra.filter(r => r.status === f.status);
-      if (f.empreiteira) rncsObra = rncsObra.filter(r => (r.executora || '') === f.empreiteira);
-      if (f.rodovia) rncsObra = rncsObra.filter(r => (r.rodovia || '') === f.rodovia);
-      if (f.parametro) {
-        if (!checklistNCs.some(nc => nc.parametro === f.parametro && nc.obra_id === obra.id)) rncsObra = [];
-      }
-
-      let cncsObra = checklistNCs.filter(nc => nc.obra_id === obra.id);
-      if (f.parametro) cncsObra = cncsObra.filter(nc => nc.parametro === f.parametro);
-      if (f.empreiteira) cncsObra = cncsObra.filter(nc => (nc.empreiteira || '') === f.empreiteira);
-      if (f.rodovia) cncsObra = cncsObra.filter(nc => (nc.rodovia || '') === f.rodovia);
-      if (f.usina) cncsObra = cncsObra.filter(nc => (nc.usina || '') === f.usina);
-      if (f.status) {
-        if (!rncs.some(r => r.obra_id === obra.id && r.status === f.status)) cncsObra = [];
-      }
-
-      const totalRnc = rncsObra.length;
-      const paramChecklist = cncsObra.length;
-      if (totalRnc === 0 && paramChecklist === 0) return null;
-
-      return {
-        obra, totalRnc, paramChecklist,
-        abertas: rncsObra.filter(r => r.status === 'aberta').length,
-        emTratativa: rncsObra.filter(r => r.status === 'em_tratativa').length,
-        finalizadas: rncsObra.filter(r => r.status === 'encerrada').length,
-        canceladas: rncsObra.filter(r => r.status === 'cancelada').length,
-      };
-    }).filter(Boolean);
-  }, [obras, rncs, checklistNCs, f]);
-
-  // ---- Handlers ----
-  const handleStatusClick = useCallback((d) => setFiltroStatus(p => p === d.statusKey ? null : d.statusKey), []);
-  const handleParametroClick = useCallback((d) => setFiltroParametro(p => p === d.name ? null : d.name), []);
-  const handleObraClick = useCallback((d) => setFiltroObraId(p => p === d.obraId ? null : d.obraId), []);
-  const handleEmpreiteiraClick = useCallback((d) => setFiltroEmpreiteira(p => p === d.name ? null : d.name), []);
-  const handleRodoviaClick = useCallback((d) => setFiltroRodovia(p => p === d.name ? null : d.name), []);
-  const handleUsinaClick = useCallback((d) => setFiltroUsina(p => p === d.name ? null : d.name), []);
-
-  const clearFilters = useCallback(() => {
-    setFiltroStatus(null); setFiltroParametro(null); setFiltroObraId(null);
-    setFiltroEmpreiteira(null); setFiltroRodovia(null); setFiltroUsina(null);
-    setFiltroDataInicial(null); setFiltroDataFinal(null);
-  }, []);
-
-  const hasActiveFilter = !!(filtroStatus || filtroParametro || filtroObraId || filtroEmpreiteira || filtroRodovia || filtroUsina || filtroDataInicial || filtroDataFinal);
+  // ---- Chart click handlers ----
+  const handleStatusClick = useCallback((d) => setFiltroStatus(p => p === d.statusKey ? null : d.statusKey), [setFiltroStatus]);
+  const handleParametroClick = useCallback((d) => setFiltroParametro(p => p === d.name ? null : d.name), [setFiltroParametro]);
+  const handleObraClick = useCallback((d) => setFiltroObraId(p => p === d.obraId ? null : d.obraId), [setFiltroObraId]);
+  const handleEmpreiteiraClick = useCallback((d) => setFiltroEmpreiteira(p => p === d.name ? null : d.name), [setFiltroEmpreiteira]);
+  const handleRodoviaClick = useCallback((d) => setFiltroRodovia(p => p === d.name ? null : d.name), [setFiltroRodovia]);
+  const handleUsinaClick = useCallback((d) => setFiltroUsina(p => p === d.name ? null : d.name), [setFiltroUsina]);
 
   const tiposDisponiveis = useMemo(() => {
     const s = new Set([...rncsVisiveis.map(() => 'Relatório NC'), ...cncsVisiveis.map(nc => {
@@ -721,19 +247,19 @@ export default function NaoConformidadesPage() {
                   <defs>
                     {Object.keys(dadosTemporais.data[0] || {}).filter(k => k !== 'date').map((obraNome, i) => (
                       <linearGradient key={obraNome} id={`color${i}`} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={TIMELINE_COLORS[i % TIMELINE_COLORS.length]} stopOpacity={0.9}/>
-                        <stop offset="95%" stopColor={TIMELINE_COLORS[i % TIMELINE_COLORS.length]} stopOpacity={0.2}/>
+                        <stop offset="5%" stopColor={dadosTemporais.timelineColors[i % dadosTemporais.timelineColors.length]} stopOpacity={0.9}/>
+                        <stop offset="95%" stopColor={dadosTemporais.timelineColors[i % dadosTemporais.timelineColors.length]} stopOpacity={0.2}/>
                       </linearGradient>
                     ))}
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,35,59,0.1)" />
-                  <XAxis 
-                    dataKey="date" 
+                  <XAxis
+                    dataKey="date"
                     tick={{ fill: '#00233B', fontSize: 11 }}
                     tickLine={{ stroke: '#00233B' }}
                     interval={(f.dataInicial || f.dataFinal) ? 0 : 4}
                   />
-                  <YAxis 
+                  <YAxis
                     domain={[0, dadosTemporais.maxValue + 5]}
                     allowDecimals={false}
                     ticks={Array.from({ length: Math.ceil(dadosTemporais.maxValue + 5) + 1 }, (_, i) => i)}
@@ -741,7 +267,7 @@ export default function NaoConformidadesPage() {
                     tickLine={{ stroke: '#00233B' }}
                     label={{ value: 'Nº de NCs', angle: -90, position: 'insideLeft', style: { fill: '#00233B', fontSize: 12 } }}
                   />
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={tooltipStyle}
                     labelStyle={{ color: '#00233B', fontWeight: 'bold', marginBottom: 4 }}
                   />
@@ -859,7 +385,6 @@ export default function NaoConformidadesPage() {
 
         {/* Tabela unificada de ocorrências */}
         {(() => {
-          // Merge RNCs + checklist NCs into unified rows
           const rncRows = rncsVisiveis.map(r => ({
             _kind: 'rnc',
             id: r.id,
@@ -916,7 +441,6 @@ export default function NaoConformidadesPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {/* Filtros locais da tabela */}
                 <div className="flex flex-col sm:flex-row gap-3 mb-4">
                   <div className="relative flex-1">
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#00233B]/40" />
