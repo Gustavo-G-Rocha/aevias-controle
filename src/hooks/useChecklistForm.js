@@ -5,8 +5,23 @@ import { Obra } from "@/entities/Obra";
 import { Regional } from "@/entities/Regional";
 import { Project } from "@/entities/Project";
 import { FaixaGranulometrica } from "@/entities/FaixaGranulometrica";
+import { ChecklistUsina } from "@/entities/ChecklistUsina";
+import { ChecklistAplicacao } from "@/entities/ChecklistAplicacao";
+import { ChecklistMRAF } from "@/entities/ChecklistMRAF";
+import { ChecklistConcretagem } from "@/entities/ChecklistConcretagem";
+import { ChecklistTerraplanagem } from "@/entities/ChecklistTerraplanagem";
+import { ChecklistReciclagem } from "@/entities/ChecklistReciclagem";
 import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { createPageUrl } from "@/utils";
+
+const ENTITY_MAP = {
+  ChecklistUsina,
+  ChecklistAplicacao,
+  ChecklistMRAF,
+  ChecklistConcretagem,
+  ChecklistTerraplanagem,
+  ChecklistReciclagem,
+};
 
 /**
  * Hook reutilizável para formulários de checklist
@@ -36,8 +51,7 @@ export function useChecklistForm(getInitialFormData, entityName, storageName) {
         const userData = await User.me();
         setUser(userData);
 
-        const currentUserAccessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
-        const isAdmin = currentUserAccessLevel === 'admin';
+        const isAdmin = userData?.role === 'admin';
 
         // Carregar dados em paralelo
         const dataPromises = [
@@ -67,7 +81,7 @@ export function useChecklistForm(getInitialFormData, entityName, storageName) {
 
         // Filtrar obras disponíveis para o usuário
         let availableObras = obrasData;
-        if (currentUserAccessLevel === 'user') {
+        if (!isAdmin) {
           const regionalDoLaboratorista = regionaisData.find(regional => {
             const laboratoristas = regional.laboratoristas_responsaveis || [];
             return laboratoristas.some(email => email.toLowerCase() === userData.email.toLowerCase());
@@ -89,7 +103,8 @@ export function useChecklistForm(getInitialFormData, entityName, storageName) {
         const editId = params.get('editId');
 
         if (editId) {
-          const Entity = (await import(`@/entities/${entityName}`)).default;
+          const Entity = ENTITY_MAP[entityName];
+          if (!Entity) throw new Error(`Entidade desconhecida: ${entityName}`);
           const checklistToEdit = await Entity.get(editId);
           setEditingChecklist(checklistToEdit);
 
