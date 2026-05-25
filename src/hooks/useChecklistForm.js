@@ -156,10 +156,17 @@ export function useChecklistForm(getInitialFormData, entityName, storageName) {
     );
   }, [regionalSelecionada, projects]);
 
-  // Permissões
+  // Permissões — calculadas apenas quando user já foi carregado
   const isApproved = formData.approved === true && formData.status !== 'rascunho';
-  const userCanEdit = user?.role === 'admin' || ((formData.created_by?.toLowerCase() === user?.email?.toLowerCase() || formData.created_by_id === user?.id) && (formData.status === 'rascunho' || formData.approved === false || formData.approved === null));
-  const isEditable = !editingChecklist?.id || userCanEdit;
+  const userCanEdit = loading ? false : (
+    user?.role === 'admin' ||
+    !editingChecklist?.id ||
+    (
+      (formData.created_by?.toLowerCase() === user?.email?.toLowerCase() || formData.created_by_id === user?.id) &&
+      (formData.status === 'rascunho' || formData.approved === false || formData.approved === null)
+    )
+  );
+  const isEditable = userCanEdit;
 
   return {
     obras,
