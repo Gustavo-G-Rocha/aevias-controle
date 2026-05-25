@@ -93,29 +93,31 @@ export default function EnsaioGranulometriaIndividualPage() {
             const pedreiras = [...new Set(proj.agregados.map(a => a.pedreira).filter(Boolean))];
             handleChange('pedreira', pedreiras.join(' + '));
 
-            // Preencher agregados
-            const novosAgregados = proj.agregados.map(agg => ({
-              nome: agg.nome || "",
-              peso_umido: "",
-              peso_seco: "",
-              agua: "",
-              umidade: "",
-              granulometria: {}
-            }));
-
-            // Adicionar agregado extra vazio se houver menos de 4
-            if (novosAgregados.length < 4) {
-              novosAgregados.push({
-                nome: "",
+            // Só preencher agregados se não estiver editando um ensaio existente
+            if (!editingEnsaio?.id) {
+              const novosAgregados = proj.agregados.map(agg => ({
+                nome: agg.nome || "",
                 peso_umido: "",
                 peso_seco: "",
                 agua: "",
                 umidade: "",
                 granulometria: {}
-              });
-            }
+              }));
 
-            setFormData(prev => ({ ...prev, agregados: novosAgregados }));
+              // Adicionar agregado extra vazio se houver menos de 4
+              if (novosAgregados.length < 4) {
+                novosAgregados.push({
+                  nome: "",
+                  peso_umido: "",
+                  peso_seco: "",
+                  agua: "",
+                  umidade: "",
+                  granulometria: {}
+                });
+              }
+
+              setFormData(prev => ({ ...prev, agregados: novosAgregados }));
+            }
           }
         }
       } else {
