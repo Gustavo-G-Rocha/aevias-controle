@@ -268,8 +268,8 @@ export default function EnsaioGranulometriaIndividualPage() {
       umidade: ag.umidade !== "" ? parseFloat(ag.umidade) || null : null,
       granulometria: Object.fromEntries(
         Object.entries(ag.granulometria || {}).map(([k, v]) => [k, {
-          retido: v.retido !== "" ? parseFloat(v.retido) || null : null,
-          passante: v.passante !== "" ? parseFloat(v.passante) || null : null,
+          retido: v && v.retido !== "" ? parseFloat(v.retido) || null : null,
+          passante: v && v.passante !== "" ? parseFloat(v.passante) || null : null,
         }])
       )
     }));
