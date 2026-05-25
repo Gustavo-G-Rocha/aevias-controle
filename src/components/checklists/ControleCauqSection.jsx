@@ -96,9 +96,8 @@ export default function ControleCauqSection({
                           {Array.from({ length: quantidade }).map((_, resultIndex) => (
                             <Input
                               key={`result-${resultIndex}`}
-                              type={ensaio.key === 'fluencia' ? 'text' : 'number'}
-                              min={ensaio.key === 'fluencia' ? undefined : "0"}
-                              step={ensaio.key === 'fluencia' ? undefined : stepValue}
+                              type="text"
+                              inputMode="decimal"
                               value={resultados[resultIndex] ?? ''}
                               onChange={(e) => handleNestedChange(
                                 `controle_cauq.${ensaio.key}.resultados.${resultIndex}`,

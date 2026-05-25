@@ -167,13 +167,14 @@ export function useChecklistUsinaForm({ formData, setFormData, projects, faixas,
         while (testObject.resultados.length <= resultIndex) testObject.resultados.push(null);
         const novos = [...testObject.resultados];
 
+        const normalizedValue = typeof value === 'string' ? value.replace(',', '.') : value;
         let parsedValue;
         if (testKey === 'fluencia') {
-          if (value !== '' && !validateDecimalInput(value, 1)) return prev;
-          parsedValue = value !== '' ? String(value) : null;
+          if (normalizedValue !== '' && !validateDecimalInput(normalizedValue, 1)) return prev;
+          parsedValue = normalizedValue !== '' ? String(normalizedValue) : null;
         } else {
-          if (value !== '' && decimals !== null && !validateDecimalInput(value, decimals)) return prev;
-          parsedValue = value !== '' ? parseFloat(value) : null;
+          if (normalizedValue !== '' && decimals !== null && !validateDecimalInput(normalizedValue, decimals)) return prev;
+          parsedValue = normalizedValue !== '' ? parseFloat(normalizedValue) : null;
           if (parsedValue !== null && parsedValue < 0) return prev;
         }
         novos[resultIndex] = parsedValue;
