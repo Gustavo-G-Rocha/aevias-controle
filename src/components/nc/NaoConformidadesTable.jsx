@@ -16,15 +16,15 @@ export default function NaoConformidadesTable({ rncsVisiveis, cncsVisiveis, tabe
   const [tipo, setTipo] = useState('_all');
   const [page, setPage] = useState(1);
 
-  const tiposDisponiveis = useMemo(() => {
-    const s = new Set(allRows.map(r => r.tipoLabel));
-    return [...s].sort();
-  }, [allRows]);
-
   const allRows = useMemo(() => [
     ...rncsVisiveis.map(mapRncToRow),
     ...cncsVisiveis.map(mapCncToRow),
   ], [rncsVisiveis, cncsVisiveis]);
+
+  const tiposDisponiveis = useMemo(() => {
+    const s = new Set(allRows.map(r => r.tipoLabel));
+    return [...s].sort();
+  }, [allRows]);
 
   const filteredRows = useMemo(
     () => filterTableRows(allRows, tipo, busca),
