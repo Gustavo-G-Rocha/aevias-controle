@@ -162,7 +162,12 @@ export function useChecklistForm(getInitialFormData, entityName, storageName) {
     user?.role === 'admin' ||
     !editingChecklist?.id ||
     (
-      (formData.created_by?.toLowerCase() === user?.email?.toLowerCase() || formData.created_by_id === user?.id) &&
+      (
+        formData.created_by?.toLowerCase() === user?.email?.toLowerCase() ||
+        formData.created_by_id === user?.id ||
+        editingChecklist?.created_by?.toLowerCase() === user?.email?.toLowerCase() ||
+        editingChecklist?.created_by_id === user?.id
+      ) &&
       (formData.status === 'rascunho' || formData.approved === false || formData.approved === null)
     )
   );
