@@ -93,7 +93,8 @@ export function useChecklistForm(getInitialFormData, entityName, storageName) {
           const checklistToEdit = await Entity.get(editId);
           setEditingChecklist(checklistToEdit);
 
-          if (userData.role === 'admin' || (checklistToEdit.created_by === userData.email && (checklistToEdit.status === 'rascunho' || checklistToEdit.approved === false || checklistToEdit.approved === null))) {
+          const isOwnerCheck = checklistToEdit.created_by?.toLowerCase() === userData.email?.toLowerCase() || checklistToEdit.created_by_id === userData.id;
+          if (userData.role === 'admin' || (isOwnerCheck && (checklistToEdit.status === 'rascunho' || checklistToEdit.approved === false || checklistToEdit.approved === null))) {
             const initialForm = getInitialFormData();
             const loadedFormData = {
               ...initialForm,
@@ -142,7 +143,7 @@ export function useChecklistForm(getInitialFormData, entityName, storageName) {
 
   // Permissões
   const isApproved = formData.approved === true && formData.status !== 'rascunho';
-  const userCanEdit = user?.role === 'admin' || (formData.created_by === user?.email && (formData.status === 'rascunho' || formData.approved === false || formData.approved === null));
+  const userCanEdit = user?.role === 'admin' || ((formData.created_by?.toLowerCase() === user?.email?.toLowerCase() || formData.created_by_id === user?.id) && (formData.status === 'rascunho' || formData.approved === false || formData.approved === null));
   const isEditable = !editingChecklist?.id || userCanEdit;
 
   return {
