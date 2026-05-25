@@ -84,7 +84,7 @@ export default function ChecklistUsinaHeader({
             <Select value={formData.project_id || ""} onValueChange={handleProjectChange} disabled={!isEditable || isApproved || !formData.obra_id}>
               <SelectTrigger><SelectValue placeholder="Selecione um projeto" /></SelectTrigger>
               <SelectContent>
-                {projetosDisponiveis.map(proj => (<SelectItem key={proj.id} value={proj.id}>{proj.name}</SelectItem>))}
+                {projetosDisponiveis.filter(p => p.tipo_projeto === 'CAUQ').map(proj => (<SelectItem key={proj.id} value={proj.id}>{proj.name}</SelectItem>))}
               </SelectContent>
             </Select>
           </div>
