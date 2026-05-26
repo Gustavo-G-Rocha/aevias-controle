@@ -390,4 +390,22 @@ describe('filtrarProjetosPorObra', () => {
     const reg = [{ id: 'r1' }];
     expect(filtrarProjetosPorObra(projetos, 'o1', obras, reg)).toEqual([]);
   });
+
+  it('inclui projetos CAUQ vinculados por regional_id além de project_ids', () => {
+    // p3 tem regional_id === 'r1' mas não está em project_ids — deve ser incluído se mudar a regional
+    const regionaisComP3 = [{ id: 'r1', project_ids: [] }];
+    const projsCom3 = [
+      { id: 'p1', tipo_projeto: 'CAUQ', regional_id: 'r1' },
+      { id: 'p3', tipo_projeto: 'CAUQ', regional_id: 'r1' },
+    ];
+    // project_ids vazio mas regional_id bate: deve retornar p1 e p3
+    const resultado = filtrarProjetosPorObra(projsCom3, 'o1', obras, regionaisComP3);
+    expect(resultado.map(p => p.id)).toContain('p1');
+    expect(resultado.map(p => p.id)).toContain('p3');
+  });
+
+  it('não retorna projetos MRAF mesmo que estejam na regional', () => {
+    const resultado = filtrarProjetosPorObra(projetos, 'o1', obras, regionais);
+    expect(resultado.find(p => p.tipo_projeto !== 'CAUQ')).toBeUndefined();
+  });
 });

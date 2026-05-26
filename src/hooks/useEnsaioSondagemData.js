@@ -76,9 +76,13 @@ export function useEnsaioSondagemData() {
     load();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Atualiza projetos quando obra muda
+  // Atualiza projetos quando obra muda (limpa quando obra é desmarcada)
   useEffect(() => {
-    if (formData.obra_id && obras.length > 0) {
+    if (!formData.obra_id) {
+      setProjects([]);
+      return;
+    }
+    if (obras.length > 0) {
       setProjects(filtrarProjetosPorObra(allProjects, formData.obra_id, obras, regionais));
     }
   }, [formData.obra_id, obras, regionais, allProjects]);
@@ -99,7 +103,7 @@ export function useEnsaioSondagemData() {
   }, [formData.project_id, projects]);
 
   return {
-    loading, user, obras, projects, regionais,
+    loading, obras, projects,
     editingEnsaio, setEditingEnsaio,
     formData, setFormData,
   };
