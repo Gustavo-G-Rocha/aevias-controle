@@ -92,9 +92,9 @@ describe('calcularLado', () => {
     expect(original.diferenca).toBe(0);
   });
 
-  it('cte_viga zero resulta em deflexão zero', () => {
+  it('cte_viga zero usa fallback 0.01', () => {
     const result = calcularLado(ladoBase, 'leitura_final', 3, 0);
-    expect(result.deflexao).toBe(0);
+    expect(result.deflexao).toBeCloseTo(0.02); // diferença=2, fallback cte=0.01
   });
 });
 
