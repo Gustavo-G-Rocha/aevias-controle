@@ -1,0 +1,23 @@
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { FileText } from "lucide-react";
+
+export default function EnsaioProctorHeader({ recordId }) {
+  return (
+    <div className="flex items-start justify-between">
+      <div>
+        <h1 className="text-3xl font-bold text-[#00233B]">Ensaio Proctor</h1>
+        <p className="text-[#00233B]/80 mt-1">ABNT NBR 7182:2016 - Compactação de Solos</p>
+      </div>
+      {recordId && (
+        <Button
+          variant="outline"
+          onClick={() => window.open(`/RelatorioProctor?id=${recordId}`, '_blank')}
+          className="flex items-center gap-2"
+        >
+          <FileText className="w-4 h-4" /> Ver Relatório
+        </Button>
+      )}
+    </div>
+  );
+}
