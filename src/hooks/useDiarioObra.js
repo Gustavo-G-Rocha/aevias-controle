@@ -177,7 +177,10 @@ export function useDiarioObra() {
         const accessLevel = currentUser.access_level || (currentUser.role === "admin" ? "admin" : "user");
         let availableObras = obrasData;
 
-        if (accessLevel === "user") {
+        const isLaboratorista = accessLevel === "user";
+        const isNonAdmin = accessLevel !== "admin" && currentUser.role !== "admin";
+
+        if (isNonAdmin) {
           const emailLower = currentUser.email.toLowerCase();
           const regionaisIds = regionaisData
             .filter(r => (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower))
