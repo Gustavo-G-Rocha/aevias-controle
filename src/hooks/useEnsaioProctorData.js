@@ -8,6 +8,7 @@ import { base44 } from "@/api/base44Client";
 import { User } from "@/entities/User";
 import { Obra } from "@/entities/Obra";
 import { getInitialForm, filtrarObrasProctor } from "@/utils/ensaioProctorUtils";
+import { defaultLimites } from "@/components/ensaios/EnsaioLimites";
 
 export function useEnsaioProctorData() {
   const [searchParams] = useSearchParams();
@@ -18,7 +19,7 @@ export function useEnsaioProctorData() {
   const [loading, setLoading] = useState(true);
   const [obras, setObras] = useState([]);
   const [projetos, setProjetos] = useState([]);
-  const [form, setForm] = useState(getInitialForm(obraId || ""));
+  const [form, setForm] = useState({ ...getInitialForm(obraId || ""), limites: defaultLimites() });
 
   useEffect(() => {
     const loadInitialData = async () => {

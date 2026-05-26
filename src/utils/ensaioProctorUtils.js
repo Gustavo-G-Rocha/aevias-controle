@@ -4,8 +4,6 @@
  * ABNT NBR 7182:2016 — Compactação de Solos
  */
 
-import { defaultLimites } from "@/components/ensaios/EnsaioLimites";
-
 // ── Estruturas iniciais ────────────────────────────────────────────────────────
 
 export const getUmidadePontoInicial = () => ({
@@ -85,7 +83,7 @@ export const getInitialForm = (obraId = "") => ({
   observacoes: "",
   realizar_cbr_expansao: false,
   realizar_limites: false,
-  limites: defaultLimites(),
+  limites: null,
   cbr_fator_anel: "",
   cbr_cilindros: Array(5).fill(null).map(getCBRCilindroInicial),
   expansao_cilindros: Array(5).fill(null).map(getExpansaoCilindroInicial),
