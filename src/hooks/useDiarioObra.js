@@ -176,22 +176,24 @@ export function useDiarioObra() {
 
         let availableObras = obrasData;
 
-        // Verifica se o usuário está alocado como laboratorista em alguma regional
+        // Verifica se o usuário está alocado em alguma regional (como laboratorista OU sala técnica)
         const emailLower = currentUser.email.toLowerCase();
-        const regionaisDoLaboratorista = regionaisData
-          .filter(r => (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower))
+        const regionaisDoUsuario = regionaisData
+          .filter(r =>
+            (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+            (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+          )
           .map(r => r.id);
 
-        // Se está alocado como laboratorista em alguma regional, filtra por essas regionais
-        // independente do role/access_level
-        if (regionaisDoLaboratorista.length > 0) {
-          const regionaisSet = new Set(regionaisDoLaboratorista);
+        // Se está alocado em alguma regional, filtra por essas regionais
+        if (regionaisDoUsuario.length > 0) {
+          const regionaisSet = new Set(regionaisDoUsuario);
           availableObras = obrasData.filter(o => regionaisSet.has(o.regional_id) && o.status === "em_andamento");
         } else if (currentUser.role !== "admin") {
           // Não é admin e não tem regional: não vê nenhuma obra
           availableObras = [];
         }
-        // admin sem regional alocada: vê todas (availableObras = obrasData)
+        // admin puro sem regional alocada: vê todas (availableObras = obrasData)
 
         setObras(availableObras);
 
