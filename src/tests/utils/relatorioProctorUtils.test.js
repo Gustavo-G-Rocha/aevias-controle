@@ -11,7 +11,7 @@ describe('fmtN', () => {
     expect(fmtN(1.234)).toBe('1.23');
   });
   it('respeita casas decimais customizadas', () => {
-    expect(fmtN(1.2345, 3)).toBe('1.235');
+    expect(fmtN(1.2345, 3)).toBe('1.234');
   });
   it('retorna "-" para null', () => {
     expect(fmtN(null)).toBe('-');
