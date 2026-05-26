@@ -1,458 +1,35 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Save, AlertTriangle, Loader2, Plus, Trash2, XCircle } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
 
-const getCamadaInicial = (numero) => {
-  return {
-    numero,
-    prof_de: numero === 1 ? 0 : null,
-    prof_ate: null,
-    espessura: null,
-    na: null,
-    classificacao_1: "",
-    classificacao_2: null
-  };
-};
-
-const CAMADAS_PADRAO = [1, 2, 3, 4, 5].map(getCamadaInicial);
-
-const getDensidadeInicial = () => ({
-  camada_ensaiada: "",
-  peso_frasco_antes: null, peso_frasco_depois: null,
-  peso_areia_deslocada: null, peso_areia_funil_placa: null,
-  peso_areia_cavidade: null,
-  massa_esp_aparente_areia: 1.2,
-  volume_buraco: null,
-  peso_solo_recipiente: null, peso_recipiente: null, peso_solo: null,
-  densidade_aparente_solo_umido: null,
-  peso_solo_umido: null, peso_solo_seco: null, peso_agua: null,
-  teor_umidade: null, densidade_aparente_solo_seco: null
-});
-
-const getInitialFormData = () => ({
-  obra_id: "",
-  data: new Date().toISOString().split('T')[0],
-  cliente: "",
-  pista: "",
-  bordo: "",
-  rodovia: "",
-  km: "",
-  furo: "",
-  operador: "",
-  camadas: CAMADAS_PADRAO.map(c => ({ ...c, classificacao_2: null })),
-  umidade_natural: {
-    camada_ensaiada_1: "", camada_ensaiada_2: "",
-    no_capsula_1: "", no_capsula_2: "",
-    massa_capsula_1: null, massa_capsula_2: null,
-    massa_cap_solo_umido_1: null, massa_cap_solo_umido_2: null,
-    massa_cap_solo_seco_1: null, massa_cap_solo_seco_2: null,
-    massa_agua_1: null, massa_agua_2: null,
-    massa_solo_seco_1: null, massa_solo_seco_2: null,
-    umidade_1: null, umidade_2: null
-  },
-  umidade_natural_2: null,
-  ensaio_insitu_realizado: false,
-  densidades_in_situ: [getDensidadeInicial()],
-  observacoes: "",
-  fotos: []
-});
-
-// Calcular campos de umidade natural
-const calcularUmidade = (un, lado) => {
-  const capSoloUmido = un[`massa_cap_solo_umido_${lado}`];
-  const capSoloSeco = un[`massa_cap_solo_seco_${lado}`];
-  const capsula = un[`massa_capsula_${lado}`];
-  if (capSoloUmido && capSoloSeco && capsula !== null) {
-    const agua = parseFloat((capSoloUmido - capSoloSeco).toFixed(2));
-    const soloSeco = parseFloat((capSoloSeco - capsula).toFixed(2));
-    const umidade = soloSeco > 0 ? parseFloat(((agua / soloSeco) * 100).toFixed(2)) : null;
-    return { agua, soloSeco, umidade };
-  }
-  return { agua: null, soloSeco: null, umidade: null };
-};
-
-// Calcular densidade in situ
-const calcularDensidade = (d) => {
-  const areiaDeslocada = d.peso_areia_funil_placa !== null && d.peso_frasco_antes !== null && d.peso_frasco_depois !== null
-    ? parseFloat((d.peso_frasco_antes - d.peso_frasco_depois).toFixed(2))
-    : null;
-  const areiaCavidade = areiaDeslocada !== null && d.peso_areia_funil_placa !== null
-    ? parseFloat((areiaDeslocada - d.peso_areia_funil_placa).toFixed(2))
-    : null;
-  const volumeBuraco = areiaCavidade !== null && d.massa_esp_aparente_areia
-    ? parseFloat((areiaCavidade / d.massa_esp_aparente_areia).toFixed(3))
-    : null;
-  const pesoSolo = d.peso_solo_recipiente !== null && d.peso_recipiente !== null
-    ? parseFloat((d.peso_solo_recipiente - d.peso_recipiente).toFixed(2))
-    : null;
-  const densidadeUmida = pesoSolo !== null && volumeBuraco
-    ? parseFloat((pesoSolo / volumeBuraco).toFixed(3))
-    : null;
-  const pesoAgua = d.peso_solo_umido !== null && d.peso_solo_seco !== null
-    ? parseFloat((d.peso_solo_umido - d.peso_solo_seco).toFixed(2))
-    : null;
-  const teorUmidade = pesoAgua !== null && d.peso_solo_seco
-    ? parseFloat(((pesoAgua / d.peso_solo_seco) * 100).toFixed(2))
-    : null;
-  const densidadeSeca = densidadeUmida !== null && teorUmidade !== null
-    ? parseFloat((densidadeUmida / (1 + teorUmidade / 100)).toFixed(3))
-    : null;
-
-  return {
-    peso_areia_deslocada: areiaDeslocada,
-    peso_areia_cavidade: areiaCavidade,
-    volume_buraco: volumeBuraco,
-    peso_solo: pesoSolo,
-    densidade_aparente_solo_umido: densidadeUmida,
-    peso_agua: pesoAgua,
-    teor_umidade: teorUmidade,
-    densidade_aparente_solo_seco: densidadeSeca
-  };
-};
+import { useBoletimSondagemData } from "@/hooks/useBoletimSondagemData";
+import { useBoletimSondagemForm } from "@/hooks/useBoletimSondagemForm";
+import { useBoletimSondagemActions } from "@/hooks/useBoletimSondagemActions";
+import { getDensidadeInicial, calcularUmidadeMedia } from "@/utils/boletimSondagemUtils";
 
 export default function BoletimSondagemPage() {
-  const [formData, setFormData] = useState(getInitialFormData());
-  const [obras, setObras] = useState([]);
-  const [regionais, setRegionais] = useState([]);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const [editingBoletim, setEditingBoletim] = useState(null);
+  const { formData, setFormData, obras, regionais, user, loading, editingBoletim } = useBoletimSondagemData();
+  const {
+    handleObraChange, handleCamadaChange,
+    adicionarCamada, removerCamada,
+    adicionarCamada2, removerCamada2,
+    handleUmidadeChange, handleDensidadeChange,
+    adicionarDensidade, removerDensidade,
+    handlePhotoUpload, handleRemovePhoto,
+  } = useBoletimSondagemForm(setFormData);
+  const { saving, handleSubmit } = useBoletimSondagemActions({ formData, user, editingBoletim });
 
-  const location = useLocation();
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const navigate = useNavigate();
 
   const isApproved = editingBoletim?.approved === true;
   const isEditable = !isApproved;
-
-  const loadInitialData = async () => {
-    setLoading(true);
-    try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
-
-      const [obrasData, regionaisData] = await Promise.all([
-        base44.entities.Obra.list(),
-        base44.entities.Regional.list()
-      ]);
-
-      const accessLevel = currentUser.access_level || (currentUser.role === 'admin' ? 'admin' : 'user');
-      let availableObras = obrasData;
-
-      if (accessLevel === 'user') {
-        const regional = regionaisData.find(r =>
-          (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === currentUser.email.toLowerCase())
-        );
-        availableObras = regional
-          ? obrasData.filter(o => o.regional_id === regional.id && o.status === 'em_andamento' && o.tipo_obra === 'sondagem')
-          : [];
-      } else {
-        availableObras = obrasData.filter(o => o.tipo_obra === 'sondagem');
-      }
-
-      setObras(availableObras);
-      setRegionais(regionaisData);
-
-      const params = new URLSearchParams(location.search);
-      const editId = params.get('editId');
-
-      if (editId) {
-        const boletimToEdit = await base44.entities.BoletimSondagem.get(editId);
-        if (currentUser.role === 'admin' || (boletimToEdit.created_by === currentUser.email && boletimToEdit.approved !== true)) {
-          setEditingBoletim(boletimToEdit);
-          const initial = getInitialFormData();
-          // Compatibilidade retroativa: migrar campo antigo densidade_in_situ para array
-          let densidades;
-          if (boletimToEdit.densidades_in_situ?.length > 0) {
-            densidades = boletimToEdit.densidades_in_situ;
-          } else if (boletimToEdit.densidade_in_situ) {
-            densidades = [{ ...getDensidadeInicial(), ...boletimToEdit.densidade_in_situ }];
-          } else {
-            densidades = [getDensidadeInicial()];
-          }
-          setFormData({
-            ...initial,
-            ...boletimToEdit,
-            data: boletimToEdit.data ? new Date(boletimToEdit.data).toISOString().split('T')[0] : initial.data,
-            camadas: boletimToEdit.camadas?.length > 0 ? boletimToEdit.camadas : initial.camadas,
-            umidade_natural: { ...initial.umidade_natural, ...(boletimToEdit.umidade_natural || {}) },
-            densidades_in_situ: densidades,
-            ensaio_insitu_realizado: boletimToEdit.ensaio_insitu_realizado ?? false,
-            fotos: Array.isArray(boletimToEdit.fotos) ? boletimToEdit.fotos : []
-          });
-        } else {
-          alert("Você não tem permissão para editar este registro.");
-          navigate(createPageUrl('MeusEnsaios'));
-        }
-      } else {
-        setFormData(prev => ({
-          ...prev,
-          operador: currentUser.laboratorista_name || currentUser.full_name,
-          obra_id: availableObras.length > 0 ? availableObras[0].id : ""
-        }));
-
-        // Preencher cliente da regional
-        if (availableObras.length > 0) {
-          const obraId = availableObras[0].id;
-          const obra = availableObras.find(o => o.id === obraId);
-          const regional = obra ? regionaisData.find(r => r.id === obra.regional_id) : null;
-          if (regional?.cliente) {
-            setFormData(prev => ({ ...prev, cliente: regional.cliente }));
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Erro ao carregar dados:", error);
-      alert("Erro ao carregar dados.");
-      navigate(createPageUrl('MeusEnsaios'));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { loadInitialData(); }, []);
-
-  const handleObraChange = useCallback((obraId) => {
-    const obra = obras.find(o => o.id === obraId);
-    const regional = obra ? regionais.find(r => r.id === obra.regional_id) : null;
-    setFormData(prev => ({
-      ...prev,
-      obra_id: obraId,
-      rodovia: "",
-      cliente: regional?.cliente || prev.cliente
-    }));
-  }, [obras, regionais]);
-
-  const handleCamadaChange = useCallback((index, field, value) => {
-    setFormData(prev => {
-      const newCamadas = prev.camadas.map(c => ({ ...c }));
-      newCamadas[index] = { ...newCamadas[index], [field]: value };
-
-      // Recalcular espessura quando DE da primeira linha é editado
-      if (field === 'prof_de' && index === 0) {
-        const { prof_de, prof_ate } = newCamadas[0];
-        if (prof_de !== null && prof_ate !== null) {
-          newCamadas[0].espessura = parseFloat((prof_ate - prof_de).toFixed(2));
-        } else {
-          newCamadas[0].espessura = null;
-        }
-      }
-
-      // Recalcular espessura da camada atual (classificação 1)
-      if (field === 'prof_ate') {
-        const { prof_de, prof_ate } = newCamadas[index];
-        if (prof_de !== null && prof_ate !== null) {
-          newCamadas[index].espessura = parseFloat((prof_ate - prof_de).toFixed(2));
-        } else {
-          newCamadas[index].espessura = null;
-        }
-        // Propagar: o "DE" da próxima linha = "ATÉ" da atual
-        if (index + 1 < newCamadas.length) {
-          newCamadas[index + 1].prof_de = prof_ate;
-          // Recalcular espessura da próxima se tiver ATÉ
-          const nextAte = newCamadas[index + 1].prof_ate;
-          if (prof_ate !== null && nextAte !== null) {
-            newCamadas[index + 1].espessura = parseFloat((nextAte - prof_ate).toFixed(2));
-          } else {
-            newCamadas[index + 1].espessura = null;
-          }
-        }
-      }
-
-      // Recalcular espessura para classificação 2
-      if (field === 'prof_ate_2') {
-        const { prof_de_2, prof_ate_2 } = newCamadas[index];
-        if (prof_de_2 !== null && prof_ate_2 !== null) {
-          newCamadas[index].espessura_2 = parseFloat((prof_ate_2 - prof_de_2).toFixed(2));
-        } else {
-          newCamadas[index].espessura_2 = null;
-        }
-        // Propagar: o "DE_2" da próxima linha = "ATÉ_2" da atual
-        if (index + 1 < newCamadas.length) {
-          newCamadas[index + 1].prof_de_2 = prof_ate_2;
-          // Recalcular espessura da próxima se tiver ATÉ_2
-          const nextAte2 = newCamadas[index + 1].prof_ate_2;
-          if (prof_ate_2 !== null && nextAte2 !== null) {
-            newCamadas[index + 1].espessura_2 = parseFloat((nextAte2 - prof_ate_2).toFixed(2));
-          } else {
-            newCamadas[index + 1].espessura_2 = null;
-          }
-        }
-      }
-
-      if (field === 'prof_de_2') {
-        const { prof_de_2, prof_ate_2 } = newCamadas[index];
-        if (prof_de_2 !== null && prof_ate_2 !== null) {
-          newCamadas[index].espessura_2 = parseFloat((prof_ate_2 - prof_de_2).toFixed(2));
-        } else {
-          newCamadas[index].espessura_2 = null;
-        }
-      }
-
-      return { ...prev, camadas: newCamadas };
-    });
-  }, []);
-
-  const adicionarCamada = useCallback(() => {
-    setFormData(prev => {
-      if (prev.camadas.length >= 15) return prev;
-      const ultima = prev.camadas[prev.camadas.length - 1];
-      const novaDe = ultima?.prof_ate ?? null;
-      const novaCamada = { ...getCamadaInicial(prev.camadas.length + 1), prof_de: novaDe };
-      return { ...prev, camadas: [...prev.camadas, novaCamada] };
-    });
-  }, []);
-
-  const removerCamada = useCallback((index) => {
-    setFormData(prev => {
-      if (prev.camadas.length <= 1) return prev;
-      const newCamadas = prev.camadas.filter((_, i) => i !== index).map((c, i) => ({ ...c, numero: i + 1 }));
-      // Recalcular propagação a partir do index removido
-      for (let i = index; i < newCamadas.length; i++) {
-        if (i === 0) {
-          newCamadas[0].prof_de = 0;
-        } else {
-          newCamadas[i].prof_de = newCamadas[i - 1].prof_ate ?? null;
-        }
-        const { prof_de, prof_ate } = newCamadas[i];
-        newCamadas[i].espessura = prof_de !== null && prof_ate !== null ? parseFloat((prof_ate - prof_de).toFixed(2)) : null;
-      }
-      return { ...prev, camadas: newCamadas };
-    });
-  }, []);
-
-  const adicionarCamada2 = useCallback(() => {
-    setFormData(prev => {
-      if (!prev.camadas_2) prev.camadas_2 = [];
-      if (prev.camadas_2.length >= 15) return prev;
-      const ultima = prev.camadas_2[prev.camadas_2.length - 1];
-      const novaDe = ultima?.prof_ate ?? null;
-      const novaCamada = { numero: prev.camadas_2.length + 1, prof_de: novaDe, prof_ate: null, espessura: null, na: null, classificacao_2: "" };
-      return { ...prev, camadas_2: [...(prev.camadas_2 || []), novaCamada] };
-    });
-  }, []);
-
-  const removerCamada2 = useCallback((index) => {
-    setFormData(prev => {
-      if (!prev.camadas_2 || prev.camadas_2.length <= 1) return prev;
-      const newCamadas = prev.camadas_2.filter((_, i) => i !== index).map((c, i) => ({ ...c, numero: i + 1 }));
-      // Recalcular propagação
-      for (let i = index; i < newCamadas.length; i++) {
-        if (i === 0) {
-          newCamadas[0].prof_de = 0;
-        } else {
-          newCamadas[i].prof_de = newCamadas[i - 1].prof_ate ?? null;
-        }
-        const { prof_de, prof_ate } = newCamadas[i];
-        newCamadas[i].espessura = prof_de !== null && prof_ate !== null ? parseFloat((prof_ate - prof_de).toFixed(2)) : null;
-      }
-      return { ...prev, camadas_2: newCamadas };
-    });
-  }, []);
-
-  const handleUmidadeChange = useCallback((field, value) => {
-    setFormData(prev => {
-      const un = { ...prev.umidade_natural, [field]: value };
-      // Recalcular para ambos os lados
-      for (const lado of [1, 2]) {
-        const { agua, soloSeco, umidade } = calcularUmidade(un, lado);
-        un[`massa_agua_${lado}`] = agua;
-        un[`massa_solo_seco_${lado}`] = soloSeco;
-        un[`umidade_${lado}`] = umidade;
-      }
-      return { ...prev, umidade_natural: un };
-    });
-  }, []);
-
-  const handleDensidadeChange = useCallback((idx, field, value) => {
-    setFormData(prev => {
-      const arr = [...(prev.densidades_in_situ || [getDensidadeInicial()])];
-      const d = { ...arr[idx], [field]: value };
-      const calc = calcularDensidade(d);
-      arr[idx] = { ...d, ...calc };
-      return { ...prev, densidades_in_situ: arr };
-    });
-  }, []);
-
-  const adicionarDensidade = useCallback(() => {
-    setFormData(prev => {
-      if ((prev.densidades_in_situ || []).length >= 3) return prev;
-      return { ...prev, densidades_in_situ: [...(prev.densidades_in_situ || []), getDensidadeInicial()] };
-    });
-  }, []);
-
-  const removerDensidade = useCallback((idx) => {
-    setFormData(prev => {
-      const arr = (prev.densidades_in_situ || []).filter((_, i) => i !== idx);
-      return { ...prev, densidades_in_situ: arr.length > 0 ? arr : [getDensidadeInicial()] };
-    });
-  }, []);
-
-  const handlePhotoUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length === 0) return;
-    setUploadingPhoto(true);
-    try {
-      const urls = [];
-      for (const file of files) {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
-        urls.push(file_url);
-      }
-      setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...urls] }));
-      e.target.value = '';
-    } catch (error) {
-      alert("Erro ao fazer upload da foto.");
-    } finally {
-      setUploadingPhoto(false);
-    }
-  };
-
-  const handleRemovePhoto = useCallback((index) => {
-    setFormData(prev => ({ ...prev, fotos: prev.fotos.filter((_, i) => i !== index) }));
-  }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.obra_id || !formData.data) {
-      alert("Preencha todos os campos obrigatórios (Obra, Data).");
-      return;
-    }
-    setSaving(true);
-    try {
-      const dataToSave = {
-        ...formData,
-        laboratorista_name: user?.laboratorista_name || user?.full_name
-      };
-      if (editingBoletim) {
-        const updateData = { ...dataToSave };
-        if (editingBoletim.approved === false) {
-          updateData.approved = null;
-          updateData.rejection_reason = null;
-          updateData.approved_by = null;
-          updateData.approved_date = null;
-        }
-        await base44.entities.BoletimSondagem.update(editingBoletim.id, updateData);
-        alert("Boletim atualizado com sucesso!");
-      } else {
-        await base44.entities.BoletimSondagem.create(dataToSave);
-        alert("Boletim criado com sucesso!");
-      }
-      navigate(createPageUrl('MeusEnsaios'));
-    } catch (error) {
-      console.error("Erro ao salvar boletim:", error);
-      alert("Erro ao salvar boletim: " + error.message);
-    } finally {
-      setSaving(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -521,7 +98,7 @@ export default function BoletimSondagemPage() {
                       <Label>Obra *</Label>
                       <select
                         value={formData.obra_id}
-                        onChange={(e) => handleObraChange(e.target.value)}
+                        onChange={(e) => handleObraChange(e.target.value, obras, regionais)}
                         disabled={!isEditable || !!editingBoletim}
                         required
                         className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
@@ -581,12 +158,13 @@ export default function BoletimSondagemPage() {
               {/* SONDAGEM - CAMADAS */}
               {(() => {
                 const temColuna2 = formData.camadas.some(c => c.classificacao_2 !== null);
-                function addColuna2() {
+                const addColuna2 = () => {
                   setFormData(prev => ({
                     ...prev,
                     camadas: prev.camadas.map(c => ({ ...c, classificacao_2: c.classificacao_2 ?? "" })),
+                    camadas_2: [],
                   }));
-                }
+                };
                 const removeColuna2 = () => setFormData(prev => ({
                   ...prev,
                   camadas: prev.camadas.map(c => ({ ...c, classificacao_2: null })),
@@ -599,12 +177,9 @@ export default function BoletimSondagemPage() {
                         {isEditable && (
                           <div className="flex gap-2">
                             {!temColuna2 && (
-                            <Button type="button" onClick={() => {
-                            addColuna2();
-                            setFormData(prev => ({ ...prev, camadas_2: [] }));
-                            }} size="sm" variant="outline" className="border-[#00233B]/30 text-[#00233B] hover:bg-[#00233B]/10 text-xs">
-                            <Plus className="w-3.5 h-3.5 mr-1" /> 2ª Classificação
-                            </Button>
+                              <Button type="button" onClick={addColuna2} size="sm" variant="outline" className="border-[#00233B]/30 text-[#00233B] hover:bg-[#00233B]/10 text-xs">
+                                <Plus className="w-3.5 h-3.5 mr-1" /> 2ª Classificação
+                              </Button>
                             )}
                             {temColuna2 && (
                               <Button type="button" onClick={removeColuna2} size="sm" variant="outline" className="border-red-300 text-red-600 hover:bg-red-50 text-xs">
@@ -835,7 +410,7 @@ export default function BoletimSondagemPage() {
                             massa_cap_solo_seco_1: null, massa_cap_solo_seco_2: null,
                             massa_agua_1: null, massa_agua_2: null,
                             massa_solo_seco_1: null, massa_solo_seco_2: null,
-                            umidade_1: null, umidade_2: null
+                            umidade_1: null, umidade_2: null,
                           }
                         }))}
                       >
@@ -855,14 +430,12 @@ export default function BoletimSondagemPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {/* Camada ensaiada - campo único (colspan 2) */}
                         <tr className="bg-white/30">
                           <td className="border border-[#00233B]/20 px-3 py-1.5 font-medium text-[#00233B]/80">Camada ensaiada</td>
                           <td className="border border-[#00233B]/20 px-2 py-1" colSpan={2}>
                             <Input value={formData.umidade_natural.camada_ensaiada_1 || ''} onChange={e => handleUmidadeChange('camada_ensaiada_1', e.target.value)} disabled={!isEditable} className="h-8 text-sm" placeholder="Ex.: 0,00 - 0,60m" />
                           </td>
                         </tr>
-                        {/* Nº cápsula e demais campos individuais */}
                         {[
                           { label: "Nº cápsula", fields: ['no_capsula_1', 'no_capsula_2'], type: 'text' },
                           { label: "Massa cápsula (g)", fields: ['massa_capsula_1', 'massa_capsula_2'], type: 'number' },
@@ -881,7 +454,6 @@ export default function BoletimSondagemPage() {
                             ))}
                           </tr>
                         ))}
-                        {/* Campos calculados */}
                         {[
                           { label: "Massa da água (g)", keys: ['massa_agua_1', 'massa_agua_2'] },
                           { label: "Massa do solo seco (g)", keys: ['massa_solo_seco_1', 'massa_solo_seco_2'] },
@@ -895,19 +467,12 @@ export default function BoletimSondagemPage() {
                             ))}
                           </tr>
                         ))}
-                        {/* Umidade média (colspan 2) */}
                         <tr className="bg-[#BFCF99]/30">
                           <td className="border border-[#00233B]/20 px-3 py-2 font-bold text-[#00233B]">Umidade (%)</td>
                           <td className="border border-[#00233B]/20 px-3 py-2 text-center font-bold text-[#00233B] text-base" colSpan={2}>
                             {(() => {
-                              const u1 = formData.umidade_natural.umidade_1;
-                              const u2 = formData.umidade_natural.umidade_2;
-                              if (u1 !== null && u1 !== undefined && u2 !== null && u2 !== undefined) {
-                                return `${((u1 + u2) / 2).toFixed(2)} %`;
-                              } else if (u1 !== null && u1 !== undefined) {
-                                return `${u1.toFixed(2)} %`;
-                              }
-                              return '—';
+                              const media = calcularUmidadeMedia(formData.umidade_natural.umidade_1, formData.umidade_natural.umidade_2);
+                              return media !== null ? `${media} %` : '—';
                             })()}
                           </td>
                         </tr>
@@ -947,14 +512,12 @@ export default function BoletimSondagemPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {/* Camada ensaiada - campo único (colspan 2) */}
                           <tr className="bg-white/30">
                             <td className="border border-[#00233B]/20 px-3 py-1.5 font-medium text-[#00233B]/80">Camada ensaiada</td>
                             <td className="border border-[#00233B]/20 px-2 py-1" colSpan={2}>
                               <Input value={formData.umidade_natural_2.camada_ensaiada_1 || ''} onChange={e => setFormData(prev => ({ ...prev, umidade_natural_2: { ...prev.umidade_natural_2, camada_ensaiada_1: e.target.value } }))} disabled={!isEditable} className="h-8 text-sm" placeholder="Ex.: 0,00 - 0,60m" />
                             </td>
                           </tr>
-                          {/* Nº cápsula e demais campos individuais */}
                           {[
                             { label: "Nº cápsula", fields: ['no_capsula_1', 'no_capsula_2'], type: 'text' },
                             { label: "Massa cápsula (g)", fields: ['massa_capsula_1', 'massa_capsula_2'], type: 'number' },
@@ -973,7 +536,6 @@ export default function BoletimSondagemPage() {
                               ))}
                             </tr>
                           ))}
-                          {/* Campos calculados */}
                           {[
                             { label: "Massa da água (g)", keys: ['massa_agua_1', 'massa_agua_2'] },
                             { label: "Massa do solo seco (g)", keys: ['massa_solo_seco_1', 'massa_solo_seco_2'] },
@@ -987,9 +549,7 @@ export default function BoletimSondagemPage() {
                                   const capSoloSeco = un2[`massa_cap_solo_seco_${ki + 1}`];
                                   const capsula = un2[`massa_capsula_${ki + 1}`];
                                   if (capSoloUmido && capSoloSeco && capsula !== null) {
-                                    const agua = capSoloUmido - capSoloSeco;
-                                    const soloSeco = capSoloSeco - capsula;
-                                    return { agua: parseFloat(agua.toFixed(2)), soloSeco: parseFloat(soloSeco.toFixed(2)) };
+                                    return { agua: parseFloat((capSoloUmido - capSoloSeco).toFixed(2)), soloSeco: parseFloat((capSoloSeco - capsula).toFixed(2)) };
                                   }
                                   return { agua: null, soloSeco: null };
                                 })();
@@ -1001,7 +561,6 @@ export default function BoletimSondagemPage() {
                               })}
                             </tr>
                           ))}
-                          {/* Umidade média (colspan 2) */}
                           <tr className="bg-[#BFCF99]/30">
                             <td className="border border-[#00233B]/20 px-3 py-2 font-bold text-[#00233B]">Umidade (%)</td>
                             <td className="border border-[#00233B]/20 px-3 py-2 text-center font-bold text-[#00233B] text-base" colSpan={2}>
@@ -1017,10 +576,8 @@ export default function BoletimSondagemPage() {
                                   }
                                   return null;
                                 };
-                                const u1 = calcU(1), u2 = calcU(2);
-                                if (u1 !== null && u2 !== null) return `${((u1 + u2) / 2).toFixed(2)} %`;
-                                if (u1 !== null) return `${u1.toFixed(2)} %`;
-                                return '—';
+                                const media = calcularUmidadeMedia(calcU(1), calcU(2));
+                                return media !== null ? `${media} %` : '—';
                               })()}
                             </td>
                           </tr>
@@ -1076,21 +633,21 @@ export default function BoletimSondagemPage() {
                           { label: "Peso do frasco antes (gf)", field: "peso_frasco_antes", type: "number", step: "0.001" },
                           { label: "Peso do frasco depois (gf)", field: "peso_frasco_depois", type: "number", step: "0.001" },
                           { label: "Peso da areia no funil e placa (gf)", field: "peso_areia_funil_placa", type: "number", step: "0.001" },
-                          { label: "Massa esp. aparente da areia (g/dm\u00b3)", field: "massa_esp_aparente_areia", type: "number", step: "0.001" },
+                          { label: "Massa esp. aparente da areia (g/dm³)", field: "massa_esp_aparente_areia", type: "number", step: "0.001" },
                           { label: "Peso da areia deslocada (gf)", field: "peso_areia_deslocada", type: "calc", dec: 2 },
                           { label: "Peso da areia na cavidade (gf)", field: "peso_areia_cavidade", type: "calc", dec: 2 },
-                          { label: "Volume do buraco (dm\u00b3)", field: "volume_buraco", type: "calc", dec: 3 },
+                          { label: "Volume do buraco (dm³)", field: "volume_buraco", type: "calc", dec: 3 },
                           { label: "— MASSA —", section: true },
                           { label: "Peso do solo e recipiente (gf)", field: "peso_solo_recipiente", type: "number" },
                           { label: "Peso do recipiente (gf)", field: "peso_recipiente", type: "number" },
                           { label: "Peso do solo (gf)", field: "peso_solo", type: "calc", dec: 2 },
                           { label: "— UMIDADE —", section: true },
-                          { label: "Peso do solo \u00famido (gf)", field: "peso_solo_umido", type: "number" },
+                          { label: "Peso do solo úmido (gf)", field: "peso_solo_umido", type: "number" },
                           { label: "Peso do solo seco (gf)", field: "peso_solo_seco", type: "number" },
                           { label: "Teor de umidade (%)", field: "teor_umidade", type: "calc", dec: 2 },
                           { label: "— RESULTADOS —", section: true },
-                          { label: "Dens. Aparente Solo \u00damido (g/dm\u00b3)", field: "densidade_aparente_solo_umido", type: "result", dec: 3 },
-                          { label: "Dens. Aparente Solo Seco (g/dm\u00b3)", field: "densidade_aparente_solo_seco", type: "result", dec: 3 },
+                          { label: "Dens. Aparente Solo Úmido (g/dm³)", field: "densidade_aparente_solo_umido", type: "result", dec: 3 },
+                          { label: "Dens. Aparente Solo Seco (g/dm³)", field: "densidade_aparente_solo_seco", type: "result", dec: 3 },
                         ];
                         return (
                           <table className="w-full text-sm border-collapse">
@@ -1117,7 +674,7 @@ export default function BoletimSondagemPage() {
                                   return (
                                     <tr key={ri} className="bg-[#00233B]/10">
                                       <td colSpan={nEnsaios + 1} className="border border-[#00233B]/20 px-3 py-1 text-xs font-bold text-[#00233B]/60 uppercase tracking-wider">
-                                        {row.label.replace(/\u2014/g, '').trim()}
+                                        {row.label.replace(/—/g, '').trim()}
                                       </td>
                                     </tr>
                                   );
@@ -1169,7 +726,7 @@ export default function BoletimSondagemPage() {
                 <Label>Registro Fotográfico</Label>
                 {isEditable && (
                   <div className="mt-2">
-                    <input id="fotos-upload" type="file" multiple accept="image/*" onChange={handlePhotoUpload} disabled={uploadingPhoto} className="hidden" />
+                    <input id="fotos-upload" type="file" multiple accept="image/*" onChange={e => handlePhotoUpload(e, setUploadingPhoto)} disabled={uploadingPhoto} className="hidden" />
                     <label htmlFor="fotos-upload" className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-[#00233B]/20 bg-white/30 rounded-md text-sm cursor-pointer hover:bg-white/50 ${uploadingPhoto ? 'opacity-50 cursor-not-allowed' : ''}`}>
                       <span className="text-[#00233B]/60">{uploadingPhoto ? 'Enviando...' : 'Selecionar fotos'}</span>
                       <span className="px-3 py-1 rounded-md text-sm font-semibold bg-[#00233B]/10 text-[#00233B] hover:bg-[#00233B]/20">
