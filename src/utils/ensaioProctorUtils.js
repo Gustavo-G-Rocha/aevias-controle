@@ -279,7 +279,6 @@ export const REQUIRED_FIELDS = [
   { field: 'rodovia',      label: 'Rodovia' },
   { field: 'trecho',       label: 'Trecho' },
   { field: 'local_coleta', label: 'Local de Coleta' },
-  { field: 'data_ensaio',  label: 'Data do Ensaio' },
   { field: 'camada',       label: 'Camada' },
   { field: 'material',     label: 'Material' },
   { field: 'procedencia',  label: 'Procedência' },
