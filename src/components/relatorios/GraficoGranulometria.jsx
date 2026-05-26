@@ -2,15 +2,19 @@ import React from 'react';
 import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line, Area } from 'recharts';
 
 const PENEIRAS_INFO = [
-    { nome: '25 mm', abertura: 25.0, key: 'peneira_25mm' },
-    { nome: '19 mm', abertura: 19.0, key: 'peneira_19mm' },
+    { nome: '25 mm', abertura: 25.0, key: 'peneira_25_0mm' },
+    { nome: '19 mm', abertura: 19.0, key: 'peneira_19_0mm' },
     { nome: '12.5 mm', abertura: 12.5, key: 'peneira_12_5mm' },
     { nome: '9.5 mm', abertura: 9.5, key: 'peneira_9_5mm' },
-    { nome: '4.8 mm', abertura: 4.8, key: 'peneira_4_8mm' },
-    { nome: '2.4 mm', abertura: 2.4, key: 'peneira_2_4mm' },
-    { nome: '1.2 mm', abertura: 1.2, key: 'peneira_1_2mm' },
+    { nome: '6.3 mm', abertura: 6.3, key: 'peneira_6_3mm' },
+    { nome: '4.75 mm', abertura: 4.75, key: 'peneira_4_75mm' },
+    { nome: '2.36 mm', abertura: 2.36, key: 'peneira_2_36mm' },
+    { nome: '2.0 mm', abertura: 2.0, key: 'peneira_2_0mm' },
+    { nome: '1.18 mm', abertura: 1.18, key: 'peneira_1_18mm' },
     { nome: '0.6 mm', abertura: 0.6, key: 'peneira_0_6mm' },
+    { nome: '0.42 mm', abertura: 0.42, key: 'peneira_0_42mm' },
     { nome: '0.3 mm', abertura: 0.3, key: 'peneira_0_3mm' },
+    { nome: '0.18 mm', abertura: 0.18, key: 'peneira_0_18mm' },
     { nome: '0.15 mm', abertura: 0.15, key: 'peneira_0_15mm' },
     { nome: '0.075 mm', abertura: 0.075, key: 'peneira_0_075mm' },
 ];
@@ -61,7 +65,7 @@ export default function GraficoGranulometria({ project, faixas, granulometriaEns
                         scale="log" 
                         domain={[0.075, 30]} 
                         reversed={true}
-                        ticks={[0.075, 0.15, 0.3, 0.6, 1.2, 2.4, 4.8, 9.5, 19, 25]}
+                        ticks={[0.075, 0.15, 0.3, 0.6, 1.18, 2.36, 4.75, 6.3, 9.5, 12.5, 19, 25]}
                         tickFormatter={(tick) => `${tick} mm`}
                         label={{ value: "Abertura da Peneira (mm) - Escala Logarítmica", position: "insideBottom", dy: 20 }}
                     />

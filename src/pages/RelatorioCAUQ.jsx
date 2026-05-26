@@ -16,6 +16,7 @@ const PENEIRAS_CONFIG = [
   { label: 'Nº ⅝"', abertura: '16,0', key: 'peneira_16_0mm' },
   { label: 'Nº ½"', abertura: '12,5', key: 'peneira_12_5mm' },
   { label: 'Nº ⅜"', abertura: '9,5', key: 'peneira_9_5mm' },
+  { label: '1/4"', abertura: '6,3', key: 'peneira_6_3mm' },
   { label: 'Nº 4', abertura: '4,75', key: 'peneira_4_75mm' },
   { label: 'Nº 8', abertura: '2,36', key: 'peneira_2_36mm' },
   { label: 'Nº 10', abertura: '2,0', key: 'peneira_2_0mm' },
