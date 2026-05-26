@@ -174,22 +174,25 @@ export function useDiarioObra() {
         const [obrasData, regionaisData] = await Promise.all([Obra.list(), Regional.list()]);
         setRegionais(regionaisData);
 
-        const accessLevel = currentUser.access_level || (currentUser.role === "admin" ? "admin" : "user");
         let availableObras = obrasData;
 
-        const isLaboratorista = accessLevel === "user";
-        const isNonAdmin = accessLevel !== "admin" && currentUser.role !== "admin";
+        // Verifica se o usuário está alocado como laboratorista em alguma regional
+        const emailLower = currentUser.email.toLowerCase();
+        const regionaisDoLaboratorista = regionaisData
+          .filter(r => (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower))
+          .map(r => r.id);
 
-        if (isNonAdmin) {
-          const emailLower = currentUser.email.toLowerCase();
-          const regionaisIds = regionaisData
-            .filter(r => (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower))
-            .map(r => r.id);
-          const regionaisSet = new Set(regionaisIds);
-          availableObras = regionaisIds.length > 0
-            ? obrasData.filter(o => regionaisSet.has(o.regional_id) && o.status === "em_andamento")
-            : [];
+        // Se está alocado como laboratorista em alguma regional, filtra por essas regionais
+        // independente do role/access_level
+        if (regionaisDoLaboratorista.length > 0) {
+          const regionaisSet = new Set(regionaisDoLaboratorista);
+          availableObras = obrasData.filter(o => regionaisSet.has(o.regional_id) && o.status === "em_andamento");
+        } else if (currentUser.role !== "admin") {
+          // Não é admin e não tem regional: não vê nenhuma obra
+          availableObras = [];
         }
+        // admin sem regional alocada: vê todas (availableObras = obrasData)
+
         setObras(availableObras);
 
         const params = new URLSearchParams(location.search);
