@@ -1,16 +1,8 @@
 import React from 'react';
 import SignatureFooter from './SignatureFooter';
+import { ReportCheckmark, ReportSectionTitle, ReportNaoConformidadesTable } from './shared';
 
-const Checkmark = ({ checked }) => {
-  if (checked === null || typeof checked === 'undefined') {
-    return <span className="text-slate-500">-</span>;
-  }
-  return (
-    <span className={`font-bold ${checked ? 'text-green-600' : 'text-red-600'}`}>
-      {checked ? '✓' : '✗'}
-    </span>
-  );
-};
+const Checkmark = ({ checked }) => <ReportCheckmark checked={checked} />;
 
 const CheckmarkColumn = ({ value, isYesColumn }) => {
   if (value === null || typeof value === 'undefined') {
@@ -28,9 +20,7 @@ const CheckmarkColumn = ({ value, isYesColumn }) => {
   return null;
 };
 
-const SectionTitle = ({ children }) => (
-  <h2 className="text-sm print:text-xs font-bold text-center bg-slate-100 p-0.5 my-0.5 uppercase tracking-wider">{children}</h2>
-);
+const SectionTitle = ({ children }) => <ReportSectionTitle>{children}</ReportSectionTitle>;
 
 const ReportPrintHeader = ({ checklist, obra, regional }) => (
   <div>
@@ -274,14 +264,7 @@ export default function RelatorioChecklistAplicacao({ checklist, obra, regional,
 
   const photoChunks = chunkArray(compressedPhotos, 6);
 
-  const formatDateBrasilia = (dateString) => {
-    if (!dateString) return 'N/A';
-    let normalizedDate = dateString;
-    if (!dateString.endsWith('Z') && !dateString.includes('+') && !dateString.includes('-', 10)) {
-      normalizedDate = dateString + 'Z';
-    }
-    return new Date(normalizedDate).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'medium' });
-  };
+  // formatDateBrasilia está centralizado em relatorioUtils — não é mais usado diretamente aqui
 
   const temAcoesCorretivas = checklist.acoes_corretivas_realizado === true && checklist.acoes_corretivas_descricao;
   const totalPages = 1 + (temAcoesCorretivas ? 1 : 0) + photoChunks.length + compressedMedicoes.length;
@@ -589,24 +572,7 @@ export default function RelatorioChecklistAplicacao({ checklist, obra, regional,
               {checklist.nao_conformidades && checklist.nao_conformidades.length > 0 && (
                 <div className="mt-4">
                   <SectionTitle>Não Conformidades</SectionTitle>
-                  <table className="w-full border-collapse border border-slate-300 text-sm">
-                    <thead>
-                      <tr className="bg-slate-100">
-                        <th className="border border-slate-300 px-3 py-2 text-left font-semibold text-slate-700">LOCAL</th>
-                        <th className="border border-slate-300 px-3 py-2 text-left font-semibold text-slate-700">CATEGORIA</th>
-                        <th className="border border-slate-300 px-3 py-2 text-left font-semibold text-slate-700">PARÂMETRO</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {checklist.nao_conformidades.map((nc, index) => (
-                        <tr key={index} className="bg-white">
-                          <td className="border border-slate-300 px-3 py-2 text-slate-800">{nc.local_nc || 'N/A'}</td>
-                          <td className="border border-slate-300 px-3 py-2 text-slate-800">{nc.categoria_nc || 'N/A'}</td>
-                          <td className="border border-slate-300 px-3 py-2 text-slate-800">{nc.parametro_nc || 'N/A'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <ReportNaoConformidadesTable naoConformidades={checklist.nao_conformidades} />
                 </div>
               )}
             </main>

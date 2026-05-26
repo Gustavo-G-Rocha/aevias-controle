@@ -1,24 +1,11 @@
 import React from 'react';
 import SignatureFooter from './SignatureFooter';
+import { ReportCheckmark, ReportSectionTitle } from './shared';
 
-const Checkmark = ({ checked }) => {
-  if (checked === true) {
-    return <span className="font-bold text-sm text-green-600">✓</span>;
-  }
-  return <span className="text-slate-500 text-sm">-</span>;
-};
-
-const XMark = ({ checked }) => {
-  if (checked === false) {
-    return <span className="font-bold text-sm text-red-600">✗</span>;
-  }
-  return <span className="text-slate-500 text-sm">-</span>;
-};
-
-
-const SectionTitle = ({ children }) => (
-  <h2 className="text-[10px] font-bold text-center bg-slate-100 p-1 my-1 uppercase tracking-wider">{children}</h2>
-);
+// Aliases locais para manter os nomes usados no JSX abaixo sem alterar estrutura
+const Checkmark = ({ checked }) => <ReportCheckmark checked={checked === true ? true : checked === false ? false : null} />;
+const XMark = ({ checked }) => checked === false ? <span className="font-bold text-sm text-red-600">✗</span> : <span className="text-slate-500 text-sm">-</span>;
+const SectionTitle = ({ children }) => <ReportSectionTitle size="sm">{children}</ReportSectionTitle>;
 
 const ReportPrintHeader = ({ checklist, obra, regional, project }) => (
   <div>
