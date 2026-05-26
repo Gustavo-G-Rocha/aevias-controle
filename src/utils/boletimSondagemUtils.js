@@ -75,29 +75,31 @@ export const calcularUmidade = (un, lado) => {
 /**
  * Calcula todos os campos derivados de um ensaio de densidade in situ.
  */
+const isNum = (v) => v !== null && v !== undefined && !Number.isNaN(v);
+
 export const calcularDensidade = (d) => {
-  const areiaDeslocada = d.peso_areia_funil_placa !== null && d.peso_frasco_antes !== null && d.peso_frasco_depois !== null
+  const areiaDeslocada = isNum(d.peso_frasco_antes) && isNum(d.peso_frasco_depois) && isNum(d.peso_areia_funil_placa)
     ? parseFloat((d.peso_frasco_antes - d.peso_frasco_depois).toFixed(2))
     : null;
-  const areiaCavidade = areiaDeslocada !== null && d.peso_areia_funil_placa !== null
+  const areiaCavidade = isNum(areiaDeslocada) && isNum(d.peso_areia_funil_placa)
     ? parseFloat((areiaDeslocada - d.peso_areia_funil_placa).toFixed(2))
     : null;
-  const volumeBuraco = areiaCavidade !== null && d.massa_esp_aparente_areia
+  const volumeBuraco = isNum(areiaCavidade) && isNum(d.massa_esp_aparente_areia)
     ? parseFloat((areiaCavidade / d.massa_esp_aparente_areia).toFixed(3))
     : null;
-  const pesoSolo = d.peso_solo_recipiente !== null && d.peso_recipiente !== null
+  const pesoSolo = isNum(d.peso_solo_recipiente) && isNum(d.peso_recipiente)
     ? parseFloat((d.peso_solo_recipiente - d.peso_recipiente).toFixed(2))
     : null;
-  const densidadeUmida = pesoSolo !== null && volumeBuraco
+  const densidadeUmida = isNum(pesoSolo) && isNum(volumeBuraco)
     ? parseFloat((pesoSolo / volumeBuraco).toFixed(3))
     : null;
-  const pesoAgua = d.peso_solo_umido !== null && d.peso_solo_seco !== null
+  const pesoAgua = isNum(d.peso_solo_umido) && isNum(d.peso_solo_seco)
     ? parseFloat((d.peso_solo_umido - d.peso_solo_seco).toFixed(2))
     : null;
-  const teorUmidade = pesoAgua !== null && d.peso_solo_seco
+  const teorUmidade = isNum(pesoAgua) && isNum(d.peso_solo_seco) && d.peso_solo_seco !== 0
     ? parseFloat(((pesoAgua / d.peso_solo_seco) * 100).toFixed(2))
     : null;
-  const densidadeSeca = densidadeUmida !== null && teorUmidade !== null
+  const densidadeSeca = isNum(densidadeUmida) && isNum(teorUmidade)
     ? parseFloat((densidadeUmida / (1 + teorUmidade / 100)).toFixed(3))
     : null;
 
