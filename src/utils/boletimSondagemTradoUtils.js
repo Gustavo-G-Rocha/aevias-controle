@@ -119,42 +119,42 @@ export function calcularUmidadeMedia(u1, u2) {
  */
 export function calcularDensidade(d) {
   const areiaDeslocada =
-    d.peso_areia_funil_placa !== null && d.peso_frasco_antes !== null && d.peso_frasco_depois !== null
+    d.peso_areia_funil_placa != null && d.peso_frasco_antes != null && d.peso_frasco_depois != null
       ? parseFloat((d.peso_frasco_antes - d.peso_frasco_depois).toFixed(2))
       : null;
 
   const areiaCavidade =
-    areiaDeslocada !== null && d.peso_areia_funil_placa !== null
+    areiaDeslocada != null && d.peso_areia_funil_placa != null
       ? parseFloat((areiaDeslocada - d.peso_areia_funil_placa).toFixed(2))
       : null;
 
   const volumeBuraco =
-    areiaCavidade !== null && d.massa_esp_aparente_areia
+    areiaCavidade != null && d.massa_esp_aparente_areia
       ? parseFloat((areiaCavidade / d.massa_esp_aparente_areia).toFixed(3))
       : null;
 
   const pesoSolo =
-    d.peso_solo_recipiente !== null && d.peso_recipiente !== null
+    d.peso_solo_recipiente != null && d.peso_recipiente != null
       ? parseFloat((d.peso_solo_recipiente - d.peso_recipiente).toFixed(2))
       : null;
 
   const densidadeUmida =
-    pesoSolo !== null && volumeBuraco
+    pesoSolo != null && volumeBuraco
       ? parseFloat((pesoSolo / volumeBuraco).toFixed(3))
       : null;
 
   const pesoAgua =
-    d.peso_solo_umido !== null && d.peso_solo_seco !== null
+    d.peso_solo_umido != null && d.peso_solo_seco != null
       ? parseFloat((d.peso_solo_umido - d.peso_solo_seco).toFixed(2))
       : null;
 
   const teorUmidade =
-    pesoAgua !== null && d.peso_solo_seco
+    pesoAgua != null && d.peso_solo_seco
       ? parseFloat(((pesoAgua / d.peso_solo_seco) * 100).toFixed(2))
       : null;
 
   const densidadeSeca =
-    densidadeUmida !== null && teorUmidade !== null
+    densidadeUmida != null && teorUmidade != null
       ? parseFloat((densidadeUmida / (1 + teorUmidade / 100)).toFixed(3))
       : null;
 
