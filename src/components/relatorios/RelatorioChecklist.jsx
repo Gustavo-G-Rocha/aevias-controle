@@ -2,17 +2,9 @@ import React from 'react';
 import SignatureFooter from './SignatureFooter';
 import PrintStyles from './PrintStyles';
 import { buildSignatureProps, formatDateBrasilia } from '@/utils/relatorioUtils';
+import { ReportCheckmark, ReportSectionTitle, ReportNaoConformidadesTable } from './shared';
 
-const Checkmark = ({ checked }) => {
-  if (checked === null || typeof checked === 'undefined') {
-    return <span className="text-slate-500">-</span>;
-  }
-  return (
-    <span className={`font-bold ${checked ? 'text-green-600' : 'text-red-600'}`}>
-      {checked ? '✓' : '✗'}
-    </span>
-  );
-};
+const Checkmark = ({ checked }) => <ReportCheckmark checked={checked} />;
 
 const TabelaControleAgregados = ({ controle_agregados }) => {
   const data = controle_agregados || [];
@@ -131,9 +123,7 @@ const TabelaControleCAUQ = ({ controle_cauq, project }) => {
   );
 };
 
-const SectionTitle = ({ children }) => (
-  <h2 className="text-lg print:text-base font-bold text-center bg-slate-100 p-1 my-2 uppercase tracking-wider">{children}</h2>
-);
+const SectionTitle = ({ children }) => <ReportSectionTitle>{children}</ReportSectionTitle>;
 
 const ReportPrintHeader = ({ checklist, obra, regional, project }) => (
   <div>
@@ -540,24 +530,7 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
               {checklist.nao_conformidades && checklist.nao_conformidades.length > 0 && (
                 <div>
                   <SectionTitle>Não Conformidades</SectionTitle>
-                  <table className="w-full border-collapse border border-slate-300 text-sm">
-                    <thead>
-                      <tr className="bg-slate-100">
-                        <th className="border border-slate-300 px-3 py-2 text-left font-semibold text-slate-700">LOCAL</th>
-                        <th className="border border-slate-300 px-3 py-2 text-left font-semibold text-slate-700">CATEGORIA</th>
-                        <th className="border border-slate-300 px-3 py-2 text-left font-semibold text-slate-700">PARÂMETRO</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {checklist.nao_conformidades.map((nc, ncIdx) => (
-                        <tr key={`nc-${nc.parametro_nc ?? ncIdx}`} className="bg-white">
-                          <td className="border border-slate-300 px-3 py-2 text-slate-800">{nc.local_nc || 'N/A'}</td>
-                          <td className="border border-slate-300 px-3 py-2 text-slate-800">{nc.categoria_nc || 'N/A'}</td>
-                          <td className="border border-slate-300 px-3 py-2 text-slate-800">{nc.parametro_nc || 'N/A'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <ReportNaoConformidadesTable naoConformidades={checklist.nao_conformidades} />
                 </div>
               )}
             </main>

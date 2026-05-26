@@ -2,6 +2,7 @@ import React from 'react';
 import SignatureFooter from './SignatureFooter';
 import PrintStyles from './PrintStyles';
 import { buildSignatureProps, formatDateBrasilia as formatDateBrasiliaUtil, formatDate as formatDateUtil } from '@/utils/relatorioUtils';
+import { ReportNaoConformidadesTable } from './shared';
 
 export default function RelatorioDiario({ diario, obra, project, user, regional, creatorUser }) {
   const [compressedPhotos, setCompressedPhotos] = React.useState([]);
@@ -235,24 +236,7 @@ export default function RelatorioDiario({ diario, obra, project, user, regional,
           {diario.nao_conformidades && diario.nao_conformidades.length > 0 && (
             <section className="mt-4">
               <h2 className="text-lg font-bold text-gray-700 border-b pb-2 mb-2">Não Conformidades</h2>
-              <table className="w-full border-collapse text-sm mb-3">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="border border-gray-300 px-3 py-2 text-left font-semibold text-gray-700">LOCAL</th>
-                    <th className="border border-gray-300 px-3 py-2 text-left font-semibold text-gray-700">CATEGORIA</th>
-                    <th className="border border-gray-300 px-3 py-2 text-left font-semibold text-gray-700">PARÂMETRO</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {diario.nao_conformidades.map((nc, index) => (
-                    <tr key={index} className="bg-white">
-                      <td className="border border-gray-300 px-3 py-2 text-gray-800">{nc.local_nc || 'N/A'}</td>
-                      <td className="border border-gray-300 px-3 py-2 text-gray-800">{nc.categoria_nc || 'N/A'}</td>
-                      <td className="border border-gray-300 px-3 py-2 text-gray-800">{nc.parametro_nc || 'N/A'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <ReportNaoConformidadesTable naoConformidades={diario.nao_conformidades} />
             </section>
           )}
         </main>

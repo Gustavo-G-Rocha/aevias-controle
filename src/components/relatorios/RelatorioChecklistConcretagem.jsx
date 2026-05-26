@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import SignatureFooter from './SignatureFooter';
+import { ReportNaoConformidadesTable } from './shared';
 
 // ── Helper functions ──────────────────────────────────────────────────────────
 function getClimaEmoji(condicao) {
@@ -35,17 +36,7 @@ function formatDateConcr(dateString) {
   return new Date(dateString).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
 }
 
-// ── Sub-components ─────────────────────────────────────────────────────────────
-const Checkmark = ({ checked }) => {
-  if (checked === null || typeof checked === 'undefined') {
-    return <span className="text-slate-500">-</span>;
-  }
-  return (
-    <span className={`font-bold ${checked ? 'text-green-600' : 'text-red-600'}`}>
-      {checked ? '✓' : '✗'}
-    </span>
-  );
-};
+import { ReportCheckmark as Checkmark } from './shared';
 
 const CargaContent = ({ carga }) => (
   <>
@@ -674,24 +665,7 @@ export default function RelatorioChecklistConcretagem({ checklist, creatorUser, 
           {checklist.nao_conformidades && checklist.nao_conformidades.length > 0 && (
             <div className="mb-2">
               <div className="bg-[#f1f5f9] text-gray-800 px-2 py-1 font-bold text-[9px] mb-1 text-center">NÃO CONFORMIDADES</div>
-              <table className="w-full border-collapse border border-slate-300 text-[9px]">
-                <thead className="bg-slate-100">
-                  <tr>
-                    <th className="border border-slate-300 px-1 py-0.5 font-bold text-left">LOCAL</th>
-                    <th className="border border-slate-300 px-1 py-0.5 font-bold text-left">CATEGORIA</th>
-                    <th className="border border-slate-300 px-1 py-0.5 font-bold text-left">PARÂMETRO</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {checklist.nao_conformidades.map((nc, index) => (
-                    <tr key={`nc-${nc.parametro_nc ?? index}`}>
-                      <td className="border border-slate-300 px-1 py-0.5">{nc.local_nc || 'N/A'}</td>
-                      <td className="border border-slate-300 px-1 py-0.5">{nc.categoria_nc || 'N/A'}</td>
-                      <td className="border border-slate-300 px-1 py-0.5">{nc.parametro_nc || 'N/A'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <ReportNaoConformidadesTable naoConformidades={checklist.nao_conformidades} />
             </div>
           )}
 
