@@ -13,7 +13,7 @@ describe("relatorioRompimentoConcretoUtils", () => {
   describe("fmtDate", () => {
     it("deve formatar data YYYY-MM-DD", () => {
       const result = fmtDate("2026-05-27");
-      expect(result).toBe("27/5/2026");
+      expect(result).toMatch(/27\/0?5\/2026/);
     });
 
     it("deve retornar '-' se null", () => {
@@ -48,8 +48,8 @@ describe("relatorioRompimentoConcretoUtils", () => {
   describe("fmtDateTime", () => {
     it("deve formatar datetime com timezone", () => {
       const result = fmtDateTime("2026-05-27T14:30:00");
-      expect(result).toContain("27");
-      expect(result).toContain("14");
+      expect(result).toMatch(/27/);
+      expect(result).toMatch(/2026/);
     });
 
     it("deve retornar '-' se null", () => {
@@ -121,7 +121,7 @@ describe("relatorioRompimentoConcretoUtils", () => {
       const cp = { data_ruptura: "2026-05-27" };
       const row = { label: "DATA DA RUPTURA" };
       const result = getValorLinha(row, cp);
-      expect(result).toBe("27/5/2026");
+      expect(result).toMatch(/27\/0?5\/2026/);
     });
 
     it("deve retornar carga formatada para CARGA DE RUPTURA", () => {

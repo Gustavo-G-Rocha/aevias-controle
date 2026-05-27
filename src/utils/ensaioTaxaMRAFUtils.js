@@ -35,26 +35,36 @@ export const calcularEnsaio = (ensaio, areaBandeja) => {
   // PA = P1 - P2
   if (e.peso_bandeja_amostra != null && e.peso_bandeja != null) {
     e.peso_amostra = parseFloat((e.peso_bandeja_amostra - e.peso_bandeja).toFixed(2));
+  } else {
+    e.peso_amostra = null;
   }
 
   // Tₓ = PA / (1000 * A)
   if (e.peso_amostra != null && areaBandeja) {
     e.taxa_mraf_aplicada = parseFloat((e.peso_amostra / (1000 * areaBandeja)).toFixed(3));
+  } else {
+    e.taxa_mraf_aplicada = null;
   }
 
   // T_L = (Tₓ * L) / (100 + L)
   if (e.taxa_mraf_aplicada != null && e.teor_ligante != null) {
     e.taxa_ligante = parseFloat(((e.taxa_mraf_aplicada * e.teor_ligante) / (100 + e.teor_ligante)).toFixed(3));
+  } else {
+    e.taxa_ligante = null;
   }
 
   // T_E = T_L / R
   if (e.taxa_ligante != null && e.residuo_emulsao != null && e.residuo_emulsao !== 0) {
     e.taxa_emulsao = parseFloat((e.taxa_ligante / (e.residuo_emulsao / 100)).toFixed(3));
+  } else {
+    e.taxa_emulsao = null;
   }
 
   // T_A = Tₓ - T_L
   if (e.taxa_mraf_aplicada != null && e.taxa_ligante != null) {
     e.taxa_agregado = parseFloat((e.taxa_mraf_aplicada - e.taxa_ligante).toFixed(3));
+  } else {
+    e.taxa_agregado = null;
   }
 
   return e;
