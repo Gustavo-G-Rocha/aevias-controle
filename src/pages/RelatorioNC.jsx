@@ -1,283 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { useReportMode } from "@/hooks/useReportMode";
-import { base44 } from "@/api/base44Client";
-import { Button } from "@/components/ui/button";
-import { Download, Loader2 } from "lucide-react";
-import PdfRenderer from "@/components/relatorios/PdfRenderer";
-
-// Importar componentes de relatório de registros vinculados
-import RelatorioDiarioComponent from "@/components/relatorios/RelatorioDiario";
-import RelatorioChecklistComponent from "@/components/relatorios/RelatorioChecklist";
-import RelatorioChecklistAplicacaoComponent from "@/components/relatorios/RelatorioChecklistAplicacao";
-import RelatorioChecklistMRAFComponent from "@/components/relatorios/RelatorioChecklistMRAF";
-import RelatorioChecklistConcretagemComponent from "@/components/relatorios/RelatorioChecklistConcretagem";
-import RelatorioChecklistTerraplanagem from "@/components/relatorios/RelatorioChecklistTerraplanagem";
-import RelatorioChecklistReciclagem from "@/components/relatorios/RelatorioChecklistReciclagem";
-
-const TIPO_LABELS = {
-  DiarioObra: "Diário de Obra",
-  ChecklistUsina: "Checklist de Usina",
-  ChecklistAplicacao: "Checklist de Aplicação",
-  ChecklistMRAF: "Checklist MRAF",
-  ChecklistConcretagem: "Checklist de Concretagem",
-  ChecklistTerraplanagem: "Checklist de Terraplanagem",
-  ChecklistReciclagem: "Checklist de Reciclagem"
-};
-
-function NCReport({ nc, obra, regional }) {
-  const formatDate = (d) => d ? new Date(d).toLocaleDateString("pt-BR", { timeZone: "UTC" }) : "—";
-  const logoUrl = regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png";
-
-  return (
-    <div className="p-8 print:p-8 bg-white font-sans min-h-[29.7cm] flex flex-col">
-      {/* Cabeçalho */}
-      <header className="grid grid-cols-3 items-center border-b-2 border-slate-900 pb-4 mb-6">
-        <div className="flex justify-start">
-          <picture><source srcSet={logoUrl} /><img src={logoUrl} alt="Logo" className="h-16 object-contain" width="auto" height="64" /></picture>
-        </div>
-        <div className="text-center">
-          <h1 className="text-xl font-bold text-gray-800 uppercase">Relatório de Não Conformidade</h1>
-          <p className="text-sm text-gray-600">{obra?.name || nc.obra_nome || "—"}</p>
-        </div>
-        <div className="flex justify-end">
-          <div className="border border-gray-400 p-2 rounded-md text-sm text-right">
-            {nc.numero_rnc && <p className="font-bold text-gray-800">RNC: {nc.numero_rnc}</p>}
-            <p className="text-gray-600">{formatDate(nc.data_nc)}</p>
-          </div>
-        </div>
-      </header>
-
-      {/* Corpo */}
-      <main className="flex-grow space-y-6 text-sm">
-        {/* Dados Gerais */}
-        <section>
-          <h2 className="text-xs font-bold text-gray-700 uppercase tracking-wider bg-slate-100 px-3 py-1 mb-3">Dados Gerais</h2>
-          <div className="grid grid-cols-3 gap-x-6 gap-y-3">
-            <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold">Cliente</p>
-              <p className="text-gray-800">{nc.cliente || "—"}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold">Contrato</p>
-              <p className="text-gray-800">{nc.contrato || "—"}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold">Executora</p>
-              <p className="text-gray-800">{nc.executora || "—"}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold">Rodovia</p>
-              <p className="text-gray-800">{nc.rodovia || "—"}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold">Trecho</p>
-              <p className="text-gray-800">{nc.trecho || "—"}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold">Campo (Afirma Evias)</p>
-              <p className="text-gray-800">{nc.campo || "—"}</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Classificação (Local / Categoria / Parâmetro) */}
-        {(nc.local_nc || nc.categoria_nc || nc.parametro_nc) && (
-          <section>
-            <h2 className="text-xs font-bold text-gray-700 uppercase tracking-wider bg-slate-100 px-3 py-1 mb-3">Classificação da Não Conformidade</h2>
-            <div className="grid grid-cols-3 gap-x-6 gap-y-3">
-              {nc.local_nc && (
-                <div>
-                  <p className="text-xs text-gray-500 uppercase font-semibold">Local</p>
-                  <p className="text-gray-800">{nc.local_nc}</p>
-                </div>
-              )}
-              {nc.categoria_nc && (
-                <div>
-                  <p className="text-xs text-gray-500 uppercase font-semibold">Categoria</p>
-                  <p className="text-gray-800">{nc.categoria_nc}</p>
-                </div>
-              )}
-              {nc.parametro_nc && (
-                <div>
-                  <p className="text-xs text-gray-500 uppercase font-semibold">Parâmetro</p>
-                  <p className="text-gray-800">{nc.parametro_nc}</p>
-                </div>
-              )}
-            </div>
-          </section>
-        )}
-
-        {/* Descrição NC */}
-        <section>
-          <h2 className="text-xs font-bold text-gray-700 uppercase tracking-wider bg-slate-100 px-3 py-1 mb-3">Descrição da Não Conformidade</h2>
-          <div className="border border-slate-300 rounded p-4 bg-gray-50 min-h-[120px] whitespace-pre-wrap">
-            {nc.descricao_nc || "—"}
-          </div>
-        </section>
-
-        {/* Ações */}
-        {nc.acoes && (
-          <section>
-            <h2 className="text-xs font-bold text-gray-700 uppercase tracking-wider bg-slate-100 px-3 py-1 mb-3">Ações a Serem Tomadas</h2>
-            <div className="border border-slate-300 rounded p-4 bg-gray-50 min-h-[80px] whitespace-pre-wrap">
-              {nc.acoes}
-            </div>
-          </section>
-        )}
-
-
-      </main>
-
-      {/* Assinaturas */}
-      <footer className="mt-10 pt-6 grid grid-cols-2 gap-16 items-end">
-        {/* Assinatura do Gestor */}
-        <div className="flex flex-col items-center">
-          <div className="w-full text-center text-xs text-gray-600 mb-2 min-h-[80px] flex flex-col justify-end">
-            {nc.manager_signature?.signed_by && (
-              <>
-                <p className="text-gray-500">Assinado digitalmente por</p>
-                <p className="font-bold text-gray-800 mt-0.5">{nc.manager_signature.manager_name || nc.relatorio_criador}</p>
-                <p className="text-gray-500">{nc.manager_signature.signed_by}</p>
-                {nc.manager_signature.crea_number && <p className="text-gray-500">CREA: {nc.manager_signature.crea_number}</p>}
-                <p className="text-gray-500">
-                  em {new Date(nc.manager_signature.signed_date).toLocaleString("pt-BR", {
-                    timeZone: "America/Sao_Paulo",
-                    day: "2-digit", month: "2-digit", year: "numeric",
-                    hour: "2-digit", minute: "2-digit", second: "2-digit"
-                  })}
-                </p>
-              </>
-            )}
-          </div>
-          <div className="w-full border-b border-gray-500"></div>
-          <p className="text-xs text-gray-600 mt-1">{nc.relatorio_criador || "Gestor Responsável"}</p>
-        </div>
-
-        {/* Assinatura do Cliente */}
-        <div className="flex flex-col items-center">
-          <div className="w-full text-center text-xs text-gray-600 mb-2 min-h-[80px] flex flex-col justify-end">
-            {nc.client_signature?.signed_by && (
-              <>
-                <p className="text-gray-500">Assinado digitalmente por</p>
-                <p className="font-bold text-gray-800 mt-0.5">{nc.client_signature.engineer_name}</p>
-                <p className="text-gray-500">{nc.client_signature.signed_by}</p>
-                {nc.client_signature.crea_number && <p className="text-gray-500">CREA: {nc.client_signature.crea_number}</p>}
-                <p className="text-gray-500">
-                  em {new Date(nc.client_signature.signed_date).toLocaleString("pt-BR", {
-                    timeZone: "America/Sao_Paulo",
-                    day: "2-digit", month: "2-digit", year: "numeric",
-                    hour: "2-digit", minute: "2-digit", second: "2-digit"
-                  })}
-                </p>
-              </>
-            )}
-          </div>
-          <div className="w-full border-b border-gray-500"></div>
-          <p className="text-xs text-gray-600 mt-1">Engenheiro Cliente</p>
-        </div>
-      </footer>
-    </div>
-  );
-}
-
-function VinculadoReport({ tipo, registro, obra, regional, project, creatorUser, user }) {
-  if (!tipo || !registro) return null;
-
-  const props = { obra, regional, project, user, creatorUser };
-
-  if (tipo === "DiarioObra") return <RelatorioDiarioComponent diario={registro} {...props} />;
-  if (tipo === "ChecklistUsina") return <RelatorioChecklistComponent checklist={registro} {...props} />;
-  if (tipo === "ChecklistAplicacao") return <RelatorioChecklistAplicacaoComponent checklist={registro} {...props} />;
-  if (tipo === "ChecklistMRAF") return <RelatorioChecklistMRAFComponent checklist={registro} {...props} />;
-  if (tipo === "ChecklistConcretagem") return <RelatorioChecklistConcretagemComponent checklist={registro} creatorUser={creatorUser} />;
-  if (tipo === "ChecklistTerraplanagem") return <RelatorioChecklistTerraplanagem checklist={registro} creatorUser={creatorUser} />;
-  if (tipo === "ChecklistReciclagem") return <RelatorioChecklistReciclagem checklist={registro} {...props} />;
-  return null;
-}
-
-// Comprime uma imagem via canvas e retorna data URL
-function compressImage(url, maxWidth = 1200, quality = 0.7) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      const scale = Math.min(1, maxWidth / img.width);
-      const canvas = document.createElement("canvas");
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
-      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL("image/jpeg", quality));
-    };
-    img.onerror = () => resolve(url); // fallback original
-    img.src = url;
-  });
-}
+import React from 'react';
+import { useReportMode } from '@/hooks/useReportMode';
+import { Loader2 } from 'lucide-react';
+import PdfRenderer from '@/components/relatorios/PdfRenderer';
+import { useRelatorioNCData } from '@/hooks/useRelatorioNCData';
+import { useRelatorioNCActions } from '@/hooks/useRelatorioNCActions';
+import NCReport from '@/components/relatorio-nc/NCReport';
+import VinculadoReport from '@/components/relatorio-nc/VinculadoReport';
+import FotosSection from '@/components/relatorio-nc/FotosSection';
+import ToolbarHeader from '@/components/relatorio-nc/ToolbarHeader';
 
 export default function RelatorioNCPage() {
   useReportMode();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [data, setData] = useState(null);
-  const [compressedFotos, setCompressedFotos] = useState([]);
-  const [compressingFotos, setCompressingFotos] = useState(false);
-
-  const load = async () => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get("id");
-      if (!id) throw new Error("ID do RNC não informado");
-
-      const [nc, user, obras, regionais, projects, allUsers] = await Promise.all([
-        base44.entities.RelatorioNC.get(id),
-        base44.auth.me(),
-        base44.entities.Obra.list(),
-        base44.entities.Regional.list(),
-        base44.entities.Project.list(),
-        base44.entities.User.list()
-      ]);
-
-      if (!nc) throw new Error("RNC não encontrado");
-
-      const obra = obras.find(o => o.id === nc.obra_id) || null;
-      const regional = obra ? regionais.find(r => r.id === obra.regional_id) : null;
-
-      let registroVinculado = null;
-      let project = null;
-      let creatorUser = null;
-
-      if (nc.checklist_ref_tipo && nc.checklist_ref_id) {
-        try {
-          registroVinculado = await base44.entities[nc.checklist_ref_tipo].get(nc.checklist_ref_id);
-          if (registroVinculado?.project_id) {
-            project = projects.find(p => p.id === registroVinculado.project_id) || null;
-          }
-          if (registroVinculado?.created_by) {
-            creatorUser = allUsers.find(u => u.email?.toLowerCase() === registroVinculado.created_by?.toLowerCase()) || null;
-          }
-        } catch (e) {
-          console.warn("Registro vinculado não encontrado:", e);
-        }
-      }
-
-      setData({ nc, obra, regional, user, registroVinculado, project, creatorUser });
-
-      // Comprimir fotos
-      if (nc.fotos?.length > 0) {
-        setCompressingFotos(true);
-        const compressed = await Promise.all(nc.fotos.map(url => compressImage(url)));
-        setCompressedFotos(compressed);
-        setCompressingFotos(false);
-      }
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    load();
-  }, [load]); // eslint-disable-line react-hooks/exhaustive-deps
+  const { loading, error, data } = useRelatorioNCData();
+  const { compressedFotos, compressingFotos, comprimirFotos, imprimirPDF } =
+    useRelatorioNCActions(data?.nc?.fotos || []);
 
   if (loading) {
     return (
@@ -287,27 +23,21 @@ export default function RelatorioNCPage() {
     );
   }
 
-  if (error) return <div className="p-8 text-center text-red-600">Erro: {error}</div>;
+  if (error) {
+    return <div className="p-8 text-center text-red-600">Erro: {error}</div>;
+  }
 
   return (
     <div className="bg-white min-h-screen">
-      <div className="print:hidden sticky top-0 bg-white border-b border-slate-200 p-4 shadow-sm z-10">
-        <div className="max-w-[210mm] mx-auto flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-slate-800">
-            Relatório de Não Conformidade {data.nc.numero_rnc ? `– ${data.nc.numero_rnc}` : ""}
-          </h2>
-          <Button onClick={() => window.print()} className="bg-slate-800 text-white hover:bg-slate-700">
-            <Download className="w-4 h-4 mr-2" />
-            Gerar PDF
-          </Button>
-        </div>
-      </div>
+      <ToolbarHeader nc={data.nc} onPrint={imprimirPDF} />
 
       <div className="report-content-container w-full bg-white print:bg-white">
-        {/* Relatório da NC */}
-        <NCReport nc={data.nc} obra={data.obra} regional={data.regional} />
+        <NCReport
+          nc={data.nc}
+          obra={data.obra}
+          regional={data.regional}
+        />
 
-        {/* Relatório do registro vinculado, na sequência */}
         {data.registroVinculado && (
           <div className="break-before-page">
             <VinculadoReport
@@ -322,38 +52,14 @@ export default function RelatorioNCPage() {
           </div>
         )}
 
-        {/* Fotos do gestor */}
-        {data.nc.fotos?.length > 0 && (
-          <div className="break-before-page p-8 bg-white font-sans">
-            <header className="grid grid-cols-3 items-center border-b-2 border-slate-900 pb-4 mb-6">
-              <div className="flex justify-start">
-                <picture><source srcSet={data.regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} /><img src={data.regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} alt="Logo" className="h-16 object-contain" width="auto" height="64" /></picture>
-              </div>
-              <div className="text-center">
-                <h1 className="text-xl font-bold text-gray-800 uppercase">Relatório Fotográfico</h1>
-                <p className="text-sm text-gray-600">{data.nc.numero_rnc ? `RNC: ${data.nc.numero_rnc}` : "Não Conformidade"}</p>
-              </div>
-              <div></div>
-            </header>
-            {compressingFotos ? (
-              <div className="flex justify-center items-center py-12">
-                <Loader2 className="w-6 h-6 animate-spin text-slate-400 mr-2" />
-                <span className="text-slate-500 text-sm">Comprimindo imagens...</span>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-4">
-                {(compressedFotos.length > 0 ? compressedFotos : data.nc.fotos).map((url, i) => (
-                  <div key={i} className="border border-slate-200 rounded p-2 flex flex-col items-center break-inside-avoid">
-                    <picture><source srcSet={url} /><img src={url} alt={`Foto ${i + 1}`} className="max-h-64 object-contain w-full" width="auto" height="auto" /></picture>
-                    <p className="text-xs text-center text-gray-500 mt-1">Foto {i + 1}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+        <FotosSection
+          nc={data.nc}
+          regional={data.regional}
+          compressedFotos={compressedFotos}
+          compressingFotos={compressingFotos}
+          onComprimir={comprimirFotos}
+        />
 
-        {/* PDFs do gestor — renderizados como imagens via PDF.js */}
         {data.nc.pdfs?.map((pdf, i) => (
           <div key={i} className="break-before-page bg-white">
             <PdfRenderer url={pdf.url} />
