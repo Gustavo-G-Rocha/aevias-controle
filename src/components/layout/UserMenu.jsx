@@ -45,35 +45,35 @@ export default function UserMenu({ user, isAdmin, isSalaTecnica, isGestorContrat
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="w-full justify-start gap-3 h-auto p-3 rounded-xl" style={{ color: 'var(--color-sidebar-text)' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--color-sidebar-hover)'} onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
-            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(191,207,153,0.2)' }}>
+          <Button variant="ghost" className="w-full justify-start gap-3 h-auto p-3 rounded-xl sidebar-user-btn">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(191,207,153,0.2)' }}>
               <UserIcon className="w-4 h-4" style={{ color: 'var(--color-sidebar-icon)' }} />
             </div>
             <div className="flex-1 text-left min-w-0">
-              <p className="font-medium text-sm truncate" style={{ color: 'var(--color-sidebar-text)' }}>{user.laboratorista_name}</p>
-              <div className="flex items-center gap-2">
+              <p className="font-medium text-sm truncate" style={{ color: 'var(--color-sidebar-text)' }}>{user.full_name || user.laboratorista_name || user.email}</p>
+              <div className="flex items-center gap-2 mt-0.5">
                 <p className="text-xs truncate" style={{ color: 'var(--color-sidebar-text-muted)' }}>{user.email}</p>
-                <Badge variant="secondary" className="text-xs" style={{ backgroundColor: 'rgba(191,207,153,0.2)', color: 'var(--color-secondary)' }}>
+                <Badge variant="secondary" className="text-xs flex-shrink-0" style={{ backgroundColor: 'rgba(191,207,153,0.2)', color: 'var(--color-secondary)', border: 'none' }}>
                   {roleLabel}
                 </Badge>
               </div>
             </div>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 border-0 shadow-lg" style={{ backgroundColor: 'var(--color-primary-light, #0A3352)', color: 'var(--color-sidebar-text)' }}>
-          <DropdownMenuItem onClick={() => navigate("/Settings")} className="cursor-pointer focus:bg-white/10">
-            <Settings className="w-4 h-4 mr-2" style={{ color: 'var(--color-secondary)' }} />
+        <DropdownMenuContent align="end" className="w-52 shadow-xl border sidebar-dropdown-content">
+          <DropdownMenuItem onClick={() => navigate("/Settings")} className="cursor-pointer gap-2">
+            <Settings className="w-4 h-4 flex-shrink-0" />
             Configurações
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setIsDeleteDialogOpen(true)}
-            className="text-red-500 cursor-pointer focus:bg-white/10 focus:text-red-400"
+            className="cursor-pointer gap-2 text-destructive focus:text-destructive"
           >
-            <Trash2 className="w-4 h-4 mr-2" />
+            <Trash2 className="w-4 h-4 flex-shrink-0" />
             Excluir Conta
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer focus:bg-white/10 focus:text-red-500">
-            <LogOut className="w-4 h-4 mr-2" />
+          <DropdownMenuItem onClick={handleLogout} className="cursor-pointer gap-2 text-destructive focus:text-destructive">
+            <LogOut className="w-4 h-4 flex-shrink-0" />
             Sair
           </DropdownMenuItem>
         </DropdownMenuContent>

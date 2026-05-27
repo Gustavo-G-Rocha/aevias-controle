@@ -25,12 +25,18 @@
 
   /* ── Sidebar (escura, inspirada na referência) ── */
   --color-sidebar-bg:        #00233B;
-  --color-sidebar-hover:     rgba(255,255,255,0.07);
+  --color-sidebar-hover:     rgba(255,255,255,0.08);
   --color-sidebar-active:    rgba(191,207,153,0.18);
   --color-sidebar-text:      #E8EDF2;
   --color-sidebar-text-muted:#8DA3B5;
-  --color-sidebar-border:    rgba(255,255,255,0.08);
+  --color-sidebar-border:    rgba(255,255,255,0.09);
   --color-sidebar-icon:      #BFCF99;
+
+  /* ── Aliases para compatibilidade ── */
+  --color-accent:            #BFCF99;
+  --color-text-light:        #E8EDF2;
+  --color-text-muted-light:  #8DA3B5;
+  --color-primary-dark:      #00233B;
 
   /* ── Backgrounds ── */
   --color-background:        #F0F2F5;   /* Off-white levemente azulado */
@@ -280,6 +286,22 @@
   button, a, [role="button"], nav, .sidebar-menu-button {
     user-select: none;
     -webkit-user-select: none;
+  }
+
+  /* ── UserMenu button na sidebar ── */
+  .sidebar-user-btn {
+    color: var(--color-sidebar-text) !important;
+    background-color: transparent !important;
+  }
+  .sidebar-user-btn:hover {
+    background-color: var(--color-sidebar-hover) !important;
+  }
+
+  /* ── Dropdown do UserMenu (usa tokens padrão do app — fundo claro) ── */
+  .sidebar-dropdown-content {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-border) !important;
   }
 
 }
