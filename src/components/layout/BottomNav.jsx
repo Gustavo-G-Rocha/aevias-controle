@@ -32,7 +32,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around mx-1"
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around mx-48"
       style={{ backgroundColor: 'var(--color-sidebar-bg)', borderTop: '1px solid var(--color-sidebar-border)' }}
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
       
