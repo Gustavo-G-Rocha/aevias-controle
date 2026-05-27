@@ -8,15 +8,17 @@ import SignatureFooter from "@/components/relatorios/SignatureFooter";
 import { useRelatorioProctorData }    from "@/hooks/useRelatorioProctorData";
 import { useRelatorioProctorActions } from "@/hooks/useRelatorioProctorActions";
 import {
-  calcISC, calcExpansao, evalParabola, buildInfoFields,
+  evalParabola, buildInfoFields, buildChartPoints, buildISCPoints, buildExpansaoPoints,
 } from "@/utils/relatorioProctorUtils";
 
-import RelatorioProctorToolbar    from "@/components/relatorio-proctor/RelatorioProctorToolbar";
-import RelatorioProctorInfo       from "@/components/relatorio-proctor/RelatorioProctorInfo";
+import RelatorioProctorToolbar     from "@/components/relatorio-proctor/RelatorioProctorToolbar";
+import RelatorioProctorHeader      from "@/components/relatorio-proctor/RelatorioProctorHeader";
+import RelatorioProctorInfo        from "@/components/relatorio-proctor/RelatorioProctorInfo";
 import RelatorioProctorCompactacao from "@/components/relatorio-proctor/RelatorioProctorCompactacao";
-import RelatorioProctorISC        from "@/components/relatorio-proctor/RelatorioProctorISC";
-import RelatorioProctorExpansao   from "@/components/relatorio-proctor/RelatorioProctorExpansao";
-import RelatorioProctorGraficos   from "@/components/relatorio-proctor/RelatorioProctorGraficos";
+import RelatorioProctorISC         from "@/components/relatorio-proctor/RelatorioProctorISC";
+import RelatorioProctorExpansao    from "@/components/relatorio-proctor/RelatorioProctorExpansao";
+import RelatorioProctorGraficos    from "@/components/relatorio-proctor/RelatorioProctorGraficos";
+import RelatorioProctorObservacoes from "@/components/relatorio-proctor/RelatorioProctorObservacoes";
 
 export default function RelatorioProctor() {
   const { ensaio, obra, regional, loading, error } = useRelatorioProctorData();
@@ -26,41 +28,11 @@ export default function RelatorioProctor() {
 
   const isHigro = ensaio?.correcao_densidade === 'higroscopica';
 
-  // ── chart points ──
-  const chartPoints = useMemo(() => {
-    if (!ensaio) return [];
-    return (ensaio.densidades || []).map((d, i) => ({
-      x: isHigro ? d.umidade_calculada : (ensaio.umidades?.[i]?.teor_umidade_media || 0),
-      y: d.dens_ap_seca,
-    })).filter(p => p.x > 0 && p.y > 0);
-  }, [ensaio, isHigro]);
-
+  const chartPoints = useMemo(() => buildChartPoints(ensaio, isHigro), [ensaio, isHigro]);
   const parabola = useMemo(() => fitParabola(chartPoints), [chartPoints]);
 
-  // ── ISC / expansão points ──
-  const iscPoints = useMemo(() => {
-    if (!ensaio) return [];
-    const umidPorCil = isHigro
-      ? (ensaio.densidades || []).map(d => d.umidade_calculada)
-      : (ensaio.umidades  || []).map(u => u.teor_umidade_media);
-    return (ensaio.cbr_cilindros || []).map((c, i) => {
-      const { isc } = calcISC(c, ensaio.cbr_fator_anel);
-      const x = umidPorCil[i];
-      return (x > 0 && isc != null) ? { x, y: isc } : null;
-    }).filter(Boolean);
-  }, [ensaio, isHigro]);
-
-  const expPoints = useMemo(() => {
-    if (!ensaio) return [];
-    const umidPorCil = isHigro
-      ? (ensaio.densidades || []).map(d => d.umidade_calculada)
-      : (ensaio.umidades  || []).map(u => u.teor_umidade_media);
-    return (ensaio.expansao_cilindros || []).map((e, i) => {
-      const { expansao_pct } = calcExpansao(e);
-      const x = umidPorCil[i];
-      return (x > 0 && expansao_pct != null) ? { x, y: expansao_pct } : null;
-    }).filter(Boolean);
-  }, [ensaio, isHigro]);
+  const iscPoints = useMemo(() => buildISCPoints(ensaio, isHigro), [ensaio, isHigro]);
+  const expPoints = useMemo(() => buildExpansaoPoints(ensaio, isHigro), [ensaio, isHigro]);
 
   const iscParabola = useMemo(() => fitParabola(iscPoints), [iscPoints]);
   const expParabola = useMemo(() => fitParabola(expPoints), [expPoints]);
@@ -79,16 +51,7 @@ export default function RelatorioProctor() {
       <RelatorioProctorToolbar ensaio={ensaio} isHigro={isHigro} onPrint={handlePrint} />
 
       <div className="w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none p-2 print:p-1 flex flex-col">
-        {/* Header */}
-        <header className="grid items-center py-1" style={{ gridTemplateColumns: '60px 1fr 60px' }}>
-          <div>
-            <picture>
-              <source srcSet={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} />
-              <img src={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} alt="Logo" className="h-8 object-contain" width="auto" height="32" />
-            </picture>
-          </div>
-          <h1 className="text-xs font-bold text-gray-800 text-center">CARACTERIZAÇÃO MECÂNICA</h1>
-        </header>
+        <RelatorioProctorHeader regional={regional} />
 
         <main className="text-xs space-y-2">
           <RelatorioProctorInfo
@@ -115,12 +78,7 @@ export default function RelatorioProctor() {
             expAtWotima={expAtWotima}
           />
 
-          {ensaio.observacoes && (
-            <section>
-              <div className="bg-slate-200 px-2 py-0.5 font-bold" style={{ fontSize: '10px' }}>OBSERVAÇÕES</div>
-              <div className="border border-slate-300 p-1 whitespace-pre-wrap" style={{ fontSize: '9px' }}>{ensaio.observacoes}</div>
-            </section>
-          )}
+          <RelatorioProctorObservacoes ensaio={ensaio} />
         </main>
 
         <footer className="mt-4 pt-2">

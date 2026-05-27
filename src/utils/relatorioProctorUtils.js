@@ -101,3 +101,45 @@ export function buildInfoFields(ensaio, obra) {
     ["DATA",          fmtDate(ensaio.data_ensaio)],
   ];
 }
+
+/**
+ * Constrói pontos de densidade a partir dos dados de densidades e umidades
+ * Filtra apenas pontos válidos (x > 0 && y > 0)
+ */
+export function buildChartPoints(ensaio, isHigro) {
+  if (!ensaio?.densidades) return [];
+  return (ensaio.densidades || []).map((d, i) => ({
+    x: isHigro ? d.umidade_calculada : (ensaio.umidades?.[i]?.teor_umidade_media || 0),
+    y: d.dens_ap_seca,
+  })).filter(p => p.x > 0 && p.y > 0);
+}
+
+/**
+ * Constrói pontos ISC a partir dos dados de CBR cilindros
+ */
+export function buildISCPoints(ensaio, isHigro) {
+  if (!ensaio?.cbr_cilindros) return [];
+  const umidPorCil = isHigro
+    ? (ensaio.densidades || []).map(d => d.umidade_calculada)
+    : (ensaio.umidades || []).map(u => u.teor_umidade_media);
+  return (ensaio.cbr_cilindros || []).map((c, i) => {
+    const { isc } = calcISC(c, ensaio.cbr_fator_anel);
+    const x = umidPorCil[i];
+    return (x > 0 && isc != null) ? { x, y: isc } : null;
+  }).filter(Boolean);
+}
+
+/**
+ * Constrói pontos de expansão a partir dos dados de expansão cilindros
+ */
+export function buildExpansaoPoints(ensaio, isHigro) {
+  if (!ensaio?.expansao_cilindros) return [];
+  const umidPorCil = isHigro
+    ? (ensaio.densidades || []).map(d => d.umidade_calculada)
+    : (ensaio.umidades || []).map(u => u.teor_umidade_media);
+  return (ensaio.expansao_cilindros || []).map((e, i) => {
+    const { expansao_pct } = calcExpansao(e);
+    const x = umidPorCil[i];
+    return (x > 0 && expansao_pct != null) ? { x, y: expansao_pct } : null;
+  }).filter(Boolean);
+}
