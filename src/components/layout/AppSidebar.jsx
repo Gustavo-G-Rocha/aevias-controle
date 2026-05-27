@@ -129,7 +129,7 @@ export default function AppSidebar({
                          <SidebarMenuButton asChild isActive={isActive(to)} className={`rounded-xl mb-0.5 h-auto ${isActive(to) ? '!bg-white !text-black' : ''}`}>
                            <NavLink to={to} className={`flex items-center gap-3 pl-10 pr-3 py-2.5 ${isActive(to) ? '!text-black' : ''}`}>
                              <Icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive(to) ? '#000000 !important' : 'var(--color-sidebar-text-muted)' }} />
-                             <span className="font-semibold text-sm" style={{ color: isActive(to) ? '#000000 !important' : 'var(--color-sidebar-text)' }}>{label}</span>
+                             <span className={`font-semibold text-sm ${isActive(to) ? '!text-black' : ''}`} style={{ color: !isActive(to) ? 'var(--color-sidebar-text)' : undefined }}>{label}</span>
                              {badge && <Badge className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{pendingTransfers}</Badge>}
                            </NavLink>
                          </SidebarMenuButton>
@@ -182,7 +182,7 @@ export default function AppSidebar({
                          <SidebarMenuButton asChild isActive={isActive(to)} className={`rounded-xl mb-0.5 h-auto ${isActive(to) ? '!bg-white !text-black' : ''}`}>
                            <NavLink to={to} className={`flex items-center gap-3 pl-10 pr-3 py-2.5 ${isActive(to) ? '!text-black' : ''}`}>
                              <Icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive(to) ? '#000000 !important' : 'var(--color-sidebar-text-muted)' }} />
-                             <span className="font-semibold text-sm" style={{ color: isActive(to) ? '#000000 !important' : 'var(--color-sidebar-text)' }}>{label}</span>
+                             <span className={`font-semibold text-sm ${isActive(to) ? '!text-black' : ''}`} style={{ color: !isActive(to) ? 'var(--color-sidebar-text)' : undefined }}>{label}</span>
                              </NavLink>
                              </SidebarMenuButton>
                              </SidebarMenuItem>
