@@ -1,31 +1,16 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
-import { getUserAccessLevel, canSeeFilters, canSeeObraChart } from '@/utils/accessControl';
+import { getUserAccessLevel, canSeeFilters } from '@/utils/accessControl';
+import { getChartVisibility } from '@/utils/dashboardUtils';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardFilters from '@/components/dashboard/DashboardFilters';
 import DashboardStats from '@/components/dashboard/DashboardStats';
-import MonthlyChart from '@/components/dashboard/MonthlyChart';
-import StatusPieChart from '@/components/dashboard/StatusPieChart';
-import RecordsByObraChart from '@/components/dashboard/RecordsByObraChart';
-import RecordsByTypeChart from '@/components/dashboard/RecordsByTypeChart';
+import DashboardChartsGrid from '@/components/dashboard/DashboardChartsGrid';
+import DashboardPage from '@/components/dashboard/DashboardPage';
 
 export default function Dashboard() {
-  const {
-    loading,
-    user,
-    filters,
-    setFilters,
-    clearFilters,
-    handlePieClick,
-    stats,
-    charts,
-    approvalPercentage,
-    obras,
-    isClienteUser,
-    isEngenheiroUser,
-    hasActiveFilters,
-  } = useDashboardData();
+  const { loading, user, filters, setFilters, clearFilters, hasActiveFilters, stats, charts, approvalPercentage, obras, isClienteUser, isEngenheiroUser } = useDashboardData();
 
   if (loading) {
     return (
@@ -39,73 +24,56 @@ export default function Dashboard() {
   }
 
   const userAccessLevel = getUserAccessLevel(user);
-  const showObraChart = canSeeObraChart(user) && charts.porObra.length > 0;
-  const showTypeChartSeparate = (
-    userAccessLevel === 'gestor_contrato' ||
-    userAccessLevel === 'sala_tecnica_afirmaevias' ||
-    userAccessLevel === 'cliente'
-  ) && charts.porTipo.length > 0;
+  const { showObraChart, showTypeChartSeparate } = getChartVisibility(userAccessLevel, charts);
 
   return (
-    <div className="p-6 space-y-6 bg-transparent min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <DashboardHeader user={user} isClienteUser={isClienteUser} />
+    <DashboardPage>
+      <DashboardHeader user={user} isClienteUser={isClienteUser} />
 
-        {canSeeFilters(user) && (
-          <DashboardFilters
-            filters={filters}
-            setFilters={setFilters}
-            clearFilters={clearFilters}
-            hasActiveFilters={hasActiveFilters}
-            obras={obras}
-          />
-        )}
-
-        <DashboardStats
-          stats={stats}
-          isClienteUser={isClienteUser}
-          isEngenheiroUser={isEngenheiroUser}
-          approvalPercentage={approvalPercentage}
+      {canSeeFilters(user) && (
+        <DashboardFilters
+          filters={filters}
+          setFilters={setFilters}
+          clearFilters={clearFilters}
+          hasActiveFilters={hasActiveFilters}
+          obras={obras}
         />
+      )}
 
-        {/* Gráficos principais */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <MonthlyChart data={charts.monthly} isClienteUser={isClienteUser} />
-          <StatusPieChart
-            data={charts.status}
-            activeStatus={filters.status}
-            isClienteUser={isClienteUser}
-            onSliceClick={data => handlePieClick(data, 'status')}
-          />
-        </div>
+      <DashboardStats
+        stats={stats}
+        isClienteUser={isClienteUser}
+        isEngenheiroUser={isEngenheiroUser}
+        approvalPercentage={approvalPercentage}
+      />
 
-        {/* Gráficos adicionais para Admin e Cliente */}
-        {showObraChart && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <RecordsByObraChart
-              data={charts.porObra}
-              activeObraId={filters.obraId}
-              onSliceClick={data => handlePieClick(data, 'obra')}
-            />
-            <RecordsByTypeChart
-              data={charts.porTipo}
-              activeTipoRegistro={filters.tipoRegistro}
-              onSliceClick={data => handlePieClick(data, 'type')}
-            />
-          </div>
-        )}
-
-        {/* Gráfico de tipos para Gestores, Sala Técnica e Cliente (quando não mostrado acima) */}
-        {!showObraChart && showTypeChartSeparate && (
-          <div className="grid grid-cols-1 gap-6 mb-8">
-            <RecordsByTypeChart
-              data={charts.porTipo}
-              activeTipoRegistro={filters.tipoRegistro}
-              onSliceClick={data => handlePieClick(data, 'type')}
-            />
-          </div>
-        )}
-      </div>
-    </div>
+      <DashboardChartsGrid
+        charts={charts}
+        filters={filters}
+        isClienteUser={isClienteUser}
+        isEngenheiroUser={isEngenheiroUser}
+        onSliceClick={(data, chartType) => {
+          setFilters(prev => {
+            if (chartType === 'status') {
+              const statusMap = {
+                'Aprovados': 'approved', 'Pendentes': 'pending', 'Reprovados': 'rejected',
+                'Assinados': 'approved', 'Aguardando': 'pending',
+              };
+              const next = statusMap[data.name];
+              return { ...prev, status: prev.status === next ? null : next };
+            }
+            if (chartType === 'obra') {
+              return { ...prev, obraId: prev.obraId === data.obraId ? null : data.obraId };
+            }
+            if (chartType === 'type') {
+              return { ...prev, tipoRegistro: prev.tipoRegistro === data.entityType ? null : data.entityType };
+            }
+            return prev;
+          });
+        }}
+        showObraChart={showObraChart}
+        showTypeChartSeparate={showTypeChartSeparate}
+      />
+    </DashboardPage>
   );
 }

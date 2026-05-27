@@ -1,7 +1,8 @@
-// useDashboardData.js — Hook do Dashboard migrado para React Query
-// Cache compartilhado com useEnsaiosList: dados não são recarregados ao navegar entre páginas
-
-import { useMemo, useCallback, useState } from 'react';
+/**
+ * Hook de carregamento de dados para Dashboard.
+ * Cache compartilhado com useEnsaiosList: dados não são recarregados ao navegar entre páginas.
+ */
+import { useMemo, useState, useCallback } from 'react';
 import { subMonths } from 'date-fns';
 import { getUserAccessLevel, filterRegionaisByUser, isCliente, isEngenheiroCliente } from '@/utils/accessControl';
 import {
@@ -104,26 +105,7 @@ export function useDashboardData() {
   );
 
   const clearFilters = useCallback(() => setFilters(DEFAULT_FILTERS), []);
-
-  const handlePieClick = useCallback((data, chartType) => {
-    setFilters(prev => {
-      if (chartType === 'status') {
-        const statusMap = {
-          'Aprovados': 'approved', 'Pendentes': 'pending', 'Reprovados': 'rejected',
-          'Assinados': 'approved', 'Aguardando': 'pending',
-        };
-        const next = statusMap[data.name];
-        return { ...prev, status: prev.status === next ? null : next };
-      }
-      if (chartType === 'obra') {
-        return { ...prev, obraId: prev.obraId === data.obraId ? null : data.obraId };
-      }
-      if (chartType === 'type') {
-        return { ...prev, tipoRegistro: prev.tipoRegistro === data.entityType ? null : data.entityType };
-      }
-      return prev;
-    });
-  }, []);
+  const hasActiveFilters = Boolean(filters.obraId || filters.status || filters.tipoRegistro);
 
   return {
     loading,
@@ -131,13 +113,12 @@ export function useDashboardData() {
     filters,
     setFilters,
     clearFilters,
-    handlePieClick,
+    hasActiveFilters,
     stats,
     charts,
     approvalPercentage,
     obras,
     isClienteUser,
     isEngenheiroUser,
-    hasActiveFilters: Boolean(filters.obraId || filters.status || filters.tipoRegistro),
   };
 }
