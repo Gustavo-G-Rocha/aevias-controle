@@ -92,7 +92,7 @@ export const findObra = (nc, obras) =>
  * @returns {Object|null}
  */
 export const findRegional = (obra, regionais) =>
-  obra ? regionais?.find((r) => r.id === obra.regional_id) : null;
+  obra ? (regionais?.find((r) => r.id === obra.regional_id) || null) : null;
 
 /**
  * Encontra projeto associado ao registro vinculado.
