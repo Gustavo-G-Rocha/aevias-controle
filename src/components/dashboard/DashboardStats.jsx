@@ -6,18 +6,25 @@ import { createPageUrl } from '@/utils';
 
 const StatCard = React.memo(({ title, value, icon: Icon, note, onClick, className }) => (
   <Card
-    className={`relative overflow-hidden bg-white/20 backdrop-blur-lg border border-white/20 shadow-sm text-[#00233B] ${onClick ? 'cursor-pointer hover:shadow-md transition-shadow' : ''} ${className || ''}`}
+    className={`relative overflow-hidden border-0 ${onClick ? 'cursor-pointer transition-all duration-200' : ''} ${className || ''}`}
+    style={{
+      backgroundColor: 'var(--color-surface)',
+      borderRadius: 'var(--card-radius)',
+      boxShadow: onClick ? undefined : 'var(--card-shadow)',
+    }}
+    onMouseEnter={onClick ? e => { e.currentTarget.style.boxShadow = 'var(--card-shadow-hover)'; e.currentTarget.style.transform = 'translateY(-1px)'; } : undefined}
+    onMouseLeave={onClick ? e => { e.currentTarget.style.boxShadow = 'var(--card-shadow)'; e.currentTarget.style.transform = 'translateY(0)'; } : undefined}
     onClick={onClick}
   >
     <CardHeader className="flex flex-row items-center justify-between pb-2">
-      <CardTitle className="text-sm font-medium text-[#00233B]/80">{title}</CardTitle>
-      <div className="p-2 rounded-lg bg-[#BFCF99]/20">
-        <Icon className="w-4 h-4 text-[#00233B]" />
+      <CardTitle className="text-sm font-medium" style={{ color: 'var(--color-text-muted)' }}>{title}</CardTitle>
+      <div className="p-2 rounded-xl" style={{ backgroundColor: 'var(--color-secondary-subtle)' }}>
+        <Icon className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
       </div>
     </CardHeader>
     <CardContent>
-      <div className="text-2xl font-bold text-[#00233B]">{value}</div>
-      {note && <p className="text-xs text-[#00233B]/70 mt-1">{note}</p>}
+      <div className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>{value}</div>
+      {note && <p className="text-xs mt-1" style={{ color: 'var(--color-text-subtle)' }}>{note}</p>}
     </CardContent>
   </Card>
 ));

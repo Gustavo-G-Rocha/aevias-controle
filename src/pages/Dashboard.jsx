@@ -31,8 +31,8 @@ export default function Dashboard() {
     return (
       <div className="flex justify-center items-center h-screen bg-transparent">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#00233B]/50" />
-          <p className="text-[#00233B]/80 mt-2">Carregando dashboard...</p>
+          <Loader2 className="w-8 h-8 animate-spin mx-auto" style={{ color: 'var(--color-text-subtle)' }} />
+          <p className="mt-2" style={{ color: 'var(--color-text-muted)' }}>Carregando dashboard...</p>
         </div>
       </div>
     );

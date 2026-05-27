@@ -35,10 +35,10 @@ const NavItem = ({ item, isActive, pendingTransfers, isGestorContrato, isSalaTec
   const showBadge = item.showBadge && pendingTransfers > 0 && (isGestorContrato || isSalaTecnica);
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton asChild className={`hover:bg-black/5 transition-all duration-200 rounded-lg mb-1 ${isActive ? "bg-black/10" : ""}`}>
+      <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive ? 'var(--color-sidebar-active)' : 'transparent' }} onMouseEnter={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'var(--color-sidebar-hover)'; }} onMouseLeave={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'transparent'; }}>
         <NavLink to={item.url} className="flex items-center gap-3 px-3 py-2.5 relative">
-          <item.icon className="w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
-          <span className="font-medium" style={{ color: 'var(--color-text)' }}>{item.title}</span>
+          <item.icon className="w-5 h-5" style={{ color: 'var(--color-sidebar-icon)' }} />
+          <span className="font-medium" style={{ color: 'var(--color-sidebar-text)' }}>{item.title}</span>
           {showBadge && (
             <Badge className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{pendingTransfers}</Badge>
           )}
@@ -62,8 +62,8 @@ export default function AppSidebar({
   const gestaoNavigation = ADMIN_NAVIGATION.filter(i => !i.allowedLevels || i.allowedLevels.includes(userAccessLevel));
 
   return (
-    <Sidebar className="border-r border-white/10 backdrop-blur-xl" style={{ backgroundColor: 'color-mix(in srgb, var(--color-background) 90%, transparent)' }}>
-      <SidebarHeader className="border-b border-white/10 p-4">
+    <Sidebar className="border-r-0" style={{ backgroundColor: 'var(--color-sidebar-bg)' }}>
+      <SidebarHeader className="p-4" style={{ borderBottom: '1px solid var(--color-sidebar-border)' }}>
         <div className="flex items-center justify-center">
           <img
             src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68a7599ee3fb9205cfb852ec/b2878d2bd_image.png"
@@ -79,15 +79,15 @@ export default function AppSidebar({
       <SidebarContent className="p-3">
         {canCreateRecords && (
           <DialogTrigger asChild>
-            <Button className="w-full mb-4 hidden lg:flex" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-on-primary)' }}>
-              <FilePlus className="w-5 h-5 mr-2" style={{ color: 'var(--color-secondary)' }} />
+            <Button className="w-full mb-4 hidden lg:flex font-semibold tracking-wide" style={{ backgroundColor: 'var(--color-secondary)', color: 'var(--color-primary)' }}>
+              <FilePlus className="w-5 h-5 mr-2" style={{ color: 'var(--color-primary)' }} />
               Novo Registro
             </Button>
           </DialogTrigger>
         )}
 
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-semibold uppercase tracking-wider px-3 py-2" style={{ color: 'var(--color-text-muted)' }}>
+          <SidebarGroupLabel className="text-xs font-semibold uppercase tracking-wider px-3 py-2" style={{ color: 'var(--color-sidebar-text-muted)' }}>
             Principal
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -100,11 +100,11 @@ export default function AppSidebar({
               {showMinhasObras && (
                 <>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="hover:bg-black/5 transition-all duration-200 rounded-lg mb-1 cursor-pointer" onClick={() => setMinhasObrasOpen(p => !p)}>
+                    <SidebarMenuButton className="transition-all duration-200 rounded-xl mb-0.5 cursor-pointer hover:bg-[var(--color-sidebar-hover)]" onClick={() => setMinhasObrasOpen(p => !p)}>
                       <div className="flex items-center gap-3 px-3 py-2.5 w-full">
-                        <FolderOpen className="w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
-                        <span className="font-medium flex-1" style={{ color: 'var(--color-text)' }}>Minhas Obras</span>
-                        {minhasObrasOpen ? <ChevronDown className="w-4 h-4" style={{ color: 'var(--color-text-muted)' }} /> : <ChevronRight className="w-4 h-4" style={{ color: 'var(--color-text-muted)' }} />}
+                        <FolderOpen className="w-5 h-5" style={{ color: 'var(--color-sidebar-icon)' }} />
+                        <span className="font-medium flex-1" style={{ color: 'var(--color-sidebar-text)' }}>Minhas Obras</span>
+                        {minhasObrasOpen ? <ChevronDown className="w-4 h-4" style={{ color: 'var(--color-sidebar-text-muted)' }} /> : <ChevronRight className="w-4 h-4" style={{ color: 'var(--color-sidebar-text-muted)' }} />}
                       </div>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -117,10 +117,10 @@ export default function AppSidebar({
                         { to: createPageUrl("SolicitacoesTransferencia"), icon: ArrowLeftRight, label: "Transferências", badge: pendingTransfers > 0 && (isGestorContrato || isSalaTecnica) },
                       ].map(({ to, icon: Icon, label, badge }) => (
                         <SidebarMenuItem key={label}>
-                          <SidebarMenuButton asChild className={`hover:bg-black/5 transition-all duration-200 rounded-lg mb-1 ${isActive(to) ? "bg-black/10" : ""}`}>
-                            <NavLink to={to} className="flex items-center gap-3 pl-10 pr-3 py-2.5">
-                              <Icon className="w-4 h-4" style={{ color: 'var(--color-secondary)' }} />
-                               <span className="font-medium text-sm" style={{ color: 'var(--color-text)' }}>{label}</span>
+                          <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive(to) ? 'var(--color-sidebar-active)' : 'transparent' }}>
+                            <NavLink to={to} className="flex items-center gap-3 pl-10 pr-3 py-2.5 hover:bg-[var(--color-sidebar-hover)] rounded-xl">
+                              <Icon className="w-4 h-4" style={{ color: 'var(--color-sidebar-icon)' }} />
+                               <span className="font-medium text-sm" style={{ color: 'var(--color-sidebar-text)' }}>{label}</span>
                                {badge && <Badge className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{pendingTransfers}</Badge>}
                             </NavLink>
                           </SidebarMenuButton>
@@ -128,20 +128,20 @@ export default function AppSidebar({
                       ))}
                       {(isGestorContrato || isAdmin) && (
                         <SidebarMenuItem>
-                          <SidebarMenuButton asChild className={`hover:bg-black/5 transition-all duration-200 rounded-lg mb-1 ${isActive("/ImpressionEtiquetas") ? "bg-black/10" : ""}`}>
-                            <NavLink to="/ImpressionEtiquetas" className="flex items-center gap-3 pl-10 pr-3 py-2.5">
-                              <FileText className="w-4 h-4" style={{ color: 'var(--color-secondary)' }} />
-                              <span className="font-medium text-sm" style={{ color: 'var(--color-text)' }}>Impressão de Etiquetas</span>
+                          <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive("/ImpressionEtiquetas") ? 'var(--color-sidebar-active)' : 'transparent' }}>
+                            <NavLink to="/ImpressionEtiquetas" className="flex items-center gap-3 pl-10 pr-3 py-2.5 hover:bg-[var(--color-sidebar-hover)] rounded-xl">
+                              <FileText className="w-4 h-4" style={{ color: 'var(--color-sidebar-icon)' }} />
+                              <span className="font-medium text-sm" style={{ color: 'var(--color-sidebar-text)' }}>Impressão de Etiquetas</span>
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
                       )}
                       {(isGestorContrato || isSalaTecnica || isAdmin) && (
                         <SidebarMenuItem>
-                          <SidebarMenuButton asChild className={`hover:bg-black/5 transition-all duration-200 rounded-lg mb-1 ${isActive("/RelatoriosUnificados") ? "bg-black/10" : ""}`}>
-                            <NavLink to="/RelatoriosUnificados" className="flex items-center gap-3 pl-10 pr-3 py-2.5">
-                              <FileText className="w-4 h-4" style={{ color: 'var(--color-secondary)' }} />
-                              <span className="font-medium text-sm" style={{ color: 'var(--color-text)' }}>Relatórios Unificados</span>
+                          <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive("/RelatoriosUnificados") ? 'var(--color-sidebar-active)' : 'transparent' }}>
+                            <NavLink to="/RelatoriosUnificados" className="flex items-center gap-3 pl-10 pr-3 py-2.5 hover:bg-[var(--color-sidebar-hover)] rounded-xl">
+                              <FileText className="w-4 h-4" style={{ color: 'var(--color-sidebar-icon)' }} />
+                              <span className="font-medium text-sm" style={{ color: 'var(--color-sidebar-text)' }}>Relatórios Unificados</span>
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -155,11 +155,11 @@ export default function AppSidebar({
               {showNaoConformidades && (
                 <>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="hover:bg-black/5 transition-all duration-200 rounded-lg mb-1 cursor-pointer" onClick={() => setNaoConformidadesOpen(p => !p)}>
+                    <SidebarMenuButton className="transition-all duration-200 rounded-xl mb-0.5 cursor-pointer hover:bg-[var(--color-sidebar-hover)]" onClick={() => setNaoConformidadesOpen(p => !p)}>
                       <div className="flex items-center gap-3 px-3 py-2.5 w-full">
-                        <AlertTriangle className="w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
-                        <span className="font-medium flex-1" style={{ color: 'var(--color-text)' }}>Não Conformidades</span>
-                        {naoConformidadesOpen ? <ChevronDown className="w-4 h-4" style={{ color: 'var(--color-text-muted)' }} /> : <ChevronRight className="w-4 h-4" style={{ color: 'var(--color-text-muted)' }} />}
+                        <AlertTriangle className="w-5 h-5" style={{ color: 'var(--color-sidebar-icon)' }} />
+                        <span className="font-medium flex-1" style={{ color: 'var(--color-sidebar-text)' }}>Não Conformidades</span>
+                        {naoConformidadesOpen ? <ChevronDown className="w-4 h-4" style={{ color: 'var(--color-sidebar-text-muted)' }} /> : <ChevronRight className="w-4 h-4" style={{ color: 'var(--color-sidebar-text-muted)' }} />}
                       </div>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -170,20 +170,20 @@ export default function AppSidebar({
                         { to: createPageUrl("GestaoNC"), icon: FileText, label: "Gestão de NCs" },
                       ].map(({ to, icon: Icon, label }) => (
                         <SidebarMenuItem key={label}>
-                          <SidebarMenuButton asChild className={`hover:bg-black/5 transition-all duration-200 rounded-lg mb-1 ${isActive(to) ? "bg-black/10" : ""}`}>
-                            <NavLink to={to} className="flex items-center gap-3 pl-10 pr-3 py-2.5">
-                              <Icon className="w-4 h-4" style={{ color: 'var(--color-secondary)' }} />
-                              <span className="font-medium text-sm" style={{ color: 'var(--color-text)' }}>{label}</span>
+                          <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive(to) ? 'var(--color-sidebar-active)' : 'transparent' }}>
+                            <NavLink to={to} className="flex items-center gap-3 pl-10 pr-3 py-2.5 hover:bg-[var(--color-sidebar-hover)] rounded-xl">
+                              <Icon className="w-4 h-4" style={{ color: 'var(--color-sidebar-icon)' }} />
+                              <span className="font-medium text-sm" style={{ color: 'var(--color-sidebar-text)' }}>{label}</span>
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
                       ))}
                       {(isGestorContrato || isAdmin) && (
                         <SidebarMenuItem>
-                          <SidebarMenuButton asChild className={`hover:bg-black/5 transition-all duration-200 rounded-lg mb-1 ${isActive(createPageUrl("NovaNC")) ? "bg-black/10" : ""}`}>
-                            <NavLink to={createPageUrl("NovaNC")} className="flex items-center gap-3 pl-10 pr-3 py-2.5">
-                              <AlertTriangle className="w-4 h-4" style={{ color: 'var(--color-secondary)' }} />
-                              <span className="font-medium text-sm" style={{ color: 'var(--color-text)' }}>Nova NC</span>
+                          <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive(createPageUrl("NovaNC")) ? 'var(--color-sidebar-active)' : 'transparent' }}>
+                            <NavLink to={createPageUrl("NovaNC")} className="flex items-center gap-3 pl-10 pr-3 py-2.5 hover:bg-[var(--color-sidebar-hover)] rounded-xl">
+                              <AlertTriangle className="w-4 h-4" style={{ color: 'var(--color-sidebar-icon)' }} />
+                              <span className="font-medium text-sm" style={{ color: 'var(--color-sidebar-text)' }}>Nova NC</span>
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -199,7 +199,7 @@ export default function AppSidebar({
         {/* Administração / Gestão */}
         {(canManageSystem || isGestorContrato || isSalaTecnica || isCliente) && gestaoNavigation.length > 0 && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-xs font-semibold uppercase tracking-wider px-3 py-2" style={{ color: 'var(--color-text-muted)' }}>
+            <SidebarGroupLabel className="text-xs font-semibold uppercase tracking-wider px-3 py-2" style={{ color: 'var(--color-sidebar-text-muted)' }}>
               {canManageSystem ? "Administração" : "Gestão"}
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -213,7 +213,7 @@ export default function AppSidebar({
         )}
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-white/10 p-4">
+      <SidebarFooter className="p-4" style={{ borderTop: '1px solid var(--color-sidebar-border)' }}>
         <UserMenu
           user={user}
           isAdmin={isAdmin}

@@ -3,32 +3,33 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const TOOLTIP_STYLE = {
-  backgroundColor: 'rgba(242, 241, 239, 0.8)',
-  border: '1px solid rgba(0, 35, 59, 0.2)',
-  borderRadius: '8px',
-  color: '#00233B',
+  backgroundColor: '#FFFFFF',
+  border: '1px solid #E1E6EC',
+  borderRadius: '10px',
+  color: '#0D2137',
+  boxShadow: '0 4px 12px rgba(0,35,59,0.09)',
 };
 
 export default function MonthlyChart({ data, isClienteUser }) {
   return (
-    <Card className="bg-white/20 backdrop-blur-lg border border-white/20 text-[#00233B]">
+    <Card className="border-0" style={{ backgroundColor: 'var(--color-surface)', borderRadius: 'var(--card-radius)', boxShadow: 'var(--card-shadow)' }}>
       <CardHeader>
-        <CardTitle className="text-lg font-semibold text-[#00233B]">
+        <CardTitle className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
           Registros nos Últimos Meses
         </CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data}>
-            <CartesianGrid stroke="none" />
-            <XAxis dataKey="name" stroke="#00233B" />
-            <YAxis stroke="#00233B" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#E1E6EC" />
+            <XAxis dataKey="name" stroke="#8FA0AE" tick={{ fontSize: 12 }} />
+            <YAxis stroke="#8FA0AE" tick={{ fontSize: 12 }} />
             <Tooltip contentStyle={TOOLTIP_STYLE} />
-            <Legend wrapperStyle={{ color: '#00233B' }} />
-            <Bar dataKey="ensaios" fill="#00233B" name="Total de Registros" />
+            <Legend wrapperStyle={{ color: '#526070', fontSize: 12 }} />
+            <Bar dataKey="ensaios" fill="#00233B" name="Total de Registros" radius={[4, 4, 0, 0]} />
             {isClienteUser
-              ? <Bar dataKey="assinados" fill="#BFCF99" name="Assinados" />
-              : <Bar dataKey="aprovados" fill="#BFCF99" name="Aprovados" />
+              ? <Bar dataKey="assinados" fill="#BFCF99" name="Assinados" radius={[4, 4, 0, 0]} />
+              : <Bar dataKey="aprovados" fill="#BFCF99" name="Aprovados" radius={[4, 4, 0, 0]} />
             }
           </BarChart>
         </ResponsiveContainer>
