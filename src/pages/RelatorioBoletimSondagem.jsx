@@ -1,430 +1,71 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useReportMode } from "@/hooks/useReportMode";
-import { base44 } from "@/api/base44Client";
-import { Button } from "@/components/ui/button";
-import { Download, Loader2 } from "lucide-react";
-import AprovacaoBar from '../components/relatorios/AprovacaoBar';
-import SignatureFooter from '../components/relatorios/SignatureFooter';
+import { Loader2 } from "lucide-react";
+
+import { useRelatorioBoletimSondagemData } from "@/hooks/useRelatorioBoletimSondagemData";
+import { useRelatorioBoletimSondagemActions } from "@/hooks/useRelatorioBoletimSondagemActions";
+import { temSegundaClassificacao } from "@/utils/relatorioBoletimSondagemUtils";
+
+import BoletimSondagemToolbar from "@/components/relatorio-boletim-sondagem/BoletimSondagemToolbar";
+import BoletimSondagemHeader from "@/components/relatorio-boletim-sondagem/BoletimSondagemHeader";
+import BoletimSondagemDadosObra from "@/components/relatorio-boletim-sondagem/BoletimSondagemDadosObra";
+import BoletimSondagemCamadas from "@/components/relatorio-boletim-sondagem/BoletimSondagemCamadas";
+import BoletimSondagemUmidade from "@/components/relatorio-boletim-sondagem/BoletimSondagemUmidade";
+import BoletimSondagemDensidade from "@/components/relatorio-boletim-sondagem/BoletimSondagemDensidade";
+import BoletimSondagemFotos from "@/components/relatorio-boletim-sondagem/BoletimSondagemFotos";
+import SignatureFooter from "@/components/relatorios/SignatureFooter";
 
 export default function RelatorioBoletimSondagem() {
-  const [boletim, setBoletim] = useState(null);
-  const [obra, setObra] = useState(null);
-  const [regional, setRegional] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
   useReportMode();
 
-  useEffect(() => {
-    const loadData = async () => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get('id');
-      if (!id) { setError("ID não fornecido"); return; }
+  const { boletim, obra, regional, loading, error } = useRelatorioBoletimSondagemData();
+  const { handlePrint } = useRelatorioBoletimSondagemActions();
 
-      const data = await base44.entities.BoletimSondagem.get(id);
-      setBoletim(data);
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-slate-500" />
+      </div>
+    );
+  }
 
-      if (data.obra_id) {
-        const obraData = await base44.entities.Obra.get(data.obra_id);
-        setObra(obraData);
-        if (obraData.regional_id) {
-          const regionalData = await base44.entities.Regional.get(obraData.regional_id);
-          setRegional(regionalData);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-      setError("Erro ao carregar dados do relatório");
-    } finally {
-      setLoading(false);
-    }
-    };
-    loadData();
-  }, []);
+  if (error || !boletim) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-red-600">{error || "Erro ao carregar"}</p>
+      </div>
+    );
+  }
 
-  const formatDate = (d) => d ? new Date(d).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : '-';
-  const formatDateTime = (d) => {
-    if (!d) return 'N/A';
-    const normalized = (!d.endsWith('Z') && !d.includes('+') && !d.includes('-', 10)) ? d + 'Z' : d;
-    return new Date(normalized).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'medium' });
-  };
-  const fmtNum = (v, dec = 2) => (v !== null && v !== undefined) ? parseFloat(v).toFixed(dec) : '-';
-
-  if (loading) return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin text-slate-500" /></div>;
-  if (error || !boletim) return <div className="flex justify-center items-center h-screen"><p className="text-red-600">{error || "Erro ao carregar"}</p></div>;
-
-  const un = boletim.umidade_natural || {};
-  // Compatibilidade retroativa: suportar campo antigo
-  const densidades = boletim.densidades_in_situ?.length > 0
-    ? boletim.densidades_in_situ
-    : boletim.densidade_in_situ
-      ? [boletim.densidade_in_situ]
-      : [{}];
-  const camadas = boletim.camadas || [];
-  const temCol2 = camadas.some(c => c.classificacao_2 !== null && c.classificacao_2 !== undefined);
+  const temCol2 = temSegundaClassificacao(boletim.camadas);
 
   return (
     <div className="relatorio-page bg-white min-h-screen">
-      {/* Toolbar */}
-      <div className="print:hidden sticky top-0 bg-white border-b border-slate-200 p-4 shadow-sm z-10">
-        <div className="max-w-[210mm] mx-auto flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-slate-800">Boletim de Sondagem (PI)</h2>
-          <div className="flex items-center gap-2">
-            {boletim && <AprovacaoBar entityName="BoletimSondagem" recordId={boletim.id} />}
-            <Button onClick={() => window.print()} className="bg-slate-800 text-white hover:bg-slate-700">
-              <Download className="w-4 h-4 mr-2" /> Gerar PDF
-            </Button>
-          </div>
-        </div>
-      </div>
+      <BoletimSondagemToolbar boletim={boletim} onPrint={handlePrint} />
 
-      <div className="w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none p-2 print:p-1 flex flex-col" style={{ fontSize: '95%', minHeight: 'calc(297mm - 16mm)' }}>
-        {/* Header */}
-        <header className="grid grid-cols-3 items-center border-b-2 border-slate-900 pb-1 mb-2">
-          <div>
-            <picture>
-              <source srcSet={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} />
-              <img
-                src={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"}
-                alt="Logo"
-                className="h-12 object-contain"
-                width="auto" height="48"
-              />
-            </picture>
-          </div>
-          <div className="text-center">
-            <h1 className="text-sm font-bold text-gray-800 leading-tight">BOLETIM DE SONDAGEM</h1>
-          </div>
-          <div></div>
-        </header>
+      <div
+        className="w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none p-2 print:p-1 flex flex-col"
+        style={{ fontSize: "95%", minHeight: "calc(297mm - 16mm)" }}
+      >
+        <BoletimSondagemHeader regional={regional} />
 
         <main className="text-xs space-y-2">
-          {/* DADOS DA OBRA */}
-          <section className="mb-1">
-            <div className="bg-slate-700 text-white px-2 py-0.5 font-bold text-center text-[10px] mb-1">DADOS DA OBRA</div>
-            <div className="grid grid-cols-3 gap-x-4 gap-y-1 text-[10px]">
-              {[
-                ["OBRA", obra?.name || '-'],
-                ["CLIENTE", boletim.cliente || regional?.cliente || '-'],
-                ["DATA", formatDate(boletim.data)],
-                ["RODOVIA", boletim.rodovia || '-'],
-                ["KM", boletim.km || '-'],
-                ["PISTA", boletim.pista || '-'],
-                ["BORDO", boletim.bordo || '-'],
-                ["FURO", boletim.furo || '-'],
-                ["OPERADOR", boletim.operador || boletim.laboratorista_name || '-'],
-              ].map(([label, val]) => (
-                <div key={label}>
-                  <span className="font-bold text-gray-700">{label}: </span>
-                  <span className="text-gray-900">{val}</span>
-                </div>
-              ))}
-            </div>
-          </section>
+          <BoletimSondagemDadosObra boletim={boletim} obra={obra} regional={regional} />
+          <BoletimSondagemCamadas boletim={boletim} temCol2={temCol2} />
+          <BoletimSondagemUmidade boletim={boletim} />
+          <BoletimSondagemDensidade boletim={boletim} />
 
-          {/* SONDAGEM — CAMADAS */}
-          <section>
-            {!temCol2 ? (
-              /* Apenas 1 classificação — tabela simples */
-              <div>
-                <div className="bg-slate-700 text-white px-2 py-0.5 font-bold text-center text-[10px] mb-1">
-                  SONDAGEM — CAMADAS
-                </div>
-                <div className="bg-slate-500 text-white px-1 py-0.5 font-bold text-center text-[9px] mb-0.5">
-                  {boletim.face_classificacao_1 ? `Face: ${boletim.face_classificacao_1}` : 'Classificação 1'}
-                </div>
-                <table className="w-full border-collapse border border-slate-400 text-[9px]">
-                  <thead>
-                    <tr className="bg-slate-200">
-                      <th rowSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">Nº</th>
-                      <th colSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">PROF. (m)</th>
-                      <th rowSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">ESP.</th>
-                      <th rowSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">N.A</th>
-                      <th rowSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">CLASSIFICAÇÃO</th>
-                    </tr>
-                    <tr className="bg-slate-100">
-                      <th className="border border-slate-400 px-1 py-0.5 text-center text-[8px]">DE</th>
-                      <th className="border border-slate-400 px-1 py-0.5 text-center text-[8px]">ATÉ</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {camadas.map((c, i) => (
-                      <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
-                        <td className="border border-slate-400 px-1 py-0.5 text-center font-semibold">{c.numero}</td>
-                        <td className="border border-slate-400 px-1 py-0.5 text-center">{c.prof_de !== null && c.prof_de !== undefined ? fmtNum(c.prof_de) : '-'}</td>
-                        <td className="border border-slate-400 px-1 py-0.5 text-center">{c.prof_ate !== null && c.prof_ate !== undefined ? fmtNum(c.prof_ate) : '-'}</td>
-                        <td className="border border-slate-400 px-1 py-0.5 text-center">{c.espessura !== null && c.espessura !== undefined ? fmtNum(c.espessura) : '-'}</td>
-                        <td className="border border-slate-400 px-1 py-0.5 text-center">{c.na !== null && c.na !== undefined ? fmtNum(c.na) : '-'}</td>
-                        <td className="border border-slate-400 px-1 py-0.5">{c.classificacao_1 || ''}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              /* 2 classificações — tabelas lado a lado */
-              <div>
-                <div className="bg-slate-700 text-white px-2 py-0.5 font-bold text-center text-[10px] mb-1">SONDAGEM — CAMADAS</div>
-                <div className="grid grid-cols-2 gap-2">
-                  {/* Classificação 1 */}
-                  <div>
-                    <div className="bg-slate-500 text-white px-1 py-0.5 font-bold text-center text-[9px] mb-0.5">
-                      {boletim.face_classificacao_1 ? `Face: ${boletim.face_classificacao_1}` : 'Classificação 1'}
-                    </div>
-                    <table className="w-full border-collapse border border-slate-400 text-[9px]">
-                      <thead>
-                        <tr className="bg-slate-200">
-                          <th rowSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">Nº</th>
-                          <th colSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">PROF. (m)</th>
-                          <th rowSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">ESP.</th>
-                          <th rowSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">N.A</th>
-                          <th rowSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">CLASSIFICAÇÃO</th>
-                        </tr>
-                        <tr className="bg-slate-100">
-                          <th className="border border-slate-400 px-1 py-0.5 text-center text-[8px]">DE</th>
-                          <th className="border border-slate-400 px-1 py-0.5 text-center text-[8px]">ATÉ</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {camadas.map((c, i) => (
-                          <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
-                            <td className="border border-slate-400 px-1 py-0.5 text-center font-semibold">{c.numero}</td>
-                            <td className="border border-slate-400 px-1 py-0.5 text-center">{c.prof_de != null ? fmtNum(c.prof_de) : '-'}</td>
-                            <td className="border border-slate-400 px-1 py-0.5 text-center">{c.prof_ate != null ? fmtNum(c.prof_ate) : '-'}</td>
-                            <td className="border border-slate-400 px-1 py-0.5 text-center">{c.espessura != null ? fmtNum(c.espessura) : '-'}</td>
-                            <td className="border border-slate-400 px-1 py-0.5 text-center">{c.na != null ? fmtNum(c.na) : '-'}</td>
-                            <td className="border border-slate-400 px-1 py-0.5">{c.classificacao_1 || ''}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  {/* Classificação 2 */}
-                  <div>
-                    <div className="bg-slate-500 text-white px-1 py-0.5 font-bold text-center text-[9px] mb-0.5">
-                      {boletim.face_classificacao_2 ? `Face: ${boletim.face_classificacao_2}` : 'Classificação 2'}
-                    </div>
-                    <table className="w-full border-collapse border border-slate-400 text-[9px]">
-                      <thead>
-                        <tr className="bg-slate-200">
-                          <th rowSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">Nº</th>
-                          <th colSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">PROF. (m)</th>
-                          <th rowSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">ESP.</th>
-                          <th rowSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">N.A</th>
-                          <th rowSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">CLASSIFICAÇÃO</th>
-                        </tr>
-                        <tr className="bg-slate-100">
-                          <th className="border border-slate-400 px-1 py-0.5 text-center text-[8px]">DE</th>
-                          <th className="border border-slate-400 px-1 py-0.5 text-center text-[8px]">ATÉ</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {(boletim.camadas_2?.length ? boletim.camadas_2 : camadas).map((c, i) => (
-                          <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
-                            <td className="border border-slate-400 px-1 py-0.5 text-center font-semibold">{c.numero}</td>
-                            <td className="border border-slate-400 px-1 py-0.5 text-center">{c.prof_de != null ? fmtNum(c.prof_de) : '-'}</td>
-                            <td className="border border-slate-400 px-1 py-0.5 text-center">{c.prof_ate != null ? fmtNum(c.prof_ate) : '-'}</td>
-                            <td className="border border-slate-400 px-1 py-0.5 text-center">{c.espessura != null ? fmtNum(c.espessura) : '-'}</td>
-                            <td className="border border-slate-400 px-1 py-0.5 text-center">{c.na != null ? fmtNum(c.na) : '-'}</td>
-                            <td className="border border-slate-400 px-1 py-0.5">{c.classificacao_2 || ''}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            )}
-          </section>
-
-          {/* UMIDADE NATURAL — lado a lado se houver 2, senão tabela simples */}
-          <section>
-            <div className="bg-slate-700 text-white px-2 py-0.5 font-bold text-center text-[10px] mb-1">UMIDADE NATURAL — DNER-ME 213/94</div>
-            {!boletim.umidade_natural_2 ? (
-              /* Apenas 1 umidade */
-              <table className="w-full border-collapse border border-slate-400 text-[9px]">
-                <thead>
-                  <tr className="bg-slate-200">
-                    <th className="border border-slate-400 px-1 py-0.5 text-left font-bold w-1/2">Campo</th>
-                    <th className="border border-slate-400 px-1 py-0.5 text-center font-bold">Am. 1</th>
-                    <th className="border border-slate-400 px-1 py-0.5 text-center font-bold">Am. 2</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="bg-white font-bold">
-                    <td className="border border-slate-400 px-1 py-0.5 font-bold text-gray-800">Camada ensaiada</td>
-                    <td className="border border-slate-400 px-1 py-0.5 text-center font-bold text-gray-900" colSpan={2}>{un.camada_ensaiada_1 || '-'}</td>
-                  </tr>
-                  {[
-                    ["Nº cápsula", un.no_capsula_1, un.no_capsula_2, false],
-                    ["Massa cápsula (g)", un.massa_capsula_1, un.massa_capsula_2, true],
-                    ["Massa cap + solo úmido (g)", un.massa_cap_solo_umido_1, un.massa_cap_solo_umido_2, true],
-                    ["Massa cap + solo seco (g)", un.massa_cap_solo_seco_1, un.massa_cap_solo_seco_2, true],
-
-                  ].map(([label, v1, v2, isNum], ri) => (
-                    <tr key={ri} className={ri % 2 === 0 ? 'bg-slate-50' : 'bg-white'}>
-                      <td className="border border-slate-400 px-1 py-0.5 text-gray-700">{label}</td>
-                      <td className="border border-slate-400 px-1 py-0.5 text-center">{isNum ? fmtNum(v1) : (v1 || '-')}</td>
-                      <td className="border border-slate-400 px-1 py-0.5 text-center">{isNum ? fmtNum(v2) : (v2 || '-')}</td>
-                    </tr>
-                  ))}
-                  <tr className="bg-slate-200 font-bold">
-                    <td className="border border-slate-400 px-1 py-0.5 font-bold">Umidade (%)</td>
-                    <td className="border border-slate-400 px-1 py-0.5 text-center font-bold text-blue-700" colSpan={2}>
-                      {(() => { const u1 = un.umidade_1, u2 = un.umidade_2; if (u1 != null && u2 != null) return `${((u1+u2)/2).toFixed(2)}%`; if (u1 != null) return `${fmtNum(u1)}%`; return '-'; })()}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            ) : (
-              /* 2 umidades lado a lado */
-              (() => {
-                const un2 = boletim.umidade_natural_2 || {};
-                const calcU2 = (idx) => {
-                  const csu = un2[`massa_cap_solo_umido_${idx}`], css = un2[`massa_cap_solo_seco_${idx}`], cap = un2[`massa_capsula_${idx}`];
-                  if (csu && css && cap != null) { const ss = css - cap; return ss > 0 ? parseFloat((((csu-css)/ss)*100).toFixed(2)) : null; }
-                  return null;
-                };
-                const agua1u2 = un2.massa_cap_solo_umido_1 && un2.massa_cap_solo_seco_1 ? parseFloat((un2.massa_cap_solo_umido_1 - un2.massa_cap_solo_seco_1).toFixed(2)) : null;
-                const agua2u2 = un2.massa_cap_solo_umido_2 && un2.massa_cap_solo_seco_2 ? parseFloat((un2.massa_cap_solo_umido_2 - un2.massa_cap_solo_seco_2).toFixed(2)) : null;
-                const ss1u2 = un2.massa_cap_solo_seco_1 && un2.massa_capsula_1 != null ? parseFloat((un2.massa_cap_solo_seco_1 - un2.massa_capsula_1).toFixed(2)) : null;
-                const ss2u2 = un2.massa_cap_solo_seco_2 && un2.massa_capsula_2 != null ? parseFloat((un2.massa_cap_solo_seco_2 - un2.massa_capsula_2).toFixed(2)) : null;
-                const u2_1 = calcU2(1), u2_2 = calcU2(2);
-                const renderUmidadeTable = (uData, rows, umidMedia) => (
-                  <div>
-                    <div className="bg-slate-500 text-white px-1 py-0.5 font-bold text-center text-[9px] mb-0.5">
-                      Camada ensaiada: {uData.camada_ensaiada_1 || '-'}
-                    </div>
-                    <table className="w-full border-collapse border border-slate-400 text-[9px]">
-                      <thead>
-                        <tr className="bg-slate-200">
-                          <th className="border border-slate-400 px-1 py-0.5 text-left font-bold">Campo</th>
-                          <th className="border border-slate-400 px-1 py-0.5 text-center font-bold">Am. 1</th>
-                          <th className="border border-slate-400 px-1 py-0.5 text-center font-bold">Am. 2</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {rows.map(([label, v1, v2, isNum], ri) => (
-                          <tr key={ri} className={ri % 2 === 0 ? 'bg-slate-50' : 'bg-white'}>
-                            <td className="border border-slate-400 px-1 py-0.5 text-gray-700">{label}</td>
-                            <td className="border border-slate-400 px-1 py-0.5 text-center">{isNum ? fmtNum(v1) : (v1 || '-')}</td>
-                            <td className="border border-slate-400 px-1 py-0.5 text-center">{isNum ? fmtNum(v2) : (v2 || '-')}</td>
-                          </tr>
-                        ))}
-                        <tr className="bg-slate-200 font-bold">
-                          <td className="border border-slate-400 px-1 py-0.5 font-bold">Umidade (%)</td>
-                          <td className="border border-slate-400 px-1 py-0.5 text-center font-bold text-blue-700" colSpan={2}>{umidMedia}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                );
-                const umid1Media = (() => { const u1 = un.umidade_1, u2 = un.umidade_2; if (u1 != null && u2 != null) return `${((u1+u2)/2).toFixed(2)}%`; if (u1 != null) return `${fmtNum(u1)}%`; return '-'; })();
-                const umid2Media = u2_1 != null && u2_2 != null ? `${((u2_1+u2_2)/2).toFixed(2)}%` : u2_1 != null ? `${fmtNum(u2_1)}%` : '-';
-                return (
-                  <div className="grid grid-cols-2 gap-2">
-                    {renderUmidadeTable(
-                      un,
-                      [
-                        ["Nº cápsula", un.no_capsula_1, un.no_capsula_2, false],
-                        ["Massa cápsula (g)", un.massa_capsula_1, un.massa_capsula_2, true],
-                        ["Massa cap + solo úmido (g)", un.massa_cap_solo_umido_1, un.massa_cap_solo_umido_2, true],
-                        ["Massa cap + solo seco (g)", un.massa_cap_solo_seco_1, un.massa_cap_solo_seco_2, true],
-                      ],
-                      umid1Media
-                    )}
-                    {renderUmidadeTable(
-                      un2,
-                      [
-                        ["Nº cápsula", un2.no_capsula_1, un2.no_capsula_2, false],
-                        ["Massa cápsula (g)", un2.massa_capsula_1, un2.massa_capsula_2, true],
-                        ["Massa cap + solo úmido (g)", un2.massa_cap_solo_umido_1, un2.massa_cap_solo_umido_2, true],
-                        ["Massa cap + solo seco (g)", un2.massa_cap_solo_seco_1, un2.massa_cap_solo_seco_2, true],
-                      ],
-                      umid2Media
-                    )}
-                  </div>
-                );
-              })()
-            )}
-          </section>
-
-          {/* DENSIDADE IN SITU — tabela multi-ensaio */}
-          {(boletim.ensaio_insitu_realizado !== false) && densidades.length > 0 && (
-          <section>
-            <div className="bg-slate-700 text-white px-2 py-0.5 font-bold text-center text-[10px] mb-1">MASSA ESPECÍFICA APARENTE IN SITU — DNER-ME 092/94</div>
-            {(() => {
-              const rows = [
-                { label: "Camada ensaiada", field: "camada_ensaiada", isNum: false },
-                { label: "VOLUME", section: true },
-                { label: "Peso do frasco antes (gf)", field: "peso_frasco_antes", isNum: true },
-                { label: "Peso do frasco depois (gf)", field: "peso_frasco_depois", isNum: true },
-                { label: "Peso areia funil e placa (gf)", field: "peso_areia_funil_placa", isNum: true },
-                { label: "Massa esp. aparente areia (g/dm³)", field: "massa_esp_aparente_areia", isNum: true },
-                { label: "Peso areia na cavidade (gf)", field: "peso_areia_cavidade", isNum: true },
-                { label: "Volume do buraco (dm³)", field: "volume_buraco", isNum: true, dec: 3 },
-                { label: "MASSA", section: true },
-                { label: "Peso solo + recipiente (gf)", field: "peso_solo_recipiente", isNum: true },
-                { label: "Peso do recipiente (gf)", field: "peso_recipiente", isNum: true },
-                { label: "Peso do solo (gf)", field: "peso_solo", isNum: true },
-                { label: "UMIDADE", section: true },
-                { label: "Peso do solo úmido (gf)", field: "peso_solo_umido", isNum: true },
-                { label: "Peso do solo seco (gf)", field: "peso_solo_seco", isNum: true },
-                { label: "Teor de umidade (%)", field: "teor_umidade", isNum: true },
-                { label: "RESULTADOS", section: true },
-                { label: "Dens. Aparente Solo Úmido (g/dm³)", field: "densidade_aparente_solo_umido", isNum: true, dec: 3, result: true },
-                { label: "Dens. Aparente Solo Seco (g/dm³)", field: "densidade_aparente_solo_seco", isNum: true, dec: 3, result: true },
-              ];
-              return (
-                <table className="w-full border-collapse border border-slate-400 text-[9px]">
-                  <thead>
-                    <tr className="bg-slate-200">
-                      <th className="border border-slate-400 px-2 py-0.5 text-left font-bold">Campo</th>
-                      {densidades.map((_, i) => (
-                        <th key={i} className="border border-slate-400 px-2 py-0.5 text-center font-bold">Ensaio {i + 1}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map((row, ri) => {
-                      if (row.section) {
-                        return (
-                          <tr key={ri} className="bg-slate-300">
-                            <td colSpan={densidades.length + 1} className="border border-slate-400 px-2 py-0.5 font-bold text-[8px] uppercase tracking-wider text-slate-600">{row.label}</td>
-                          </tr>
-                        );
-                      }
-                      return (
-                        <tr key={ri} className={row.result ? 'bg-slate-200 font-bold' : ri % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
-                          <td className="border border-slate-400 px-2 py-0.5 text-gray-700">{row.label}</td>
-                          {densidades.map((d, di) => (
-                            <td key={di} className={`border border-slate-400 px-2 py-0.5 text-center font-semibold ${row.result ? 'text-blue-700' : ''}`}>
-                              {row.isNum ? fmtNum(d[row.field], row.dec ?? 2) : (d[row.field] || '-')}
-                            </td>
-                          ))}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              );
-            })()}
-          </section>
-          )}
-
-          {/* Observações */}
           {boletim.observacoes && (
             <section className="mb-[50px]">
               <div className="bg-slate-200 px-2 py-0.5 font-bold text-[10px]">OBSERVAÇÕES</div>
-              <div className="border border-slate-300 p-1 text-[10px] min-h-[20px] break-words whitespace-pre-wrap">{boletim.observacoes}</div>
+              <div className="border border-slate-300 p-1 text-[10px] min-h-[20px] break-words whitespace-pre-wrap">
+                {boletim.observacoes}
+              </div>
             </section>
           )}
-
         </main>
 
-        {/* Footer — assinaturas ficam na mesma página do relatório */}
-        <footer className="mt-auto pt-1" style={{ breakInside: 'avoid', breakBefore: 'avoid' }}>
+        <footer className="mt-auto pt-1" style={{ breakInside: "avoid", breakBefore: "avoid" }}>
           <SignatureFooter
             labName={boletim.laboratorista_name}
             labEmail={boletim.created_by}
@@ -444,64 +85,7 @@ export default function RelatorioBoletimSondagem() {
         </footer>
       </div>
 
-      {/* Relatório Fotográfico — páginas separadas, idêntico ao checklist de usina */}
-      {boletim.fotos?.length > 0 && (() => {
-        const chunkArray = (arr, size) => {
-          const chunks = [];
-          for (let i = 0; i < arr.length; i += size) chunks.push(arr.slice(i, i + size));
-          return chunks;
-        };
-        const photoChunks = chunkArray(boletim.fotos, 6);
-        return photoChunks.map((chunk, pageIndex) => (
-          <div key={pageIndex} className="p-8 print:p-8 flex flex-col min-h-screen" style={{ breakBefore: 'page' }}>
-            <div className="w-full max-w-[190mm] mx-auto flex-grow flex flex-col">
-              <header className="grid grid-cols-3 items-center border-b-2 border-gray-800 pb-2">
-                <div className="flex justify-start">
-                  <picture>
-                    <source srcSet={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} />
-                    <img
-                      src={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"}
-                      alt="Logo"
-                      className="h-16 object-contain"
-                      width="auto" height="64"
-                    />
-                  </picture>
-                </div>
-                <div className="text-center">
-                  <h1 className="text-xl font-bold text-gray-800">Relatório Fotográfico</h1>
-                  <p className="text-sm text-gray-600">Boletim de Sondagem — {obra?.name || ''}</p>
-                </div>
-                <div className="flex justify-end">
-                  <div className="border border-gray-400 p-2 rounded-md text-sm">
-                    <p>{boletim.data ? new Date(boletim.data).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : '-'}</p>
-                  </div>
-                </div>
-              </header>
-              <main className="flex-grow grid grid-cols-2 gap-4 mt-4" style={{ gridAutoRows: 'minmax(0, 1fr)' }}>
-                {chunk.map((fotoUrl, fotoIndex) => (
-                  <div key={fotoIndex} className="border p-2 rounded-lg flex flex-col" style={{ height: 'calc((100vh - 300px) / 3)' }}>
-                    <div className="bg-gray-100 flex-grow flex items-center justify-center rounded overflow-hidden">
-                      <picture>
-                        <source srcSet={fotoUrl} />
-                        <img
-                          src={fotoUrl}
-                          alt={`Foto ${pageIndex * 6 + fotoIndex + 1}`}
-                          className="max-h-full max-w-full object-contain"
-                          width="auto" height="auto"
-                        />
-                      </picture>
-                    </div>
-                    <p className="text-center text-sm mt-2 font-medium">Foto {pageIndex * 6 + fotoIndex + 1}</p>
-                  </div>
-                ))}
-              </main>
-              <footer className="mt-auto pt-2 text-center text-xs text-gray-500">
-                Página {pageIndex + 2} de {photoChunks.length + 1}
-              </footer>
-            </div>
-          </div>
-        ));
-      })()}
+      <BoletimSondagemFotos boletim={boletim} obra={obra} regional={regional} />
 
       <style>{`
         table tr { line-height: 1.075; }
