@@ -5,8 +5,7 @@ describe('relatorioDensidadeInSituUtils', () => {
   describe('formatDate', () => {
     it('formata data no padrão pt-BR com UTC', () => {
       const result = formatDate('2024-05-15');
-      expect(result).toContain('15');
-      expect(result).toMatch(/15.*mai/i);
+      expect(result).toBe('15/05/2024');
     });
 
     it('retorna string vazia se data nula', () => {
