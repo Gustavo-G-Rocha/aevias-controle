@@ -88,7 +88,7 @@ export default function AppSidebar({
       <SidebarContent className="p-3 pb-6">
         {canCreateRecords &&
         <DialogTrigger asChild>
-            <Button className="w-full mb-4 hidden lg:flex font-semibold tracking-wide" style={{ backgroundColor: 'var(--color-secondary)', color: 'var(--color-primary)' }}>
+            <Button className="w-full mb-4 hidden lg:flex font-semibold tracking-wide text-xs" style={{ backgroundColor: 'var(--color-secondary)', color: 'var(--color-primary)' }}>
               <FilePlus className="w-5 h-5 mr-2" style={{ color: 'var(--color-primary)' }} />
               Novo Registro
             </Button>
