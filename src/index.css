@@ -219,8 +219,22 @@
     display: none !important;
   }
 
-  /* Container principal da sidebar: flex coluna, altura total, sem overflow */
-  [data-sidebar="sidebar"] {
+  /* Desktop: container interno da sidebar (filho do fixed wrapper) */
+  [data-sidebar="sidebar"]:not([data-mobile="true"]) {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  /* Mobile: o SheetContent já é o [data-sidebar="sidebar"],
+     o layout flex-col está no div filho direto — não sobrescrever o SheetContent */
+  [data-sidebar="sidebar"][data-mobile="true"] {
+    overflow: hidden !important;
+  }
+
+  /* Mobile: div interno flex-col (filho direto do SheetContent) */
+  [data-sidebar="sidebar"][data-mobile="true"] > div {
     display: flex !important;
     flex-direction: column !important;
     height: 100% !important;
