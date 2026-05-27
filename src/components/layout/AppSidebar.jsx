@@ -38,12 +38,11 @@ const NavItem = ({ item, isActive, pendingTransfers, isGestorContrato, isSalaTec
       <SidebarMenuButton
         asChild
         isActive={isActive}
-        className={`rounded-xl mb-0.5 h-auto ${isActive ? '!bg-white' : ''}`}
-        style={isActive ? { color: '#00233B !important' } : {}}>
+        className={`rounded-xl mb-0.5 h-auto ${isActive ? '!bg-white !text-black' : ''}`}>
         
         <NavLink to={item.url} className="flex items-center gap-3 px-3 py-2.5">
-          <item.icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive ? '#00233B !important' : 'var(--color-sidebar-text-muted)' }} />
-          <span className="font-semibold text-sm" style={{ color: isActive ? '#00233B !important' : 'var(--color-sidebar-text)' }}>{item.title}</span>
+          <item.icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive ? '#000000 !important' : 'var(--color-sidebar-text-muted)' }} />
+          <span className="font-semibold text-sm" style={{ color: isActive ? '#000000 !important' : 'var(--color-sidebar-text)' }}>{item.title}</span>
           {showBadge &&
           <Badge className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{pendingTransfers}</Badge>
           }
@@ -129,7 +128,7 @@ export default function AppSidebar({
                   <SidebarMenuItem key={label}>
                          <SidebarMenuButton asChild isActive={isActive(to)} className={`rounded-xl mb-0.5 h-auto ${isActive(to) ? '!bg-white' : ''}`} style={isActive(to) ? { color: '#00233B !important' } : {}}>
                            <NavLink to={to} className="flex items-center gap-3 pl-10 pr-3 py-2.5">
-                             <Icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive(to) ? '#00233B !important' : 'var(--color-sidebar-text-muted)' }} />
+                             <Icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive(to) ? '#000000 !important' : 'var(--color-sidebar-text-muted)' }} />
                              <span className="font-semibold text-sm" style={{ color: isActive(to) ? '#00233B !important' : 'var(--color-sidebar-text)' }}>{label}</span>
                              {badge && <Badge className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{pendingTransfers}</Badge>}
                            </NavLink>
@@ -138,20 +137,20 @@ export default function AppSidebar({
                   )}
                       {(isGestorContrato || isAdmin) &&
                   <SidebarMenuItem>
-                         <SidebarMenuButton asChild isActive={isActive("/ImpressionEtiquetas")} className={`rounded-xl mb-0.5 h-auto ${isActive("/ImpressionEtiquetas") ? '!bg-white' : ''}`} style={isActive("/ImpressionEtiquetas") ? { color: '#00233B !important' } : {}}>
+                         <SidebarMenuButton asChild isActive={isActive("/ImpressionEtiquetas")} className={`rounded-xl mb-0.5 h-auto ${isActive("/ImpressionEtiquetas") ? '!bg-white !text-black' : ''}`}>
                            <NavLink to="/ImpressionEtiquetas" className="flex items-center gap-3 pl-10 pr-3 py-2.5">
-                             <FileText className="w-4 h-4 flex-shrink-0" style={{ color: isActive("/ImpressionEtiquetas") ? '#00233B !important' : 'var(--color-sidebar-text-muted)' }} />
-                             <span className="font-semibold text-sm" style={{ color: isActive("/ImpressionEtiquetas") ? '#00233B !important' : 'var(--color-sidebar-text)' }}>Impressão de Etiquetas</span>
+                             <FileText className="w-4 h-4 flex-shrink-0" style={{ color: isActive("/ImpressionEtiquetas") ? '#000000 !important' : 'var(--color-sidebar-text-muted)' }} />
+                             <span className="font-semibold text-sm" style={{ color: isActive("/ImpressionEtiquetas") ? '#000000 !important' : 'var(--color-sidebar-text)' }}>Impressão de Etiquetas</span>
                            </NavLink>
                          </SidebarMenuButton>
                        </SidebarMenuItem>
                   }
                       {(isGestorContrato || isSalaTecnica || isAdmin) &&
                   <SidebarMenuItem>
-                         <SidebarMenuButton asChild isActive={isActive("/RelatoriosUnificados")} className={`rounded-xl mb-0.5 h-auto ${isActive("/RelatoriosUnificados") ? '!bg-white' : ''}`} style={isActive("/RelatoriosUnificados") ? { color: '#00233B !important' } : {}}>
+                         <SidebarMenuButton asChild isActive={isActive("/RelatoriosUnificados")} className={`rounded-xl mb-0.5 h-auto ${isActive("/RelatoriosUnificados") ? '!bg-white !text-black' : ''}`}>
                            <NavLink to="/RelatoriosUnificados" className="flex items-center gap-3 pl-10 pr-3 py-2.5">
-                             <FileText className="w-4 h-4 flex-shrink-0" style={{ color: isActive("/RelatoriosUnificados") ? '#00233B !important' : 'var(--color-sidebar-text-muted)' }} />
-                             <span className="font-semibold text-sm" style={{ color: isActive("/RelatoriosUnificados") ? '#00233B !important' : 'var(--color-sidebar-text)' }}>Relatórios Unificados</span>
+                             <FileText className="w-4 h-4 flex-shrink-0" style={{ color: isActive("/RelatoriosUnificados") ? '#000000 !important' : 'var(--color-sidebar-text-muted)' }} />
+                             <span className="font-semibold text-sm" style={{ color: isActive("/RelatoriosUnificados") ? '#000000 !important' : 'var(--color-sidebar-text)' }}>Relatórios Unificados</span>
                            </NavLink>
                          </SidebarMenuButton>
                        </SidebarMenuItem>
@@ -182,18 +181,18 @@ export default function AppSidebar({
                   <SidebarMenuItem key={label}>
                          <SidebarMenuButton asChild isActive={isActive(to)} className={`rounded-xl mb-0.5 h-auto ${isActive(to) ? '!bg-white' : ''}`} style={isActive(to) ? { color: '#00233B !important' } : {}}>
                            <NavLink to={to} className="flex items-center gap-3 pl-10 pr-3 py-2.5">
-                             <Icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive(to) ? '#00233B !important' : 'var(--color-sidebar-text-muted)' }} />
+                             <Icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive(to) ? '#000000 !important' : 'var(--color-sidebar-text-muted)' }} />
                              <span className="font-semibold text-sm" style={{ color: isActive(to) ? '#00233B !important' : 'var(--color-sidebar-text)' }}>{label}</span>
                            </NavLink>
                          </SidebarMenuButton>
                        </SidebarMenuItem>
                   )}
                       {(isGestorContrato || isAdmin) &&
-                  <SidebarMenuItem>
-                         <SidebarMenuButton asChild isActive={isActive(createPageUrl("NovaNC"))} className={`rounded-xl mb-0.5 h-auto ${isActive(createPageUrl("NovaNC")) ? '!bg-white' : ''}`} style={isActive(createPageUrl("NovaNC")) ? { color: '#00233B !important' } : {}}>
+                      <SidebarMenuItem>
+                         <SidebarMenuButton asChild isActive={isActive(createPageUrl("NovaNC"))} className={`rounded-xl mb-0.5 h-auto ${isActive(createPageUrl("NovaNC")) ? '!bg-white !text-black' : ''}`}>
                            <NavLink to={createPageUrl("NovaNC")} className="flex items-center gap-3 pl-10 pr-3 py-2.5">
-                             <AlertTriangle className="w-4 h-4 flex-shrink-0" style={{ color: isActive(createPageUrl("NovaNC")) ? '#00233B !important' : 'var(--color-sidebar-text-muted)' }} />
-                             <span className="font-semibold text-sm" style={{ color: isActive(createPageUrl("NovaNC")) ? '#00233B !important' : 'var(--color-sidebar-text)' }}>Nova NC</span>
+                             <AlertTriangle className="w-4 h-4 flex-shrink-0" style={{ color: isActive(createPageUrl("NovaNC")) ? '#000000 !important' : 'var(--color-sidebar-text-muted)' }} />
+                             <span className="font-semibold text-sm" style={{ color: isActive(createPageUrl("NovaNC")) ? '#000000 !important' : 'var(--color-sidebar-text)' }}>Nova NC</span>
                            </NavLink>
                          </SidebarMenuButton>
                        </SidebarMenuItem>
