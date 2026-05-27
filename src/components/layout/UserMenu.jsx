@@ -46,23 +46,23 @@ export default function UserMenu({ user, isAdmin, isSalaTecnica, isGestorContrat
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="w-full justify-start gap-3 h-auto p-3 hover:bg-black/5">
-            <div className="w-8 h-8 bg-[#00233B] rounded-full flex items-center justify-center">
-              <UserIcon className="w-4 h-4 text-[#BFCF99]" />
+            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)' }}>
+              <UserIcon className="w-4 h-4" style={{ color: 'var(--color-secondary)' }} />
             </div>
             <div className="flex-1 text-left min-w-0">
-              <p className="font-medium text-[#00233B] text-sm truncate">{user.laboratorista_name}</p>
+              <p className="font-medium text-sm truncate" style={{ color: 'var(--color-text)' }}>{user.laboratorista_name}</p>
               <div className="flex items-center gap-2">
-                <p className="text-xs text-[#00233B]/70 truncate">{user.email}</p>
-                <Badge variant="secondary" className="text-xs bg-black/10 text-[#00233B]">
+                <p className="text-xs truncate" style={{ color: 'var(--color-text-muted)' }}>{user.email}</p>
+                <Badge variant="secondary" className="text-xs bg-black/10" style={{ color: 'var(--color-text)' }}>
                   {roleLabel}
                 </Badge>
               </div>
             </div>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 bg-[#F2F1EF]/80 backdrop-blur-lg border-white/20 text-[#00233B]">
+        <DropdownMenuContent align="end" className="w-48 backdrop-blur-lg border-white/20" style={{ backgroundColor: 'color-mix(in srgb, var(--color-background) 90%, transparent)', color: 'var(--color-text)' }}>
           <DropdownMenuItem onClick={() => navigate("/Settings")} className="cursor-pointer focus:bg-white/10">
-            <Settings className="w-4 h-4 mr-2 text-[#BFCF99]" />
+            <Settings className="w-4 h-4 mr-2" style={{ color: 'var(--color-secondary)' }} />
             Configurações
           </DropdownMenuItem>
           <DropdownMenuItem

@@ -36,7 +36,7 @@ const AppLayout = ({ children }) => {
   return (
     <SidebarProvider>
       <Dialog open={isCreateEnsaioOpen} onOpenChange={setIsCreateEnsaioOpen}>
-        <div className="min-h-screen flex w-full bg-[#F2F1EF] overflow-x-hidden">
+        <div className="min-h-screen flex w-full overflow-x-hidden" style={{ backgroundColor: 'var(--color-background)' }}>
           <AppSidebar
             user={user}
             userAccessLevel={userAccessLevel}
@@ -76,10 +76,10 @@ const AppLayout = ({ children }) => {
           </main>
         </div>
 
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden bg-[#F2F1EF]/80 backdrop-blur-xl border-white/20 text-[#00233B]">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden backdrop-blur-xl border-white/20" style={{ backgroundColor: 'color-mix(in srgb, var(--color-background) 90%, transparent)', color: 'var(--color-text)' }}>
           <DialogHeader>
-            <DialogTitle className="text-xl text-[#00233B]">Iniciar Novo Registro</DialogTitle>
-            <p className="text-sm text-[#00233B]/80">Selecione o tipo de registro que deseja criar</p>
+            <DialogTitle className="text-xl" style={{ color: 'var(--color-text)' }}>Iniciar Novo Registro</DialogTitle>
+            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Selecione o tipo de registro que deseja criar</p>
           </DialogHeader>
           <CreateEnsaioDialog
             onSelect={() => setIsCreateEnsaioOpen(false)}

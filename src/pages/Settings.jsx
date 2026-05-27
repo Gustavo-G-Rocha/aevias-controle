@@ -26,26 +26,26 @@ export default function Settings() {
   return (
     <div className="p-6 max-w-2xl mx-auto space-y-6 min-h-screen bg-transparent">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#00233B]">Configurações</h1>
-        <p className="text-[#00233B]/80 mt-1">Personalize a aparência do aplicativo</p>
+        <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text)' }}>Configurações</h1>
+        <p className="mt-1" style={{ color: 'var(--color-text-muted)' }}>Personalize a aparência do aplicativo</p>
       </div>
 
       <Card className="bg-white/20 backdrop-blur-lg border border-white/20 text-[#00233B]">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-[#00233B] flex items-center gap-2">
-            <Sun className="w-5 h-5 text-[#BFCF99]" />
+          <CardTitle className="text-lg font-semibold flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
+            <Sun className="w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
             Tema
           </CardTitle>
-          <p className="text-sm text-[#00233B]/70">O aplicativo utiliza o tema claro.</p>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>O aplicativo utiliza o tema claro.</p>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-3 p-4 rounded-xl border-2 border-[#BFCF99] bg-[#BFCF99]/20 w-fit">
-            <div className="p-3 rounded-full bg-[#00233B]">
-              <Sun className="w-6 h-6 text-[#BFCF99]" />
+            <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--color-primary)' }}>
+              <Sun className="w-6 h-6" style={{ color: 'var(--color-secondary)' }} />
             </div>
             <div>
-              <p className="font-semibold text-sm text-[#00233B]">Claro</p>
-              <p className="text-xs text-[#00233B]/50 mt-0.5">Tema claro ativo</p>
+              <p className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>Claro</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-subtle)' }}>Tema claro ativo</p>
             </div>
           </div>
         </CardContent>
@@ -57,7 +57,7 @@ export default function Settings() {
             <Trash2 className="w-5 h-5" />
             Zona de Perigo
           </CardTitle>
-          <p className="text-sm text-[#00233B]/70">Ações irreversíveis para a sua conta</p>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Ações irreversíveis para a sua conta</p>
         </CardHeader>
         <CardContent>
           <AlertDialog>
