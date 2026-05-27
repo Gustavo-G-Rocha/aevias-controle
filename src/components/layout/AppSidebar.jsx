@@ -73,7 +73,7 @@ export default function AppSidebar({
           <img src="https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/2754f7c59_AE_-_Logo_Hor_Negativo.png"
 
           alt="Afirmaevias Logo"
-          className="h-16 w-auto brightness-200 contrast-110 rounded-[32px] py-3"
+          className="h-16 w-auto brightness-200 contrast-110 rounded-[32px] py-3 px-4"
           width="480"
           height="200"
           loading="lazy" />
