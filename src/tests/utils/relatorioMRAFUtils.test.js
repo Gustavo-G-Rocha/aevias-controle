@@ -42,7 +42,7 @@ describe('calcularGranulometria', () => {
     };
     const result = calcularGranulometria(ensaioBase, faixa, null);
     expect(result).toHaveLength(3);
-    expect(result[0].astm).toBe('Nº ¾"');
+    expect(result[0].astm).toBe('3/4"');
   });
 
   it('calcula percentual passante corretamente', () => {
