@@ -42,10 +42,23 @@ export default function RelatorioMRAF({ ensaio, obra, project, user, regional, f
       
       let faixaTrabalhoMin = '', faixaTrabalhoMax = '', faixaTrabalho = '';
       if (project) {
-        const keyFaixaTrabalho = peneira.key;
-        faixaTrabalho = project.faixa_trabalho?.[keyFaixaTrabalho] || '';
-        faixaTrabalhoMin = project.faixa_trabalho_min?.[keyFaixaTrabalho] || '';
-        faixaTrabalhoMax = project.faixa_trabalho_max?.[keyFaixaTrabalho] || '';
+        // Busca por key direta; se não encontrar, procura pela abertura numérica em todas as keys do projeto
+        const aberturaNum = parseFloat(peneira.abertura.replace(',', '.'));
+        const findValueByAbertura = (obj) => {
+          if (!obj) return '';
+          // Tentativa direta pela key
+          if (obj[peneira.key] !== undefined && obj[peneira.key] !== null && obj[peneira.key] !== '') return obj[peneira.key];
+          // Fallback: varredura por abertura numérica
+          for (const [k, v] of Object.entries(obj)) {
+            const parts = k.replace('peneira_', '').replace('mm', '').split('_');
+            const keyNum = parseFloat(parts.join('.'));
+            if (!isNaN(keyNum) && Math.abs(keyNum - aberturaNum) < 0.001 && v !== undefined && v !== null && v !== '') return v;
+          }
+          return '';
+        };
+        faixaTrabalho    = findValueByAbertura(project.faixa_trabalho);
+        faixaTrabalhoMin = findValueByAbertura(project.faixa_trabalho_min);
+        faixaTrabalhoMax = findValueByAbertura(project.faixa_trabalho_max);
       }
       
       return {
