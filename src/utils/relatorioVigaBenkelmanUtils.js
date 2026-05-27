@@ -41,8 +41,12 @@ export function agruparLevantamentosPorFaixa(levantamentos, maxFaixas = 4) {
   
   if (levs.length === 0) return [];
 
-  const todosTemFaixaNome = levs.every(l => l.faixa_nome);
-  const todasIguais = todosTemFaixaNome && levs.every(l => l.faixa_nome === levs[0].faixa_nome);
+  // Filtrar apenas levantamentos com dados reais
+  const levsFiltrados = levs.filter(lev => temDadosLevantamento(lev));
+  if (levsFiltrados.length === 0) return [];
+
+  const todosTemFaixaNome = levsFiltrados.every(l => l.faixa_nome);
+  const todasIguais = todosTemFaixaNome && levsFiltrados.every(l => l.faixa_nome === levsFiltrados[0].faixa_nome);
 
   let faixasArray;
   
@@ -50,7 +54,7 @@ export function agruparLevantamentosPorFaixa(levantamentos, maxFaixas = 4) {
     // Agrupar pelo campo faixa_nome
     const faixasMap = {};
     const faixasOrder = [];
-    levs.forEach(lev => {
+    levsFiltrados.forEach(lev => {
       const nome = lev.faixa_nome;
       if (!faixasMap[nome]) {
         faixasMap[nome] = [];
@@ -62,19 +66,16 @@ export function agruparLevantamentosPorFaixa(levantamentos, maxFaixas = 4) {
   } else {
     // Agrupar em blocos de 20 (compatibilidade com dados antigos)
     const blocoSize = 20;
-    const numBlocos = Math.ceil(levs.length / blocoSize);
+    const numBlocos = Math.ceil(levsFiltrados.length / blocoSize);
     faixasArray = [];
     for (let i = 0; i < numBlocos && i < maxFaixas; i++) {
-      const bloco = levs.slice(i * blocoSize, (i + 1) * blocoSize);
+      const bloco = levsFiltrados.slice(i * blocoSize, (i + 1) * blocoSize);
       const nome = bloco.find(l => l.faixa_nome)?.faixa_nome || `Faixa ${i + 1}`;
       faixasArray.push({ nome, levantamentos: bloco });
     }
   }
 
-  // Filtrar faixas que não têm dados reais
-  return faixasArray.filter(faixa =>
-    faixa.levantamentos.some(lev => lev.estaca_km || (lev.bordo_esquerdo?.leitura_final && lev.bordo_esquerdo.leitura_final !== 0))
-  );
+  return faixasArray;
 }
 
 /**
@@ -108,10 +109,11 @@ export function deflexaoExcedeLimite(deflexao, defAdmissivel) {
  * Valida se levantamento tem dados
  */
 export function temDadosLevantamento(lev) {
-  return lev && (
+  if (!lev) return false;
+  return !!(
     lev.estaca_km || 
-    lev.bordo_esquerdo?.leitura_final ||
-    lev.eixo?.leitura_final ||
-    lev.bordo_direito?.leitura_final
+    (lev.bordo_esquerdo?.leitura_final && lev.bordo_esquerdo.leitura_final !== 0) ||
+    (lev.eixo?.leitura_final && lev.eixo.leitura_final !== 0) ||
+    (lev.bordo_direito?.leitura_final && lev.bordo_direito.leitura_final !== 0)
   );
 }
