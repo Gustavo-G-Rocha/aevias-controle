@@ -1,5 +1,3 @@
-import { Regional } from "@/entities/Regional";
-
 /**
  * Get user's regional access based on role
  */
@@ -63,58 +61,23 @@ export const filterProjectsByUserAccess = (
 };
 
 /**
- * Update project regional association
+ * Calculate updated project IDs after removing a project
  */
-export const updateProjectRegional = async (
-  projectId,
-  oldRegionalId,
-  newRegionalId,
-  regionais
+export const removeProjectFromRegional = (
+  projectIds,
+  projectId
 ) => {
-  // Remove from old regional
-  if (oldRegionalId) {
-    const regionalAntiga = regionais.find((r) => r.id === oldRegionalId);
-    if (regionalAntiga?.project_ids) {
-      const novosProjectIds = regionalAntiga.project_ids.filter(
-        (id) => id !== projectId
-      );
-      await Regional.update(regionalAntiga.id, {
-        project_ids: novosProjectIds,
-      });
-    }
-  }
-
-  // Add to new regional
-  if (newRegionalId) {
-    const regionalNova = regionais.find((r) => r.id === newRegionalId);
-    if (regionalNova) {
-      const projectIds = regionalNova.project_ids || [];
-      if (!projectIds.includes(projectId)) {
-        await Regional.update(regionalNova.id, {
-          project_ids: [...projectIds, projectId],
-        });
-      }
-    }
-  }
+  return projectIds.filter((id) => id !== projectId);
 };
 
 /**
- * Add project to regional
+ * Calculate updated project IDs after adding a project
  */
-export const addProjectToRegional = async (
-  projectId,
-  regionalId,
-  regionais
-) => {
-  const regional = regionais.find((r) => r.id === regionalId);
-  if (regional) {
-    const projectIds = regional.project_ids || [];
-    if (!projectIds.includes(projectId)) {
-      await Regional.update(regional.id, {
-        project_ids: [...projectIds, projectId],
-      });
-    }
+export const addProjectIdToRegional = (projectIds, projectId) => {
+  if (!projectIds.includes(projectId)) {
+    return [...projectIds, projectId];
   }
+  return projectIds;
 };
 
 /**

@@ -2,8 +2,8 @@ import { useState, useCallback } from "react";
 import { Project } from "@/entities/Project";
 import { Regional } from "@/entities/Regional";
 import {
-  updateProjectRegional,
-  addProjectToRegional,
+  removeProjectFromRegional,
+  addProjectIdToRegional,
 } from "@/utils/projectsUtils";
 
 export const useProjectsActions = (regionais, loadData) => {
@@ -20,22 +20,54 @@ export const useProjectsActions = (regionais, loadData) => {
           savedProject = { ...editingProject, ...projectData };
 
           if (editingProject.regional_id !== projectData.regional_id) {
-            await updateProjectRegional(
-              editingProject.id,
-              editingProject.regional_id,
-              projectData.regional_id,
-              regionais
-            );
+            // Remove from old regional
+            if (editingProject.regional_id) {
+              const regionalAntiga = regionais.find(
+                (r) => r.id === editingProject.regional_id
+              );
+              if (regionalAntiga?.project_ids) {
+                const novosProjectIds = removeProjectFromRegional(
+                  regionalAntiga.project_ids,
+                  editingProject.id
+                );
+                await Regional.update(regionalAntiga.id, {
+                  project_ids: novosProjectIds,
+                });
+              }
+            }
+
+            // Add to new regional
+            if (projectData.regional_id) {
+              const regionalNova = regionais.find(
+                (r) => r.id === projectData.regional_id
+              );
+              if (regionalNova) {
+                const projectIds = addProjectIdToRegional(
+                  regionalNova.project_ids || [],
+                  editingProject.id
+                );
+                await Regional.update(regionalNova.id, {
+                  project_ids: projectIds,
+                });
+              }
+            }
           }
         } else {
           savedProject = await Project.create(projectData);
 
           if (projectData.regional_id) {
-            await addProjectToRegional(
-              savedProject.id,
-              projectData.regional_id,
-              regionais
+            const regional = regionais.find(
+              (r) => r.id === projectData.regional_id
             );
+            if (regional) {
+              const projectIds = addProjectIdToRegional(
+                regional.project_ids || [],
+                savedProject.id
+              );
+              await Regional.update(regional.id, {
+                project_ids: projectIds,
+              });
+            }
           }
         }
 

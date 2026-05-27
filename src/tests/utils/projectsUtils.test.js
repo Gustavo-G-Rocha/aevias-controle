@@ -4,6 +4,8 @@ import {
   getRegionalNome,
   getUserAccessLevel,
   canManageProjects,
+  removeProjectFromRegional,
+  addProjectIdToRegional,
   STATUS_COLORS,
   TIPO_PROJETO_COLORS,
   TIPO_PROJETO_LABELS,
@@ -112,6 +114,44 @@ describe("projectsUtils", () => {
 
     it("deve retornar false para user", () => {
       expect(canManageProjects("user")).toBe(false);
+    });
+  });
+
+  describe("removeProjectFromRegional", () => {
+    it("deve remover projeto da lista", () => {
+      const projectIds = ["p1", "p2", "p3"];
+      const result = removeProjectFromRegional(projectIds, "p2");
+      expect(result).toEqual(["p1", "p3"]);
+    });
+
+    it("deve retornar lista vazia se único projeto", () => {
+      const result = removeProjectFromRegional(["p1"], "p1");
+      expect(result).toEqual([]);
+    });
+
+    it("deve não modificar se projeto não existe", () => {
+      const projectIds = ["p1", "p2"];
+      const result = removeProjectFromRegional(projectIds, "p3");
+      expect(result).toEqual(["p1", "p2"]);
+    });
+  });
+
+  describe("addProjectIdToRegional", () => {
+    it("deve adicionar projeto se não existe", () => {
+      const projectIds = ["p1", "p2"];
+      const result = addProjectIdToRegional(projectIds, "p3");
+      expect(result).toEqual(["p1", "p2", "p3"]);
+    });
+
+    it("deve não duplicar se já existe", () => {
+      const projectIds = ["p1", "p2"];
+      const result = addProjectIdToRegional(projectIds, "p2");
+      expect(result).toEqual(["p1", "p2"]);
+    });
+
+    it("deve criar lista com primeiro projeto", () => {
+      const result = addProjectIdToRegional([], "p1");
+      expect(result).toEqual(["p1"]);
     });
   });
 
