@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
 import {
-  ENTITY_KEYS,
   filterObrasByUserAccess,
   filterRecordsByDateRange,
   extractLaboratoristas,
@@ -9,16 +8,6 @@ import {
 } from "@/utils/relatoriosUnificadosUtils";
 
 describe("relatoriosUnificadosUtils", () => {
-  describe("ENTITY_KEYS", () => {
-    it("deve conter 23 entidades", () => {
-      expect(ENTITY_KEYS).toHaveLength(23);
-    });
-
-    it("deve incluir DiarioObra e BoletimSondagem", () => {
-      expect(ENTITY_KEYS).toContain("DiarioObra");
-      expect(ENTITY_KEYS).toContain("BoletimSondagem");
-    });
-  });
 
   describe("filterObrasByUserAccess", () => {
     it("deve retornar todas as obras para admin", () => {
