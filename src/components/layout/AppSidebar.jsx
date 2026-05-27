@@ -112,7 +112,7 @@ export default function AppSidebar({
                     <SidebarMenuButton className="transition-all duration-200 rounded-xl mb-0.5 cursor-pointer hover:bg-[var(--color-sidebar-hover)]" onClick={() => setMinhasObrasOpen((p) => !p)}>
                       <div className="flex items-center gap-3 px-3 py-2.5 w-full">
                         <FolderOpen className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />
-                        <span className="font-medium flex-1" style={{ color: 'var(--color-sidebar-text)' }}>Minhas Obras</span>
+                        <span className="font-medium flex-1 text-xs" style={{ color: 'var(--color-sidebar-text)' }}>Minhas Obras</span>
                         {minhasObrasOpen ? <ChevronDown className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} /> : <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />}
                       </div>
                     </SidebarMenuButton>
