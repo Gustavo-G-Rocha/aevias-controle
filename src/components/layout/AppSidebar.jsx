@@ -71,7 +71,7 @@ export default function AppSidebar({
   const gestaoNavigation = ADMIN_NAVIGATION.filter((i) => !i.allowedLevels || i.allowedLevels.includes(userAccessLevel));
 
   return (
-    <Sidebar className="border-r-0" style={{ backgroundColor: 'var(--color-sidebar-bg)', '--sidebar-accent': '#ffffff', '--sidebar-accent-foreground': '#00233B' }}>
+    <Sidebar className="border-r-0 rounded-[32px]" style={{ backgroundColor: 'var(--color-sidebar-bg)', '--sidebar-accent': '#ffffff', '--sidebar-accent-foreground': '#00233B' }}>
       <SidebarHeader className="flex-shrink-0 px-4 pt-4 pb-3" style={{ borderBottom: '1px solid var(--color-sidebar-border)' }}>
         <div className="flex items-center justify-center">
           <img src="https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/2754f7c59_AE_-_Logo_Hor_Negativo.png"
@@ -186,9 +186,9 @@ export default function AppSidebar({
                              </NavLink>
                              </SidebarMenuButton>
                              </SidebarMenuItem>
-                             )}
+                  )}
                              {(isGestorContrato || isAdmin) &&
-                      <SidebarMenuItem>
+                  <SidebarMenuItem>
                          <SidebarMenuButton asChild isActive={isActive(createPageUrl("NovaNC"))} className={`rounded-xl mb-0.5 h-auto ${isActive(createPageUrl("NovaNC")) ? '!bg-white !text-black' : ''}`}>
                            <NavLink to={createPageUrl("NovaNC")} className="flex items-center gap-3 pl-10 pr-3 py-2.5">
                              <AlertTriangle className="w-4 h-4 flex-shrink-0" style={{ color: isActive(createPageUrl("NovaNC")) ? '#000000 !important' : 'var(--color-sidebar-text-muted)' }} />
