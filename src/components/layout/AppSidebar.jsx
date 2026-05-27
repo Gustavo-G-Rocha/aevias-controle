@@ -65,14 +65,14 @@ export default function AppSidebar({
     <Sidebar className="border-r border-white/10 bg-white/10 backdrop-blur-xl">
       <SidebarHeader className="border-b border-white/10 p-4">
         <div className="flex items-center justify-center">
-          <picture>
-            <source srcSet="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68a7599ee3fb9205cfb852ec/b2878d2bd_image.png" />
-            <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68a7599ee3fb9205cfb852ec/b2878d2bd_image.png" alt="Afirmaevias Logo" className="h-16 w-auto dark:hidden" width="auto" height="64" loading="lazy" />
-          </picture>
-          <picture>
-            <source srcSet="https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/7d9853579_LogoDarkmode.jpg" />
-            <img src="https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/7d9853579_LogoDarkmode.jpg" alt="Afirmaevias Logo" className="h-16 w-auto hidden dark:block" width="auto" height="64" loading="lazy" />
-          </picture>
+          <img
+            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68a7599ee3fb9205cfb852ec/b2878d2bd_image.png"
+            alt="Afirmaevias Logo"
+            className="h-16 w-auto"
+            width="auto"
+            height="64"
+            loading="lazy"
+          />
         </div>
       </SidebarHeader>
 
