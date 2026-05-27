@@ -37,7 +37,7 @@ const NavItem = ({ item, isActive, pendingTransfers, isGestorContrato, isSalaTec
     <SidebarMenuItem>
       <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive ? 'var(--color-sidebar-active)' : 'transparent' }} onMouseEnter={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'var(--color-sidebar-hover)'; }} onMouseLeave={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'transparent'; }}>
         <NavLink to={item.url} className="flex items-center gap-3 px-3 py-2.5 relative">
-          <item.icon className="w-5 h-5" style={{ color: 'var(--color-sidebar-icon)' }} />
+          <item.icon className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />
           <span className="font-medium" style={{ color: 'var(--color-sidebar-text)' }}>{item.title}</span>
           {showBadge && (
             <Badge className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{pendingTransfers}</Badge>
@@ -62,13 +62,13 @@ export default function AppSidebar({
   const gestaoNavigation = ADMIN_NAVIGATION.filter(i => !i.allowedLevels || i.allowedLevels.includes(userAccessLevel));
 
   return (
-    <Sidebar className="border-r-0" style={{ backgroundColor: 'var(--color-sidebar-bg)' }}>
-      <SidebarHeader className="p-4" style={{ borderBottom: '1px solid var(--color-sidebar-border)' }}>
+    <Sidebar className="border-r-0 flex flex-col h-full" style={{ backgroundColor: 'var(--color-sidebar-bg)' }}>
+      <SidebarHeader className="flex-shrink-0 px-4 pt-4 pb-3" style={{ borderBottom: '1px solid var(--color-sidebar-border)' }}>
         <div className="flex items-center justify-center">
           <img
             src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68a7599ee3fb9205cfb852ec/b2878d2bd_image.png"
             alt="Afirmaevias Logo"
-            className="h-16 w-auto"
+            className="h-16 w-auto brightness-200 contrast-110"
             width="auto"
             height="64"
             loading="lazy"
@@ -76,7 +76,7 @@ export default function AppSidebar({
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="p-3">
+      <SidebarContent className="flex-1 min-h-0 overflow-y-auto p-3 pb-4">
         {canCreateRecords && (
           <DialogTrigger asChild>
             <Button className="w-full mb-4 hidden lg:flex font-semibold tracking-wide" style={{ backgroundColor: 'var(--color-secondary)', color: 'var(--color-primary)' }}>
@@ -102,9 +102,9 @@ export default function AppSidebar({
                   <SidebarMenuItem>
                     <SidebarMenuButton className="transition-all duration-200 rounded-xl mb-0.5 cursor-pointer hover:bg-[var(--color-sidebar-hover)]" onClick={() => setMinhasObrasOpen(p => !p)}>
                       <div className="flex items-center gap-3 px-3 py-2.5 w-full">
-                        <FolderOpen className="w-5 h-5" style={{ color: 'var(--color-sidebar-icon)' }} />
+                        <FolderOpen className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />
                         <span className="font-medium flex-1" style={{ color: 'var(--color-sidebar-text)' }}>Minhas Obras</span>
-                        {minhasObrasOpen ? <ChevronDown className="w-4 h-4" style={{ color: 'var(--color-sidebar-text-muted)' }} /> : <ChevronRight className="w-4 h-4" style={{ color: 'var(--color-sidebar-text-muted)' }} />}
+                        {minhasObrasOpen ? <ChevronDown className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} /> : <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />}
                       </div>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -119,7 +119,7 @@ export default function AppSidebar({
                         <SidebarMenuItem key={label}>
                           <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive(to) ? 'var(--color-sidebar-active)' : 'transparent' }}>
                             <NavLink to={to} className="flex items-center gap-3 pl-10 pr-3 py-2.5 hover:bg-[var(--color-sidebar-hover)] rounded-xl">
-                              <Icon className="w-4 h-4" style={{ color: 'var(--color-sidebar-icon)' }} />
+                              <Icon className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />
                                <span className="font-medium text-sm" style={{ color: 'var(--color-sidebar-text)' }}>{label}</span>
                                {badge && <Badge className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{pendingTransfers}</Badge>}
                             </NavLink>
@@ -130,7 +130,7 @@ export default function AppSidebar({
                         <SidebarMenuItem>
                           <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive("/ImpressionEtiquetas") ? 'var(--color-sidebar-active)' : 'transparent' }}>
                             <NavLink to="/ImpressionEtiquetas" className="flex items-center gap-3 pl-10 pr-3 py-2.5 hover:bg-[var(--color-sidebar-hover)] rounded-xl">
-                              <FileText className="w-4 h-4" style={{ color: 'var(--color-sidebar-icon)' }} />
+                              <FileText className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />
                               <span className="font-medium text-sm" style={{ color: 'var(--color-sidebar-text)' }}>Impressão de Etiquetas</span>
                             </NavLink>
                           </SidebarMenuButton>
@@ -140,7 +140,7 @@ export default function AppSidebar({
                         <SidebarMenuItem>
                           <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive("/RelatoriosUnificados") ? 'var(--color-sidebar-active)' : 'transparent' }}>
                             <NavLink to="/RelatoriosUnificados" className="flex items-center gap-3 pl-10 pr-3 py-2.5 hover:bg-[var(--color-sidebar-hover)] rounded-xl">
-                              <FileText className="w-4 h-4" style={{ color: 'var(--color-sidebar-icon)' }} />
+                              <FileText className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />
                               <span className="font-medium text-sm" style={{ color: 'var(--color-sidebar-text)' }}>Relatórios Unificados</span>
                             </NavLink>
                           </SidebarMenuButton>
@@ -157,9 +157,9 @@ export default function AppSidebar({
                   <SidebarMenuItem>
                     <SidebarMenuButton className="transition-all duration-200 rounded-xl mb-0.5 cursor-pointer hover:bg-[var(--color-sidebar-hover)]" onClick={() => setNaoConformidadesOpen(p => !p)}>
                       <div className="flex items-center gap-3 px-3 py-2.5 w-full">
-                        <AlertTriangle className="w-5 h-5" style={{ color: 'var(--color-sidebar-icon)' }} />
+                        <AlertTriangle className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />
                         <span className="font-medium flex-1" style={{ color: 'var(--color-sidebar-text)' }}>Não Conformidades</span>
-                        {naoConformidadesOpen ? <ChevronDown className="w-4 h-4" style={{ color: 'var(--color-sidebar-text-muted)' }} /> : <ChevronRight className="w-4 h-4" style={{ color: 'var(--color-sidebar-text-muted)' }} />}
+                        {naoConformidadesOpen ? <ChevronDown className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} /> : <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />}
                       </div>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -172,7 +172,7 @@ export default function AppSidebar({
                         <SidebarMenuItem key={label}>
                           <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive(to) ? 'var(--color-sidebar-active)' : 'transparent' }}>
                             <NavLink to={to} className="flex items-center gap-3 pl-10 pr-3 py-2.5 hover:bg-[var(--color-sidebar-hover)] rounded-xl">
-                              <Icon className="w-4 h-4" style={{ color: 'var(--color-sidebar-icon)' }} />
+                              <Icon className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />
                               <span className="font-medium text-sm" style={{ color: 'var(--color-sidebar-text)' }}>{label}</span>
                             </NavLink>
                           </SidebarMenuButton>
@@ -182,7 +182,7 @@ export default function AppSidebar({
                         <SidebarMenuItem>
                           <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive(createPageUrl("NovaNC")) ? 'var(--color-sidebar-active)' : 'transparent' }}>
                             <NavLink to={createPageUrl("NovaNC")} className="flex items-center gap-3 pl-10 pr-3 py-2.5 hover:bg-[var(--color-sidebar-hover)] rounded-xl">
-                              <AlertTriangle className="w-4 h-4" style={{ color: 'var(--color-sidebar-icon)' }} />
+                              <AlertTriangle className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />
                               <span className="font-medium text-sm" style={{ color: 'var(--color-sidebar-text)' }}>Nova NC</span>
                             </NavLink>
                           </SidebarMenuButton>
@@ -213,7 +213,7 @@ export default function AppSidebar({
         )}
       </SidebarContent>
 
-      <SidebarFooter className="p-4" style={{ borderTop: '1px solid var(--color-sidebar-border)' }}>
+      <SidebarFooter className="flex-shrink-0 p-4" style={{ borderTop: '1px solid var(--color-sidebar-border)' }}>
         <UserMenu
           user={user}
           isAdmin={isAdmin}
