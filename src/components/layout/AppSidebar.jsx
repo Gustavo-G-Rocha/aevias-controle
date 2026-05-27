@@ -35,7 +35,7 @@ const NavItem = ({ item, isActive, pendingTransfers, isGestorContrato, isSalaTec
   const showBadge = item.showBadge && pendingTransfers > 0 && (isGestorContrato || isSalaTecnica);
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive ? 'var(--color-sidebar-active)' : 'transparent' }} onMouseEnter={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'var(--color-sidebar-hover)'; }} onMouseLeave={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'transparent'; }}>
+      <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive ? 'rgba(255,255,255,0.12)' : 'transparent' }} onMouseEnter={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'var(--color-sidebar-hover)'; }} onMouseLeave={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'transparent'; }}>
         <NavLink to={item.url} className="flex items-center gap-3 px-3 py-2.5 relative">
           <item.icon className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />
           <span className="font-medium" style={{ color: 'var(--color-sidebar-text)' }}>{item.title}</span>
