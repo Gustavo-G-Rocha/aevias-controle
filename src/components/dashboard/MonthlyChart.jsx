@@ -3,11 +3,11 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const TOOLTIP_STYLE = {
-  backgroundColor: '#FFFFFF',
-  border: '1px solid #E1E6EC',
-  borderRadius: '10px',
-  color: '#0D2137',
-  boxShadow: '0 4px 12px rgba(0,35,59,0.09)',
+  backgroundColor: 'var(--color-surface)',
+  border: '1px solid var(--color-border)',
+  borderRadius: 'var(--radius-md)',
+  color: 'var(--color-text)',
+  boxShadow: 'var(--shadow-md)',
 };
 
 export default function MonthlyChart({ data, isClienteUser }) {
@@ -21,12 +21,12 @@ export default function MonthlyChart({ data, isClienteUser }) {
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E1E6EC" />
-            <XAxis dataKey="name" stroke="#8FA0AE" tick={{ fontSize: 12 }} />
-            <YAxis stroke="#8FA0AE" tick={{ fontSize: 12 }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+            <XAxis dataKey="name" stroke="var(--color-text-subtle)" tick={{ fontSize: 12 }} />
+            <YAxis stroke="var(--color-text-subtle)" tick={{ fontSize: 12 }} />
             <Tooltip contentStyle={TOOLTIP_STYLE} />
-            <Legend wrapperStyle={{ color: '#526070', fontSize: 12 }} />
-            <Bar dataKey="ensaios" fill="#00233B" name="Total de Registros" radius={[4, 4, 0, 0]} />
+            <Legend wrapperStyle={{ color: 'var(--color-text-muted)', fontSize: 12 }} />
+            <Bar dataKey="ensaios" fill="var(--color-primary)" name="Total de Registros" radius={[4, 4, 0, 0]} />
             {isClienteUser
               ? <Bar dataKey="assinados" fill="#BFCF99" name="Assinados" radius={[4, 4, 0, 0]} />
               : <Bar dataKey="aprovados" fill="#BFCF99" name="Aprovados" radius={[4, 4, 0, 0]} />

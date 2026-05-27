@@ -11,47 +11,49 @@ import {
 
 export default function UsersTable({ filteredUsers, regionais, canManageUsers, isCliente, isAdmin, searchTerm, onEdit }) {
   return (
-    <div className="bg-white/20 backdrop-blur-lg border border-white/20 rounded-lg overflow-x-auto">
-      <table className="min-w-full divide-y divide-white/10">
-        <thead className="bg-black/5">
+    <div className="rounded-lg overflow-x-auto border-0" style={{ backgroundColor: 'var(--color-surface)', boxShadow: 'var(--card-shadow)' }}>
+      <table className="min-w-full" style={{ borderColor: 'var(--color-border)' }}>
+        <thead style={{ backgroundColor: 'var(--color-surface-muted)' }}>
           <tr>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#00233B]/70 uppercase tracking-wider">Usuário</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#00233B]/70 uppercase tracking-wider">Empresa/Cargo</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#00233B]/70 uppercase tracking-wider">Regional</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#00233B]/70 uppercase tracking-wider">Nível</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#00233B]/70 uppercase tracking-wider">Ativo</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#00233B]/70 uppercase tracking-wider">Status</th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Usuário</th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Empresa/Cargo</th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Regional</th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Nível</th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Ativo</th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Status</th>
             {(canManageUsers && !isCliente) && (
               <th scope="col" className="relative px-6 py-3"><span className="sr-only">Editar</span></th>
             )}
           </tr>
         </thead>
-        <tbody className="divide-y divide-white/10">
+        <tbody>
           {filteredUsers.map(user => {
             const regional    = getRegionalForUser(user.email, regionais);
             const loginStatus = getLoginStatus(user);
             return (
-              <tr key={user.id} className="hover:bg-black/5">
+              <tr key={user.id} className="border-t transition-colors" style={{ borderColor: 'var(--color-border)' }}
+                onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--color-surface-muted)'}
+                onMouseLeave={e => e.currentTarget.style.backgroundColor = ''}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div>
-                    <div className="text-sm font-medium text-[#00233B]">{user.laboratorista_name}</div>
-                    <div className="text-sm text-[#00233B]/80">{user.email}</div>
+                    <div className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>{user.laboratorista_name}</div>
+                    <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{user.email}</div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div>
-                    <div className="text-sm text-[#00233B]">{user.company || "—"}</div>
-                    <div className="text-sm text-[#00233B]/80">{user.position || "—"}</div>
+                    <div className="text-sm" style={{ color: 'var(--color-text)' }}>{user.company || "—"}</div>
+                    <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{user.position || "—"}</div>
                   </div>
                 </td>
                 <td className="px-6 py-4">
                   {regional ? (
                     <div>
-                      <div className="text-sm font-medium text-[#00233B]">{regional.nome}</div>
-                      <div className="text-xs text-[#00233B]/60">{regional.codigo}</div>
+                      <div className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>{regional.nome}</div>
+                      <div className="text-xs" style={{ color: 'var(--color-text-subtle)' }}>{regional.codigo}</div>
                     </div>
                   ) : (
-                    <span className="text-sm text-[#00233B]/40">—</span>
+                    <span className="text-sm" style={{ color: 'var(--color-text-subtle)' }}>—</span>
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -69,12 +71,12 @@ export default function UsersTable({ filteredUsers, regionais, canManageUsers, i
                     {loginStatus.status === 'online' && (
                       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                     )}
-                    <span className="text-sm text-[#00233B]/80">{loginStatus.text}</span>
+                    <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{loginStatus.text}</span>
                   </div>
                 </td>
                 {(canManageUsers && !isCliente) && (
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Button variant="ghost" size="sm" onClick={() => onEdit(user)} className="hover:bg-black/10">
+                    <Button variant="ghost" size="sm" onClick={() => onEdit(user)}>
                       <Edit className="w-4 h-4 mr-1" />
                       Editar
                     </Button>
@@ -88,11 +90,11 @@ export default function UsersTable({ filteredUsers, regionais, canManageUsers, i
 
       {filteredUsers.length === 0 && (
         <div className="text-center py-12">
-          <UsersIcon className="w-12 h-12 text-[#00233B]/20 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-[#00233B] mb-2">
+          <UsersIcon className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--color-text-subtle)' }} />
+          <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--color-text)' }}>
             {searchTerm ? 'Nenhum usuário encontrado' : 'Nenhum usuário cadastrado'}
           </h3>
-          <p className="text-[#00233B]/80">
+          <p style={{ color: 'var(--color-text-muted)' }}>
             {searchTerm
               ? 'Tente ajustar os filtros de pesquisa.'
               : isAdmin

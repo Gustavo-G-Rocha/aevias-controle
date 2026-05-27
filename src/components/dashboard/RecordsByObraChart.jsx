@@ -3,20 +3,21 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recha
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const TOOLTIP_STYLE = {
-  backgroundColor: 'rgba(242, 241, 239, 0.8)',
-  border: '1px solid rgba(0, 35, 59, 0.2)',
-  borderRadius: '8px',
-  color: '#00233B',
+  backgroundColor: 'var(--color-surface)',
+  border: '1px solid var(--color-border)',
+  borderRadius: 'var(--radius-md)',
+  color: 'var(--color-text)',
+  boxShadow: 'var(--shadow-md)',
 };
 
 export default function RecordsByObraChart({ data, activeObraId, onSliceClick }) {
   if (!data.length) return null;
   return (
-    <Card className="bg-white/20 backdrop-blur-lg border border-white/20 text-[#00233B]">
+    <Card className="border-0" style={{ backgroundColor: 'var(--color-surface)', borderRadius: 'var(--card-radius)', boxShadow: 'var(--card-shadow)' }}>
       <CardHeader>
-        <CardTitle className="text-lg font-semibold text-[#00233B]">
+        <CardTitle className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
           Registros por Obra
-          <span className="text-xs font-normal text-[#00233B]/60 ml-2">(clique para filtrar)</span>
+          <span className="text-xs font-normal ml-2" style={{ color: 'var(--color-text-subtle)' }}>(clique para filtrar)</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -40,7 +41,7 @@ export default function RecordsByObraChart({ data, activeObraId, onSliceClick })
               ))}
             </Pie>
             <Tooltip contentStyle={TOOLTIP_STYLE} />
-            <Legend wrapperStyle={{ color: '#00233B' }} />
+            <Legend wrapperStyle={{ color: 'var(--color-text-muted)' }} />
           </PieChart>
         </ResponsiveContainer>
       </CardContent>

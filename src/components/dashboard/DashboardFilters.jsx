@@ -17,7 +17,7 @@ export default function DashboardFilters({ filters, setFilters, clearFilters, ha
             <CardTitle className="text-lg" style={{ color: 'var(--color-text)' }}>Filtros</CardTitle>
           </div>
           {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={clearFilters} style={{ color: 'var(--color-text-muted)' }} className="hover:bg-black/5">
+            <Button variant="ghost" size="sm" onClick={clearFilters} style={{ color: 'var(--color-text-muted)' }}>
               <X className="w-4 h-4 mr-2" />
               Limpar Filtros
             </Button>

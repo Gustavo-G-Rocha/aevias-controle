@@ -32,9 +32,9 @@ export default function UsersPage() {
       <div className="p-6 space-y-6 bg-transparent min-h-screen">
         <div className="max-w-7xl mx-auto">
           <div className="text-center py-12">
-            <Loader2 className="w-16 h-16 text-[#00233B]/20 mx-auto mb-4 animate-spin" />
-            <h3 className="text-lg font-semibold text-[#00233B] mb-2">Carregando usuários...</h3>
-            <p className="text-[#00233B]/80">Aguarde enquanto carregamos os dados.</p>
+            <Loader2 className="w-16 h-16 mx-auto mb-4 animate-spin" style={{ color: 'var(--color-text-subtle)' }} />
+            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text)' }}>Carregando usuários...</h3>
+            <p style={{ color: 'var(--color-text-muted)' }}>Aguarde enquanto carregamos os dados.</p>
           </div>
         </div>
       </div>
@@ -46,11 +46,11 @@ export default function UsersPage() {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-[#00233B] flex items-center gap-3">
-              <UsersIcon className="w-8 h-8 text-[#BFCF99]" />
+            <h1 className="text-3xl font-bold flex items-center gap-3" style={{ color: 'var(--color-text)' }}>
+              <UsersIcon className="w-8 h-8" style={{ color: 'var(--color-accent)' }} />
               {isAdmin ? 'Gestão de Usuários Corporativos' : 'Usuários da Minha Regional'}
             </h1>
-            <p className="text-[#00233B]/80 mt-2">
+            <p className="mt-2" style={{ color: 'var(--color-text-muted)' }}>
               {isAdmin
                 ? 'Cadastre colaboradores e laboratoristas.'
                 : isCliente
@@ -65,14 +65,14 @@ export default function UsersPage() {
               if (!open) handleCloseForm();
             }}>
               <DialogTrigger asChild>
-                <Button className="bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90">
-                  <Plus className="w-4 h-4 mr-2 text-[#BFCF99]" />
+                <Button style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-on-primary)' }}>
+                  <Plus className="w-4 h-4 mr-2" style={{ color: 'var(--color-accent)' }} />
                   Cadastrar Usuário
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#F2F1EF]/80 backdrop-blur-lg border-white/20 text-[#00233B]">
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto backdrop-blur-lg border-white/20" style={{ backgroundColor: 'var(--color-background)', color: 'var(--color-text)' }}>
                 <DialogHeader>
-                  <DialogTitle className="text-[#00233B]">
+                  <DialogTitle style={{ color: 'var(--color-text)' }}>
                     {editingUser ? 'Editar Usuário' : 'Cadastrar Novo Usuário Corporativo'}
                   </DialogTitle>
                 </DialogHeader>
@@ -88,15 +88,16 @@ export default function UsersPage() {
           )}
         </div>
 
-        <Card className="mb-6 bg-white/20 backdrop-blur-lg border border-white/20">
+        <Card className="mb-6 border-0" style={{ backgroundColor: 'var(--color-surface)', borderRadius: 'var(--card-radius)', boxShadow: 'var(--card-shadow)' }}>
           <CardContent className="p-4">
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-[#BFCF99]" />
+              <Search className="absolute left-3 top-3 h-4 w-4" style={{ color: 'var(--color-accent)' }} />
               <Input
                 placeholder="Pesquisar por nome, email, empresa ou cargo..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-transparent border-white/20 text-[#00233B] placeholder:text-[#00233B]/60"
+                className="pl-10"
+                style={{ backgroundColor: 'var(--color-surface-muted)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
               />
             </div>
           </CardContent>

@@ -85,12 +85,12 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
   }, [onObraAdded]);
 
   return (
-    <Card className="bg-white/80 backdrop-blur-sm border border-[#00233B]/10 shadow-sm hover:shadow-md transition-shadow">
+    <Card className="border-0 transition-shadow hover:shadow-md" style={{ backgroundColor: 'var(--color-surface)', borderRadius: 'var(--card-radius)', boxShadow: 'var(--card-shadow)' }}>
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <CardTitle className="text-lg font-semibold text-[#00233B] line-clamp-1">{regional.nome}</CardTitle>
-            <p className="text-sm text-[#00233B]/70">{regional.codigo}</p>
+            <CardTitle className="text-lg font-semibold line-clamp-1" style={{ color: 'var(--color-text)' }}>{regional.nome}</CardTitle>
+            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{regional.codigo}</p>
           </div>
           <Badge className={`${STATUS_COLORS_REGIONAL[regional.status] || STATUS_COLORS_REGIONAL.ativa} border`}>
             {regional.status || 'ativa'}
@@ -102,28 +102,28 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
         <div className="space-y-3 mb-4">
           {regional.cliente && (
             <div>
-              <p className="text-sm font-medium text-[#00233B]/70">Cliente</p>
-              <p className="text-sm text-[#00233B]">{regional.cliente}</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--color-text-muted)' }}>Cliente</p>
+              <p className="text-sm" style={{ color: 'var(--color-text)' }}>{regional.cliente}</p>
             </div>
           )}
           {regional.estado && (
             <div>
-              <p className="text-sm font-medium text-[#00233B]/70">Estado</p>
-              <p className="text-sm text-[#00233B]">{regional.estado}</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--color-text-muted)' }}>Estado</p>
+              <p className="text-sm" style={{ color: 'var(--color-text)' }}>{regional.estado}</p>
             </div>
           )}
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-1.5" title={`${obrasNaRegional.length} obras`}>
-              <ConstructionIcon className="w-4 h-4 text-[#566E3D] flex-shrink-0" />
-              <span className="text-[#00233B] leading-none font-medium">{obrasNaRegional.length}</span>
+              <ConstructionIcon className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-secondary)' }} />
+              <span className="leading-none font-medium" style={{ color: 'var(--color-text)' }}>{obrasNaRegional.length}</span>
             </div>
             <div className="flex items-center gap-1.5" title={`${projetosNaRegional.length} projetos`}>
-              <FileText className="w-4 h-4 text-[#566E3D] flex-shrink-0" />
-              <span className="text-[#00233B] leading-none font-medium">{projetosNaRegional.length}</span>
+              <FileText className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-secondary)' }} />
+              <span className="leading-none font-medium" style={{ color: 'var(--color-text)' }}>{projetosNaRegional.length}</span>
             </div>
             <div className="flex items-center gap-1.5" title={`${laboratoristasCount} laboratoristas`}>
-              <UsersIcon className="w-4 h-4 text-[#566E3D] flex-shrink-0" />
-              <span className="text-[#00233B] leading-none font-medium">{laboratoristasCount}</span>
+              <UsersIcon className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-secondary)' }} />
+              <span className="leading-none font-medium" style={{ color: 'var(--color-text)' }}>{laboratoristasCount}</span>
             </div>
           </div>
         </div>
@@ -131,7 +131,7 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <div className="flex items-center gap-2">
             <CollapsibleTrigger asChild>
-              <Button variant="outline" size="sm" className="flex-1 border-[#00233B]/20 text-[#00233B] hover:bg-[#00233B]/5">
+              <Button variant="outline" size="sm" className="flex-1" style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)' }}>
                 {isOpen ? <ChevronUp className="w-4 h-4 mr-1" /> : <ChevronDown className="w-4 h-4 mr-1" />}
                 {isOpen ? 'Ocultar' : 'Ver'} Obras ({obrasNaRegional.length})
               </Button>
@@ -140,13 +140,13 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
             {canManage && !isLaboratorista && (
               <Dialog open={isObraDialogOpen} onOpenChange={setIsObraDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button size="sm" className="bg-[#00233B] hover:bg-[#00233B]/90 text-[#F2F1EF]">
-                    <Plus className="w-4 h-4 mr-1 text-[#BFCF99]" />Nova Obra
+                  <Button size="sm" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-on-primary)' }}>
+                    <Plus className="w-4 h-4 mr-1" style={{ color: 'var(--color-accent)' }} />Nova Obra
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#F2F1EF]/95 backdrop-blur-lg border border-[#00233B]/20 text-[#00233B]">
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto backdrop-blur-lg" style={{ backgroundColor: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}>
                   <DialogHeader>
-                    <DialogTitle className="text-[#00233B]">
+                    <DialogTitle style={{ color: 'var(--color-text)' }}>
                       {editingObra ? 'Editar Obra' : `Nova Obra - ${regional.nome}`}
                     </DialogTitle>
                   </DialogHeader>
@@ -165,29 +165,29 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
             {obrasNaRegional.length > 0 ? (
               <div className="space-y-2">
                 {obrasNaRegional.map(obra => (
-                  <div key={obra.id} className="p-3 bg-[#F2F1EF] rounded-lg border border-[#00233B]/10">
+                  <div key={obra.id} className="p-3 rounded-lg" style={{ backgroundColor: 'var(--color-surface-muted)', border: '1px solid var(--color-border)' }}>
                     <div className="flex gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start gap-2 mb-2">
-                          <h4 className="font-medium text-[#00233B] truncate flex-shrink">{obra.name}</h4>
+                          <h4 className="font-medium truncate flex-shrink" style={{ color: 'var(--color-text)' }}>{obra.name}</h4>
                         </div>
                         <div className="flex flex-wrap items-center gap-2 mb-2">
                           <Badge className={`${STATUS_COLORS_OBRA[obra.status] || STATUS_COLORS_OBRA.planejamento} border flex-shrink-0`}>
                             {obra.status || 'planejamento'}
                           </Badge>
                           {obra.tipo_obra && (
-                            <Badge variant="outline" className="flex items-center gap-1 border-[#00233B]/20 text-[#00233B] flex-shrink-0">
+                            <Badge variant="outline" className="flex items-center gap-1 flex-shrink-0" style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)' }}>
                               {tipoObraIcons[obra.tipo_obra]}
                               {TIPO_OBRA_LABELS[obra.tipo_obra] || obra.tipo_obra}
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-[#00233B]/70 truncate">Contrato: {obra.code}</p>
-                        {obra.location && <p className="text-xs text-[#00233B]/60 mt-1 truncate">{obra.location}</p>}
+                        <p className="text-sm truncate" style={{ color: 'var(--color-text-muted)' }}>Contrato: {obra.code}</p>
+                        {obra.location && <p className="text-xs mt-1 truncate" style={{ color: 'var(--color-text-subtle)' }}>{obra.location}</p>}
 
                         {obra.tipo_obra === "supervisao" && obra.empreiteiras?.length > 0 && (
                           <div className="mt-2">
-                            <p className="text-xs text-[#00233B]/60 mb-1">Empreiteiras:</p>
+                            <p className="text-xs mb-1" style={{ color: 'var(--color-text-subtle)' }}>Empreiteiras:</p>
                             <div className="flex flex-wrap gap-1">
                               {obra.empreiteiras.map(emp => <Badge key={emp} variant="secondary" className="bg-blue-100 text-blue-800 text-xs">{emp}</Badge>)}
                             </div>
@@ -195,7 +195,7 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
                         )}
                         {(obra.tipo_obra === "levantamentos" || obra.tipo_obra === "sondagem") && obra.clientes?.length > 0 && (
                           <div className="mt-2">
-                            <p className="text-xs text-[#00233B]/60 mb-1">Clientes:</p>
+                            <p className="text-xs mb-1" style={{ color: 'var(--color-text-subtle)' }}>Clientes:</p>
                             <div className="flex flex-wrap gap-1">
                               {obra.clientes.map(c => <Badge key={c} variant="secondary" className="bg-teal-100 text-teal-800 text-xs">{c}</Badge>)}
                             </div>
@@ -203,7 +203,7 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
                         )}
                         {obra.usinas?.length > 0 && (
                           <div className="mt-2">
-                            <p className="text-xs text-[#00233B]/60 mb-1">Usinas:</p>
+                            <p className="text-xs mb-1" style={{ color: 'var(--color-text-subtle)' }}>Usinas:</p>
                             <div className="flex flex-wrap gap-1">
                               {obra.usinas.map(u => <Badge key={u} variant="secondary" className="bg-green-100 text-green-800 text-xs">{u}</Badge>)}
                             </div>
@@ -211,7 +211,7 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
                         )}
                         {obra.rodovias?.length > 0 && (
                           <div className="mt-2">
-                            <p className="text-xs text-[#00233B]/60 mb-1">Rodovias:</p>
+                            <p className="text-xs mb-1" style={{ color: 'var(--color-text-subtle)' }}>Rodovias:</p>
                             <div className="flex flex-wrap gap-1">
                               {obra.rodovias.map(r => <Badge key={r} variant="secondary" className="bg-purple-100 text-purple-800 text-xs">{r}</Badge>)}
                             </div>
@@ -221,7 +221,7 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
 
                       {canManage && !isLaboratorista && (
                         <div className="flex flex-col gap-1 flex-shrink-0">
-                          <Button variant="ghost" size="icon" onClick={() => { setEditingObra(obra); setIsObraDialogOpen(true); }} className="text-[#00233B] hover:bg-[#00233B]/10 h-8 w-8">
+                          <Button variant="ghost" size="icon" onClick={() => { setEditingObra(obra); setIsObraDialogOpen(true); }} className="h-8 w-8" style={{ color: 'var(--color-text)' }}>
                             <Edit className="w-4 h-4" />
                           </Button>
                           <Button variant="ghost" size="icon" onClick={() => handleDeleteObra(obra.id)} className="text-[#800020] hover:text-[#800020] hover:bg-[#800020]/10 h-8 w-8">
@@ -234,8 +234,8 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
                 ))}
               </div>
             ) : (
-              <div className="text-center py-6 text-[#00233B]/60">
-                <ConstructionIcon className="w-8 h-8 text-[#00233B]/30 mx-auto mb-2" />
+              <div className="text-center py-6" style={{ color: 'var(--color-text-muted)' }}>
+                <ConstructionIcon className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--color-text-subtle)' }} />
                 <p className="text-sm">Nenhuma obra {statusFilter !== 'all' ? `com status "${statusFilter}"` : 'cadastrada'}</p>
               </div>
             )}
@@ -243,16 +243,16 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
         </Collapsible>
       </CardContent>
 
-      <CardFooter className="py-3 border-t border-[#00233B]/10">
+      <CardFooter className="py-3" style={{ borderTop: '1px solid var(--color-border)' }}>
         <div className="w-full flex items-center justify-center">
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => setSelectedRegional(regional)} className="text-[#00233B] hover:bg-[#00233B]/10">
-              <Eye className="w-4 h-4 mr-1 text-[#566E3D]" />Ver Detalhes
+            <Button variant="ghost" size="sm" onClick={() => setSelectedRegional(regional)} style={{ color: 'var(--color-text)' }}>
+              <Eye className="w-4 h-4 mr-1" style={{ color: 'var(--color-secondary)' }} />Ver Detalhes
             </Button>
             {canManage && (
               <>
-                <Button variant="ghost" size="sm" onClick={() => onEdit(regional)} className="text-[#00233B] hover:bg-[#00233B]/10">
-                  <Edit className="w-4 h-4 mr-1 text-[#566E3D]" />Editar
+                <Button variant="ghost" size="sm" onClick={() => onEdit(regional)} style={{ color: 'var(--color-text)' }}>
+                  <Edit className="w-4 h-4 mr-1" style={{ color: 'var(--color-secondary)' }} />Editar
                 </Button>
                 {isAdmin && (
                   <Button variant="ghost" size="sm" onClick={() => onDelete(regional.id)} className="text-[#800020] hover:text-[#800020] hover:bg-[#800020]/10">

@@ -3,11 +3,11 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const TOOLTIP_STYLE = {
-  backgroundColor: '#FFFFFF',
-  border: '1px solid #E1E6EC',
-  borderRadius: '10px',
-  color: '#0D2137',
-  boxShadow: '0 4px 12px rgba(0,35,59,0.09)',
+  backgroundColor: 'var(--color-surface)',
+  border: '1px solid var(--color-border)',
+  borderRadius: 'var(--radius-md)',
+  color: 'var(--color-text)',
+  boxShadow: 'var(--shadow-md)',
 };
 
 const STATUS_MAP = {
@@ -27,9 +27,9 @@ export default function StatusPieChart({ data, activeStatus, isClienteUser, onSl
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data} onClick={e => e?.activePayload && onSliceClick(e.activePayload[0].payload)}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E1E6EC" />
-            <XAxis dataKey="name" stroke="#8FA0AE" tick={{ fontSize: 12 }} />
-            <YAxis stroke="#8FA0AE" tick={{ fontSize: 12 }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+            <XAxis dataKey="name" stroke="var(--color-text-subtle)" tick={{ fontSize: 12 }} />
+            <YAxis stroke="var(--color-text-subtle)" tick={{ fontSize: 12 }} />
             <Tooltip contentStyle={TOOLTIP_STYLE} />
             <Bar dataKey="value" name="Registros" style={{ cursor: 'pointer' }} radius={[4, 4, 0, 0]}>
               {data.map((entry, index) => (

@@ -28,34 +28,34 @@ export default function RegionaisPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-[#F2F1EF]">
+      <div className="flex justify-center items-center h-screen bg-transparent">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#00233B]/40" />
-          <p className="text-[#00233B]/60 mt-2">Carregando regionais...</p>
+          <Loader2 className="w-8 h-8 animate-spin mx-auto" style={{ color: 'var(--color-text-subtle)' }} />
+          <p className="mt-2" style={{ color: 'var(--color-text-muted)' }}>Carregando regionais...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 space-y-6 bg-[#F2F1EF] min-h-screen">
+    <div className="p-6 space-y-6 bg-transparent min-h-screen">
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-[#00233B] flex items-center gap-3">
-              <MapPin className="w-8 h-8 text-[#566E3D]" />
+            <h1 className="text-3xl font-bold flex items-center gap-3" style={{ color: 'var(--color-text)' }}>
+              <MapPin className="w-8 h-8" style={{ color: 'var(--color-accent)' }} />
               Regionais
             </h1>
-            <p className="text-[#00233B]/80 mt-2">
+            <p className="mt-2" style={{ color: 'var(--color-text-muted)' }}>
               {isAdmin ? "Gerencie as regionais e suas obras" : "Visualize as regionais e obras"}
             </p>
           </div>
 
           {isLaboratorista && (
-            <Button onClick={() => setIsTransferenciaModalOpen(true)} className="bg-[#00233B] hover:bg-[#00233B]/90 text-[#F2F1EF]">
-              <ArrowLeftRight className="w-4 h-4 mr-2 text-[#BFCF99]" />
+            <Button onClick={() => setIsTransferenciaModalOpen(true)} style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-on-primary)' }}>
+              <ArrowLeftRight className="w-4 h-4 mr-2" style={{ color: 'var(--color-accent)' }} />
               Solicitar Transferência
             </Button>
           )}
@@ -63,14 +63,14 @@ export default function RegionaisPage() {
           {canManage && !isLaboratorista && (
             <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-[#00233B] hover:bg-[#00233B]/90 text-[#F2F1EF]">
-                  <Plus className="w-4 h-4 mr-2 text-[#BFCF99]" />
+                <Button style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-on-primary)' }}>
+                  <Plus className="w-4 h-4 mr-2" style={{ color: 'var(--color-accent)' }} />
                   Nova Regional
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#F2F1EF]/95 backdrop-blur-lg border border-[#00233B]/20 text-[#00233B]">
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto backdrop-blur-lg" style={{ backgroundColor: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}>
                 <DialogHeader>
-                  <DialogTitle className="text-[#00233B]">
+                  <DialogTitle style={{ color: 'var(--color-text)' }}>
                     {editingRegional ? 'Editar Regional' : 'Nova Regional'}
                   </DialogTitle>
                 </DialogHeader>
@@ -88,23 +88,25 @@ export default function RegionaisPage() {
         </div>
 
         {/* Filtros */}
-        <Card className="mb-6 bg-white/80 backdrop-blur-sm border border-[#00233B]/10 shadow-sm">
+        <Card className="mb-6 border-0" style={{ backgroundColor: 'var(--color-surface)', borderRadius: 'var(--card-radius)', boxShadow: 'var(--card-shadow)' }}>
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-[#00233B]/60" />
+                <Search className="absolute left-3 top-3 h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                 <Input
                   placeholder="Pesquisar regionais..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-white border-[#00233B]/20 text-[#00233B]"
+                  className="pl-10"
+                  style={{ backgroundColor: 'var(--color-surface-muted)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
                 />
               </div>
               <div className="w-full md:w-48">
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full h-10 px-3 py-2 border border-[#00233B]/20 rounded-md bg-white text-sm text-[#00233B]"
+                  className="w-full h-10 px-3 py-2 rounded-md text-sm"
+                  style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}
                 >
                   <option value="all">Todas as Obras</option>
                   <option value="planejamento">Planejamento</option>
@@ -139,13 +141,13 @@ export default function RegionaisPage() {
         </div>
 
         {filteredRegionais.length === 0 && (
-          <Card className="bg-white/80 backdrop-blur-sm border border-[#00233B]/10 shadow-sm">
+          <Card className="border-0" style={{ backgroundColor: 'var(--color-surface)', boxShadow: 'var(--card-shadow)' }}>
             <CardContent className="flex flex-col items-center justify-center py-16">
-              <div className="w-16 h-16 bg-[#00233B]/10 rounded-full flex items-center justify-center mb-4">
-                <MapPin className="w-8 h-8 text-[#00233B]/30" />
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: 'var(--color-secondary-subtle)' }}>
+                <MapPin className="w-8 h-8" style={{ color: 'var(--color-text-subtle)' }} />
               </div>
-              <h3 className="text-lg font-semibold text-[#00233B] mb-2">Nenhuma regional encontrada</h3>
-              <p className="text-[#00233B]/70 text-center">
+              <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text)' }}>Nenhuma regional encontrada</h3>
+              <p className="text-center" style={{ color: 'var(--color-text-muted)' }}>
                 {searchTerm ? 'Tente ajustar seus filtros de pesquisa.' : 'Comece criando sua primeira regional.'}
               </p>
             </CardContent>
@@ -166,9 +168,9 @@ export default function RegionaisPage() {
 
       {/* Regional Details Dialog */}
       <Dialog open={!!selectedRegional} onOpenChange={(open) => !open && setSelectedRegional(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#F2F1EF]/95 backdrop-blur-lg border border-[#00233B]/20 text-[#00233B]">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto backdrop-blur-lg" style={{ backgroundColor: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}>
           <DialogHeader>
-            <DialogTitle className="text-[#00233B]">Detalhes da Regional</DialogTitle>
+            <DialogTitle style={{ color: 'var(--color-text)' }}>Detalhes da Regional</DialogTitle>
           </DialogHeader>
           {selectedRegional && (
             <RegionalDetails regional={selectedRegional} users={users} projects={projects} />

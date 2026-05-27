@@ -70,10 +70,10 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <div className="flex items-center gap-4 text-sm text-[#00233B]/70">
+        <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>
           <span>{filteredEnsaios.length} registro(s) encontrado(s)</span>
           {isAnyFilterActive && (
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="h-7 text-xs text-[#00233B]/80 hover:bg-black/10">
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="h-7 text-xs" style={{ color: 'var(--color-text-muted)' }}>
               Limpar todos os filtros
             </Button>
           )}
@@ -81,7 +81,7 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
         {canCreate && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button className="bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90">
+              <Button style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-on-primary)' }}>
                 <PlusCircle className="mr-2 h-4 w-4" /> Novo Registro
               </Button>
             </DropdownMenuTrigger>
@@ -99,7 +99,7 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
         )}
       </div>
 
-      <Card className="bg-white/20 backdrop-blur-lg border border-white/20">
+      <Card className="border-0" style={{ backgroundColor: 'var(--color-surface)', borderRadius: 'var(--card-radius)', boxShadow: 'var(--card-shadow)' }}>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -136,9 +136,9 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
               </tbody>
             </table>
             {filteredEnsaios.length === 0 && (
-              <div className="text-center py-12 text-[#00233B]/70">
-                <FileText className="w-12 h-12 text-[#00233B]/30 mx-auto mb-4" />
-                <h3 className="font-medium text-[#00233B] mb-2">Nenhum registro encontrado</h3>
+              <div className="text-center py-12" style={{ color: 'var(--color-text-muted)' }}>
+                <FileText className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--color-text-subtle)' }} />
+                <h3 className="font-medium mb-2" style={{ color: 'var(--color-text)' }}>Nenhum registro encontrado</h3>
                 <p>Ajuste os filtros ou aguarde novos registros.</p>
               </div>
             )}
