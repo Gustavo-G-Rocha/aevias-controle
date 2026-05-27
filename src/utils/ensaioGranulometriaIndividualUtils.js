@@ -48,7 +48,7 @@ export const EQUIVALENTE_CAMPOS_PERMITIDOS = ['topo_argila', 'topo_areia'];
 export function calcAgregadoUmidade(pesoUmidoStr, pesoSecoStr) {
   const pesoUmido = parseFloat(pesoUmidoStr) || 0;
   const pesoSeco  = parseFloat(pesoSecoStr)  || 0;
-  if (!pesoUmido) return {};
+  if (!pesoUmido || pesoSecoStr === '' || pesoSecoStr === null || pesoSecoStr === undefined) return {};
   const agua    = (pesoUmido - pesoSeco).toFixed(2);
   const umidade = pesoSeco > 0
     ? (((pesoUmido - pesoSeco) / pesoSeco) * 100).toFixed(2)
