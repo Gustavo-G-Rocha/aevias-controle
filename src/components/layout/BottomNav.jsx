@@ -46,7 +46,7 @@ export default function BottomNav() {
             className="flex flex-col items-center gap-1 py-3 px-6 transition-colors select-none"
             style={{ color: isActive ? 'var(--color-secondary)' : 'var(--color-sidebar-text-muted)' }}>
             
-            <item.icon className="w-5 h-5 bg-[hsl(var(--sidebar-border))]" style={{ color: isActive ? 'var(--color-secondary)' : 'var(--color-sidebar-text-muted)' }} />
+            <item.icon className="w-5 h-5" style={{ color: isActive ? 'var(--color-secondary)' : 'var(--color-sidebar-text-muted)' }} />
             <span className="text-[10px] font-medium">{item.label}</span>
           </button>);
 
