@@ -66,7 +66,7 @@ const AppLayout = ({ children }) => {
                 className="flex-1 flex flex-col"
               >
                 <PullToRefresh>
-                  <div className="pb-16 lg:pb-0 lg:pt-0 overflow-x-hidden" style={{ paddingTop: "calc(3rem + env(safe-area-inset-top))" }}>
+                  <div className="pb-16 lg:pb-0 overflow-x-hidden" style={{ paddingTop: "env(safe-area-inset-top)" }}>
                     {children}
                   </div>
                 </PullToRefresh>
