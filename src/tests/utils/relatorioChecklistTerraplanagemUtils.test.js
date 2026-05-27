@@ -14,7 +14,7 @@ import {
 describe('relatorioChecklistTerraplanagemUtils', () => {
   describe('formatDateTerra', () => {
     it('retorna string vazia se inválida', () => {
-      expect(formatDateTerra('N/A')).toBe('');
+      expect(formatDateTerra('invalid')).toBe('');
     });
 
     it('retorna data formatada se válida', () => {

@@ -5,7 +5,7 @@ import { formatDate } from '@/utils/relatorioUtils';
  */
 export function formatDateTerra(dateString) {
   const formatted = formatDate(dateString);
-  return formatted === 'N/A' ? '' : formatted;
+  return formatted === 'N/A' || formatted === 'Invalid Date' ? '' : formatted;
 }
 
 /**
@@ -68,7 +68,7 @@ export function chunkArray(arr, size) {
  * Verifica se há ações corretivas
  */
 export function temAcoesCorretivas(checklist) {
-  return checklist.acoes_corretivas_realizado === true && checklist.acoes_corretivas_descricao;
+  return checklist.acoes_corretivas_realizado === true && !!checklist.acoes_corretivas_descricao;
 }
 
 /**
