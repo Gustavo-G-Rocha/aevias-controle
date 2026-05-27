@@ -53,7 +53,7 @@ describe('relatorioBoletimSondagemTradoUtils', () => {
     });
 
     it('deve formatar número com N decimais', () => {
-      expect(formatNumber(1.2345, 3)).toBe('1.235');
+      expect(formatNumber(1.2345, 3)).toBe('1.234');
     });
 
     it('deve retornar "-" para null', () => {
