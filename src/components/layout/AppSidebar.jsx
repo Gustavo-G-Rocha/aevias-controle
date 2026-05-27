@@ -60,7 +60,12 @@ export default function AppSidebar({
   isAdmin, isSalaTecnica, isGestorContrato, isCliente
 }) {
   const location = useLocation();
-  const isActive = (url) => location.pathname === url;
+  const isActive = (url) => {
+    if (location.pathname === url) return true;
+    // Dashboard is mounted at "/" but createPageUrl returns "/Dashboard"
+    if (url === '/Dashboard' && location.pathname === '/') return true;
+    return false;
+  };
 
   const showNaoConformidades = [ACCESS_LEVELS.ADMIN, ACCESS_LEVELS.GESTOR_CONTRATO, ACCESS_LEVELS.SALA_TECNICA, ACCESS_LEVELS.CLIENTE].includes(userAccessLevel);
   const showMinhasObras = Object.values(ACCESS_LEVELS).includes(userAccessLevel);
