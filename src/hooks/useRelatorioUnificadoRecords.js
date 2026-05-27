@@ -4,7 +4,7 @@
  */
 import { useState, useEffect } from 'react';
 import { getDataEnsaio } from '@/components/ensaios/ensaioMappers';
-import { getEntityInstance } from '@/utils/relatorioUnificadoUtils';
+import { getEntityInstance } from '@/utils/relatorioUnificadoEntityMap';
 
 export function useRelatorioUnificadoRecords(filters) {
   const [records, setRecords] = useState([]);

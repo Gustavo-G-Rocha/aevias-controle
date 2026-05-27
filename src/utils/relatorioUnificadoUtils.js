@@ -1,44 +1,12 @@
 /**
  * Funções puras para RelatorioUnificado.
- * Utilitários para mapeamento, validação e transformação de dados.
+ * Utilitários para validação e transformação de dados.
+ * Não importa base44Client para ser testável sem browser.
  */
-import { base44 } from '@/api/base44Client';
 import { getEnsaioTypeInfo } from '@/components/ensaios/ensaioMappers';
 
-/**
- * Retorna a instância da entidade base44 para um tipo de registro.
- * @param {string} key - Tipo de registro (ex: 'DiarioObra', 'ChecklistUsina')
- * @returns {Object|null} Instância da entidade ou null
- */
-export const getEntityInstance = (key) => {
-  const map = {
-    DiarioObra: base44.entities.DiarioObra,
-    EnsaioCAUQ: base44.entities.EnsaioCAUQ,
-    EnsaioMRAF: base44.entities.EnsaioMRAF,
-    EnsaioDensidade: base44.entities.EnsaioDensidade,
-    EnsaioDensidadeInSitu: base44.entities.EnsaioDensidadeInSitu,
-    EnsaioTaxaPinturaImprimacao: base44.entities.EnsaioTaxaPinturaImprimacao,
-    ChecklistUsina: base44.entities.ChecklistUsina,
-    ChecklistAplicacao: base44.entities.ChecklistAplicacao,
-    ChecklistMRAF: base44.entities.ChecklistMRAF,
-    ChecklistConcretagem: base44.entities.ChecklistConcretagem,
-    ChecklistTerraplanagem: base44.entities.ChecklistTerraplanagem,
-    ChecklistReciclagem: base44.entities.ChecklistReciclagem,
-    EnsaioSondagem: base44.entities.EnsaioSondagem,
-    EnsaioGranulometriaIndividual: base44.entities.EnsaioGranulometriaIndividual,
-    AcompanhamentoUsinagem: base44.entities.AcompanhamentoUsinagem,
-    AcompanhamentoCarga: base44.entities.AcompanhamentoCarga,
-    EnsaioManchaPendulo: base44.entities.EnsaioManchaPendulo,
-    EnsaioVigaBenkelman: base44.entities.EnsaioVigaBenkelman,
-    EnsaioTaxaMRAF: base44.entities.EnsaioTaxaMRAF,
-    BoletimSondagem: base44.entities.BoletimSondagem,
-    BoletimSondagemTrado: base44.entities.BoletimSondagemTrado,
-    EnsaioProctor: base44.entities.EnsaioProctor,
-    EnsaioRompimentoConcreto: base44.entities.EnsaioRompimentoConcreto,
-    GranuMistura: base44.entities.GranuMistura,
-  };
-  return map[key];
-};
+// Re-exporta getEntityInstance do módulo de dependências
+export { getEntityInstance } from '@/utils/relatorioUnificadoEntityMap';
 
 /**
  * Formata uma data para o padrão pt-BR.
@@ -71,7 +39,7 @@ export const isFiltersValid = (filters) => {
 /**
  * Obtém descrição resumida dos filtros aplicados.
  * @param {Object} filters - Objeto de filtros
- * @returns {Object} Objeto com descrição dos filtros ativos
+ * @returns {Array<string>} Lista de descrições dos filtros ativos
  */
 export const getActiveFiltersDescription = (filters) => {
   const active = [];

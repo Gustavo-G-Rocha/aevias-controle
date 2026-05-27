@@ -22,9 +22,13 @@ export const normalizeNumber = (v, d = 2) => {
  * @returns {number|null}
  */
 export const calcUmidade = (umido, seco, tara) => {
-  const agua = normalizeNumber(umido) - normalizeNumber(seco);
-  const solo = normalizeNumber(seco) - normalizeNumber(tara);
-  if (!agua || !solo || solo <= 0) return null;
+  const numUmido = normalizeNumber(umido);
+  const numSeco = normalizeNumber(seco);
+  const numTara = normalizeNumber(tara);
+  if (numUmido == null || numSeco == null || numTara == null) return null;
+  const agua = numUmido - numSeco;
+  const solo = numSeco - numTara;
+  if (solo <= 0) return null;
   return parseFloat(((agua / solo) * 100).toFixed(2));
 };
 
