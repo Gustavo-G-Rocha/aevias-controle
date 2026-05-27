@@ -9,6 +9,13 @@ beforeAll(() => {
 
 // Mock do app-params.js para evitar acesso a window
 vi.mock('@/lib/app-params', () => ({
+  appParams: {
+    appId: 'test-app',
+    token: null,
+    fromUrl: 'http://localhost',
+    functionsVersion: '1',
+    appBaseUrl: 'http://localhost',
+  },
   getAppParams: () => ({
     appId: 'test-app',
     token: null,
