@@ -1,44 +1,93 @@
 /**
- * Funções puras para RelatorioChecklistAplicacao.
- * Utilitários para validação e transformação de dados.
+ * Formata data para exibição em pt-BR (UTC)
  */
+export function formatDataChecklist(data) {
+  if (!data) return '-';
+  return new Date(data).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+}
 
 /**
- * Valida se o checklist e dados relacionados estão disponíveis.
- * @param {Object} checklist - Dados do checklist
- * @param {Object} obra - Dados da obra
- * @returns {boolean}
+ * Formata valor de conformidade para texto Sim/Não/-
  */
-export const isChecklistValid = (checklist, obra) => {
-  return !!(checklist && obra);
-};
+export function formatConformidade(value) {
+  if (value === true) return 'Sim';
+  if (value === false) return 'Não';
+  return '-';
+}
 
 /**
- * Valida se os dados de regional estão disponíveis.
- * @param {Object} regional - Dados da regional
- * @returns {boolean}
+ * Formata valor numérico com casas decimais, retorna '-' se null/undefined
  */
-export const isRegionalValid = (regional) => {
-  return !!regional;
-};
+export function formatNumerico(value, decimais = 2) {
+  if (value === null || value === undefined) return '-';
+  return Number(value).toFixed(decimais);
+}
 
 /**
- * Verifica se o checklist tem criador definido.
- * @param {Object} creatorUser - Dados do usuário criador
- * @returns {boolean}
+ * Formata temperatura com sufixo °C
  */
-export const hasCreator = (creatorUser) => {
-  return !!creatorUser;
-};
+export function formatTemperatura(value) {
+  if (value === null || value === undefined) return '-';
+  return `${Number(value).toFixed(1)}°C`;
+}
 
 /**
- * Retorna a mensagem de erro apropriada baseada no estado.
- * @param {string} error - Mensagem de erro
- * @param {Object} checklist - Dados do checklist
- * @returns {string}
+ * Divide array em chunks de tamanho específico
  */
-export const getErrorMessage = (error, checklist) => {
-  if (error) return error;
-  if (!checklist) return 'Checklist não encontrado';
-  return 'Erro ao carregar relatório';
-};
+export function chunkArray(arr, size) {
+  const chunks = [];
+  if (!arr) return chunks;
+  for (let i = 0; i < arr.length; i += size) {
+    chunks.push(arr.slice(i, i + size));
+  }
+  return chunks;
+}
+
+/**
+ * Verifica se há ações corretivas registradas
+ */
+export function temAcoesCorretivas(checklist) {
+  return checklist.acoes_corretivas_realizado === true && !!checklist.acoes_corretivas_descricao;
+}
+
+/**
+ * Formata jornada de trabalho (início - fim)
+ */
+export function formatarJornada(jornada) {
+  if (!jornada?.horario_inicio || !jornada?.horario_fim) return null;
+  return `${jornada.horario_inicio} - ${jornada.horario_fim}`;
+}
+
+/**
+ * Constrói props para SignatureFooter a partir do checklist
+ */
+export function buildFooterPropsAplicacao(checklist, creatorUser) {
+  return {
+    labName: checklist.laboratorista_name,
+    labEmail: checklist.created_by,
+    labCreatedDate: checklist.created_date,
+    labPosition: creatorUser?.position || 'Laboratorista',
+    approverName: checklist.approver_details?.name,
+    approverEmail: checklist.approved_by,
+    approverPosition: checklist.approver_details?.position,
+    approverCREA: checklist.approver_details?.crea_number,
+    approverDate: checklist.approved_date,
+    clientName: checklist.client_signature?.engineer_name,
+    clientEmail: checklist.client_signature?.signed_by,
+    clientPosition: checklist.client_signature?.position,
+    clientCREA: checklist.client_signature?.crea_number,
+    clientDate: checklist.client_signature?.signed_date,
+  };
+}
+
+/**
+ * Retorna label de condição climática com emoji
+ */
+export function formatClimaLabel(condicao) {
+  const map = {
+    bom: '☀️ Bom',
+    instavel: '⛅ Instável',
+    chuva: '🌧️ Chuva',
+  };
+  return map[condicao] || null;
+}

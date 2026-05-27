@@ -1,77 +1,159 @@
 import { describe, it, expect } from 'vitest';
 import {
-  isChecklistValid,
-  isRegionalValid,
-  hasCreator,
-  getErrorMessage,
-} from '@/utils/relatorioChecklistAplicacaoUtils';
+  formatDataChecklist,
+  formatConformidade,
+  formatNumerico,
+  formatTemperatura,
+  chunkArray,
+  temAcoesCorretivas,
+  formatarJornada,
+  buildFooterPropsAplicacao,
+  formatClimaLabel,
+} from '../../utils/relatorioChecklistAplicacaoUtils';
 
 describe('relatorioChecklistAplicacaoUtils', () => {
-  describe('isChecklistValid', () => {
-    it('deve retornar true quando checklist e obra estão definidos', () => {
-      const checklist = { id: '1', nome: 'Test' };
-      const obra = { id: '2', name: 'Obra Test' };
-      expect(isChecklistValid(checklist, obra)).toBe(true);
+  describe('formatDataChecklist', () => {
+    it('retorna "-" para data nula', () => {
+      expect(formatDataChecklist(null)).toBe('-');
+      expect(formatDataChecklist(undefined)).toBe('-');
     });
 
-    it('deve retornar false quando checklist é null', () => {
-      expect(isChecklistValid(null, { id: '2' })).toBe(false);
-    });
-
-    it('deve retornar false quando obra é null', () => {
-      expect(isChecklistValid({ id: '1' }, null)).toBe(false);
-    });
-
-    it('deve retornar false quando ambos são null', () => {
-      expect(isChecklistValid(null, null)).toBe(false);
+    it('retorna data formatada em pt-BR', () => {
+      const resultado = formatDataChecklist('2025-05-27');
+      expect(resultado).toBe('27/05/2025');
     });
   });
 
-  describe('isRegionalValid', () => {
-    it('deve retornar true quando regional está definido', () => {
-      expect(isRegionalValid({ id: '1', name: 'Regional' })).toBe(true);
+  describe('formatConformidade', () => {
+    it('retorna "Sim" para true', () => {
+      expect(formatConformidade(true)).toBe('Sim');
     });
 
-    it('deve retornar false quando regional é null', () => {
-      expect(isRegionalValid(null)).toBe(false);
+    it('retorna "Não" para false', () => {
+      expect(formatConformidade(false)).toBe('Não');
     });
 
-    it('deve retornar false quando regional é undefined', () => {
-      expect(isRegionalValid(undefined)).toBe(false);
-    });
-  });
-
-  describe('hasCreator', () => {
-    it('deve retornar true quando creatorUser está definido', () => {
-      expect(hasCreator({ id: '1', name: 'João' })).toBe(true);
-    });
-
-    it('deve retornar false quando creatorUser é null', () => {
-      expect(hasCreator(null)).toBe(false);
-    });
-
-    it('deve retornar false quando creatorUser é undefined', () => {
-      expect(hasCreator(undefined)).toBe(false);
+    it('retorna "-" para null/undefined', () => {
+      expect(formatConformidade(null)).toBe('-');
+      expect(formatConformidade(undefined)).toBe('-');
     });
   });
 
-  describe('getErrorMessage', () => {
-    it('deve retornar a mensagem de erro quando error está definido', () => {
-      const message = 'Erro específico';
-      expect(getErrorMessage(message, { id: '1' })).toBe(message);
+  describe('formatNumerico', () => {
+    it('formata número com 2 casas decimais', () => {
+      expect(formatNumerico(1.5)).toBe('1.50');
+      expect(formatNumerico(100)).toBe('100.00');
     });
 
-    it('deve retornar mensagem padrão quando checklist é null', () => {
-      expect(getErrorMessage(null, null)).toBe('Checklist não encontrado');
+    it('retorna "-" para null ou undefined', () => {
+      expect(formatNumerico(null)).toBe('-');
+      expect(formatNumerico(undefined)).toBe('-');
     });
 
-    it('deve retornar mensagem genérica quando nenhuma condição específica', () => {
-      expect(getErrorMessage(null, { id: '1' })).toBe('Erro ao carregar relatório');
+    it('respeita número de casas decimais personalizado', () => {
+      expect(formatNumerico(1.5678, 1)).toBe('1.6');
+    });
+  });
+
+  describe('formatTemperatura', () => {
+    it('formata temperatura com sufixo °C', () => {
+      expect(formatTemperatura(25.5)).toBe('25.5°C');
     });
 
-    it('deve priorizar a mensagem de erro sobre outras condições', () => {
-      const message = 'Erro específico';
-      expect(getErrorMessage(message, null)).toBe(message);
+    it('retorna "-" para null ou undefined', () => {
+      expect(formatTemperatura(null)).toBe('-');
+      expect(formatTemperatura(undefined)).toBe('-');
+    });
+  });
+
+  describe('chunkArray', () => {
+    it('divide array em chunks iguais', () => {
+      expect(chunkArray([1, 2, 3, 4], 2)).toEqual([[1, 2], [3, 4]]);
+    });
+
+    it('retorna array vazio para null', () => {
+      expect(chunkArray(null, 2)).toEqual([]);
+    });
+
+    it('trata último chunk menor que o tamanho', () => {
+      expect(chunkArray([1, 2, 3], 2)).toEqual([[1, 2], [3]]);
+    });
+
+    it('retorna array único se menor que chunk', () => {
+      expect(chunkArray([1], 6)).toEqual([[1]]);
+    });
+  });
+
+  describe('temAcoesCorretivas', () => {
+    it('retorna true quando há ação e descrição', () => {
+      const c = { acoes_corretivas_realizado: true, acoes_corretivas_descricao: 'Ação X' };
+      expect(temAcoesCorretivas(c)).toBe(true);
+    });
+
+    it('retorna false quando descrição vazia', () => {
+      const c = { acoes_corretivas_realizado: true, acoes_corretivas_descricao: '' };
+      expect(temAcoesCorretivas(c)).toBe(false);
+    });
+
+    it('retorna false quando realizado é false', () => {
+      const c = { acoes_corretivas_realizado: false, acoes_corretivas_descricao: 'Ação X' };
+      expect(temAcoesCorretivas(c)).toBe(false);
+    });
+  });
+
+  describe('formatarJornada', () => {
+    it('formata jornada completa', () => {
+      expect(formatarJornada({ horario_inicio: '08:00', horario_fim: '17:00' })).toBe('08:00 - 17:00');
+    });
+
+    it('retorna null sem horários', () => {
+      expect(formatarJornada({ horario_inicio: '08:00' })).toBeNull();
+      expect(formatarJornada(null)).toBeNull();
+    });
+  });
+
+  describe('buildFooterPropsAplicacao', () => {
+    it('constrói props do footer corretamente', () => {
+      const checklist = {
+        laboratorista_name: 'João',
+        created_by: 'joao@test.com',
+        created_date: '2025-01-01',
+        approved_by: 'eng@test.com',
+        approved_date: '2025-01-02',
+        approver_details: { name: 'Eng Silva', position: 'Engenheiro', crea_number: '1234' },
+        client_signature: {
+          engineer_name: 'Cli Eng',
+          signed_by: 'cli@test.com',
+          crea_number: '5678',
+          signed_date: '2025-01-03',
+        },
+      };
+      const props = buildFooterPropsAplicacao(checklist, { position: 'Técnico' });
+
+      expect(props.labName).toBe('João');
+      expect(props.labEmail).toBe('joao@test.com');
+      expect(props.labPosition).toBe('Técnico');
+      expect(props.approverName).toBe('Eng Silva');
+      expect(props.clientName).toBe('Cli Eng');
+    });
+
+    it('usa "Laboratorista" como posição padrão se não fornecida', () => {
+      const checklist = { laboratorista_name: 'Maria' };
+      const props = buildFooterPropsAplicacao(checklist, null);
+      expect(props.labPosition).toBe('Laboratorista');
+    });
+  });
+
+  describe('formatClimaLabel', () => {
+    it('retorna label com emoji para condições válidas', () => {
+      expect(formatClimaLabel('bom')).toBe('☀️ Bom');
+      expect(formatClimaLabel('instavel')).toBe('⛅ Instável');
+      expect(formatClimaLabel('chuva')).toBe('🌧️ Chuva');
+    });
+
+    it('retorna null para condição desconhecida', () => {
+      expect(formatClimaLabel('unknown')).toBeNull();
+      expect(formatClimaLabel(null)).toBeNull();
     });
   });
 });
