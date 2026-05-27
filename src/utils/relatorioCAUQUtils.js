@@ -59,9 +59,9 @@ export function formatDateBrasilia(dateString) {
  * Compara abertura de peneira (string com vírgula ou mm) com abertura da config (string com vírgula).
  */
 function aberturaMatch(aberturaFaixaRaw, aberturaConfig) {
-  const a = aberturaFaixaRaw.toString().replace(/mm/gi, '').replace(',', '.').trim();
-  const b = aberturaConfig.replace(',', '.').trim();
-  return parseFloat(a) === parseFloat(b);
+  const a = parseFloat(aberturaFaixaRaw.toString().replace(/mm/gi, '').replace(',', '.').trim());
+  const b = parseFloat(aberturaConfig.replace(',', '.').trim());
+  return Math.abs(a - b) < 0.001;
 }
 
 /**
@@ -106,9 +106,20 @@ export function calcularGranulometria(ensaio, faixa, project) {
 
     let faixaTrabalhoMin = '', faixaTrabalhoMax = '', faixaTrabalho = '';
     if (project) {
-      faixaTrabalho    = project.faixa_trabalho?.[peneira.key]     || '';
-      faixaTrabalhoMin = project.faixa_trabalho_min?.[peneira.key] || '';
-      faixaTrabalhoMax = project.faixa_trabalho_max?.[peneira.key] || '';
+      const aberturaNum = parseFloat(peneira.abertura.replace(',', '.'));
+      const findByAbertura = (obj) => {
+        if (!obj) return '';
+        if (obj[peneira.key] !== undefined && obj[peneira.key] !== null && obj[peneira.key] !== '') return obj[peneira.key];
+        for (const [k, v] of Object.entries(obj)) {
+          const parts = k.replace('peneira_', '').replace(/mm$/, '').split('_');
+          const keyNum = parseFloat(parts.join('.'));
+          if (!isNaN(keyNum) && Math.abs(keyNum - aberturaNum) < 0.001 && v !== undefined && v !== null && v !== '') return v;
+        }
+        return '';
+      };
+      faixaTrabalho    = findByAbertura(project.faixa_trabalho);
+      faixaTrabalhoMin = findByAbertura(project.faixa_trabalho_min);
+      faixaTrabalhoMax = findByAbertura(project.faixa_trabalho_max);
     }
 
     return {

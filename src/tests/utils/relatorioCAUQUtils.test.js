@@ -151,6 +151,39 @@ describe('calcularGranulometria', () => {
     expect(Number(peneira.percentualPassante)).toBe(0);
   });
 
+  it('popula faixaTrabalho para peneira 1/4" (6,3mm) por key direta', () => {
+    const project = {
+      faixa_trabalho_min: { peneira_6_3mm: 30 },
+      faixa_trabalho_max: { peneira_6_3mm: 55 },
+    };
+    const faixa = { peneiras: [{ abertura: '6,3', min: 53, max: 78 }] };
+    const ensaio = {
+      granulometria: { peso_retido_peneiras: { peneira_6_3mm: 100 } },
+      extracao_ligante: { amostra_sem_ligante: 500 },
+    };
+    const result = calcularGranulometria(ensaio, faixa, project);
+    expect(result[0].faixaTrabalhoMin).toBe(30);
+    expect(result[0].faixaTrabalhoMax).toBe(55);
+    expect(result[0].limiteMin).toBe(53);
+    expect(result[0].limiteMax).toBe(78);
+  });
+
+  it('popula faixaTrabalho para peneira 1/4" (6,3mm) por abertura numérica (fallback)', () => {
+    // Simula projeto salvo com key diferente mas mesma abertura numérica
+    const project = {
+      faixa_trabalho_min: { peneira_6_3mm: 30 },
+      faixa_trabalho_max: { peneira_6_3mm: 55 },
+    };
+    const faixa = { peneiras: [{ abertura: '6.3mm', min: 53, max: 78 }] };
+    const ensaio = {
+      granulometria: { peso_retido_peneiras: { peneira_6_3mm: 100 } },
+      extracao_ligante: { amostra_sem_ligante: 500 },
+    };
+    const result = calcularGranulometria(ensaio, faixa, project);
+    expect(result[0].faixaTrabalhoMin).toBe(30);
+    expect(result[0].faixaTrabalhoMax).toBe(55);
+  });
+
   it('acumula retido corretamente (passante decresce)', () => {
     const ensaio = {
       granulometria: {
