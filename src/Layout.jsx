@@ -34,9 +34,9 @@ const AppLayout = ({ children }) => {
   const canCreateRecords = !loadingUser && (isAdmin || (!isSalaTecnica && !isGestorContrato && !isCliente));
 
   return (
-    <SidebarProvider style={{ "--sidebar-background": "210 100% 12%" }}>
+    <SidebarProvider>
       <Dialog open={isCreateEnsaioOpen} onOpenChange={setIsCreateEnsaioOpen}>
-        <div className="min-h-screen flex w-full overflow-x-hidden" style={{ backgroundColor: 'var(--brand-surface)' }}>
+        <div className="min-h-screen flex w-full bg-[#F2F1EF] overflow-x-hidden">
           <AppSidebar
             user={user}
             userAccessLevel={userAccessLevel}

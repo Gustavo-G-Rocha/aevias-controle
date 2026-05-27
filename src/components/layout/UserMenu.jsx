@@ -45,15 +45,15 @@ export default function UserMenu({ user, isAdmin, isSalaTecnica, isGestorContrat
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="w-full justify-start gap-3 h-auto p-3 hover:bg-white/10">
-            <div className="w-8 h-8 bg-[#BFCF99]/20 border border-[#BFCF99]/40 rounded-full flex items-center justify-center">
+          <Button variant="ghost" className="w-full justify-start gap-3 h-auto p-3 hover:bg-black/5">
+            <div className="w-8 h-8 bg-[#00233B] rounded-full flex items-center justify-center">
               <UserIcon className="w-4 h-4 text-[#BFCF99]" />
             </div>
             <div className="flex-1 text-left min-w-0">
-              <p className="font-medium text-white text-sm truncate">{user.laboratorista_name || user.full_name}</p>
+              <p className="font-medium text-[#00233B] text-sm truncate">{user.laboratorista_name}</p>
               <div className="flex items-center gap-2">
-                <p className="text-xs text-white/60 truncate">{user.email}</p>
-                <Badge variant="secondary" className="text-xs bg-[#BFCF99]/20 text-[#BFCF99] border-0">
+                <p className="text-xs text-[#00233B]/70 truncate">{user.email}</p>
+                <Badge variant="secondary" className="text-xs bg-black/10 text-[#00233B]">
                   {roleLabel}
                 </Badge>
               </div>
