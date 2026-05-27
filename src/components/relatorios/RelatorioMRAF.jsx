@@ -28,11 +28,11 @@ export default function RelatorioMRAF({ ensaio, obra, project, user, regional, f
       
       let limiteMin = '', limiteMax = '';
       if (faixaGranulometrica?.peneiras) {
-        const peneiraFaixa = faixaGranulometrica.peneiras.find(p => {
-          const aberturaFaixa = p.abertura.toString().replace(/mm/gi, '').replace(',', '.').trim();
-          const aberturaConfig = peneira.abertura.replace(',', '.').trim();
-          return parseFloat(aberturaFaixa) === parseFloat(aberturaConfig);
-        });
+      const peneiraFaixa = faixaGranulometrica.peneiras.find(p => {
+        const aberturaFaixa = parseFloat(p.abertura.toString().replace(/mm/gi, '').replace(',', '.').trim());
+        const aberturaConfig = parseFloat(peneira.abertura.replace(',', '.').trim());
+        return Math.abs(aberturaFaixa - aberturaConfig) < 0.001;
+      });
         
         if (peneiraFaixa) {
           limiteMin = peneiraFaixa.min || '';
