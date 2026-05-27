@@ -129,7 +129,7 @@ export default function AppSidebar({
                          <SidebarMenuButton asChild isActive={isActive(to)} className={`rounded-xl mb-0.5 h-auto ${isActive(to) ? '!bg-white !text-black' : ''}`}>
                            <NavLink to={to} className={`flex items-center gap-3 pl-10 pr-3 py-2.5 ${isActive(to) ? '!text-black' : ''}`}>
                              <Icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive(to) ? '#000000 !important' : 'var(--color-sidebar-text-muted)' }} />
-                             <span className={`font-semibold text-sm ${isActive(to) ? '!text-black' : ''}`} style={{ color: !isActive(to) ? 'var(--color-sidebar-text)' : undefined }}>{label}</span>
+                             <span className={`font-semibold text-xs ${isActive(to) ? '!text-black' : ''}`} style={{ color: !isActive(to) ? 'var(--color-sidebar-text)' : undefined }}>{label}</span>
                              {badge && <Badge className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{pendingTransfers}</Badge>}
                            </NavLink>
                          </SidebarMenuButton>
@@ -140,7 +140,7 @@ export default function AppSidebar({
                          <SidebarMenuButton asChild isActive={isActive("/ImpressionEtiquetas")} className={`rounded-xl mb-0.5 h-auto ${isActive("/ImpressionEtiquetas") ? '!bg-white !text-black' : ''}`}>
                            <NavLink to="/ImpressionEtiquetas" className="flex items-center gap-3 pl-10 pr-3 py-2.5">
                              <FileText className="w-4 h-4 flex-shrink-0" style={{ color: isActive("/ImpressionEtiquetas") ? '#000000 !important' : 'var(--color-sidebar-text-muted)' }} />
-                             <span className="font-semibold text-sm" style={{ color: isActive("/ImpressionEtiquetas") ? '#000000 !important' : 'var(--color-sidebar-text)' }}>Impressão de Etiquetas</span>
+                             <span className="font-semibold text-xs" style={{ color: isActive("/ImpressionEtiquetas") ? '#000000 !important' : 'var(--color-sidebar-text)' }}>Impressão de Etiquetas</span>
                            </NavLink>
                          </SidebarMenuButton>
                        </SidebarMenuItem>
@@ -150,7 +150,7 @@ export default function AppSidebar({
                          <SidebarMenuButton asChild isActive={isActive("/RelatoriosUnificados")} className={`rounded-xl mb-0.5 h-auto ${isActive("/RelatoriosUnificados") ? '!bg-white !text-black' : ''}`}>
                            <NavLink to="/RelatoriosUnificados" className="flex items-center gap-3 pl-10 pr-3 py-2.5">
                              <FileText className="w-4 h-4 flex-shrink-0" style={{ color: isActive("/RelatoriosUnificados") ? '#000000 !important' : 'var(--color-sidebar-text-muted)' }} />
-                             <span className="font-semibold text-sm" style={{ color: isActive("/RelatoriosUnificados") ? '#000000 !important' : 'var(--color-sidebar-text)' }}>Relatórios Unificados</span>
+                             <span className="font-semibold text-xs" style={{ color: isActive("/RelatoriosUnificados") ? '#000000 !important' : 'var(--color-sidebar-text)' }}>Relatórios Unificados</span>
                            </NavLink>
                          </SidebarMenuButton>
                        </SidebarMenuItem>
@@ -182,7 +182,7 @@ export default function AppSidebar({
                          <SidebarMenuButton asChild isActive={isActive(to)} className={`rounded-xl mb-0.5 h-auto ${isActive(to) ? '!bg-white !text-black' : ''}`}>
                            <NavLink to={to} className={`flex items-center gap-3 pl-10 pr-3 py-2.5 ${isActive(to) ? '!text-black' : ''}`}>
                              <Icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive(to) ? '#000000 !important' : 'var(--color-sidebar-text-muted)' }} />
-                             <span className={`font-semibold text-sm ${isActive(to) ? '!text-black' : ''}`} style={{ color: !isActive(to) ? 'var(--color-sidebar-text)' : undefined }}>{label}</span>
+                             <span className={`font-semibold text-xs ${isActive(to) ? '!text-black' : ''}`} style={{ color: !isActive(to) ? 'var(--color-sidebar-text)' : undefined }}>{label}</span>
                              </NavLink>
                              </SidebarMenuButton>
                              </SidebarMenuItem>
@@ -192,7 +192,7 @@ export default function AppSidebar({
                          <SidebarMenuButton asChild isActive={isActive(createPageUrl("NovaNC"))} className={`rounded-xl mb-0.5 h-auto ${isActive(createPageUrl("NovaNC")) ? '!bg-white !text-black' : ''}`}>
                            <NavLink to={createPageUrl("NovaNC")} className="flex items-center gap-3 pl-10 pr-3 py-2.5">
                              <AlertTriangle className="w-4 h-4 flex-shrink-0" style={{ color: isActive(createPageUrl("NovaNC")) ? '#000000 !important' : 'var(--color-sidebar-text-muted)' }} />
-                             <span className="font-semibold text-sm" style={{ color: isActive(createPageUrl("NovaNC")) ? '#000000 !important' : 'var(--color-sidebar-text)' }}>Nova NC</span>
+                             <span className="font-semibold text-xs" style={{ color: isActive(createPageUrl("NovaNC")) ? '#000000 !important' : 'var(--color-sidebar-text)' }}>Nova NC</span>
                            </NavLink>
                          </SidebarMenuButton>
                        </SidebarMenuItem>
