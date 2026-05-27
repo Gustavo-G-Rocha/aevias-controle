@@ -1,63 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { Loader2 } from "lucide-react";
 import { useReportMode } from "@/hooks/useReportMode";
 import { Button } from "@/components/ui/button";
-import { Download, Loader2 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
-import RelatorioDensidadeInSituComponent from '../components/relatorios/RelatorioDensidadeInSitu';
-import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import { Download } from "lucide-react";
+
+import { useRelatorioDensidadeInSituData } from "@/hooks/useRelatorioDensidadeInSituData";
+import { useRelatorioDensidadeInSituActions } from "@/hooks/useRelatorioDensidadeInSituActions";
+import AprovacaoBar from '@/components/relatorios/AprovacaoBar';
+
+import RelatorioDensidadeInSituHeader from "@/components/relatorio-densidade-insitu/RelatorioDensidadeInSituHeader";
+import RelatorioDensidadeInSituDadosObra from "@/components/relatorio-densidade-insitu/RelatorioDensidadeInSituDadosObra";
+import RelatorioDensidadeInSituTabela from "@/components/relatorio-densidade-insitu/RelatorioDensidadeInSituTabela";
+import RelatorioDensidadeInSituObservacoes from "@/components/relatorio-densidade-insitu/RelatorioDensidadeInSituObservacoes";
+import SignatureFooter from '@/components/relatorios/SignatureFooter';
 
 export default function RelatorioDensidadeInSituPage() {
   useReportMode();
-  const [state, setState] = useState({
-    loading: true,
-    error: null,
-    data: null
-  });
+  const { ensaio, obra, regional, loading, error } = useRelatorioDensidadeInSituData();
+  const { handlePrint } = useRelatorioDensidadeInSituActions();
 
-  const loadReportData = async () => {
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get('id');
-
-      if (!id) throw new Error('ID do ensaio é obrigatório na URL');
-
-      const [ensaio, obras, regionais] = await Promise.all([
-        base44.entities.EnsaioDensidadeInSitu.get(id),
-        base44.entities.Obra.list(),
-        base44.entities.Regional.list()
-      ]);
-
-      if (!ensaio) throw new Error(`Ensaio com ID ${id} não encontrado`);
-
-      let obra = null;
-      let regional = null;
-      if (ensaio.obra_id) {
-        obra = obras.find(o => o.id === ensaio.obra_id);
-        if (obra && obra.regional_id) {
-          regional = regionais.find(r => r.id === obra.regional_id);
-        }
-      }
-
-      setState({
-        loading: false,
-        error: null,
-        data: { ensaio, obra, regional }
-      });
-    } catch (error) {
-      console.error('Erro ao carregar relatório:', error);
-      setState({ loading: false, error: error.message, data: null });
-    }
-  };
-
-  useEffect(() => {
-    loadReportData();
-  }, [loadReportData]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handlePrint = () => {
-    window.print();
-  };
-
-  if (state.loading) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center">
@@ -68,8 +30,8 @@ export default function RelatorioDensidadeInSituPage() {
     );
   }
 
-  if (state.error) {
-    return <div className="p-8 text-center text-red-600">Erro: {state.error}</div>;
+  if (error) {
+    return <div className="p-8 text-center text-red-600">Erro: {error}</div>;
   }
 
   return (
@@ -80,7 +42,7 @@ export default function RelatorioDensidadeInSituPage() {
             Relatório de Densidade In Situ
           </h2>
           <div className="flex items-center gap-2">
-            {state.data && <AprovacaoBar entityName="EnsaioDensidadeInSitu" recordId={state.data.ensaio?.id} />}
+            {ensaio && <AprovacaoBar entityName="EnsaioDensidadeInSitu" recordId={ensaio.id} />}
             <Button onClick={handlePrint} className="bg-slate-800 text-white hover:bg-slate-700">
               <Download className="w-4 h-4 mr-2" />
               Gerar PDF
@@ -90,12 +52,36 @@ export default function RelatorioDensidadeInSituPage() {
       </div>
       
       <div className="report-content-container w-full bg-white print:bg-white">
-        {state.data && (
-          <RelatorioDensidadeInSituComponent 
-            ensaio={state.data.ensaio} 
-            obra={state.data.obra} 
-            regional={state.data.regional} 
-          />
+        {ensaio && (
+          <div className="bg-white font-sans">
+            <div className="w-full max-w-[210mm] mx-auto bg-white p-6 print:p-6 print:min-h-[297mm]" style={{ minHeight: '100vh' }}>
+              <RelatorioDensidadeInSituHeader regional={regional} />
+              <RelatorioDensidadeInSituDadosObra ensaio={ensaio} obra={obra} regional={regional} />
+              <RelatorioDensidadeInSituTabela ensaio={ensaio} />
+
+              <footer className="mt-4 pt-3 print:break-inside-avoid">
+                <RelatorioDensidadeInSituObservacoes ensaio={ensaio} />
+                <div className="px-4">
+                  <SignatureFooter 
+                    labName={ensaio.laboratorista_name}
+                    labEmail={ensaio.created_by}
+                    labCreatedDate={ensaio.created_date}
+                    labPosition="Laboratorista"
+                    approverName={ensaio.approver_details?.name}
+                    approverEmail={ensaio.approved_by}
+                    approverPosition={ensaio.approver_details?.position}
+                    approverCREA={ensaio.approver_details?.crea_number}
+                    approverDate={ensaio.approved_date}
+                    clientName={ensaio.client_signature?.engineer_name}
+                    clientEmail={ensaio.client_signature?.signed_by}
+                    clientPosition={ensaio.client_signature?.position}
+                    clientCREA={ensaio.client_signature?.crea_number}
+                    clientDate={ensaio.client_signature?.signed_date}
+                  />
+                </div>
+              </footer>
+            </div>
+          </div>
         )}
       </div>
 
