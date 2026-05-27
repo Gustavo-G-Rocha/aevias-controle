@@ -6,8 +6,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  DropdownMenuTrigger } from
+"@/components/ui/dropdown-menu";
 import { User } from "@/entities/User";
 import { useCallback } from "react";
 
@@ -21,20 +21,20 @@ export default function MobileHeader({ user, canCreateRecords }) {
 
   return (
     <div
-      className="lg:hidden fixed top-0 left-0 right-0 z-40 backdrop-blur-sm flex items-center justify-between px-4"
+      className="lg:hidden fixed top-0 left-0 right-0 z-40 backdrop-blur-sm flex items-center justify-between px-4 hidden"
       style={{ backgroundColor: 'var(--color-sidebar-bg)', borderBottom: '1px solid var(--color-sidebar-border)' }}
-      style={{ paddingTop: "env(safe-area-inset-top)", minHeight: "calc(3rem + env(safe-area-inset-top))" }}
-    >
-      {location.pathname !== "/" && (
-        <button
-          type="button"
-          onClick={() => window.history.length > 1 ? navigate(-1) : navigate("/")}
-          className="flex items-center gap-1 font-medium select-none py-2 pr-6 pl-1 min-h-[44px] min-w-[80px] active:opacity-70"
-          style={{ color: 'var(--color-sidebar-text)' }}
-        >
+      style={{ paddingTop: "env(safe-area-inset-top)", minHeight: "calc(3rem + env(safe-area-inset-top))" }}>
+      
+      {location.pathname !== "/" &&
+      <button
+        type="button"
+        onClick={() => window.history.length > 1 ? navigate(-1) : navigate("/")}
+        className="flex items-center gap-1 font-medium select-none py-2 pr-6 pl-1 min-h-[44px] min-w-[80px] active:opacity-70"
+        style={{ color: 'var(--color-sidebar-text)' }}>
+        
           <div className="flex items-center gap-2 py-3">
-            {user && (
-              <DropdownMenu>
+            {user &&
+          <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full" style={{ backgroundColor: 'rgba(191,207,153,0.15)' }}>
                     <UserIcon className="w-4 h-4" style={{ color: 'var(--color-sidebar-icon)' }} />
@@ -55,21 +55,21 @@ export default function MobileHeader({ user, canCreateRecords }) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            )}
+          }
             <span className="text-base font-bold" style={{ color: 'var(--color-sidebar-text)' }}>Afirmaevias</span>
           </div>
         </button>
-      )}
+      }
 
       <div className="flex items-center gap-2">
-        {canCreateRecords && (
-          <DialogTrigger asChild>
+        {canCreateRecords &&
+        <DialogTrigger asChild>
             <Button size="icon" className="shadow-lg transition-opacity h-11 w-11 active:scale-95" style={{ backgroundColor: 'var(--color-secondary)', color: 'var(--color-primary)' }}>
               <FilePlus className="w-5 h-5" style={{ color: 'var(--color-primary)' }} />
             </Button>
           </DialogTrigger>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 }
