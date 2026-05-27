@@ -62,7 +62,7 @@ export default function AppSidebar({
   const gestaoNavigation = ADMIN_NAVIGATION.filter(i => !i.allowedLevels || i.allowedLevels.includes(userAccessLevel));
 
   return (
-    <Sidebar className="border-r-0 flex flex-col h-full" style={{ backgroundColor: 'var(--color-sidebar-bg)' }}>
+    <Sidebar className="border-r-0" style={{ backgroundColor: 'var(--color-sidebar-bg)' }}>
       <SidebarHeader className="flex-shrink-0 px-4 pt-4 pb-3" style={{ borderBottom: '1px solid var(--color-sidebar-border)' }}>
         <div className="flex items-center justify-center">
           <img
@@ -76,7 +76,7 @@ export default function AppSidebar({
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="flex-1 min-h-0 overflow-y-auto p-3 pb-4">
+      <SidebarContent className="p-3 pb-6">
         {canCreateRecords && (
           <DialogTrigger asChild>
             <Button className="w-full mb-4 hidden lg:flex font-semibold tracking-wide" style={{ backgroundColor: 'var(--color-secondary)', color: 'var(--color-primary)' }}>
@@ -213,7 +213,7 @@ export default function AppSidebar({
         )}
       </SidebarContent>
 
-      <SidebarFooter className="flex-shrink-0 p-4" style={{ borderTop: '1px solid var(--color-sidebar-border)' }}>
+      <SidebarFooter className="p-4" style={{ borderTop: '1px solid var(--color-sidebar-border)' }}>
         <UserMenu
           user={user}
           isAdmin={isAdmin}
