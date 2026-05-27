@@ -11,7 +11,7 @@ describe('relatorioTaxaMRAFUtils', () => {
   describe('formatDate', () => {
     it('formata data em pt-BR com UTC', () => {
       const result = formatDate('2024-05-15');
-      expect(result).toBe('15/5/2024');
+      expect(result).toBe('15/05/2024');
     });
 
     it('retorna string vazia se nulo', () => {
