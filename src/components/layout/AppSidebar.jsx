@@ -62,7 +62,7 @@ export default function AppSidebar({
   const gestaoNavigation = ADMIN_NAVIGATION.filter(i => !i.allowedLevels || i.allowedLevels.includes(userAccessLevel));
 
   return (
-    <Sidebar className="border-r border-white/10 bg-white/10 backdrop-blur-xl">
+    <Sidebar className="border-r border-white/10" style={{ backgroundColor: 'var(--brand-primary)' }}>
       <SidebarHeader className="border-b border-white/10 p-4">
         <div className="flex items-center justify-center">
           <picture>

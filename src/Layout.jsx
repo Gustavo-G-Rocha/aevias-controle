@@ -36,7 +36,7 @@ const AppLayout = ({ children }) => {
   return (
     <SidebarProvider>
       <Dialog open={isCreateEnsaioOpen} onOpenChange={setIsCreateEnsaioOpen}>
-        <div className="min-h-screen flex w-full bg-[#F2F1EF] overflow-x-hidden">
+        <div className="min-h-screen flex w-full overflow-x-hidden" style={{ backgroundColor: 'var(--brand-surface)' }}>
           <AppSidebar
             user={user}
             userAccessLevel={userAccessLevel}

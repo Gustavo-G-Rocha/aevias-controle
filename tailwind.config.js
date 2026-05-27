@@ -9,7 +9,22 @@ module.exports = {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
+  		boxShadow: {
+  			sm: 'var(--shadow-sm)',
+  			md: 'var(--shadow-md)',
+  			lg: 'var(--shadow-lg)',
+  		},
   		colors: {
+  			/* Brand colors — use as bg-brand-primary, text-brand-accent, etc. */
+  			brand: {
+  				primary:    '#00233B',
+  				accent:     '#BFCF99',
+  				surface:    '#F2F1EF',
+  				success:    '#16a34a',
+  				warning:    '#f59e0b',
+  				danger:     '#dc2626',
+  				info:       '#2563eb',
+  			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
