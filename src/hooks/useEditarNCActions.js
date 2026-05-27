@@ -1,0 +1,79 @@
+import { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { base44 } from "@/api/base44Client";
+import { createPageUrl } from "@/utils";
+import { validateNCForm, buildNCUpdatePayload } from "@/utils/editarNCUtils";
+
+export const useEditarNCActions = (nc) => {
+  const navigate = useNavigate();
+  const [uploadingFotos, setUploadingFotos] = useState(false);
+  const [uploadingPdfs, setUploadingPdfs] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const handleUploadFotos = useCallback(async (files, currentFotos, setFotos) => {
+    if (!files.length) return;
+    setUploadingFotos(true);
+    try {
+      const urls = await Promise.all(
+        files.map(async (file) => {
+          const { file_url } = await base44.integrations.Core.UploadFile({
+            file,
+          });
+          return file_url;
+        })
+      );
+      setFotos((prev) => [...prev, ...urls]);
+    } finally {
+      setUploadingFotos(false);
+    }
+  }, []);
+
+  const handleUploadPdfs = useCallback(async (files, currentPdfs, setPdfs) => {
+    if (!files.length) return;
+    setUploadingPdfs(true);
+    try {
+      const results = await Promise.all(
+        files.map(async (file) => {
+          const { file_url } = await base44.integrations.Core.UploadFile({
+            file,
+          });
+          return { url: file_url, nome: file.name };
+        })
+      );
+      setPdfs((prev) => [...prev, ...results]);
+    } finally {
+      setUploadingPdfs(false);
+    }
+  }, []);
+
+  const handleSave = useCallback(
+    async (form, fotos, pdfs) => {
+      if (!validateNCForm(form)) {
+        alert("Preencha os campos obrigatórios: Data da NC e Descrição.");
+        return;
+      }
+
+      setSaving(true);
+      try {
+        const payload = buildNCUpdatePayload(form, fotos, pdfs);
+        await base44.entities.RelatorioNC.update(nc.id, payload);
+        navigate(createPageUrl("GestaoNC"));
+      } catch (error) {
+        console.error("[EditarNC] Erro ao salvar NC:", error?.message || error);
+        alert("Erro ao salvar a NC. Tente novamente.");
+      } finally {
+        setSaving(false);
+      }
+    },
+    [nc, navigate]
+  );
+
+  return {
+    uploadingFotos,
+    uploadingPdfs,
+    saving,
+    handleUploadFotos,
+    handleUploadPdfs,
+    handleSave,
+  };
+};
