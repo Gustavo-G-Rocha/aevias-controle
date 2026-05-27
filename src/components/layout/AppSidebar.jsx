@@ -35,10 +35,10 @@ const NavItem = ({ item, isActive, pendingTransfers, isGestorContrato, isSalaTec
   const showBadge = item.showBadge && pendingTransfers > 0 && (isGestorContrato || isSalaTecnica);
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton asChild className={`hover:bg-black/5 transition-all duration-200 rounded-lg mb-1 ${isActive ? "bg-black/10" : ""}`}>
+      <SidebarMenuButton asChild className={`hover:bg-white/10 transition-all duration-200 rounded-lg mb-1 ${isActive ? "bg-white/15" : ""}`}>
         <NavLink to={item.url} className="flex items-center gap-3 px-3 py-2.5 relative">
           <item.icon className="w-5 h-5 text-[#BFCF99]" />
-          <span className="font-medium text-[#00233B]">{item.title}</span>
+          <span className="font-medium text-white/90">{item.title}</span>
           {showBadge && (
             <Badge className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{pendingTransfers}</Badge>
           )}
@@ -62,7 +62,7 @@ export default function AppSidebar({
   const gestaoNavigation = ADMIN_NAVIGATION.filter(i => !i.allowedLevels || i.allowedLevels.includes(userAccessLevel));
 
   return (
-    <Sidebar className="border-r border-white/10" style={{ backgroundColor: 'var(--brand-primary)' }}>
+    <Sidebar className="border-r border-white/10 bg-[#00233B]">
       <SidebarHeader className="border-b border-white/10 p-4">
         <div className="flex items-center justify-center">
           <picture>
@@ -79,7 +79,7 @@ export default function AppSidebar({
       <SidebarContent className="p-3">
         {canCreateRecords && (
           <DialogTrigger asChild>
-            <Button className="w-full bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90 mb-4 hidden lg:flex">
+            <Button className="w-full bg-white/15 border border-white/20 text-white hover:bg-white/25 mb-4 hidden lg:flex">
               <FilePlus className="w-5 h-5 mr-2 text-[#BFCF99]" />
               Novo Registro
             </Button>
@@ -87,7 +87,7 @@ export default function AppSidebar({
         )}
 
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-semibold text-[#00233B]/70 uppercase tracking-wider px-3 py-2">
+          <SidebarGroupLabel className="text-xs font-semibold text-white/50 uppercase tracking-wider px-3 py-2">
             Principal
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -100,11 +100,11 @@ export default function AppSidebar({
               {showMinhasObras && (
                 <>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="hover:bg-black/5 transition-all duration-200 rounded-lg mb-1 cursor-pointer" onClick={() => setMinhasObrasOpen(p => !p)}>
+                    <SidebarMenuButton className="hover:bg-white/10 transition-all duration-200 rounded-lg mb-1 cursor-pointer" onClick={() => setMinhasObrasOpen(p => !p)}>
                       <div className="flex items-center gap-3 px-3 py-2.5 w-full">
                         <FolderOpen className="w-5 h-5 text-[#BFCF99]" />
-                        <span className="font-medium text-[#00233B] flex-1">Minhas Obras</span>
-                        {minhasObrasOpen ? <ChevronDown className="w-4 h-4 text-[#00233B]/60" /> : <ChevronRight className="w-4 h-4 text-[#00233B]/60" />}
+                        <span className="font-medium text-white/90 flex-1">Minhas Obras</span>
+                        {minhasObrasOpen ? <ChevronDown className="w-4 h-4 text-white/50" /> : <ChevronRight className="w-4 h-4 text-white/50" />}
                       </div>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -120,7 +120,7 @@ export default function AppSidebar({
                           <SidebarMenuButton asChild className={`hover:bg-black/5 transition-all duration-200 rounded-lg mb-1 ${isActive(to) ? "bg-black/10" : ""}`}>
                             <NavLink to={to} className="flex items-center gap-3 pl-10 pr-3 py-2.5">
                               <Icon className="w-4 h-4 text-[#BFCF99]" />
-                              <span className="font-medium text-[#00233B] text-sm">{label}</span>
+                              <span className="font-medium text-white/80 text-sm">{label}</span>
                               {badge && <Badge className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{pendingTransfers}</Badge>}
                             </NavLink>
                           </SidebarMenuButton>
@@ -130,8 +130,8 @@ export default function AppSidebar({
                         <SidebarMenuItem>
                           <SidebarMenuButton asChild className={`hover:bg-black/5 transition-all duration-200 rounded-lg mb-1 ${isActive("/ImpressionEtiquetas") ? "bg-black/10" : ""}`}>
                             <NavLink to="/ImpressionEtiquetas" className="flex items-center gap-3 pl-10 pr-3 py-2.5">
-                              <FileText className="w-4 h-4 text-[#BFCF99]" />
-                              <span className="font-medium text-[#00233B] text-sm">Impressão de Etiquetas</span>
+                             <FileText className="w-4 h-4 text-[#BFCF99]" />
+                             <span className="font-medium text-white/80 text-sm">Impressão de Etiquetas</span>
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -140,8 +140,8 @@ export default function AppSidebar({
                         <SidebarMenuItem>
                           <SidebarMenuButton asChild className={`hover:bg-black/5 transition-all duration-200 rounded-lg mb-1 ${isActive("/RelatoriosUnificados") ? "bg-black/10" : ""}`}>
                             <NavLink to="/RelatoriosUnificados" className="flex items-center gap-3 pl-10 pr-3 py-2.5">
-                              <FileText className="w-4 h-4 text-[#BFCF99]" />
-                              <span className="font-medium text-[#00233B] text-sm">Relatórios Unificados</span>
+                             <FileText className="w-4 h-4 text-[#BFCF99]" />
+                             <span className="font-medium text-white/80 text-sm">Relatórios Unificados</span>
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -155,11 +155,11 @@ export default function AppSidebar({
               {showNaoConformidades && (
                 <>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="hover:bg-black/5 transition-all duration-200 rounded-lg mb-1 cursor-pointer" onClick={() => setNaoConformidadesOpen(p => !p)}>
+                    <SidebarMenuButton className="hover:bg-white/10 transition-all duration-200 rounded-lg mb-1 cursor-pointer" onClick={() => setNaoConformidadesOpen(p => !p)}>
                       <div className="flex items-center gap-3 px-3 py-2.5 w-full">
                         <AlertTriangle className="w-5 h-5 text-[#BFCF99]" />
-                        <span className="font-medium text-[#00233B] flex-1">Não Conformidades</span>
-                        {naoConformidadesOpen ? <ChevronDown className="w-4 h-4 text-[#00233B]/60" /> : <ChevronRight className="w-4 h-4 text-[#00233B]/60" />}
+                        <span className="font-medium text-white/90 flex-1">Não Conformidades</span>
+                        {naoConformidadesOpen ? <ChevronDown className="w-4 h-4 text-white/50" /> : <ChevronRight className="w-4 h-4 text-white/50" />}
                       </div>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -173,7 +173,7 @@ export default function AppSidebar({
                           <SidebarMenuButton asChild className={`hover:bg-black/5 transition-all duration-200 rounded-lg mb-1 ${isActive(to) ? "bg-black/10" : ""}`}>
                             <NavLink to={to} className="flex items-center gap-3 pl-10 pr-3 py-2.5">
                               <Icon className="w-4 h-4 text-[#BFCF99]" />
-                              <span className="font-medium text-[#00233B] text-sm">{label}</span>
+                              <span className="font-medium text-white/80 text-sm">{label}</span>
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -183,7 +183,7 @@ export default function AppSidebar({
                           <SidebarMenuButton asChild className={`hover:bg-black/5 transition-all duration-200 rounded-lg mb-1 ${isActive(createPageUrl("NovaNC")) ? "bg-black/10" : ""}`}>
                             <NavLink to={createPageUrl("NovaNC")} className="flex items-center gap-3 pl-10 pr-3 py-2.5">
                               <AlertTriangle className="w-4 h-4 text-[#BFCF99]" />
-                              <span className="font-medium text-[#00233B] text-sm">Nova NC</span>
+                              <span className="font-medium text-white/80 text-sm">Nova NC</span>
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -199,7 +199,7 @@ export default function AppSidebar({
         {/* Administração / Gestão */}
         {(canManageSystem || isGestorContrato || isSalaTecnica || isCliente) && gestaoNavigation.length > 0 && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-xs font-semibold text-[#00233B]/70 uppercase tracking-wider px-3 py-2">
+            <SidebarGroupLabel className="text-xs font-semibold text-white/50 uppercase tracking-wider px-3 py-2">
               {canManageSystem ? "Administração" : "Gestão"}
             </SidebarGroupLabel>
             <SidebarGroupContent>
