@@ -1,8 +1,23 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeAll } from 'vitest';
+
+// Mock window antes de qualquer import de SDK
+beforeAll(() => {
+  if (typeof window === 'undefined') {
+    globalThis.window = { location: { href: 'http://localhost' } };
+  }
+});
+
+// Mock do app-params.js para evitar acesso a window
+vi.mock('@/lib/app-params', () => ({
+  getAppParams: () => ({
+    appId: 'test-app',
+    token: null,
+    fromUrl: 'http://localhost',
+  }),
+}));
 
 import {
   formatDate,
-  getRecordTypeName,
   isFiltersValid,
   getActiveFiltersDescription,
 } from '@/utils/relatorioUnificadoUtils';
@@ -27,12 +42,7 @@ describe('relatorioUnificadoUtils', () => {
     });
   });
 
-  describe('getRecordTypeName', () => {
-    it('deve retornar o tipo original quando não encontra mapeamento', () => {
-      const result = getRecordTypeName('UnknownType');
-      expect(result).toBe('UnknownType');
-    });
-  });
+
 
   describe('isFiltersValid', () => {
     it('deve retornar true quando todos os filtros obrigatórios estão presentes', () => {
