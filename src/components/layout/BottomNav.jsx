@@ -32,7 +32,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around"
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around ml-64"
       style={{ backgroundColor: 'var(--color-sidebar-bg)', borderTop: '1px solid var(--color-sidebar-border)', paddingBottom: "env(safe-area-inset-bottom)" }}>
       
       {NAV_ITEMS.map((item) => {
