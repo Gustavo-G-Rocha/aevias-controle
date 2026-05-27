@@ -35,10 +35,16 @@ const NavItem = ({ item, isActive, pendingTransfers, isGestorContrato, isSalaTec
   const showBadge = item.showBadge && pendingTransfers > 0 && (isGestorContrato || isSalaTecnica);
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive ? 'rgba(255,255,255,0.12)' : 'transparent' }} onMouseEnter={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'var(--color-sidebar-hover)'; }} onMouseLeave={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'transparent'; }}>
+      <SidebarMenuButton
+        asChild
+        className="transition-all duration-200 rounded-xl mb-0.5"
+        style={{ backgroundColor: isActive ? 'rgba(255,255,255,0.95)' : 'transparent' }}
+        onMouseEnter={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'; }}
+        onMouseLeave={e => { if (!isActive) e.currentTarget.style.backgroundColor = 'transparent'; }}
+      >
         <NavLink to={item.url} className="flex items-center gap-3 px-3 py-2.5 relative">
-          <item.icon className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />
-          <span className="font-medium" style={{ color: 'var(--color-sidebar-text)' }}>{item.title}</span>
+          <item.icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive ? 'var(--color-primary-dark)' : 'var(--color-sidebar-text-muted)' }} />
+          <span className="font-semibold" style={{ color: isActive ? 'var(--color-primary-dark)' : 'var(--color-sidebar-text)' }}>{item.title}</span>
           {showBadge && (
             <Badge className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{pendingTransfers}</Badge>
           )}
@@ -117,10 +123,16 @@ export default function AppSidebar({
                         { to: createPageUrl("SolicitacoesTransferencia"), icon: ArrowLeftRight, label: "Transferências", badge: pendingTransfers > 0 && (isGestorContrato || isSalaTecnica) },
                       ].map(({ to, icon: Icon, label, badge }) => (
                         <SidebarMenuItem key={label}>
-                          <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive(to) ? 'var(--color-sidebar-active)' : 'transparent' }}>
-                            <NavLink to={to} className="flex items-center gap-3 pl-10 pr-3 py-2.5 hover:bg-[var(--color-sidebar-hover)] rounded-xl">
-                              <Icon className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />
-                               <span className="font-medium text-sm" style={{ color: 'var(--color-sidebar-text)' }}>{label}</span>
+                          <SidebarMenuButton
+                            asChild
+                            className="transition-all duration-200 rounded-xl mb-0.5"
+                            style={{ backgroundColor: isActive(to) ? 'rgba(255,255,255,0.95)' : 'transparent' }}
+                            onMouseEnter={e => { if (!isActive(to)) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'; }}
+                            onMouseLeave={e => { if (!isActive(to)) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                          >
+                            <NavLink to={to} className="flex items-center gap-3 pl-10 pr-3 py-2.5 rounded-xl">
+                              <Icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive(to) ? 'var(--color-primary-dark)' : 'var(--color-sidebar-text-muted)' }} />
+                               <span className="font-semibold text-sm" style={{ color: isActive(to) ? 'var(--color-primary-dark)' : 'var(--color-sidebar-text)' }}>{label}</span>
                                {badge && <Badge className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{pendingTransfers}</Badge>}
                             </NavLink>
                           </SidebarMenuButton>
@@ -128,20 +140,32 @@ export default function AppSidebar({
                       ))}
                       {(isGestorContrato || isAdmin) && (
                         <SidebarMenuItem>
-                          <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive("/ImpressionEtiquetas") ? 'var(--color-sidebar-active)' : 'transparent' }}>
-                            <NavLink to="/ImpressionEtiquetas" className="flex items-center gap-3 pl-10 pr-3 py-2.5 hover:bg-[var(--color-sidebar-hover)] rounded-xl">
-                              <FileText className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />
-                              <span className="font-medium text-sm" style={{ color: 'var(--color-sidebar-text)' }}>Impressão de Etiquetas</span>
+                          <SidebarMenuButton
+                            asChild
+                            className="transition-all duration-200 rounded-xl mb-0.5"
+                            style={{ backgroundColor: isActive("/ImpressionEtiquetas") ? 'rgba(255,255,255,0.95)' : 'transparent' }}
+                            onMouseEnter={e => { if (!isActive("/ImpressionEtiquetas")) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'; }}
+                            onMouseLeave={e => { if (!isActive("/ImpressionEtiquetas")) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                          >
+                            <NavLink to="/ImpressionEtiquetas" className="flex items-center gap-3 pl-10 pr-3 py-2.5 rounded-xl">
+                              <FileText className="w-4 h-4 flex-shrink-0" style={{ color: isActive("/ImpressionEtiquetas") ? 'var(--color-primary-dark)' : 'var(--color-sidebar-text-muted)' }} />
+                              <span className="font-semibold text-sm" style={{ color: isActive("/ImpressionEtiquetas") ? 'var(--color-primary-dark)' : 'var(--color-sidebar-text)' }}>Impressão de Etiquetas</span>
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
                       )}
                       {(isGestorContrato || isSalaTecnica || isAdmin) && (
                         <SidebarMenuItem>
-                          <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive("/RelatoriosUnificados") ? 'var(--color-sidebar-active)' : 'transparent' }}>
-                            <NavLink to="/RelatoriosUnificados" className="flex items-center gap-3 pl-10 pr-3 py-2.5 hover:bg-[var(--color-sidebar-hover)] rounded-xl">
-                              <FileText className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />
-                              <span className="font-medium text-sm" style={{ color: 'var(--color-sidebar-text)' }}>Relatórios Unificados</span>
+                          <SidebarMenuButton
+                            asChild
+                            className="transition-all duration-200 rounded-xl mb-0.5"
+                            style={{ backgroundColor: isActive("/RelatoriosUnificados") ? 'rgba(255,255,255,0.95)' : 'transparent' }}
+                            onMouseEnter={e => { if (!isActive("/RelatoriosUnificados")) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'; }}
+                            onMouseLeave={e => { if (!isActive("/RelatoriosUnificados")) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                          >
+                            <NavLink to="/RelatoriosUnificados" className="flex items-center gap-3 pl-10 pr-3 py-2.5 rounded-xl">
+                              <FileText className="w-4 h-4 flex-shrink-0" style={{ color: isActive("/RelatoriosUnificados") ? 'var(--color-primary-dark)' : 'var(--color-sidebar-text-muted)' }} />
+                              <span className="font-semibold text-sm" style={{ color: isActive("/RelatoriosUnificados") ? 'var(--color-primary-dark)' : 'var(--color-sidebar-text)' }}>Relatórios Unificados</span>
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -170,20 +194,32 @@ export default function AppSidebar({
                         { to: createPageUrl("GestaoNC"), icon: FileText, label: "Gestão de NCs" },
                       ].map(({ to, icon: Icon, label }) => (
                         <SidebarMenuItem key={label}>
-                          <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive(to) ? 'var(--color-sidebar-active)' : 'transparent' }}>
-                            <NavLink to={to} className="flex items-center gap-3 pl-10 pr-3 py-2.5 hover:bg-[var(--color-sidebar-hover)] rounded-xl">
-                              <Icon className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />
-                              <span className="font-medium text-sm" style={{ color: 'var(--color-sidebar-text)' }}>{label}</span>
+                          <SidebarMenuButton
+                            asChild
+                            className="transition-all duration-200 rounded-xl mb-0.5"
+                            style={{ backgroundColor: isActive(to) ? 'rgba(255,255,255,0.95)' : 'transparent' }}
+                            onMouseEnter={e => { if (!isActive(to)) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'; }}
+                            onMouseLeave={e => { if (!isActive(to)) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                          >
+                            <NavLink to={to} className="flex items-center gap-3 pl-10 pr-3 py-2.5 rounded-xl">
+                              <Icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive(to) ? 'var(--color-primary-dark)' : 'var(--color-sidebar-text-muted)' }} />
+                              <span className="font-semibold text-sm" style={{ color: isActive(to) ? 'var(--color-primary-dark)' : 'var(--color-sidebar-text)' }}>{label}</span>
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
                       ))}
                       {(isGestorContrato || isAdmin) && (
                         <SidebarMenuItem>
-                          <SidebarMenuButton asChild className="transition-all duration-200 rounded-xl mb-0.5" style={{ backgroundColor: isActive(createPageUrl("NovaNC")) ? 'var(--color-sidebar-active)' : 'transparent' }}>
-                            <NavLink to={createPageUrl("NovaNC")} className="flex items-center gap-3 pl-10 pr-3 py-2.5 hover:bg-[var(--color-sidebar-hover)] rounded-xl">
-                              <AlertTriangle className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />
-                              <span className="font-medium text-sm" style={{ color: 'var(--color-sidebar-text)' }}>Nova NC</span>
+                          <SidebarMenuButton
+                            asChild
+                            className="transition-all duration-200 rounded-xl mb-0.5"
+                            style={{ backgroundColor: isActive(createPageUrl("NovaNC")) ? 'rgba(255,255,255,0.95)' : 'transparent' }}
+                            onMouseEnter={e => { if (!isActive(createPageUrl("NovaNC"))) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'; }}
+                            onMouseLeave={e => { if (!isActive(createPageUrl("NovaNC"))) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                          >
+                            <NavLink to={createPageUrl("NovaNC")} className="flex items-center gap-3 pl-10 pr-3 py-2.5 rounded-xl">
+                              <AlertTriangle className="w-4 h-4 flex-shrink-0" style={{ color: isActive(createPageUrl("NovaNC")) ? 'var(--color-primary-dark)' : 'var(--color-sidebar-text-muted)' }} />
+                              <span className="font-semibold text-sm" style={{ color: isActive(createPageUrl("NovaNC")) ? 'var(--color-primary-dark)' : 'var(--color-sidebar-text)' }}>Nova NC</span>
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
