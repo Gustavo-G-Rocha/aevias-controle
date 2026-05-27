@@ -120,7 +120,7 @@ const Sidebar = React.forwardRef(function Sidebar(
           data-sidebar="sidebar"
           data-mobile="true"
           className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
-          style={{ "--sidebar-width": SIDEBAR_WIDTH_MOBILE }}
+          style={{ "--sidebar-width": SIDEBAR_WIDTH_MOBILE, backgroundColor: 'hsl(var(--sidebar-background, 210 100% 12%))' }}
           side={side}
         >
           <div className="flex h-full w-full flex-col">{children}</div>
@@ -164,6 +164,7 @@ const Sidebar = React.forwardRef(function Sidebar(
         <div
           data-sidebar="sidebar"
           className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
+          style={{ backgroundColor: '#00233B', color: 'rgba(255,255,255,0.92)' }}
         >
           {children}
         </div>

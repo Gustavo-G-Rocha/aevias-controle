@@ -39,11 +39,11 @@
 
     /* ── Sidebar — azul-marinho escuro (igual à imagem) ─ */
     --sidebar-background: 210 100% 12%;   /* #00233B */
-    --sidebar-foreground: 40 10% 94%;     /* #F2F1EF */
+    --sidebar-foreground: 0 0% 96%;       /* branco suave */
     --sidebar-primary: 82 30% 72%;        /* #BFCF99 */
     --sidebar-primary-foreground: 210 100% 12%;
-    --sidebar-accent: 210 80% 18%;        /* hover ligeiramente mais claro */
-    --sidebar-accent-foreground: 40 10% 94%;
+    --sidebar-accent: 210 70% 20%;        /* hover mais claro */
+    --sidebar-accent-foreground: 0 0% 96%;
     --sidebar-border: 210 60% 20%;
     --sidebar-ring: 82 30% 72%;
 
@@ -195,16 +195,25 @@
     -webkit-user-select: none;
   }
 
-  /* ── Sidebar escura — textos e ícones sempre claros ── */
+  /* ── Sidebar escura — força fundo e textos claros ── */
+  [data-sidebar="sidebar"],
+  div[data-sidebar="sidebar"] {
+    background-color: #00233B !important;
+    color: rgba(255,255,255,0.9) !important;
+  }
   [data-sidebar="sidebar"] .text-\[#00233B\] {
-    color: hsl(40 10% 90%) !important;
+    color: rgba(255,255,255,0.9) !important;
   }
   [data-sidebar="sidebar"] .text-\[#00233B\]\/70,
   [data-sidebar="sidebar"] .text-\[#00233B\]\/60 {
-    color: hsl(40 10% 75%) !important;
+    color: rgba(255,255,255,0.6) !important;
   }
   [data-sidebar="sidebar"] .text-\[#BFCF99\] {
     color: #BFCF99 !important;
+  }
+  /* Garante que o SheetContent mobile também use o fundo correto */
+  [data-sidebar="sidebar"][data-mobile="true"] {
+    background-color: #00233B !important;
   }
 
   /* ============================================

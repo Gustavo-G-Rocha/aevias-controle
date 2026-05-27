@@ -66,14 +66,14 @@ module.exports = {
   				'5': 'hsl(var(--chart-5))'
   			},
   			sidebar: {
-  				DEFAULT: 'hsl(var(--sidebar-background))',
-  				foreground: 'hsl(var(--sidebar-foreground))',
-  				primary: 'hsl(var(--sidebar-primary))',
-  				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-  				accent: 'hsl(var(--sidebar-accent))',
-  				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-  				border: 'hsl(var(--sidebar-border))',
-  				ring: 'hsl(var(--sidebar-ring))'
+  				DEFAULT: '#00233B',
+  				foreground: 'rgba(255,255,255,0.92)',
+  				primary: '#BFCF99',
+  				'primary-foreground': '#00233B',
+  				accent: '#003560',
+  				'accent-foreground': 'rgba(255,255,255,0.92)',
+  				border: 'rgba(255,255,255,0.12)',
+  				ring: '#BFCF99'
   			}
   		},
   		keyframes: {
