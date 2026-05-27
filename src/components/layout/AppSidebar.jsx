@@ -42,7 +42,7 @@ const NavItem = ({ item, isActive, pendingTransfers, isGestorContrato, isSalaTec
         
         <NavLink to={item.url} className="flex items-center gap-3 px-3 py-2.5">
           <item.icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive ? '#000000 !important' : 'var(--color-sidebar-text-muted)' }} />
-          <span className="font-semibold text-sm" style={{ color: isActive ? '#000000 !important' : 'var(--color-sidebar-text)' }}>{item.title}</span>
+          <span className="font-semibold text-xs" style={{ color: isActive ? '#000000 !important' : 'var(--color-sidebar-text)' }}>{item.title}</span>
           {showBadge &&
           <Badge className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{pendingTransfers}</Badge>
           }
@@ -167,7 +167,7 @@ export default function AppSidebar({
                     <SidebarMenuButton className="transition-all duration-200 rounded-xl mb-0.5 cursor-pointer hover:bg-[var(--color-sidebar-hover)]" onClick={() => setNaoConformidadesOpen((p) => !p)}>
                       <div className="flex items-center gap-3 px-3 py-2.5 w-full">
                         <AlertTriangle className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />
-                        <span className="font-medium flex-1" style={{ color: 'var(--color-sidebar-text)' }}>Não Conformidades</span>
+                        <span className="font-medium flex-1 text-xs" style={{ color: 'var(--color-sidebar-text)' }}>Não Conformidades</span>
                         {naoConformidadesOpen ? <ChevronDown className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} /> : <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-sidebar-text-muted)' }} />}
                       </div>
                     </SidebarMenuButton>

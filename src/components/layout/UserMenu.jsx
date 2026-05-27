@@ -6,8 +6,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  DropdownMenuTrigger } from
+"@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,8 +16,8 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+  AlertDialogTitle } from
+"@/components/ui/alert-dialog";
 import { useState, useCallback } from "react";
 import { User } from "@/entities/User";
 
@@ -33,11 +33,11 @@ export default function UserMenu({ user, isAdmin, isSalaTecnica, isGestorContrat
     await User.logout();
   }, []);
 
-  const roleLabel = isAdmin ? "Admin"
-    : isSalaTecnica ? "Sala Técnica"
-    : isGestorContrato ? "Gestor"
-    : isCliente ? "Cliente"
-    : "Colaborador";
+  const roleLabel = isAdmin ? "Admin" :
+  isSalaTecnica ? "Sala Técnica" :
+  isGestorContrato ? "Gestor" :
+  isCliente ? "Cliente" :
+  "Colaborador";
 
   if (!user) return null;
 
@@ -50,7 +50,7 @@ export default function UserMenu({ user, isAdmin, isSalaTecnica, isGestorContrat
               <UserIcon className="w-4 h-4" style={{ color: 'var(--color-sidebar-icon)' }} />
             </div>
             <div className="flex-1 text-left min-w-0">
-              <p className="font-medium text-sm truncate" style={{ color: 'var(--color-sidebar-text)' }}>{user.full_name || user.laboratorista_name || user.email}</p>
+              <p className="font-medium truncate text-xs" style={{ color: 'var(--color-sidebar-text)' }}>{user.full_name || user.laboratorista_name || user.email}</p>
               <div className="flex items-center gap-2 mt-0.5">
                 <p className="text-xs truncate" style={{ color: 'var(--color-sidebar-text-muted)' }}>{user.email}</p>
                 <Badge variant="secondary" className="text-xs flex-shrink-0" style={{ backgroundColor: 'rgba(191,207,153,0.2)', color: 'var(--color-secondary)', border: 'none' }}>
@@ -67,8 +67,8 @@ export default function UserMenu({ user, isAdmin, isSalaTecnica, isGestorContrat
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setIsDeleteDialogOpen(true)}
-            className="cursor-pointer gap-2 text-destructive focus:text-destructive"
-          >
+            className="cursor-pointer gap-2 text-destructive focus:text-destructive">
+            
             <Trash2 className="w-4 h-4 flex-shrink-0" />
             Excluir Conta
           </DropdownMenuItem>
@@ -91,13 +91,13 @@ export default function UserMenu({ user, isAdmin, isSalaTecnica, isGestorContrat
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteAccount}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              
               Sim, excluir minha conta
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
-  );
+    </>);
+
 }
