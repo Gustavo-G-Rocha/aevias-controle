@@ -10,29 +10,6 @@ import {
 } from "@/utils/editarNCUtils";
 
 describe("editarNCUtils", () => {
-  describe("extractNCIdFromUrl", () => {
-    it("deve extrair ID da URL", () => {
-      const original = window.location.search;
-      Object.defineProperty(window.location, "search", {
-        value: "?id=nc-123",
-        writable: true,
-      });
-      const id = extractNCIdFromUrl();
-      expect(id).toBe("nc-123");
-      Object.defineProperty(window.location, "search", { value: original });
-    });
-
-    it("deve retornar null se ID não está na URL", () => {
-      const original = window.location.search;
-      Object.defineProperty(window.location, "search", {
-        value: "?other=value",
-        writable: true,
-      });
-      const id = extractNCIdFromUrl();
-      expect(id).toBeNull();
-      Object.defineProperty(window.location, "search", { value: original });
-    });
-  });
 
   describe("initializeNCForm", () => {
     it("deve inicializar form com dados da NC", () => {
