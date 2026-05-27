@@ -126,10 +126,10 @@ export default function AppSidebar({
                   { to: createPageUrl("SolicitacoesTransferencia"), icon: ArrowLeftRight, label: "Transferências", badge: pendingTransfers > 0 && (isGestorContrato || isSalaTecnica) }].
                   map(({ to, icon: Icon, label, badge }) =>
                   <SidebarMenuItem key={label}>
-                         <SidebarMenuButton asChild isActive={isActive(to)} className={`rounded-xl mb-0.5 h-auto ${isActive(to) ? '!bg-white' : ''}`} style={isActive(to) ? { color: '#00233B !important' } : {}}>
+                         <SidebarMenuButton asChild isActive={isActive(to)} className={`rounded-xl mb-0.5 h-auto ${isActive(to) ? '!bg-white !text-black' : ''}`}>
                            <NavLink to={to} className="flex items-center gap-3 pl-10 pr-3 py-2.5">
                              <Icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive(to) ? '#000000 !important' : 'var(--color-sidebar-text-muted)' }} />
-                             <span className="font-semibold text-sm" style={{ color: isActive(to) ? '#00233B !important' : 'var(--color-sidebar-text)' }}>{label}</span>
+                             <span className="font-semibold text-sm" style={{ color: isActive(to) ? '#000000 !important' : 'var(--color-sidebar-text)' }}>{label}</span>
                              {badge && <Badge className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{pendingTransfers}</Badge>}
                            </NavLink>
                          </SidebarMenuButton>
@@ -179,15 +179,15 @@ export default function AppSidebar({
                   { to: createPageUrl("GestaoNC"), icon: FileText, label: "Gestão de NCs" }].
                   map(({ to, icon: Icon, label }) =>
                   <SidebarMenuItem key={label}>
-                         <SidebarMenuButton asChild isActive={isActive(to)} className={`rounded-xl mb-0.5 h-auto ${isActive(to) ? '!bg-white' : ''}`} style={isActive(to) ? { color: '#00233B !important' } : {}}>
+                         <SidebarMenuButton asChild isActive={isActive(to)} className={`rounded-xl mb-0.5 h-auto ${isActive(to) ? '!bg-white !text-black' : ''}`}>
                            <NavLink to={to} className="flex items-center gap-3 pl-10 pr-3 py-2.5">
                              <Icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive(to) ? '#000000 !important' : 'var(--color-sidebar-text-muted)' }} />
-                             <span className="font-semibold text-sm" style={{ color: isActive(to) ? '#00233B !important' : 'var(--color-sidebar-text)' }}>{label}</span>
-                           </NavLink>
-                         </SidebarMenuButton>
-                       </SidebarMenuItem>
-                  )}
-                      {(isGestorContrato || isAdmin) &&
+                             <span className="font-semibold text-sm" style={{ color: isActive(to) ? '#000000 !important' : 'var(--color-sidebar-text)' }}>{label}</span>
+                             </NavLink>
+                             </SidebarMenuButton>
+                             </SidebarMenuItem>
+                             )}
+                             {(isGestorContrato || isAdmin) &&
                       <SidebarMenuItem>
                          <SidebarMenuButton asChild isActive={isActive(createPageUrl("NovaNC"))} className={`rounded-xl mb-0.5 h-auto ${isActive(createPageUrl("NovaNC")) ? '!bg-white !text-black' : ''}`}>
                            <NavLink to={createPageUrl("NovaNC")} className="flex items-center gap-3 pl-10 pr-3 py-2.5">
