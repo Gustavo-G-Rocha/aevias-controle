@@ -93,7 +93,7 @@ export const isFormValid = (
   laboratoristasChecked,
   tipoRegistro
 ) => {
-  return (
+  return !!(
     dataInicio &&
     dataFim &&
     obraSelecionada &&

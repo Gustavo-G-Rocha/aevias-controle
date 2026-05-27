@@ -73,7 +73,7 @@ describe("relatoriosUnificadosUtils", () => {
       const result = extractLaboratoristas(records);
       expect(result).toContain("Ana");
       expect(result).toContain("Carlos");
-      expect(result).toBeSorted();
+      expect(result).toEqual([...result].sort());
     });
 
     it("deve retornar array vazio para registros vazios", () => {
