@@ -1,0 +1,27 @@
+import React from 'react';
+
+export default function RelatorioChecklistConcretagemContainer({ children }) {
+  return (
+    <div className="bg-white min-h-screen">
+      {children}
+      <style>{`
+        @media print {
+          @page {
+            size: A4 portrait;
+            margin: 0;
+          }
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          aside, nav, [data-sidebar], [role="navigation"] {
+            display: none !important;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
