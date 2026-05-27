@@ -166,7 +166,7 @@ describe('ensaioManchaPenduloUtils', () => {
   describe('prepareDadosParaSalvar', () => {
     it('deve preparar dados com médias calculadas', () => {
       const formData = {
-        ensaios_mancha: [{ hs_mm: 0.8 }, { hs_mm: 0.9 }],
+        ensaios_mancha: [{ hs_mm: 0.6 }, { hs_mm: 0.7 }],
         ensaios_pendulo: [{ vrd: 50 }],
         data_aplicacao: '2024-01-01'
       };
