@@ -1,0 +1,73 @@
+/**
+ * Seção de camadas (estratigrafia) do boletim.
+ */
+import React from 'react';
+import { formatNumber, getFaceTitle } from '@/utils/relatorioBoletimSondagemTradoUtils';
+
+export default function BoletimCamadas({ camadas, faceClassificacao }) {
+  const faceTitle = getFaceTitle(faceClassificacao);
+
+  return (
+    <section>
+      <div className="bg-slate-700 text-white px-2 py-0.5 font-bold text-center text-[10px] mb-1">
+        SONDAGEM — CAMADAS
+      </div>
+      <div className="bg-slate-500 text-white px-1 py-0.5 font-bold text-center text-[9px] mb-0.5">
+        {faceTitle}
+      </div>
+      <table className="w-full border-collapse border border-slate-400 text-[9px]">
+        <thead>
+          <tr className="bg-slate-200">
+            <th rowSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">
+              Nº
+            </th>
+            <th colSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">
+              PROF. (m)
+            </th>
+            <th rowSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">
+              ESP.
+            </th>
+            <th rowSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">
+              N.A
+            </th>
+            <th rowSpan={2} className="border border-slate-400 px-1 py-0.5 text-center font-bold">
+              CLASSIFICAÇÃO
+            </th>
+          </tr>
+          <tr className="bg-slate-100">
+            <th className="border border-slate-400 px-1 py-0.5 text-center text-[8px]">
+              DE
+            </th>
+            <th className="border border-slate-400 px-1 py-0.5 text-center text-[8px]">
+              ATÉ
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {camadas.map((c, i) => (
+            <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+              <td className="border border-slate-400 px-1 py-0.5 text-center font-semibold">
+                {c.numero}
+              </td>
+              <td className="border border-slate-400 px-1 py-0.5 text-center">
+                {c.prof_de != null ? formatNumber(c.prof_de) : '-'}
+              </td>
+              <td className="border border-slate-400 px-1 py-0.5 text-center">
+                {c.prof_ate != null ? formatNumber(c.prof_ate) : '-'}
+              </td>
+              <td className="border border-slate-400 px-1 py-0.5 text-center">
+                {c.espessura != null ? formatNumber(c.espessura) : '-'}
+              </td>
+              <td className="border border-slate-400 px-1 py-0.5 text-center">
+                {c.na != null ? formatNumber(c.na) : '-'}
+              </td>
+              <td className="border border-slate-400 px-1 py-0.5">
+                {c.classificacao_1 || ''}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  );
+}
