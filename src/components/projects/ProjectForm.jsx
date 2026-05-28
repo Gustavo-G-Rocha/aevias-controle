@@ -19,26 +19,26 @@ import { filterRegionaisByAccessLevel } from "@/utils/regionalFilter";
 // MAPEAMENTO FIXO E FINAL DE PENEIRAS DNIT/ASTM
 // ========================================
 const PENEIRAS_PADRAO = {
-  75.0: { key: 'peneira_75_0mm', nome: '75.0 mm', astm: '3"' },
-  63.0: { key: 'peneira_63_0mm', nome: '63.0 mm', astm: '2 1/2"' },
-  50.0: { key: 'peneira_50_0mm', nome: '50.0 mm', astm: '2"' },
-  37.5: { key: 'peneira_37_5mm', nome: '37.5 mm', astm: '1 1/2"' },
-  25.0: { key: 'peneira_25_0mm', nome: '25.0 mm', astm: '1"' },
-  19.0: { key: 'peneira_19_0mm', nome: '19.0 mm', astm: '3/4"' },
-  16.0: { key: 'peneira_16_0mm', nome: '16.0 mm', astm: '5/8"' },
-  12.5: { key: 'peneira_12_5mm', nome: '12.5 mm', astm: '1/2"' },
-  9.5: { key: 'peneira_9_5mm', nome: '9.5 mm', astm: '3/8"' },
-  6.3: { key: 'peneira_6_3mm', nome: '6.3 mm', astm: '1/4"' },
-  4.75: { key: 'peneira_4_75mm', nome: '4.75 mm', astm: 'Nº 4' },
-  2.36: { key: 'peneira_2_36mm', nome: '2.36 mm', astm: 'Nº 8' },
-  2.0: { key: 'peneira_2_0mm', nome: '2.0 mm', astm: 'Nº 10' }, 
-  1.18: { key: 'peneira_1_18mm', nome: '1.18 mm', astm: 'Nº 16' },
-  0.6: { key: 'peneira_0_6mm', nome: '0.6 mm', astm: 'Nº 30' },
-  0.42: { key: 'peneira_0_42mm', nome: '0.42 mm', astm: 'Nº 40' },
-  0.3: { key: 'peneira_0_3mm', nome: '0.3 mm', astm: 'Nº 50' },
-  0.18: { key: 'peneira_0_18mm', nome: '0.18 mm', astm: 'Nº 80' },
-  0.15: { key: 'peneira_0_15mm', nome: '0.15 mm', astm: 'Nº 100' },
-  0.075: { key: 'peneira_0_075mm', nome: '0.075 mm', astm: 'Nº 200' }
+  "75": { key: 'peneira_75_0mm', nome: '75.0 mm', astm: '3"' },
+  "63": { key: 'peneira_63_0mm', nome: '63.0 mm', astm: '2 1/2"' },
+  "50": { key: 'peneira_50_0mm', nome: '50.0 mm', astm: '2"' },
+  "37.5": { key: 'peneira_37_5mm', nome: '37.5 mm', astm: '1 1/2"' },
+  "25": { key: 'peneira_25_0mm', nome: '25.0 mm', astm: '1"' },
+  "19": { key: 'peneira_19_0mm', nome: '19.0 mm', astm: '3/4"' },
+  "16": { key: 'peneira_16_0mm', nome: '16.0 mm', astm: '5/8"' },
+  "12.5": { key: 'peneira_12_5mm', nome: '12.5 mm', astm: '1/2"' },
+  "9.5": { key: 'peneira_9_5mm', nome: '9.5 mm', astm: '3/8"' },
+  "6.3": { key: 'peneira_6_3mm', nome: '6.3 mm', astm: '1/4"' },
+  "4.75": { key: 'peneira_4_75mm', nome: '4.75 mm', astm: 'Nº 4' },
+  "2.36": { key: 'peneira_2_36mm', nome: '2.36 mm', astm: 'Nº 8' },
+  "2": { key: 'peneira_2_0mm', nome: '2.0 mm', astm: 'Nº 10' },
+  "1.18": { key: 'peneira_1_18mm', nome: '1.18 mm', astm: 'Nº 16' },
+  "0.6": { key: 'peneira_0_6mm', nome: '0.6 mm', astm: 'Nº 30' },
+  "0.42": { key: 'peneira_0_42mm', nome: '0.42 mm', astm: 'Nº 40' },
+  "0.3": { key: 'peneira_0_3mm', nome: '0.3 mm', astm: 'Nº 50' },
+  "0.18": { key: 'peneira_0_18mm', nome: '0.18 mm', astm: 'Nº 80' },
+  "0.15": { key: 'peneira_0_15mm', nome: '0.15 mm', astm: 'Nº 100' },
+  "0.075": { key: 'peneira_0_075mm', nome: '0.075 mm', astm: 'Nº 200' }
 };
 
 const extrairAberturaNumero = (aberturaString) => {
@@ -51,7 +51,9 @@ const extrairAberturaNumero = (aberturaString) => {
 const obterPeneiraPadrao = (aberturaString) => {
   const aberturaNum = extrairAberturaNumero(aberturaString);
   if (aberturaNum === null) return null;
-  return PENEIRAS_PADRAO[aberturaNum];
+  // Usa String(parseFloat) para normalizar "75.0" → "75", "6.3" → "6.3", etc.
+  const chave = String(aberturaNum);
+  return PENEIRAS_PADRAO[chave] ?? null;
 };
 
 export default function ProjectForm({ project, faixas, regionais, user, onSave, onCancel }) {
