@@ -23,9 +23,10 @@ export const createPhotoPages = (photos, photosPerPage = 6) => {
  * @returns {boolean}
  */
 export const shouldShowActionsPage = (checklist) => {
-  const hasActions = checklist?.acoes_corretivas_realizado === true && checklist?.acoes_corretivas_descricao;
-  const hasNaoConformidades = checklist?.nao_conformidades && checklist.nao_conformidades.length > 0;
-  return hasActions || hasNaoConformidades;
+  if (!checklist) return false;
+  const hasActions = checklist.acoes_corretivas_realizado === true && !!checklist.acoes_corretivas_descricao;
+  const hasNaoConformidades = checklist.nao_conformidades && checklist.nao_conformidades.length > 0;
+  return !!(hasActions || hasNaoConformidades);
 };
 
 /**
@@ -36,7 +37,12 @@ export const shouldShowActionsPage = (checklist) => {
 export const formatReportDate = (dateString) => {
   if (!dateString) return '-';
   try {
-    return new Date(dateString).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '-';
+    const day = date.getUTCDate();
+    const month = date.getUTCMonth() + 1;
+    const year = date.getUTCFullYear();
+    return `${day}/${month}/${year}`;
   } catch {
     return '-';
   }
