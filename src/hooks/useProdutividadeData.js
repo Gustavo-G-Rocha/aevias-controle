@@ -87,17 +87,10 @@ export function useProdutividadeData(currentMonth) {
         ? new Date(todayLocal.getFullYear(), todayLocal.getMonth(), todayLocal.getDate())
         : new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
 
-      // ── 4. Buscar todos os registros em paralelo ─────────────────────────────
+      // ── 4. Buscar registros em lotes para evitar rate limit ──────────────────
       const [
         diarios, checklistsUsina, checklistsAplicacao, checklistsMRAF,
-        checklistsConcretagem, checklistsTerraplanagem, checklistsReciclagem,
-        ensaiosCAUQ, ensaiosDensidade, ensaiosDensidadeInSitu,
-        ensaiosSondagem, ensaiosTaxaPintura, acompanhamentoCarga,
-        ensaiosMRAF, ensaiosManchaPendulo, ensaiosVigaBenkelman, ensaiosTaxaMRAF,
-        acompanhamentosUsinagem, ensaiosGranuIndividual, granuMisturas,
-        ensaiosProctor, ensaiosRompimentoConcreto,
-        boletinsSondagem, boletinsSondagemTrado,
-        produtividadeDiaria
+        checklistsConcretagem, checklistsTerraplanagem, checklistsReciclagem, ensaiosCAUQ
       ] = await Promise.all([
         base44.entities.DiarioObra.list("-created_date", 500),
         base44.entities.ChecklistUsina.list("-created_date", 500),
@@ -107,6 +100,12 @@ export function useProdutividadeData(currentMonth) {
         base44.entities.ChecklistTerraplanagem.list("-created_date", 500),
         base44.entities.ChecklistReciclagem.list("-created_date", 500),
         base44.entities.EnsaioCAUQ.list("-created_date", 500),
+      ]);
+
+      const [
+        ensaiosDensidade, ensaiosDensidadeInSitu, ensaiosSondagem, ensaiosTaxaPintura,
+        acompanhamentoCarga, ensaiosMRAF, ensaiosManchaPendulo, ensaiosVigaBenkelman
+      ] = await Promise.all([
         base44.entities.EnsaioDensidade.list("-created_date", 500),
         base44.entities.EnsaioDensidadeInSitu.list("-created_date", 500),
         base44.entities.EnsaioSondagem.list("-created_date", 500),
@@ -115,6 +114,13 @@ export function useProdutividadeData(currentMonth) {
         base44.entities.EnsaioMRAF.list("-created_date", 500),
         base44.entities.EnsaioManchaPendulo.list("-created_date", 500),
         base44.entities.EnsaioVigaBenkelman.list("-created_date", 500),
+      ]);
+
+      const [
+        ensaiosTaxaMRAF, acompanhamentosUsinagem, ensaiosGranuIndividual, granuMisturas,
+        ensaiosProctor, ensaiosRompimentoConcreto, boletinsSondagem, boletinsSondagemTrado,
+        produtividadeDiaria
+      ] = await Promise.all([
         base44.entities.EnsaioTaxaMRAF.list("-created_date", 500),
         base44.entities.AcompanhamentoUsinagem.list("-created_date", 500),
         base44.entities.EnsaioGranulometriaIndividual.list("-created_date", 500),
@@ -123,7 +129,7 @@ export function useProdutividadeData(currentMonth) {
         base44.entities.EnsaioRompimentoConcreto.list("-created_date", 500),
         base44.entities.BoletimSondagem.list("-created_date", 500),
         base44.entities.BoletimSondagemTrado.list("-created_date", 500),
-        base44.entities.ProdutividadeDiaria.list()
+        base44.entities.ProdutividadeDiaria.list(),
       ]);
 
       // ── 5. Processar registros — acumular por email ──────────────────────────

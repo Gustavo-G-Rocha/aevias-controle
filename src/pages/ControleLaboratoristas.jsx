@@ -30,7 +30,7 @@ export default function ControleLaboratoristas() {
       const obrasData = await base44.entities.Obra.list();
       setObras(obrasData);
 
-      // Buscar registros em lotes para evitar rate limit
+      // Buscar registros em lotes de 8 para evitar rate limit
       const [
         diariosObra, checklistsUsina, checklistsAplicacao, checklistsMRAF,
         checklistsConcretagem, checklistsTerraplanagem, checklistsReciclagem, ensaiosCAUQ
@@ -71,6 +71,12 @@ export default function ControleLaboratoristas() {
         base44.entities.GranuMistura.list("-created_date", 500),
       ]);
 
+      // Último lote separado
+      const [boletinsSondagem, boletinsSondagemTrado] = await Promise.all([
+        base44.entities.BoletimSondagem.list("-created_date", 500),
+        base44.entities.BoletimSondagemTrado.list("-created_date", 500),
+      ]);
+
       // Combinar todos os registros
       const todosRegistros = [
         ...diariosObra, ...checklistsUsina, ...checklistsAplicacao, ...checklistsMRAF,
@@ -79,7 +85,7 @@ export default function ControleLaboratoristas() {
         ...ensaiosSondagem, ...ensaiosTaxaPintura, ...ensaiosGranIndividual,
         ...ensaiosManchaPendulo, ...ensaiosVigaBenkelman, ...acompanhamentosUsinagem,
         ...acompanhamentosCarga, ...ensaiosProctor, ...ensaiosRompimento,
-        ...ensaiosTaxaMRAF, ...granuMisturas
+        ...ensaiosTaxaMRAF, ...granuMisturas, ...boletinsSondagem, ...boletinsSondagemTrado
       ];
 
       setRegistros(todosRegistros);
