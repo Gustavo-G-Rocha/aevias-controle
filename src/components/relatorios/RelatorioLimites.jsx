@@ -3,67 +3,13 @@ import {
   ComposedChart, Scatter, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer,
 } from "recharts";
-
-const fmtN = (v, d = 2) => (v !== null && v !== undefined && !isNaN(parseFloat(v))) ? parseFloat(v).toFixed(d) : '-';
-
-/* ─── Calc helpers (same logic as EnsaioLimites component) ─── */
-function calcUmidade(umido, seco, tara) {
-  const agua = parseFloat(umido) - parseFloat(seco);
-  const solo = parseFloat(seco) - parseFloat(tara);
-  if (isNaN(agua) || isNaN(solo) || solo <= 0) return null;
-  return parseFloat(((agua / solo) * 100).toFixed(2));
-}
-
-function calcLLRow(row) {
-  const agua = parseFloat(row.solo_umido_capsula) - parseFloat(row.solo_seco_capsula);
-  const solo = parseFloat(row.solo_seco_capsula) - parseFloat(row.peso_capsula);
-  if (isNaN(agua) || isNaN(solo) || solo <= 0) return { teor: null };
-  return { teor: parseFloat(((agua / solo) * 100).toFixed(2)) };
-}
-
-function fitLogLine(points) {
-  const valid = points.filter(p => p.x > 0 && p.y != null);
-  if (valid.length < 2) return null;
-  const n = valid.length;
-  const sx = valid.reduce((s, p) => s + p.x, 0);
-  const sy = valid.reduce((s, p) => s + p.y, 0);
-  const sxx = valid.reduce((s, p) => s + p.x * p.x, 0);
-  const sxy = valid.reduce((s, p) => s + p.x * p.y, 0);
-  const denom = n * sxx - sx * sx;
-  if (Math.abs(denom) < 1e-10) return null;
-  const a = (n * sxy - sx * sy) / denom;
-  const b = (sy - a * sx) / n;
-  return { a, b, ll: parseFloat((a * 25 + b).toFixed(1)) };
-}
-
-function calcIG(F200, ll, ip) {
-  if (F200 == null || ll == null || ip == null) return null;
-  const ll200 = F200 < 35 ? 0 : Math.min(F200, 75) - 35;
-  const ip200 = F200 < 15 ? 0 : Math.min(F200, 55) - 15;
-  const llAt = ll < 40 ? 0 : Math.min(ll, 60) - 40;
-  const ipAt = ip < 10 ? 0 : Math.min(ip, 30) - 10;
-  return Math.max(0, parseFloat((0.2 * ll200 + 0.005 * ll200 * llAt + 0.01 * ip200 * ipAt).toFixed(0)));
-}
-
-function classificarHRB(F10, F40, F200, ll, ip, ig) {
-  const f200 = F200 ?? 0, f40 = F40 ?? 0, f10 = F10 ?? 0;
-  const llv = ll ?? 0, ipv = ip ?? 0, igv = ig ?? 0;
-  if (f200 <= 35) {
-    if (f10 <= 50 && f40 <= 30 && ipv <= 6 && igv === 0) return "A1-a";
-    if (f40 <= 50 && ipv <= 6 && igv === 0) return "A1-b";
-    if (f40 >= 51 && ipv === 0 && f200 <= 10 && igv === 0) return "A3";
-    if (llv <= 40 && ipv <= 10 && igv === 0) return "A2-4";
-    if (llv >= 41 && ipv <= 10 && igv === 0) return "A2-5";
-    if (llv <= 40 && ipv >= 11 && igv <= 4) return "A2-6";
-    if (llv >= 41 && ipv >= 11 && igv <= 4) return "A2-7";
-  }
-  if (f200 >= 36 && llv <= 40 && ipv <= 10 && igv <= 8) return "A4";
-  if (f200 >= 36 && llv >= 41 && ipv <= 10 && igv <= 12) return "A5";
-  if (f200 >= 36 && llv <= 40 && ipv >= 11 && igv <= 16) return "A6";
-  if (f200 >= 36 && llv >= 41 && ipv >= 11 && ipv <= (llv - 30) && igv <= 20) return "A7-5";
-  if (f200 >= 36 && llv >= 41 && ipv >= 11 && ipv > (llv - 30) && igv <= 20) return "A7-6";
-  return "-";
-}
+import {
+  fmtN, calcUmidade, calcLLRow, fitLogLine, calcIG, classificarHRB,
+} from "@/utils/relatorioLimitesUtils";
+import LimitesHeader from "@/components/relatorio-limites/LimitesHeader";
+import LimitesInfoFields from "@/components/relatorio-limites/LimitesInfoFields";
+import LimitesResumo from "@/components/relatorio-limites/LimitesResumo";
+import LimitesAssinaturas from "@/components/relatorio-limites/LimitesAssinaturas";
 
 const PENEIRAS_GROSSAS = [
   { label: '3"', mm: 76.2 }, { label: '2"', mm: 50.8 }, { label: '1"', mm: 25.4 },
@@ -71,9 +17,11 @@ const PENEIRAS_GROSSAS = [
 ];
 const PENEIRAS_FINAS = [{ label: '40', mm: 0.42 }, { label: '200', mm: 0.075 }];
 
-/* ─── LL curve data ─── */
+/* ─── Gráfico LL ─── */
 function LLChart({ llPoints, llFit, llYAxisDomain }) {
-  if (llPoints.length < 2) return <div className="text-[7px] text-gray-400 flex items-center justify-center h-full">Insuficiente</div>;
+  if (llPoints.length < 2) return (
+    <div className="text-[7px] text-gray-400 flex items-center justify-center h-full">Insuficiente</div>
+  );
   const xs = llPoints.map(p => p.x);
   const minX = Math.max(1, Math.min(...xs) - 2), maxX = Math.max(...xs) + 2;
   const curveData = [
@@ -92,19 +40,26 @@ function LLChart({ llPoints, llFit, llYAxisDomain }) {
           tick={{ fontSize: 7 }} width={36} tickCount={6} />
         <Tooltip formatter={(v) => `${Number(v).toFixed(2)}%`} />
         <Line data={curveData} dataKey="y" type="monotone" stroke="#1e3a5f" strokeWidth={1.5} dot={false} isAnimationActive={false} />
-        <Line data={[
-          { x: 25, y: 0 },
-          { x: 25, y: llFit.ll }
-        ]} dataKey="y" type="monotone" stroke="red" strokeDasharray="3 2" strokeWidth={1} dot={false} name="LL ref" />
-        <Line data={[
-          { x: 0, y: llFit.ll },
-          { x: 25, y: llFit.ll }
-        ]} dataKey="y" type="monotone" stroke="red" strokeDasharray="3 2" strokeWidth={1} dot={false} isAnimationActive={false} label={{ value: `LL=${llFit.ll}%`, fill: 'red', fontSize: 7, position: 'top' }} />
+        <Line data={[{ x: 25, y: 0 }, { x: 25, y: llFit.ll }]} dataKey="y" type="monotone" stroke="red" strokeDasharray="3 2" strokeWidth={1} dot={false} name="LL ref" />
+        <Line data={[{ x: 0, y: llFit.ll }, { x: 25, y: llFit.ll }]} dataKey="y" type="monotone" stroke="red" strokeDasharray="3 2" strokeWidth={1} dot={false} isAnimationActive={false}
+          label={{ value: `LL=${llFit.ll}%`, fill: 'red', fontSize: 7, position: 'top' }} />
         <Scatter data={llPoints} dataKey="y" fill="#6b8f3e" stroke="#1e3a5f" r={4} isAnimationActive={false} />
       </ComposedChart>
     </ResponsiveContainer>
   );
 }
+
+/* ─── Tabela genérica com colunas dinâmicas (LL / LP) ─── */
+const FIELD_ROWS = [
+  { label: "Nº Cápsula", field: "numero_capsula" },
+  { label: "S+Ú+C (g)", field: "solo_umido_capsula" },
+  { label: "S+S+C (g)", field: "solo_seco_capsula" },
+  { label: "Peso C (g)", field: "peso_capsula" },
+];
+const th = "border border-slate-400 px-1 py-0.5 text-left font-semibold bg-slate-100 text-[8px]";
+const td = "border border-slate-400 px-1 py-0.5 text-[8px]";
+const tdC = "border border-slate-400 px-1 py-0.5 text-center text-[8px]";
+const tdCalc = "border border-slate-400 px-1 py-0.5 text-center text-[8px] bg-gray-50 text-gray-600 font-semibold";
 
 /* ─── MAIN EXPORT ─── */
 export default function RelatorioLimites({ limites, ensaio, obra, regional }) {
@@ -178,13 +133,10 @@ export default function RelatorioLimites({ limites, ensaio, obra, regional }) {
     llRows.map((r, i) => ({ x: parseFloat(r.num_golpes), y: llCalc[i].teor }))
       .filter(p => p.x > 0 && p.y != null),
     [llRows, llCalc]);
-
   const llYAxisDomain = useMemo(() => {
     if (llPoints.length === 0) return ['auto', 'auto'];
     const yValues = llPoints.map(p => p.y).filter(y => y != null);
-    const minY = Math.min(...yValues);
-    const maxY = Math.max(...yValues);
-    return [parseFloat((minY - 5).toFixed(2)), parseFloat((maxY + 5).toFixed(2))];
+    return [parseFloat((Math.min(...yValues) - 5).toFixed(2)), parseFloat((Math.max(...yValues) + 5).toFixed(2))];
   }, [llPoints]);
   const llFit = useMemo(() => fitLogLine(llPoints), [llPoints]);
 
@@ -198,68 +150,25 @@ export default function RelatorioLimites({ limites, ensaio, obra, regional }) {
 
   /* IP, IG, HRB */
   const IP = llFit?.ll != null && lpMedia != null ? parseFloat((llFit.ll - lpMedia).toFixed(1)) : null;
-
   const pct200 = useMemo(() => {
     if (!granFinaCalc.length || !totalSeca || sp10 == null || !amostParcSeca) return null;
     const passando200 = granFinaCalc[granFinaCalc.length - 1]?.passando || 0;
     return parseFloat(((passando200 / amostParcSeca) * (sp10 / totalSeca) * 100).toFixed(1));
   }, [granFinaCalc, totalSeca, sp10, amostParcSeca]);
-
   const pct10 = granGrossaCalc[5]?.passando != null && totalSeca
     ? parseFloat((granGrossaCalc[5].passando / totalSeca * 100).toFixed(1)) : null;
   const pct40 = granFinaCalc[0]?.passando != null && totalSeca && sp10 && amostParcSeca
     ? parseFloat(((granFinaCalc[0].passando / amostParcSeca) * (sp10 / totalSeca) * 100).toFixed(1)) : null;
-
   const igCalc = calcIG(pct200, llFit?.ll, IP);
   const hrb = classificarHRB(pct10, pct40, pct200, llFit?.ll ?? null, IP, igCalc);
 
   if (!limites) return null;
 
-  const fmtDate = (d) => d ? new Date(d + (d.length === 10 ? 'T00:00:00' : '')).toLocaleDateString('pt-BR') : '-';
-  const fmtDateTime = (d) => {
-    if (!d) return '-';
-    const n = (!d.endsWith('Z') && !d.includes('+')) ? d + 'Z' : d;
-    return new Date(n).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' });
-  };
-
-  const th = "border border-slate-400 px-1 py-0.5 text-left font-semibold bg-slate-100 text-[8px]";
-  const td = "border border-slate-400 px-1 py-0.5 text-[8px]";
-  const tdC = "border border-slate-400 px-1 py-0.5 text-center text-[8px]";
-  const tdCalc = "border border-slate-400 px-1 py-0.5 text-center text-[8px] bg-gray-50 text-gray-600 font-semibold";
-
-  const infoFields = ensaio ? [
-    ["OBRA", obra?.name || '-'],
-    ["LOCAL", ensaio.local_coleta || '-'],
-    ["MATERIAL", ensaio.material || '-'],
-    ["RODOVIA", ensaio.rodovia || '-'],
-    ["ENERGIA", ensaio.energia_compactacao || '-'],
-    ["LABORATORISTA", ensaio.laboratorista_name || '-'],
-    ["TRECHO", ensaio.trecho || '-'],
-    ["CAMADA", ensaio.camada || '-'],
-    ["DATA", fmtDate(ensaio.data_ensaio)],
-  ] : [];
-
   return (
     <section className="space-y-2" style={{ pageBreakBefore: 'always' }}>
 
-      {/* Cabeçalho repetido */}
-      <header className="grid items-center py-1 mb-1" style={{ gridTemplateColumns: '60px 1fr 60px' }}>
-        <div>
-          <picture><source srcSet={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} /><img src={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} alt="Logo" className="h-8 object-contain" width="auto" height="32" /></picture>
-        </div>
-        <h1 className="text-xs font-bold text-gray-800 text-center">CARACTERIZAÇÃO MECÂNICA</h1>
-      </header>
-
-      {infoFields.length > 0 && (
-        <div className="grid grid-cols-3 gap-x-4 gap-y-0.5 text-[9px] border border-slate-300 p-1 rounded mb-1">
-          {infoFields.map(([label, val]) => (
-            <div key={label}>
-              <span className="font-bold text-gray-700">{label}: </span>
-              <span className="text-gray-900">{val}</span>
-            </div>
-          ))}
-        </div>
-      )}
+      <LimitesHeader regional={regional} />
+      <LimitesInfoFields ensaio={ensaio} obra={obra} />
 
       <div className="bg-slate-700 text-white px-2 py-0.5 font-bold text-center text-[10px]">
         ENSAIOS FÍSICOS DE CARACTERIZAÇÃO (ABNT NBR 7181 | 6459 | 7180)
@@ -270,7 +179,12 @@ export default function RelatorioLimites({ limites, ensaio, obra, regional }) {
         <div className="bg-slate-200 px-1 py-0.5 font-bold text-[9px] mb-0.5">Umidade Higroscópica</div>
         <table className="w-full border-collapse border border-slate-400">
           <thead>
-            <tr><th className={th}>Campo</th><th className={th + " text-center"}>Am. 1</th><th className={th + " text-center"}>Am. 2</th><th className={th + " text-center"}>Média</th></tr>
+            <tr>
+              <th className={th}>Campo</th>
+              <th className={th + " text-center"}>Am. 1</th>
+              <th className={th + " text-center"}>Am. 2</th>
+              <th className={th + " text-center"}>Média</th>
+            </tr>
           </thead>
           <tbody>
             {[
@@ -384,12 +298,7 @@ export default function RelatorioLimites({ limites, ensaio, obra, regional }) {
               </tr>
             </thead>
             <tbody>
-              {[
-                { label: "Nº Cápsula", field: "numero_capsula" },
-                { label: "S+Ú+C (g)", field: "solo_umido_capsula" },
-                { label: "S+S+C (g)", field: "solo_seco_capsula" },
-                { label: "Peso C (g)", field: "peso_capsula" },
-              ].map(row => (
+              {FIELD_ROWS.map(row => (
                 <tr key={row.field}>
                   <td className={td}>{row.label}</td>
                   {llRows.map((r, i) => <td key={`ll-r-${i}`} className={tdC}>{r[row.field] || '-'}</td>)}
@@ -419,16 +328,11 @@ export default function RelatorioLimites({ limites, ensaio, obra, regional }) {
             <thead>
               <tr>
                 <th className={th}>Campo</th>
-                {lpRows.map((_, i) => <th key={`lp-h-${i + 1}`} className={th + " text-center"}>#{i+1}</th>)}
+                {lpRows.map((_, i) => <th key={`lp-h-${i+1}`} className={th + " text-center"}>#{i+1}</th>)}
               </tr>
             </thead>
             <tbody>
-              {[
-                { label: "Nº Cápsula", field: "numero_capsula" },
-                { label: "S+Ú+C (g)", field: "solo_umido_capsula" },
-                { label: "S+S+C (g)", field: "solo_seco_capsula" },
-                { label: "Peso C (g)", field: "peso_capsula" },
-              ].map(row => (
+              {FIELD_ROWS.map(row => (
                 <tr key={row.field}>
                   <td className={td}>{row.label}</td>
                   {lpRows.map((r, i) => <td key={`lp-r-${i}`} className={tdC}>{r[row.field] || '-'}</td>)}
@@ -453,89 +357,18 @@ export default function RelatorioLimites({ limites, ensaio, obra, regional }) {
         <div>
           <div className="bg-slate-200 px-1 py-0.5 font-bold text-[9px] mb-0.5">Gráfico — Limite de Liquidez</div>
           <div style={{ height: 208 }}>
-           <LLChart llPoints={llPoints} llFit={llFit} llYAxisDomain={llYAxisDomain} />
+            <LLChart llPoints={llPoints} llFit={llFit} llYAxisDomain={llYAxisDomain} />
           </div>
         </div>
       )}
 
-      {/* Resumo */}
-      <div>
-        <div className="bg-slate-200 px-1 py-0.5 font-bold text-[9px] mb-0.5">Resumo de Caracterização</div>
-        <table className="w-full border-collapse border border-slate-400">
-          <tbody>
-            {[
-              ["% Passante #10 (2mm)", pct10 != null ? `${pct10}%` : '-'],
-              ["% Passante #40 (0,42mm)", pct40 != null ? `${pct40}%` : '-'],
-              ["% Passante #200 (0,075mm)", pct200 != null ? `${pct200}%` : '-'],
-              ["Limite de Liquidez (LL)", llFit?.ll != null ? `${llFit.ll}%` : '-'],
-              ["Limite de Plasticidade (LP)", lpMedia != null ? `${lpMedia}%` : '-'],
-              ["Índice de Plasticidade (IP)", IP != null ? `${IP}%` : '-'],
-              ["Índice de Grupo (IG)", igCalc != null ? `${igCalc}` : '-'],
-              ["Classificação HRB (AASHTO)", hrb],
-            ].map(([label, val]) => (
-              <tr key={label} className="odd:bg-white even:bg-slate-50">
-                <td className={td + " w-3/4"}>{label}</td>
-                <td className={tdC + " font-bold text-blue-800"}>{val}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <LimitesResumo
+        pct10={pct10} pct40={pct40} pct200={pct200}
+        ll={llFit?.ll} lp={lpMedia} ip={IP} ig={igCalc} hrb={hrb}
+      />
 
-      {/* Assinaturas */}
-      {ensaio && (
-        <footer className="mt-4 pt-2">
-          <div className="grid grid-cols-3 gap-8 items-end">
-            {/* Laboratorista */}
-            <div className="text-center">
-              <div className="text-[8px] text-slate-500 mb-2 h-16 flex flex-col justify-end items-center">
-                {ensaio.laboratorista_name && (
-                  <>
-                    <p className="font-bold text-slate-700">{ensaio.laboratorista_name}</p>
-                    <p>{ensaio.created_by}</p>
-                    {ensaio.created_date && <p>em {fmtDateTime(ensaio.created_date)}</p>}
-                  </>
-                )}
-              </div>
-              <div className="border-t-2 border-gray-500 pt-1 w-3/4 mx-auto">
-                <p className="font-semibold text-[8px]">LABORATORISTA RESPONSÁVEL</p>
-              </div>
-            </div>
-            {/* Engenheiro */}
-            <div className="text-center">
-              <div className="text-[8px] text-slate-500 mb-2 h-16 flex flex-col justify-end items-center">
-                {ensaio.approver_details?.name && (
-                  <>
-                    <p className="font-bold text-slate-700">{ensaio.approver_details.name}</p>
-                    <p>{ensaio.approved_by}</p>
-                    {ensaio.approver_details.crea_number && <p>CREA: {ensaio.approver_details.crea_number}</p>}
-                    {ensaio.approved_date && <p>em {fmtDateTime(ensaio.approved_date)}</p>}
-                  </>
-                )}
-              </div>
-              <div className="border-t-2 border-gray-500 pt-1 w-3/4 mx-auto">
-                <p className="font-semibold text-[8px]">ENGENHEIRO RESPONSÁVEL</p>
-              </div>
-            </div>
-            {/* Cliente */}
-            <div className="text-center">
-              <div className="text-[8px] text-slate-500 mb-2 h-16 flex flex-col justify-end items-center">
-                {ensaio.client_signature?.signed_by && (
-                  <>
-                    <p className="font-bold text-slate-700">{ensaio.client_signature.engineer_name}</p>
-                    <p>{ensaio.client_signature.signed_by}</p>
-                    {ensaio.client_signature.crea_number && <p>CREA: {ensaio.client_signature.crea_number}</p>}
-                    {ensaio.client_signature.signed_date && <p>em {fmtDateTime(ensaio.client_signature.signed_date)}</p>}
-                  </>
-                )}
-              </div>
-              <div className="border-t-2 border-gray-500 pt-1 w-3/4 mx-auto">
-                <p className="font-semibold text-[8px]">ENGENHEIRO CLIENTE</p>
-              </div>
-            </div>
-          </div>
-        </footer>
-      )}
+      <LimitesAssinaturas ensaio={ensaio} />
+
     </section>
   );
 }
