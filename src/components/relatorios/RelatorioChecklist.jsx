@@ -3,12 +3,16 @@ import SignatureFooter from './SignatureFooter';
 import PrintStyles from './PrintStyles';
 import { buildSignatureProps, formatDateBrasilia } from '@/utils/relatorioUtils';
 import { ReportCheckmark, ReportSectionTitle, ReportNaoConformidadesTable } from './shared';
+import TabelaControleLigante from './checklist/TabelaControleLigante';
+import PaginaMedicaoCargas from './checklist/PaginaMedicaoCargas';
+
+const LOGO_DEFAULT = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png";
 
 const Checkmark = ({ checked }) => <ReportCheckmark checked={checked} />;
 
+// ─── Tabela de Controle de Agregados ─────────────────────────────────────────
 const TabelaControleAgregados = ({ controle_agregados }) => {
   const data = controle_agregados || [];
-
   return (
     <table className="w-full print:text-base border-collapse border border-slate-300 text-sm">
       <thead className="bg-slate-100">
@@ -37,6 +41,7 @@ const TabelaControleAgregados = ({ controle_agregados }) => {
   );
 };
 
+// ─── Tabela de Controle de CAUQ ───────────────────────────────────────────────
 const TabelaControleCAUQ = ({ controle_cauq, project }) => {
   const data = controle_cauq || {};
   const ensaios = [
@@ -54,40 +59,24 @@ const TabelaControleCAUQ = ({ controle_cauq, project }) => {
 
   const formatResultado = (ensaioData) => {
     if (!ensaioData) return '-';
-    
-    // Se tiver resultados em array
     if (Array.isArray(ensaioData.resultados) && ensaioData.resultados.length > 0) {
-      const resultadosValidos = ensaioData.resultados.filter(r => r !== null && r !== undefined);
-      if (resultadosValidos.length === 0) return '-';
-      
-      if (resultadosValidos.length === 1) {
-        return resultadosValidos[0];
-      }
-      
-      return resultadosValidos.join(' / ');
+      const validos = ensaioData.resultados.filter(r => r !== null && r !== undefined);
+      if (validos.length === 0) return '-';
+      return validos.length === 1 ? validos[0] : validos.join(' / ');
     }
-    
-    // Fallback para formato antigo (resultado único)
-    if (ensaioData.resultado !== null && ensaioData.resultado !== undefined) {
-      return ensaioData.resultado;
-    }
-    
+    if (ensaioData.resultado !== null && ensaioData.resultado !== undefined) return ensaioData.resultado;
     return '-';
   };
 
   const formatConformidade = (conforme) => {
-    if (conforme === null || conforme === undefined) {
-      return <span className="text-slate-500 text-xl">-</span>;
-    }
-    if (conforme === true) {
-      return <span className="text-green-600 font-bold text-2xl">✓</span>;
-    }
+    if (conforme === null || conforme === undefined) return <span className="text-slate-500 text-xl">-</span>;
+    if (conforme === true) return <span className="text-green-600 font-bold text-2xl">✓</span>;
     return <span className="text-red-600 font-bold text-2xl">✗</span>;
   };
 
   return (
     <div className="w-full">
-      <SectionTitle>Controle de CAUQ</SectionTitle>
+      <ReportSectionTitle>Controle de CAUQ</ReportSectionTitle>
       <table className="w-full print:text-base border-collapse border border-slate-400">
         <thead>
           <tr className="bg-slate-100 text-base print:text-base">
@@ -102,14 +91,12 @@ const TabelaControleCAUQ = ({ controle_cauq, project }) => {
         <tbody className="text-base print:text-base">
           {ensaios.map(ensaio => {
             const ensaioData = data[ensaio.key];
-            const resultado = formatResultado(ensaioData);
-            
             return (
               <tr key={ensaio.key}>
                 <td className="border border-slate-300 p-2 print:p-1 font-medium bg-slate-50">{ensaio.label}</td>
                 <td className="border border-slate-300 p-2 print:p-1 text-center"><Checkmark checked={ensaioData?.realizado} /></td>
                 <td className="border border-slate-300 p-2 print:p-1 text-center">{ensaioData?.quantidade ?? '-'}</td>
-                <td className="border border-slate-300 p-2 print:p-1 text-center">{resultado}</td>
+                <td className="border border-slate-300 p-2 print:p-1 text-center">{formatResultado(ensaioData)}</td>
                 <td className="border border-slate-300 p-2 print:p-1 text-center">{ensaio.padrao}</td>
                 <td className="border border-slate-300 p-2 print:p-1 text-center">
                   {ensaio.noConformity ? <span className="text-slate-500 text-xl">-</span> : formatConformidade(ensaioData?.conforme)}
@@ -123,73 +110,46 @@ const TabelaControleCAUQ = ({ controle_cauq, project }) => {
   );
 };
 
-const SectionTitle = ({ children }) => <ReportSectionTitle>{children}</ReportSectionTitle>;
-
+// ─── Cabeçalho de Impressão ───────────────────────────────────────────────────
 const ReportPrintHeader = ({ checklist, obra, regional, project }) => (
   <div>
     <header className="grid grid-cols-3 items-center border-b-2 border-slate-900 pb-2">
       <div className="flex justify-start">
         <picture>
-          <source srcSet={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} />
-          <img src={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} alt="Logo Regional" className="h-16 object-contain" width="auto" height="64" />
+          <source srcSet={regional?.logo_url || LOGO_DEFAULT} />
+          <img src={regional?.logo_url || LOGO_DEFAULT} alt="Logo Regional" className="h-16 object-contain" width="auto" height="64" />
         </picture>
       </div>
       <div className="text-center">
         <h1 className="text-xl font-bold text-gray-800">Controle Tecnológico de Usinagem</h1>
       </div>
       <div className="flex justify-end">
-         <div className="border border-gray-400 p-2 rounded-md text-base print:text-sm">
-            <p className="font-semibold text-gray-800">
-              {new Date(checklist.data).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
-            </p>
-         </div>
+        <div className="border border-gray-400 p-2 rounded-md text-base print:text-sm">
+          <p className="font-semibold text-gray-800">
+            {new Date(checklist.data).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
+          </p>
+        </div>
       </div>
     </header>
     <main className="text-base print:text-base mt-2">
-      <SectionTitle>Dados da Obra e Projeto</SectionTitle>
+      <ReportSectionTitle>Dados da Obra e Projeto</ReportSectionTitle>
       <div className="grid grid-cols-4 gap-x-4 gap-y-2">
-        <div>
-          <p className="font-bold">CLIENTE:</p>
-          <p>{regional?.cliente || 'N/A'}</p>
-        </div>
-        <div>
-          <p className="font-bold">PROJETO:</p>
-          <p>{project?.name || checklist.projeto_utilizado || 'N/A'}</p>
-        </div>
-        <div>
-          <p className="font-bold">PEDREIRA:</p>
-          <p>{checklist.pedreira || 'N/A'}</p>
-        </div>
-        <div>
-          <p className="font-bold">INSPETOR:</p>
-          <p>{checklist.inspetor_campo || 'N/A'}</p>
-        </div>
-
-        <div>
-          <p className="font-bold">OBRA:</p>
-          <p>{obra?.name || 'N/A'}</p>
-        </div>
-        <div>
-          <p className="font-bold">FAIXA ESPECIFICADA:</p>
-          <p>{checklist.faixa_especificada || 'N/A'}</p>
-        </div>
-        <div>
-          <p className="font-bold">ENSAIO REALIZADO POR:</p>
-          <p>{checklist.ensaio_realizado_por || 'N/A'}</p>
-        </div>
+        <div><p className="font-bold">CLIENTE:</p><p>{regional?.cliente || 'N/A'}</p></div>
+        <div><p className="font-bold">PROJETO:</p><p>{project?.name || checklist.projeto_utilizado || 'N/A'}</p></div>
+        <div><p className="font-bold">PEDREIRA:</p><p>{checklist.pedreira || 'N/A'}</p></div>
+        <div><p className="font-bold">INSPETOR:</p><p>{checklist.inspetor_campo || 'N/A'}</p></div>
+        <div><p className="font-bold">OBRA:</p><p>{obra?.name || 'N/A'}</p></div>
+        <div><p className="font-bold">FAIXA ESPECIFICADA:</p><p>{checklist.faixa_especificada || 'N/A'}</p></div>
+        <div><p className="font-bold">ENSAIO REALIZADO POR:</p><p>{checklist.ensaio_realizado_por || 'N/A'}</p></div>
         <div>
           <p className="font-bold">JORNADA:</p>
-          <p>{checklist.jornada?.horario_inicio && checklist.jornada?.horario_fim ? `${checklist.jornada.horario_inicio} - ${checklist.jornada.horario_fim}` : 'N/A'}</p>
+          <p>{checklist.jornada?.horario_inicio && checklist.jornada?.horario_fim
+            ? `${checklist.jornada.horario_inicio} - ${checklist.jornada.horario_fim}`
+            : 'N/A'}
+          </p>
         </div>
-
-        <div>
-          <p className="font-bold">USINA:</p>
-          <p>{checklist.usina}</p>
-        </div>
-        <div>
-          <p className="font-bold">LIGANTE:</p>
-          <p>{checklist.ligante || 'N/A'}</p>
-        </div>
+        <div><p className="font-bold">USINA:</p><p>{checklist.usina}</p></div>
+        <div><p className="font-bold">LIGANTE:</p><p>{checklist.ligante || 'N/A'}</p></div>
       </div>
     </main>
   </div>
@@ -199,7 +159,7 @@ const ReportFooter = ({ checklist, creatorUser }) => (
   <SignatureFooter {...buildSignatureProps(checklist, creatorUser)} />
 );
 
-
+// ─── Componente Principal ─────────────────────────────────────────────────────
 export default function RelatorioChecklist({ checklist, obra, regional, project, user, creatorUser }) {
   const [compressedPhotos, setCompressedPhotos] = React.useState([]);
   const [isCompressing, setIsCompressing] = React.useState(true);
@@ -210,73 +170,53 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
         setIsCompressing(false);
         return;
       }
-
       const compressed = await Promise.all(
         checklist.fotos.filter(photo => photo && photo.trim() !== '').map(async (photoUrl) => {
           try {
             const img = new Image();
             img.crossOrigin = 'anonymous';
-            
             await new Promise((resolve, reject) => {
               img.onload = resolve;
               img.onerror = reject;
               img.src = photoUrl;
             });
-
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            
-            // Reduzir dimensões para 50% do original
             const maxWidth = 800;
             const maxHeight = 600;
             let width = img.width;
             let height = img.height;
-            
             if (width > maxWidth || height > maxHeight) {
               const ratio = Math.min(maxWidth / width, maxHeight / height);
               width = width * ratio;
               height = height * ratio;
             }
-            
             canvas.width = width;
             canvas.height = height;
             ctx.drawImage(img, 0, 0, width, height);
-            
-            // Comprimir com qualidade de 50%
             return canvas.toDataURL('image/jpeg', 0.5);
-          } catch (error) {
-            console.error('Erro ao comprimir imagem:', error);
-            return photoUrl; // Usar original se falhar
+          } catch {
+            return photoUrl;
           }
         })
       );
-
       setCompressedPhotos(compressed);
       setIsCompressing(false);
     };
-
     compressImages();
   }, [checklist?.fotos]);
 
-  if (!checklist) {
-    return <div className="p-8">Dados do checklist não encontrados.</div>;
-  }
+  if (!checklist) return <div className="p-8">Dados do checklist não encontrados.</div>;
+  if (isCompressing) return <div className="p-8 text-center">Otimizando imagens para impressão...</div>;
 
-  if (isCompressing) {
-    return <div className="p-8 text-center">Otimizando imagens para impressão...</div>;
-  }
-
-  const chunkArray = (array, chunkSize) => {
+  const chunkArray = (array, size) => {
     const chunks = [];
     if (!array) return chunks;
-    for (let i = 0; i < array.length; i += chunkSize) {
-      chunks.push(array.slice(i, i + chunkSize));
-    }
+    for (let i = 0; i < array.length; i += size) chunks.push(array.slice(i, i + size));
     return chunks;
   };
-  
-  const photoChunks = chunkArray(compressedPhotos, 6);
 
+  const photoChunks = chunkArray(compressedPhotos, 6);
   const temAcoesCorretivas = checklist.acoes_corretivas_realizado === true && checklist.acoes_corretivas_descricao;
   const temControleLigante = checklist.controle_ligante_ativo === true;
   const temMedicaoUsina = (checklist.medicoes_usina?.cargas?.length || 0) > 0;
@@ -285,69 +225,72 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
   return (
     <div className="bg-white font-sans">
       <PrintStyles />
-      {/* --- Página 1: Agregados & Produção --- */}
+
+      {/* Página 1: Agregados & Produção */}
       <div className="p-8 print:p-8 flex flex-col page-container min-h-screen">
         <div className="w-full max-w-[190mm] mx-auto flex-grow flex flex-col">
-            <ReportPrintHeader checklist={checklist} obra={obra} regional={regional} project={project} />
-            <main className="flex-grow">
-              <SectionTitle>Controle de Agregados</SectionTitle>
-              <TabelaControleAgregados controle_agregados={checklist.controle_agregados} />
-              
-              <div className="mt-4 space-y-2">
-                <div className="flex items-start gap-4">
-                  <div className="flex-1">
-                    <strong className="font-medium">Equivalente de Areia Realizado?</strong>
-                    <span className="ml-2 font-medium">
-                      {checklist.equivalente_areia_status === 'realizado' ? <span className="text-green-600">Sim</span> :
-                       checklist.equivalente_areia_status === 'nao_realizado' ? <span className="text-red-600">Não</span> :
-                       <span className="text-slate-500">N/A</span>}
-                    </span>
-                    {checklist.equivalente_areia_status === 'realizado' && checklist.equivalente_areia_quantidade > 0 && (
-                      <div className="mt-2 space-y-1">
-                        <p className="text-sm font-medium text-slate-700">Quantidade: {checklist.equivalente_areia_quantidade} ensaio(s)</p>
-                        <div className="grid grid-cols-3 gap-2">
-                          {checklist.equivalente_areia_resultados?.map((resultado, index) => (
-                            <div key={index} className="bg-slate-50 border border-slate-200 rounded p-2">
-                              <p className="text-xs text-slate-600">Resultado {index + 1}:</p>
-                              <p className="text-base font-semibold text-slate-800">{resultado !== null ? `${resultado}%` : '-'}</p>
-                            </div>
-                          ))}
-                        </div>
+          <ReportPrintHeader checklist={checklist} obra={obra} regional={regional} project={project} />
+          <main className="flex-grow">
+            <ReportSectionTitle>Controle de Agregados</ReportSectionTitle>
+            <TabelaControleAgregados controle_agregados={checklist.controle_agregados} />
+
+            <div className="mt-4 space-y-2">
+              <div className="flex items-start gap-4">
+                <div className="flex-1">
+                  <strong className="font-medium">Equivalente de Areia Realizado?</strong>
+                  <span className="ml-2 font-medium">
+                    {checklist.equivalente_areia_status === 'realizado'
+                      ? <span className="text-green-600">Sim</span>
+                      : checklist.equivalente_areia_status === 'nao_realizado'
+                        ? <span className="text-red-600">Não</span>
+                        : <span className="text-slate-500">N/A</span>}
+                  </span>
+                  {checklist.equivalente_areia_status === 'realizado' && checklist.equivalente_areia_quantidade > 0 && (
+                    <div className="mt-2 space-y-1">
+                      <p className="text-sm font-medium text-slate-700">Quantidade: {checklist.equivalente_areia_quantidade} ensaio(s)</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {checklist.equivalente_areia_resultados?.map((resultado, index) => (
+                          <div key={index} className="bg-slate-50 border border-slate-200 rounded p-2">
+                            <p className="text-xs text-slate-600">Resultado {index + 1}:</p>
+                            <p className="text-base font-semibold text-slate-800">{resultado !== null ? `${resultado}%` : '-'}</p>
+                          </div>
+                        ))}
                       </div>
-                    )}
-                  </div>
-                  {checklist.observacoes_agregados && (
-                    <div className="flex-1">
-                      <strong className="font-medium">Observações:</strong>
-                      <p className="text-sm mt-1">{checklist.observacoes_agregados.substring(0, 500)}</p>
                     </div>
                   )}
                 </div>
-              </div>
-
-              <SectionTitle>Acompanhamento da Produção</SectionTitle>
-              <div className="grid grid-cols-2 gap-4">
-                {(checklist.rodadas_producao || []).map((rodada, index) => (
-                  <div key={index} className="border border-slate-200 p-2 rounded-md space-y-1 text-sm">
-                    <h3 className="font-bold text-center">Rodada {rodada.numero_rodada}</h3>
-                    <p><strong className="font-medium">Horário:</strong> {rodada.horario_inicio} às {rodada.horario_termino}</p>
-                    <p><strong className="font-medium">Temp. Ambiente:</strong> {rodada.temperatura_ambiente}°C</p>
-                    <p><strong className="font-medium">Clima:</strong> {rodada.condicoes_climaticas}</p>
-                    <p><strong className="font-medium">Qtde. Produzida:</strong> {rodada.quantidade_produzida} t</p>
-                    <p><strong className="font-medium">Controle de Cargas (Qtde):</strong> {rodada.controle_cargas_qtde}</p>
-                    <p><strong className="font-medium">Caminhões Enlonados:</strong> <Checkmark checked={rodada.caminhoes_enlonados} /></p>
-                    <p><strong className="font-medium">Temp. Massa:</strong> T1: {rodada.temperatura_massa_t1}°C / T2: {rodada.temperatura_massa_t2}°C</p>
+                {checklist.observacoes_agregados && (
+                  <div className="flex-1">
+                    <strong className="font-medium">Observações:</strong>
+                    <p className="text-sm mt-1">{checklist.observacoes_agregados.substring(0, 500)}</p>
                   </div>
-                ))}
+                )}
               </div>
-            </main>
-            <footer className="mt-auto pt-2 text-center text-sm print:text-xs text-gray-400">
-              Página 1 de {totalPages}
-            </footer>
+            </div>
+
+            <ReportSectionTitle>Acompanhamento da Produção</ReportSectionTitle>
+            <div className="grid grid-cols-2 gap-4">
+              {(checklist.rodadas_producao || []).map((rodada, index) => (
+                <div key={index} className="border border-slate-200 p-2 rounded-md space-y-1 text-sm">
+                  <h3 className="font-bold text-center">Rodada {rodada.numero_rodada}</h3>
+                  <p><strong className="font-medium">Horário:</strong> {rodada.horario_inicio} às {rodada.horario_termino}</p>
+                  <p><strong className="font-medium">Temp. Ambiente:</strong> {rodada.temperatura_ambiente}°C</p>
+                  <p><strong className="font-medium">Clima:</strong> {rodada.condicoes_climaticas}</p>
+                  <p><strong className="font-medium">Qtde. Produzida:</strong> {rodada.quantidade_produzida} t</p>
+                  <p><strong className="font-medium">Controle de Cargas (Qtde):</strong> {rodada.controle_cargas_qtde}</p>
+                  <p><strong className="font-medium">Caminhões Enlonados:</strong> <Checkmark checked={rodada.caminhoes_enlonados} /></p>
+                  <p><strong className="font-medium">Temp. Massa:</strong> T1: {rodada.temperatura_massa_t1}°C / T2: {rodada.temperatura_massa_t2}°C</p>
+                </div>
+              ))}
+            </div>
+          </main>
+          <footer className="mt-auto pt-2 text-center text-sm print:text-xs text-gray-400">
+            Página 1 de {totalPages}
+          </footer>
         </div>
       </div>
-      
-      {/* --- Página 2: Controle de CAUQ --- */}
+
+      {/* Página 2: Controle de CAUQ */}
       <div className="p-8 print:p-8 flex flex-col page-container min-h-screen break-before-page">
         <div className="w-full max-w-[190mm] mx-auto flex-grow flex flex-col">
           <ReportPrintHeader checklist={checklist} obra={obra} regional={regional} project={project} />
@@ -357,156 +300,18 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
           </main>
           <ReportFooter checklist={checklist} creatorUser={creatorUser} />
           <footer className="mt-auto pt-2 text-center text-sm print:text-xs text-gray-400">
-             Página 2 de {totalPages}
+            Página 2 de {totalPages}
           </footer>
         </div>
       </div>
 
-      {/* --- Página 3: Controle de Ligante (se houver) --- */}
+      {/* Página 3: Controle de Ligante (condicional) */}
       {temControleLigante && (
         <div className="p-8 print:p-8 flex flex-col page-container min-h-screen break-before-page">
           <div className="w-full max-w-[190mm] mx-auto flex-grow flex flex-col">
             <ReportPrintHeader checklist={checklist} obra={obra} regional={regional} project={project} />
             <main className="flex-grow mt-6">
-              <SectionTitle>Controle de Qualidade de Ligantes</SectionTitle>
-              
-              <div className="grid grid-cols-4 gap-4 mb-4">
-                <div>
-                  <strong className="font-medium text-sm">Fornecedor:</strong>
-                  <p className="text-base">{checklist.controle_ligante?.fornecedor || 'N/A'}</p>
-                </div>
-                <div>
-                  <strong className="font-medium text-sm">Nota Fiscal:</strong>
-                  <p className="text-base">{checklist.controle_ligante?.nota_fiscal || 'N/A'}</p>
-                </div>
-                <div>
-                  <strong className="font-medium text-sm">Placa Carreta:</strong>
-                  <p className="text-base">{checklist.controle_ligante?.placa_carreta || 'N/A'}</p>
-                </div>
-                <div>
-                  <strong className="font-medium text-sm">Quantidade:</strong>
-                  <p className="text-base">{checklist.controle_ligante?.quantidade_toneladas ? `${checklist.controle_ligante.quantidade_toneladas} t` : 'N/A'}</p>
-                </div>
-              </div>
-
-              <table className="w-full border-collapse border border-slate-400 text-sm mt-4">
-                <thead>
-                  <tr className="bg-slate-100">
-                    <th className="border border-slate-300 p-2 text-left font-semibold">Ensaio</th>
-                    <th className="border border-slate-300 p-2 text-center font-semibold">Unidade</th>
-                    <th className="border border-slate-300 p-2 text-center font-semibold">Resultado</th>
-                    <th className="border border-slate-300 p-2 text-center font-semibold">Limite Esp.</th>
-                    <th className="border border-slate-300 p-2 text-center font-semibold">Especificação</th>
-                    <th className="border border-slate-300 p-2 text-center font-semibold">Conformidade</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="even:bg-slate-50">
-                    <td className="border border-slate-300 p-2">
-                      Viscosidade Brookfield a {checklist.controle_ligante?.viscosidade_1_temp || '-'}ºC, SP {checklist.controle_ligante?.viscosidade_1_sp || '-'} [{checklist.controle_ligante?.viscosidade_1_rpm || '-'} rpm]
-                    </td>
-                    <td className="border border-slate-300 p-2 text-center">cP</td>
-                    <td className="border border-slate-300 p-2 text-center font-semibold">{checklist.controle_ligante?.viscosidade_1_resultado || '-'}</td>
-                    <td className="border border-slate-300 p-2 text-center bg-blue-50">{checklist.controle_ligante?.viscosidade_1_limite || '-'}</td>
-                    <td className="border border-slate-300 p-2 text-center">ABNT NBR - 15184</td>
-                    <td className="border border-slate-300 p-2 text-center">
-                      {checklist.controle_ligante?.viscosidade_1_conforme ? (
-                        <span className="text-green-600 font-bold text-2xl">✓</span>
-                      ) : (
-                        <span className="text-red-600 font-bold text-2xl">✗</span>
-                      )}
-                    </td>
-                  </tr>
-                  <tr className="even:bg-slate-50">
-                    <td className="border border-slate-300 p-2">
-                      Viscosidade Brookfield a {checklist.controle_ligante?.viscosidade_2_temp || '-'}ºC, SP {checklist.controle_ligante?.viscosidade_2_sp || '-'} [{checklist.controle_ligante?.viscosidade_2_rpm || '-'} rpm]
-                    </td>
-                    <td className="border border-slate-300 p-2 text-center">cP</td>
-                    <td className="border border-slate-300 p-2 text-center font-semibold">{checklist.controle_ligante?.viscosidade_2_resultado || '-'}</td>
-                    <td className="border border-slate-300 p-2 text-center bg-blue-50">{checklist.controle_ligante?.viscosidade_2_limite || '-'}</td>
-                    <td className="border border-slate-300 p-2 text-center">ABNT NBR - 15529</td>
-                    <td className="border border-slate-300 p-2 text-center">
-                      {checklist.controle_ligante?.viscosidade_2_conforme ? (
-                        <span className="text-green-600 font-bold text-2xl">✓</span>
-                      ) : (
-                        <span className="text-red-600 font-bold text-2xl">✗</span>
-                      )}
-                    </td>
-                  </tr>
-                  <tr className="even:bg-slate-50">
-                    <td className="border border-slate-300 p-2">
-                      Viscosidade Brookfield a {checklist.controle_ligante?.viscosidade_3_temp || '-'}ºC, SP {checklist.controle_ligante?.viscosidade_3_sp || '-'} [{checklist.controle_ligante?.viscosidade_3_rpm || '-'} rpm]
-                    </td>
-                    <td className="border border-slate-300 p-2 text-center">cP</td>
-                    <td className="border border-slate-300 p-2 text-center font-semibold">{checklist.controle_ligante?.viscosidade_3_resultado || '-'}</td>
-                    <td className="border border-slate-300 p-2 text-center bg-blue-50">{checklist.controle_ligante?.viscosidade_3_limite || '-'}</td>
-                    <td className="border border-slate-300 p-2 text-center">ABNT NBR - 15184</td>
-                    <td className="border border-slate-300 p-2 text-center">
-                      {checklist.controle_ligante?.viscosidade_3_conforme ? (
-                        <span className="text-green-600 font-bold text-2xl">✓</span>
-                      ) : (
-                        <span className="text-red-600 font-bold text-2xl">✗</span>
-                      )}
-                    </td>
-                  </tr>
-                  <tr className="even:bg-slate-50">
-                    <td className="border border-slate-300 p-2">Recuperação Elástica</td>
-                    <td className="border border-slate-300 p-2 text-center">%</td>
-                    <td className="border border-slate-300 p-2 text-center font-semibold">{checklist.controle_ligante?.recuperacao_elastica_resultado || '-'}</td>
-                    <td className="border border-slate-300 p-2 text-center bg-blue-50">{checklist.controle_ligante?.recuperacao_elastica_limite || '-'}</td>
-                    <td className="border border-slate-300 p-2 text-center">ABNT NBR - 15086</td>
-                    <td className="border border-slate-300 p-2 text-center">
-                      {checklist.controle_ligante?.recuperacao_elastica_conforme ? (
-                        <span className="text-green-600 font-bold text-2xl">✓</span>
-                      ) : (
-                        <span className="text-red-600 font-bold text-2xl">✗</span>
-                      )}
-                    </td>
-                  </tr>
-                  <tr className="even:bg-slate-50">
-                    <td className="border border-slate-300 p-2">Penetração (100g, 5s, 25ºC)</td>
-                    <td className="border border-slate-300 p-2 text-center">0,1 mm</td>
-                    <td className="border border-slate-300 p-2 text-center font-semibold">{checklist.controle_ligante?.penetracao_resultado || '-'}</td>
-                    <td className="border border-slate-300 p-2 text-center bg-blue-50">{checklist.controle_ligante?.penetracao_limite || '-'}</td>
-                    <td className="border border-slate-300 p-2 text-center">ABNT NBR - 6576</td>
-                    <td className="border border-slate-300 p-2 text-center">
-                      {checklist.controle_ligante?.penetracao_conforme ? (
-                        <span className="text-green-600 font-bold text-2xl">✓</span>
-                      ) : (
-                        <span className="text-red-600 font-bold text-2xl">✗</span>
-                      )}
-                    </td>
-                  </tr>
-                  <tr className="even:bg-slate-50">
-                    <td className="border border-slate-300 p-2">Ponto de Amolecimento</td>
-                    <td className="border border-slate-300 p-2 text-center">ºC</td>
-                    <td className="border border-slate-300 p-2 text-center font-semibold">{checklist.controle_ligante?.ponto_amolecimento_resultado || '-'}</td>
-                    <td className="border border-slate-300 p-2 text-center bg-blue-50">{checklist.controle_ligante?.ponto_amolecimento_limite || '-'}</td>
-                    <td className="border border-slate-300 p-2 text-center">ABNT NBR - 6560</td>
-                    <td className="border border-slate-300 p-2 text-center">
-                      {checklist.controle_ligante?.ponto_amolecimento_conforme ? (
-                        <span className="text-green-600 font-bold text-2xl">✓</span>
-                      ) : (
-                        <span className="text-red-600 font-bold text-2xl">✗</span>
-                      )}
-                    </td>
-                  </tr>
-                  <tr className="even:bg-slate-50">
-                    <td className="border border-slate-300 p-2">Ponto de Fulgor</td>
-                    <td className="border border-slate-300 p-2 text-center">ºC</td>
-                    <td className="border border-slate-300 p-2 text-center font-semibold">{checklist.controle_ligante?.ponto_fulgor_resultado || '-'}</td>
-                    <td className="border border-slate-300 p-2 text-center bg-blue-50">{checklist.controle_ligante?.ponto_fulgor_limite || '-'}</td>
-                    <td className="border border-slate-300 p-2 text-center">ABNT NBR - 11341</td>
-                    <td className="border border-slate-300 p-2 text-center">
-                      {checklist.controle_ligante?.ponto_fulgor_conforme ? (
-                        <span className="text-green-600 font-bold text-2xl">✓</span>
-                      ) : (
-                        <span className="text-red-600 font-bold text-2xl">✗</span>
-                      )}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <TabelaControleLigante controle_ligante={checklist.controle_ligante} />
             </main>
             <ReportFooter checklist={checklist} creatorUser={creatorUser} />
             <footer className="pt-1 text-center text-sm print:text-xs text-gray-400">
@@ -516,20 +321,19 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
         </div>
       )}
 
-      {/* --- Página 4 (ou 3 se não houver ligante): Ações Corretivas (se houver) --- */}
+      {/* Página: Ações Corretivas (condicional) */}
       {temAcoesCorretivas && (
         <div className="p-8 print:p-8 flex flex-col page-container min-h-screen break-before-page">
           <div className="w-full max-w-[190mm] mx-auto flex-grow flex flex-col">
             <ReportPrintHeader checklist={checklist} obra={obra} regional={regional} project={project} />
             <main className="flex-grow mt-6">
-              <SectionTitle>Ações Corretivas Realizadas</SectionTitle>
+              <ReportSectionTitle>Ações Corretivas Realizadas</ReportSectionTitle>
               <div className="border-2 border-slate-300 rounded-lg p-6 bg-white min-h-48 mb-6">
                 <p className="text-base leading-relaxed whitespace-pre-wrap text-justify">{checklist.acoes_corretivas_descricao}</p>
               </div>
-
               {checklist.nao_conformidades && checklist.nao_conformidades.length > 0 && (
                 <div>
-                  <SectionTitle>Não Conformidades</SectionTitle>
+                  <ReportSectionTitle>Não Conformidades</ReportSectionTitle>
                   <ReportNaoConformidadesTable naoConformidades={checklist.nao_conformidades} />
                 </div>
               )}
@@ -542,110 +346,38 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
         </div>
       )}
 
-      {/* --- Página: Medição de Cargas da Usina (se houver) --- */}
-      {temMedicaoUsina && (() => {
-        const medicoes = checklist.medicoes_usina;
-        const pageNum = 2 + (temControleLigante ? 1 : 0) + (temAcoesCorretivas ? 1 : 0) + 1;
-        const servicoLabel = {
-          capa: 'Capa',
-          reperfilagem: 'Reperfilagem',
-          remendo: 'Remendo',
-          capa_reperfilagem: 'Capa/Reperfilagem'
-        }[medicoes.servico] || medicoes.servico || '-';
+      {/* Página: Medição de Cargas da Usina (condicional) */}
+      {temMedicaoUsina && (
+        <PaginaMedicaoCargas
+          checklist={checklist}
+          obra={obra}
+          regional={regional}
+          creatorUser={creatorUser}
+          pageNum={2 + (temControleLigante ? 1 : 0) + (temAcoesCorretivas ? 1 : 0) + 1}
+          totalPages={totalPages}
+        />
+      )}
 
-        return (
-          <div className="p-8 print:p-8 flex flex-col page-container min-h-screen break-before-page">
-            <div className="w-full max-w-[190mm] mx-auto flex-grow flex flex-col">
-              {/* Cabeçalho próprio igual ao do PDF */}
-              <header className="border-b-2 border-slate-900 pb-2 mb-3">
-                <div className="flex justify-between items-center">
-                  <picture>
-                    <source srcSet={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} />
-                    <img src={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} alt="Logo" className="h-14 object-contain" width="auto" height="56" />
-                  </picture>
-                  <h1 className="text-xl font-bold text-center text-gray-800 flex-1 mx-4">MEDIÇÃO DE CARGAS DA USINA</h1>
-                  <div className="border border-gray-400 p-2 rounded-md text-sm">
-                    <p className="font-semibold">{new Date(checklist.data).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</p>
-                  </div>
-                </div>
-              </header>
-
-              {/* Dados de cabeçalho */}
-              <div className="grid grid-cols-2 gap-x-8 text-sm mb-3 border border-slate-300 p-2">
-                <div className="space-y-1">
-                  <p><span className="font-bold">OBRA:</span> {obra?.name || '-'}</p>
-                  <p><span className="font-bold">USINA:</span> {checklist.usina || '-'}</p>
-                  <p><span className="font-bold">TRECHO:</span> {medicoes.sub_trecho || '-'}</p>
-                  <p><span className="font-bold">SUB-TRECHO:</span> {medicoes.sub_trecho || '-'}</p>
-                </div>
-                <div className="space-y-1">
-                  <p><span className="font-bold">FISCAL DE CAMPO:</span> {checklist.inspetor_campo || '-'}</p>
-                  <p><span className="font-bold">EMPREITEIRA:</span> {obra?.empreiteiras?.[0] || '-'}</p>
-                  <p><span className="font-bold">SERVIÇO:</span> {servicoLabel}</p>
-                </div>
-              </div>
-
-              {/* Tabela de cargas — sempre 20 linhas para preencher a página */}
-              <main className="flex-grow flex flex-col">
-                <table className="w-full border-collapse border border-slate-400 text-xs flex-grow" style={{ tableLayout: 'fixed' }}>
-                  <thead>
-                    <tr className="bg-slate-200">
-                      <th className="border border-slate-400 px-1 py-1.5 text-center font-bold" style={{width:'13%'}}>Nº TICKET<br/>(NOTA FISCAL)</th>
-                      <th className="border border-slate-400 px-1 py-1.5 text-center font-bold" style={{width:'10%'}}>PLACA</th>
-                      <th className="border border-slate-400 px-1 py-1.5 text-center font-bold" style={{width:'8%'}}>QTE.<br/>(t)</th>
-                      <th className="border border-slate-400 px-1 py-1.5 text-center font-bold" style={{width:'9%'}}>VOLUME<br/>(m³)</th>
-                      <th className="border border-slate-400 px-1 py-1.5 text-center font-bold" style={{width:'10%'}}>TEMP.<br/>(°C)</th>
-                      <th className="border border-slate-400 px-1 py-1.5 text-center font-bold" style={{width:'20%'}}>RODOVIA DESTINO</th>
-                      <th className="border border-slate-400 px-1 py-1.5 text-center font-bold" style={{width:'15%'}}>EQUIPE</th>
-                      <th className="border border-slate-400 px-1 py-1.5 text-center font-bold" style={{width:'22%'}}>OBSERVAÇÕES</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Array.from({ length: 30 }).map((_, i) => {
-                      const carga = (medicoes.cargas || [])[i];
-                      return (
-                        <tr key={i} style={{ height: '20px' }} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
-                          <td className="border border-slate-300 px-1 text-center overflow-hidden">{carga?.numero_ticket || ''}</td>
-                          <td className="border border-slate-300 px-1 text-center overflow-hidden">{carga?.placa || ''}</td>
-                          <td className="border border-slate-300 px-1 text-center overflow-hidden">{carga?.quantidade_toneladas ?? ''}</td>
-                          <td className="border border-slate-300 px-1 text-center overflow-hidden">{carga?.volume_m3 ?? ''}</td>
-                          <td className="border border-slate-300 px-1 text-center overflow-hidden">{carga?.temperatura ?? ''}</td>
-                          <td className="border border-slate-300 px-1 text-center overflow-hidden">{carga?.rodovia_destino || ''}</td>
-                          <td className="border border-slate-300 px-1 text-center overflow-hidden">{carga?.equipe || ''}</td>
-                          <td className="border border-slate-300 px-1 overflow-hidden">{carga?.observacoes || ''}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </main>
-
-              <ReportFooter checklist={checklist} creatorUser={creatorUser} />
-              <footer className="mt-2 pt-1 text-center text-sm print:text-xs text-gray-400">
-                Página {pageNum} de {totalPages}
-              </footer>
-            </div>
-          </div>
-        );
-      })()}
-
-      {/* --- Páginas seguintes: Relatório Fotográfico --- */}
+      {/* Páginas: Relatório Fotográfico */}
       {photoChunks.map((chunk, pageIndex) => (
         <div key={pageIndex} className="p-8 print:p-8 flex flex-col page-container min-h-screen break-before-page">
           <div className="w-full max-w-[190mm] mx-auto flex-grow flex flex-col">
             <header className="grid grid-cols-3 items-center border-b-2 border-gray-800 pb-2">
-               <div className="flex justify-start">
-                  <picture><source srcSet={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} /><img src={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} alt="Logo Regional" className="h-16 object-contain" width="auto" height="64" /></picture>
+              <div className="flex justify-start">
+                <picture>
+                  <source srcSet={regional?.logo_url || LOGO_DEFAULT} />
+                  <img src={regional?.logo_url || LOGO_DEFAULT} alt="Logo Regional" className="h-16 object-contain" width="auto" height="64" />
+                </picture>
+              </div>
+              <div className="text-center">
+                <h1 className="text-2xl print:text-xl font-bold text-gray-800">Relatório Fotográfico  Checklist</h1>
+                <p className="text-base print:text-sm text-gray-600">Obra: {obra?.name || 'N/A'}</p>
+              </div>
+              <div className="flex justify-end text-sm print:text-xs">
+                <div className="border border-gray-400 p-2 rounded-md">
+                  <p>{new Date(checklist.data).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</p>
                 </div>
-                <div className="text-center">
-                  <h1 className="text-2xl print:text-xl font-bold text-gray-800">Relatório Fotográfico  Checklist</h1>
-                  <p className="text-base print:text-sm text-gray-600">Obra: {obra?.name || 'N/A'}</p>
-                </div>
-                <div className="flex justify-end text-sm print:text-xs">
-                   <div className="border border-gray-400 p-2 rounded-md">
-                      <p>{new Date(checklist.data).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</p>
-                   </div>
-                </div>
+              </div>
             </header>
             <main className="grid grid-cols-2 gap-4 mt-4">
               {chunk.map((fotoUrl, fotoIndex) => (
