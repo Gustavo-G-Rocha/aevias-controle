@@ -1,10 +1,10 @@
 import React from 'react';
 import SignatureFooter from './SignatureFooter';
-import { ReportCheckmark, ReportSectionTitle } from './shared';
+import { ReportSectionTitle } from './shared';
+import CondicionamentoInsumos from './checklist-mraf/CondicionamentoInsumos';
+import PreparacaoSuperficie from './checklist-mraf/PreparacaoSuperficie';
+import AcompanhamentoAplicacao from './checklist-mraf/AcompanhamentoAplicacao';
 
-// Aliases locais para manter os nomes usados no JSX abaixo sem alterar estrutura
-const Checkmark = ({ checked }) => <ReportCheckmark checked={checked === true ? true : checked === false ? false : null} />;
-const XMark = ({ checked }) => checked === false ? <span className="font-bold text-sm text-red-600">✗</span> : <span className="text-slate-500 text-sm">-</span>;
 const SectionTitle = ({ children }) => <ReportSectionTitle size="sm">{children}</ReportSectionTitle>;
 
 const ReportPrintHeader = ({ checklist, obra, regional, project }) => (
@@ -224,211 +224,11 @@ export default function RelatorioChecklistMRAF({ checklist, obra, regional, proj
             </table>
           </div>
 
-          {/* CONDICIONAMENTO DOS INSUMOS */}
-          <div className="break-inside-avoid">
-            <SectionTitle>Condicionamento dos Insumos</SectionTitle>
-            <table className="w-full border-collapse" style={{ fontSize: '9px' }}>
-              <thead>
-                <tr className="bg-slate-100">
-                  <th className="border border-slate-300 px-0.5 py-0.5 text-left">Serviço</th>
-                  <th className="border border-slate-300 px-0.5 py-0.5 text-center" style={{ width: '35px' }}>Sim</th>
-                  <th className="border border-slate-300 px-0.5 py-0.5 text-center" style={{ width: '35px' }}>Não</th>
-                  <th className="border border-slate-300 px-0.5 py-0.5 text-left">Observações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="border border-slate-300 px-0.5 py-0.5">Agregados separados no canteiro?</td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center">
-                    <Checkmark checked={checklist.condicionamento_insumos?.agregados_separados} />
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center">
-                    <XMark checked={checklist.condicionamento_insumos?.agregados_separados} />
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5" rowSpan="5">
-                    {checklist.condicionamento_insumos?.observacoes || '-'}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-slate-300 px-0.5 py-0.5">Agregados devidamente cobertos?</td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center">
-                    <Checkmark checked={checklist.condicionamento_insumos?.agregados_cobertos} />
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center">
-                    <XMark checked={checklist.condicionamento_insumos?.agregados_cobertos} />
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-slate-300 px-0.5 py-0.5">Filler utilizado:</td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center bg-slate-50" colSpan="2">
-                    {checklist.condicionamento_insumos?.filler_utilizado || 'N/A'}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-slate-300 px-0.5 py-0.5">Utilização de aditivos?</td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center">
-                    <Checkmark checked={checklist.condicionamento_insumos?.utilizacao_aditivos} />
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center">
-                    <XMark checked={checklist.condicionamento_insumos?.utilizacao_aditivos} />
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-slate-300 px-0.5 py-0.5">Água contaminada?</td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center">
-                    <Checkmark checked={checklist.condicionamento_insumos?.agua_contaminada} />
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center">
-                    <XMark checked={checklist.condicionamento_insumos?.agua_contaminada} />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <CondicionamentoInsumos data={checklist.condicionamento_insumos} />
 
-          {/* PREPARAÇÃO DA SUPERFÍCIE */}
-          <div className="break-inside-avoid">
-            <SectionTitle>Acompanhamento da Condição e Preparação da Superfície</SectionTitle>
-            <table className="w-full border-collapse" style={{ fontSize: '9px' }}>
-              <thead>
-                <tr className="bg-slate-100">
-                  <th className="border border-slate-300 px-0.5 py-0.5 text-left">Serviço</th>
-                  <th className="border border-slate-300 px-0.5 py-0.5 text-center" style={{ width: '35px' }}>Sim</th>
-                  <th className="border border-slate-300 px-0.5 py-0.5 text-center" style={{ width: '35px' }}>Não</th>
-                  <th className="border border-slate-300 px-0.5 py-0.5 text-left">Observações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="border border-slate-300 px-0.5 py-0.5">Superfície úmida?</td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center">
-                    <Checkmark checked={checklist.preparacao_superficie?.superficie_umida} />
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center">
-                    <XMark checked={checklist.preparacao_superficie?.superficie_umida} />
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5" rowSpan="5">
-                    {checklist.preparacao_superficie?.observacoes || '-'}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-slate-300 px-0.5 py-0.5">Temperatura do pavimento:</td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center bg-slate-50" colSpan="2">
-                    {checklist.preparacao_superficie?.temperatura_pavimento ? `${checklist.preparacao_superficie.temperatura_pavimento} °C` : 'N/A'}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-slate-300 px-0.5 py-0.5">Pavimento apresenta patologias?</td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center">
-                    <Checkmark checked={checklist.preparacao_superficie?.pavimento_patologias} />
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center">
-                    <XMark checked={checklist.preparacao_superficie?.pavimento_patologias} />
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-slate-300 px-0.5 py-0.5">Superfície fresada? (Se sim acima)</td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center">
-                    <Checkmark checked={checklist.preparacao_superficie?.superficie_fresada} />
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center">
-                    <XMark checked={checklist.preparacao_superficie?.superficie_fresada} />
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-slate-300 px-0.5 py-0.5">A superfície foi limpa antes da aplicação?</td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center">
-                    <Checkmark checked={checklist.preparacao_superficie?.superficie_limpa} />
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-center">
-                    <XMark checked={checklist.preparacao_superficie?.superficie_limpa} />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <p className="text-[7px] italic text-slate-600 mt-0.5">*Preferencialmente por vassouras mecânicas, podendo ser usados, também, processos manuais.</p>
-          </div>
+          <PreparacaoSuperficie data={checklist.preparacao_superficie} />
 
-          {/* ACOMPANHAMENTO DA APLICAÇÃO */}
-          <div className="break-inside-avoid">
-            <SectionTitle>Acompanhamento da Aplicação</SectionTitle>
-            <table className="w-full border-collapse text-center" style={{ fontSize: '9px' }}>
-              <thead>
-                <tr className="bg-slate-100">
-                  <th className="border border-slate-300 px-0.5 py-0.5">Serviço</th>
-                  <th className="border border-slate-300 px-0.5 py-0.5" style={{ width: '35px' }}>Sim</th>
-                  <th className="border border-slate-300 px-0.5 py-0.5" style={{ width: '35px' }}>Não</th>
-                  <th className="border border-slate-300 px-0.5 py-0.5">Resultado</th>
-                  <th className="border border-slate-300 px-0.5 py-0.5">Limites DNIT 035/2018</th>
-                  <th className="border border-slate-300 px-0.5 py-0.5">Observações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-left">Aguardado tempo necessário para rompimento/cura?</td>
-                  <td className="border border-slate-300 px-0.5 py-0.5">
-                    <Checkmark checked={checklist.acompanhamento_aplicacao?.tempo_rompimento_cura?.realizado} />
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5">
-                    <XMark checked={checklist.acompanhamento_aplicacao?.tempo_rompimento_cura?.realizado} />
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 bg-slate-50">N/A</td>
-                  <td className="border border-slate-300 px-0.5 py-0.5 bg-slate-50">N/A</td>
-                  <td className="border border-slate-300 px-0.5 py-0.5" rowSpan="4">
-                    {checklist.acompanhamento_aplicacao?.observacoes || '-'}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-left">Taxa de Aplicação</td>
-                  <td className="border border-slate-300 px-0.5 py-0.5">
-                    <Checkmark checked={checklist.acompanhamento_aplicacao?.taxa_aplicacao?.realizado} />
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5">
-                    <XMark checked={checklist.acompanhamento_aplicacao?.taxa_aplicacao?.realizado} />
-                  </td>
-                  <td className={`border border-slate-300 px-0.5 py-0.5 ${
-                    checklist.acompanhamento_aplicacao?.taxa_aplicacao?.conforme === false ? 'text-red-600 font-bold' : ''
-                  }`}>
-                    {checklist.acompanhamento_aplicacao?.taxa_aplicacao?.resultado || '-'}
-                    {checklist.acompanhamento_aplicacao?.taxa_aplicacao?.conforme === false && ' ⚠️'}
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5">8 kg/m² a 16 kg/m²</td>
-                </tr>
-                <tr>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-left">Resíduo da Emulsão</td>
-                  <td className="border border-slate-300 px-0.5 py-0.5">
-                    <Checkmark checked={checklist.acompanhamento_aplicacao?.residuo_emulsao?.realizado} />
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5">
-                    <XMark checked={checklist.acompanhamento_aplicacao?.residuo_emulsao?.realizado} />
-                  </td>
-                  <td className={`border border-slate-300 px-0.5 py-0.5 ${
-                    checklist.acompanhamento_aplicacao?.residuo_emulsao?.conforme === false ? 'text-red-600 font-bold' : ''
-                  }`}>
-                    {checklist.acompanhamento_aplicacao?.residuo_emulsao?.resultado || '-'}
-                    {checklist.acompanhamento_aplicacao?.residuo_emulsao?.conforme === false && ' ⚠️'}
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5">6,5% a 12,0%</td>
-                </tr>
-                <tr>
-                  <td className="border border-slate-300 px-0.5 py-0.5 text-left">Espessura da Camada</td>
-                  <td className="border border-slate-300 px-0.5 py-0.5">
-                    <Checkmark checked={checklist.acompanhamento_aplicacao?.espessura_camada?.realizado} />
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5">
-                    <XMark checked={checklist.acompanhamento_aplicacao?.espessura_camada?.realizado} />
-                  </td>
-                  <td className={`border border-slate-300 px-0.5 py-0.5 ${
-                    checklist.acompanhamento_aplicacao?.espessura_camada?.conforme === false ? 'text-red-600 font-bold' : ''
-                  }`}>
-                    {checklist.acompanhamento_aplicacao?.espessura_camada?.resultado || '-'}
-                    {checklist.acompanhamento_aplicacao?.espessura_camada?.conforme === false && ' ⚠️'}
-                  </td>
-                  <td className="border border-slate-300 px-0.5 py-0.5">6 mm a 20 mm</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <AcompanhamentoAplicacao data={checklist.acompanhamento_aplicacao} />
 
           {/* CONTROLE DE APLICAÇÃO */}
           <div className="break-inside-avoid">
