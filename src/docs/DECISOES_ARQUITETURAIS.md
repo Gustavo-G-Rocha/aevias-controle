@@ -87,8 +87,8 @@ export const useRelatorioCAUQData = (projectId) => {
 - ✅ **ESCOLHIDA** — Unit + integração seletiva
 
 ### Status Atual
-- ✅ Utils: 29 testes
-- ✅ Componentes: 18 testes
+- ✅ Utils: Estruturados em testes unitários
+- ✅ Componentes: Estruturados em testes de integração
 - ⚠️ Hooks: Implícitamente testados via componentes
 - ⚠️ Pages: Testados via features
 
@@ -342,7 +342,7 @@ it('módulo importável e é função', async () => {
 ### Consequências
 - ✅ Testes rápidos (node é leve)
 - ✅ Foco em lógica, não renderização
-- ✅ 47 testes em <2s
+- ✅ Testes estruturados executam rapidamente
 - ⚠️ Sem testes visuales (aceitável)
 
 ---
