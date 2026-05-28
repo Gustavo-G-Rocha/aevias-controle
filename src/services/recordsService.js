@@ -88,8 +88,16 @@ export function deduplicateRecords(records) {
  * @returns {Promise<object[]>} array normalizado com `entityType`
  */
 export async function loadAllRecords() {
-  const promises = ALL_RECORD_ENTITIES.map(type => loadEntity(type));
-  const results = await Promise.all(promises);
+  const settled = await Promise.allSettled(
+    ALL_RECORD_ENTITIES.map(type => loadEntity(type))
+  );
+  const results = settled.map((r, i) => {
+    if (r.status === 'rejected') {
+      console.warn(`[recordsService] loadAllRecords: ${ALL_RECORD_ENTITIES[i]} rejeitou:`, r.reason?.message || r.reason);
+      return [];
+    }
+    return r.value;
+  });
   const normalized = normalizeRecords(results, ALL_RECORD_ENTITIES);
   return deduplicateRecords(normalized);
 }

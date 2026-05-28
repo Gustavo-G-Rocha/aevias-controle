@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from "react";
-import { Obra } from "@/entities/Obra";
 import { base44 } from "@/api/base44Client";
 import {
   extractLaboratoristas,
@@ -84,13 +83,12 @@ export const useRelatoriosUnificadosFilters = () => {
 
   const loadFiltrosObra = useCallback(async (obraId) => {
     try {
-      const obraData = await Obra.get(obraId);
-      if (obraData) {
-        setRodoviasDisponiveis(obraData.rodovias || []);
-        setEmpreiteirasDisponiveis(obraData.empreiteiras || []);
-        setUsinasDisponiveis(obraData.usinas || []);
-      }
-    } catch {
+      const obraData = await base44.entities.Obra.get(obraId);
+      setRodoviasDisponiveis(obraData?.rodovias || []);
+      setEmpreiteirasDisponiveis(obraData?.empreiteiras || []);
+      setUsinasDisponiveis(obraData?.usinas || []);
+    } catch (err) {
+      console.warn('[RelatoriosUnificados] Filtros da obra não carregados:', err?.message || err);
       setRodoviasDisponiveis([]);
       setEmpreiteirasDisponiveis([]);
       setUsinasDisponiveis([]);
@@ -100,24 +98,24 @@ export const useRelatoriosUnificadosFilters = () => {
   const loadLaboratoristas = useCallback(async (obraId, inicio, fim) => {
     setLoadingLaboratoristas(true);
     try {
-      const allRecords = [];
-      await Promise.all(
-        ENTITY_KEYS.map(async (key) => {
-          try {
-            const entity = getEntityInstance(key);
-            const records = await entity.filter(
-              { obra_id: obraId },
-              "-created_date",
-              1000
-            );
-            records.forEach((r) => {
-              allRecords.push({ ...r, entityType: key });
-            });
-          } catch (e) {
-            console.warn(`Falha ao carregar ${key}:`, e?.message || e);
-          }
+      const results = await Promise.allSettled(
+        ENTITY_KEYS.map(key => {
+          const entity = getEntityInstance(key);
+          return entity
+            ? entity.filter({ obra_id: obraId }, "-created_date", 1000)
+                .then(records => records.map(r => ({ ...r, entityType: key })))
+            : Promise.resolve([]);
         })
       );
+
+      const allRecords = [];
+      results.forEach((result, i) => {
+        if (result.status === 'fulfilled') {
+          result.value.forEach(r => allRecords.push(r));
+        } else {
+          console.warn(`[RelatoriosUnificados] Falha ao carregar ${ENTITY_KEYS[i]}:`, result.reason?.message || result.reason);
+        }
+      });
 
       const filtered = filterRecordsByDateRange(allRecords, inicio, fim);
       const labs = extractLaboratoristas(filtered);

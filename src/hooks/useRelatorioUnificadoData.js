@@ -4,9 +4,6 @@
  */
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Regional } from '@/entities/Regional';
-import { Project } from '@/entities/Project';
-import { User } from '@/entities/User';
 
 export function useRelatorioUnificadoData() {
   const [obra, setObra] = useState(null);
@@ -28,12 +25,8 @@ export function useRelatorioUnificadoData() {
           return;
         }
 
-        const [obraData, regionaisData, projectsData, currentUser] = await Promise.all([
-          base44.entities.Obra.get(obra_id),
-          Regional.list(),
-          Project.list(),
-          User.me()
-        ]);
+        // Obra é obrigatória; os demais são independentes — falha isolada não bloqueia
+        const obraData = await base44.entities.Obra.get(obra_id).catch(() => null);
 
         if (!obraData) {
           setError(`Obra com ID ${obra_id} não encontrada`);
@@ -42,15 +35,32 @@ export function useRelatorioUnificadoData() {
         }
 
         setObra(obraData);
+
+        // Dados relacionados em paralelo com fallback individual
+        const [regionaisResult, projectsResult, userResult] = await Promise.allSettled([
+          base44.entities.Regional.list(),
+          base44.entities.Project.list(),
+          base44.auth.me(),
+        ]);
+
+        const regionaisData = regionaisResult.status === 'fulfilled' ? regionaisResult.value : [];
+        const projectsData  = projectsResult.status  === 'fulfilled' ? projectsResult.value  : [];
+        const currentUser   = userResult.status       === 'fulfilled' ? userResult.value       : null;
+
+        if (regionaisResult.status === 'rejected')
+          console.warn('[RelatorioUnificado] Regionais não carregadas:', regionaisResult.reason);
+        if (projectsResult.status === 'rejected')
+          console.warn('[RelatorioUnificado] Projetos não carregados:', projectsResult.reason);
+        if (userResult.status === 'rejected')
+          console.warn('[RelatorioUnificado] Usuário não carregado:', userResult.reason);
+
         setUser(currentUser);
         setProjects(projectsData);
-
-        const regionalData = regionaisData.find(r => r.id === obraData.regional_id);
-        setRegional(regionalData);
+        setRegional(regionaisData.find(r => r.id === obraData.regional_id) ?? null);
 
         setLoading(false);
       } catch (err) {
-        console.error('Erro ao carregar dados do relatório unificado:', err);
+        console.error('[RelatorioUnificado] Erro ao carregar dados:', err);
         setError(err.message || 'Erro ao carregar dados');
         setLoading(false);
       }

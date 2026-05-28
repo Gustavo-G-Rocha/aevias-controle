@@ -4,11 +4,6 @@
  */
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { ChecklistUsina } from '@/entities/ChecklistUsina';
-import { Obra } from '@/entities/Obra';
-import { Regional } from '@/entities/Regional';
-import { Project } from '@/entities/Project';
-import { User } from '@/entities/User';
 
 export function useRelatorioChecklistData() {
   const [checklist, setChecklist] = useState(null);
@@ -32,13 +27,10 @@ export function useRelatorioChecklistData() {
           return;
         }
 
-        // Carrega dados em paralelo
-        const [checklistData, userData, obrasList, regionaisList, projectsList] = await Promise.all([
-          ChecklistUsina.get(id),
-          User.me(),
-          Obra.list(),
-          Regional.list(),
-          Project.list(),
+        // Carrega checklist e usuário corrente em paralelo — ambos obrigatórios
+        const [checklistData, userData] = await Promise.all([
+          base44.entities.ChecklistUsina.get(id),
+          base44.auth.me().catch(() => null),
         ]);
 
         if (!checklistData) {
@@ -50,39 +42,40 @@ export function useRelatorioChecklistData() {
         setChecklist(checklistData);
         setUser(userData);
 
-        // Encontra obra e regional
-        if (checklistData.obra_id) {
-          const obraData = obrasList.find((o) => o.id === checklistData.obra_id);
-          setObra(obraData);
+        // Dados relacionados em paralelo — falha isolada não quebra o relatório
+        await Promise.allSettled([
+          // Obra → Regional (sequencial pois regional depende de obra)
+          checklistData.obra_id
+            ? base44.entities.Obra.get(checklistData.obra_id)
+                .then(obraData => {
+                  setObra(obraData);
+                  if (obraData?.regional_id) {
+                    return base44.entities.Regional.get(obraData.regional_id)
+                      .then(reg => setRegional(reg))
+                      .catch(err => console.warn('[RelatorioChecklist] Regional não carregada:', err));
+                  }
+                })
+                .catch(err => console.warn('[RelatorioChecklist] Obra não carregada:', err))
+            : Promise.resolve(),
 
-          if (obraData && obraData.regional_id) {
-            const regionalData = regionaisList.find((r) => r.id === obraData.regional_id);
-            setRegional(regionalData);
-          }
-        }
+          // Projeto
+          checklistData.project_id
+            ? base44.entities.Project.get(checklistData.project_id)
+                .then(proj => setProject(proj))
+                .catch(err => console.warn('[RelatorioChecklist] Projeto não carregado:', err))
+            : Promise.resolve(),
 
-        // Encontra projeto
-        if (checklistData.project_id) {
-          const projectData = projectsList.find((p) => p.id === checklistData.project_id);
-          setProject(projectData);
-        }
-
-        // Busca criador do checklist
-        if (checklistData.created_by) {
-          try {
-            const allUsers = await base44.entities.User.list();
-            const creator = allUsers.find(
-              (u) => u.email?.toLowerCase() === checklistData.created_by?.toLowerCase()
-            ) || null;
-            setCreatorUser(creator);
-          } catch (err) {
-            console.warn("Não foi possível buscar dados do criador:", err);
-          }
-        }
+          // Criador — buscado no mesmo lote, sem chamada sequencial extra
+          checklistData.created_by
+            ? base44.entities.User.filter({ email: checklistData.created_by })
+                .then(users => { if (users?.length > 0) setCreatorUser(users[0]); })
+                .catch(err => console.warn('[RelatorioChecklist] Criador não carregado:', err))
+            : Promise.resolve(),
+        ]);
 
         setLoading(false);
       } catch (err) {
-        console.error('Erro ao carregar relatório do checklist:', err);
+        console.error('[RelatorioChecklist] Erro ao carregar relatório:', err);
         setError(err.message || 'Erro ao carregar o checklist');
         setLoading(false);
       }

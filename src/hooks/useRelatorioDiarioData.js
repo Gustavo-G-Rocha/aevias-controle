@@ -4,10 +4,6 @@
  */
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { DiarioObra } from '@/entities/DiarioObra';
-import { Obra } from '@/entities/Obra';
-import { Project } from '@/entities/Project';
-import { User } from '@/entities/User';
 
 export function useRelatorioDiarioData() {
   const [diario, setDiario] = useState(null);
@@ -31,71 +27,55 @@ export function useRelatorioDiarioData() {
           return;
         }
 
-        // Verificar autenticação
-        const isAuth = await base44.auth.isAuthenticated();
-        if (!isAuth) {
-          setError('Você precisa estar autenticado para visualizar este relatório');
-          setLoading(false);
-          return;
-        }
+        // Diário e usuário em paralelo — diário é obrigatório
+        const [diarioData, userData] = await Promise.all([
+          base44.entities.DiarioObra.get(id),
+          base44.auth.me().catch(() => null),
+        ]);
 
-        // Carrega diário
-        const diarioData = await DiarioObra.get(id);
         if (!diarioData) {
           setError(`Diário com ID ${id} não encontrado`);
           setLoading(false);
           return;
         }
-        setDiario(diarioData);
 
-        // Carrega usuário atual
-        const userData = await User.me();
+        setDiario(diarioData);
         setUser(userData);
 
-        // Carrega criador do diário
-        if (diarioData.created_by) {
-          try {
-            const allUsers = await base44.entities.User.list();
-            const creator = allUsers.find(
-              (u) => u.email?.toLowerCase() === diarioData.created_by?.toLowerCase()
-            ) || null;
-            setCreatorUser(creator);
-          } catch (err) {
-            console.warn("Não foi possível buscar dados do criador:", err);
-          }
-        }
+        // Dados relacionados em paralelo — falha isolada não quebra o relatório
+        await Promise.allSettled([
+          // Obra → Projeto e Regional (sequencial pois dependem de obra)
+          diarioData.obra_id
+            ? base44.entities.Obra.get(diarioData.obra_id)
+                .then(obraData => {
+                  setObra(obraData);
+                  return Promise.allSettled([
+                    obraData?.project_id
+                      ? base44.entities.Project.get(obraData.project_id)
+                          .then(p => setProject(p))
+                          .catch(err => console.warn('[RelatorioDiario] Projeto não carregado:', err))
+                      : Promise.resolve(),
+                    obraData?.regional_id
+                      ? base44.entities.Regional.get(obraData.regional_id)
+                          .then(r => setRegional(r))
+                          .catch(err => console.warn('[RelatorioDiario] Regional não carregada:', err))
+                      : Promise.resolve(),
+                  ]);
+                })
+                .catch(err => console.warn('[RelatorioDiario] Obra não carregada:', err))
+            : Promise.resolve(),
 
-        // Carrega obra, projeto e regional
-        if (diarioData.obra_id) {
-          try {
-            const obraData = await Obra.get(diarioData.obra_id);
-            setObra(obraData);
-
-            if (obraData.project_id) {
-              try {
-                const projectData = await Project.get(obraData.project_id);
-                setProject(projectData);
-              } catch (err) {
-                console.warn("Projeto não encontrado:", obraData.project_id);
-              }
-            }
-
-            if (obraData.regional_id) {
-              try {
-                const regionalData = await base44.entities.Regional.get(obraData.regional_id);
-                setRegional(regionalData);
-              } catch (err) {
-                console.warn("Regional não encontrada:", obraData.regional_id);
-              }
-            }
-          } catch (err) {
-            console.warn("Obra não encontrada:", diarioData.obra_id);
-          }
-        }
+          // Criador — filtro direto, sem carregar toda a lista
+          diarioData.created_by
+            ? base44.entities.User.filter({ email: diarioData.created_by })
+                .then(users => { if (users?.length > 0) setCreatorUser(users[0]); })
+                .catch(err => console.warn('[RelatorioDiario] Criador não carregado:', err))
+            : Promise.resolve(),
+        ]);
 
         setLoading(false);
       } catch (err) {
-        console.error('Erro ao carregar relatório do diário:', err);
+        console.error('[RelatorioDiario] Erro ao carregar relatório:', err);
         setError('Erro ao carregar o diário');
         setLoading(false);
       }

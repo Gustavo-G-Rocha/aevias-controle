@@ -27,13 +27,10 @@ export function useRelatorioChecklistAplicacaoData() {
           return;
         }
 
-        // Carrega dados em paralelo
-        const [checklistData, userData, obrasList, regionaisList, projectsList] = await Promise.all([
+        // Checklist e usuário em paralelo — checklist é obrigatório
+        const [checklistData, userData] = await Promise.all([
           base44.entities.ChecklistAplicacao.get(id),
-          base44.auth.me(),
-          base44.entities.Obra.list(),
-          base44.entities.Regional.list(),
-          base44.entities.Project.list(),
+          base44.auth.me().catch(() => null),
         ]);
 
         if (!checklistData) {
@@ -45,35 +42,36 @@ export function useRelatorioChecklistAplicacaoData() {
         setChecklist(checklistData);
         setUser(userData);
 
-        // Encontra obra e regional
-        if (checklistData.obra_id) {
-          const obraData = obrasList.find((o) => o.id === checklistData.obra_id);
-          setObra(obraData);
+        // Dados relacionados em paralelo — falha isolada não quebra o relatório
+        await Promise.allSettled([
+          // Obra → Regional (sequencial)
+          checklistData.obra_id
+            ? base44.entities.Obra.get(checklistData.obra_id)
+                .then(obraData => {
+                  setObra(obraData);
+                  if (obraData?.regional_id) {
+                    return base44.entities.Regional.get(obraData.regional_id)
+                      .then(reg => setRegional(reg))
+                      .catch(err => console.warn('[ChecklistAplicacao] Regional não carregada:', err));
+                  }
+                })
+                .catch(err => console.warn('[ChecklistAplicacao] Obra não carregada:', err))
+            : Promise.resolve(),
 
-          if (obraData && obraData.regional_id) {
-            const regionalData = regionaisList.find((r) => r.id === obraData.regional_id);
-            setRegional(regionalData);
-          }
-        }
+          // Projeto
+          checklistData.project_id
+            ? base44.entities.Project.get(checklistData.project_id)
+                .then(proj => setProject(proj))
+                .catch(err => console.warn('[ChecklistAplicacao] Projeto não carregado:', err))
+            : Promise.resolve(),
 
-        // Encontra projeto
-        if (checklistData.project_id) {
-          const projectData = projectsList.find((p) => p.id === checklistData.project_id);
-          setProject(projectData);
-        }
-
-        // Busca criador do checklist
-        if (checklistData.created_by) {
-          try {
-            const allUsers = await base44.entities.User.list();
-            const creator = allUsers.find(
-              (u) => u.email?.toLowerCase() === checklistData.created_by?.toLowerCase()
-            ) || null;
-            setCreatorUser(creator);
-          } catch (err) {
-            console.warn("Não foi possível buscar dados do criador:", err);
-          }
-        }
+          // Criador — filtro direto, sem carregar toda a lista
+          checklistData.created_by
+            ? base44.entities.User.filter({ email: checklistData.created_by })
+                .then(users => { if (users?.length > 0) setCreatorUser(users[0]); })
+                .catch(err => console.warn('[ChecklistAplicacao] Criador não carregado:', err))
+            : Promise.resolve(),
+        ]);
 
         setLoading(false);
       } catch (err) {

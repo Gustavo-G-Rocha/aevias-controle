@@ -28,7 +28,13 @@ export function useRelatorioUnificadoRecords(filters) {
           return;
         }
 
-        const allRecords = await entity.filter({ obra_id: filters.filters.obra_id }, '-created_date', 2000);
+        const rawRecords = await entity
+          .filter({ obra_id: filters.filters.obra_id }, '-created_date', 2000)
+          .catch(err => {
+            console.warn('[RelatorioUnificado] Falha ao buscar registros:', err?.message || err);
+            return [];
+          });
+        const allRecords = Array.isArray(rawRecords) ? rawRecords : [];
 
         // Filtrar por período
         const inicio = new Date(filters.filters.data_inicio);
