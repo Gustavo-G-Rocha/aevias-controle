@@ -1,5 +1,9 @@
 import React from 'react';
 import { getHeightClass, calcularMedia } from '@/utils/relatorioCAUQUtils';
+import { getPaddingClass, getTableFontSize, estáForaDaFaixa, estáAbaixoMin, fmtNum } from '@/utils/relatorioCAUQTabelasUtils';
+import CellsCP from './tabelas/CellsCP';
+import MarshallRowSimples from './tabelas/MarshallRowSimples';
+import MarshallSecaoRTCDEstabilidade from './tabelas/MarshallSecaoRTCDEstabilidade';
 
 /**
  * Seção "DADOS DO ENSAIO" — tabelas de granulometria, extração de ligante,
@@ -14,6 +18,9 @@ export default function RelatorioCAUQTabelas({ ensaio, project, faixa, dadosGran
   const numPeneiras  = dadosGranulometria.length;
   const heightClass  = (idx) => getHeightClass(numPeneiras, ensaio.realizar_marshall);
   const paddingClass = ensaio.realizar_marshall ? 'px-0' : 'px-1.5';
+  const paddingExtracaoLigante = getPaddingClass(ensaio.realizar_marshall);
+  const fontSizeGranulometria = getTableFontSize(ensaio.realizar_marshall, 'granulometria_header');
+  const fontSizeExtracao = getTableFontSize(ensaio.realizar_marshall, 'extracao_header');
 
   return (
     <>
@@ -46,20 +53,17 @@ export default function RelatorioCAUQTabelas({ ensaio, project, faixa, dadosGran
               <tbody>
                 {dadosGranulometria.map((dado, idx) => {
                   const hc = heightClass(idx);
-                  const pct = parseFloat(dado.percentualPassante);
-                  const fMin = parseFloat(dado.faixaTrabalhoMin);
-                  const fMax = parseFloat(dado.faixaTrabalhoMax);
-                  const foraFaixa = (fMin && fMax) && (pct < fMin || pct > fMax);
+                  const foraFaixa = estáForaDaFaixa(dado.percentualPassante, dado.faixaTrabalhoMin, dado.faixaTrabalhoMax);
                   return (
                     <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
                       <td className={`border-r border-slate-300 ${paddingClass} text-center font-semibold ${hc}`}>{dado.astm}</td>
                       <td className={`border-r border-slate-300 ${paddingClass} text-center ${hc}`}>{dado.retido}</td>
                       <td className={`border-r border-slate-300 ${paddingClass} text-center ${hc}`}>{dado.passante}</td>
                       <td className={`border-r border-slate-300 ${paddingClass} text-center font-semibold ${hc} ${foraFaixa ? 'text-red-600' : ''}`}>{dado.percentualPassante}</td>
-                      <td className={`border-r border-slate-300 ${paddingClass} text-center ${hc}`}>{dado.faixaTrabalhoMin ? parseFloat(dado.faixaTrabalhoMin).toFixed(1) : ''}</td>
-                      <td className={`border-r border-slate-300 ${paddingClass} text-center ${hc}`}>{dado.faixaTrabalhoMax ? parseFloat(dado.faixaTrabalhoMax).toFixed(1) : ''}</td>
-                      <td className={`border-r border-slate-300 ${paddingClass} text-center ${hc}`}>{dado.limiteMin ? parseFloat(dado.limiteMin).toFixed(1) : ''}</td>
-                      <td className={`${paddingClass} text-center ${hc}`}>{dado.limiteMax ? parseFloat(dado.limiteMax).toFixed(1) : ''}</td>
+                      <td className={`border-r border-slate-300 ${paddingClass} text-center ${hc}`}>{fmtNum(dado.faixaTrabalhoMin, 1)}</td>
+                      <td className={`border-r border-slate-300 ${paddingClass} text-center ${hc}`}>{fmtNum(dado.faixaTrabalhoMax, 1)}</td>
+                      <td className={`border-r border-slate-300 ${paddingClass} text-center ${hc}`}>{fmtNum(dado.limiteMin, 1)}</td>
+                      <td className={`${paddingClass} text-center ${hc}`}>{fmtNum(dado.limiteMax, 1)}</td>
                     </tr>
                   );
                 })}
@@ -71,7 +75,7 @@ export default function RelatorioCAUQTabelas({ ensaio, project, faixa, dadosGran
         {/* Extração de Ligante */}
         <div className="col-span-5">
           <div className={`border border-slate-400 ${ensaio.realizar_marshall ? 'border-l-0' : ''}`}>
-            <div className={`bg-slate-200 font-bold text-center border-b border-slate-400 leading-tight ${ensaio.realizar_marshall ? 'px-0.5 py-0 text-[8px]' : 'px-1.5 py-1 text-[11px]'}`}>
+            <div className={`bg-slate-200 font-bold text-center border-b border-slate-400 leading-tight ${fontSizeExtracao} ${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-1.5 py-1'}`}>
               EXTRAÇÃO LIGANTE (ROTAREX)<br />ABNT NBR 16208/2013
             </div>
             <table className={`w-full border-collapse table-fixed ${ensaio.realizar_marshall ? 'text-[7px]' : 'text-[9px]'}`}>
@@ -81,62 +85,60 @@ export default function RelatorioCAUQTabelas({ ensaio, project, faixa, dadosGran
               </colgroup>
               <tbody>
                 <tr className="bg-white">
-                  <td className={`border-r border-slate-300 font-bold ${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>TEMP. CAP:</td>
-                  <td className={`${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>{ensaio.temperatura_cap || '-'}°C</td>
+                  <td className={`border-r border-slate-300 font-bold ${paddingExtracaoLigante}`}>TEMP. CAP:</td>
+                  <td className={`${paddingExtracaoLigante}`}>{ensaio.temperatura_cap || '-'}°C</td>
                 </tr>
                 <tr className="bg-slate-50">
-                  <td className={`border-r border-slate-300 font-bold ${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>TIPO LIG.:</td>
-                  <td className={`${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>{ensaio.tipo_ligante || '-'}</td>
+                  <td className={`border-r border-slate-300 font-bold ${paddingExtracaoLigante}`}>TIPO LIG.:</td>
+                  <td className={`${paddingExtracaoLigante}`}>{ensaio.tipo_ligante || '-'}</td>
                 </tr>
 
                 {ensaio.extracao_ligante && (
                   <>
                     <tr className="bg-white">
-                      <td className={`border-r border-slate-300 font-bold ${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>AM. C/ LIG.:</td>
-                      <td className={`${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>{ensaio.extracao_ligante.amostra_com_ligante || '-'} g</td>
+                      <td className={`border-r border-slate-300 font-bold ${paddingExtracaoLigante}`}>AM. C/ LIG.:</td>
+                      <td className={`${paddingExtracaoLigante}`}>{ensaio.extracao_ligante.amostra_com_ligante || '-'} g</td>
                     </tr>
                     <tr className="bg-slate-50">
-                      <td className={`border-r border-slate-300 font-bold ${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>AM. S/ LIG.:</td>
-                      <td className={`${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>{ensaio.extracao_ligante.amostra_sem_ligante || '-'} g</td>
+                      <td className={`border-r border-slate-300 font-bold ${paddingExtracaoLigante}`}>AM. S/ LIG.:</td>
+                      <td className={`${paddingExtracaoLigante}`}>{ensaio.extracao_ligante.amostra_sem_ligante || '-'} g</td>
                     </tr>
                     <tr className="bg-white">
-                      <td className={`border-r border-slate-300 font-bold ${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>FAT. CORR.:</td>
-                      <td className={`${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>{ensaio.extracao_ligante.fator_correcao || '1.0000'}</td>
+                      <td className={`border-r border-slate-300 font-bold ${paddingExtracaoLigante}`}>FAT. CORR.:</td>
+                      <td className={`${paddingExtracaoLigante}`}>{ensaio.extracao_ligante.fator_correcao || '1.0000'}</td>
                     </tr>
                     <tr className="bg-slate-50">
-                      <td className={`border-r border-slate-300 font-bold ${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>PESO LIG.:</td>
-                      <td className={`${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>{ensaio.extracao_ligante.peso_ligante || '-'} g</td>
+                      <td className={`border-r border-slate-300 font-bold ${paddingExtracaoLigante}`}>PESO LIG.:</td>
+                      <td className={`${paddingExtracaoLigante}`}>{ensaio.extracao_ligante.peso_ligante || '-'} g</td>
                     </tr>
                     <tr className="bg-white">
-                      <td className={`border-r border-slate-300 font-bold ${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>TEOR LIG.:</td>
-                      <td className={`font-semibold ${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'} ${
-                        project?.teor_ligante && ensaio.extracao_ligante.teor_ligante && (
-                          parseFloat(ensaio.extracao_ligante.teor_ligante) < parseFloat(project.teor_ligante.min) ||
-                          parseFloat(ensaio.extracao_ligante.teor_ligante) > parseFloat(project.teor_ligante.max)
-                        ) ? 'text-red-600' : ''
+                      <td className={`border-r border-slate-300 font-bold ${paddingExtracaoLigante}`}>TEOR LIG.:</td>
+                      <td className={`font-semibold ${paddingExtracaoLigante} ${
+                        estáForaDaFaixa(ensaio.extracao_ligante.teor_ligante, project?.teor_ligante?.min, project?.teor_ligante?.max)
+                          ? 'text-red-600'
+                          : ''
                       }`}>{ensaio.extracao_ligante.teor_ligante || '-'}%</td>
                     </tr>
                     <tr className="bg-slate-50">
-                      <td className={`border-r border-slate-300 font-bold ${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>FILLER/BET.:</td>
-                      <td className={`font-semibold ${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>{ensaio.extracao_ligante.filler_betume || '-'}</td>
+                      <td className={`border-r border-slate-300 font-bold ${paddingExtracaoLigante}`}>FILLER/BET.:</td>
+                      <td className={`font-semibold ${paddingExtracaoLigante}`}>{ensaio.extracao_ligante.filler_betume || '-'}</td>
                     </tr>
 
                     {ensaio.extracao_ligante.teor_ligante_real && (
                       <tr className="bg-blue-50">
-                        <td className={`border-r border-slate-300 font-bold ${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>TEOR LIG. REAL:</td>
-                        <td className={`font-semibold ${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'} ${
-                          project?.teor_ligante && ensaio.extracao_ligante.teor_ligante_real && (
-                            parseFloat(ensaio.extracao_ligante.teor_ligante_real) < parseFloat(project.teor_ligante.min) ||
-                            parseFloat(ensaio.extracao_ligante.teor_ligante_real) > parseFloat(project.teor_ligante.max)
-                          ) ? 'text-red-600' : 'text-blue-700'
+                        <td className={`border-r border-slate-300 font-bold ${paddingExtracaoLigante}`}>TEOR LIG. REAL:</td>
+                        <td className={`font-semibold ${paddingExtracaoLigante} ${
+                          estáForaDaFaixa(ensaio.extracao_ligante.teor_ligante_real, project?.teor_ligante?.min, project?.teor_ligante?.max)
+                            ? 'text-red-600'
+                            : 'text-blue-700'
                         }`}>{ensaio.extracao_ligante.teor_ligante_real}%</td>
                       </tr>
                     )}
 
                     {ensaio.extracao_ligante.amostra_umida && (
                       <tr className="bg-blue-50">
-                        <td className={`border-r border-slate-300 font-bold ${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>UMIDADE:</td>
-                        <td className={`font-semibold text-blue-700 ${ensaio.realizar_marshall ? 'px-0.5 py-0' : 'px-2 py-1.5'}`}>{ensaio.extracao_ligante.umidade || 0}%</td>
+                        <td className={`border-r border-slate-300 font-bold ${paddingExtracaoLigante}`}>UMIDADE:</td>
+                        <td className={`font-semibold text-blue-700 ${paddingExtracaoLigante}`}>{ensaio.extracao_ligante.umidade || 0}%</td>
                       </tr>
                     )}
                   </>
@@ -188,31 +190,25 @@ export default function RelatorioCAUQTabelas({ ensaio, project, faixa, dadosGran
               <tbody>
                 {/* Linhas simples (sem média ou com média fixa) */}
                 {[
-                  { label: 'PESO AR',           un: 'g',     campo: 'peso_ar',           bg: 'bg-white'   },
-                  { label: 'PESO IMERSO',        un: 'g',     campo: 'peso_imerso',        bg: 'bg-slate-50' },
-                  { label: 'PESO SSS',           un: 'g',     campo: 'peso_sss',           bg: 'bg-white'   },
-                  { label: 'VOLUME',             un: 'cm³',   campo: 'volume',             bg: 'bg-slate-50' },
-                ].map(({ label, un, campo, bg }) => (
-                  <tr key={label} className={bg}>
-                    <td className="border border-slate-400 px-0 py-0 font-semibold text-[7px]">{label}</td>
-                    <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{un}</td>
-                    {[0, 1, 2, 3, 4, 5].map(idx => (
-                      <td key={idx} className="border border-slate-400 px-0 py-0 text-center text-[7px]">{cpsValidos[idx]?.[campo] || '-'}</td>
-                    ))}
-                    <td className="border border-slate-400 px-0 py-0 text-center font-semibold text-[7px]">-</td>
-                    <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
-                    <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
-                    <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
-                  </tr>
+                  { label: 'peso_ar',       un: 'g',     bg: 'bg-white'   },
+                  { label: 'peso_imerso',   un: 'g',     bg: 'bg-slate-50' },
+                  { label: 'peso_sss',      un: 'g',     bg: 'bg-white'   },
+                  { label: 'volume',        un: 'cm³',   bg: 'bg-slate-50' },
+                ].map(({ label, un, bg }) => (
+                  <MarshallRowSimples
+                    key={label}
+                    label={label.toUpperCase().replace(/_/g, ' ')}
+                    unidade={un}
+                    cpsValidos={cpsValidos}
+                    bg={bg}
+                  />
                 ))}
 
                 {/* Densidade aparente */}
                 <tr className="bg-white">
                   <td className="border border-slate-400 px-0 py-0 font-semibold text-[7px]">DENSIDADE APARENTE</td>
                   <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">g/cm³</td>
-                  {[0, 1, 2, 3, 4, 5].map(idx => (
-                    <td key={idx} className="border border-slate-400 px-0 py-0 text-center font-semibold text-[7px]">{cpsValidos[idx]?.densidade_aparente || '-'}</td>
-                  ))}
+                  <CellsCP cpsValidos={cpsValidos} campo="densidade_aparente" bold />
                   <td className="border border-slate-400 px-0 py-0 text-center font-bold text-[7px]">{media('densidade_aparente')}</td>
                   <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{project?.massa_especifica_aparente || '-'}</td>
                   <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
@@ -223,27 +219,20 @@ export default function RelatorioCAUQTabelas({ ensaio, project, faixa, dadosGran
                 <tr className="bg-slate-50">
                   <td className="border border-slate-400 px-0 py-0 font-semibold text-[7px]">VOLUME DE VAZIOS</td>
                   <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">%</td>
-                  {[0, 1, 2, 3, 4, 5].map(idx => (
-                    <td key={idx} className="border border-slate-400 px-0 py-0 text-center font-semibold text-[7px]">{cpsValidos[idx]?.volume_vazios || '-'}</td>
-                  ))}
+                  <CellsCP cpsValidos={cpsValidos} campo="volume_vazios" bold />
                   <td className={`border border-slate-400 px-0 py-0 text-center font-bold text-[7px] ${
-                    project?.volume_vazios && media('volume_vazios') !== '-' && (
-                      parseFloat(media('volume_vazios')) < parseFloat(project.volume_vazios.min) ||
-                      parseFloat(media('volume_vazios')) > parseFloat(project.volume_vazios.max)
-                    ) ? 'text-red-600' : ''
+                    estáForaDaFaixa(media('volume_vazios'), project?.volume_vazios?.min, project?.volume_vazios?.max) ? 'text-red-600' : ''
                   }`}>{media('volume_vazios')}</td>
-                  <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{project?.volume_vazios?.min ? parseFloat(project.volume_vazios.min).toFixed(1) : '-'}</td>
-                  <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{project?.volume_vazios?.max ? parseFloat(project.volume_vazios.max).toFixed(1) : '-'}</td>
-                  <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{project?.volume_vazios?.otimo ? parseFloat(project.volume_vazios.otimo).toFixed(1) : '-'}</td>
+                  <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{fmtNum(project?.volume_vazios?.min, 1)}</td>
+                  <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{fmtNum(project?.volume_vazios?.max, 1)}</td>
+                  <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{fmtNum(project?.volume_vazios?.otimo, 1)}</td>
                 </tr>
 
                 {/* VCB */}
                 <tr className="bg-white">
                   <td className="border border-slate-400 px-0 py-0 font-semibold text-[7px]">V.C.B.</td>
                   <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">%</td>
-                  {[0, 1, 2, 3, 4, 5].map(idx => (
-                    <td key={idx} className="border border-slate-400 px-0 py-0 text-center text-[7px]">{cpsValidos[idx]?.vcb || '-'}</td>
-                  ))}
+                  <CellsCP cpsValidos={cpsValidos} campo="vcb" />
                   <td className="border border-slate-400 px-0 py-0 text-center font-semibold text-[7px]">-</td>
                   <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
                   <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
@@ -254,14 +243,12 @@ export default function RelatorioCAUQTabelas({ ensaio, project, faixa, dadosGran
                 <tr className="bg-slate-50">
                   <td className="border border-slate-400 px-0 py-0 font-semibold text-[7px]">V.A.M.</td>
                   <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">%</td>
-                  {[0, 1, 2, 3, 4, 5].map(idx => (
-                    <td key={idx} className="border border-slate-400 px-0 py-0 text-center text-[7px]">{cpsValidos[idx]?.vam || '-'}</td>
-                  ))}
+                  <CellsCP cpsValidos={cpsValidos} campo="vam" />
                   <td className={`border border-slate-400 px-0 py-0 text-center font-semibold text-[7px] ${
-                    project?.vam && media('vam') !== '-' && parseFloat(media('vam')) < parseFloat(project.vam.min) ? 'text-red-600' : ''
+                    estáAbaixoMin(media('vam'), project?.vam?.min) ? 'text-red-600' : ''
                   }`}>-</td>
-                  <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{project?.vam?.projeto ? parseFloat(project.vam.projeto).toFixed(1) : '-'}</td>
-                  <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{project?.vam?.min ? parseFloat(project.vam.min).toFixed(1) : '-'}</td>
+                  <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{fmtNum(project?.vam?.projeto, 1)}</td>
+                  <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{fmtNum(project?.vam?.min, 1)}</td>
                   <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
                 </tr>
 
@@ -269,27 +256,20 @@ export default function RelatorioCAUQTabelas({ ensaio, project, faixa, dadosGran
                 <tr className="bg-white">
                   <td className="border border-slate-400 px-0 py-0 font-semibold text-[7px]">R.B.V.</td>
                   <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">%</td>
-                  {[0, 1, 2, 3, 4, 5].map(idx => (
-                    <td key={idx} className="border border-slate-400 px-0 py-0 text-center text-[7px]">{cpsValidos[idx]?.rbv || '-'}</td>
-                  ))}
+                  <CellsCP cpsValidos={cpsValidos} campo="rbv" />
                   <td className={`border border-slate-400 px-0 py-0 text-center font-semibold text-[7px] ${
-                    project?.rbv && media('rbv') !== '-' && (
-                      parseFloat(media('rbv')) < parseFloat(project.rbv.min) ||
-                      parseFloat(media('rbv')) > parseFloat(project.rbv.max)
-                    ) ? 'text-red-600' : ''
+                    estáForaDaFaixa(media('rbv'), project?.rbv?.min, project?.rbv?.max) ? 'text-red-600' : ''
                   }`}>-</td>
-                  <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{project?.rbv?.projeto ? parseFloat(project.rbv.projeto).toFixed(1) : '-'}</td>
-                  <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{project?.rbv?.min ? parseFloat(project.rbv.min).toFixed(1) : '-'}</td>
-                  <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{project?.rbv?.max ? parseFloat(project.rbv.max).toFixed(1) : '-'}</td>
+                  <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{fmtNum(project?.rbv?.projeto, 1)}</td>
+                  <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{fmtNum(project?.rbv?.min, 1)}</td>
+                  <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{fmtNum(project?.rbv?.max, 1)}</td>
                 </tr>
 
                 {/* ALTURA */}
                 <tr className="bg-slate-50">
                   <td className="border border-slate-400 px-0 py-0 font-semibold text-[7px]">ALTURA</td>
                   <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">cm</td>
-                  {[0, 1, 2, 3, 4, 5].map(idx => (
-                    <td key={idx} className="border border-slate-400 px-0 py-0 text-center text-[7px]">{cpsValidos[idx]?.altura || '-'}</td>
-                  ))}
+                  <CellsCP cpsValidos={cpsValidos} campo="altura" />
                   <td className="border border-slate-400 px-0 py-0 text-center font-semibold text-[7px]">-</td>
                   <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
                   <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
@@ -297,103 +277,11 @@ export default function RelatorioCAUQTabelas({ ensaio, project, faixa, dadosGran
                 </tr>
 
                 {/* RTCD / Estabilidade dinâmico */}
-                {(() => {
-                  const temDiametral   = cpsValidos.some(cp => cp?.rtcd_leitura != null && cp?.rtcd_leitura !== '');
-                  const temEstabilidade = cpsValidos.some(cp => cp?.estabilidade_leitura != null && cp?.estabilidade_leitura !== '');
-                  const constPrensa = cpsValidos[0]?.const_prensa ? parseFloat(cpsValidos[0].const_prensa).toFixed(4) : '1.0000';
-
-                  const rowConstPrensa = (
-                    <tr className="bg-white">
-                      <td className="border border-slate-400 px-0 py-0 font-semibold text-[7px]">CONST. PRENSA</td>
-                      <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
-                      <td colSpan="6" className="border border-slate-400 px-0 py-0 text-center font-semibold text-[7px]">{constPrensa}</td>
-                      <td className="border border-slate-400 px-0 py-0 text-center font-semibold text-[7px]">-</td>
-                      <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
-                      <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
-                      <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
-                    </tr>
-                  );
-
-                  return (
-                    <>
-                      {temDiametral && (
-                        <>
-                          {rowConstPrensa}
-                          <tr className="bg-slate-50">
-                            <td className="border border-slate-400 px-0 py-0 font-semibold text-[7px]">LEITURA</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">Kgf/cm²</td>
-                            {[0, 1, 2, 3, 4, 5].map(idx => (
-                              <td key={idx} className="border border-slate-400 px-0 py-0 text-center text-[7px]">{cpsValidos[idx]?.rtcd_leitura || '-'}</td>
-                            ))}
-                            <td className="border border-slate-400 px-0 py-0 text-center font-semibold text-[7px]">-</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
-                          </tr>
-                          <tr className="bg-white">
-                            <td className="border border-slate-400 px-0 py-0 font-semibold text-[7px]">RTCD</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">MPa</td>
-                            {[0, 1, 2, 3, 4, 5].map(idx => (
-                              <td key={idx} className="border border-slate-400 px-0 py-0 text-center font-semibold text-[7px]">{cpsValidos[idx]?.rtcd_valor || '-'}</td>
-                            ))}
-                            <td className={`border border-slate-400 px-0 py-0 text-center font-bold text-[7px] ${
-                              project?.rtcd && media('rtcd_valor') !== '-' && parseFloat(media('rtcd_valor')) < parseFloat(project.rtcd.min) ? 'text-red-600' : ''
-                            }`}>{media('rtcd_valor')}</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{project?.rtcd?.min ? parseFloat(project.rtcd.min).toFixed(1) : '-'}</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
-                          </tr>
-                        </>
-                      )}
-
-                      {temEstabilidade && (
-                        <>
-                          {!temDiametral && rowConstPrensa}
-                          <tr className="bg-slate-50">
-                            <td className="border border-slate-400 px-0 py-0 font-semibold text-[7px]">LEITURA</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">Kgf/cm²</td>
-                            {[0, 1, 2, 3, 4, 5].map(idx => (
-                              <td key={idx} className="border border-slate-400 px-0 py-0 text-center text-[7px]">{cpsValidos[idx]?.estabilidade_leitura || '-'}</td>
-                            ))}
-                            <td className="border border-slate-400 px-0 py-0 text-center font-semibold text-[7px]">-</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
-                          </tr>
-                          <tr className="bg-white">
-                            <td className="border border-slate-400 px-0 py-0 font-semibold text-[7px]">ESTABILIDADE CORRIG.</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">Kgf/cm²</td>
-                            {[0, 1, 2, 3, 4, 5].map(idx => (
-                              <td key={idx} className="border border-slate-400 px-0 py-0 text-center font-semibold text-[7px]">{cpsValidos[idx]?.estabilidade_corrigida || '-'}</td>
-                            ))}
-                            <td className={`border border-slate-400 px-0 py-0 text-center font-bold text-[7px] ${
-                              project?.estabilidade && media('estabilidade_corrigida') !== '-' && parseFloat(media('estabilidade_corrigida')) < parseFloat(project.estabilidade.min) ? 'text-red-600' : ''
-                            }`}>{media('estabilidade_corrigida')}</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{project?.estabilidade?.projeto ? parseFloat(project.estabilidade.projeto).toFixed(1) : '-'}</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{project?.estabilidade?.min ? parseFloat(project.estabilidade.min).toFixed(1) : '-'}</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">-</td>
-                          </tr>
-                          <tr className="bg-slate-50">
-                            <td className="border border-slate-400 px-0 py-0 font-semibold text-[7px]">FLUÊNCIA</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">mm</td>
-                            {[0, 1, 2, 3, 4, 5].map(idx => (
-                              <td key={idx} className="border border-slate-400 px-0 py-0 text-center font-semibold text-[7px]">{cpsValidos[idx]?.fluencia || '-'}</td>
-                            ))}
-                            <td className={`border border-slate-400 px-0 py-0 text-center font-bold text-[7px] ${
-                              project?.fluencia && media('fluencia') !== '-' && (
-                                parseFloat(media('fluencia')) < parseFloat(project.fluencia.min) ||
-                                parseFloat(media('fluencia')) > parseFloat(project.fluencia.max)
-                              ) ? 'text-red-600' : ''
-                            }`}>{media('fluencia')}</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{project?.fluencia?.projeto ? parseFloat(project.fluencia.projeto).toFixed(1) : '-'}</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{project?.fluencia?.min ? parseFloat(project.fluencia.min).toFixed(1) : '-'}</td>
-                            <td className="border border-slate-400 px-0 py-0 text-center text-[7px]">{project?.fluencia?.max ? parseFloat(project.fluencia.max).toFixed(1) : '-'}</td>
-                          </tr>
-                        </>
-                      )}
-                    </>
-                  );
-                })()}
+                <MarshallSecaoRTCDEstabilidade
+                  cpsValidos={cpsValidos}
+                  media={media}
+                  project={project}
+                />
               </tbody>
             </table>
           </div>
