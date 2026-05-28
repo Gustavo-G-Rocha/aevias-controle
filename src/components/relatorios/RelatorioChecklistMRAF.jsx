@@ -4,103 +4,12 @@ import { ReportSectionTitle } from './shared';
 import CondicionamentoInsumos from './checklist-mraf/CondicionamentoInsumos';
 import PreparacaoSuperficie from './checklist-mraf/PreparacaoSuperficie';
 import AcompanhamentoAplicacao from './checklist-mraf/AcompanhamentoAplicacao';
+import MRAFHeader from './checklist-mraf/MRAFHeader';
+import MRAFPhotosPage from './checklist-mraf/MRAFPhotosPage';
+import MRAFActionsPage from './checklist-mraf/MRAFActionsPage';
+import { createPhotoPages, shouldShowActionsPage } from '@/utils/relatorioChecklistMRAFUtils';
 
 const SectionTitle = ({ children }) => <ReportSectionTitle size="sm">{children}</ReportSectionTitle>;
-
-const ReportPrintHeader = ({ checklist, obra, regional, project }) => (
-  <div>
-    <header className="grid grid-cols-3 items-center border-b-2 border-slate-900 pb-0.5 mb-1">
-      <div className="flex justify-start">
-        <picture>
-          <source srcSet={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} />
-          <img src={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} alt="Logo Regional" className="h-8 object-contain" width="auto" height="32" />
-        </picture>
-      </div>
-      <div className="text-center">
-        <h1 className="text-xs font-bold text-gray-800">Controle Tecnológico - Aplicação de Microrrevestimento</h1>
-      </div>
-      <div className="flex justify-end">
-        <div className="border border-gray-400 p-0.5 rounded-md text-[10px]">
-          <p className="font-semibold text-gray-800">
-            {new Date(checklist.data).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
-          </p>
-        </div>
-      </div>
-    </header>
-    <main className="text-sm mt-0.5">
-      <SectionTitle>Dados da Obra</SectionTitle>
-      <div className="grid grid-cols-4 gap-x-2 gap-y-1" style={{ fontSize: '9px' }}>
-        {/* 1ª Coluna: Cliente, Obra, Rodovia */}
-        <div>
-          <p className="font-bold">CLIENTE:</p>
-          <p>{regional?.cliente || 'N/A'}</p>
-        </div>
-
-        {/* 2ª Coluna: Trecho, Empreiteira, Ensaio Realizado Por */}
-        <div>
-          <p className="font-bold">TRECHO:</p>
-          <p>{checklist.trecho}</p>
-        </div>
-
-        {/* 3ª Coluna: Projeto, Faixa, Ligante */}
-        <div>
-          <p className="font-bold">PROJETO UTILIZADO:</p>
-          <p>{project?.name || checklist.projeto_utilizado || 'N/A'}</p>
-        </div>
-
-        {/* 4ª Coluna: Pedreira, Fiscal, Jornada */}
-        <div>
-          <p className="font-bold">PEDREIRA:</p>
-          <p>{checklist.pedreira || 'N/A'}</p>
-        </div>
-
-        {/* Linha 2 */}
-        <div>
-          <p className="font-bold">OBRA:</p>
-          <p>{obra?.name || 'N/A'}</p>
-        </div>
-
-        <div>
-          <p className="font-bold">EMPREITEIRA:</p>
-          <p>{checklist.empreiteira || 'N/A'}</p>
-        </div>
-
-        <div>
-          <p className="font-bold">FAIXA ESPECIFICADA:</p>
-          <p>{checklist.faixa_especificada || 'N/A'}</p>
-        </div>
-
-        <div>
-          <p className="font-bold">FISCAL DE CAMPO:</p>
-          <p>{checklist.inspetor_campo || checklist.laboratorista_name || 'N/A'}</p>
-        </div>
-
-        {/* Linha 3 */}
-        <div>
-          <p className="font-bold">RODOVIA:</p>
-          <p>{checklist.rodovia}</p>
-        </div>
-
-        <div>
-          <p className="font-bold">ENSAIO REALIZADO POR:</p>
-          <p>{checklist.ensaio_realizado_por || 'N/A'}</p>
-        </div>
-
-        <div>
-          <p className="font-bold">LIGANTE:</p>
-          <p>{checklist.ligante || 'N/A'}</p>
-        </div>
-
-        {checklist.jornada?.horario_inicio && checklist.jornada?.horario_fim && (
-          <div>
-            <p className="font-bold">JORNADA:</p>
-            <p>{checklist.jornada.horario_inicio} - {checklist.jornada.horario_fim}</p>
-          </div>
-        )}
-      </div>
-    </main>
-  </div>
-);
 
 const ReportFooter = ({ checklist }) => (
   <SignatureFooter
@@ -147,7 +56,6 @@ export default function RelatorioChecklistMRAF({ checklist, obra, regional, proj
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             
-            // Reduzir dimensões para 50% do original
             const maxWidth = 800;
             const maxHeight = 600;
             let width = img.width;
@@ -163,11 +71,10 @@ export default function RelatorioChecklistMRAF({ checklist, obra, regional, proj
             canvas.height = height;
             ctx.drawImage(img, 0, 0, width, height);
             
-            // Comprimir com qualidade de 50%
             return canvas.toDataURL('image/jpeg', 0.5);
           } catch (error) {
             console.error('Erro ao comprimir imagem:', error);
-            return photoUrl; // Usar original se falhar
+            return photoUrl;
           }
         })
       );
@@ -183,18 +90,12 @@ export default function RelatorioChecklistMRAF({ checklist, obra, regional, proj
     return <div className="p-8 text-center">Otimizando imagens para impressão...</div>;
   }
 
-  // Agrupar fotos em páginas de 6 fotos cada
-  const photosPerPage = 6;
-  const photoPages = compressedPhotos.length > 0 
-    ? Array.from({ length: Math.ceil(compressedPhotos.length / photosPerPage) }, (_, i) =>
-        compressedPhotos.slice(i * photosPerPage, (i + 1) * photosPerPage)
-      )
-    : [];
+  const photoPages = createPhotoPages(compressedPhotos);
 
   return (
     <div className="w-full max-w-[210mm] mx-auto bg-white print:bg-white" style={{ fontSize: '9px' }}>
       <div className="relative min-h-[297mm] p-4 print:p-4 flex flex-col">
-        <ReportPrintHeader checklist={checklist} obra={obra} regional={regional} project={project} />
+        <MRAFHeader checklist={checklist} obra={obra} regional={regional} project={project} />
 
         <div className="flex-1 space-y-0.5">
           {/* CONDIÇÕES CLIMÁTICAS */}
@@ -277,103 +178,18 @@ export default function RelatorioChecklistMRAF({ checklist, obra, regional, proj
         </footer>
       </div>
 
-      {/* PÁGINA DE AÇÕES CORRETIVAS E/OU NÃO CONFORMIDADES - Inserida ANTES das fotos */}
-      {(checklist.acoes_corretivas_realizado === true && checklist.acoes_corretivas_descricao) || (checklist.nao_conformidades && checklist.nao_conformidades.length > 0) ? (
-        <div className="break-before-page relative p-3 print:p-3" style={{ minHeight: '297mm', height: '297mm' }}>
-          <div className="w-full max-w-[190mm] mx-auto relative" style={{ height: '100%' }}>
-            <ReportPrintHeader checklist={checklist} obra={obra} regional={regional} project={project} />
+      {shouldShowActionsPage(checklist) && (
+        <MRAFActionsPage checklist={checklist} obra={obra} regional={regional} project={project} />
+      )}
 
-            <main className="mt-2">
-              {checklist.acoes_corretivas_realizado === true && checklist.acoes_corretivas_descricao && (
-                <>
-                  <SectionTitle>Ações Corretivas</SectionTitle>
-                  <div className="border-2 border-slate-400 rounded p-6 bg-white" style={{ minHeight: '500px' }}>
-                    <p className="font-bold text-base mb-4 text-slate-800">AÇÕES CORRETIVAS APONTADAS:</p>
-                    <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
-                      {checklist.acoes_corretivas_descricao}
-                    </p>
-                  </div>
-                </>
-              )}
-
-              {checklist.nao_conformidades && checklist.nao_conformidades.length > 0 && (
-                <div className="mt-4">
-                  <SectionTitle>Não Conformidades</SectionTitle>
-                  <table className="w-full border-collapse border border-slate-300 text-sm">
-                    <thead>
-                      <tr className="bg-slate-100">
-                        <th className="border border-slate-300 px-3 py-2 text-left font-semibold text-slate-700">LOCAL</th>
-                        <th className="border border-slate-300 px-3 py-2 text-left font-semibold text-slate-700">CATEGORIA</th>
-                        <th className="border border-slate-300 px-3 py-2 text-left font-semibold text-slate-700">PARÂMETRO</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {checklist.nao_conformidades.map((nc, index) => (
-                        <tr key={index} className="bg-white">
-                          <td className="border border-slate-300 px-3 py-2 text-slate-800">{nc.local_nc || 'N/A'}</td>
-                          <td className="border border-slate-300 px-3 py-2 text-slate-800">{nc.categoria_nc || 'N/A'}</td>
-                          <td className="border border-slate-300 px-3 py-2 text-slate-800">{nc.parametro_nc || 'N/A'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </main>
-
-            <div className="absolute bottom-0 left-0 right-0 pt-1 break-inside-avoid">
-              <ReportFooter checklist={checklist} />
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      {/* PÁGINAS DE FOTOS - CADA UMA COM HEADER */}
       {photoPages.map((photos, pageIndex) => (
-        <div key={pageIndex} className="break-before-page relative min-h-[297mm] p-4 print:p-4 flex flex-col">
-          <header className="grid grid-cols-3 items-center border-b-2 border-slate-900 pb-2 mb-4">
-            <div className="flex justify-start">
-              <picture>
-                <source srcSet={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} />
-                <img 
-                  src={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} 
-                  alt="Logo Regional" 
-                  className="h-10 object-contain"
-                  width="40" height="40"
-                  loading="lazy"
-                />
-              </picture>
-            </div>
-            <div className="text-center">
-              <h1 className="text-sm font-bold text-gray-800">Relatório Fotográfico - Checklist MRAF</h1>
-              <p className="text-xs text-gray-600">Obra: {obra?.name || 'N/A'}</p>
-            </div>
-            <div className="flex justify-end">
-              {/* Espaço reservado para alinhamento */}
-            </div>
-          </header>
-
-          <div className="flex-1 flex items-stretch">
-            <div className="grid grid-cols-2 gap-4 w-full">
-              {photos.map((foto, index) => (
-                <div key={index} className="break-inside-avoid flex flex-col">
-                  <div className="border-2 border-slate-300 rounded overflow-hidden bg-slate-50 flex items-center justify-center">
-                    <picture>
-                      <source srcSet={foto} />
-                      <img src={foto} alt={`Foto ${pageIndex * photosPerPage + index + 1}`} className="w-full h-auto object-contain" style={{ maxHeight: '280px' }} width="auto" height="auto" loading="lazy" />
-                    </picture>
-                  </div>
-                  <p className="text-center text-sm text-slate-600 mt-2 font-medium">
-                    Foto {pageIndex * photosPerPage + index + 1}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <footer className="mt-4 pt-2 break-inside-avoid">
-          </footer>
-        </div>
+        <MRAFPhotosPage
+          key={pageIndex}
+          photos={photos}
+          pageIndex={pageIndex}
+          regional={regional}
+          obra={obra}
+        />
       ))}
     </div>
   );
