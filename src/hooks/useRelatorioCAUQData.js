@@ -26,29 +26,39 @@ export function useRelatorioCAUQData() {
         }
 
         const ensaioData = await base44.entities.EnsaioCAUQ.get(ensaioId);
+        if (!ensaioData) { setError('Ensaio não encontrado'); return; }
         setEnsaio(ensaioData);
 
-        if (ensaioData.obra_id) {
-          const obraData = await base44.entities.Obra.get(ensaioData.obra_id);
-          setObra(obraData);
+        // Dados relacionados em paralelo — falha isolada não quebra o relatório
+        await Promise.allSettled([
+          ensaioData.obra_id
+            ? base44.entities.Obra.get(ensaioData.obra_id)
+                .then(obraData => {
+                  setObra(obraData);
+                  if (obraData?.regional_id) {
+                    return base44.entities.Regional.get(obraData.regional_id)
+                      .then(r => setRegional(r))
+                      .catch(e => console.warn('[RelatorioCAUQ] Regional não carregada:', e));
+                  }
+                })
+                .catch(e => console.warn('[RelatorioCAUQ] Obra não carregada:', e))
+            : Promise.resolve(),
 
-          if (obraData.regional_id) {
-            const regionalData = await base44.entities.Regional.get(obraData.regional_id);
-            setRegional(regionalData);
-          }
-        }
-
-        if (ensaioData.project_id) {
-          const projectData = await base44.entities.Project.get(ensaioData.project_id);
-          setProject(projectData);
-
-          if (projectData.faixa_granulometrica_id) {
-            const faixaData = await base44.entities.FaixaGranulometrica.get(projectData.faixa_granulometrica_id);
-            setFaixa(faixaData);
-          }
-        }
+          ensaioData.project_id
+            ? base44.entities.Project.get(ensaioData.project_id)
+                .then(projectData => {
+                  setProject(projectData);
+                  if (projectData?.faixa_granulometrica_id) {
+                    return base44.entities.FaixaGranulometrica.get(projectData.faixa_granulometrica_id)
+                      .then(f => setFaixa(f))
+                      .catch(e => console.warn('[RelatorioCAUQ] Faixa não carregada:', e));
+                  }
+                })
+                .catch(e => console.warn('[RelatorioCAUQ] Projeto não carregado:', e))
+            : Promise.resolve(),
+        ]);
       } catch (err) {
-        console.error('Erro ao carregar dados:', err);
+        console.error('[RelatorioCAUQ] Erro ao carregar dados:', err);
         setError('Erro ao carregar dados do relatório');
       } finally {
         setLoading(false);

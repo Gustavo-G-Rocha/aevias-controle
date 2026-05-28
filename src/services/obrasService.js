@@ -17,7 +17,7 @@ export async function listarObrasAtivas() {
 }
 
 export async function obterObraById(id) {
-  return base44.entities.Obra.read(id);
+  return base44.entities.Obra.get(id);
 }
 
 export async function criarObra(data) {

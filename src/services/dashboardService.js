@@ -13,7 +13,7 @@ export async function loadDashboardData(user) {
 
   // Carregar registros (limite 200/entidade no dashboard) + dados auxiliares em paralelo
   const [allRecords, { obras: obrasRaw, projects: projectsRaw, regionais }] = await Promise.all([
-    loadAllRecords('dashboard'),
+    loadAllRecords(),
     loadAuxData({ needsRegionais }),
   ]);
 

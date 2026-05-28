@@ -19,15 +19,20 @@ export function useRelatorioProctorData() {
         if (!id) { setError('ID não fornecido'); return; }
 
         const data = await base44.entities.EnsaioProctor.get(id);
+        if (!data) { setError('Ensaio não encontrado'); return; }
         setEnsaio(data);
 
         if (data.obra_id) {
-          const obraData = await base44.entities.Obra.get(data.obra_id);
-          setObra(obraData);
-          if (obraData.regional_id) {
-            const reg = await base44.entities.Regional.get(obraData.regional_id);
-            setRegional(reg);
-          }
+          await base44.entities.Obra.get(data.obra_id)
+            .then(obraData => {
+              setObra(obraData);
+              if (obraData?.regional_id) {
+                return base44.entities.Regional.get(obraData.regional_id)
+                  .then(reg => setRegional(reg))
+                  .catch(e => console.warn('[RelatorioProctor] Regional não carregada:', e));
+              }
+            })
+            .catch(e => console.warn('[RelatorioProctor] Obra não carregada:', e));
         }
       } catch (err) {
         setError('Erro ao carregar: ' + err.message);

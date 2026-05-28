@@ -109,16 +109,18 @@ export async function loadAllRecords() {
  * @returns {Promise<object[]>}
  */
 export async function loadRecordsByObra(obraId) {
-  const promises = ALL_RECORD_ENTITIES.map(type =>
-    base44.entities[type]
-      .filter({ obra_id: obraId }, '-created_date', RECORD_PAGE_SIZE)
-      .catch(e => {
-        console.error(`[recordsService] Falha ao filtrar ${type} por obra:`, e?.message || e);
-        return [];
-      })
+  const settled = await Promise.allSettled(
+    ALL_RECORD_ENTITIES.map(type =>
+      base44.entities[type].filter({ obra_id: obraId }, '-created_date', RECORD_PAGE_SIZE)
+    )
   );
-
-  const results = await Promise.all(promises);
+  const results = settled.map((r, i) => {
+    if (r.status === 'rejected') {
+      console.warn(`[recordsService] loadRecordsByObra: ${ALL_RECORD_ENTITIES[i]} rejeitou:`, r.reason?.message || r.reason);
+      return [];
+    }
+    return r.value;
+  });
   const normalized = normalizeRecords(results, ALL_RECORD_ENTITIES);
   return deduplicateRecords(normalized);
 }
@@ -128,15 +130,20 @@ export async function loadRecordsByObra(obraId) {
  * @param {{ needsRegionais?: boolean, needsUsers?: boolean }} opts
  */
 export async function loadAuxData({ needsRegionais = true, needsUsers = false } = {}) {
-  const [obras, projects, regionais, users] = await Promise.all([
-    base44.entities.Obra.list('-created_date', 500).catch(() => []),
-    base44.entities.Project.list('-created_date', 500).catch(() => []),
-    needsRegionais
-      ? base44.entities.Regional.list().catch(() => [])
-      : Promise.resolve([]),
-    needsUsers
-      ? base44.entities.User.list().catch(() => [])
-      : Promise.resolve([]),
+  const [obrasResult, projectsResult, regionaisResult, usersResult] = await Promise.allSettled([
+    base44.entities.Obra.list('-created_date', 500),
+    base44.entities.Project.list('-created_date', 500),
+    needsRegionais ? base44.entities.Regional.list() : Promise.resolve([]),
+    needsUsers ? base44.entities.User.list() : Promise.resolve([]),
   ]);
-  return { obras, projects, regionais, users };
+  if (obrasResult.status    === 'rejected') console.warn('[recordsService] loadAuxData: Obra falhou:',     obrasResult.reason?.message);
+  if (projectsResult.status === 'rejected') console.warn('[recordsService] loadAuxData: Project falhou:', projectsResult.reason?.message);
+  if (regionaisResult.status === 'rejected') console.warn('[recordsService] loadAuxData: Regional falhou:', regionaisResult.reason?.message);
+  if (usersResult.status    === 'rejected') console.warn('[recordsService] loadAuxData: User falhou:',     usersResult.reason?.message);
+  return {
+    obras:     obrasResult.status    === 'fulfilled' ? obrasResult.value    : [],
+    projects:  projectsResult.status === 'fulfilled' ? projectsResult.value : [],
+    regionais: regionaisResult.status === 'fulfilled' ? regionaisResult.value : [],
+    users:     usersResult.status    === 'fulfilled' ? usersResult.value    : [],
+  };
 }
