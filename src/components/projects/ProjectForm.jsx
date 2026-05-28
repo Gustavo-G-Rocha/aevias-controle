@@ -42,7 +42,9 @@ const PENEIRAS_PADRAO = {
 };
 
 const extrairAberturaNumero = (aberturaString) => {
-  const match = aberturaString.match(/[\d.]+/);
+  // Normaliza vírgula para ponto antes de extrair o número (ex: "6,3" → 6.3)
+  const normalized = aberturaString.toString().replace(',', '.');
+  const match = normalized.match(/[\d.]+/);
   return match ? parseFloat(match[0]) : null;
 };
 
