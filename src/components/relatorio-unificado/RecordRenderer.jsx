@@ -73,6 +73,26 @@ export default function RecordRenderer({ record, obra, regional, project, user }
       return <RelatorioGranulometriaIndividual ensaio={record} obra={obra} regional={regional} project={project} user={user} />;
     case 'GranuMistura':
       return <RelatorioGranuMistura ensaio={record} obra={obra} regional={regional} project={project} user={user} />;
+    case 'EnsaioMRAF':
+      return (
+        <div className="bg-white min-h-screen">
+          <iframe
+            src={`/RelatorioEnsaio?id=${record.id}&tipo=mraf`}
+            className="w-full h-screen border-0"
+            title="Relatório Ensaio MRAF"
+          />
+        </div>
+      );
+    case 'EnsaioTaxaMRAF':
+      return (
+        <div className="bg-white min-h-screen">
+          <iframe
+            src={`/RelatorioTaxaMRAF?id=${record.id}`}
+            className="w-full h-screen border-0"
+            title="Relatório Taxa de MRAF"
+          />
+        </div>
+      );
     case 'EnsaioCAUQ':
       return (
         <div className="bg-white min-h-screen">
