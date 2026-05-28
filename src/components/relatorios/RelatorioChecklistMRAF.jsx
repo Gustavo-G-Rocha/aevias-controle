@@ -590,13 +590,13 @@ export default function RelatorioChecklistMRAF({ checklist, obra, regional, proj
           </header>
 
           <div className="flex-1 flex items-stretch">
-            <div className="grid grid-cols-2 gap-4 w-full auto-rows-fr">
+            <div className="grid grid-cols-2 gap-4 w-full">
               {photos.map((foto, index) => (
                 <div key={index} className="break-inside-avoid flex flex-col">
-                  <div className="flex-1 border-2 border-slate-300 rounded overflow-hidden bg-slate-50 flex items-center justify-center" style={{ minHeight: '240px', maxHeight: '240px' }}>
+                  <div className="border-2 border-slate-300 rounded overflow-hidden bg-slate-50 flex items-center justify-center">
                     <picture>
                       <source srcSet={foto} />
-                      <img src={foto} alt={`Foto ${pageIndex * photosPerPage + index + 1}`} className="w-full h-full object-cover" width="500" height="240" loading="lazy" style={{ maxHeight: '240px' }} />
+                      <img src={foto} alt={`Foto ${pageIndex * photosPerPage + index + 1}`} className="w-full h-auto object-contain" style={{ maxHeight: '280px' }} width="auto" height="auto" loading="lazy" />
                     </picture>
                   </div>
                   <p className="text-center text-sm text-slate-600 mt-2 font-medium">

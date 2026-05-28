@@ -704,11 +704,11 @@ export default function RelatorioChecklistConcretagem({ checklist, creatorUser, 
 
           <div className="grid grid-cols-2 gap-2">
             {chunk.map((fotoUrl, fotoIndex) => (
-              <div key={fotoIndex} className="border border-slate-300 p-1 rounded flex flex-col h-56">
-                <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden flex-1">
+              <div key={fotoIndex} className="border border-slate-300 p-1 rounded flex flex-col">
+                <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden">
                   <picture>
                     <source srcSet={fotoUrl} />
-                    <img src={fotoUrl} alt={`Foto ${pageIndex * 6 + fotoIndex + 1}`} className="max-h-full max-w-full object-contain" width="auto" height="auto" />
+                    <img src={fotoUrl} alt={`Foto ${pageIndex * 6 + fotoIndex + 1}`} className="w-full h-auto object-contain" style={{ maxHeight: '280px' }} width="auto" height="auto" />
                   </picture>
                 </div>
                 <p className="text-center text-[8px] mt-1 font-medium">
