@@ -102,7 +102,7 @@ const ReportPrintHeader = ({ checklist, obra, regional, project }) => (
   </div>
 );
 
-const ReportFooter = ({ checklist, formatDateBrasilia }) => (
+const ReportFooter = ({ checklist }) => (
   <SignatureFooter
     labName={checklist.laboratorista_name}
     labEmail={checklist.created_by}
@@ -182,12 +182,6 @@ export default function RelatorioChecklistMRAF({ checklist, obra, regional, proj
   if (isCompressing) {
     return <div className="p-8 text-center">Otimizando imagens para impressão...</div>;
   }
-
-  const formatDateBrasilia = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-  };
 
   // Agrupar fotos em páginas de 6 fotos cada
   const photosPerPage = 6;
@@ -479,22 +473,7 @@ export default function RelatorioChecklistMRAF({ checklist, obra, regional, proj
         </div>
 
         <footer className="mt-2 pt-1 break-inside-avoid">
-          <SignatureFooter
-            labName={checklist.laboratorista_name}
-            labEmail={checklist.created_by}
-            labCreatedDate={checklist.created_date}
-            labPosition="Laboratorista"
-            approverName={checklist.approver_details?.name}
-            approverEmail={checklist.approved_by}
-            approverPosition={checklist.approver_details?.position}
-            approverCREA={checklist.approver_details?.crea_number}
-            approverDate={checklist.approved_date}
-            clientName={checklist.client_signature?.engineer_name}
-            clientEmail={checklist.client_signature?.signed_by}
-            clientPosition={checklist.client_signature?.position}
-            clientCREA={checklist.client_signature?.crea_number}
-            clientDate={checklist.client_signature?.signed_date}
-          />
+          <ReportFooter checklist={checklist} />
         </footer>
       </div>
 
@@ -543,22 +522,7 @@ export default function RelatorioChecklistMRAF({ checklist, obra, regional, proj
             </main>
 
             <div className="absolute bottom-0 left-0 right-0 pt-1 break-inside-avoid">
-              <SignatureFooter
-                labName={checklist.laboratorista_name}
-                labEmail={checklist.created_by}
-                labCreatedDate={checklist.created_date}
-                labPosition="Laboratorista"
-                approverName={checklist.approver_details?.name}
-                approverEmail={checklist.approved_by}
-                approverPosition={checklist.approver_details?.position}
-                approverCREA={checklist.approver_details?.crea_number}
-                approverDate={checklist.approved_date}
-                clientName={checklist.client_signature?.engineer_name}
-                clientEmail={checklist.client_signature?.signed_by}
-                clientPosition={checklist.client_signature?.position}
-                clientCREA={checklist.client_signature?.crea_number}
-                clientDate={checklist.client_signature?.signed_date}
-              />
+              <ReportFooter checklist={checklist} />
             </div>
           </div>
         </div>
