@@ -3,7 +3,6 @@ import { base44 } from '@/api/base44Client';
 /**
  * Service centralizado para operações com Regionais
  */
-
 export async function listarRegionais() {
   return base44.entities.Regional.list();
 }

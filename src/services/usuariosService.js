@@ -3,7 +3,6 @@ import { base44 } from '@/api/base44Client';
 /**
  * Service centralizado para operações com Usuários
  */
-
 export async function obterUsuarioAtual() {
   return base44.auth.me();
 }

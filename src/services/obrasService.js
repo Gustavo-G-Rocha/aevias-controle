@@ -3,7 +3,6 @@ import { base44 } from '@/api/base44Client';
 /**
  * Service centralizado para operações com Obras
  */
-
 export async function listarObrasRecentes(limit = 500) {
   return base44.entities.Obra.list('-created_date', limit);
 }

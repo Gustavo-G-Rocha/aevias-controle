@@ -3,7 +3,6 @@ import { base44 } from '@/api/base44Client';
 /**
  * Service centralizado para operações com Ensaios
  */
-
 const ENSAIO_ENTITIES = {
   'EnsaioCAUQ': 'EnsaioCAUQ',
   'EnsaioMRAF': 'EnsaioMRAF',

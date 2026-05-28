@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 
 const DATE_FIELD = {
@@ -41,15 +41,12 @@ export function useProdutividadeData(currentMonth) {
   const [usinas, setUsinas] = useState([]);
   const marcadoresDiaRef = useRef({});
 
-  // Cache de todos os registros de entidades (não varia por mês)
   const entityCacheRef = useRef(null);
-  // Cache de dados processados por chave "YYYY-MM"
   const monthCacheRef = useRef({});
 
   const loadData = useCallback(async (force = true) => {
     const monthKey = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
 
-    // Se já temos cache do mês e não é forced, usa direto
     if (!force && monthCacheRef.current[monthKey]) {
       const cached = monthCacheRef.current[monthKey];
       setLaboratoristas(cached.laboratoristas);
@@ -75,7 +72,6 @@ export function useProdutividadeData(currentMonth) {
         base44.entities.Obra.list()
       ]);
 
-      // ── 1. Determinar obras visíveis conforme perfil ─────────────────────────
       let obrasVisiveisIds;
       if (isAdmin) {
         obrasVisiveisIds = new Set(obras.map(o => o.id));
@@ -89,7 +85,6 @@ export function useProdutividadeData(currentMonth) {
         obrasVisiveisIds = new Set(obras.filter(o => regionaisVisiveisIds.has(o.regional_id)).map(o => o.id));
       }
 
-      // ── 2. Empreiteiras e usinas das obras visíveis ──────────────────────────
       const empresasSet = new Set();
       const usinasSet = new Set();
       obras.forEach(obra => {
@@ -102,7 +97,6 @@ export function useProdutividadeData(currentMonth) {
       setEmpreiteiras(empreiteirasArr);
       setUsinas(usinasArr);
 
-      // ── 3. Buscar registros de entidades (com cache global, não por mês) ──────
       if (force || !entityCacheRef.current) {
         const lote1 = settled(await Promise.allSettled([
           base44.entities.DiarioObra.list("-created_date", 500),
@@ -152,13 +146,11 @@ export function useProdutividadeData(currentMonth) {
 
       const ec = entityCacheRef.current;
 
-      // ProdutividadeDiaria sempre busca fresco (marcadores são dinâmicos)
       const [produtividadeDiariaResult] = settled(await Promise.allSettled([
         base44.entities.ProdutividadeDiaria.list(),
       ]));
       const produtividadeDiaria = produtividadeDiariaResult;
 
-      // ── 4. Intervalo de datas do mês visualizado ─────────────────────────────
       const startDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
       const todayLocal = new Date();
       const isViewingCurrentMonth =
@@ -168,7 +160,6 @@ export function useProdutividadeData(currentMonth) {
         ? new Date(todayLocal.getFullYear(), todayLocal.getMonth(), todayLocal.getDate())
         : new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
 
-      // ── 5. Processar registros — acumular por email ──────────────────────────
       const prodData = {};
 
       const processarRegistros = (registros, entityName) => {
@@ -224,7 +215,6 @@ export function useProdutividadeData(currentMonth) {
       processarRegistros(ec.boletinsSondagem, 'BoletimSondagem');
       processarRegistros(ec.boletinsSondagemTrado, 'BoletimSondagemTrado');
 
-      // ── 6. Marcadores manuais de dias ────────────────────────────────────────
       const marcadoresDia = {};
       produtividadeDiaria.forEach(marc => {
         if (!marc.data || !marc.laboratorista_email) return;
@@ -236,7 +226,6 @@ export function useProdutividadeData(currentMonth) {
         }
       });
 
-      // ── 7. Montar lista de laboratoristas com registros no mês ───────────────
       const emailsComRegistros = new Set(Object.keys(prodData));
       const usersByEmail = Object.fromEntries(allUsers.map(u => [u.email.toLowerCase(), u]));
       const labUsers = Array.from(emailsComRegistros).map(email =>
@@ -251,7 +240,6 @@ export function useProdutividadeData(currentMonth) {
         (a.laboratorista_name || a.full_name || '').localeCompare(b.laboratorista_name || b.full_name || '')
       );
 
-      // Salva no cache do mês
       monthCacheRef.current[monthKey] = {
         laboratoristas: labsSorted,
         produtividade: prodData,

@@ -3,7 +3,6 @@ import { base44 } from '@/api/base44Client';
 /**
  * Service centralizado para operações com Projects
  */
-
 export async function listarProjects() {
   return base44.entities.Project.list();
 }

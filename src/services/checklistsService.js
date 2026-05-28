@@ -3,7 +3,6 @@ import { base44 } from '@/api/base44Client';
 /**
  * Service centralizado para operações com Checklists
  */
-
 const CHECKLIST_ENTITIES = {
   'ChecklistUsina': 'ChecklistUsina',
   'ChecklistAplicacao': 'ChecklistAplicacao',

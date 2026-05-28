@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -26,11 +26,9 @@ export default function ControleLaboratoristas() {
         return;
       }
 
-      // Buscar todas as obras
       const obrasData = await base44.entities.Obra.list();
       setObras(obrasData);
 
-      // Buscar registros em lotes de 8 com allSettled (falha isolada não quebra tudo)
       const s = (results) => results.map(r => r.status === 'fulfilled' ? r.value : []);
 
       const [
@@ -76,7 +74,6 @@ export default function ControleLaboratoristas() {
         base44.entities.BoletimSondagemTrado.list("-created_date", 500),
       ]));
 
-      // Combinar todos os registros
       const todosRegistros = [
         ...diariosObra, ...checklistsUsina, ...checklistsAplicacao, ...checklistsMRAF,
         ...checklistsConcretagem, ...checklistsTerraplanagem, ...checklistsReciclagem,
@@ -132,10 +129,9 @@ export default function ControleLaboratoristas() {
       }
     });
 
-    // Calcular percentual de reprovação
     Object.values(stats).forEach(stat => {
       const totalAvaliados = stat.aprovados + stat.reprovados;
-      stat.percentualReprovacao = totalAvaliados > 0 
+      stat.percentualReprovacao = totalAvaliados > 0
         ? ((stat.reprovados / totalAvaliados) * 100).toFixed(1)
         : '0.0';
     });
@@ -269,10 +265,10 @@ export default function ControleLaboratoristas() {
                         <div className="flex items-center justify-center gap-2">
                           <TrendingDown className="w-4 h-4 text-orange-600" />
                           <span className={`font-bold ${
-                            parseFloat(lab.percentualReprovacao) > 20 
-                              ? 'text-red-600' 
-                              : parseFloat(lab.percentualReprovacao) > 10 
-                                ? 'text-orange-600' 
+                            parseFloat(lab.percentualReprovacao) > 20
+                              ? 'text-red-600'
+                              : parseFloat(lab.percentualReprovacao) > 10
+                                ? 'text-orange-600'
                                 : 'text-green-600'
                           }`}>
                             {lab.percentualReprovacao}%
