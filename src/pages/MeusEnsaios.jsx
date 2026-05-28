@@ -1,11 +1,12 @@
 import React from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { useEnsaiosList } from "@/hooks/useEnsaiosList";
 import { useEnsaiosActions } from "@/hooks/useEnsaiosActions";
 import { isAdmin, isCliente as isClienteUser, isGestorContrato, isSalaTecnica } from "@/utils/accessControl";
 import AdminInterface from "@/components/ensaios/AdminInterface";
 import ClienteInterface from "@/components/ensaios/ClienteInterface";
 import LaboratoristaInterface from "@/components/ensaios/LaboratoristaInterface";
+import { DialogTrigger } from "@/components/ui/dialog";
 
 export default function MeusEnsaios() {
   const { ensaios, obras, projects, allUsers, user, loading, reload } = useEnsaiosList();
@@ -31,6 +32,19 @@ export default function MeusEnsaios() {
           <h1 className="text-3xl font-bold text-[#00233B]">Ensaios Realizados</h1>
           <p className="text-[#00233B]/80 mt-1">{subtitle}</p>
         </div>
+
+        {/* FAB mobile para laboratoristas */}
+        {canCreate && (
+          <DialogTrigger asChild>
+            <button
+              className="lg:hidden fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
+              style={{ backgroundColor: 'var(--color-primary)' }}
+              aria-label="Novo Registro"
+            >
+              <Plus className="w-7 h-7 text-white" />
+            </button>
+          </DialogTrigger>
+        )}
 
         {loading ? (
           <div className="text-center py-12">
