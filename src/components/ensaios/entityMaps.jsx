@@ -1,23 +1,17 @@
 import { base44 } from "@/api/base44Client";
-import { DiarioObra } from "@/entities/DiarioObra";
-import { EnsaioDensidade } from "@/entities/EnsaioDensidade";
-import { ChecklistUsina } from "@/entities/ChecklistUsina";
-import { ChecklistAplicacao } from "@/entities/ChecklistAplicacao";
-import { ChecklistMRAF } from "@/entities/ChecklistMRAF";
-import { ChecklistConcretagem } from "@/entities/ChecklistConcretagem";
 
 export const getEntityMap = () => ({
-  "DiarioObra": DiarioObra,
+  "DiarioObra": base44.entities.DiarioObra,
   "EnsaioCAUQ": base44.entities.EnsaioCAUQ,
   "EnsaioMRAF": base44.entities.EnsaioMRAF,
-  "EnsaioDensidade": EnsaioDensidade,
+  "EnsaioDensidade": base44.entities.EnsaioDensidade,
   "EnsaioDensidadeInSitu": base44.entities.EnsaioDensidadeInSitu,
   "EnsaioTaxaPinturaImprimacao": base44.entities.EnsaioTaxaPinturaImprimacao,
   "EnsaioVigaBenkelman": base44.entities.EnsaioVigaBenkelman,
-  "ChecklistUsina": ChecklistUsina,
+  "ChecklistUsina": base44.entities.ChecklistUsina,
   "ChecklistAplicacao": base44.entities.ChecklistAplicacao,
-  "ChecklistMRAF": ChecklistMRAF,
-  "ChecklistConcretagem": ChecklistConcretagem,
+  "ChecklistMRAF": base44.entities.ChecklistMRAF,
+  "ChecklistConcretagem": base44.entities.ChecklistConcretagem,
   "ChecklistTerraplanagem": base44.entities.ChecklistTerraplanagem,
   "ChecklistReciclagem": base44.entities.ChecklistReciclagem,
   "EnsaioSondagem": base44.entities.EnsaioSondagem,
@@ -30,5 +24,5 @@ export const getEntityMap = () => ({
   "BoletimSondagemTrado": base44.entities.BoletimSondagemTrado,
   "EnsaioProctor": base44.entities.EnsaioProctor,
   "EnsaioRompimentoConcreto": base44.entities.EnsaioRompimentoConcreto,
-  "GranuMistura": base44.entities.GranuMistura
+  "GranuMistura": base44.entities.GranuMistura,
 });

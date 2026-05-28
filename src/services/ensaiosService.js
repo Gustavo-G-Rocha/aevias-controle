@@ -91,13 +91,12 @@ export async function assinarEnsaio(ensaio, user) {
   return base44.entities[entityName].update(ensaio.id, signatureData);
 }
 
-export async function aprovarEnsaio(ensaio, user, obras) {
+export async function aprovarEnsaio(ensaio, user) {
   if (!ensaio?.id) {
     throw new Error('Ensaio inválido');
   }
 
   const entityName = detectEntityName(ensaio);
-  const obra = obras?.find(o => o.id === ensaio.obra_id);
 
   const approvalData = {
     approved: true,
