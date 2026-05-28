@@ -34,7 +34,7 @@ export default function EditarNCPage() {
     handleSave,
   } = useEditarNCActions(nc);
 
-  if (loading) {
+  if (loading || !nc) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Loader2 className="w-8 h-8 animate-spin text-slate-500" />
