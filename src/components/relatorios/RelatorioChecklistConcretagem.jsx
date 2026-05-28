@@ -1,43 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
 import SignatureFooter from './SignatureFooter';
-import { ReportNaoConformidadesTable } from './shared';
+import { ReportNaoConformidadesTable, ReportCheckmark as Checkmark } from './shared';
+import ConcretagemPageHeader from '@/components/relatorio-checklist-concretagem/ConcretagemPageHeader';
+import ConcretagemDadosObra from '@/components/relatorio-checklist-concretagem/ConcretagemDadosObra';
+import ConcretagemClimaTable from '@/components/relatorio-checklist-concretagem/ConcretagemClimaTable';
+import ConcretagemFotoPage from '@/components/relatorio-checklist-concretagem/ConcretagemFotoPage';
+import {
+  chunkArray,
+  buildFooterProps,
+  formatDateConcr,
+  getTipoRupturaTexto,
+} from '@/utils/relatorioChecklistConcretagemUtils';
+import { compressImages } from '@/utils/reportImageCompression';
 
-// ── Helper functions ──────────────────────────────────────────────────────────
-function getClimaEmoji(condicao) {
-  switch(condicao) {
-    case 'bom': return '☀️';
-    case 'instavel': return '⛅';
-    case 'chuva': return '🌧️';
-    default: return '';
-  }
-}
-
-function getClimaTexto(condicao) {
-  switch(condicao) {
-    case 'bom': return 'Bom';
-    case 'instavel': return 'Instável';
-    case 'chuva': return 'Chuva';
-    default: return '-';
-  }
-}
-
-function getPeriodoNome(periodo) {
-  switch(periodo) {
-    case 'manha': return 'MANHÃ';
-    case 'tarde': return 'TARDE';
-    case 'noite': return 'NOITE';
-    default: return periodo.toUpperCase();
-  }
-}
-
-function formatDateConcr(dateString) {
-  if (!dateString) return '';
-  return new Date(dateString).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
-}
-
-import { ReportCheckmark as Checkmark } from './shared';
-
+// ── CargaContent ──────────────────────────────────────────────────────────────
 const CargaContent = ({ carga }) => (
   <>
     <div className="mb-1">
@@ -52,11 +28,8 @@ const CargaContent = ({ carga }) => (
     <h3 className="font-bold text-xs mb-0.5 bg-slate-50 p-0.5">Ensaios de Qualidade</h3>
     <table className="w-full border-collapse border border-slate-300 text-xs mb-1" style={{tableLayout:'fixed'}}>
       <colgroup>
-        <col style={{width:'28%'}} />
-        <col style={{width:'16%'}} />
-        <col style={{width:'18%'}} />
-        <col style={{width:'24%'}} />
-        <col style={{width:'14%'}} />
+        <col style={{width:'28%'}} /><col style={{width:'16%'}} />
+        <col style={{width:'18%'}} /><col style={{width:'24%'}} /><col style={{width:'14%'}} />
       </colgroup>
       <thead className="bg-slate-100">
         <tr>
@@ -68,24 +41,27 @@ const CargaContent = ({ carga }) => (
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td className="border border-slate-300 px-1 py-0.5 font-medium bg-slate-50">Slump Test</td>
-          <td className="border border-slate-300 px-1 py-0.5 text-center"><Checkmark checked={carga.slump_test?.realizado} /></td>
-          <td className="border border-slate-300 px-1 py-0.5 text-center">{carga.slump_test?.realizado && carga.slump_test?.resultado !== null ? carga.slump_test.resultado : '-'}</td>
-          <td className="border border-slate-300 px-1 py-0.5 text-center text-xs">{carga.slump_test?.limite || 'N/A'}</td>
-          <td className="border border-slate-300 px-1 py-0.5 text-center">
-            {carga.slump_test?.realizado ? (carga.slump_test.conforme === true ? <span className="text-green-600 font-bold text-lg">✓</span> : carga.slump_test.conforme === false ? <span className="text-red-600 font-bold text-lg">✗</span> : <span className="text-slate-500">-</span>) : <span className="text-slate-500">-</span>}
-          </td>
-        </tr>
-        <tr>
-          <td className="border border-slate-300 px-1 py-0.5 font-medium bg-slate-50">Espessura da Camada</td>
-          <td className="border border-slate-300 px-1 py-0.5 text-center"><Checkmark checked={carga.espessura_camada?.realizado} /></td>
-          <td className="border border-slate-300 px-1 py-0.5 text-center">{carga.espessura_camada?.realizado && carga.espessura_camada?.resultado !== null ? carga.espessura_camada.resultado : '-'}</td>
-          <td className="border border-slate-300 px-1 py-0.5 text-center text-xs">{carga.espessura_camada?.limite || 'N/A'}</td>
-          <td className="border border-slate-300 px-1 py-0.5 text-center">
-            {carga.espessura_camada?.realizado ? (carga.espessura_camada.conforme === true ? <span className="text-green-600 font-bold text-lg">✓</span> : carga.espessura_camada.conforme === false ? <span className="text-red-600 font-bold text-lg">✗</span> : <span className="text-slate-500">-</span>) : <span className="text-slate-500">-</span>}
-          </td>
-        </tr>
+        {[
+          { label: 'Slump Test', key: 'slump_test' },
+          { label: 'Espessura da Camada', key: 'espessura_camada' },
+        ].map(({ label, key }) => {
+          const ensaio = carga[key];
+          return (
+            <tr key={key}>
+              <td className="border border-slate-300 px-1 py-0.5 font-medium bg-slate-50">{label}</td>
+              <td className="border border-slate-300 px-1 py-0.5 text-center"><Checkmark checked={ensaio?.realizado} /></td>
+              <td className="border border-slate-300 px-1 py-0.5 text-center">{ensaio?.realizado && ensaio?.resultado !== null ? ensaio.resultado : '-'}</td>
+              <td className="border border-slate-300 px-1 py-0.5 text-center text-xs">{ensaio?.limite || 'N/A'}</td>
+              <td className="border border-slate-300 px-1 py-0.5 text-center">
+                {ensaio?.realizado
+                  ? ensaio.conforme === true ? <span className="text-green-600 font-bold text-lg">✓</span>
+                  : ensaio.conforme === false ? <span className="text-red-600 font-bold text-lg">✗</span>
+                  : <span className="text-slate-500">-</span>
+                  : <span className="text-slate-500">-</span>}
+              </td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
     <p className="text-xs mb-1"><strong>Equipamento de Lançamento:</strong> {carga.equipamento_lancamento === 'convencional' ? 'Convencional' : carga.equipamento_lancamento === 'bombeado' ? 'Bombeado' : 'N/A'}</p>
@@ -111,43 +87,39 @@ const CargaContent = ({ carga }) => (
         </tr>
       </tbody>
     </table>
-    {carga.observacoes_lancamento && (<div className="text-xs mb-1"><strong>Observações:</strong> {carga.observacoes_lancamento}</div>)}
+    {carga.observacoes_lancamento && <div className="text-xs mb-1"><strong>Observações:</strong> {carga.observacoes_lancamento}</div>}
     <div className="mb-0">
       <h3 className="font-bold text-xs mb-0.5 bg-slate-50 p-0.5">Moldes para Fiscalização</h3>
       {carga.moldado_fiscalizacao ? (
-        <>
-          {carga.corpos_prova && carga.corpos_prova.length > 0 ? (
-            <>
-              <table className="w-full border-collapse border border-slate-300 text-xs mt-0.5">
-                <thead className="bg-slate-100">
-                  <tr>
-                    <th className="border border-slate-300 px-1 py-0.5 font-medium text-center">Dias para Ruptura</th>
-                    <th className="border border-slate-300 px-1 py-0.5 font-medium text-center">Quantidade de CPs</th>
-                    <th className="border border-slate-300 px-1 py-0.5 font-medium text-center">Tipo de Ruptura</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[3, 7, 28].map((dias) => {
-                    const cpsDestaDia = carga.corpos_prova.filter(cp => cp.dias_ruptura === dias);
-                    if (cpsDestaDia.length === 0) return null;
-                    const tipoRuptura = cpsDestaDia[0].tipo_ruptura;
-                    const tipoTexto = tipoRuptura === 'compressao_axial' ? 'Compressão Axial' : tipoRuptura === 'comp_diametral' ? 'Compressão Diametral' : tipoRuptura === 'tracao_flexao' ? 'Tração na Flexão' : 'N/A';
-                    return (
-                      <tr key={dias}>
-                        <td className="border border-slate-300 px-1 py-0.5 text-center font-medium bg-slate-50">{dias} dias</td>
-                        <td className="border border-slate-300 px-1 py-0.5 text-center">{cpsDestaDia.length}</td>
-                        <td className="border border-slate-300 px-1 py-0.5 text-center">{tipoTexto}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              <p className="text-xs mt-0.5 text-slate-600 mb-0"><strong>Total de CPs moldados:</strong> {carga.corpos_prova.length}</p>
-            </>
-          ) : (
-            <div className="text-xs"><p><strong>Moldado:</strong> ✓ Sim</p><p className="text-slate-500 italic">Detalhes dos corpos de prova não registrados</p></div>
-          )}
-        </>
+        carga.corpos_prova?.length > 0 ? (
+          <>
+            <table className="w-full border-collapse border border-slate-300 text-xs mt-0.5">
+              <thead className="bg-slate-100">
+                <tr>
+                  <th className="border border-slate-300 px-1 py-0.5 font-medium text-center">Dias para Ruptura</th>
+                  <th className="border border-slate-300 px-1 py-0.5 font-medium text-center">Quantidade de CPs</th>
+                  <th className="border border-slate-300 px-1 py-0.5 font-medium text-center">Tipo de Ruptura</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[3, 7, 28].map((dias) => {
+                  const cpsDestaDia = carga.corpos_prova.filter(cp => cp.dias_ruptura === dias);
+                  if (cpsDestaDia.length === 0) return null;
+                  return (
+                    <tr key={dias}>
+                      <td className="border border-slate-300 px-1 py-0.5 text-center font-medium bg-slate-50">{dias} dias</td>
+                      <td className="border border-slate-300 px-1 py-0.5 text-center">{cpsDestaDia.length}</td>
+                      <td className="border border-slate-300 px-1 py-0.5 text-center">{getTipoRupturaTexto(cpsDestaDia[0].tipo_ruptura)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            <p className="text-xs mt-0.5 text-slate-600 mb-0"><strong>Total de CPs moldados:</strong> {carga.corpos_prova.length}</p>
+          </>
+        ) : (
+          <div className="text-xs"><p><strong>Moldado:</strong> ✓ Sim</p><p className="text-slate-500 italic">Detalhes dos corpos de prova não registrados</p></div>
+        )
       ) : (
         <div className="text-xs"><p><strong>Moldado para Fiscalização:</strong> ✗ Não</p></div>
       )}
@@ -156,568 +128,113 @@ const CargaContent = ({ carga }) => (
 );
 
 // ── Main component ─────────────────────────────────────────────────────────────
-export default function RelatorioChecklistConcretagem({ checklist, creatorUser, obra: obraProp, regional: regionalProp, project: projectProp }) {
-  const [obra, setObra] = useState(obraProp || null);
-  const [project, setProject] = useState(projectProp || null);
-  const [regional, setRegional] = useState(regionalProp || null);
+export default function RelatorioChecklistConcretagem({ checklist, creatorUser, obra, regional, project }) {
   const [compressedPhotos, setCompressedPhotos] = useState([]);
   const [isCompressing, setIsCompressing] = useState(true);
 
   useEffect(() => {
-    if (!obraProp) loadRelatedData();
-  }, [checklist, obraProp]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    const compressImages = async () => {
-      if (!checklist?.fotos || checklist.fotos.length === 0) {
-        setIsCompressing(false);
-        return;
-      }
-
-      const validPhotos = checklist.fotos.filter(photo => photo && photo.trim() !== '');
-      const compressed = [];
-      
-      for (let i = 0; i < validPhotos.length; i++) {
-        const photoUrl = validPhotos[i];
-        let attempts = 0;
-        const maxAttempts = 3;
-        
-        while (attempts < maxAttempts) {
-          try {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            
-            await new Promise((resolve, reject) => {
-              const timeout = setTimeout(() => reject(new Error('Timeout ao carregar imagem')), 10000);
-              img.onload = () => {
-                clearTimeout(timeout);
-                resolve();
-              };
-              img.onerror = () => {
-                clearTimeout(timeout);
-                reject(new Error('Erro ao carregar imagem'));
-              };
-              img.src = photoUrl;
-            });
-
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            const maxWidth = 800;
-            const maxHeight = 600;
-            let width = img.width;
-            let height = img.height;
-            
-            if (width > maxWidth || height > maxHeight) {
-              const ratio = Math.min(maxWidth / width, maxHeight / height);
-              width = width * ratio;
-              height = height * ratio;
-            }
-            
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(img, 0, 0, width, height);
-            
-            compressed.push(canvas.toDataURL('image/jpeg', 0.75));
-            break;
-          } catch (error) {
-            attempts++;
-            console.error(`Tentativa ${attempts} falhou para imagem ${i + 1}:`, error);
-            
-            if (attempts >= maxAttempts) {
-              compressed.push(photoUrl);
-            } else {
-              await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
-            }
-          }
-        }
-        
-        if (i < validPhotos.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 600));
-        }
-      }
-
-      setCompressedPhotos(compressed);
-      setIsCompressing(false);
-    };
-
-    compressImages();
+    compressImages(checklist?.fotos || [], { maxWidth: 800, maxHeight: 600, quality: 0.75 })
+      .then(photos => setCompressedPhotos(photos))
+      .finally(() => setIsCompressing(false));
   }, [checklist?.fotos]);
-
-  const loadRelatedData = async () => {
-    try {
-      if (checklist.obra_id) {
-        const obraData = await base44.entities.Obra.get(checklist.obra_id);
-        setObra(obraData);
-        
-        if (obraData.regional_id) {
-          const regionalData = await base44.entities.Regional.get(obraData.regional_id);
-          setRegional(regionalData);
-        }
-      }
-      if (checklist.project_id) {
-        const projectData = await base44.entities.Project.get(checklist.project_id);
-        setProject(projectData);
-      }
-    } catch (error) {
-      console.error("Erro ao carregar dados relacionados:", error);
-    }
-  };
 
   if (isCompressing) {
     return <div className="p-8 text-center">Otimizando imagens para impressão...</div>;
   }
 
-  const chunkArray = (arr, size) => { const chunks = []; if (!arr) return chunks; for (let i = 0; i < arr.length; i += size) { chunks.push(arr.slice(i, i + size)); } return chunks; };
   const photoChunks = chunkArray(compressedPhotos, 6);
   const cargas = checklist.cargas_concreto || [];
   const temMultiplasCargas = cargas.length > 1;
   const temAcoesCorretivas = checklist.acoes_corretivas_realizado === true && checklist.acoes_corretivas_descricao;
+  const footerProps = buildFooterProps(checklist, creatorUser);
 
-  const footerProps = {
-    labName: checklist.laboratorista_name, labEmail: checklist.created_by, labCreatedDate: checklist.created_date,
-    labPosition: creatorUser?.position || 'Laboratorista', approverName: checklist.approver_details?.name,
-    approverEmail: checklist.approved_by, approverPosition: checklist.approver_details?.position,
-    approverCREA: checklist.approver_details?.crea_number, approverDate: checklist.approved_date,
-    clientName: checklist.client_signature?.engineer_name, clientEmail: checklist.client_signature?.signed_by,
-    clientPosition: checklist.client_signature?.position, clientCREA: checklist.client_signature?.crea_number,
-    clientDate: checklist.client_signature?.signed_date,
-  };
+  const DadosClimaObs = () => (
+    <>
+      <ConcretagemDadosObra checklist={checklist} obra={obra} regional={regional} />
+      <ConcretagemClimaTable periodos={checklist.periodos_clima} />
+      {checklist.observacoes_gerais && (
+        <div className="mb-2">
+          <div className="bg-[#f1f5f9] text-gray-800 px-2 py-1 font-bold text-[9px] mb-1 text-center">OBSERVAÇÕES GERAIS</div>
+          <div className="text-[9px] p-1 bg-slate-50 border border-slate-300 rounded">{checklist.observacoes_gerais}</div>
+        </div>
+      )}
+    </>
+  );
 
   return (
     <div className="bg-white font-sans">
       <style>{`
         @media print {
-          @page {
-            size: A4 portrait;
-            margin: 12mm 14mm;
-            marks: none;
-          }
-
-          /* Remove browser header/footer (URL, title, date) */
-          html {
-            -webkit-print-color-adjust: exact;
-          }
-
-          html, body { 
-            margin: 0 !important;
-            padding: 0 !important;
-            background: white !important;
-            color-adjust: exact;
-            print-color-adjust: exact;
-            -webkit-print-color-adjust: exact; 
-          }
-
-          aside, nav, [data-sidebar], [role="navigation"] {
-            display: none !important;
-          }
-
-          .print-page { 
-            width: 100% !important;
-            min-height: 100vh;
-            box-sizing: border-box !important;
-            page-break-after: always;
-          }
-
-          img {
-            max-width: 80% !important;
-            height: auto !important;
-            display: block !important;
-          }
-
-          table {
-            max-width: 100% !important;
-            table-layout: fixed !important;
-          }
-
-          td, th {
-            word-break: break-word !important;
-            overflow-wrap: break-word !important;
-          }
+          @page { size: A4 portrait; margin: 12mm 14mm; marks: none; }
+          html { -webkit-print-color-adjust: exact; }
+          html, body { margin: 0 !important; padding: 0 !important; background: white !important; color-adjust: exact; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+          aside, nav, [data-sidebar], [role="navigation"] { display: none !important; }
+          .print-page { width: 100% !important; min-height: 100vh; box-sizing: border-box !important; page-break-after: always; }
+          img { max-width: 80% !important; height: auto !important; display: block !important; }
+          table { max-width: 100% !important; table-layout: fixed !important; }
+          td, th { word-break: break-word !important; overflow-wrap: break-word !important; }
         }
       `}</style>
 
-      {/* CASO 1: UMA ÚNICA CARGA - TUDO NA PRIMEIRA PÁGINA */}
+      {/* CASO 1: UMA ÚNICA CARGA */}
       {!temMultiplasCargas && cargas.length === 1 && (
         <div className="print-page w-full max-w-[210mm] mx-auto bg-white min-h-[297mm]">
-          {/* Header */}
-          <div className="flex justify-between items-start mb-4 pb-4 border-b-2 border-slate-900">
-            <div className="w-16">
-              <picture>
-                <source srcSet={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} />
-                <img 
-                  src={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} 
-                  alt="Logo" 
-                  className="h-12 object-contain"
-                  width="auto" height="48"
-                />
-              </picture>
-            </div>
-            
-            <div className="text-center flex-1">
-              <h1 className="text-sm font-bold text-gray-800 leading-tight">
-                CONTROLE TECNOLÓGICO<br/>DE CONCRETO
-              </h1>
-            </div>
-            
-            <div className="text-right w-16">
-              <div className="border border-gray-400 p-1 rounded inline-block">
-                <p className="text-[9px] font-semibold text-gray-800">{formatDateConcr(checklist.data)}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* DADOS DA OBRA */}
-    <div className="mb-3 text-[9px]"> {/* Defini o tamanho base de 9px aqui no pai */}
-  <div className="bg-[#f1f5f9] text-gray-800 px-2 py-1 font-bold mb-1 text-center">
-    DADOS DA OBRA
-  </div>
-  
-  <div className="grid grid-cols-3 gap-x-3 gap-y-1"> {/* Removido text-[9px] daqui */}
-    <div>
-      <p className="font-bold text-gray-700">CLIENTE:</p>
-      <p className="text-gray-900">{regional?.cliente || obra?.name || 'N/A'}</p>
-    </div>
-    <div>
-      <p className="font-bold text-gray-700">CONCRETEIRA:</p>
-      <p className="text-gray-900">{checklist.concreteira || 'N/A'}</p> {/* Adicionado fallback por boa prática */}
-    </div>
-    <div>
-      <p className="font-bold text-gray-700">EMPREITEIRA:</p>
-      <p className="text-gray-900">{checklist.empreiteira || 'N/A'}</p>
-    </div>
-
-    <div>
-      <p className="font-bold text-gray-700">OBRA:</p>
-      <p className="text-gray-900">{obra?.code || 'N/A'}</p>
-    </div>
-    <div>
-      <p className="font-bold text-gray-700">RODOVIA:</p>
-      <p className="text-gray-900">{checklist.rodovia || 'N/A'}</p>
-    </div>
-    <div>
-      <p className="font-bold text-gray-700">TRECHO:</p>
-      <p className="text-gray-900">{checklist.trecho || 'N/A'}</p>
-    </div>
-
-    <div>
-      <p className="font-bold text-gray-700">VOLUME (m³):</p>
-      <p className="text-gray-900">{checklist.volume || 'N/A'}</p>
-    </div>
-    <div>
-      <p className="font-bold text-gray-700">Fck (MPa):</p>
-      <p className="text-gray-900">{checklist.fck || 'N/A'}</p>
-    </div>
-    <div>
-      <p className="font-bold text-gray-700">ESTRUTURA:</p>
-      <p className="text-gray-900">{checklist.estrutura || 'N/A'}</p>
-    </div>
-  </div>
-</div>
-
-          {/* Condições Climáticas */}
-          <div className="mb-2">
-            <div className="bg-[#f1f5f9] text-gray-800 px-2 py-1 font-bold text-[9px] mb-1 text-center">CONDIÇÕES CLIMÁTICAS</div>
-            <table className="w-full border-collapse text-[9px]">
-              <thead>
-                <tr className="bg-slate-100">
-                  {checklist.periodos_clima?.map((periodo, index) => (
-                    <th key={index} className="border border-slate-300 px-1 py-0.5 text-center font-bold uppercase">
-                      {getPeriodoNome(periodo.periodo)}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {checklist.periodos_clima?.map((periodo) => (
-                    <td key={periodo.periodo} className="border border-slate-300 px-1 py-0.5 text-center">
-                      <p className="font-medium mb-0.5">Temp. Ambiente (°C): {periodo.temperatura_ambiente || 'N/A'}</p>
-                      <p className="font-bold">{getClimaEmoji(periodo.condicoes_climaticas)} {getClimaTexto(periodo.condicoes_climaticas)}</p>
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          {/* Observações Gerais */}
-          {checklist.observacoes_gerais && (
-            <div className="mb-2">
-              <div className="bg-[#f1f5f9] text-gray-800 px-2 py-1 font-bold text-[9px] mb-1 text-center">OBSERVAÇÕES GERAIS</div>
-              <div className="text-[9px] p-1 bg-slate-50 border border-slate-300 rounded">
-                {checklist.observacoes_gerais}
-              </div>
-            </div>
-          )}
-
-          {/* Carga de Concreto */}
+          <ConcretagemPageHeader regional={regional} data={checklist.data} titulo={"CONTROLE TECNOLÓGICO\nDE CONCRETO"} />
+          <DadosClimaObs />
           <div className="mb-2">
             <div className="bg-[#f1f5f9] text-gray-800 px-2 py-1 font-bold text-[9px] mb-1 text-center">CARGA DE CONCRETO 1</div>
-            <div className="text-[9px]">
-              <CargaContent carga={cargas[0]} />
-            </div>
+            <div className="text-[9px]"><CargaContent carga={cargas[0]} /></div>
           </div>
-
-          {/* Signature Footer */}
-          <div className="mt-4 w-full">
-            <SignatureFooter {...footerProps} />
-          </div>
+          <div className="mt-4 w-full"><SignatureFooter {...footerProps} /></div>
         </div>
       )}
 
-      {/* CASO 2: MÚLTIPLAS CARGAS - UMA CARGA POR PÁGINA */}
-      {temMultiplasCargas && cargas.map((carga, cargaIndex) => {
-        const isUltimaCarga = cargaIndex === cargas.length - 1;
-        const isPrimeiraCarga = cargaIndex === 0;
-        
-        return (
-          <div key={cargaIndex} className="print-page w-full max-w-[210mm] mx-auto bg-white min-h-[297mm]">
-            {/* Header */}
-            <div className="flex justify-between items-start mb-4 pb-4 border-b-2 border-slate-900">
-              <div className="w-16">
-                <picture>
-                  <source srcSet={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} />
-                  <img 
-                    src={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} 
-                    alt="Logo" 
-                    className="h-12 object-contain"
-                    width="auto" height="48"
-                  />
-                </picture>
-              </div>
-              
-              <div className="text-center flex-1">
-                <h1 className="text-sm font-bold text-gray-800 leading-tight">
-                  CONTROLE TECNOLÓGICO<br/>DE CONCRETO
-                </h1>
-              </div>
-              
-              <div className="text-right w-16">
-                <div className="border border-gray-400 p-1 rounded inline-block">
-                  <p className="text-[9px] font-semibold text-gray-800">{formatDateConcr(checklist.data)}</p>
-                </div>
-              </div>
-            </div>
-
-            {isPrimeiraCarga && (
-              <>
-                {/* DADOS DA OBRA */}
-                <div className="mb-3">
-                  <div className="bg-[#f1f5f9] text-gray-800 px-2 py-1 font-bold text-[9px] mb-1 text-center">DADOS DA OBRA</div>
-                  <div className="grid grid-cols-3 gap-x-3 gap-y-1 text-[9px]">
-                    <div>
-                      <p className="font-bold text-gray-700">CLIENTE:</p>
-                      <p className="text-gray-900">{regional?.cliente || obra?.name || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="font-bold text-gray-700">CONCRETEIRA:</p>
-                      <p className="text-gray-900">{checklist.concreteira}</p>
-                    </div>
-                    <div>
-                      <p className="font-bold text-gray-700">EMPREITEIRA:</p>
-                      <p className="text-gray-900">{checklist.empreiteira || 'N/A'}</p>
-                    </div>
-
-                    <div>
-                      <p className="font-bold text-gray-700">OBRA:</p>
-                      <p className="text-gray-900">{obra?.code || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="font-bold text-gray-700">RODOVIA:</p>
-                      <p className="text-gray-900">{checklist.rodovia || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="font-bold text-gray-700">TRECHO:</p>
-                      <p className="text-gray-900">{checklist.trecho || 'N/A'}</p>
-                    </div>
-
-                    <div>
-                      <p className="font-bold text-gray-700">VOLUME (m³):</p>
-                      <p className="text-gray-900">{checklist.volume || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="font-bold text-gray-700">Fck (MPa):</p>
-                      <p className="text-gray-900">{checklist.fck || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="font-bold text-gray-700">ESTRUTURA:</p>
-                      <p className="text-gray-900">{checklist.estrutura || 'N/A'}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Condições Climáticas */}
-                <div className="mb-2">
-                  <div className="bg-[#f1f5f9] text-gray-800 px-2 py-1 font-bold text-[9px] mb-1 text-center">CONDIÇÕES CLIMÁTICAS</div>
-                  <table className="w-full border-collapse text-[9px]">
-                    <thead>
-                      <tr className="bg-slate-100">
-                        {checklist.periodos_clima?.map((periodo) => (
-                          <th key={periodo.periodo} className="border border-slate-300 px-1 py-0.5 text-center font-bold uppercase">
-                            {getPeriodoNome(periodo.periodo)}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        {checklist.periodos_clima?.map((periodo) => (
-                          <td key={periodo.periodo} className="border border-slate-300 px-1 py-0.5 text-center">
-                            <p className="font-medium mb-0.5">Temp. Ambiente (°C): {periodo.temperatura_ambiente || 'N/A'}</p>
-                            <p className="font-bold">{getClimaEmoji(periodo.condicoes_climaticas)} {getClimaTexto(periodo.condicoes_climaticas)}</p>
-                          </td>
-                        ))}
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Observações Gerais */}
-                {checklist.observacoes_gerais && (
-                  <div className="mb-2">
-                    <div className="bg-[#f1f5f9] text-gray-800 px-2 py-1 font-bold text-[9px] mb-1 text-center">OBSERVAÇÕES GERAIS</div>
-                    <div className="text-[9px] p-1 bg-slate-50 border border-slate-300 rounded">
-                      {checklist.observacoes_gerais}
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Carga de Concreto */}
-            <div className="mb-2">
-              <div className="bg-[#f1f5f9] text-gray-800 px-2 py-1 font-bold text-[9px] mb-1 text-center">CARGA DE CONCRETO {carga.numero_carga}</div>
-              <div className="text-[9px]">
-                <CargaContent carga={carga} />
-              </div>
-            </div>
-
-            {isUltimaCarga && !temAcoesCorretivas && (
-              <div className="mt-4 w-full">
-                <SignatureFooter {...footerProps} />
-              </div>
-            )}
+      {/* CASO 2: MÚLTIPLAS CARGAS */}
+      {temMultiplasCargas && cargas.map((carga, idx) => (
+        <div key={idx} className="print-page w-full max-w-[210mm] mx-auto bg-white min-h-[297mm]">
+          <ConcretagemPageHeader regional={regional} data={checklist.data} titulo={"CONTROLE TECNOLÓGICO\nDE CONCRETO"} />
+          {idx === 0 && <DadosClimaObs />}
+          <div className="mb-2">
+            <div className="bg-[#f1f5f9] text-gray-800 px-2 py-1 font-bold text-[9px] mb-1 text-center">CARGA DE CONCRETO {carga.numero_carga}</div>
+            <div className="text-[9px]"><CargaContent carga={carga} /></div>
           </div>
-        );
-      })}
+          {idx === cargas.length - 1 && !temAcoesCorretivas && (
+            <div className="mt-4 w-full"><SignatureFooter {...footerProps} /></div>
+          )}
+        </div>
+      ))}
 
-      {/* PÁGINA DE AÇÕES CORRETIVAS E/OU NÃO CONFORMIDADES */}
-      {(temAcoesCorretivas || (checklist.nao_conformidades && checklist.nao_conformidades.length > 0)) && (
+      {/* PÁGINA DE AÇÕES CORRETIVAS / NÃO CONFORMIDADES */}
+      {(temAcoesCorretivas || checklist.nao_conformidades?.length > 0) && (
         <div className="print-page w-full max-w-[210mm] mx-auto bg-white min-h-[297mm]">
-          {/* Header */}
-          <div className="flex justify-between items-start mb-4 pb-4 border-b-2 border-slate-900">
-            <div className="w-16">
-              <picture>
-                <source srcSet={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} />
-                <img 
-                  src={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} 
-                  alt="Logo" 
-                  className="h-12 object-contain"
-                  width="auto" height="48"
-                />
-              </picture>
-            </div>
-            
-            <div className="text-center flex-1">
-              <h1 className="text-sm font-bold text-gray-800 leading-tight">
-                CONTROLE TECNOLÓGICO<br/>DE CONCRETO
-              </h1>
-            </div>
-            
-            <div className="text-right w-16">
-              <div className="border border-gray-400 p-1 rounded inline-block">
-                <p className="text-[9px] font-semibold text-gray-800">{formatDateConcr(checklist.data)}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* DADOS DA OBRA */}
+          <ConcretagemPageHeader regional={regional} data={checklist.data} titulo={"CONTROLE TECNOLÓGICO\nDE CONCRETO"} />
           <div className="mb-2">
             <div className="bg-[#f1f5f9] text-gray-800 px-2 py-1 font-bold text-[9px] mb-1 text-center">DADOS DA OBRA</div>
             <div className="grid grid-cols-3 gap-x-3 gap-y-1 text-[9px]">
-              <div>
-                <p className="font-bold text-gray-700">CLIENTE:</p>
-                <p className="text-gray-900">{regional?.cliente || obra?.name || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="font-bold text-gray-700">CONCRETEIRA:</p>
-                <p className="text-gray-900">{checklist.concreteira}</p>
-              </div>
-              <div>
-                <p className="font-bold text-gray-700">EMPREITEIRA:</p>
-                <p className="text-gray-900">{checklist.empreiteira || 'N/A'}</p>
-              </div>
+              <div><p className="font-bold text-gray-700">CLIENTE:</p><p className="text-gray-900">{regional?.cliente || obra?.name || 'N/A'}</p></div>
+              <div><p className="font-bold text-gray-700">CONCRETEIRA:</p><p className="text-gray-900">{checklist.concreteira || 'N/A'}</p></div>
+              <div><p className="font-bold text-gray-700">EMPREITEIRA:</p><p className="text-gray-900">{checklist.empreiteira || 'N/A'}</p></div>
             </div>
           </div>
-
-          {/* Ações Corretivas */}
           {temAcoesCorretivas && (
             <div className="mb-2">
               <div className="bg-[#f1f5f9] text-gray-800 px-2 py-1 font-bold text-[9px] mb-1 text-center">AÇÕES CORRETIVAS</div>
-              <div className="border border-slate-300 p-2 text-[9px] bg-slate-50 min-h-[60px]">
-                {checklist.acoes_corretivas_descricao}
-              </div>
+              <div className="border border-slate-300 p-2 text-[9px] bg-slate-50 min-h-[60px]">{checklist.acoes_corretivas_descricao}</div>
             </div>
           )}
-
-          {/* Não Conformidades */}
-          {checklist.nao_conformidades && checklist.nao_conformidades.length > 0 && (
+          {checklist.nao_conformidades?.length > 0 && (
             <div className="mb-2">
               <div className="bg-[#f1f5f9] text-gray-800 px-2 py-1 font-bold text-[9px] mb-1 text-center">NÃO CONFORMIDADES</div>
               <ReportNaoConformidadesTable naoConformidades={checklist.nao_conformidades} />
             </div>
           )}
-
-          <div className="mt-4 w-full">
-            <SignatureFooter {...footerProps} />
-          </div>
+          <div className="mt-4 w-full"><SignatureFooter {...footerProps} /></div>
         </div>
       )}
 
-      {/* Páginas de Fotos */}
+      {/* PÁGINAS DE FOTOS */}
       {photoChunks.map((chunk, pageIndex) => (
-        <div key={pageIndex} className="print-page w-full max-w-[210mm] mx-auto bg-white min-h-[297mm]">
-          {/* Header */}
-          <div className="flex justify-between items-start mb-2 pb-2 border-b-2 border-slate-900">
-            <div className="w-12">
-              <picture>
-                <source srcSet={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} />
-                <img 
-                  src={regional?.logo_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png"} 
-                  alt="Logo" 
-                  className="h-10 object-contain"
-                  width="auto" height="40"
-                />
-              </picture>
-            </div>
-            
-            <div className="text-center flex-1">
-              <h1 className="text-sm font-bold text-gray-800">Relatório Fotográfico</h1>
-              <p className="text-[8px] text-gray-600">Checklist de Concretagem</p>
-            </div>
-            
-            <div className="text-right w-12">
-              <p className="text-[8px] font-semibold text-gray-800">{formatDateConcr(checklist.data)}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            {chunk.map((fotoUrl, fotoIndex) => (
-              <div key={fotoIndex} className="border border-slate-300 p-1 rounded flex flex-col">
-                <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden">
-                  <picture>
-                    <source srcSet={fotoUrl} />
-                    <img src={fotoUrl} alt={`Foto ${pageIndex * 6 + fotoIndex + 1}`} className="w-full h-auto object-contain" style={{ maxHeight: '280px' }} width="auto" height="auto" />
-                  </picture>
-                </div>
-                <p className="text-center text-[8px] mt-1 font-medium">
-                  Foto {(pageIndex * 6) + fotoIndex + 1}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <ConcretagemFotoPage key={pageIndex} chunk={chunk} pageIndex={pageIndex} regional={regional} data={checklist.data} />
       ))}
     </div>
   );

@@ -10,7 +10,7 @@ import RelatorioChecklistConcretagemContainer from '@/components/relatorio-check
 export default function RelatorioChecklistConcretagemPage() {
   useReportMode();
 
-  const { checklist, creatorUser, loading, error } = useRelatorioChecklistConcretagemData();
+  const { checklist, creatorUser, obra, regional, project, loading, error } = useRelatorioChecklistConcretagemData();
   const { handlePrint } = useRelatorioChecklistConcretagemActions();
 
   if (loading) {
@@ -32,7 +32,7 @@ export default function RelatorioChecklistConcretagemPage() {
   return (
     <RelatorioChecklistConcretagemContainer>
       <RelatorioChecklistConcretagemHeader checklist={checklist} onPrint={handlePrint} />
-      <RelatorioChecklistConcretagemComponent checklist={checklist} creatorUser={creatorUser} />
+      <RelatorioChecklistConcretagemComponent checklist={checklist} creatorUser={creatorUser} obra={obra} regional={regional} project={project} />
     </RelatorioChecklistConcretagemContainer>
   );
 }
