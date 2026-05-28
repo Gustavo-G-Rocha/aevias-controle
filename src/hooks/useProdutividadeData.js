@@ -28,6 +28,10 @@ const DATE_FIELD = {
   BoletimSondagemTrado: 'data',
 };
 
+// Extrai resultado de Promise.allSettled, retornando [] em caso de rejeição
+const settled = (results) =>
+  results.map(r => (r.status === 'fulfilled' ? r.value : []));
+
 export function useProdutividadeData(currentMonth) {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -37,7 +41,26 @@ export function useProdutividadeData(currentMonth) {
   const [usinas, setUsinas] = useState([]);
   const marcadoresDiaRef = useRef({});
 
-  const loadData = useCallback(async () => {
+  // Cache de todos os registros de entidades (não varia por mês)
+  const entityCacheRef = useRef(null);
+  // Cache de dados processados por chave "YYYY-MM"
+  const monthCacheRef = useRef({});
+
+  const loadData = useCallback(async (force = false) => {
+    const monthKey = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
+
+    // Se já temos cache do mês e não é forced, usa direto
+    if (!force && monthCacheRef.current[monthKey]) {
+      const cached = monthCacheRef.current[monthKey];
+      setLaboratoristas(cached.laboratoristas);
+      setProdutividade(cached.produtividade);
+      marcadoresDiaRef.current = cached.marcadoresDia;
+      setEmpreiteiras(cached.empreiteiras);
+      setUsinas(cached.usinas);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       const currentUser = await base44.auth.me();
@@ -74,10 +97,68 @@ export function useProdutividadeData(currentMonth) {
         (obra.empreiteiras || []).forEach(e => { empresasSet.add(e); });
         (obra.usinas || []).forEach(u => { usinasSet.add(u); });
       });
-      setEmpreiteiras(Array.from(empresasSet).sort());
-      setUsinas(Array.from(usinasSet).sort());
+      const empreiteirasArr = Array.from(empresasSet).sort();
+      const usinasArr = Array.from(usinasSet).sort();
+      setEmpreiteiras(empreiteirasArr);
+      setUsinas(usinasArr);
 
-      // ── 3. Intervalo de datas do mês visualizado ─────────────────────────────
+      // ── 3. Buscar registros de entidades (com cache global, não por mês) ──────
+      if (force || !entityCacheRef.current) {
+        const lote1 = settled(await Promise.allSettled([
+          base44.entities.DiarioObra.list("-created_date", 500),
+          base44.entities.ChecklistUsina.list("-created_date", 500),
+          base44.entities.ChecklistAplicacao.list("-created_date", 500),
+          base44.entities.ChecklistMRAF.list("-created_date", 500),
+          base44.entities.ChecklistConcretagem.list("-created_date", 500),
+          base44.entities.ChecklistTerraplanagem.list("-created_date", 500),
+          base44.entities.ChecklistReciclagem.list("-created_date", 500),
+          base44.entities.EnsaioCAUQ.list("-created_date", 500),
+        ]));
+
+        const lote2 = settled(await Promise.allSettled([
+          base44.entities.EnsaioDensidade.list("-created_date", 500),
+          base44.entities.EnsaioDensidadeInSitu.list("-created_date", 500),
+          base44.entities.EnsaioSondagem.list("-created_date", 500),
+          base44.entities.EnsaioTaxaPinturaImprimacao.list("-created_date", 500),
+          base44.entities.AcompanhamentoCarga.list("-created_date", 500),
+          base44.entities.EnsaioMRAF.list("-created_date", 500),
+          base44.entities.EnsaioManchaPendulo.list("-created_date", 500),
+          base44.entities.EnsaioVigaBenkelman.list("-created_date", 500),
+        ]));
+
+        const lote3 = settled(await Promise.allSettled([
+          base44.entities.EnsaioTaxaMRAF.list("-created_date", 500),
+          base44.entities.AcompanhamentoUsinagem.list("-created_date", 500),
+          base44.entities.EnsaioGranulometriaIndividual.list("-created_date", 500),
+          base44.entities.GranuMistura.list("-created_date", 500),
+          base44.entities.EnsaioProctor.list("-created_date", 500),
+          base44.entities.EnsaioRompimentoConcreto.list("-created_date", 500),
+          base44.entities.BoletimSondagem.list("-created_date", 500),
+          base44.entities.BoletimSondagemTrado.list("-created_date", 500),
+        ]));
+
+        entityCacheRef.current = {
+          diarios: lote1[0], checklistsUsina: lote1[1], checklistsAplicacao: lote1[2],
+          checklistsMRAF: lote1[3], checklistsConcretagem: lote1[4], checklistsTerraplanagem: lote1[5],
+          checklistsReciclagem: lote1[6], ensaiosCAUQ: lote1[7],
+          ensaiosDensidade: lote2[0], ensaiosDensidadeInSitu: lote2[1], ensaiosSondagem: lote2[2],
+          ensaiosTaxaPintura: lote2[3], acompanhamentoCarga: lote2[4], ensaiosMRAF: lote2[5],
+          ensaiosManchaPendulo: lote2[6], ensaiosVigaBenkelman: lote2[7],
+          ensaiosTaxaMRAF: lote3[0], acompanhamentosUsinagem: lote3[1], ensaiosGranuIndividual: lote3[2],
+          granuMisturas: lote3[3], ensaiosProctor: lote3[4], ensaiosRompimentoConcreto: lote3[5],
+          boletinsSondagem: lote3[6], boletinsSondagemTrado: lote3[7],
+        };
+      }
+
+      const ec = entityCacheRef.current;
+
+      // ProdutividadeDiaria sempre busca fresco (marcadores são dinâmicos)
+      const [produtividadeDiariaResult] = settled(await Promise.allSettled([
+        base44.entities.ProdutividadeDiaria.list(),
+      ]));
+      const produtividadeDiaria = produtividadeDiariaResult;
+
+      // ── 4. Intervalo de datas do mês visualizado ─────────────────────────────
       const startDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
       const todayLocal = new Date();
       const isViewingCurrentMonth =
@@ -86,51 +167,6 @@ export function useProdutividadeData(currentMonth) {
       const endDate = isViewingCurrentMonth
         ? new Date(todayLocal.getFullYear(), todayLocal.getMonth(), todayLocal.getDate())
         : new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
-
-      // ── 4. Buscar registros em lotes para evitar rate limit ──────────────────
-      const [
-        diarios, checklistsUsina, checklistsAplicacao, checklistsMRAF,
-        checklistsConcretagem, checklistsTerraplanagem, checklistsReciclagem, ensaiosCAUQ
-      ] = await Promise.all([
-        base44.entities.DiarioObra.list("-created_date", 500),
-        base44.entities.ChecklistUsina.list("-created_date", 500),
-        base44.entities.ChecklistAplicacao.list("-created_date", 500),
-        base44.entities.ChecklistMRAF.list("-created_date", 500),
-        base44.entities.ChecklistConcretagem.list("-created_date", 500),
-        base44.entities.ChecklistTerraplanagem.list("-created_date", 500),
-        base44.entities.ChecklistReciclagem.list("-created_date", 500),
-        base44.entities.EnsaioCAUQ.list("-created_date", 500),
-      ]);
-
-      const [
-        ensaiosDensidade, ensaiosDensidadeInSitu, ensaiosSondagem, ensaiosTaxaPintura,
-        acompanhamentoCarga, ensaiosMRAF, ensaiosManchaPendulo, ensaiosVigaBenkelman
-      ] = await Promise.all([
-        base44.entities.EnsaioDensidade.list("-created_date", 500),
-        base44.entities.EnsaioDensidadeInSitu.list("-created_date", 500),
-        base44.entities.EnsaioSondagem.list("-created_date", 500),
-        base44.entities.EnsaioTaxaPinturaImprimacao.list("-created_date", 500),
-        base44.entities.AcompanhamentoCarga.list("-created_date", 500),
-        base44.entities.EnsaioMRAF.list("-created_date", 500),
-        base44.entities.EnsaioManchaPendulo.list("-created_date", 500),
-        base44.entities.EnsaioVigaBenkelman.list("-created_date", 500),
-      ]);
-
-      const [
-        ensaiosTaxaMRAF, acompanhamentosUsinagem, ensaiosGranuIndividual, granuMisturas,
-        ensaiosProctor, ensaiosRompimentoConcreto, boletinsSondagem, boletinsSondagemTrado,
-        produtividadeDiaria
-      ] = await Promise.all([
-        base44.entities.EnsaioTaxaMRAF.list("-created_date", 500),
-        base44.entities.AcompanhamentoUsinagem.list("-created_date", 500),
-        base44.entities.EnsaioGranulometriaIndividual.list("-created_date", 500),
-        base44.entities.GranuMistura.list("-created_date", 500),
-        base44.entities.EnsaioProctor.list("-created_date", 500),
-        base44.entities.EnsaioRompimentoConcreto.list("-created_date", 500),
-        base44.entities.BoletimSondagem.list("-created_date", 500),
-        base44.entities.BoletimSondagemTrado.list("-created_date", 500),
-        base44.entities.ProdutividadeDiaria.list(),
-      ]);
 
       // ── 5. Processar registros — acumular por email ──────────────────────────
       const prodData = {};
@@ -163,30 +199,30 @@ export function useProdutividadeData(currentMonth) {
         });
       };
 
-      processarRegistros(diarios, 'DiarioObra');
-      processarRegistros(checklistsUsina, 'ChecklistUsina');
-      processarRegistros(checklistsAplicacao, 'ChecklistAplicacao');
-      processarRegistros(checklistsMRAF, 'ChecklistMRAF');
-      processarRegistros(checklistsConcretagem, 'ChecklistConcretagem');
-      processarRegistros(checklistsTerraplanagem, 'ChecklistTerraplanagem');
-      processarRegistros(checklistsReciclagem, 'ChecklistReciclagem');
-      processarRegistros(ensaiosCAUQ, 'EnsaioCAUQ');
-      processarRegistros(ensaiosDensidade, 'EnsaioDensidade');
-      processarRegistros(ensaiosDensidadeInSitu, 'EnsaioDensidadeInSitu');
-      processarRegistros(ensaiosSondagem, 'EnsaioSondagem');
-      processarRegistros(ensaiosTaxaPintura, 'EnsaioTaxaPinturaImprimacao');
-      processarRegistros(acompanhamentoCarga, 'AcompanhamentoCarga');
-      processarRegistros(ensaiosMRAF, 'EnsaioMRAF');
-      processarRegistros(ensaiosManchaPendulo, 'EnsaioManchaPendulo');
-      processarRegistros(ensaiosVigaBenkelman, 'EnsaioVigaBenkelman');
-      processarRegistros(ensaiosTaxaMRAF, 'EnsaioTaxaMRAF');
-      processarRegistros(acompanhamentosUsinagem, 'AcompanhamentoUsinagem');
-      processarRegistros(ensaiosGranuIndividual, 'EnsaioGranulometriaIndividual');
-      processarRegistros(granuMisturas, 'GranuMistura');
-      processarRegistros(ensaiosProctor, 'EnsaioProctor');
-      processarRegistros(ensaiosRompimentoConcreto, 'EnsaioRompimentoConcreto');
-      processarRegistros(boletinsSondagem, 'BoletimSondagem');
-      processarRegistros(boletinsSondagemTrado, 'BoletimSondagemTrado');
+      processarRegistros(ec.diarios, 'DiarioObra');
+      processarRegistros(ec.checklistsUsina, 'ChecklistUsina');
+      processarRegistros(ec.checklistsAplicacao, 'ChecklistAplicacao');
+      processarRegistros(ec.checklistsMRAF, 'ChecklistMRAF');
+      processarRegistros(ec.checklistsConcretagem, 'ChecklistConcretagem');
+      processarRegistros(ec.checklistsTerraplanagem, 'ChecklistTerraplanagem');
+      processarRegistros(ec.checklistsReciclagem, 'ChecklistReciclagem');
+      processarRegistros(ec.ensaiosCAUQ, 'EnsaioCAUQ');
+      processarRegistros(ec.ensaiosDensidade, 'EnsaioDensidade');
+      processarRegistros(ec.ensaiosDensidadeInSitu, 'EnsaioDensidadeInSitu');
+      processarRegistros(ec.ensaiosSondagem, 'EnsaioSondagem');
+      processarRegistros(ec.ensaiosTaxaPintura, 'EnsaioTaxaPinturaImprimacao');
+      processarRegistros(ec.acompanhamentoCarga, 'AcompanhamentoCarga');
+      processarRegistros(ec.ensaiosMRAF, 'EnsaioMRAF');
+      processarRegistros(ec.ensaiosManchaPendulo, 'EnsaioManchaPendulo');
+      processarRegistros(ec.ensaiosVigaBenkelman, 'EnsaioVigaBenkelman');
+      processarRegistros(ec.ensaiosTaxaMRAF, 'EnsaioTaxaMRAF');
+      processarRegistros(ec.acompanhamentosUsinagem, 'AcompanhamentoUsinagem');
+      processarRegistros(ec.ensaiosGranuIndividual, 'EnsaioGranulometriaIndividual');
+      processarRegistros(ec.granuMisturas, 'GranuMistura');
+      processarRegistros(ec.ensaiosProctor, 'EnsaioProctor');
+      processarRegistros(ec.ensaiosRompimentoConcreto, 'EnsaioRompimentoConcreto');
+      processarRegistros(ec.boletinsSondagem, 'BoletimSondagem');
+      processarRegistros(ec.boletinsSondagemTrado, 'BoletimSondagemTrado');
 
       // ── 6. Marcadores manuais de dias ────────────────────────────────────────
       const marcadoresDia = {};
@@ -211,11 +247,20 @@ export function useProdutividadeData(currentMonth) {
         if (!prodData[lab.email.toLowerCase()]) prodData[lab.email.toLowerCase()] = {};
       });
 
-      setLaboratoristas(
-        labUsers.sort((a, b) =>
-          (a.laboratorista_name || a.full_name || '').localeCompare(b.laboratorista_name || b.full_name || '')
-        )
+      const labsSorted = labUsers.sort((a, b) =>
+        (a.laboratorista_name || a.full_name || '').localeCompare(b.laboratorista_name || b.full_name || '')
       );
+
+      // Salva no cache do mês
+      monthCacheRef.current[monthKey] = {
+        laboratoristas: labsSorted,
+        produtividade: prodData,
+        marcadoresDia,
+        empreiteiras: empreiteirasArr,
+        usinas: usinasArr,
+      };
+
+      setLaboratoristas(labsSorted);
       setProdutividade(prodData);
       marcadoresDiaRef.current = marcadoresDia;
 
@@ -230,6 +275,13 @@ export function useProdutividadeData(currentMonth) {
     loadData();
   }, [loadData]);
 
+  // Expõe loadData(true) para forçar refresh após saves
+  const reloadFresh = useCallback(() => {
+    entityCacheRef.current = null;
+    monthCacheRef.current = {};
+    loadData(true);
+  }, [loadData]);
+
   return {
     loading,
     user,
@@ -238,6 +290,6 @@ export function useProdutividadeData(currentMonth) {
     empreiteiras,
     usinas,
     marcadoresDiaRef,
-    loadData,
+    loadData: reloadFresh,
   };
 }

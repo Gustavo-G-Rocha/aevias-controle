@@ -30,11 +30,13 @@ export default function ControleLaboratoristas() {
       const obrasData = await base44.entities.Obra.list();
       setObras(obrasData);
 
-      // Buscar registros em lotes de 8 para evitar rate limit
+      // Buscar registros em lotes de 8 com allSettled (falha isolada não quebra tudo)
+      const s = (results) => results.map(r => r.status === 'fulfilled' ? r.value : []);
+
       const [
         diariosObra, checklistsUsina, checklistsAplicacao, checklistsMRAF,
         checklistsConcretagem, checklistsTerraplanagem, checklistsReciclagem, ensaiosCAUQ
-      ] = await Promise.all([
+      ] = s(await Promise.allSettled([
         base44.entities.DiarioObra.list("-created_date", 500),
         base44.entities.ChecklistUsina.list("-created_date", 500),
         base44.entities.ChecklistAplicacao.list("-created_date", 500),
@@ -43,12 +45,12 @@ export default function ControleLaboratoristas() {
         base44.entities.ChecklistTerraplanagem.list("-created_date", 500),
         base44.entities.ChecklistReciclagem.list("-created_date", 500),
         base44.entities.EnsaioCAUQ.list("-created_date", 500),
-      ]);
+      ]));
 
       const [
         ensaiosMRAF, ensaiosDensidade, ensaiosDensidadeInSitu, ensaiosSondagem,
         ensaiosTaxaPintura, ensaiosGranIndividual, ensaiosManchaPendulo, ensaiosVigaBenkelman
-      ] = await Promise.all([
+      ] = s(await Promise.allSettled([
         base44.entities.EnsaioMRAF.list("-created_date", 500),
         base44.entities.EnsaioDensidade.list("-created_date", 500),
         base44.entities.EnsaioDensidadeInSitu.list("-created_date", 500),
@@ -57,25 +59,22 @@ export default function ControleLaboratoristas() {
         base44.entities.EnsaioGranulometriaIndividual.list("-created_date", 500),
         base44.entities.EnsaioManchaPendulo.list("-created_date", 500),
         base44.entities.EnsaioVigaBenkelman.list("-created_date", 500),
-      ]);
+      ]));
 
       const [
         acompanhamentosUsinagem, acompanhamentosCarga, ensaiosProctor,
-        ensaiosRompimento, ensaiosTaxaMRAF, granuMisturas
-      ] = await Promise.all([
+        ensaiosRompimento, ensaiosTaxaMRAF, granuMisturas,
+        boletinsSondagem, boletinsSondagemTrado
+      ] = s(await Promise.allSettled([
         base44.entities.AcompanhamentoUsinagem.list("-created_date", 500),
         base44.entities.AcompanhamentoCarga.list("-created_date", 500),
         base44.entities.EnsaioProctor.list("-created_date", 500),
         base44.entities.EnsaioRompimentoConcreto.list("-created_date", 500),
         base44.entities.EnsaioTaxaMRAF.list("-created_date", 500),
         base44.entities.GranuMistura.list("-created_date", 500),
-      ]);
-
-      // Último lote separado
-      const [boletinsSondagem, boletinsSondagemTrado] = await Promise.all([
         base44.entities.BoletimSondagem.list("-created_date", 500),
         base44.entities.BoletimSondagemTrado.list("-created_date", 500),
-      ]);
+      ]));
 
       // Combinar todos os registros
       const todosRegistros = [
