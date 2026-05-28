@@ -37,13 +37,13 @@ export default function ReportPhotoPage({ photos, pageOffset, photosPerPage = 6,
             )}
           </div>
         </header>
-        <main className="flex-grow grid grid-cols-2 gap-4 mt-2" style={{ gridAutoRows: 'minmax(0, 1fr)' }}>
+        <main className="grid grid-cols-2 gap-4 mt-2">
           {photos.map((fotoUrl, fotoIndex) => (
-            <div key={fotoIndex} className="border p-2 rounded-lg break-inside-avoid flex flex-col" style={{ height: 'calc((100vh - 300px) / 3)' }}>
-              <div className="bg-gray-100 flex-grow flex items-center justify-center rounded overflow-hidden">
+            <div key={fotoIndex} className="border p-2 rounded-lg break-inside-avoid flex flex-col">
+              <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden">
                 <picture>
                   <source srcSet={fotoUrl} />
-                  <img src={fotoUrl} alt={`Foto ${pageOffset * photosPerPage + fotoIndex + 1}`} className="max-h-full max-w-full object-contain" width="auto" height="auto" />
+                  <img src={fotoUrl} alt={`Foto ${pageOffset * photosPerPage + fotoIndex + 1}`} className="w-full h-auto object-contain" style={{ maxHeight: '280px' }} width="auto" height="auto" />
                 </picture>
               </div>
               <p className="text-center text-sm print:text-xs mt-2 font-medium">
