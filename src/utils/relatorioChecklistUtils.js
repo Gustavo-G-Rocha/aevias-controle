@@ -1,33 +1,72 @@
 /**
- * Extrai ID do checklist da URL
+ * Utilitários puros para RelatorioChecklist
  */
-export const extractChecklistIdFromUrl = () => {
-  const params = new URLSearchParams(window.location.search);
-  return params.get('id');
+
+/**
+ * Agrupa array em chunks de tamanho especificado
+ * @param {Array} array
+ * @param {number} size
+ * @returns {Array<Array>}
+ */
+export const chunkArray = (array, size) => {
+  const chunks = [];
+  if (!array) return chunks;
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
 };
 
 /**
- * Monta dados consolidados do relatório
+ * Calcula número de páginas do relatório
+ * @param {Object} config
+ * @returns {number}
  */
-export const buildRelatorioChecklistData = (checklist, obra, regional, project, user, creatorUser) => ({
-  checklist,
-  obra,
-  regional,
-  project,
-  user,
-  creatorUser,
-});
-
-/**
- * Valida se os dados mínimos estão disponíveis
- */
-export const isValidRelatorioChecklistData = (checklist) => {
-  return !!(checklist && checklist.id);
+export const calculateTotalPages = ({
+  temControleLigante,
+  temAcoesCorretivas,
+  temMedicaoUsina,
+  photoChunksLength,
+}) => {
+  return 1 + 1 + (temControleLigante ? 1 : 0) + (temAcoesCorretivas ? 1 : 0) + (temMedicaoUsina ? 1 : 0) + photoChunksLength;
 };
 
 /**
- * Determina a entidade name para AprovacaoBar
+ * Calcula número da página para seção de fotos
+ * @param {number} pageIndex - índice da foto (começando em 0)
+ * @param {Object} config
+ * @returns {number}
  */
-export const getChecklistEntityName = () => {
-  return 'ChecklistUsina';
+export const calculatePhotoPageNumber = (
+  pageIndex,
+  { temControleLigante, temAcoesCorretivas, temMedicaoUsina }
+) => {
+  return pageIndex + 3 + (temControleLigante ? 1 : 0) + (temAcoesCorretivas ? 1 : 0) + (temMedicaoUsina ? 1 : 0);
+};
+
+/**
+ * Calcula número da página para seção de ações corretivas
+ * @param {Object} config
+ * @returns {number}
+ */
+export const calculateAcoesPageNumber = ({ temControleLigante }) => {
+  return temControleLigante ? 4 : 3;
+};
+
+/**
+ * Formata resultado de ensaio para tabela CAUQ
+ * @param {Object} ensaioData
+ * @returns {string}
+ */
+export const formatResultado = (ensaioData) => {
+  if (!ensaioData) return '-';
+  if (Array.isArray(ensaioData.resultados) && ensaioData.resultados.length > 0) {
+    const validos = ensaioData.resultados.filter(r => r !== null && r !== undefined);
+    if (validos.length === 0) return '-';
+    return validos.length === 1 ? validos[0] : validos.join(' / ');
+  }
+  if (ensaioData.resultado !== null && ensaioData.resultado !== undefined) {
+    return ensaioData.resultado;
+  }
+  return '-';
 };

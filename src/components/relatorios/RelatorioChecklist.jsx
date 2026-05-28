@@ -1,17 +1,26 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import SignatureFooter from './SignatureFooter';
 import PrintStyles from './PrintStyles';
-import { buildSignatureProps, formatDateBrasilia } from '@/utils/relatorioUtils';
+import { buildSignatureProps } from '@/utils/relatorioUtils';
 import { ReportCheckmark, ReportSectionTitle, ReportNaoConformidadesTable } from './shared';
 import TabelaControleLigante from './checklist/TabelaControleLigante';
 import PaginaMedicaoCargas from './checklist/PaginaMedicaoCargas';
-
-const LOGO_DEFAULT = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png";
-
-const Checkmark = ({ checked }) => <ReportCheckmark checked={checked} />;
+import PageContainer from './checklist/PageContainer';
+import ReportHeaderWithProject from './checklist/ReportHeaderWithProject';
+import ReportHeader from './checklist/ReportHeader';
+import RodadaProducaoCard from './checklist/RodadaProducaoCard';
+import PhotoGalleryPage from './checklist/PhotoGalleryPage';
+import {
+  chunkArray,
+  calculateTotalPages,
+  calculatePhotoPageNumber,
+  calculateAcoesPageNumber,
+  formatResultado,
+} from '@/utils/relatorioChecklistUtils';
 
 // ─── Tabela de Controle de Agregados ─────────────────────────────────────────
 const TabelaControleAgregados = ({ controle_agregados }) => {
+  const Checkmark = ({ checked }) => <ReportCheckmark checked={checked} />;
   const data = controle_agregados || [];
   return (
     <table className="w-full print:text-base border-collapse border border-slate-300 text-sm">
@@ -57,17 +66,6 @@ const TabelaControleCAUQ = ({ controle_cauq, project }) => {
     { label: 'Fluência', key: 'fluencia', padrao: project?.fluencia ? `${project.fluencia.min} a ${project.fluencia.max} mm` : 'Indicativo' },
   ];
 
-  const formatResultado = (ensaioData) => {
-    if (!ensaioData) return '-';
-    if (Array.isArray(ensaioData.resultados) && ensaioData.resultados.length > 0) {
-      const validos = ensaioData.resultados.filter(r => r !== null && r !== undefined);
-      if (validos.length === 0) return '-';
-      return validos.length === 1 ? validos[0] : validos.join(' / ');
-    }
-    if (ensaioData.resultado !== null && ensaioData.resultado !== undefined) return ensaioData.resultado;
-    return '-';
-  };
-
   const formatConformidade = (conforme) => {
     if (conforme === null || conforme === undefined) return <span className="text-slate-500 text-xl">-</span>;
     if (conforme === true) return <span className="text-green-600 font-bold text-2xl">✓</span>;
@@ -110,50 +108,7 @@ const TabelaControleCAUQ = ({ controle_cauq, project }) => {
   );
 };
 
-// ─── Cabeçalho de Impressão ───────────────────────────────────────────────────
-const ReportPrintHeader = ({ checklist, obra, regional, project }) => (
-  <div>
-    <header className="grid grid-cols-3 items-center border-b-2 border-slate-900 pb-2">
-      <div className="flex justify-start">
-        <picture>
-          <source srcSet={regional?.logo_url || LOGO_DEFAULT} />
-          <img src={regional?.logo_url || LOGO_DEFAULT} alt="Logo Regional" className="h-16 object-contain" width="auto" height="64" />
-        </picture>
-      </div>
-      <div className="text-center">
-        <h1 className="text-xl font-bold text-gray-800">Controle Tecnológico de Usinagem</h1>
-      </div>
-      <div className="flex justify-end">
-        <div className="border border-gray-400 p-2 rounded-md text-base print:text-sm">
-          <p className="font-semibold text-gray-800">
-            {new Date(checklist.data).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
-          </p>
-        </div>
-      </div>
-    </header>
-    <main className="text-base print:text-base mt-2">
-      <ReportSectionTitle>Dados da Obra e Projeto</ReportSectionTitle>
-      <div className="grid grid-cols-4 gap-x-4 gap-y-2">
-        <div><p className="font-bold">CLIENTE:</p><p>{regional?.cliente || 'N/A'}</p></div>
-        <div><p className="font-bold">PROJETO:</p><p>{project?.name || checklist.projeto_utilizado || 'N/A'}</p></div>
-        <div><p className="font-bold">PEDREIRA:</p><p>{checklist.pedreira || 'N/A'}</p></div>
-        <div><p className="font-bold">INSPETOR:</p><p>{checklist.inspetor_campo || 'N/A'}</p></div>
-        <div><p className="font-bold">OBRA:</p><p>{obra?.name || 'N/A'}</p></div>
-        <div><p className="font-bold">FAIXA ESPECIFICADA:</p><p>{checklist.faixa_especificada || 'N/A'}</p></div>
-        <div><p className="font-bold">ENSAIO REALIZADO POR:</p><p>{checklist.ensaio_realizado_por || 'N/A'}</p></div>
-        <div>
-          <p className="font-bold">JORNADA:</p>
-          <p>{checklist.jornada?.horario_inicio && checklist.jornada?.horario_fim
-            ? `${checklist.jornada.horario_inicio} - ${checklist.jornada.horario_fim}`
-            : 'N/A'}
-          </p>
-        </div>
-        <div><p className="font-bold">USINA:</p><p>{checklist.usina}</p></div>
-        <div><p className="font-bold">LIGANTE:</p><p>{checklist.ligante || 'N/A'}</p></div>
-      </div>
-    </main>
-  </div>
-);
+
 
 const ReportFooter = ({ checklist, creatorUser }) => (
   <SignatureFooter {...buildSignatureProps(checklist, creatorUser)} />
@@ -161,10 +116,10 @@ const ReportFooter = ({ checklist, creatorUser }) => (
 
 // ─── Componente Principal ─────────────────────────────────────────────────────
 export default function RelatorioChecklist({ checklist, obra, regional, project, user, creatorUser }) {
-  const [compressedPhotos, setCompressedPhotos] = React.useState([]);
-  const [isCompressing, setIsCompressing] = React.useState(true);
+  const [compressedPhotos, setCompressedPhotos] = useState([]);
+  const [isCompressing, setIsCompressing] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const compressImages = async () => {
       if (!checklist?.fotos || checklist.fotos.length === 0) {
         setIsCompressing(false);
@@ -209,30 +164,40 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
   if (!checklist) return <div className="p-8">Dados do checklist não encontrados.</div>;
   if (isCompressing) return <div className="p-8 text-center">Otimizando imagens para impressão...</div>;
 
-  const chunkArray = (array, size) => {
-    const chunks = [];
-    if (!array) return chunks;
-    for (let i = 0; i < array.length; i += size) chunks.push(array.slice(i, i + size));
-    return chunks;
-  };
-
   const photoChunks = chunkArray(compressedPhotos, 6);
   const temAcoesCorretivas = checklist.acoes_corretivas_realizado === true && checklist.acoes_corretivas_descricao;
   const temControleLigante = checklist.controle_ligante_ativo === true;
   const temMedicaoUsina = (checklist.medicoes_usina?.cargas?.length || 0) > 0;
-  const totalPages = 1 + 1 + (temControleLigante ? 1 : 0) + (temAcoesCorretivas ? 1 : 0) + (temMedicaoUsina ? 1 : 0) + photoChunks.length;
+  
+  const totalPages = calculateTotalPages({
+    temControleLigante,
+    temAcoesCorretivas,
+    temMedicaoUsina,
+    photoChunksLength: photoChunks.length,
+  });
+  
+  const pageConfig = { temControleLigante, temAcoesCorretivas, temMedicaoUsina };
 
   return (
     <div className="bg-white font-sans">
       <PrintStyles />
 
       {/* Página 1: Agregados & Produção */}
-      <div className="p-8 print:p-8 flex flex-col page-container min-h-screen">
-        <div className="w-full max-w-[190mm] mx-auto flex-grow flex flex-col">
-          <ReportPrintHeader checklist={checklist} obra={obra} regional={regional} project={project} />
-          <main className="flex-grow">
-            <ReportSectionTitle>Controle de Agregados</ReportSectionTitle>
-            <TabelaControleAgregados controle_agregados={checklist.controle_agregados} />
+      <PageContainer
+        pageNumber={1}
+        totalPages={totalPages}
+        headerContent={
+          <ReportHeaderWithProject 
+            regional={regional} 
+            checklist={checklist} 
+            obra={obra} 
+            project={project} 
+          />
+        }
+        footerContent={null}
+      >
+        <ReportSectionTitle>Controle de Agregados</ReportSectionTitle>
+        <TabelaControleAgregados controle_agregados={checklist.controle_agregados} />
 
             <div className="mt-4 space-y-2">
               <div className="flex items-start gap-4">
@@ -268,82 +233,76 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
               </div>
             </div>
 
-            <ReportSectionTitle>Acompanhamento da Produção</ReportSectionTitle>
-            <div className="grid grid-cols-2 gap-4">
-              {(checklist.rodadas_producao || []).map((rodada, index) => (
-                <div key={index} className="border border-slate-200 p-2 rounded-md space-y-1 text-sm">
-                  <h3 className="font-bold text-center">Rodada {rodada.numero_rodada}</h3>
-                  <p><strong className="font-medium">Horário:</strong> {rodada.horario_inicio} às {rodada.horario_termino}</p>
-                  <p><strong className="font-medium">Temp. Ambiente:</strong> {rodada.temperatura_ambiente}°C</p>
-                  <p><strong className="font-medium">Clima:</strong> {rodada.condicoes_climaticas}</p>
-                  <p><strong className="font-medium">Qtde. Produzida:</strong> {rodada.quantidade_produzida} t</p>
-                  <p><strong className="font-medium">Controle de Cargas (Qtde):</strong> {rodada.controle_cargas_qtde}</p>
-                  <p><strong className="font-medium">Caminhões Enlonados:</strong> <Checkmark checked={rodada.caminhoes_enlonados} /></p>
-                  <p><strong className="font-medium">Temp. Massa:</strong> T1: {rodada.temperatura_massa_t1}°C / T2: {rodada.temperatura_massa_t2}°C</p>
-                </div>
-              ))}
-            </div>
-          </main>
-          <footer className="mt-auto pt-2 text-center text-sm print:text-xs text-gray-400">
-            Página 1 de {totalPages}
-          </footer>
+        <ReportSectionTitle>Acompanhamento da Produção</ReportSectionTitle>
+        <div className="grid grid-cols-2 gap-4">
+          {(checklist.rodadas_producao || []).map((rodada, index) => (
+            <RodadaProducaoCard key={index} rodada={rodada} index={index} />
+          ))}
         </div>
-      </div>
+      </PageContainer>
 
       {/* Página 2: Controle de CAUQ */}
-      <div className="p-8 print:p-8 flex flex-col page-container min-h-screen break-before-page">
-        <div className="w-full max-w-[190mm] mx-auto flex-grow flex flex-col">
-          <ReportPrintHeader checklist={checklist} obra={obra} regional={regional} project={project} />
-          <main className="flex-grow">
-            <TabelaControleCAUQ controle_cauq={checklist.controle_cauq} project={project} />
-            <div className="mt-2"><strong className="font-medium">Observações Gerais:</strong> {checklist.observacoes?.substring(0, 500) || 'N/A'}</div>
-          </main>
-          <ReportFooter checklist={checklist} creatorUser={creatorUser} />
-          <footer className="mt-auto pt-2 text-center text-sm print:text-xs text-gray-400">
-            Página 2 de {totalPages}
-          </footer>
-        </div>
-      </div>
+      <PageContainer
+        pageNumber={2}
+        totalPages={totalPages}
+        headerContent={
+          <ReportHeader 
+            regional={regional} 
+            title="Controle Tecnológico de Usinagem" 
+            checklist={checklist} 
+          />
+        }
+        footerContent={<ReportFooter checklist={checklist} creatorUser={creatorUser} />}
+      >
+        <TabelaControleCAUQ controle_cauq={checklist.controle_cauq} project={project} />
+        <div className="mt-2"><strong className="font-medium">Observações Gerais:</strong> {checklist.observacoes?.substring(0, 500) || 'N/A'}</div>
+      </PageContainer>
 
       {/* Página 3: Controle de Ligante (condicional) */}
       {temControleLigante && (
-        <div className="p-8 print:p-8 flex flex-col page-container min-h-screen break-before-page">
-          <div className="w-full max-w-[190mm] mx-auto flex-grow flex flex-col">
-            <ReportPrintHeader checklist={checklist} obra={obra} regional={regional} project={project} />
-            <main className="flex-grow mt-6">
-              <TabelaControleLigante controle_ligante={checklist.controle_ligante} />
-            </main>
-            <ReportFooter checklist={checklist} creatorUser={creatorUser} />
-            <footer className="pt-1 text-center text-sm print:text-xs text-gray-400">
-              Página 3 de {totalPages}
-            </footer>
-          </div>
-        </div>
+        <PageContainer
+          pageNumber={3}
+          totalPages={totalPages}
+          headerContent={
+            <ReportHeader 
+              regional={regional} 
+              title="Controle Tecnológico de Usinagem" 
+              checklist={checklist} 
+            />
+          }
+          footerContent={<ReportFooter checklist={checklist} creatorUser={creatorUser} />}
+          className="mt-6"
+        >
+          <TabelaControleLigante controle_ligante={checklist.controle_ligante} />
+        </PageContainer>
       )}
 
       {/* Página: Ações Corretivas (condicional) */}
       {temAcoesCorretivas && (
-        <div className="p-8 print:p-8 flex flex-col page-container min-h-screen break-before-page">
-          <div className="w-full max-w-[190mm] mx-auto flex-grow flex flex-col">
-            <ReportPrintHeader checklist={checklist} obra={obra} regional={regional} project={project} />
-            <main className="flex-grow mt-6">
-              <ReportSectionTitle>Ações Corretivas Realizadas</ReportSectionTitle>
-              <div className="border-2 border-slate-300 rounded-lg p-6 bg-white min-h-48 mb-6">
-                <p className="text-base leading-relaxed whitespace-pre-wrap text-justify">{checklist.acoes_corretivas_descricao}</p>
-              </div>
-              {checklist.nao_conformidades && checklist.nao_conformidades.length > 0 && (
-                <div>
-                  <ReportSectionTitle>Não Conformidades</ReportSectionTitle>
-                  <ReportNaoConformidadesTable naoConformidades={checklist.nao_conformidades} />
-                </div>
-              )}
-            </main>
-            <ReportFooter checklist={checklist} creatorUser={creatorUser} />
-            <footer className="mt-auto pt-2 text-center text-sm print:text-xs text-gray-400">
-              Página {temControleLigante ? 4 : 3} de {totalPages}
-            </footer>
+        <PageContainer
+          pageNumber={calculateAcoesPageNumber({ temControleLigante })}
+          totalPages={totalPages}
+          headerContent={
+            <ReportHeader 
+              regional={regional} 
+              title="Controle Tecnológico de Usinagem" 
+              checklist={checklist} 
+            />
+          }
+          footerContent={<ReportFooter checklist={checklist} creatorUser={creatorUser} />}
+          className="mt-6"
+        >
+          <ReportSectionTitle>Ações Corretivas Realizadas</ReportSectionTitle>
+          <div className="border-2 border-slate-300 rounded-lg p-6 bg-white min-h-48 mb-6">
+            <p className="text-base leading-relaxed whitespace-pre-wrap text-justify">{checklist.acoes_corretivas_descricao}</p>
           </div>
-        </div>
+          {checklist.nao_conformidades && checklist.nao_conformidades.length > 0 && (
+            <div>
+              <ReportSectionTitle>Não Conformidades</ReportSectionTitle>
+              <ReportNaoConformidadesTable naoConformidades={checklist.nao_conformidades} />
+            </div>
+          )}
+        </PageContainer>
       )}
 
       {/* Página: Medição de Cargas da Usina (condicional) */}
@@ -360,45 +319,16 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
 
       {/* Páginas: Relatório Fotográfico */}
       {photoChunks.map((chunk, pageIndex) => (
-        <div key={pageIndex} className="p-8 print:p-8 flex flex-col page-container min-h-screen break-before-page">
-          <div className="w-full max-w-[190mm] mx-auto flex-grow flex flex-col">
-            <header className="grid grid-cols-3 items-center border-b-2 border-gray-800 pb-2">
-              <div className="flex justify-start">
-                <picture>
-                  <source srcSet={regional?.logo_url || LOGO_DEFAULT} />
-                  <img src={regional?.logo_url || LOGO_DEFAULT} alt="Logo Regional" className="h-16 object-contain" width="auto" height="64" />
-                </picture>
-              </div>
-              <div className="text-center">
-                <h1 className="text-2xl print:text-xl font-bold text-gray-800">Relatório Fotográfico  Checklist</h1>
-                <p className="text-base print:text-sm text-gray-600">Obra: {obra?.name || 'N/A'}</p>
-              </div>
-              <div className="flex justify-end text-sm print:text-xs">
-                <div className="border border-gray-400 p-2 rounded-md">
-                  <p>{new Date(checklist.data).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</p>
-                </div>
-              </div>
-            </header>
-            <main className="grid grid-cols-2 gap-4 mt-4">
-              {chunk.map((fotoUrl, fotoIndex) => (
-                <div key={`foto-${fotoIndex}`} className="border p-2 rounded-lg break-inside-avoid flex flex-col">
-                  <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden">
-                    <picture>
-                      <source srcSet={fotoUrl} />
-                      <img src={fotoUrl} alt={`Foto ${pageIndex * 6 + fotoIndex + 1}`} className="w-full h-auto object-contain" style={{ maxHeight: '280px' }} width="auto" height="auto" />
-                    </picture>
-                  </div>
-                  <p className="text-center text-base print:text-sm mt-2 font-medium">
-                    Foto {(pageIndex * 6) + fotoIndex + 1}
-                  </p>
-                </div>
-              ))}
-            </main>
-            <footer className="mt-auto pt-2 text-center text-sm print:text-xs text-gray-500">
-              Página {pageIndex + 3 + (temControleLigante ? 1 : 0) + (temAcoesCorretivas ? 1 : 0) + (temMedicaoUsina ? 1 : 0)} de {totalPages}
-            </footer>
-          </div>
-        </div>
+        <PhotoGalleryPage
+          key={pageIndex}
+          photoChunk={chunk}
+          pageIndex={pageIndex}
+          regional={regional}
+          checklist={checklist}
+          obra={obra}
+          pageNumber={calculatePhotoPageNumber(pageIndex, pageConfig)}
+          totalPages={totalPages}
+        />
       ))}
     </div>
   );
