@@ -171,14 +171,14 @@ describe("relatorioChecklistUtils", () => {
       const resultado = formatResultado({
         resultados: [5.5, 6.0, 5.8],
       });
-      expect(resultado).toBe("5.5 / 6.0 / 5.8");
+      expect(resultado).toBe("5.5 / 6 / 5.8");
     });
 
     it("ignora valores null/undefined no array", () => {
       const resultado = formatResultado({
         resultados: [5.5, null, 6.0, undefined],
       });
-      expect(resultado).toBe("5.5 / 6.0");
+      expect(resultado).toBe("5.5 / 6");
     });
 
     it("retorna '-' se array vazio", () => {
@@ -190,7 +190,7 @@ describe("relatorioChecklistUtils", () => {
     });
 
     it("usa campo resultado se não há array", () => {
-      expect(formatResultado({ resultado: 5.5 })).toBe(5.5);
+      expect(formatResultado({ resultado: 5.5 })).toBe("5.5");
     });
 
     it("prioriza array sobre resultado único", () => {
@@ -198,7 +198,7 @@ describe("relatorioChecklistUtils", () => {
         resultados: [5.5, 6.0],
         resultado: 5.7,
       });
-      expect(resultado).toBe("5.5 / 6.0");
+      expect(resultado).toBe("5.5 / 6");
     });
   });
 });

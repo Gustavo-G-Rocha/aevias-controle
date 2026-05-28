@@ -63,10 +63,10 @@ export const formatResultado = (ensaioData) => {
   if (Array.isArray(ensaioData.resultados) && ensaioData.resultados.length > 0) {
     const validos = ensaioData.resultados.filter(r => r !== null && r !== undefined);
     if (validos.length === 0) return '-';
-    return validos.length === 1 ? validos[0] : validos.join(' / ');
+    return validos.map(v => String(v)).join(' / ');
   }
   if (ensaioData.resultado !== null && ensaioData.resultado !== undefined) {
-    return ensaioData.resultado;
+    return String(ensaioData.resultado);
   }
   return '-';
 };

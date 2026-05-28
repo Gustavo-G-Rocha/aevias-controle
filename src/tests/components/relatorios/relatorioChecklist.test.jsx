@@ -100,7 +100,7 @@ describe("estrutura de dados para RelatorioChecklist", () => {
       const temAcoes =
         checklist.acoes_corretivas_realizado === true &&
         checklist.acoes_corretivas_descricao;
-      expect(temAcoes).toBe(true);
+      expect(!!temAcoes).toBe(true);
     });
 
     it("não detecta se descrição ausente", () => {
@@ -111,7 +111,7 @@ describe("estrutura de dados para RelatorioChecklist", () => {
       const temAcoes =
         checklist.acoes_corretivas_realizado === true &&
         checklist.acoes_corretivas_descricao;
-      expect(temAcoes).toBe(false);
+      expect(!!temAcoes).toBe(false);
     });
 
     it("detecta controle de ligante ativo", () => {
