@@ -2,7 +2,7 @@
  * Hook de carregamento de registros para RelatorioUnificado.
  * Busca e filtra registros por tipo, período e critérios adicionais.
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getDataEnsaio } from '@/components/ensaios/ensaioMappers';
 import { getEntityInstance } from '@/utils/relatorioUnificadoEntityMap';
 
@@ -11,7 +11,14 @@ export function useRelatorioUnificadoRecords(filters) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Stringify para evitar disparos em loop por nova referência de objeto
+  const filterKey = JSON.stringify(filters);
+  const prevKeyRef = useRef(null);
+
   useEffect(() => {
+    if (prevKeyRef.current === filterKey) return;
+    prevKeyRef.current = filterKey;
+
     const loadRecords = async () => {
       if (!filters.hasValidFilters) {
         setLoading(false);
@@ -86,7 +93,8 @@ export function useRelatorioUnificadoRecords(filters) {
     };
 
     loadRecords();
-  }, [filters]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterKey]);
 
   return { records, loading, error };
 }
