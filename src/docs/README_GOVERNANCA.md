@@ -6,7 +6,8 @@
 
 ## 📌 Resumo Executivo
 
-O projeto **está arquiteturalmente saudável** e passou em auditoria final de governança.
+O projeto **está arquiteturalmente saudável** e passou em auditoria final de governança técnica.  
+**Pronto para homologação/produção** sujeito a validação funcional, QA e deploy (ver ADR-009 e CHECKLIST_CICD.md).
 
 | Dimensão | Nota | Status |
 |---|---|---|
@@ -239,12 +240,12 @@ Criar issue com:
 
 ## 🚀 Status Atual
 
-### ✅ PRONTO PARA:
-- Produção imediata
-- Equipes de 5-10 devs
-- Evolução por 2+ anos
-- CI/CD automático
-- Manutenção contínua
+### ✅ ARQUITETURALMENTE PRONTO PARA:
+- Homologação/produção (sujeito a validação funcional, QA, deploy e testes de aceitação)
+- Equipes de 5-10 devs (com onboarding via PADROES_CODIGO.md)
+- Evolução por 2+ anos (padrões sustentáveis, sem débito técnico crítico)
+- CI/CD automático (requer setup conforme CHECKLIST_CICD.md)
+- Manutenção contínua (documentação de decisões via DECISOES_ARQUITETURAIS.md)
 
 ### ⚠️ NÃO PRONTO PARA:
 - E2E testing (sem test environment)
@@ -298,7 +299,7 @@ Criar issue com:
 - 📂 [CHECKLIST_CICD.md](./CHECKLIST_CICD.md) — Automação
 
 ### Auditoria
-- 📂 [AUDITORIA_ARQUITETURAL_2026.md](./AUDITORIA_ARQUITETURAIS_2026.md) — Análise completa
+- 📂 [AUDITORIA_ARQUITETURAL_2026.md](./AUDITORIA_ARQUITETURAL_2026.md) — Análise completa
 
 ---
 

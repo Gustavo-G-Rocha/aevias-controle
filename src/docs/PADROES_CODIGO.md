@@ -449,7 +449,8 @@ Antes de commitar, verificar:
 
 - 📋 [AUDITORIA_ARQUITETURAL_2026.md](./AUDITORIA_ARQUITETURAL_2026.md) — Diagnóstico completo
 - 🏗️ [ARCHITECTURE.md](./ARCHITECTURE.md) — Visão geral do projeto
-- 📝 [DECISOES.md](./DECISOES.md) — Por quê certas escolhas (a criar se necessário)
+- 📝 [DECISOES_ARQUITETURAIS.md](./DECISOES_ARQUITETURAIS.md) — Por quês das escolhas arquiteturais
+- ✅ [CHECKLIST_CICD.md](./CHECKLIST_CICD.md) — Automação e validação de CI/CD
 
 ---
 

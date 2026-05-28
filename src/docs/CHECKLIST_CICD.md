@@ -11,7 +11,7 @@ Executar antes de `git push`:
 
 ### Linting
 ```bash
-# ✅ ESLint (se configurado)
+# ✅ ESLint (se configurado em package.json)
 npm run lint
 
 # ⚠️ Se falhar — corrigir antes de commit
@@ -20,7 +20,7 @@ npm run lint
 
 ### Formatação
 ```bash
-# ✅ Prettier (opcional mas recomendado)
+# ✅ Prettier (se configurado em package.json - opcional mas recomendado)
 npm run format
 
 # Verificar
@@ -29,12 +29,14 @@ npm run format -- --check
 
 ### Testes
 ```bash
-# ✅ Vitest local
+# ✅ Vitest local (verificar comando em package.json)
 npm run test
 
-# ⚠️ Esperado: 47+ testes passando
+# ⚠️ Esperado: Testes passando (cobertura > 70%)
 # ⚠️ Se falhar: não commitar
 ```
+
+**Nota**: Comandos baseados em convenção. Verificar `package.json` scripts para comandos específicos do projeto.
 
 ### Checklist Manual
 - [ ] Nomes seguem padrão (PascalCase components, camelCase utils)
@@ -66,7 +68,7 @@ npm run lint
 
 ### Stage 3: Type Check (Opcional)
 ```bash
-# Se usar TypeScript/JSDoc
+# Se usar TypeScript/JSDoc (verificar em package.json)
 npm run type-check
 ```
 
@@ -75,8 +77,8 @@ npm run type-check
 npm run test
 ```
 - ✅ Vitest com coverage
-- ✅ 47 testes obrigatórios
-- ⚠️ Falha se < 70% coverage
+- ✅ Esperado: Testes passando (cobertura > 70%)
+- ⚠️ Falha se < 70% coverage (atual: baseado em vitest.config.js)
 - ⚠️ Falha se algum teste falha
 
 ### Stage 5: Build
@@ -119,10 +121,13 @@ jobs:
       - run: npm ci
       
       - run: npm run lint
+        # Nota: verificar comando exato em package.json scripts
       
       - run: npm run test
+        # Nota: verificar comando exato em package.json scripts
       
       - run: npm run build
+        # Nota: verificar comando exato em package.json scripts
       
       - name: Archive build artifacts
         if: always()
@@ -131,6 +136,8 @@ jobs:
           name: build
           path: dist/
 ```
+
+**Nota**: Este exemplo usa comandos convencionais. Adaptar conforme `package.json` do seu projeto.
 
 ---
 
@@ -183,7 +190,7 @@ npm audit
 
 ## 📝 Documentação para Merge
 
-Ao fazer PR, incluir:
+Ao fazer PR, incluir (referenciar PADROES_CODIGO.md e DECISOES_ARQUITETURAIS.md):
 
 ```markdown
 ## Descrição
