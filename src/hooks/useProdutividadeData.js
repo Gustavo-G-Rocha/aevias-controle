@@ -46,7 +46,7 @@ export function useProdutividadeData(currentMonth) {
   // Cache de dados processados por chave "YYYY-MM"
   const monthCacheRef = useRef({});
 
-  const loadData = useCallback(async (force = false) => {
+  const loadData = useCallback(async (force = true) => {
     const monthKey = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
 
     // Se já temos cache do mês e não é forced, usa direto
@@ -272,14 +272,7 @@ export function useProdutividadeData(currentMonth) {
   }, [currentMonth]);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  // Expõe loadData(true) para forçar refresh após saves
-  const reloadFresh = useCallback(() => {
-    entityCacheRef.current = null;
-    monthCacheRef.current = {};
-    loadData(true);
+    loadData(false);
   }, [loadData]);
 
   return {
@@ -290,6 +283,6 @@ export function useProdutividadeData(currentMonth) {
     empreiteiras,
     usinas,
     marcadoresDiaRef,
-    loadData: reloadFresh,
+    loadData,
   };
 }
