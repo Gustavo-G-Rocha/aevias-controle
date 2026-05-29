@@ -11,8 +11,7 @@ const TOOLTIP_STYLE = {
 };
 
 const TreemapContent = (props) => {
-  const { x, y, width, height, fill, payload } = props;
-  const opacity = payload.activeObra ? 1 : 0.5;
+  const { x, y, width, height, fill } = props;
 
   return (
     <rect
@@ -21,7 +20,6 @@ const TreemapContent = (props) => {
       width={width}
       height={height}
       fill={fill}
-      opacity={opacity}
       style={{ cursor: 'pointer' }}
     />
   );
