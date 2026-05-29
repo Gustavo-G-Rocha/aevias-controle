@@ -2,8 +2,6 @@ import { Loader2, AlertTriangle, XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { createPageUrl } from "@/utils";
 import AcoesCorretivasNC from "@/components/checklists/AcoesCorretivasNC";
 import ChecklistFooter from "@/components/checklists/ChecklistFooter";
