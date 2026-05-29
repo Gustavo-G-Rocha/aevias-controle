@@ -4,11 +4,7 @@ import {
   extractLaboratoristas,
   filterRecordsByDateRange,
 } from "@/utils/relatoriosUnificadosUtils";
-import { getEntityInstance } from "@/utils/relatorioUnificadoEntityMap";
-import { ALL_RECORD_ENTITIES } from "@/services/recordsService";
-
-// Alias local para clareza — mesma lista canônica de recordsService
-const ENTITY_KEYS = ALL_RECORD_ENTITIES;
+import { loadRecordsByObra } from "@/services/recordsService";
 
 export const useRelatoriosUnificadosFilters = () => {
   const [obraSelecionada, setObraSelecionada] = useState("");
@@ -44,28 +40,9 @@ export const useRelatoriosUnificadosFilters = () => {
   const loadLaboratoristas = useCallback(async (obraId, inicio, fim) => {
     setLoadingLaboratoristas(true);
     try {
-      const results = await Promise.allSettled(
-        ENTITY_KEYS.map(key => {
-          const entity = getEntityInstance(key);
-          return entity
-            ? entity.filter({ obra_id: obraId }, "-created_date", 1000)
-                .then(records => records.map(r => ({ ...r, entityType: key })))
-            : Promise.resolve([]);
-        })
-      );
-
-      const allRecords = [];
-      results.forEach((result, i) => {
-        if (result.status === 'fulfilled') {
-          result.value.forEach(r => allRecords.push(r));
-        } else {
-          console.warn(`[RelatoriosUnificados] Falha ao carregar ${ENTITY_KEYS[i]}:`, result.reason?.message || result.reason);
-        }
-      });
-
+      const allRecords = await loadRecordsByObra(obraId);
       const filtered = filterRecordsByDateRange(allRecords, inicio, fim);
       const labs = extractLaboratoristas(filtered);
-
       setLaboratoristasDisponiveis(labs);
       setLaboratoristasChecked(labs);
     } catch (err) {
