@@ -52,29 +52,41 @@ export default function ProjectFormBGS({ formData, peneirasCarregadas, peneirasD
             <p className="text-xs text-slate-500 mb-4">
               Informe os limites mínimo e máximo de passante para cada peneira relevante.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
+            {/* Cabeçalho das colunas */}
+            <div className="flex items-center gap-2 mb-1 border-b pb-2">
+              <span className="text-xs font-semibold text-slate-500 w-28 shrink-0">Peneira</span>
+              <span className="text-xs font-semibold text-slate-500 flex-1 text-center">Mín (%)</span>
+              <span className="text-xs font-semibold text-slate-500 flex-1 text-center">Ótimo (%)</span>
+              <span className="text-xs font-semibold text-slate-500 flex-1 text-center">Máx (%)</span>
+            </div>
+            <div className="space-y-2">
               {peneirasDisponiveis.map(p => (
                 <div key={p.key} className="flex items-center gap-2">
                   <span className="text-xs font-medium w-28 shrink-0">{p.astm}</span>
-                  <div className="flex items-center gap-1 flex-1">
-                    <Input
-                      type="number"
-                      step="0.1"
-                      placeholder="Mín"
-                      value={formData.faixa_trabalho_min?.[p.key] ?? ""}
-                      onChange={(e) => onFaixaTrabalhoChange?.(p.key, 'min', e.target.value)}
-                      className="text-xs h-8"
-                    />
-                    <span className="text-slate-400 text-xs">–</span>
-                    <Input
-                      type="number"
-                      step="0.1"
-                      placeholder="Máx"
-                      value={formData.faixa_trabalho_max?.[p.key] ?? ""}
-                      onChange={(e) => onFaixaTrabalhoChange?.(p.key, 'max', e.target.value)}
-                      className="text-xs h-8"
-                    />
-                  </div>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    placeholder="Mín"
+                    value={formData.faixa_trabalho_min?.[p.key] ?? ""}
+                    onChange={(e) => onFaixaTrabalhoChange?.(p.key, 'min', e.target.value)}
+                    className="text-xs h-8 flex-1"
+                  />
+                  <Input
+                    type="number"
+                    step="0.1"
+                    placeholder="Ótimo"
+                    value={formData.faixa_trabalho?.[p.key] ?? ""}
+                    onChange={(e) => onFaixaTrabalhoChange?.(p.key, 'otimo', e.target.value)}
+                    className="text-xs h-8 flex-1"
+                  />
+                  <Input
+                    type="number"
+                    step="0.1"
+                    placeholder="Máx"
+                    value={formData.faixa_trabalho_max?.[p.key] ?? ""}
+                    onChange={(e) => onFaixaTrabalhoChange?.(p.key, 'max', e.target.value)}
+                    className="text-xs h-8 flex-1"
+                  />
                 </div>
               ))}
             </div>
