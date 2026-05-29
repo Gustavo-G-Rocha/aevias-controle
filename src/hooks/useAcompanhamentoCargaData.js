@@ -1,8 +1,4 @@
 import { useState, useEffect } from "react";
-import { User } from "@/entities/User";
-import { Obra } from "@/entities/Obra";
-import { Regional } from "@/entities/Regional";
-import { Project } from "@/entities/Project";
 import { base44 } from "@/api/base44Client";
 import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import {
@@ -34,10 +30,10 @@ export function useAcompanhamentoCargaData() {
         const editIdParam = urlParams.get('editId');
 
         const [userData, obrasData, regionaisData, projectsData] = await Promise.all([
-          User.me(),
-          Obra.list(),
-          Regional.list(),
-          Project.list(),
+          base44.auth.me(),
+          base44.entities.Obra.list(),
+          base44.entities.Regional.list(),
+          base44.entities.Project.list(),
         ]);
 
         setUser(userData);

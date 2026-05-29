@@ -1,9 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-import { User } from "@/entities/User";
-import { Obra } from "@/entities/Obra";
-import { Regional } from "@/entities/Regional";
-import { Project } from "@/entities/Project";
 import { getInitialFormData } from "@/utils/acompanhamentoUsinagemUtils";
 
 export function useAcompanhamentoUsinagemData() {
@@ -18,13 +14,13 @@ export function useAcompanhamentoUsinagemData() {
 
   const loadInitialData = useCallback(async () => {
     try {
-      const userData = await User.me();
+      const userData = await base44.auth.me();
       setUser(userData);
 
       const [obrasData, regionaisData, projectsData] = await Promise.all([
-        Obra.list(),
-        Regional.list(),
-        Project.list(),
+        base44.entities.Obra.list(),
+        base44.entities.Regional.list(),
+        base44.entities.Project.list(),
       ]);
 
       setObras(obrasData);
