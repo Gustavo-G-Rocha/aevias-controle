@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Printer, Loader2 } from "lucide-react";
-import { ChecklistUsina } from '@/entities/ChecklistUsina';
-import { Obra } from '@/entities/Obra';
-import { Regional } from '@/entities/Regional';
-import { Project } from '@/entities/Project'; // Import Project
-import { User } from '@/entities/User';
+import { base44 } from '@/api/base44Client';
 import RelatorioChecklistComponent from '../components/relatorios/RelatorioChecklist';
 
 export default function RelatorioChecklistPage() {
@@ -24,11 +20,11 @@ export default function RelatorioChecklistPage() {
         if (!id) throw new Error('ID do checklist é obrigatório na URL');
 
         const [checklist, user, obras, regionais, projects] = await Promise.all([
-          ChecklistUsina.get(id),
-          User.me(),
-          Obra.list(),
-          Regional.list(),
-          Project.list()
+          base44.entities.ChecklistUsina.get(id),
+          base44.auth.me(),
+          base44.entities.Obra.list(),
+          base44.entities.Regional.list(),
+          base44.entities.Project.list()
         ]);
 
         if (!checklist) throw new Error(`Checklist com ID ${id} não encontrado`);
