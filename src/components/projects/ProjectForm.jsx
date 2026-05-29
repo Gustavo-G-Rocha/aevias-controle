@@ -257,10 +257,19 @@ export default function ProjectForm({ project, faixas, regionais, user, onSave, 
               {!isCartaTraco && isBgs && (
               <ProjectFormBGS
                 formData={formData}
+                peneirasCarregadas={peneirasCarregadas}
+                peneirasDisponiveis={peneirasDisponiveis}
                 onAgregadoAdd={adicionarAgregado}
                 onAgregadoRemove={removerAgregado}
                 onAgregadoChange={handleAgregadoChange}
                 onInputChange={handleInputChange}
+                onFaixaTrabalhoChange={(key, type, value) => {
+                  const faixaType = resolveFaixaTrabalhoType(type);
+                  setFormData(prev => ({
+                    ...prev,
+                    [faixaType]: { ...prev[faixaType], [key]: value === '' ? '' : parseFloat(value) }
+                  }));
+                }}
               />
               )}
 

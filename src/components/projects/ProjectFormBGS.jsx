@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 
-export default function ProjectFormBGS({ formData, onAgregadoAdd, onAgregadoRemove, onAgregadoChange, onInputChange, onNestedChange }) {
+export default function ProjectFormBGS({ formData, peneirasCarregadas, peneirasDisponiveis, onAgregadoAdd, onAgregadoRemove, onAgregadoChange, onInputChange, onNestedChange, onFaixaTrabalhoChange }) {
   return (
     <div className="space-y-6">
       {/* Densidade Seca Máxima */}
@@ -43,59 +43,44 @@ export default function ProjectFormBGS({ formData, onAgregadoAdd, onAgregadoRemo
       </Card>
 
       {/* Faixa de Trabalho */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Faixa de Trabalho (% Passante)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-xs text-slate-500 mb-4">
-            Informe os limites mínimo e máximo de passante para cada peneira relevante.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
-            {[
-              { label: '3"', min: 'faixa_min_75', max: 'faixa_max_75' },
-              { label: '2"', min: 'faixa_min_50', max: 'faixa_max_50' },
-              { label: '1 1/2"', min: 'faixa_min_38', max: 'faixa_max_38' },
-              { label: '1"', min: 'faixa_min_25', max: 'faixa_max_25' },
-              { label: '3/4"', min: 'faixa_min_19', max: 'faixa_max_19' },
-              { label: '3/8"', min: 'faixa_min_9_5', max: 'faixa_max_9_5' },
-              { label: 'Nº4 (4,75mm)', min: 'faixa_min_4_75', max: 'faixa_max_4_75' },
-              { label: 'Nº10 (2,00mm)', min: 'faixa_min_2_0', max: 'faixa_max_2_0' },
-              { label: 'Nº40 (0,42mm)', min: 'faixa_min_0_42', max: 'faixa_max_0_42' },
-              { label: 'Nº200 (0,075mm)', min: 'faixa_min_0_075', max: 'faixa_max_0_075' },
-            ].map(({ label, min, max }) => (
-              <div key={label} className="flex items-center gap-2">
-                <span className="text-xs font-medium w-28 shrink-0">{label}</span>
-                <div className="flex items-center gap-1 flex-1">
-                  <Input
-                    type="number"
-                    step="0.1"
-                    placeholder="Mín"
-                    value={formData.faixa_trabalho_bgs?.[min] ?? ""}
-                    onChange={(e) => onInputChange?.('faixa_trabalho_bgs', {
-                      ...formData.faixa_trabalho_bgs,
-                      [min]: e.target.value === '' ? '' : parseFloat(e.target.value)
-                    })}
-                    className="text-xs h-8"
-                  />
-                  <span className="text-slate-400 text-xs">–</span>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    placeholder="Máx"
-                    value={formData.faixa_trabalho_bgs?.[max] ?? ""}
-                    onChange={(e) => onInputChange?.('faixa_trabalho_bgs', {
-                      ...formData.faixa_trabalho_bgs,
-                      [max]: e.target.value === '' ? '' : parseFloat(e.target.value)
-                    })}
-                    className="text-xs h-8"
-                  />
+      {peneirasCarregadas && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Faixa de Trabalho (% Passante)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-xs text-slate-500 mb-4">
+              Informe os limites mínimo e máximo de passante para cada peneira relevante.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
+              {peneirasDisponiveis.map(p => (
+                <div key={p.key} className="flex items-center gap-2">
+                  <span className="text-xs font-medium w-28 shrink-0">{p.astm}</span>
+                  <div className="flex items-center gap-1 flex-1">
+                    <Input
+                      type="number"
+                      step="0.1"
+                      placeholder="Mín"
+                      value={formData.faixa_trabalho_min?.[p.key] ?? ""}
+                      onChange={(e) => onFaixaTrabalhoChange?.(p.key, 'min', e.target.value)}
+                      className="text-xs h-8"
+                    />
+                    <span className="text-slate-400 text-xs">–</span>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      placeholder="Máx"
+                      value={formData.faixa_trabalho_max?.[p.key] ?? ""}
+                      onChange={(e) => onFaixaTrabalhoChange?.(p.key, 'max', e.target.value)}
+                      className="text-xs h-8"
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Agregados */}
       <Card>
