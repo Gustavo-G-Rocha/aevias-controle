@@ -11,7 +11,7 @@ export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = useCallback(async (e) => {
+  const handleSubmit = useCallback(async (e, saveStatus = "finalizado") => {
     e.preventDefault();
 
     if (!formData.obra_id || !formData.data_ensaio) {
@@ -23,14 +23,15 @@ export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
     try {
       const dataToSave = {
         ...formData,
+        status: saveStatus,
         laboratorista_name: user?.laboratorista_name || user?.full_name,
       };
 
       if (editingEnsaio) {
         const updateData = { ...dataToSave };
-        let successMessage = "Ensaio atualizado com sucesso!";
+        let successMessage = saveStatus === "rascunho" ? "Progresso salvo!" : "Ensaio atualizado com sucesso!";
 
-        if (editingEnsaio.approved === false) {
+        if (editingEnsaio.approved === false && saveStatus === "finalizado") {
           updateData.approved = null;
           updateData.rejection_reason = null;
           updateData.approved_by = null;
@@ -43,10 +44,12 @@ export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
         alert(successMessage);
       } else {
         await base44.entities.EnsaioDensidadeInSitu.create(dataToSave);
-        alert("Ensaio criado com sucesso!");
+        alert(saveStatus === "rascunho" ? "Progresso salvo!" : "Ensaio criado com sucesso!");
       }
 
-      navigate(createPageUrl('MeusEnsaios'));
+      if (saveStatus === "finalizado") {
+        navigate(createPageUrl('MeusEnsaios'));
+      }
     } catch (error) {
       console.error("Erro ao salvar ensaio:", error);
       alert(`Erro ao salvar ensaio: ${error.message || 'Erro desconhecido'}`);
