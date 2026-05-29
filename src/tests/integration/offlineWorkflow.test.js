@@ -4,6 +4,37 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
+// Mock offlineStorageService com storage em memória
+const mockStorage = new Map();
+
+vi.mock('@/services/offlineStorageService', () => ({
+  addQueueItem: vi.fn(async (item) => {
+    mockStorage.set(item.id, item);
+    return item.id;
+  }),
+  getQueueItem: vi.fn(async (itemId) => mockStorage.get(itemId) || null),
+  updateQueueItem: vi.fn(async (itemId, updates) => {
+    const item = mockStorage.get(itemId);
+    if (item) mockStorage.set(itemId, { ...item, ...updates });
+  }),
+  getQueueItemsByStatus: vi.fn(async (status) => {
+    return Array.from(mockStorage.values()).filter(item => item.status === status);
+  }),
+  findDuplicateQueueItem: vi.fn(async (entityType, operation, dataHash) => {
+    return Array.from(mockStorage.values()).find(
+      (item) =>
+        item.entityType === entityType &&
+        item.operation === operation &&
+        item.dataHash === dataHash &&
+        item.status !== 'synced'
+    ) || null;
+  }),
+  removeQueueItem: vi.fn(async (itemId) => {
+    mockStorage.delete(itemId);
+  }),
+  clearQueue: vi.fn(async () => mockStorage.clear()),
+}));
 import { createQueueItem } from '@/utils/offlineQueue';
 import { addOrUpdateQueueItem } from '@/services/syncService';
 import { getQueueItem, countQueueItemsByStatus, clearQueue } from '@/services/offlineStorageService';
@@ -25,12 +56,12 @@ vi.mock('@/api/base44Client', () => ({
 
 describe('offlineWorkflow - Integração', () => {
   beforeEach(async () => {
-    await clearQueue();
+    mockStorage.clear();
     vi.clearAllMocks();
   });
 
   afterEach(async () => {
-    await clearQueue();
+    mockStorage.clear();
   });
 
   it('fluxo completo: offline → criar → sync → online', async () => {

@@ -3,14 +3,15 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
 import { useOfflineDetection } from '@/hooks/useOfflineDetection';
+import { renderHook, act } from 'vitest';
 
 describe('useOfflineDetection', () => {
   beforeEach(() => {
     // Mock navigator.onLine
     Object.defineProperty(navigator, 'onLine', {
       writable: true,
+      configurable: true,
       value: true,
     });
   });
@@ -20,25 +21,36 @@ describe('useOfflineDetection', () => {
     expect(result.current.isOnline).toBe(true);
   });
 
-  it('deve detectar mudança para offline', () => {
+  it('deve detectar mudança para offline', async () => {
     const { result } = renderHook(() => useOfflineDetection());
 
     act(() => {
-      Object.defineProperty(navigator, 'onLine', { value: false });
+      Object.defineProperty(navigator, 'onLine', { 
+        writable: true,
+        configurable: true,
+        value: false 
+      });
       window.dispatchEvent(new Event('offline'));
     });
 
     expect(result.current.isOnline).toBe(false);
   });
 
-  it('deve detectar mudança para online', () => {
-    Object.defineProperty(navigator, 'onLine', { value: false });
+  it('deve detectar mudança para online', async () => {
+    Object.defineProperty(navigator, 'onLine', { 
+      writable: true,
+      configurable: true,
+      value: false 
+    });
     const { result } = renderHook(() => useOfflineDetection());
-
     expect(result.current.isOnline).toBe(false);
 
     act(() => {
-      Object.defineProperty(navigator, 'onLine', { value: true });
+      Object.defineProperty(navigator, 'onLine', { 
+        writable: true,
+        configurable: true,
+        value: true 
+      });
       window.dispatchEvent(new Event('online'));
     });
 

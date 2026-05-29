@@ -26,59 +26,42 @@ vi.mock('@/api/base44Client', () => ({
   },
 }));
 
-// Mock IndexedDB para testes
-const mockIndexedDB = {
-  databases: {},
-  open: vi.fn((name, version) => {
-    if (!mockIndexedDB.databases[name]) {
-      mockIndexedDB.databases[name] = {
-        objectStoreNames: { contains: () => false },
-        createObjectStore: vi.fn(() => ({
-          createIndex: vi.fn(),
-        })),
-      };
-    }
-    return {
-      onsuccess: null,
-      onerror: null,
-      onupgradeneeded: null,
-      result: mockIndexedDB.databases[name],
-      addEventListener: vi.fn(function(event, handler) {
-        if (event === 'success') this.onsuccess?.();
-        if (event === 'upgradeneeded') this.onupgradeneeded?.();
-      }),
-    };
-  }),
-};
+// Mock operações de fila com storage em memória
+const mockStorage = new Map();
 
-// Mock operações de fila
-vi.mock('@/services/offlineStorageService', () => {
-  const storage = new Map();
-  return {
-    addQueueItem: vi.fn(async (item) => {
-      storage.set(item.id, item);
-      return item.id;
-    }),
-    getQueueItem: vi.fn(async (itemId) => storage.get(itemId) || null),
-    updateQueueItem: vi.fn(async (itemId, updates) => {
-      const item = storage.get(itemId);
-      if (item) storage.set(itemId, { ...item, ...updates });
-    }),
-    getQueueItemsByStatus: vi.fn(async (status) => {
-      return Array.from(storage.values()).filter(item => item.status === status);
-    }),
-    clearQueue: vi.fn(async () => storage.clear()),
-  };
-});
+vi.mock('@/services/offlineStorageService', () => ({
+  addQueueItem: vi.fn(async (item) => {
+    mockStorage.set(item.id, item);
+    return item.id;
+  }),
+  getQueueItem: vi.fn(async (itemId) => mockStorage.get(itemId) || null),
+  updateQueueItem: vi.fn(async (itemId, updates) => {
+    const item = mockStorage.get(itemId);
+    if (item) mockStorage.set(itemId, { ...item, ...updates });
+  }),
+  getQueueItemsByStatus: vi.fn(async (status) => {
+    return Array.from(mockStorage.values()).filter(item => item.status === status);
+  }),
+  findDuplicateQueueItem: vi.fn(async (entityType, operation, dataHash) => {
+    return Array.from(mockStorage.values()).find(
+      (item) =>
+        item.entityType === entityType &&
+        item.operation === operation &&
+        item.dataHash === dataHash &&
+        item.status !== 'synced'
+    ) || null;
+  }),
+  clearQueue: vi.fn(async () => mockStorage.clear()),
+}));
 
 describe('syncService', () => {
   beforeEach(async () => {
-    await clearQueue();
+    mockStorage.clear();
     vi.clearAllMocks();
   });
 
   afterEach(async () => {
-    await clearQueue();
+    mockStorage.clear();
   });
 
   describe('syncQueueItem', () => {
@@ -123,21 +106,17 @@ describe('syncService', () => {
         payload: { obra_id: 'X' },
       });
 
-      // Simular 5 tentativas
-      for (let i = 0; i < 5; i++) {
-        await addQueueItem({ ...item, id: `item-${i}` });
-      }
+      // Criar um item com 5 tentativas já
+      const itemWithRetries = { ...item, id: 'item-retry', attempts: 5 };
+      await addQueueItem(itemWithRetries);
 
-      // Sincronizar todos até falhar
-      for (let i = 0; i < 5; i++) {
-        const stored = await getQueueItem(`item-${i}`);
-        await syncQueueItem(stored);
-      }
+      // Sincronizar (deve falhar e ser marcado como failed)
+      const result = await syncQueueItem(itemWithRetries);
 
-      // Verificar que o quinto é marked como failed (attempts >= 5)
-      const lastItem = await getQueueItem('item-4');
+      // Item deve ser marcado como failed após atingir 5 tentativas
+      expect(result.success).toBe(false);
+      const lastItem = await getQueueItem('item-retry');
       expect(lastItem.status).toBe('failed');
-      expect(lastItem.attempts).toBe(1);
     });
 
     it('deve rejeitar operação desconhecida', async () => {

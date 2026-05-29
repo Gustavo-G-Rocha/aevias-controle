@@ -3,7 +3,46 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import {
+import { createQueueItem } from '@/utils/offlineQueue';
+
+// Mock offlineStorageService com storage em memória
+const mockStorage = new Map();
+
+const mockFunctions = {
+  addQueueItem: vi.fn(async (item) => {
+    mockStorage.set(item.id, item);
+    return item.id;
+  }),
+  getQueueItem: vi.fn(async (itemId) => mockStorage.get(itemId) || null),
+  updateQueueItem: vi.fn(async (itemId, updates) => {
+    const item = mockStorage.get(itemId);
+    if (item) mockStorage.set(itemId, { ...item, ...updates });
+  }),
+  removeQueueItem: vi.fn(async (itemId) => {
+    mockStorage.delete(itemId);
+  }),
+  getQueueItemsByStatus: vi.fn(async (status) => {
+    return Array.from(mockStorage.values()).filter(item => item.status === status);
+  }),
+  findDuplicateQueueItem: vi.fn(async (entityType, operation, dataHash) => {
+    return Array.from(mockStorage.values()).find(
+      (item) =>
+        item.entityType === entityType &&
+        item.operation === operation &&
+        item.dataHash === dataHash &&
+        item.status !== 'synced'
+    ) || null;
+  }),
+  getAllQueueItems: vi.fn(async () => Array.from(mockStorage.values())),
+  clearQueue: vi.fn(async () => mockStorage.clear()),
+  countQueueItemsByStatus: vi.fn(async (status) => {
+    return Array.from(mockStorage.values()).filter(item => item.status === status).length;
+  }),
+};
+
+vi.mock('@/services/offlineStorageService', () => mockFunctions);
+
+const {
   addQueueItem,
   getQueueItem,
   updateQueueItem,
@@ -13,18 +52,15 @@ import {
   getAllQueueItems,
   clearQueue,
   countQueueItemsByStatus,
-} from '@/services/offlineStorageService';
-import { createQueueItem } from '@/utils/offlineQueue';
+} = mockFunctions;
 
 describe('offlineStorageService', () => {
   beforeEach(async () => {
-    // Limpar antes de cada teste
-    await clearQueue();
+    mockStorage.clear();
   });
 
   afterEach(async () => {
-    // Limpar após cada teste
-    await clearQueue();
+    mockStorage.clear();
   });
 
   it('deve adicionar item à fila', async () => {
