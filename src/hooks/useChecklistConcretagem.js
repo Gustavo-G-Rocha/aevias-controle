@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { Project } from "@/entities/Project";
 import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { createPageUrl } from "@/utils";
 
@@ -115,7 +114,7 @@ export function useChecklistConcretagem() {
       const [userData, obrasData, projectsData, regionaisData] = await Promise.all([
         base44.auth.me(),
         base44.entities.Obra.list(),
-        Project.list(),
+        base44.entities.Project.list(),
         base44.entities.Regional.list(),
       ]);
 

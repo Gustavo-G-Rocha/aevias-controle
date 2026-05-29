@@ -5,8 +5,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { User } from "@/entities/User";
-import { Obra } from "@/entities/Obra";
 import { getInitialForm, filtrarObrasProctor } from "@/utils/ensaioProctorUtils";
 import { defaultLimites } from "@/components/ensaios/EnsaioLimites";
 
@@ -24,11 +22,11 @@ export function useEnsaioProctorData() {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        const userData = await User.me();
+        const userData = await base44.auth.me();
         setForm(prev => ({ ...prev, laboratorista_name: userData.laboratorista_name || userData.full_name }));
 
         const [obrasData, regionaisData, recordData] = await Promise.all([
-          Obra.list(),
+          base44.entities.Obra.list(),
           base44.entities.Regional.list(),
           recordId ? base44.entities.EnsaioProctor.get(recordId) : Promise.resolve(null),
         ]);

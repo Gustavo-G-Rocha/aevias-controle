@@ -1,12 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { User } from "@/entities/User";
-import { Obra } from "@/entities/Obra";
-import { Regional } from "@/entities/Regional";
-import { Project } from "@/entities/Project";
-import { FaixaGranulometrica } from "@/entities/FaixaGranulometrica";
-import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { base44 } from "@/api/base44Client";
+import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { createPageUrl } from "@/utils";
 
 /**
@@ -38,22 +33,22 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
     const loadData = async () => {
       setLoading(true);
       try {
-        const userData = await User.me();
+        const userData = await base44.auth.me();
         setUser(userData);
 
         const currentUserAccessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
 
         let faixasData = [];
         try {
-          faixasData = await FaixaGranulometrica.list();
+          faixasData = await base44.entities.FaixaGranulometrica.list();
         } catch (faixasError) {
           console.warn(`[${entityName}] Faixas indisponíveis:`, faixasError?.message);
         }
 
         const [obrasData, regionaisData, projectsData] = await Promise.all([
-          Obra.list(),
-          Regional.list(),
-          Project.list()
+          base44.entities.Obra.list(),
+          base44.entities.Regional.list(),
+          base44.entities.Project.list()
         ]);
 
         setRegionais(regionaisData);

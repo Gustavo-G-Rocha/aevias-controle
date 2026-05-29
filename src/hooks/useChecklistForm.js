@@ -1,27 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { User } from "@/entities/User";
-import { Obra } from "@/entities/Obra";
-import { Regional } from "@/entities/Regional";
-import { Project } from "@/entities/Project";
-import { FaixaGranulometrica } from "@/entities/FaixaGranulometrica";
-import { ChecklistUsina } from "@/entities/ChecklistUsina";
-import { ChecklistAplicacao } from "@/entities/ChecklistAplicacao";
-import { ChecklistMRAF } from "@/entities/ChecklistMRAF";
-import { ChecklistConcretagem } from "@/entities/ChecklistConcretagem";
-import { ChecklistTerraplanagem } from "@/entities/ChecklistTerraplanagem";
-import { ChecklistReciclagem } from "@/entities/ChecklistReciclagem";
+import { base44 } from "@/api/base44Client";
 import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { createPageUrl } from "@/utils";
 
-const ENTITY_MAP = {
-  ChecklistUsina,
-  ChecklistAplicacao,
-  ChecklistMRAF,
-  ChecklistConcretagem,
-  ChecklistTerraplanagem,
-  ChecklistReciclagem,
-};
+
 
 /**
  * Hook reutilizável para formulários de checklist
@@ -48,27 +31,27 @@ export function useChecklistForm(getInitialFormData, entityName, storageName) {
     const loadData = async () => {
       setLoading(true);
       try {
-        const userData = await User.me();
+        const userData = await base44.auth.me();
         setUser(userData);
 
         const isAdmin = userData?.role === 'admin';
 
         // Carregar dados em paralelo
         const dataPromises = [
-          Obra.list(),
-          Regional.list(),
-          Project.list()
+          base44.entities.Obra.list(),
+          base44.entities.Regional.list(),
+          base44.entities.Project.list()
         ];
 
         let faixasData = [];
         try {
-          faixasData = await FaixaGranulometrica.list();
+          faixasData = await base44.entities.FaixaGranulometrica.list();
         } catch (faixasError) {
           console.warn(`[${entityName}] Faixas indisponíveis:`, faixasError?.message);
         }
 
         if (isAdmin) {
-          dataPromises.push(User.list());
+          dataPromises.push(base44.entities.User.list());
         }
 
         const loadedData = await Promise.all(dataPromises);
@@ -103,9 +86,7 @@ export function useChecklistForm(getInitialFormData, entityName, storageName) {
         const editId = params.get('editId');
 
         if (editId) {
-          const Entity = ENTITY_MAP[entityName];
-          if (!Entity) throw new Error(`Entidade desconhecida: ${entityName}`);
-          const checklistToEdit = await Entity.get(editId);
+          const checklistToEdit = await base44.entities[entityName].get(editId);
           setEditingChecklist(checklistToEdit);
 
           const isOwnerCheck = checklistToEdit.created_by?.toLowerCase() === userData.email?.toLowerCase() || checklistToEdit.created_by_id === userData.id;
