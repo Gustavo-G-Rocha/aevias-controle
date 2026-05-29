@@ -1,5 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
-import { validateDecimalInput } from "@/utils/checklistValidation";
+import { useCallback } from "react";
 
 /**
  * Hook de estado e handlers para o formulário de Checklist Usina.

@@ -108,7 +108,7 @@ export default function RelatorioProctor() {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         @media print {
           @page { size: A4 portrait; margin: 8mm 10mm; }
           body { print-color-adjust: exact; -webkit-print-color-adjust: exact; margin: 0; padding: 0; }

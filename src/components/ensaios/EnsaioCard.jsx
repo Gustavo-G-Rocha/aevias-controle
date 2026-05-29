@@ -7,7 +7,7 @@ import { FileText, Edit, MessageSquare, MapPin, User as UserIconSmall, Building 
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components/ensaios/ensaioMappers";
-import { getLocalInfo, getLaboratoristaInfo, getResponsavelInfo, getEmpireiteiraInfo, getRodoviaInfo, getTrechoInfo, getNaoConformidades, getStatusInfo } from "@/components/ensaios/utils";
+import { getLaboratoristaInfo, getResponsavelInfo, getRodoviaInfo, getTrechoInfo, getNaoConformidades, getStatusInfo } from "@/components/ensaios/utils";
 import { assinarEnsaio } from "@/services/ensaiosService";
 
 const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {

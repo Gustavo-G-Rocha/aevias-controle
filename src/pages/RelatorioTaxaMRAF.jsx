@@ -10,7 +10,7 @@ import RelatorioTaxaMRAFTabelas from "@/components/relatorio-taxa-mraf/Relatorio
 import RelatorioTaxaMRAFResumo from "@/components/relatorio-taxa-mraf/RelatorioTaxaMRAFResumo";
 import RelatorioTaxaMRAFObservacoes from "@/components/relatorio-taxa-mraf/RelatorioTaxaMRAFObservacoes";
 import SignatureFooter from '@/components/relatorios/SignatureFooter';
-import { formatDateBrasilia } from '@/utils/relatorioTaxaMRAFUtils';
+
 
 export default function RelatorioTaxaMRAF() {
   useReportMode();

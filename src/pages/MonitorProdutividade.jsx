@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, TrendingUp, CheckCircle, FileText, Users } from "lucide-react";
+import { Loader2, Users } from "lucide-react";
 import { User } from "@/entities/User";
 import { Obra } from "@/entities/Obra";
 import { Regional } from "@/entities/Regional";

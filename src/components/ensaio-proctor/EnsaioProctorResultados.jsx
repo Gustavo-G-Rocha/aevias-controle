@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import ProctorChart, { fitParabola } from "@/components/ensaios/ProctorChart";
+import ProctorChart from "@/components/ensaios/ProctorChart";
 import ProctorCBRExpansao from "@/components/ensaios/ProctorCBRExpansao";
 import EnsaioLimites, { defaultLimites } from "@/components/ensaios/EnsaioLimites";
 

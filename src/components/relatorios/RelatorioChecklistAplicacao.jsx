@@ -10,7 +10,7 @@ import PhotoPagesAplicacao from '@/components/relatorio-checklist-aplicacao/Phot
 import MedicoesGeometricasPage from '@/components/relatorio-checklist-aplicacao/MedicoesGeometricasPage';
 import ActionsPageAplicacao from '@/components/relatorio-checklist-aplicacao/ActionsPageAplicacao';
 
-import { temAcoesCorretivas, buildFooterPropsAplicacao, chunkArray } from '@/utils/relatorioChecklistAplicacaoUtils';
+import { temAcoesCorretivas, buildFooterPropsAplicacao } from '@/utils/relatorioChecklistAplicacaoUtils';
 
 export default function RelatorioChecklistAplicacao({ checklist, obra, regional, user, creatorUser }) {
   const [compressedPhotos, setCompressedPhotos] = React.useState([]);

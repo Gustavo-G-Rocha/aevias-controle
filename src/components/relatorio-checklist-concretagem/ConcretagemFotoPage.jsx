@@ -1,6 +1,5 @@
 import React from 'react';
 import ConcretagemPageHeader from './ConcretagemPageHeader';
-import { formatDateConcr } from '@/utils/relatorioChecklistConcretagemUtils';
 
 /**
  * Página de fotos para o relatório de concretagem.

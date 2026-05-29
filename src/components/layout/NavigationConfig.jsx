@@ -3,7 +3,6 @@ import {
   LayoutDashboard,
   Settings,
   Users,
-  FolderOpen,
   Grid,
   FlaskConical,
   Book,

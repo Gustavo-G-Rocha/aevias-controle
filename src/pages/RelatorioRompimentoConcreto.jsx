@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 
 import { useRelatorioRompimentoConcretoData } from "@/hooks/useRelatorioRompimentoConcretoData";
 import { useRelatorioRompimentoConcretoActions } from "@/hooks/useRelatorioRompimentoConcretoActions";
-import { agruparEmSeries } from "@/utils/relatorioRompimentoConcretoUtils";
+
 
 import RelatorioRompimentoHeader from "@/components/relatorio-rompimento-concreto/RelatorioRompimentoHeader";
 import RelatorioRompimentoDadosGerais from "@/components/relatorio-rompimento-concreto/RelatorioRompimentoDadosGerais";

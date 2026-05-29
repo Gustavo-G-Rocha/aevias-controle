@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import {
-  ScatterChart, Scatter, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  ComposedChart, ReferenceLine, ResponsiveContainer, Label
+  Scatter, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  ComposedChart, ReferenceLine, ResponsiveContainer
 } from "recharts";
 
 // Gaussian elimination helper for any NxN system (augmented matrix)

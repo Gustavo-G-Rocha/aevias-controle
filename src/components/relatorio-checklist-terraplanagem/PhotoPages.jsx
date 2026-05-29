@@ -1,5 +1,4 @@
 import React from 'react';
-import HeaderTerra from './HeaderTerra';
 import { formatDateTerra, chunkArray } from '@/utils/relatorioChecklistTerraplanagemUtils';
 
 const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png';

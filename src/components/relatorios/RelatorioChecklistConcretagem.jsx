@@ -8,7 +8,6 @@ import ConcretagemFotoPage from '@/components/relatorio-checklist-concretagem/Co
 import {
   chunkArray,
   buildFooterProps,
-  formatDateConcr,
   getTipoRupturaTexto,
 } from '@/utils/relatorioChecklistConcretagemUtils';
 import { compressImages } from '@/utils/reportImageCompression';

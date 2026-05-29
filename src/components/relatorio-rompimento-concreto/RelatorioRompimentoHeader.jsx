@@ -1,8 +1,7 @@
 import React from "react";
-import { Download, Loader2 } from "lucide-react";
+import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AprovacaoBar from "@/components/relatorios/AprovacaoBar";
-import { fmtDate } from "@/utils/relatorioRompimentoConcretoUtils";
 
 export default function RelatorioRompimentoHeader({ ensaio, regional, onPrint }) {
   return (
