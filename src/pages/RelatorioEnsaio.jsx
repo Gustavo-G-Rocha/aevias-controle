@@ -4,14 +4,9 @@ import { useReportMode } from "@/hooks/useReportMode";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
-import { EnsaioDensidade } from '@/entities/EnsaioDensidade';
-import { Obra } from '@/entities/Obra';
-import { Project } from '@/entities/Project';
-import { User } from '@/entities/User';
-import { Regional } from '@/entities/Regional';
+import { base44 } from "@/api/base44Client";
 import RelatorioDensidade from '../components/relatorios/RelatorioDensidade';
 import RelatorioMRAF from '../components/relatorios/RelatorioMRAF';
-import { base44 } from "@/api/base44Client";
 
 export default function RelatorioEnsaio() {
   useReportMode();
@@ -29,14 +24,14 @@ export default function RelatorioEnsaio() {
 
       if (!id || !tipo) throw new Error('ID e tipo são obrigatórios na URL');
 
-      const user = await User.me();
+      const user = await base44.auth.me();
       
       const [ensaiosDensidade, ensaiosMRAF, obras, projects, regionais] = await Promise.all([
-        EnsaioDensidade.list(),
+        base44.entities.EnsaioDensidade.list(),
         base44.entities.EnsaioMRAF.list(),
-        Obra.list(),
-        Project.list(),
-        Regional.list()
+        base44.entities.Obra.list(),
+        base44.entities.Project.list(),
+        base44.entities.Regional.list()
       ]);
 
       let record;
