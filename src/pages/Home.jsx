@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User } from '@/entities/User';
+import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { LogIn } from 'lucide-react';
@@ -12,7 +12,7 @@ export default function HomePage() {
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const user = await User.me();
+        const user = await base44.auth.me();
         if (user) {
           if (user.role === 'admin') {
             navigate(createPageUrl('Dashboard'), { replace: true });
@@ -30,7 +30,7 @@ export default function HomePage() {
   }, [navigate]);
 
   const handleLogin = async () => {
-    await User.login();
+    base44.auth.redirectToLogin();
   };
 
   if (loading) {
