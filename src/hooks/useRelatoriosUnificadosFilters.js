@@ -14,7 +14,7 @@ export const useRelatoriosUnificadosFilters = () => {
   const [obraSelecionada, setObraSelecionada] = useState("");
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
-  const [tipoRegistro, setTipoRegistro] = useState("");
+  const [tipoRegistro, setTipoRegistro] = useState([]); // array de tipos selecionados
 
   const [laboratoristasDisponiveis, setLaboratoristasDisponiveis] = useState([]);
   const [laboratoristasChecked, setLaboratoristasChecked] = useState([]);
@@ -100,7 +100,7 @@ export const useRelatoriosUnificadosFilters = () => {
   const clearFilters = useCallback(() => {
     setDataInicio("");
     setDataFim("");
-    setTipoRegistro("");
+    setTipoRegistro([]);
     setLaboratoristasDisponiveis([]);
     setLaboratoristasChecked([]);
     setRodoviasDisponiveis([]);

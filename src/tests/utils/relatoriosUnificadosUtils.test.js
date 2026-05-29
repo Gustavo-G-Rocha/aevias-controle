@@ -82,7 +82,7 @@ describe("relatoriosUnificadosUtils", () => {
   });
 
   describe("buildReportParams", () => {
-    it("deve construir URLSearchParams corretamente", () => {
+    it("deve construir URLSearchParams corretamente com tipo único (string)", () => {
       const params = buildReportParams(
         "obra1",
         "2026-05-01",
@@ -97,6 +97,22 @@ describe("relatoriosUnificadosUtils", () => {
       expect(params.get("obra_id")).toBe("obra1");
       expect(params.get("laboratoristas")).toBe("Lab1,Lab2");
       expect(params.get("rodovia")).toBe("Rodovia X");
+      expect(params.get("tipos")).toBe("DiarioObra");
+    });
+
+    it("deve construir URLSearchParams com múltiplos tipos (array)", () => {
+      const params = buildReportParams(
+        "obra1",
+        "2026-05-01",
+        "2026-05-31",
+        ["DiarioObra", "ChecklistUsina", "ChecklistAplicacao"],
+        ["Lab1"],
+        "",
+        "",
+        ""
+      );
+
+      expect(params.get("tipos")).toBe("DiarioObra,ChecklistUsina,ChecklistAplicacao");
     });
 
     it("deve permitir filtros adicionais vazios", () => {
@@ -104,7 +120,7 @@ describe("relatoriosUnificadosUtils", () => {
         "obra1",
         "2026-05-01",
         "2026-05-31",
-        "DiarioObra",
+        ["DiarioObra"],
         ["Lab1"],
         "",
         "",
@@ -118,42 +134,32 @@ describe("relatoriosUnificadosUtils", () => {
   });
 
   describe("isFormValid", () => {
-    it("deve validar formulário completo", () => {
-      const valid = isFormValid(
-        "2026-05-01",
-        "2026-05-31",
-        "obra1",
-        ["Lab1"],
-        "DiarioObra"
-      );
-      expect(valid).toBe(true);
+    it("deve validar formulário com um tipo (string)", () => {
+      expect(isFormValid("2026-05-01", "2026-05-31", "obra1", ["Lab1"], "DiarioObra")).toBe(true);
+    });
+
+    it("deve validar formulário com múltiplos tipos (array)", () => {
+      expect(isFormValid("2026-05-01", "2026-05-31", "obra1", ["Lab1"], ["DiarioObra", "ChecklistUsina"])).toBe(true);
+    });
+
+    it("deve falhar com array vazio de tipos", () => {
+      expect(isFormValid("2026-05-01", "2026-05-31", "obra1", ["Lab1"], [])).toBe(false);
+    });
+
+    it("deve falhar com string vazia de tipo", () => {
+      expect(isFormValid("2026-05-01", "2026-05-31", "obra1", ["Lab1"], "")).toBe(false);
     });
 
     it("deve falhar sem laboratoristas", () => {
-      const valid = isFormValid(
-        "2026-05-01",
-        "2026-05-31",
-        "obra1",
-        [],
-        "DiarioObra"
-      );
-      expect(valid).toBe(false);
+      expect(isFormValid("2026-05-01", "2026-05-31", "obra1", [], ["DiarioObra"])).toBe(false);
     });
 
     it("deve falhar sem obra", () => {
-      const valid = isFormValid(
-        "2026-05-01",
-        "2026-05-31",
-        "",
-        ["Lab1"],
-        "DiarioObra"
-      );
-      expect(valid).toBe(false);
+      expect(isFormValid("2026-05-01", "2026-05-31", "", ["Lab1"], ["DiarioObra"])).toBe(false);
     });
 
     it("deve falhar sem datas", () => {
-      const valid = isFormValid("", "", "obra1", ["Lab1"], "DiarioObra");
-      expect(valid).toBe(false);
+      expect(isFormValid("", "", "obra1", ["Lab1"], ["DiarioObra"])).toBe(false);
     });
   });
 });

@@ -60,6 +60,7 @@ export const extractLaboratoristas = (filtered) => {
 
 /**
  * Build URLSearchParams for report
+ * tipoRegistro aceita string ou string[] (multi-seleção)
  */
 export const buildReportParams = (
   obraSelecionada,
@@ -71,11 +72,12 @@ export const buildReportParams = (
   empreiteiraSelecionada,
   usinaSelecionada
 ) => {
+  const tipos = Array.isArray(tipoRegistro) ? tipoRegistro : [tipoRegistro];
   return new URLSearchParams({
     obra_id: obraSelecionada,
     data_inicio: dataInicio,
     data_fim: dataFim,
-    tipo: tipoRegistro,
+    tipos: tipos.join(","),
     laboratoristas: laboratoristasChecked.join(","),
     rodovia: rodoviaSelecionada || "",
     empreiteira: empreiteiraSelecionada || "",
@@ -85,19 +87,23 @@ export const buildReportParams = (
 
 /**
  * Validate form
+ * tiposRegistro aceita string ou string[]
  */
 export const isFormValid = (
   dataInicio,
   dataFim,
   obraSelecionada,
   laboratoristasChecked,
-  tipoRegistro
+  tiposRegistro
 ) => {
+  const hasType = Array.isArray(tiposRegistro)
+    ? tiposRegistro.length > 0
+    : !!tiposRegistro;
   return !!(
     dataInicio &&
     dataFim &&
     obraSelecionada &&
     laboratoristasChecked.length > 0 &&
-    tipoRegistro
+    hasType
   );
 };

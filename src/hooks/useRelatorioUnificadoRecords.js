@@ -28,20 +28,38 @@ export function useRelatorioUnificadoRecords(filters) {
       try {
         setLoading(true);
 
-        const entity = getEntityInstance(filters.filters.tipo);
-        if (!entity) {
-          setError(`Tipo de registro "${filters.filters.tipo}" não suportado.`);
+        // Suporta 'tipos' (array, multi-seleção) com fallback para 'tipo' (legado)
+        const tiposArray = filters.filters.tipos?.length
+          ? filters.filters.tipos
+          : filters.filters.tipo
+            ? [filters.filters.tipo]
+            : [];
+
+        if (tiposArray.length === 0) {
+          setError('Nenhum tipo de registro selecionado.');
           setLoading(false);
           return;
         }
 
-        const rawRecords = await entity
-          .filter({ obra_id: filters.filters.obra_id }, '-created_date', 2000)
-          .catch(err => {
-            console.warn('[RelatorioUnificado] Falha ao buscar registros:', err?.message || err);
-            return [];
-          });
-        const allRecords = Array.isArray(rawRecords) ? rawRecords : [];
+        // Busca todos os tipos em paralelo
+        const results = await Promise.allSettled(
+          tiposArray.map(async (tipo) => {
+            const entity = getEntityInstance(tipo);
+            if (!entity) {
+              console.warn(`[RelatorioUnificado] Tipo "${tipo}" não suportado.`);
+              return [];
+            }
+            const raw = await entity
+              .filter({ obra_id: filters.filters.obra_id }, '-created_date', 2000)
+              .catch(err => {
+                console.warn(`[RelatorioUnificado] Falha ao buscar ${tipo}:`, err?.message || err);
+                return [];
+              });
+            return (Array.isArray(raw) ? raw : []).map(r => ({ ...r, entityType: tipo }));
+          })
+        );
+
+        const allRecords = results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
 
         // Filtrar por período
         const inicio = new Date(filters.filters.data_inicio);
@@ -49,7 +67,6 @@ export function useRelatorioUnificadoRecords(filters) {
         fim.setHours(23, 59, 59);
 
         const filtered = allRecords
-          .map(r => ({ ...r, entityType: filters.filters.tipo }))
           .filter(r => {
             const d = getDataEnsaio(r);
             if (!d) return false;

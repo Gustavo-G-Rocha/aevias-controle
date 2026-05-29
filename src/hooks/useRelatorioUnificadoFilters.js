@@ -13,7 +13,9 @@ export function useRelatorioUnificadoFilters() {
     const obra_id = params.get('obra_id');
     const data_inicio = params.get('data_inicio');
     const data_fim = params.get('data_fim');
-    const tipo = params.get('tipo');
+    // Suporta 'tipos' (multi) e 'tipo' (legado single) para compatibilidade
+    const tiposParam = params.get('tipos') || params.get('tipo') || '';
+    const tipos = tiposParam.split(',').filter(Boolean);
     const laboratoristas = (params.get('laboratoristas') || '').split(',').filter(Boolean);
     const rodovia = params.get('rodovia');
     const empreiteira = params.get('empreiteira');
@@ -23,7 +25,9 @@ export function useRelatorioUnificadoFilters() {
       obra_id,
       data_inicio,
       data_fim,
-      tipo,
+      tipos,
+      // Mantém 'tipo' como primeiro item para retrocompatibilidade com componentes que o lêem
+      tipo: tipos[0] || '',
       laboratoristas,
       rodovia,
       empreiteira,
@@ -33,7 +37,7 @@ export function useRelatorioUnificadoFilters() {
     setFilters(newFilters);
 
     // Validar filtros obrigatórios
-    const isValid = obra_id && data_inicio && data_fim && tipo;
+    const isValid = obra_id && data_inicio && data_fim && tipos.length > 0;
     setHasValidFilters(!!isValid);
   }, []);
 
