@@ -130,16 +130,20 @@ export async function loadRecordsByObra(obraId) {
  * @param {{ needsRegionais?: boolean, needsUsers?: boolean }} opts
  */
 export async function loadAuxData({ needsRegionais = true, needsUsers = false } = {}) {
-  const [obrasResult, projectsResult, regionaisResult, usersResult] = await Promise.allSettled([
+  const results = await Promise.allSettled([
     base44.entities.Obra.list('-created_date', 500),
     base44.entities.Project.list('-created_date', 500),
     needsRegionais ? base44.entities.Regional.list() : Promise.resolve([]),
     needsUsers ? base44.entities.User.list() : Promise.resolve([]),
   ]);
+  
+  const [obrasResult, projectsResult, regionaisResult, usersResult] = results;
+  
   if (obrasResult.status    === 'rejected') console.warn('[recordsService] loadAuxData: Obra falhou:',     obrasResult.reason?.message);
   if (projectsResult.status === 'rejected') console.warn('[recordsService] loadAuxData: Project falhou:', projectsResult.reason?.message);
   if (regionaisResult.status === 'rejected') console.warn('[recordsService] loadAuxData: Regional falhou:', regionaisResult.reason?.message);
   if (usersResult.status    === 'rejected') console.warn('[recordsService] loadAuxData: User falhou:',     usersResult.reason?.message);
+  
   return {
     obras:     obrasResult.status    === 'fulfilled' ? obrasResult.value    : [],
     projects:  projectsResult.status === 'fulfilled' ? projectsResult.value : [],

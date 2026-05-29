@@ -36,7 +36,7 @@ export function useDashboardData() {
 
   // Aplicar filtros de acesso
   const { obras, projects, ensaios } = useMemo(() => {
-    if (!user || !auxData || !allRecords.length) {
+    if (!user || !auxData || !allRecords?.length) {
       return { obras: auxData?.obras ?? [], projects: auxData?.projects ?? [], ensaios: [] };
     }
 
