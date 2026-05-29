@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowRightLeft, MapPin } from "lucide-react";
-import { SolicitacaoTransferenciaRegional } from "@/entities/SolicitacaoTransferenciaRegional";
+import { base44 } from "@/api/base44Client";
 
 export default function SolicitarTransferenciaRegionalModal({ 
   isOpen, 
@@ -41,7 +41,7 @@ export default function SolicitarTransferenciaRegionalModal({
     try {
       const regionalDestino = todasRegionais.find(r => r.id === regionalDestinoId);
       
-      await SolicitacaoTransferenciaRegional.create({
+      await base44.entities.SolicitacaoTransferenciaRegional.create({
         laboratorista_email: user.email,
         laboratorista_name: user.full_name,
         regional_atual_id: regionalAtual.id,
