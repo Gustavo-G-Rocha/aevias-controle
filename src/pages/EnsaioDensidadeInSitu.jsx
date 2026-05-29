@@ -56,6 +56,7 @@ export default function EnsaioDensidadeInSituPage() {
                 setFormData={setFormData}
                 obras={obras}
                 regionais={regionais}
+                projects={projects}
                 isEditable={isEditable}
                 handleGlobalDataChange={handleGlobalDataChange}
                 handleProctorChange={handleProctorChange}

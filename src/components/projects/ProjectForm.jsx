@@ -260,6 +260,7 @@ export default function ProjectForm({ project, faixas, regionais, user, onSave, 
                 onAgregadoAdd={adicionarAgregado}
                 onAgregadoRemove={removerAgregado}
                 onAgregadoChange={handleAgregadoChange}
+                onInputChange={handleInputChange}
               />
               )}
 

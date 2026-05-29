@@ -114,6 +114,10 @@ export const INITIAL_FORM_DATA = {
     densidade_otima: "",
     resistencia_mpa: "",
   },
+  // BGS
+  densidade_seca_max: "",
+  umidade_otima: "",
+  faixa_trabalho_bgs: {},
   status: "ativo",
 };
 
@@ -179,6 +183,10 @@ export const mapProjectToFormData = (project) => {
           resistencia_mpa: project.resistencia_mpa || "",
         }
       : { ...INITIAL_FORM_DATA.camadas_granulares },
+    // BGS
+    densidade_seca_max: project.densidade_seca_max || "",
+    umidade_otima: project.umidade_otima || "",
+    faixa_trabalho_bgs: project.faixa_trabalho_bgs || {},
     status: project.status || "ativo",
   };
 };

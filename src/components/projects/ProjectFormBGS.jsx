@@ -3,85 +3,158 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Trash2, AlertCircle } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
-export default function ProjectFormBGS({ formData, onAgregadoAdd, onAgregadoRemove, onAgregadoChange }) {
+export default function ProjectFormBGS({ formData, onAgregadoAdd, onAgregadoRemove, onAgregadoChange, onInputChange, onNestedChange }) {
   return (
-    <Card className="bg-slate-50">
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          <AlertCircle className="w-5 h-5 text-blue-500" />
-          <CardTitle className="text-lg">
-            Projeto {formData.tipo_projeto} - Configuração Simplificada
-          </CardTitle>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-slate-600 mb-4">
-          Para projetos do tipo <strong>{formData.tipo_projeto}</strong>, os parâmetros técnicos específicos podem ser configurados conforme necessário.
-          O sistema já está preparado com a especificação granulométrica e o limite de equivalente de areia.
-        </p>
-
-        <Card className="bg-white">
-          <CardHeader>
-            <CardTitle className="text-base">Agregados (Opcional)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex justify-between items-center mb-4">
-              <p className="text-sm text-slate-600">Adicione agregados se necessário para este projeto.</p>
-              <Button type="button" onClick={onAgregadoAdd} size="sm" className="bg-green-600 hover:bg-green-700">
-                <Plus className="w-4 h-4 mr-2" />
-                Adicionar Agregado
-              </Button>
+    <div className="space-y-6">
+      {/* Densidade Seca Máxima */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Parâmetros de Compactação</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="densidade_seca_max_bgs">Densidade Seca Máxima (g/cm³)</Label>
+              <Input
+                id="densidade_seca_max_bgs"
+                type="number"
+                step="0.001"
+                value={formData.densidade_seca_max || ""}
+                onChange={(e) => onInputChange?.('densidade_seca_max', e.target.value === '' ? '' : parseFloat(e.target.value))}
+                placeholder="Ex: 2.150"
+              />
+              <p className="text-xs text-slate-500 mt-1">Valor de referência para ensaios de densidade in situ</p>
             </div>
+            <div>
+              <Label htmlFor="umidade_otima_bgs">Umidade Ótima (%)</Label>
+              <Input
+                id="umidade_otima_bgs"
+                type="number"
+                step="0.01"
+                value={formData.umidade_otima || ""}
+                onChange={(e) => onInputChange?.('umidade_otima', e.target.value === '' ? '' : parseFloat(e.target.value))}
+                placeholder="Ex: 12.5"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-            {formData.agregados.length > 0 ? (
-              <div className="space-y-4">
-                {formData.agregados.map((agregado, index) => (
-                  <div key={index} className="p-4 border rounded-lg bg-slate-50">
-                    <div className="flex justify-between items-center mb-3">
-                      <h5 className="font-semibold text-sm">Agregado {index + 1}</h5>
-                      <Button
-                        type="button"
-                        onClick={() => onAgregadoRemove(index)}
-                        size="sm"
-                        variant="ghost"
-                        className="text-red-500"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+      {/* Faixa de Trabalho */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Faixa de Trabalho (% Passante)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-xs text-slate-500 mb-4">
+            Informe os limites mínimo e máximo de passante para cada peneira relevante.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
+            {[
+              { label: '3"', min: 'faixa_min_75', max: 'faixa_max_75' },
+              { label: '2"', min: 'faixa_min_50', max: 'faixa_max_50' },
+              { label: '1 1/2"', min: 'faixa_min_38', max: 'faixa_max_38' },
+              { label: '1"', min: 'faixa_min_25', max: 'faixa_max_25' },
+              { label: '3/4"', min: 'faixa_min_19', max: 'faixa_max_19' },
+              { label: '3/8"', min: 'faixa_min_9_5', max: 'faixa_max_9_5' },
+              { label: 'Nº4 (4,75mm)', min: 'faixa_min_4_75', max: 'faixa_max_4_75' },
+              { label: 'Nº10 (2,00mm)', min: 'faixa_min_2_0', max: 'faixa_max_2_0' },
+              { label: 'Nº40 (0,42mm)', min: 'faixa_min_0_42', max: 'faixa_max_0_42' },
+              { label: 'Nº200 (0,075mm)', min: 'faixa_min_0_075', max: 'faixa_max_0_075' },
+            ].map(({ label, min, max }) => (
+              <div key={label} className="flex items-center gap-2">
+                <span className="text-xs font-medium w-28 shrink-0">{label}</span>
+                <div className="flex items-center gap-1 flex-1">
+                  <Input
+                    type="number"
+                    step="0.1"
+                    placeholder="Mín"
+                    value={formData.faixa_trabalho_bgs?.[min] ?? ""}
+                    onChange={(e) => onInputChange?.('faixa_trabalho_bgs', {
+                      ...formData.faixa_trabalho_bgs,
+                      [min]: e.target.value === '' ? '' : parseFloat(e.target.value)
+                    })}
+                    className="text-xs h-8"
+                  />
+                  <span className="text-slate-400 text-xs">–</span>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    placeholder="Máx"
+                    value={formData.faixa_trabalho_bgs?.[max] ?? ""}
+                    onChange={(e) => onInputChange?.('faixa_trabalho_bgs', {
+                      ...formData.faixa_trabalho_bgs,
+                      [max]: e.target.value === '' ? '' : parseFloat(e.target.value)
+                    })}
+                    className="text-xs h-8"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Agregados */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base">Agregados (Opcional)</CardTitle>
+            <Button type="button" onClick={onAgregadoAdd} size="sm" className="bg-green-600 hover:bg-green-700">
+              <Plus className="w-4 h-4 mr-2" />
+              Adicionar Agregado
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {formData.agregados.length > 0 ? (
+            <div className="space-y-4">
+              {formData.agregados.map((agregado, index) => (
+                <div key={index} className="p-4 border rounded-lg bg-slate-50">
+                  <div className="flex justify-between items-center mb-3">
+                    <h5 className="font-semibold text-sm">Agregado {index + 1}</h5>
+                    <Button
+                      type="button"
+                      onClick={() => onAgregadoRemove(index)}
+                      size="sm"
+                      variant="ghost"
+                      className="text-red-500"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-xs">Nome/Tipo</Label>
+                      <Input
+                        value={agregado.nome}
+                        onChange={(e) => onAgregadoChange(index, 'nome', e.target.value)}
+                        placeholder="Ex: Areia natural"
+                        className="text-sm"
+                      />
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-xs">Nome/Tipo</Label>
-                        <Input
-                          value={agregado.nome}
-                          onChange={(e) => onAgregadoChange(index, 'nome', e.target.value)}
-                          placeholder="Ex: Areia natural"
-                          className="text-sm"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Pedreira</Label>
-                        <Input
-                          value={agregado.pedreira}
-                          onChange={(e) => onAgregadoChange(index, 'pedreira', e.target.value)}
-                          placeholder="Ex: Pedreira Central"
-                          className="text-sm"
-                        />
-                      </div>
+                    <div>
+                      <Label className="text-xs">Pedreira</Label>
+                      <Input
+                        value={agregado.pedreira}
+                        onChange={(e) => onAgregadoChange(index, 'pedreira', e.target.value)}
+                        placeholder="Ex: Pedreira Central"
+                        className="text-sm"
+                      />
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-center text-slate-400 py-8 italic text-sm">
-                Nenhum agregado adicionado ainda.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      </CardContent>
-    </Card>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-slate-400 py-6 italic text-sm">
+              Nenhum agregado adicionado ainda.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

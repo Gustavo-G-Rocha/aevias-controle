@@ -12,27 +12,22 @@
         "CAMADAS_GRANULARES"
       ],
       "default": "CAUQ",
-      "description": "Tipo do projeto: CAUQ, MRAF, BGS, Carta Tra\u00e7o de Concreto ou Camadas Granulares"
+      "description": "Tipo do projeto"
     },
     "regional_id": {
-      "type": "string",
-      "description": "ID da regional a qual este projeto est\u00e1 vinculado"
+      "type": "string"
     },
     "name": {
-      "type": "string",
-      "description": "Nome do projeto"
+      "type": "string"
     },
     "description": {
-      "type": "string",
-      "description": "Descri\u00e7\u00e3o do projeto"
+      "type": "string"
     },
     "client": {
-      "type": "string",
-      "description": "Cliente do projeto"
+      "type": "string"
     },
     "location": {
-      "type": "string",
-      "description": "Localiza\u00e7\u00e3o do projeto"
+      "type": "string"
     },
     "status": {
       "type": "string",
@@ -44,16 +39,13 @@
       "default": "ativo"
     },
     "faixa_granulometrica_id": {
-      "type": "string",
-      "description": "ID da Faixa Granulom\u00e9trica de refer\u00eancia - apenas para CAUQ, MRAF, BGS, CAMADAS_GRANULARES"
+      "type": "string"
     },
     "equivalente_areia_minimo": {
-      "type": "number",
-      "description": "Limite m\u00ednimo de equivalente de areia (%) - apenas para CAUQ, MRAF, BGS"
+      "type": "number"
     },
     "agregados": {
       "type": "array",
-      "description": "Agregados utilizados - apenas para CAUQ, MRAF, BGS, CAMADAS_GRANULARES",
       "items": {
         "type": "object",
         "properties": {
@@ -67,76 +59,13 @@
             "type": "number"
           },
           "granulometria": {
-            "type": "object",
-            "properties": {
-              "peneira_75_0mm": {
-                "type": "number"
-              },
-              "peneira_63_0mm": {
-                "type": "number"
-              },
-              "peneira_50_0mm": {
-                "type": "number"
-              },
-              "peneira_37_5mm": {
-                "type": "number"
-              },
-              "peneira_25_0mm": {
-                "type": "number"
-              },
-              "peneira_19_0mm": {
-                "type": "number"
-              },
-              "peneira_16_0mm": {
-                "type": "number"
-              },
-              "peneira_12_5mm": {
-                "type": "number"
-              },
-              "peneira_9_5mm": {
-                "type": "number"
-              },
-              "peneira_6_3mm": {
-                "type": "number"
-              },
-              "peneira_4_75mm": {
-                "type": "number"
-              },
-              "peneira_2_36mm": {
-                "type": "number"
-              },
-              "peneira_2_0mm": {
-                "type": "number"
-              },
-              "peneira_1_18mm": {
-                "type": "number"
-              },
-              "peneira_0_6mm": {
-                "type": "number"
-              },
-              "peneira_0_42mm": {
-                "type": "number"
-              },
-              "peneira_0_3mm": {
-                "type": "number"
-              },
-              "peneira_0_18mm": {
-                "type": "number"
-              },
-              "peneira_0_15mm": {
-                "type": "number"
-              },
-              "peneira_0_075mm": {
-                "type": "number"
-              }
-            }
+            "type": "object"
           }
         }
       }
     },
     "ligante": {
       "type": "object",
-      "description": "Ligante asf\u00e1ltico - apenas CAUQ",
       "properties": {
         "tipo": {
           "type": "string"
@@ -150,12 +79,10 @@
       }
     },
     "emulsao_utilizada": {
-      "type": "string",
-      "description": "Emuls\u00e3o utilizada - apenas MRAF"
+      "type": "string"
     },
     "temperaturas": {
       "type": "object",
-      "description": "Temperaturas de controle - apenas CAUQ",
       "properties": {
         "mistura": {
           "type": "object",
@@ -193,206 +120,16 @@
       }
     },
     "faixa_trabalho": {
-      "type": "object",
-      "description": "Faixa de trabalho \u00f3tima (% passante)",
-      "properties": {
-        "peneira_75_0mm": {
-          "type": "number"
-        },
-        "peneira_63_0mm": {
-          "type": "number"
-        },
-        "peneira_50_0mm": {
-          "type": "number"
-        },
-        "peneira_37_5mm": {
-          "type": "number"
-        },
-        "peneira_25_0mm": {
-          "type": "number"
-        },
-        "peneira_19_0mm": {
-          "type": "number"
-        },
-        "peneira_16_0mm": {
-          "type": "number"
-        },
-        "peneira_12_5mm": {
-          "type": "number"
-        },
-        "peneira_9_5mm": {
-          "type": "number"
-        },
-        "peneira_6_3mm": {
-          "type": "number"
-        },
-        "peneira_4_75mm": {
-          "type": "number"
-        },
-        "peneira_2_36mm": {
-          "type": "number"
-        },
-        "peneira_2_0mm": {
-          "type": "number"
-        },
-        "peneira_1_18mm": {
-          "type": "number"
-        },
-        "peneira_0_6mm": {
-          "type": "number"
-        },
-        "peneira_0_42mm": {
-          "type": "number"
-        },
-        "peneira_0_3mm": {
-          "type": "number"
-        },
-        "peneira_0_18mm": {
-          "type": "number"
-        },
-        "peneira_0_15mm": {
-          "type": "number"
-        },
-        "peneira_0_075mm": {
-          "type": "number"
-        }
-      }
+      "type": "object"
     },
     "faixa_trabalho_min": {
-      "type": "object",
-      "description": "Limites m\u00ednimos (% passante)",
-      "properties": {
-        "peneira_75_0mm": {
-          "type": "number"
-        },
-        "peneira_63_0mm": {
-          "type": "number"
-        },
-        "peneira_50_0mm": {
-          "type": "number"
-        },
-        "peneira_37_5mm": {
-          "type": "number"
-        },
-        "peneira_25_0mm": {
-          "type": "number"
-        },
-        "peneira_19_0mm": {
-          "type": "number"
-        },
-        "peneira_16_0mm": {
-          "type": "number"
-        },
-        "peneira_12_5mm": {
-          "type": "number"
-        },
-        "peneira_9_5mm": {
-          "type": "number"
-        },
-        "peneira_6_3mm": {
-          "type": "number"
-        },
-        "peneira_4_75mm": {
-          "type": "number"
-        },
-        "peneira_2_36mm": {
-          "type": "number"
-        },
-        "peneira_2_0mm": {
-          "type": "number"
-        },
-        "peneira_1_18mm": {
-          "type": "number"
-        },
-        "peneira_0_6mm": {
-          "type": "number"
-        },
-        "peneira_0_42mm": {
-          "type": "number"
-        },
-        "peneira_0_3mm": {
-          "type": "number"
-        },
-        "peneira_0_18mm": {
-          "type": "number"
-        },
-        "peneira_0_15mm": {
-          "type": "number"
-        },
-        "peneira_0_075mm": {
-          "type": "number"
-        }
-      }
+      "type": "object"
     },
     "faixa_trabalho_max": {
-      "type": "object",
-      "description": "Limites m\u00e1ximos (% passante)",
-      "properties": {
-        "peneira_75_0mm": {
-          "type": "number"
-        },
-        "peneira_63_0mm": {
-          "type": "number"
-        },
-        "peneira_50_0mm": {
-          "type": "number"
-        },
-        "peneira_37_5mm": {
-          "type": "number"
-        },
-        "peneira_25_0mm": {
-          "type": "number"
-        },
-        "peneira_19_0mm": {
-          "type": "number"
-        },
-        "peneira_16_0mm": {
-          "type": "number"
-        },
-        "peneira_12_5mm": {
-          "type": "number"
-        },
-        "peneira_9_5mm": {
-          "type": "number"
-        },
-        "peneira_6_3mm": {
-          "type": "number"
-        },
-        "peneira_4_75mm": {
-          "type": "number"
-        },
-        "peneira_2_36mm": {
-          "type": "number"
-        },
-        "peneira_2_0mm": {
-          "type": "number"
-        },
-        "peneira_1_18mm": {
-          "type": "number"
-        },
-        "peneira_0_6mm": {
-          "type": "number"
-        },
-        "peneira_0_42mm": {
-          "type": "number"
-        },
-        "peneira_0_3mm": {
-          "type": "number"
-        },
-        "peneira_0_18mm": {
-          "type": "number"
-        },
-        "peneira_0_15mm": {
-          "type": "number"
-        },
-        "peneira_0_075mm": {
-          "type": "number"
-        }
-      }
+      "type": "object"
     },
     "teor_ligante": {
       "type": "object",
-      "description": "Teor de ligante - apenas CAUQ",
       "properties": {
         "min": {
           "type": "number"
@@ -407,7 +144,6 @@
     },
     "teor_ligante_residual": {
       "type": "object",
-      "description": "Teor de ligante residual - apenas MRAF",
       "properties": {
         "min": {
           "type": "number"
@@ -421,12 +157,10 @@
       }
     },
     "percentual_emulsao": {
-      "type": "number",
-      "description": "Percentual de emuls\u00e3o - apenas MRAF"
+      "type": "number"
     },
     "taxa_aplicacao_mraf": {
       "type": "object",
-      "description": "Taxa de aplica\u00e7\u00e3o - apenas MRAF",
       "properties": {
         "min": {
           "type": "number"
@@ -440,20 +174,16 @@
       }
     },
     "densidade_mistura_mraf": {
-      "type": "number",
-      "description": "Densidade da mistura - apenas MRAF"
+      "type": "number"
     },
     "massa_especifica_aparente": {
-      "type": "number",
-      "description": "Massa espec\u00edfica aparente - apenas CAUQ"
+      "type": "number"
     },
     "densidade_maxima_medida": {
-      "type": "number",
-      "description": "Densidade m\u00e1xima medida RICE - apenas CAUQ"
+      "type": "number"
     },
     "volume_vazios": {
       "type": "object",
-      "description": "Volume de vazios - apenas CAUQ",
       "properties": {
         "min": {
           "type": "number"
@@ -468,7 +198,6 @@
     },
     "rtcd": {
       "type": "object",
-      "description": "RTCD - apenas CAUQ",
       "properties": {
         "min": {
           "type": "number"
@@ -477,7 +206,6 @@
     },
     "estabilidade": {
       "type": "object",
-      "description": "Estabilidade Marshall - apenas CAUQ",
       "properties": {
         "min": {
           "type": "number"
@@ -489,7 +217,6 @@
     },
     "fluencia": {
       "type": "object",
-      "description": "Flu\u00eancia Marshall - apenas CAUQ",
       "properties": {
         "min": {
           "type": "number"
@@ -504,7 +231,6 @@
     },
     "vam": {
       "type": "object",
-      "description": "VAM - apenas CAUQ",
       "properties": {
         "min": {
           "type": "number"
@@ -516,7 +242,6 @@
     },
     "rbv": {
       "type": "object",
-      "description": "RBV - apenas CAUQ",
       "properties": {
         "min": {
           "type": "number"
@@ -530,52 +255,111 @@
       }
     },
     "fck": {
-      "type": "number",
-      "description": "Resist\u00eancia caracter\u00edstica do concreto (MPa) - apenas CARTA_TRACO_CONCRETO"
+      "type": "number"
     },
     "slump_projeto": {
-      "type": "number",
-      "description": "Slump de projeto (cm) - apenas CARTA_TRACO_CONCRETO"
+      "type": "number"
     },
     "slump_minimo": {
-      "type": "number",
-      "description": "Slump m\u00ednimo (cm) - apenas CARTA_TRACO_CONCRETO"
+      "type": "number"
     },
     "slump_maximo": {
-      "type": "number",
-      "description": "Slump m\u00e1ximo (cm) - apenas CARTA_TRACO_CONCRETO"
+      "type": "number"
     },
     "consumo_agua": {
-      "type": "number",
-      "description": "Consumo de \u00e1gua (L/m\u00b3) - apenas CARTA_TRACO_CONCRETO"
+      "type": "number"
     },
     "tipo_aditivo": {
-      "type": "string",
-      "description": "Tipo de aditivo - apenas CARTA_TRACO_CONCRETO"
+      "type": "string"
     },
     "tipo_cimento": {
-      "type": "string",
-      "description": "Tipo de cimento - apenas CARTA_TRACO_CONCRETO"
+      "type": "string"
     },
     "concreteira": {
-      "type": "string",
-      "description": "Nome da concreteira fornecedora - apenas CARTA_TRACO_CONCRETO"
+      "type": "string"
     },
     "melhorador_utilizado": {
-      "type": "string",
-      "description": "Melhorador utilizado - apenas CAMADAS_GRANULARES"
+      "type": "string"
     },
     "umidade_otima": {
       "type": "number",
-      "description": "Umidade \u00f3tima (%) - apenas CAMADAS_GRANULARES"
+      "description": "Umidade \u00f3tima (%) - BGS e Camadas Granulares"
     },
     "densidade_otima": {
-      "type": "number",
-      "description": "Densidade \u00f3tima (g/cm\u00b3) - apenas CAMADAS_GRANULARES"
+      "type": "number"
     },
     "resistencia_mpa": {
+      "type": "number"
+    },
+    "densidade_seca_max": {
       "type": "number",
-      "description": "Resist\u00eancia em MPa (opcional) - apenas CAMADAS_GRANULARES"
+      "description": "Densidade seca m\u00e1xima (g/cm\u00b3) - apenas BGS"
+    },
+    "faixa_trabalho_bgs": {
+      "type": "object",
+      "description": "Faixa de trabalho BGS (min/max por peneira)",
+      "properties": {
+        "faixa_min_75": {
+          "type": "number"
+        },
+        "faixa_max_75": {
+          "type": "number"
+        },
+        "faixa_min_50": {
+          "type": "number"
+        },
+        "faixa_max_50": {
+          "type": "number"
+        },
+        "faixa_min_38": {
+          "type": "number"
+        },
+        "faixa_max_38": {
+          "type": "number"
+        },
+        "faixa_min_25": {
+          "type": "number"
+        },
+        "faixa_max_25": {
+          "type": "number"
+        },
+        "faixa_min_19": {
+          "type": "number"
+        },
+        "faixa_max_19": {
+          "type": "number"
+        },
+        "faixa_min_9_5": {
+          "type": "number"
+        },
+        "faixa_max_9_5": {
+          "type": "number"
+        },
+        "faixa_min_4_75": {
+          "type": "number"
+        },
+        "faixa_max_4_75": {
+          "type": "number"
+        },
+        "faixa_min_2_0": {
+          "type": "number"
+        },
+        "faixa_max_2_0": {
+          "type": "number"
+        },
+        "faixa_min_0_42": {
+          "type": "number"
+        },
+        "faixa_max_0_42": {
+          "type": "number"
+        },
+        "faixa_min_0_075": {
+          "type": "number"
+        },
+        "faixa_max_0_075": {
+          "type": "number"
+        }
+      }
     }
   },
   "required": [

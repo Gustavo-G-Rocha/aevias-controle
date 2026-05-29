@@ -5,12 +5,12 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { base44 } from "@/api/base44Client";
 
-export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obras, regionais, isEditable, handleGlobalDataChange, handleProctorChange }) {
+export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obras, regionais, isEditable, handleGlobalDataChange, handleProctorChange, projects = [] }) {
   const handleObraChange = (obraId) => {
     const obra = obras.find(o => o.id === obraId);
     const regional = obra ? regionais.find(r => r.id === obra.regional_id) : null;
 
-    setFormData(prev => ({ ...prev, obra_id: obraId }));
+    setFormData(prev => ({ ...prev, obra_id: obraId, project_id: '' }));
 
     if (regional?.gestor_contrato_responsavel) {
       base44.entities.User.list().then(allUsers => {
@@ -25,6 +25,27 @@ export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obra
         }
       }).catch(() => {});
     }
+  };
+
+  // Projetos BGS disponíveis para a obra selecionada
+  const obra = obras.find(o => o.id === formData.obra_id);
+  const regional = obra ? regionais.find(r => r.id === obra.regional_id) : null;
+  const projectIdsDaRegional = regional?.project_ids || [];
+  const projetosBGS = projects.filter(p =>
+    p.tipo_projeto === 'BGS' && projectIdsDaRegional.includes(p.id)
+  );
+
+  const handleProjectChange = (projectId) => {
+    const projeto = projects.find(p => p.id === projectId);
+    setFormData(prev => ({
+      ...prev,
+      project_id: projectId,
+      dados_proctor: {
+        ...prev.dados_proctor,
+        densidade_seca_max: projeto?.densidade_seca_max || prev.dados_proctor.densidade_seca_max || null,
+        umidade_otima: projeto?.umidade_otima || prev.dados_proctor.umidade_otima || null,
+      }
+    }));
   };
 
   return (
@@ -49,6 +70,25 @@ export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obra
               ))}
             </select>
           </div>
+
+          {projetosBGS.length > 0 && (
+            <div>
+              <Label htmlFor="project_id">Projeto BGS (opcional)</Label>
+              <select
+                id="project_id"
+                value={formData.project_id || ''}
+                onChange={(e) => handleProjectChange(e.target.value)}
+                disabled={!isEditable}
+                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+              >
+                <option value="">Selecione o projeto BGS</option>
+                {projetosBGS.map(p => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+              <p className="text-xs text-slate-500 mt-1">Preenche automaticamente a densidade seca máxima do Proctor</p>
+            </div>
+          )}
 
           <div>
             <Label htmlFor="data_ensaio">Data do Ensaio *</Label>
