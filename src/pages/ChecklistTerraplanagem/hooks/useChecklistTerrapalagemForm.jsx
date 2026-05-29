@@ -2,7 +2,10 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
 import { useChecklistForm } from "@/hooks/useChecklistForm";
+import { useOfflineDetection } from "@/hooks/useOfflineDetection";
 import { buildDataToSave, validateForm } from "../utils/checklistTerrapalagemMapper";
+import { createQueueItem } from "@/utils/offlineQueue";
+import { addOrUpdateQueueItem } from "@/services/syncService";
 
 const getInitialFormData = () => ({
   obra_id: "",
@@ -57,6 +60,7 @@ export function useChecklistTerrapalagemForm() {
     isApproved, isEditable, clearSavedData, navigate,
   } = useChecklistForm(getInitialFormData, 'ChecklistTerraplanagem', 'checklist_terraplanagem');
 
+  const { isOnline } = useOfflineDetection();
   const [saving, setSaving] = useState(false);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [selectedFileNames, setSelectedFileNames] = useState("Nenhum ficheiro selecionado");
@@ -195,25 +199,42 @@ export function useChecklistTerrapalagemForm() {
     try {
       const dataToSave = buildDataToSave(formData, saveStatus);
 
-      if (editingChecklist?.id) {
-        const updateData = { ...dataToSave };
-        let msg = saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist atualizado com sucesso!";
-        if (editingChecklist.approved === false && saveStatus === 'finalizado') {
-          updateData.approved = null;
-          updateData.rejection_reason = null;
-          updateData.approved_by = null;
-          updateData.approved_date = null;
-          updateData.was_rejected = true;
-          msg = "Checklist atualizado com sucesso! O registro voltará para análise do administrador.";
+      if (isOnline) {
+        // ONLINE: Comportamento original
+        if (editingChecklist?.id) {
+          const updateData = { ...dataToSave };
+          let msg = saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist atualizado com sucesso!";
+          if (editingChecklist.approved === false && saveStatus === 'finalizado') {
+            updateData.approved = null;
+            updateData.rejection_reason = null;
+            updateData.approved_by = null;
+            updateData.approved_date = null;
+            updateData.was_rejected = true;
+            msg = "Checklist atualizado com sucesso! O registro voltará para análise do administrador.";
+          }
+          await base44.entities.ChecklistTerraplanagem.update(editingChecklist.id, updateData);
+          alert(msg);
+        } else {
+          await base44.entities.ChecklistTerraplanagem.create(dataToSave);
+          alert(saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!");
         }
-        await base44.entities.ChecklistTerraplanagem.update(editingChecklist.id, updateData);
-        alert(msg);
+        clearSavedData();
+        navigate(createPageUrl("MeusEnsaios"));
       } else {
-        await base44.entities.ChecklistTerraplanagem.create(dataToSave);
-        alert(saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!");
+        // OFFLINE: Enfileirar sincronização
+        const operation = editingChecklist?.id ? 'update' : 'create';
+        const queueItem = createQueueItem({
+          operation,
+          entityType: 'ChecklistTerraplanagem',
+          entityId: editingChecklist?.id || null,
+          payload: dataToSave,
+        });
+
+        await addOrUpdateQueueItem(queueItem);
+        alert(`Registro salvo localmente. Será sincronizado quando a conexão voltar.${editingChecklist?.id ? '' : ''}`);
+        clearSavedData();
+        navigate(createPageUrl("MeusEnsaios"));
       }
-      clearSavedData();
-      navigate(createPageUrl("MeusEnsaios"));
     } catch (error) {
       console.error("Erro ao salvar checklist:", error);
       alert(`Erro ao salvar checklist: ${error.message}`);
@@ -228,6 +249,7 @@ export function useChecklistTerrapalagemForm() {
     isApproved, isEditable, clearSavedData, navigate,
     saving, uploadingPhotos, selectedFileNames,
     variacaoUmidade, grauCompactacao,
+    isOnline,
     handleCheckboxChange, handleRoloChange, handleEnsaioChange,
     handleFileChange, handleRemovePhoto, handleLegendChange, handleSubmit,
   };
