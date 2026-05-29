@@ -1,5 +1,5 @@
 import React from 'react';
-import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Treemap, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const TOOLTIP_STYLE = {
@@ -10,15 +10,16 @@ const TOOLTIP_STYLE = {
   boxShadow: 'var(--shadow-md)',
 };
 
-const LollipopDot = (props) => {
-  const { cx, cy, fill, payload } = props;
-  const opacity = payload.activeObra ? 1 : 0.6;
-  
+const TreemapContent = (props) => {
+  const { x, y, width, height, fill, payload } = props;
+  const opacity = payload.activeObra ? 1 : 0.5;
+
   return (
-    <circle
-      cx={cx}
-      cy={cy}
-      r={6}
+    <rect
+      x={x}
+      y={y}
+      width={width}
+      height={height}
       fill={fill}
       opacity={opacity}
       style={{ cursor: 'pointer' }}
@@ -26,17 +27,53 @@ const LollipopDot = (props) => {
   );
 };
 
+const TreemapLabel = (props) => {
+  const { x, y, width, height, name, value } = props;
+  
+  return (
+    <g>
+      <text
+        x={x + width / 2}
+        y={y + height / 2 - 7}
+        textAnchor="middle"
+        fill="white"
+        fontSize={12}
+        fontWeight="bold"
+      >
+        {name}
+      </text>
+      <text
+        x={x + width / 2}
+        y={y + height / 2 + 10}
+        textAnchor="middle"
+        fill="white"
+        fontSize={14}
+        fontWeight="bold"
+      >
+        {value}
+      </text>
+    </g>
+  );
+};
+
 export default function RecordsByObraChart({ data, activeObraId, onSliceClick }) {
   if (!data.length) return null;
 
-  // Adicionar flag de atividade aos dados
-  const chartData = data.map(entry => ({
-    ...entry,
-    activeObra: !activeObraId || entry.obraId === activeObraId,
-  }));
+  // Preparar dados para Treemap com nó root
+  const chartData = [
+    {
+      name: 'Registros',
+      children: data.map(entry => ({
+        ...entry,
+        activeObra: !activeObraId || entry.obraId === activeObraId,
+      })),
+    },
+  ];
 
-  const handleBarClick = (entry) => {
-    onSliceClick({ obraId: entry.obraId });
+  const handleTreemapClick = (entry) => {
+    if (entry.obraId) {
+      onSliceClick({ obraId: entry.obraId });
+    }
   };
 
   return (
@@ -49,38 +86,17 @@ export default function RecordsByObraChart({ data, activeObraId, onSliceClick })
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
-          <ComposedChart
+          <Treemap
             data={chartData}
-            margin={{ top: 20, right: 30, left: 0, bottom: 20 }}
+            dataKey="value"
+            stroke="var(--color-border)"
+            fill="var(--color-primary)"
+            onClick={(e) => handleTreemapClick(e.payload)}
+            content={<TreemapContent />}
+            label={<TreemapLabel />}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-            <XAxis
-              dataKey="name"
-              tick={{ fontSize: 12, fill: 'var(--color-text-muted)' }}
-              angle={-45}
-              textAnchor="end"
-              height={80}
-            />
-            <YAxis
-              tick={{ fontSize: 12, fill: 'var(--color-text-muted)' }}
-            />
             <Tooltip contentStyle={TOOLTIP_STYLE} />
-            <Line
-              type="monotone"
-              dataKey="value"
-              stroke="var(--color-border)"
-              strokeWidth={2}
-              isAnimationActive={false}
-              dot={<LollipopDot />}
-            />
-            <Bar
-              dataKey="value"
-              fill="transparent"
-              onClick={(e) => handleBarClick(e.payload)}
-              style={{ cursor: 'pointer' }}
-              shape={<g />}
-            />
-          </ComposedChart>
+          </Treemap>
         </ResponsiveContainer>
       </CardContent>
     </Card>
