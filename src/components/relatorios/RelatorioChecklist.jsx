@@ -52,6 +52,7 @@ const TabelaControleAgregados = ({ controle_agregados }) => {
 
 // ─── Tabela de Controle de CAUQ ───────────────────────────────────────────────
 const TabelaControleCAUQ = ({ controle_cauq, project }) => {
+  const Checkmark = ({ checked }) => <ReportCheckmark checked={checked} />;
   const data = controle_cauq || {};
   const ensaios = [
     { label: 'Ext. Ligante (Rotarex)', key: 'extracao_ligante_rotarex', padrao: project?.teor_ligante ? `${project.teor_ligante.min} a ${project.teor_ligante.max} %` : 'N/A' },
