@@ -2,11 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, AlertTriangle } from "lucide-react";
-import { EnsaioDensidade as EnsaioDensidadeEntity } from "@/entities/EnsaioDensidade";
-import { Obra } from "@/entities/Obra";
-import { Project } from "@/entities/Project";
-import { User } from "@/entities/User";
-import { Regional } from "@/entities/Regional"; // Added import for Regional entity
+import { base44 } from "@/api/base44Client";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -46,16 +42,16 @@ export default function EnsaioDensidadePage() {
     const loadInitialData = async () => {
       setLoading(true);
       try {
-        const currentUser = await User.me();
+        const currentUser = await base44.auth.me();
         setUser(currentUser);
 
-        let obrasData = await Obra.list();
-        const projectsData = await Project.list();
+        let obrasData = await base44.entities.Obra.list();
+        const projectsData = await base44.entities.Project.list();
         
         // Se for laboratorista, filtrar apenas obras em andamento da sua regional
         const currentUserAccessLevel = currentUser.access_level || (currentUser.role === 'admin' ? 'admin' : 'user');
         if (currentUserAccessLevel === 'user') {
-          const regionaisData = await Regional.list();
+          const regionaisData = await base44.entities.Regional.list();
           const regionalDoLaboratorista = regionaisData.find(regional => {
             const laboratoristas = regional.laboratoristas_responsaveis || [];
             return laboratoristas.some(email => email.toLowerCase() === currentUser.email.toLowerCase());
@@ -78,7 +74,7 @@ export default function EnsaioDensidadePage() {
         const editId = params.get('editId');
 
         if (editId) {
-          const ensaioToEdit = await EnsaioDensidadeEntity.get(editId);
+          const ensaioToEdit = await base44.entities.EnsaioDensidade.get(editId);
           if (currentUser.role === 'admin' || (ensaioToEdit.created_by === currentUser.email && ensaioToEdit.approved !== true)) {
             setEditingEnsaio(ensaioToEdit);
           } else {
@@ -120,10 +116,10 @@ export default function EnsaioDensidadePage() {
           successMessage = "Ensaio atualizado com sucesso! O registro voltará para análise do administrador.";
         }
         
-        await EnsaioDensidadeEntity.update(editingEnsaio.id, updateData);
+        await base44.entities.EnsaioDensidade.update(editingEnsaio.id, updateData);
         alert(successMessage);
       } else {
-        await EnsaioDensidadeEntity.create({ ...formData, pesos: pesosParsed, laboratorista_name: user?.laboratorista_name || user?.full_name });
+        await base44.entities.EnsaioDensidade.create({ ...formData, pesos: pesosParsed, laboratorista_name: user?.laboratorista_name || user?.full_name });
         alert("Ensaio criado com sucesso!");
       }
       navigate(createPageUrl('MeusEnsaios'));
