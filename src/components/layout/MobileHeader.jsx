@@ -1,5 +1,3 @@
-import { User } from "@/entities/User";
-
 export default function MobileHeader({ user, canCreateRecords }) {
 
   return null;

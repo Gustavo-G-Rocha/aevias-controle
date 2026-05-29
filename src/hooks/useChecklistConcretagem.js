@@ -107,7 +107,7 @@ export function useChecklistConcretagem() {
       const stillAvailable = projetosFiltrados.some(p => p.id === formData.project_id);
       if (!stillAvailable) setFormData(prev => ({ ...prev, project_id: "" }));
     }
-  }, [formData.obra_id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [formData.obra_id]);
 
   const loadInitialData = useCallback(async () => {
     setLoading(true);

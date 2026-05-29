@@ -26,7 +26,7 @@ export function useEnsaioMRAFForm({
   }, [setFormData]);
 
   // ── cálculo automático extração de ligante ────────────────────────────────
-  useEffect(() => { // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
     const ext = formData.extracao_ligante;
     const patches = calcExtracaoLigante(ext);
     if (Object.keys(patches).length === 0) return;
@@ -42,7 +42,7 @@ export function useEnsaioMRAFForm({
     formData.extracao_ligante.fator_correcao,
     formData.extracao_ligante.teor_ligante,
     formData.extracao_ligante.residuo_emulsao,
-  ]); // setFormData é estável — omitido intencionalmente
+  ]);
 
   // ── seleção de projeto ────────────────────────────────────────────────────
   const handleProjectChange = useCallback((projectId) => {

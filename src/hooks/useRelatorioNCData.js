@@ -71,7 +71,6 @@ export const useRelatorioNCData = () => {
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { loading, error, data };

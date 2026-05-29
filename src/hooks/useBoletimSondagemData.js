@@ -94,7 +94,7 @@ export function useBoletimSondagemData() {
       }
     };
     load();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   return { formData, setFormData, obras, regionais, user, loading, editingBoletim };
 }

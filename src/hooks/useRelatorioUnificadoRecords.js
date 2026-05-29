@@ -93,7 +93,6 @@ export function useRelatorioUnificadoRecords(filters) {
     };
 
     loadRecords();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterKey]);
 
   return { records, loading, error };

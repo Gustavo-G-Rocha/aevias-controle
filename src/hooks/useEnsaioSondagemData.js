@@ -74,7 +74,7 @@ export function useEnsaioSondagemData() {
       }
     };
     load();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // Atualiza projetos quando obra muda (limpa quando obra é desmarcada)
   useEffect(() => {
