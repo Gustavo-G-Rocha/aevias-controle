@@ -4,9 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Printer } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
-import { Obra } from "@/entities/Obra";
-import { Regional } from "@/entities/Regional";
-import { Project } from "@/entities/Project";
+
 import RelatorioAcompanhamentoCarga from "@/components/relatorios/RelatorioAcompanhamentoCarga";
 
 export default function RelatorioAcompanhamentoCargaPage() {
@@ -39,17 +37,17 @@ export default function RelatorioAcompanhamentoCargaPage() {
       setAcompanhamento(acompanhamentoData);
 
       if (acompanhamentoData.obra_id) {
-        const obraData = await Obra.get(acompanhamentoData.obra_id);
+        const obraData = await base44.entities.Obra.get(acompanhamentoData.obra_id);
         setObra(obraData);
 
         if (obraData.regional_id) {
-          const regionalData = await Regional.get(obraData.regional_id);
+          const regionalData = await base44.entities.Regional.get(obraData.regional_id);
           setRegional(regionalData);
         }
       }
 
       if (acompanhamentoData.project_id) {
-        const projetoData = await Project.get(acompanhamentoData.project_id);
+        const projetoData = await base44.entities.Project.get(acompanhamentoData.project_id);
         setProjeto(projetoData);
 
         // Buscar faixa granulométrica pelo ID se existir
