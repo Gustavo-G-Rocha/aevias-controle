@@ -303,12 +303,6 @@ export function useChecklistConcretagem() {
       for (const [cond, msg] of requiredFields) {
         if (cond) { alert(`Por favor, ${msg}.`); setSaving(false); return; }
       }
-      for (const p of formData.periodos_clima) {
-        if (!p.temperatura_ambiente) {
-          alert(`Preencha a temperatura do período ${p.periodo}.`);
-          setSaving(false); return;
-        }
-      }
       for (const c of formData.cargas_concreto) {
         if (c.moldado_fiscalizacao && (!c.corpos_prova || c.corpos_prova.length === 0)) {
           alert(`Configure ao menos 1 corpo de prova para a Carga ${c.numero_carga}.`);
