@@ -72,6 +72,14 @@ export default function DadosObraSection({ formData, setFormData, obras, obraSel
             <Input value={formData.material} onChange={(e) => set({ material: e.target.value })} placeholder="Material utilizado" />
           </div>
           <div>
+            <Label>Local de origem do material</Label>
+            <Input value={formData.origem_material || ""} onChange={(e) => set({ origem_material: e.target.value })} placeholder="Ex: Jazida km 15, Bota-fora A" />
+          </div>
+          <div>
+            <Label>Nome do material</Label>
+            <Input value={formData.nome_material || ""} onChange={(e) => set({ nome_material: e.target.value })} placeholder="Ex: Solo argiloso, Brita 0, Macadame" />
+          </div>
+          <div>
             <Label>Inspetor Fiscal</Label>
             <Input value={formData.inspetor_fiscal} onChange={(e) => set({ inspetor_fiscal: e.target.value })} />
           </div>

@@ -47,6 +47,22 @@ export default function DadosObraTerra({ regional, obra, checklist }) {
           <p className="font-bold">ENSAIO REALIZADO POR:</p>
           <p>{checklist.ensaio_realizado_por || 'N/A'}</p>
         </div>
+        {(checklist.origem_material || checklist.nome_material) && (
+          <>
+            {checklist.origem_material && (
+              <div>
+                <p className="font-bold">ORIGEM DO MATERIAL:</p>
+                <p>{checklist.origem_material}</p>
+              </div>
+            )}
+            {checklist.nome_material && (
+              <div>
+                <p className="font-bold">NOME DO MATERIAL:</p>
+                <p>{checklist.nome_material}</p>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </>
   );

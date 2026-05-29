@@ -15,6 +15,8 @@ const getInitialFormData = () => ({
   camada: "",
   inspetor_fiscal: "",
   material: "",
+  origem_material: "",
+  nome_material: "",
   umidade_otima_proctor: "",
   umidade_in_situ: "",
   ensaio_realizado_por: "Afirma Evias",

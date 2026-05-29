@@ -18,6 +18,8 @@ const baseFormData = {
   ],
   acoes_corretivas_realizado: null,
   acoes_corretivas_descricao: '',
+  origem_material: '',
+  nome_material: '',
 };
 
 describe('validateForm — ChecklistTerraplanagem', () => {
@@ -90,6 +92,30 @@ describe('validateForm — ChecklistTerraplanagem', () => {
 
     it('válido quando periodos_clima está vazio', () => {
       expect(validateForm({ ...baseFormData, periodos_clima: [] }, 'finalizado')).toBeNull();
+    });
+  });
+
+  describe('novos campos — origem e nome do material (opcionais)', () => {
+    it('válido com origem_material e nome_material preenchidos', () => {
+      const data = { ...baseFormData, origem_material: 'Jazida km 15', nome_material: 'Solo argiloso' };
+      expect(validateForm(data, 'finalizado')).toBeNull();
+    });
+
+    it('válido com origem_material e nome_material vazios', () => {
+      expect(validateForm({ ...baseFormData, origem_material: '', nome_material: '' }, 'finalizado')).toBeNull();
+    });
+
+    it('válido sem os campos (registros antigos)', () => {
+      const { origem_material, nome_material, ...dataAntigo } = baseFormData;
+      expect(validateForm(dataAntigo, 'finalizado')).toBeNull();
+    });
+
+    it('válido com apenas origem_material preenchido', () => {
+      expect(validateForm({ ...baseFormData, origem_material: 'Bota-fora A', nome_material: '' }, 'finalizado')).toBeNull();
+    });
+
+    it('válido com apenas nome_material preenchido', () => {
+      expect(validateForm({ ...baseFormData, origem_material: '', nome_material: 'Brita 0' }, 'finalizado')).toBeNull();
     });
   });
 
