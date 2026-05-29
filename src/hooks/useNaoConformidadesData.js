@@ -1,8 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-import { User } from "@/entities/User";
-import { Obra } from "@/entities/Obra";
-import { Regional } from "@/entities/Regional";
 import {
   TIPOS_CHECKLIST,
   OUTROS_TIPOS_REGISTRO,
@@ -25,11 +22,11 @@ export function useNaoConformidadesData() {
   const loadAll = useCallback(async () => {
     setLoading(true);
     try {
-      const userData = await User.me();
+      const userData = await base44.auth.me();
       const userAccessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
 
       const [obrasData, regionaisData, rncsData] = await Promise.all([
-        Obra.list(), Regional.list(),
+        base44.entities.Obra.list(), base44.entities.Regional.list(),
         base44.entities.RelatorioNC.list("-created_date", 1000)
       ]);
 

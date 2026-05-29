@@ -2,15 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Users } from "lucide-react";
-import { User } from "@/entities/User";
-import { Obra } from "@/entities/Obra";
-import { Regional } from "@/entities/Regional";
-import { DiarioObra } from "@/entities/DiarioObra";
-import { EnsaioDensidade } from "@/entities/EnsaioDensidade";
-import { ChecklistUsina } from "@/entities/ChecklistUsina";
-import { ChecklistAplicacao } from "@/entities/ChecklistAplicacao";
-import { ChecklistMRAF } from "@/entities/ChecklistMRAF";
-import { ChecklistConcretagem } from "@/entities/ChecklistConcretagem";
 import { base44 } from "@/api/base44Client";
 
 export default function MonitorProdutividade() {
@@ -22,7 +13,7 @@ export default function MonitorProdutividade() {
     const loadData = async () => {
       setLoading(true);
     try {
-      const user = await User.me();
+      const user = await base44.auth.me();
       setCurrentUser(user);
 
       // Verificar se é admin
@@ -34,8 +25,8 @@ export default function MonitorProdutividade() {
       // Carregar dados
       const [todosUsuarios, regionaisData, obrasData] = await Promise.all([
         base44.entities.User.list(),
-        Regional.list(),
-        Obra.list(),
+        base44.entities.Regional.list(),
+        base44.entities.Obra.list(),
       ]);
 
       // Carregar todos os registros
@@ -52,15 +43,15 @@ export default function MonitorProdutividade() {
         checklistsTerraplanamemData,
         sondagemData
       ] = await Promise.all([
-        DiarioObra.list("-created_date", 500),
+        base44.entities.DiarioObra.list("-created_date", 500),
         base44.entities.EnsaioCAUQ.list("-created_date", 500),
-        EnsaioDensidade.list("-created_date", 500),
+        base44.entities.EnsaioDensidade.list("-created_date", 500),
         base44.entities.EnsaioDensidadeInSitu.list("-created_date", 500),
         base44.entities.EnsaioTaxaPinturaImprimacao.list("-created_date", 500),
-        ChecklistUsina.list("-created_date", 500),
-        ChecklistAplicacao.list("-created_date", 500),
-        ChecklistMRAF.list("-created_date", 500),
-        ChecklistConcretagem.list("-created_date", 500),
+        base44.entities.ChecklistUsina.list("-created_date", 500),
+        base44.entities.ChecklistAplicacao.list("-created_date", 500),
+        base44.entities.ChecklistMRAF.list("-created_date", 500),
+        base44.entities.ChecklistConcretagem.list("-created_date", 500),
         base44.entities.ChecklistTerraplanagem.list("-created_date", 500),
         base44.entities.EnsaioSondagem.list("-created_date", 500)
       ]);

@@ -5,7 +5,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { base44 } from "@/api/base44Client";
-import { User } from "@/entities/User";
 
 // Props:
 //   entityName: string (e.g. "ChecklistConcretagem")
@@ -20,7 +19,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const userData = await User.me();
+        const userData = await base44.auth.me();
         setUser(userData);
       } catch (err) {
         console.error('AprovacaoBar: erro ao carregar usuário', err);

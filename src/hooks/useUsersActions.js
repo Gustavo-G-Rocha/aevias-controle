@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
-import { User } from "@/entities/User";
-import { Regional } from "@/entities/Regional";
+import { base44 } from "@/api/base44Client";
 import {
   resolveAccessLevel,
   deriveRoleFromAccessLevel,
@@ -46,7 +45,7 @@ export function useUsersActions({ currentUser, regionais, loadData }) {
           cleanedFields.role = deriveRoleFromAccessLevel(cleanedFields.access_level);
         }
 
-        await User.update(editingUser.id, cleanedFields);
+        await base44.entities.User.update(editingUser.id, cleanedFields);
         alert("Usuário atualizado com sucesso!");
       } else {
         // CRIAÇÃO
@@ -66,7 +65,7 @@ export function useUsersActions({ currentUser, regionais, loadData }) {
           Object.entries(newUserData).filter(([, v]) => v !== '' && v !== null && v !== undefined)
         );
 
-        await User.create(finalUserData);
+        await base44.entities.User.create(finalUserData);
 
         // Alocar na regional se gestor/sala técnica criando laboratorista
         if (isGestorOrSalaTecnica && userData.access_level === 'user') {
@@ -77,7 +76,7 @@ export function useUsersActions({ currentUser, regionais, loadData }) {
             const laboratoristasAtuais = regionalDoUsuario.laboratoristas_responsaveis || [];
             const novoEmail = userData.email.toLowerCase();
             if (!laboratoristasAtuais.some(e => e.toLowerCase() === novoEmail)) {
-              await Regional.update(regionalDoUsuario.id, {
+              await base44.entities.Regional.update(regionalDoUsuario.id, {
                 laboratoristas_responsaveis: [...laboratoristasAtuais, userData.email],
               });
             }

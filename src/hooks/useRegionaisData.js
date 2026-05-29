@@ -4,10 +4,7 @@
  * filtrar regionais por nível de acesso; expor loadData para refresh.
  */
 import { useState, useEffect, useCallback } from "react";
-import { Regional } from "@/entities/Regional";
-import { Obra } from "@/entities/Obra";
-import { User } from "@/entities/User";
-import { Project } from "@/entities/Project";
+import { base44 } from "@/api/base44Client";
 import { getUserAccessLevel, filtrarRegionaisPorAcesso } from "@/utils/regionaisUtils";
 
 export function useRegionaisData() {
@@ -22,15 +19,15 @@ export function useRegionaisData() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const userData = await User.me();
+      const userData = await base44.auth.me();
       setUser(userData);
 
       const accessLevel = getUserAccessLevel(userData);
 
       const [regionaisData, obrasData, projectsData] = await Promise.all([
-        Regional.list("-created_date", 100),
-        Obra.list(),
-        Project.list(),
+        base44.entities.Regional.list("-created_date", 100),
+        base44.entities.Obra.list(),
+        base44.entities.Project.list(),
       ]);
 
       setTodasRegionais(regionaisData);
@@ -39,7 +36,7 @@ export function useRegionaisData() {
       let usersData = [];
       if (accessLevel !== 'user') {
         try {
-          usersData = await User.list();
+          usersData = await base44.entities.User.list();
         } catch (e) {
           console.error('[Regionais] Sem permissão para listar usuários:', e?.message || e);
         }

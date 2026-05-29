@@ -4,9 +4,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { Obra } from "@/entities/Obra";
-import { Project } from "@/entities/Project";
-import { Regional } from "@/entities/Regional";
 import { createPageUrl } from "@/utils";
 import {
   getInitialFormData,
@@ -34,9 +31,9 @@ export function useEnsaioSondagemData() {
       try {
         const [userData, obrasData, projectsData, regionaisData] = await Promise.all([
           base44.auth.me(),
-          Obra.list(),
-          Project.list(),
-          Regional.list(),
+          base44.entities.Obra.list(),
+          base44.entities.Project.list(),
+          base44.entities.Regional.list(),
         ]);
 
         setUser(userData);

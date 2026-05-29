@@ -1,7 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { SolicitacaoTransferenciaRegional } from '@/entities/SolicitacaoTransferenciaRegional';
-import { Regional } from '@/entities/Regional';
-import { User } from '@/entities/User';
+import { base44 } from '@/api/base44Client';
 import { filterSolicitacoesByUserAccess } from '@/utils/solicitacoesTransferenciaUtils';
 
 export function useSolicitacoesTransferenciaData() {
@@ -14,9 +12,9 @@ export function useSolicitacoesTransferenciaData() {
     setLoading(true);
     try {
       const [userData, solicitacoesData, regionaisData] = await Promise.all([
-        User.me(),
-        SolicitacaoTransferenciaRegional.list('-created_date'),
-        Regional.list()
+        base44.auth.me(),
+        base44.entities.SolicitacaoTransferenciaRegional.list('-created_date'),
+        base44.entities.Regional.list()
       ]);
 
       setUser(userData);

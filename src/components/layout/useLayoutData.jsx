@@ -1,7 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { User } from "@/entities/User";
-import { Obra } from "@/entities/Obra";
-import { Regional } from "@/entities/Regional";
 import { base44 } from "@/api/base44Client";
 import {
   SESSION_KEYS,
@@ -19,10 +16,10 @@ export function useLayoutData() {
   const loadUserAndObras = useCallback(async () => {
     setLoadingUser(true);
     try {
-      const userData = await User.me();
+      const userData = await base44.auth.me();
 
       if (userData?.is_active === false) {
-        await User.logout();
+        base44.auth.logout();
         return;
       }
 
@@ -30,7 +27,7 @@ export function useLayoutData() {
       const userAccessLevel = getUserAccessLevel(userData);
 
       if (userAccessLevel === ACCESS_LEVELS.USER) {
-        const [obrasData, regionaisData] = await Promise.all([Obra.list(), Regional.list()]);
+        const [obrasData, regionaisData] = await Promise.all([base44.entities.Obra.list(), base44.entities.Regional.list()]);
 
         const emailLower = userData.email.toLowerCase();
         const regionaisIds = regionaisData
@@ -50,7 +47,7 @@ export function useLayoutData() {
       // Carregar transferências pendentes para gestores/sala técnica
       if (userAccessLevel === ACCESS_LEVELS.GESTOR_CONTRATO || userAccessLevel === ACCESS_LEVELS.SALA_TECNICA) {
         const [regionaisData, transferenciaObra, transferenciaRegional] = await Promise.all([
-          Regional.list(),
+          base44.entities.Regional.list(),
           base44.entities.SolicitacaoTransferenciaObra.list(),
           base44.entities.SolicitacaoTransferenciaRegional.list(),
         ]);

@@ -1,9 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { DiarioObra as DiarioObraEntity } from "@/entities/DiarioObra";
-import { Obra } from "@/entities/Obra";
-import { Regional } from "@/entities/Regional";
-import { User } from "@/entities/User";
+import { base44 } from "@/api/base44Client";
 import { uploadMultipleFiles } from "@/utils/imageUpload";
 import { createPageUrl } from "@/utils";
 
@@ -147,10 +144,10 @@ export function useDiarioObra() {
         if (editingDiarioOriginal.approved === false && saveStatus === "finalizado") {
           Object.assign(updateData, { approved: null, rejection_reason: null, approved_by: null, approved_date: null, was_rejected: true });
         }
-        await DiarioObraEntity.update(editingDiarioOriginal.id, updateData);
+        await base44.entities.DiarioObra.update(editingDiarioOriginal.id, updateData);
         alert(saveStatus === "rascunho" ? "Progresso salvo!" : "Diário atualizado com sucesso!");
       } else {
-        await DiarioObraEntity.create({ ...dataToSave, created_by: user.email, laboratorista_name: user.laboratorista_name || user.full_name });
+        await base44.entities.DiarioObra.create({ ...dataToSave, created_by: user.email, laboratorista_name: user.laboratorista_name || user.full_name });
         alert(saveStatus === "rascunho" ? "Progresso salvo!" : "Diário criado com sucesso!");
       }
       navigate(createPageUrl("MeusEnsaios"));
@@ -168,10 +165,10 @@ export function useDiarioObra() {
     const loadData = async () => {
       setLoading(true);
       try {
-        const currentUser = await User.me();
+        const currentUser = await base44.auth.me();
         setUser(currentUser);
 
-        const [obrasData, regionaisData] = await Promise.all([Obra.list(), Regional.list()]);
+        const [obrasData, regionaisData] = await Promise.all([base44.entities.Obra.list(), base44.entities.Regional.list()]);
         setRegionais(regionaisData);
 
         let availableObras = obrasData;
@@ -201,7 +198,7 @@ export function useDiarioObra() {
         const editId = params.get("editId");
 
         if (editId) {
-          const diarioToEdit = await DiarioObraEntity.get(editId);
+          const diarioToEdit = await base44.entities.DiarioObra.get(editId);
           setEditingDiarioOriginal(diarioToEdit);
           if (currentUser.role === "admin" || (diarioToEdit.created_by === currentUser.email && diarioToEdit.approved !== true)) {
             setFormData({

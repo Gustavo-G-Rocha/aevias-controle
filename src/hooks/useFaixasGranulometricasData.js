@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { FaixaGranulometrica } from '@/entities/FaixaGranulometrica';
-import { User } from '@/entities/User';
+import { base44 } from '@/api/base44Client';
 
 export function useFaixasGranulometricasData() {
   const [faixas, setFaixas] = useState([]);
@@ -11,8 +10,8 @@ export function useFaixasGranulometricasData() {
     setLoading(true);
     try {
       const [userData, faixasData] = await Promise.all([
-        User.me(),
-        FaixaGranulometrica.list("-created_date")
+        base44.auth.me(),
+        base44.entities.FaixaGranulometrica.list("-created_date")
       ]);
       
       setUser(userData);

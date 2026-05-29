@@ -1,6 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { User } from "@/entities/User";
-import { Regional } from "@/entities/Regional";
 import { base44 } from "@/api/base44Client";
 import {
   resolveAccessLevel,
@@ -17,10 +15,10 @@ export function useUsersData() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const currentUserData = await User.me();
+      const currentUserData = await base44.auth.me();
       setCurrentUser(currentUserData);
 
-      const regionaisData = await Regional.list();
+      const regionaisData = await base44.entities.Regional.list();
       setRegionais(regionaisData);
 
       const { data: response } = await base44.functions.invoke('getRegionalUsers');

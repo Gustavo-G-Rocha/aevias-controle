@@ -1,7 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { User } from "@/entities/User";
-import { Obra } from "@/entities/Obra";
-import { Regional } from "@/entities/Regional";
+import { base44 } from "@/api/base44Client";
 
 export function useNovaNCData() {
   const [user, setUser] = useState(null);
@@ -12,10 +10,10 @@ export function useNovaNCData() {
   const loadInitialData = useCallback(async () => {
     setLoading(true);
     try {
-      const userData = await User.me();
+      const userData = await base44.auth.me();
       setUser(userData);
 
-      const [obrasData, regionaisData] = await Promise.all([Obra.list(), Regional.list()]);
+      const [obrasData, regionaisData] = await Promise.all([base44.entities.Obra.list(), base44.entities.Regional.list()]);
       setRegionais(regionaisData);
 
       const userAccessLevel = userData?.access_level || (userData?.role === "admin" ? "admin" : "user");

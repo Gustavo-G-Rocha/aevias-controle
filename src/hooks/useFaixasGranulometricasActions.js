@@ -1,13 +1,13 @@
 import { useCallback } from 'react';
-import { FaixaGranulometrica } from '@/entities/FaixaGranulometrica';
+import { base44 } from '@/api/base44Client';
 
 export function useFaixasGranulometricasActions(onSuccess) {
   const handleSaveFaixa = useCallback(async (faixaData, editingFaixa) => {
     try {
       if (editingFaixa) {
-        await FaixaGranulometrica.update(editingFaixa.id, faixaData);
+        await base44.entities.FaixaGranulometrica.update(editingFaixa.id, faixaData);
       } else {
-        await FaixaGranulometrica.create(faixaData);
+        await base44.entities.FaixaGranulometrica.create(faixaData);
       }
       onSuccess();
     } catch (error) {
@@ -20,7 +20,7 @@ export function useFaixasGranulometricasActions(onSuccess) {
   const handleDelete = useCallback(async (id, onDeleteSuccess) => {
     if (window.confirm("Tem certeza que deseja excluir esta faixa granulométrica?")) {
       try {
-        await FaixaGranulometrica.delete(id);
+        await base44.entities.FaixaGranulometrica.delete(id);
         onDeleteSuccess();
       } catch (error) {
         console.error("Erro ao excluir faixa:", error);
