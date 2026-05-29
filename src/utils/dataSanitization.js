@@ -143,7 +143,10 @@ export const sanitizeProjectData = (formData, tipoProject) => {
         estabilidade: sanitizeNestedNumbers(formData.estabilidade),
         fluencia: sanitizeNestedNumbers(formData.fluencia),
         vam: sanitizeNestedNumbers(formData.vam),
-        rbv: sanitizeNestedNumbers(formData.rbv)
+        rbv: sanitizeNestedNumbers(formData.rbv),
+        // BGS
+        densidade_seca_max: sanitizeNumber(formData.densidade_seca_max),
+        umidade_otima: sanitizeNumber(formData.umidade_otima),
       };
   }
 };
