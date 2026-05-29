@@ -51,7 +51,7 @@ export const extrairUrls = (fotos) => {
  * @returns {boolean}
  */
 export const ehFotoComEstrutura = (obj) => {
-  return obj && typeof obj === 'object' && typeof obj.url === 'string';
+  return !!(obj && typeof obj === 'object' && typeof obj.url === 'string');
 };
 
 /**
