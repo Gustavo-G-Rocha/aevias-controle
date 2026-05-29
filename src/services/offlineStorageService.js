@@ -17,6 +17,11 @@ let db = null;
 async function initDB() {
   if (db) return db;
 
+  // Guard para ambiente de teste (sem indexedDB)
+  if (typeof indexedDB === 'undefined') {
+    throw new Error('[offlineStorage] IndexedDB não disponível neste ambiente');
+  }
+
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 

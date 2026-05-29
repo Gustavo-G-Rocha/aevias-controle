@@ -26,6 +26,51 @@ vi.mock('@/api/base44Client', () => ({
   },
 }));
 
+// Mock IndexedDB para testes
+const mockIndexedDB = {
+  databases: {},
+  open: vi.fn((name, version) => {
+    if (!mockIndexedDB.databases[name]) {
+      mockIndexedDB.databases[name] = {
+        objectStoreNames: { contains: () => false },
+        createObjectStore: vi.fn(() => ({
+          createIndex: vi.fn(),
+        })),
+      };
+    }
+    return {
+      onsuccess: null,
+      onerror: null,
+      onupgradeneeded: null,
+      result: mockIndexedDB.databases[name],
+      addEventListener: vi.fn(function(event, handler) {
+        if (event === 'success') this.onsuccess?.();
+        if (event === 'upgradeneeded') this.onupgradeneeded?.();
+      }),
+    };
+  }),
+};
+
+// Mock operações de fila
+vi.mock('@/services/offlineStorageService', () => {
+  const storage = new Map();
+  return {
+    addQueueItem: vi.fn(async (item) => {
+      storage.set(item.id, item);
+      return item.id;
+    }),
+    getQueueItem: vi.fn(async (itemId) => storage.get(itemId) || null),
+    updateQueueItem: vi.fn(async (itemId, updates) => {
+      const item = storage.get(itemId);
+      if (item) storage.set(itemId, { ...item, ...updates });
+    }),
+    getQueueItemsByStatus: vi.fn(async (status) => {
+      return Array.from(storage.values()).filter(item => item.status === status);
+    }),
+    clearQueue: vi.fn(async () => storage.clear()),
+  };
+});
+
 describe('syncService', () => {
   beforeEach(async () => {
     await clearQueue();
