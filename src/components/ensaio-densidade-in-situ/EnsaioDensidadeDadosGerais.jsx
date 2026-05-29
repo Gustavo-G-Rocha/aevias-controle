@@ -32,7 +32,7 @@ export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obra
   const regional = obra ? regionais.find(r => r.id === obra.regional_id) : null;
   const projectIdsDaRegional = regional?.project_ids || [];
   const projetosBGS = projects.filter(p =>
-    p.tipo_projeto === 'BGS' && projectIdsDaRegional.includes(p.id)
+    (p.tipo_projeto === 'BGS' || p.tipo_projeto === 'CAMADAS_GRANULARES') && projectIdsDaRegional.includes(p.id)
   );
 
   const handleProjectChange = (projectId) => {
@@ -73,7 +73,7 @@ export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obra
 
           {projetosBGS.length > 0 && (
             <div>
-              <Label htmlFor="project_id">Projeto BGS (opcional)</Label>
+              <Label htmlFor="project_id">Projeto BGS / Camadas Granulares (opcional)</Label>
               <select
                 id="project_id"
                 value={formData.project_id || ''}
@@ -81,7 +81,7 @@ export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obra
                 disabled={!isEditable}
                 className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
               >
-                <option value="">Selecione o projeto BGS</option>
+                <option value="">Selecione o projeto</option>
                 {projetosBGS.map(p => (
                   <option key={p.id} value={p.id}>{p.name}</option>
                 ))}
