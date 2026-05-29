@@ -1,5 +1,6 @@
 import React from 'react';
 import { formatDateTerra, chunkArray } from '@/utils/relatorioChecklistTerraplanagemUtils';
+import { normalizarFoto, extrairLegenda } from '@/utils/photoLegendaUtils';
 
 const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png';
 
@@ -35,19 +36,23 @@ export default function PhotoPages({ photos, regional, checklist, obra }) {
 
             {/* Photos grid */}
             <main className="grid grid-cols-2 gap-3">
-              {chunk.map((fotoUrl, fotoIndex) => (
-                <div key={`foto-${fotoIndex}`} className="border p-2 rounded-lg break-inside-avoid flex flex-col">
-                  <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden">
-                    <picture>
-                      <source srcSet={fotoUrl} />
-                      <img src={fotoUrl} alt={`Foto ${pageIndex * 6 + fotoIndex + 1}`} className="w-full h-auto object-contain" style={{ maxHeight: '280px' }} width="auto" height="auto" />
-                    </picture>
+              {chunk.map((foto, fotoIndex) => {
+                const fotoNormalizada = normalizarFoto(foto);
+                const legenda = extrairLegenda(foto, pageIndex * 6 + fotoIndex);
+                return (
+                  <div key={`foto-${fotoIndex}`} className="border p-2 rounded-lg break-inside-avoid flex flex-col">
+                    <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden">
+                      <picture>
+                        <source srcSet={fotoNormalizada.url} />
+                        <img src={fotoNormalizada.url} alt={legenda} className="w-full h-auto object-contain" style={{ maxHeight: '280px' }} width="auto" height="auto" />
+                      </picture>
+                    </div>
+                    <p className="text-center text-sm mt-2 font-medium">
+                      {legenda}
+                    </p>
                   </div>
-                  <p className="text-center text-sm mt-2 font-medium">
-                    Foto {pageIndex * 6 + fotoIndex + 1}
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </main>
           </div>
         </div>

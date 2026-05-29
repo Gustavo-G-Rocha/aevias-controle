@@ -8,6 +8,7 @@ import { createPageUrl } from "@/utils";
 import AcoesCorretivasNC from "@/components/checklists/AcoesCorretivasNC";
 import ChecklistFooter from "@/components/checklists/ChecklistFooter";
 
+import UploadGallery from "@/components/forms/UploadGallery";
 import { useChecklistTerrapalagemForm } from "./hooks/useChecklistTerrapalagemForm";
 import DadosObraSection from "./components/DadosObraSection";
 import ClimaSection from "./components/ClimaSection";
@@ -21,7 +22,7 @@ export default function ChecklistTerraplanagem() {
     isApproved, isEditable, clearSavedData, navigate,
     saving, uploadingPhotos, selectedFileNames,
     handleCheckboxChange, handleRoloChange, handleEnsaioChange,
-    handleFileChange, handleRemovePhoto, handleSubmit,
+    handleFileChange, handleRemovePhoto, handleLegendChange, handleSubmit,
   } = useChecklistTerrapalagemForm();
 
   if (loading) {
@@ -115,37 +116,19 @@ export default function ChecklistTerraplanagem() {
               />
 
               {/* Fotos */}
-              <div>
-                <Label>Registro Fotográfico</Label>
-                <div>
-                  <Input id="fotos" type="file" multiple accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                    onChange={handleFileChange} disabled={uploadingPhotos} className="hidden" />
-                  <Label htmlFor="fotos"
-                    className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm cursor-pointer hover:bg-slate-50 ${uploadingPhotos ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                    <span className="truncate text-slate-500">{selectedFileNames}</span>
-                    <span className="flex-shrink-0 ml-4 px-3 py-1 rounded-md text-sm font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100">
-                      {uploadingPhotos ? 'Enviando...' : 'Escolher Ficheiros'}
-                    </span>
-                  </Label>
-                </div>
-                {uploadingPhotos && (
-                  <div className="flex items-center gap-2 text-sm text-blue-600 mt-2">
-                    <Loader2 className="w-4 h-4 animate-spin" /><span>Fazendo upload das fotos...</span>
-                  </div>
-                )}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
-                  {(formData.fotos || []).map((url, index) => (
-                    <div key={index} className="relative group">
-                      <picture><source srcSet={url} /><img src={url} alt={`Foto ${index + 1}`} className="w-full h-32 object-cover rounded-md border" width="auto" height="128" /></picture>
-                      <Button type="button" variant="destructive" size="icon"
-                        className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => handleRemovePhoto(index)}>
-                        <XCircle className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <UploadGallery
+                fotos={formData.fotos || []}
+                onFileChange={handleFileChange}
+                onRemove={handleRemovePhoto}
+                onLegendChange={handleLegendChange}
+                loading={uploadingPhotos}
+                progress={[]}
+                isEditable={isEditable}
+                isApproved={isApproved}
+                fileNames={selectedFileNames}
+                inputId="fotos-terraplanagem"
+                label="Registro Fotográfico"
+              />
 
               <ChecklistFooter
                 isEditable={isEditable}

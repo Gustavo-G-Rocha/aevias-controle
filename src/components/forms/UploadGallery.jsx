@@ -2,27 +2,30 @@ import { Loader2, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { normalizarFoto, extrairUrl } from "@/utils/photoLegendaUtils";
 
 /**
  * Componente reutilizável de upload + galeria de fotos.
  * Aceita até N imagens, exibe progresso de upload e permite remoção individual.
  *
  * Props:
- *   fotos        — string[]  — URLs das fotos já carregadas
- *   onFileChange — (e) => void — handler do input file
- *   onRemove     — (index) => void — remove foto por índice
- *   loading      — boolean — exibe spinner durante upload
- *   progress     — Array<{ id, fileName, status, error }> — progresso por arquivo
- *   isEditable   — boolean — exibe controles de edição
- *   isApproved   — boolean — bloqueia edição quando aprovado
- *   fileNames    — string — texto exibido no botão de escolha
- *   inputId      — string — id único do input (default: "fotos")
- *   label        — string — label da seção (default: "Registro Fotográfico" / "Relatório Fotográfico")
+ *   fotos         — Array<string | { url: string; legenda?: string }>  — URLs ou fotos com legenda
+ *   onFileChange  — (e) => void — handler do input file
+ *   onRemove      — (index) => void — remove foto por índice
+ *   onLegendChange— (index, legenda) => void — atualiza legenda da foto
+ *   loading       — boolean — exibe spinner durante upload
+ *   progress      — Array<{ id, fileName, status, error }> — progresso por arquivo
+ *   isEditable    — boolean — exibe controles de edição
+ *   isApproved    — boolean — bloqueia edição quando aprovado
+ *   fileNames     — string — texto exibido no botão de escolha
+ *   inputId       — string — id único do input (default: "fotos")
+ *   label         — string — label da seção (default: "Registro Fotográfico" / "Relatório Fotográfico")
  */
 export default function UploadGallery({
   fotos = [],
   onFileChange,
   onRemove,
+  onLegendChange,
   loading = false,
   progress = [],
   isEditable = true,
@@ -88,26 +91,54 @@ export default function UploadGallery({
       )}
 
       {fotos.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
-          {fotos.map((url, i) => (
-            <div key={i} className="relative group">
-              <picture>
-                <source srcSet={url} />
-                <img src={url} alt={`Foto ${i + 1}`} className="w-full h-32 object-cover rounded-md border" width="auto" height="128" />
-              </picture>
-              {canEdit && (
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="icon"
-                  className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => onRemove(i)}
-                >
-                  <XCircle className="h-4 w-4" />
-                </Button>
-              )}
+        <div className="space-y-4 mt-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {fotos.map((foto, i) => {
+              const fotoNormalizada = normalizarFoto(foto);
+              return (
+                <div key={i} className="relative group">
+                  <picture>
+                    <source srcSet={fotoNormalizada.url} />
+                    <img src={fotoNormalizada.url} alt={`Foto ${i + 1}`} className="w-full h-32 object-cover rounded-md border" width="auto" height="128" />
+                  </picture>
+                  {canEdit && (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => onRemove(i)}
+                    >
+                      <XCircle className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {canEdit && onLegendChange && (
+            <div className="space-y-3 border-t pt-4">
+              {fotos.map((foto, i) => {
+                const fotoNormalizada = normalizarFoto(foto);
+                return (
+                  <div key={`legenda-${i}`} className="flex flex-col gap-1">
+                    <label htmlFor={`legenda-${i}`} className="text-sm font-medium text-slate-700">
+                      Legenda da Foto {i + 1}
+                    </label>
+                    <input
+                      id={`legenda-${i}`}
+                      type="text"
+                      placeholder={`Foto ${i + 1}`}
+                      value={fotoNormalizada.legenda}
+                      onChange={(e) => onLegendChange(i, e.target.value)}
+                      className="px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                );
+              })}
             </div>
-          ))}
+          )}
         </div>
       )}
 

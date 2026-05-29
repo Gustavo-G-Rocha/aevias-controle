@@ -173,6 +173,19 @@ export function useChecklistTerrapalagemForm() {
     setFormData(prev => ({ ...prev, fotos: prev.fotos.filter((_, i) => i !== index) }));
   };
 
+  const handleLegendChange = (index, legenda) => {
+    setFormData(prev => {
+      const fotos = [...prev.fotos];
+      const foto = fotos[index];
+      if (typeof foto === 'string') {
+        fotos[index] = { url: foto, legenda };
+      } else {
+        fotos[index] = { ...foto, legenda };
+      }
+      return { ...prev, fotos };
+    });
+  };
+
   const handleSubmit = async (e, saveStatus = 'finalizado') => {
     e.preventDefault();
     const error = validateForm(formData, saveStatus);
@@ -216,6 +229,6 @@ export function useChecklistTerrapalagemForm() {
     saving, uploadingPhotos, selectedFileNames,
     variacaoUmidade, grauCompactacao,
     handleCheckboxChange, handleRoloChange, handleEnsaioChange,
-    handleFileChange, handleRemovePhoto, handleSubmit,
+    handleFileChange, handleRemovePhoto, handleLegendChange, handleSubmit,
   };
 }
