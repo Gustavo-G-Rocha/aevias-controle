@@ -19,18 +19,18 @@ import {
   AlertDialogTitle } from
 "@/components/ui/alert-dialog";
 import { useState, useCallback } from "react";
-import { User } from "@/entities/User";
+import { base44 } from "@/api/base44Client";
 
 export default function UserMenu({ user, isAdmin, isSalaTecnica, isGestorContrato, isCliente }) {
   const navigate = useNavigate();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const handleLogout = useCallback(async () => {
-    await User.logout();
+    base44.auth.logout();
   }, []);
 
   const handleDeleteAccount = useCallback(async () => {
-    await User.logout();
+    base44.auth.logout();
   }, []);
 
   const roleLabel = isAdmin ? "Admin" :
