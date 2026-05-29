@@ -8,6 +8,22 @@ export default function RelatoriosUnificadosPeriodo({
   dataFim,
   setDataFim,
 }) {
+  const handleDataInicio = (e) => {
+    const val = e.target.value;
+    setDataInicio(val);
+    // Se data fim já foi preenchida e ficou menor que a nova data início, ajusta
+    if (dataFim && val && val > dataFim) {
+      setDataFim(val);
+    }
+  };
+
+  const handleDataFim = (e) => {
+    const val = e.target.value;
+    // Não permite data fim menor que data início
+    if (dataInicio && val && val < dataInicio) return;
+    setDataFim(val);
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
@@ -15,7 +31,8 @@ export default function RelatoriosUnificadosPeriodo({
         <Input
           type="date"
           value={dataInicio}
-          onChange={(e) => setDataInicio(e.target.value)}
+          max={dataFim || undefined}
+          onChange={handleDataInicio}
         />
       </div>
       <div className="space-y-2">
@@ -23,7 +40,8 @@ export default function RelatoriosUnificadosPeriodo({
         <Input
           type="date"
           value={dataFim}
-          onChange={(e) => setDataFim(e.target.value)}
+          min={dataInicio || undefined}
+          onChange={handleDataFim}
         />
       </div>
     </div>
