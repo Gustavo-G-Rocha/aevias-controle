@@ -81,13 +81,6 @@ export const validateForm = (formData, saveStatus) => {
   if (!formData.jornada?.horario_inicio?.trim()) return "Por favor, preencha o Horário de Início.";
   if (!formData.jornada?.horario_fim?.trim()) return "Por favor, preencha o Horário Fim.";
 
-  for (const periodo of formData.periodos_clima) {
-    if (!periodo.temperatura_ambiente || periodo.temperatura_ambiente === '') {
-      const label = periodo.periodo === 'manha' ? 'Manhã' : 'Tarde';
-      return `Por favor, preencha a temperatura do período ${label}.`;
-    }
-  }
-
   if (formData.acoes_corretivas_realizado === true && !formData.acoes_corretivas_descricao?.trim())
     return "Por favor, descreva as ações corretivas realizadas.";
 

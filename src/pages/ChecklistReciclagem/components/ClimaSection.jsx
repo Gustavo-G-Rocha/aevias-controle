@@ -24,12 +24,12 @@ export default function ClimaSection({ periodos, onChange, isEditable }) {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <Label className="text-sm">Temperatura (°C) *</Label>
+                  <Label className="text-sm">Temperatura (°C)</Label>
                   <Input type="number" step="0.1" value={periodo.temperatura_ambiente} disabled={!isEditable}
-                    onChange={(e) => update(index, { temperatura_ambiente: e.target.value })} required />
-                </div>
-                <div>
-                  <Label className="text-sm">Condições *</Label>
+                   onChange={(e) => update(index, { temperatura_ambiente: e.target.value })} />
+                  </div>
+                  <div>
+                  <Label className="text-sm">Condições</Label>
                   <Select value={periodo.condicoes_climaticas} disabled={!isEditable}
                     onValueChange={(v) => update(index, { condicoes_climaticas: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>

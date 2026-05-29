@@ -18,13 +18,6 @@ export const validateForm = (formData, saveStatus) => {
     if (!val) return `Por favor, preencha o campo ${label}.`;
   }
 
-  for (const p of formData.periodos_clima) {
-    if (!p.temperatura_ambiente && p.temperatura_ambiente !== 0) {
-      const label = p.periodo === 'manha' ? 'Manhã' : p.periodo === 'tarde' ? 'Tarde' : 'Noite';
-      return `Preencha a temperatura do período ${label}.`;
-    }
-  }
-
   if (formData.acoes_corretivas_realizado === true && !formData.acoes_corretivas_descricao?.trim())
     return "Por favor, descreva as ações corretivas realizadas.";
 

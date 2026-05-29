@@ -22,16 +22,15 @@ export default function ClimaSection({ periodos, onChange }) {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <Label className="text-sm">Temperatura (°C) *</Label>
+                  <Label className="text-sm">Temperatura (°C)</Label>
                   <Input
                     type="number" step="0.1"
                     value={periodo.temperatura_ambiente}
                     onChange={(e) => updatePeriodo(index, { temperatura_ambiente: e.target.value })}
-                    required
                   />
                 </div>
                 <div>
-                  <Label className="text-sm">Condições *</Label>
+                  <Label className="text-sm">Condições</Label>
                   <Select
                     value={periodo.condicoes_climaticas}
                     onValueChange={(v) => updatePeriodo(index, { condicoes_climaticas: v })}
