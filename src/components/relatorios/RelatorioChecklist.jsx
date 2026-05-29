@@ -166,18 +166,20 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
   if (isCompressing) return <div className="p-8 text-center">Otimizando imagens para impressão...</div>;
 
   const photoChunks = chunkArray(compressedPhotos, 6);
-  const temAcoesCorretivas = checklist.acoes_corretivas_realizado === true && checklist.acoes_corretivas_descricao;
+  const temAcoesCorretivas = checklist.acoes_corretivas_realizado === true && !!checklist.acoes_corretivas_descricao;
+  const temNC = Array.isArray(checklist.nao_conformidades) && checklist.nao_conformidades.length > 0;
   const temControleLigante = checklist.controle_ligante_ativo === true;
   const temMedicaoUsina = (checklist.medicoes_usina?.cargas?.length || 0) > 0;
   
   const totalPages = calculateTotalPages({
     temControleLigante,
     temAcoesCorretivas,
+    temNC,
     temMedicaoUsina,
     photoChunksLength: photoChunks.length,
   });
   
-  const pageConfig = { temControleLigante, temAcoesCorretivas, temMedicaoUsina };
+  const pageConfig = { temControleLigante, temAcoesCorretivas, temNC, temMedicaoUsina };
 
   return (
     <div className="bg-white font-sans">
@@ -278,8 +280,8 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
         </PageContainer>
       )}
 
-      {/* Página: Ações Corretivas (condicional) */}
-      {temAcoesCorretivas && (
+      {/* Página: Ações Corretivas / Não Conformidades (condicional) */}
+      {(temAcoesCorretivas || temNC) && (
         <PageContainer
           pageNumber={calculateAcoesPageNumber({ temControleLigante })}
           totalPages={totalPages}
@@ -293,11 +295,15 @@ export default function RelatorioChecklist({ checklist, obra, regional, project,
           footerContent={<ReportFooter checklist={checklist} creatorUser={creatorUser} />}
           className="mt-6"
         >
-          <ReportSectionTitle>Ações Corretivas Realizadas</ReportSectionTitle>
-          <div className="border-2 border-slate-300 rounded-lg p-6 bg-white min-h-48 mb-6">
-            <p className="text-base leading-relaxed whitespace-pre-wrap text-justify">{checklist.acoes_corretivas_descricao}</p>
-          </div>
-          {checklist.nao_conformidades && checklist.nao_conformidades.length > 0 && (
+          {temAcoesCorretivas && (
+            <>
+              <ReportSectionTitle>Ações Corretivas Realizadas</ReportSectionTitle>
+              <div className="border-2 border-slate-300 rounded-lg p-6 bg-white min-h-48 mb-6">
+                <p className="text-base leading-relaxed whitespace-pre-wrap text-justify">{checklist.acoes_corretivas_descricao}</p>
+              </div>
+            </>
+          )}
+          {temNC && (
             <div>
               <ReportSectionTitle>Não Conformidades</ReportSectionTitle>
               <ReportNaoConformidadesTable naoConformidades={checklist.nao_conformidades} />

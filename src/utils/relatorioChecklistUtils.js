@@ -25,10 +25,12 @@ export const chunkArray = (array, size) => {
 export const calculateTotalPages = ({
   temControleLigante,
   temAcoesCorretivas,
+  temNC,
   temMedicaoUsina,
   photoChunksLength,
 }) => {
-  return 1 + 1 + (temControleLigante ? 1 : 0) + (temAcoesCorretivas ? 1 : 0) + (temMedicaoUsina ? 1 : 0) + photoChunksLength;
+  const temPaginaAcoesNC = temAcoesCorretivas || temNC;
+  return 1 + 1 + (temControleLigante ? 1 : 0) + (temPaginaAcoesNC ? 1 : 0) + (temMedicaoUsina ? 1 : 0) + photoChunksLength;
 };
 
 /**
@@ -39,9 +41,10 @@ export const calculateTotalPages = ({
  */
 export const calculatePhotoPageNumber = (
   pageIndex,
-  { temControleLigante, temAcoesCorretivas, temMedicaoUsina }
+  { temControleLigante, temAcoesCorretivas, temNC, temMedicaoUsina }
 ) => {
-  return pageIndex + 3 + (temControleLigante ? 1 : 0) + (temAcoesCorretivas ? 1 : 0) + (temMedicaoUsina ? 1 : 0);
+  const temPaginaAcoesNC = temAcoesCorretivas || temNC;
+  return pageIndex + 3 + (temControleLigante ? 1 : 0) + (temPaginaAcoesNC ? 1 : 0) + (temMedicaoUsina ? 1 : 0);
 };
 
 /**
@@ -51,6 +54,17 @@ export const calculatePhotoPageNumber = (
  */
 export const calculateAcoesPageNumber = ({ temControleLigante }) => {
   return temControleLigante ? 4 : 3;
+};
+
+/**
+ * Determina se a página de Ações Corretivas / NC deve ser exibida
+ * @param {Object} checklist
+ * @returns {boolean}
+ */
+export const temPaginaAcoesNC = (checklist) => {
+  const temAcoes = checklist.acoes_corretivas_realizado === true && !!checklist.acoes_corretivas_descricao;
+  const temNC = Array.isArray(checklist.nao_conformidades) && checklist.nao_conformidades.length > 0;
+  return temAcoes || temNC;
 };
 
 /**

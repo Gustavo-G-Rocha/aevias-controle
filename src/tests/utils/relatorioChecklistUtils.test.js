@@ -4,6 +4,7 @@ import {
   calculateTotalPages,
   calculatePhotoPageNumber,
   calculateAcoesPageNumber,
+  temPaginaAcoesNC,
   formatResultado,
 } from "@/utils/relatorioChecklistUtils";
 
@@ -64,6 +65,29 @@ describe("relatorioChecklistUtils", () => {
       const total = calculateTotalPages({
         temControleLigante: false,
         temAcoesCorretivas: true,
+        temNC: false,
+        temMedicaoUsina: false,
+        photoChunksLength: 0,
+      });
+      expect(total).toBe(3);
+    });
+
+    it("inclui página quando temNC=true e temAcoesCorretivas=false", () => {
+      const total = calculateTotalPages({
+        temControleLigante: false,
+        temAcoesCorretivas: false,
+        temNC: true,
+        temMedicaoUsina: false,
+        photoChunksLength: 0,
+      });
+      expect(total).toBe(3);
+    });
+
+    it("não duplica página quando ambos temAcoesCorretivas e temNC são true", () => {
+      const total = calculateTotalPages({
+        temControleLigante: false,
+        temAcoesCorretivas: true,
+        temNC: true,
         temMedicaoUsina: false,
         photoChunksLength: 0,
       });
@@ -124,6 +148,17 @@ describe("relatorioChecklistUtils", () => {
       const pageNum = calculatePhotoPageNumber(0, {
         temControleLigante: false,
         temAcoesCorretivas: true,
+        temNC: false,
+        temMedicaoUsina: false,
+      });
+      expect(pageNum).toBe(4);
+    });
+
+    it("incrementa página quando apenas temNC=true", () => {
+      const pageNum = calculatePhotoPageNumber(0, {
+        temControleLigante: false,
+        temAcoesCorretivas: false,
+        temNC: true,
         temMedicaoUsina: false,
       });
       expect(pageNum).toBe(4);
@@ -141,6 +176,38 @@ describe("relatorioChecklistUtils", () => {
         temMedicaoUsina: false,
       });
       expect(pageNum1).toBe(pageNum0 + 1);
+    });
+  });
+
+  describe("temPaginaAcoesNC", () => {
+    it("retorna true quando tem ações corretivas", () => {
+      const checklist = { acoes_corretivas_realizado: true, acoes_corretivas_descricao: "Recompactar", nao_conformidades: [] };
+      expect(temPaginaAcoesNC(checklist)).toBe(true);
+    });
+
+    it("retorna true quando tem não conformidades sem ações corretivas", () => {
+      const checklist = { acoes_corretivas_realizado: false, acoes_corretivas_descricao: "", nao_conformidades: [{ local_nc: "CAMPO", categoria_nc: "A", parametro_nc: "X" }] };
+      expect(temPaginaAcoesNC(checklist)).toBe(true);
+    });
+
+    it("retorna true quando tem ambos", () => {
+      const checklist = { acoes_corretivas_realizado: true, acoes_corretivas_descricao: "Algo", nao_conformidades: [{ local_nc: "CAMPO" }] };
+      expect(temPaginaAcoesNC(checklist)).toBe(true);
+    });
+
+    it("retorna false quando não tem nenhum", () => {
+      const checklist = { acoes_corretivas_realizado: false, acoes_corretivas_descricao: "", nao_conformidades: [] };
+      expect(temPaginaAcoesNC(checklist)).toBe(false);
+    });
+
+    it("retorna false para registro antigo sem campo nao_conformidades", () => {
+      const checklist = { acoes_corretivas_realizado: null };
+      expect(temPaginaAcoesNC(checklist)).toBe(false);
+    });
+
+    it("retorna false quando acoes_corretivas_realizado=true mas descrição vazia", () => {
+      const checklist = { acoes_corretivas_realizado: true, acoes_corretivas_descricao: "", nao_conformidades: [] };
+      expect(temPaginaAcoesNC(checklist)).toBe(false);
     });
   });
 
