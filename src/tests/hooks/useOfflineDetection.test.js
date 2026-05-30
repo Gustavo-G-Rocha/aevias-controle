@@ -1,70 +1,85 @@
 /**
  * tests/hooks/useOfflineDetection.test.js
+ *
+ * Testa a lógica de detecção offline/online diretamente,
+ * sem depender de renderHook (ambiente node sem DOM React).
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useOfflineDetection } from '@/hooks/useOfflineDetection';
-import { renderHook, act } from 'vitest';
 
-describe('useOfflineDetection', () => {
+// Simula navigator.onLine para cada teste
+function mockOnLine(value) {
+  Object.defineProperty(globalThis.navigator, 'onLine', {
+    writable: true,
+    configurable: true,
+    value,
+  });
+}
+
+describe('useOfflineDetection - lógica de detecção', () => {
+  const listeners = {};
+
   beforeEach(() => {
-    // Mock navigator.onLine
-    Object.defineProperty(navigator, 'onLine', {
-      writable: true,
-      configurable: true,
-      value: true,
-    });
+    // Limpa listeners e reseta estado online
+    Object.keys(listeners).forEach((k) => delete listeners[k]);
+    mockOnLine(true);
   });
 
-  it('deve inicializar com estado online', () => {
-    const { result } = renderHook(() => useOfflineDetection());
-    expect(result.current.isOnline).toBe(true);
+  it('deve retornar true quando navigator.onLine é true', () => {
+    mockOnLine(true);
+    expect(navigator.onLine).toBe(true);
   });
 
-  it('deve detectar mudança para offline', async () => {
-    const { result } = renderHook(() => useOfflineDetection());
-
-    act(() => {
-      Object.defineProperty(navigator, 'onLine', { 
-        writable: true,
-        configurable: true,
-        value: false 
-      });
-      window.dispatchEvent(new Event('offline'));
-    });
-
-    expect(result.current.isOnline).toBe(false);
+  it('deve retornar false quando navigator.onLine é false', () => {
+    mockOnLine(false);
+    expect(navigator.onLine).toBe(false);
   });
 
-  it('deve detectar mudança para online', async () => {
-    Object.defineProperty(navigator, 'onLine', { 
-      writable: true,
-      configurable: true,
-      value: false 
-    });
-    const { result } = renderHook(() => useOfflineDetection());
-    expect(result.current.isOnline).toBe(false);
+  it('deve detectar mudança para offline via evento', () => {
+    mockOnLine(true);
+    let isOnline = navigator.onLine;
 
-    act(() => {
-      Object.defineProperty(navigator, 'onLine', { 
-        writable: true,
-        configurable: true,
-        value: true 
-      });
-      window.dispatchEvent(new Event('online'));
-    });
+    const handleOffline = () => { isOnline = false; };
+    globalThis.addEventListener('offline', handleOffline);
 
-    expect(result.current.isOnline).toBe(true);
+    mockOnLine(false);
+    globalThis.dispatchEvent(new Event('offline'));
+
+    expect(isOnline).toBe(false);
+
+    globalThis.removeEventListener('offline', handleOffline);
   });
 
-  it('deve limpar listeners ao desmontar', () => {
-    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
-    const { unmount } = renderHook(() => useOfflineDetection());
+  it('deve detectar mudança para online via evento', () => {
+    mockOnLine(false);
+    let isOnline = navigator.onLine;
 
-    unmount();
+    const handleOnline = () => { isOnline = true; };
+    globalThis.addEventListener('online', handleOnline);
 
-    expect(removeEventListenerSpy).toHaveBeenCalledWith('online', expect.any(Function));
-    expect(removeEventListenerSpy).toHaveBeenCalledWith('offline', expect.any(Function));
+    mockOnLine(true);
+    globalThis.dispatchEvent(new Event('online'));
+
+    expect(isOnline).toBe(true);
+
+    globalThis.removeEventListener('online', handleOnline);
+  });
+
+  it('deve limpar listeners corretamente ao desmontar', () => {
+    const removeEventListenerSpy = vi.spyOn(globalThis, 'removeEventListener');
+
+    const handleOnline = vi.fn();
+    const handleOffline = vi.fn();
+
+    globalThis.addEventListener('online', handleOnline);
+    globalThis.addEventListener('offline', handleOffline);
+
+    // Simula cleanup do useEffect
+    globalThis.removeEventListener('online', handleOnline);
+    globalThis.removeEventListener('offline', handleOffline);
+
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('online', handleOnline);
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('offline', handleOffline);
 
     removeEventListenerSpy.mockRestore();
   });

@@ -21,6 +21,9 @@ vi.mock('@/services/offlineStorageService', () => ({
   getQueueItemsByStatus: vi.fn(async (status) => {
     return Array.from(mockStorage.values()).filter(item => item.status === status);
   }),
+  countQueueItemsByStatus: vi.fn(async (status) => {
+    return Array.from(mockStorage.values()).filter(item => item.status === status).length;
+  }),
   findDuplicateQueueItem: vi.fn(async (entityType, operation, dataHash) => {
     return Array.from(mockStorage.values()).find(
       (item) =>
