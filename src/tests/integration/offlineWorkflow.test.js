@@ -158,7 +158,7 @@ describe('offlineWorkflow - Integração', () => {
       .mockRejectedValueOnce(new Error('Erro de conexão'))
       .mockResolvedValueOnce({ id: 'id-3' });
 
-    // 3 registros
+    // 3 registros — item2 com attempts=4 para que 1 falha o marque como 'failed'
     const item1 = createQueueItem({
       operation: 'create',
       entityType: 'ChecklistTerraplanagem',
@@ -178,6 +178,10 @@ describe('offlineWorkflow - Integração', () => {
     const id1 = await addOrUpdateQueueItem(item1);
     const id2 = await addOrUpdateQueueItem(item2);
     const id3 = await addOrUpdateQueueItem(item3);
+
+    // Forçar item2 ao limiar de tentativas para que falha o marque como 'failed'
+    const { updateQueueItem: updateItem } = await import('@/services/offlineStorageService');
+    await updateItem(id2, { attempts: 4 });
 
     // Sincronizar todos
     const { syncQueueItem } = await import('@/services/syncService');

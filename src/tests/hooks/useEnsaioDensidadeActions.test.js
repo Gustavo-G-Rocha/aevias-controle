@@ -3,10 +3,10 @@
  *
  * Testa a lógica de submit do EnsaioDensidadeInSitu diretamente,
  * sem depender de renderHook (ambiente node sem DOM React).
+ * vi.mock é hoisted — não pode referenciar variáveis externas.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock das dependências externas
 const mockNavigate = vi.fn();
 
 vi.mock('react-router-dom', () => ({
@@ -17,8 +17,11 @@ vi.mock('@/utils', () => ({
   createPageUrl: (page) => `/${page}`,
 }));
 
-const mockCreate = vi.fn();
-const mockUpdate = vi.fn();
+// Mock com vi.hoisted para evitar problema de hoisting
+const { mockCreate, mockUpdate } = vi.hoisted(() => ({
+  mockCreate: vi.fn(),
+  mockUpdate: vi.fn(),
+}));
 
 vi.mock('@/api/base44Client', () => ({
   base44: {
@@ -31,10 +34,9 @@ vi.mock('@/api/base44Client', () => ({
   },
 }));
 
-// Importa as dependências mockadas para acessar nos testes
 import { base44 } from '@/api/base44Client';
 
-// Função auxiliar que replica a lógica do hook sem React
+// Replica a lógica core do hook sem React
 async function invokeHandleSubmit({ formData, user, editingEnsaio, saveStatus = 'finalizado' }) {
   const e = { preventDefault: vi.fn() };
   e.preventDefault();

@@ -1,13 +1,13 @@
 /**
  * tests/hooks/useOfflineDetection.test.js
  *
- * Testa a lógica de detecção offline/online diretamente,
- * sem depender de renderHook (ambiente node sem DOM React).
+ * Testa a lógica de detecção offline/online usando um EventEmitter
+ * simulado — sem depender de globalThis.addEventListener (node puro).
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-// Simula navigator.onLine para cada teste
+// Simula navigator.onLine
 function mockOnLine(value) {
   Object.defineProperty(globalThis.navigator, 'onLine', {
     writable: true,
@@ -16,12 +16,30 @@ function mockOnLine(value) {
   });
 }
 
+// EventEmitter mínimo que simula window/globalThis no contexto node
+class FakeEventTarget {
+  constructor() {
+    this._listeners = {};
+  }
+  addEventListener(event, fn) {
+    if (!this._listeners[event]) this._listeners[event] = [];
+    this._listeners[event].push(fn);
+  }
+  removeEventListener(event, fn) {
+    if (!this._listeners[event]) return;
+    this._listeners[event] = this._listeners[event].filter((f) => f !== fn);
+  }
+  dispatchEvent(event) {
+    const handlers = this._listeners[event.type] || [];
+    handlers.forEach((fn) => fn(event));
+  }
+}
+
 describe('useOfflineDetection - lógica de detecção', () => {
-  const listeners = {};
+  let fakeWindow;
 
   beforeEach(() => {
-    // Limpa listeners e reseta estado online
-    Object.keys(listeners).forEach((k) => delete listeners[k]);
+    fakeWindow = new FakeEventTarget();
     mockOnLine(true);
   });
 
@@ -40,14 +58,14 @@ describe('useOfflineDetection - lógica de detecção', () => {
     let isOnline = navigator.onLine;
 
     const handleOffline = () => { isOnline = false; };
-    globalThis.addEventListener('offline', handleOffline);
+    fakeWindow.addEventListener('offline', handleOffline);
 
     mockOnLine(false);
-    globalThis.dispatchEvent(new Event('offline'));
+    fakeWindow.dispatchEvent({ type: 'offline' });
 
     expect(isOnline).toBe(false);
 
-    globalThis.removeEventListener('offline', handleOffline);
+    fakeWindow.removeEventListener('offline', handleOffline);
   });
 
   it('deve detectar mudança para online via evento', () => {
@@ -55,32 +73,52 @@ describe('useOfflineDetection - lógica de detecção', () => {
     let isOnline = navigator.onLine;
 
     const handleOnline = () => { isOnline = true; };
-    globalThis.addEventListener('online', handleOnline);
+    fakeWindow.addEventListener('online', handleOnline);
 
     mockOnLine(true);
-    globalThis.dispatchEvent(new Event('online'));
+    fakeWindow.dispatchEvent({ type: 'online' });
 
     expect(isOnline).toBe(true);
 
-    globalThis.removeEventListener('online', handleOnline);
+    fakeWindow.removeEventListener('online', handleOnline);
   });
 
   it('deve limpar listeners corretamente ao desmontar', () => {
-    const removeEventListenerSpy = vi.spyOn(globalThis, 'removeEventListener');
-
     const handleOnline = vi.fn();
     const handleOffline = vi.fn();
 
-    globalThis.addEventListener('online', handleOnline);
-    globalThis.addEventListener('offline', handleOffline);
+    fakeWindow.addEventListener('online', handleOnline);
+    fakeWindow.addEventListener('offline', handleOffline);
 
     // Simula cleanup do useEffect
-    globalThis.removeEventListener('online', handleOnline);
-    globalThis.removeEventListener('offline', handleOffline);
+    fakeWindow.removeEventListener('online', handleOnline);
+    fakeWindow.removeEventListener('offline', handleOffline);
 
-    expect(removeEventListenerSpy).toHaveBeenCalledWith('online', handleOnline);
-    expect(removeEventListenerSpy).toHaveBeenCalledWith('offline', handleOffline);
+    // Após remoção, eventos não devem mais chamar os handlers
+    fakeWindow.dispatchEvent({ type: 'online' });
+    fakeWindow.dispatchEvent({ type: 'offline' });
 
-    removeEventListenerSpy.mockRestore();
+    expect(handleOnline).not.toHaveBeenCalled();
+    expect(handleOffline).not.toHaveBeenCalled();
+  });
+
+  it('não deve chamar handler removido após removeEventListener', () => {
+    const handler = vi.fn();
+    fakeWindow.addEventListener('online', handler);
+    fakeWindow.removeEventListener('online', handler);
+    fakeWindow.dispatchEvent({ type: 'online' });
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it('deve chamar múltiplos handlers para o mesmo evento', () => {
+    const handler1 = vi.fn();
+    const handler2 = vi.fn();
+
+    fakeWindow.addEventListener('online', handler1);
+    fakeWindow.addEventListener('online', handler2);
+    fakeWindow.dispatchEvent({ type: 'online' });
+
+    expect(handler1).toHaveBeenCalledTimes(1);
+    expect(handler2).toHaveBeenCalledTimes(1);
   });
 });
