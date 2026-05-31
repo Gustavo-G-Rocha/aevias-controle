@@ -131,16 +131,16 @@ describe('useEnsaioDensidadeActions - lógica de submit', () => {
   });
 
   it('deve bloquear submit quando obra_id estiver ausente', async () => {
-    const alertMock = vi.spyOn(globalThis, 'alert').mockImplementation(() => {});
+    globalThis.alert = vi.fn();
     const invalidFormData = { ...mockFormData, obra_id: null };
 
     const { alerted } = await invokeHandleSubmit({ formData: invalidFormData, user: mockUser, editingEnsaio: null, saveStatus: 'finalizado' });
 
     expect(alerted).toBe(true);
-    expect(alertMock).toHaveBeenCalledWith(expect.stringContaining('campos obrigatórios'));
+    expect(globalThis.alert).toHaveBeenCalledWith(expect.stringContaining('campos obrigatórios'));
     expect(base44.entities.EnsaioDensidadeInSitu.create).not.toHaveBeenCalled();
 
-    alertMock.mockRestore();
+    delete globalThis.alert;
   });
 
   it('deve limpar campos de aprovação ao re-submeter reprovado', async () => {
