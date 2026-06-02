@@ -7,7 +7,7 @@ export default function DashboardHeader({ user, isClienteUser }) {
       style={{
         backgroundImage: 'url(https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/1ecf83e7e_image.png)',
         backgroundSize: 'cover',
-        backgroundPosition: 'center 60%',
+        backgroundPosition: 'center 75%',
       }}
     >
       <div className="px-6 py-14" style={{ background: 'linear-gradient(to right, rgba(0,35,59,0.75) 0%, rgba(0,35,59,0.4) 100%)' }}>
