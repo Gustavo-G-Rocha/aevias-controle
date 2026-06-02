@@ -14,8 +14,8 @@ export default function DashboardHeader({ user, isClienteUser }) {
       }}
     >
       <div className="px-6 py-14" style={{ background: 'linear-gradient(to right, rgba(0,35,59,0.75) 0%, rgba(0,35,59,0.4) 100%)' }}>
-        <p className="text-white/70 text-sm mb-1">Bem-vindo(a),</p>
         <NicknameEditor user={user} />
+        <p className="text-white/70 text-sm mt-1 mb-1">Bem-vindo(a),</p>
         <p className="text-white/70 text-sm mt-2">
           {isClienteUser
             ? 'Acompanhe os registros das suas obras.'
