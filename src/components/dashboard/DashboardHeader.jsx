@@ -13,7 +13,7 @@ export default function DashboardHeader({ user, isClienteUser }) {
         backgroundPosition: 'center 75%',
       }}
     >
-      <div className="px-6 pt-12 pb-16" style={{ background: 'linear-gradient(to right, rgba(0,35,59,0.75) 0%, rgba(0,35,59,0.4) 100%)' }}>
+      <div className="px-6 pt-16 pb-24" style={{ background: 'linear-gradient(to right, rgba(0,35,59,0.75) 0%, rgba(0,35,59,0.4) 100%)' }}>
         <NicknameEditor user={user} />
         <p className="text-white/70 text-sm mt-1 mb-1">Bem-vindo(a),</p>
         <p className="text-white/70 text-sm mt-2">
