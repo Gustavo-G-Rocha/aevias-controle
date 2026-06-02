@@ -6,15 +6,14 @@ export default function DashboardHeader({ user, isClienteUser }) {
 
   return (
     <div
-      className="mb-8 rounded-xl overflow-hidden relative min-h-[320px]"
+      className="mb-8 rounded-xl overflow-hidden relative"
       style={{
         backgroundImage: 'url(https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/a0653a144_Gemini_Generated_Image_gcu5d3gcu5d3gcu5.png)',
         backgroundSize: 'cover',
-        backgroundPosition: 'center center',
-        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center 60%',
       }}
     >
-      <div className="px-6 pt-14 pb-24" style={{ background: 'linear-gradient(to right, rgba(0,35,59,0.75) 0%, rgba(0,35,59,0.4) 100%)' }}>
+      <div className="px-6 pt-8 pb-8" style={{ background: 'linear-gradient(to right, rgba(0,35,59,0.75) 0%, rgba(0,35,59,0.4) 100%)' }}>
         <NicknameEditor user={user} />
         <p className="text-white/70 text-sm mt-1 mb-1">Bem-vindo(a),</p>
         <p className="text-white/70 text-sm mt-2">
