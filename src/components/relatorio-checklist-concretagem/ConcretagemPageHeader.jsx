@@ -12,7 +12,7 @@ export default function ConcretagemPageHeader({ regional, data, titulo = "CONTRO
   const logoW = small ? "w-12" : "w-16";
 
   return (
-    <div className={`flex justify-between items-start ${small ? 'mb-2 pb-2' : 'mb-4 pb-4'} border-b-2 border-slate-900`}>
+    <div className={`flex justify-between items-center ${small ? 'mb-1 pb-1' : 'mb-2 pb-2'} border-b-2 border-slate-900`}>
       <div className={logoW}>
         <picture>
           <source srcSet={logoUrl} />
