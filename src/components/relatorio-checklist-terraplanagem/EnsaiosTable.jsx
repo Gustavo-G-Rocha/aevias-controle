@@ -54,17 +54,19 @@ export default function EnsaiosTable({ ensaios_empreiteira, umidade, checklist }
           <EnsaioRow label="Análise Granulométrica por Peneiramento" ensaio={ensaios_empreiteira.granulometria} />
 
           {/* Variação de Umidade */}
-          <EnsaioRow
+          <EnsaioSimpleRow
             label="Variação de Umidade (%)"
-            ensaio={ensaios_empreiteira.variacao_umidade}
-            isCalculated={true}
+            realizado={ensaios_empreiteira.variacao_umidade_quantidade}
+            quantidade={ensaios_empreiteira.variacao_umidade_quantidade}
+            resultados={ensaios_empreiteira.variacao_umidade_resultados}
           />
 
           {/* Grau de Compactação */}
-          <EnsaioRow
+          <EnsaioSimpleRow
             label="Grau de Compactação (%)"
-            ensaio={ensaios_empreiteira.grau_compactacao}
-            isCalculated={true}
+            realizado={ensaios_empreiteira.grau_compactacao_quantidade}
+            quantidade={ensaios_empreiteira.grau_compactacao_quantidade}
+            resultados={ensaios_empreiteira.grau_compactacao_resultados}
           />
         </tbody>
       </table>
