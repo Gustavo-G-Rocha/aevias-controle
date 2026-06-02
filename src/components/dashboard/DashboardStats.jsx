@@ -8,23 +8,23 @@ const StatCard = React.memo(({ title, value, icon: Icon, note, onClick, classNam
   <Card
     className={`relative overflow-hidden border-0 ${onClick ? 'cursor-pointer transition-all duration-200' : ''} ${className || ''}`}
     style={{
-      backgroundColor: 'var(--color-surface)',
+      backgroundColor: 'var(--color-primary)',
       borderRadius: 'var(--card-radius)',
-      boxShadow: onClick ? undefined : 'var(--card-shadow)',
+      boxShadow: 'var(--card-shadow)',
     }}
     onMouseEnter={onClick ? e => { e.currentTarget.style.boxShadow = 'var(--card-shadow-hover)'; e.currentTarget.style.transform = 'translateY(-1px)'; } : undefined}
     onMouseLeave={onClick ? e => { e.currentTarget.style.boxShadow = 'var(--card-shadow)'; e.currentTarget.style.transform = 'translateY(0)'; } : undefined}
     onClick={onClick}
   >
     <CardHeader className="flex flex-row items-center justify-between pb-2">
-      <CardTitle className="text-sm font-medium" style={{ color: 'var(--color-text-muted)' }}>{title}</CardTitle>
-      <div className="p-2 rounded-xl" style={{ backgroundColor: 'var(--color-secondary-subtle)' }}>
-        <Icon className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
+      <CardTitle className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>{title}</CardTitle>
+      <div className="p-2 rounded-xl" style={{ backgroundColor: 'rgba(255,255,255,0.12)' }}>
+        <Icon className="w-4 h-4" style={{ color: 'var(--color-secondary)' }} />
       </div>
     </CardHeader>
     <CardContent>
-      <div className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>{value}</div>
-      {note && <p className="text-xs mt-1" style={{ color: 'var(--color-text-subtle)' }}>{note}</p>}
+      <div className="text-2xl font-bold" style={{ color: '#ffffff' }}>{value}</div>
+      {note && <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.55)' }}>{note}</p>}
     </CardContent>
   </Card>
 ));
