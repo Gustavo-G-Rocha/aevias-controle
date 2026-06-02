@@ -7,10 +7,10 @@ export default function DashboardHeader({ user, isClienteUser }) {
       style={{
         backgroundImage: 'url(https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/f0f118ebc_Semttulo.jpeg)',
         backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundPosition: 'center 60%',
       }}
     >
-      <div className="px-6 py-8" style={{ background: 'linear-gradient(to right, rgba(0,35,59,0.75) 0%, rgba(0,35,59,0.4) 100%)' }}>
+      <div className="px-6 py-14" style={{ background: 'linear-gradient(to right, rgba(0,35,59,0.75) 0%, rgba(0,35,59,0.4) 100%)' }}>
         <h1 className="text-3xl font-bold mb-2 text-white">Dashboard</h1>
         <p className="text-white/80">
           Bem-vindo(a), {user?.full_name}.{' '}
