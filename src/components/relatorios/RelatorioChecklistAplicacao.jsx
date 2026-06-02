@@ -20,7 +20,8 @@ export default function RelatorioChecklistAplicacao({ checklist, obra, regional,
   React.useEffect(() => {
     const compressImages = async () => {
       const hasFotos = checklist?.fotos && checklist.fotos.length > 0;
-      const hasMedicoes = checklist?.medicoes_geometricas && checklist.medicoes_geometricas.length > 0;
+      const medicoesFotos = Array.isArray(checklist?.medicoes_geometricas) ? checklist.medicoes_geometricas : [];
+      const hasMedicoes = medicoesFotos.length > 0;
 
       if (!hasFotos && !hasMedicoes) { setIsCompressing(false); return; }
 
@@ -61,7 +62,7 @@ export default function RelatorioChecklistAplicacao({ checklist, obra, regional,
 
       if (hasMedicoes) {
         const compressed = await Promise.all(
-          checklist.medicoes_geometricas.filter(m => m && m.trim() !== '').map(url => compressImage(url, true))
+          medicoesFotos.filter(m => m && m.trim() !== '').map(url => compressImage(url, true))
         );
         setCompressedMedicoes(compressed);
       }
@@ -70,7 +71,7 @@ export default function RelatorioChecklistAplicacao({ checklist, obra, regional,
     };
 
     compressImages();
-  }, [checklist?.fotos, checklist?.medicoes_geometricas]);
+  }, [checklist?.fotos, checklist?.medicoes_geometricas, checklist?.medicoes_geometricas?.length]);
 
   if (!checklist) return <div className="p-8">Dados do checklist não encontrados.</div>;
   if (isCompressing) return <div className="p-8 text-center">Otimizando imagens para impressão...</div>;
