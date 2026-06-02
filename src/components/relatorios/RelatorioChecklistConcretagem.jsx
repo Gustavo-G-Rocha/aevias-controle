@@ -177,20 +177,20 @@ export default function RelatorioChecklistConcretagem({ checklist, creatorUser, 
 
       {/* CASO 1: UMA ÚNICA CARGA */}
       {!temMultiplasCargas && cargas.length === 1 && (
-        <div className="print-page w-full max-w-[210mm] mx-auto bg-white min-h-[297mm] p-4">
+        <div className="print-page w-full max-w-[210mm] mx-auto bg-white min-h-[297mm] p-4 flex flex-col">
           <ConcretagemPageHeader regional={regional} data={checklist.data} titulo={"CONTROLE TECNOLÓGICO\nDE CONCRETO"} />
           <DadosClimaObs />
           <div className="mb-2">
             <div className="bg-[#f1f5f9] text-gray-800 px-2 py-1 font-bold text-[9px] mb-1 text-center">CARGA DE CONCRETO 1</div>
             <div className="text-[9px]"><CargaContent carga={cargas[0]} /></div>
           </div>
-          <div className="mt-4 w-full"><SignatureFooter {...footerProps} /></div>
+          <div className="mt-auto pt-4 w-full"><SignatureFooter {...footerProps} /></div>
         </div>
       )}
 
       {/* CASO 2: MÚLTIPLAS CARGAS */}
       {temMultiplasCargas && cargas.map((carga, idx) => (
-        <div key={idx} className="print-page w-full max-w-[210mm] mx-auto bg-white min-h-[297mm] p-4">
+        <div key={idx} className="print-page w-full max-w-[210mm] mx-auto bg-white min-h-[297mm] p-4 flex flex-col">
           <ConcretagemPageHeader regional={regional} data={checklist.data} titulo={"CONTROLE TECNOLÓGICO\nDE CONCRETO"} />
           {idx === 0 && <DadosClimaObs />}
           <div className="mb-2">
@@ -198,14 +198,14 @@ export default function RelatorioChecklistConcretagem({ checklist, creatorUser, 
             <div className="text-[9px]"><CargaContent carga={carga} /></div>
           </div>
           {idx === cargas.length - 1 && !temAcoesCorretivas && (
-            <div className="mt-4 w-full"><SignatureFooter {...footerProps} /></div>
+            <div className="mt-auto pt-4 w-full"><SignatureFooter {...footerProps} /></div>
           )}
         </div>
       ))}
 
       {/* PÁGINA DE AÇÕES CORRETIVAS / NÃO CONFORMIDADES */}
       {(temAcoesCorretivas || checklist.nao_conformidades?.length > 0) && (
-        <div className="print-page w-full max-w-[210mm] mx-auto bg-white min-h-[297mm] p-4">
+        <div className="print-page w-full max-w-[210mm] mx-auto bg-white min-h-[297mm] p-4 flex flex-col">
           <ConcretagemPageHeader regional={regional} data={checklist.data} titulo={"CONTROLE TECNOLÓGICO\nDE CONCRETO"} />
           <div className="mb-2">
             <div className="bg-[#f1f5f9] text-gray-800 px-2 py-1 font-bold text-[9px] mb-1 text-center">DADOS DA OBRA</div>
@@ -227,7 +227,7 @@ export default function RelatorioChecklistConcretagem({ checklist, creatorUser, 
               <ReportNaoConformidadesTable naoConformidades={checklist.nao_conformidades} />
             </div>
           )}
-          <div className="mt-4 w-full"><SignatureFooter {...footerProps} /></div>
+          <div className="mt-auto pt-4 w-full"><SignatureFooter {...footerProps} /></div>
         </div>
       )}
 
