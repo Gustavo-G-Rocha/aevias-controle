@@ -2,6 +2,10 @@
   "name": "User",
   "type": "object",
   "properties": {
+    "nickname": {
+      "type": "string",
+      "description": "Apelido do usu\u00e1rio (exibido no Dashboard)"
+    },
     "company": {
       "type": "string",
       "description": "Empresa do usu\u00e1rio"
