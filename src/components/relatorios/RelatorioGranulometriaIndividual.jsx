@@ -32,16 +32,23 @@ export default function RelatorioGranulometriaIndividual({ ensaio, obra, project
     ? peneirasOrdenadas.filter(key => project.faixa_trabalho[key] !== null && project.faixa_trabalho[key] !== undefined)
     : peneirasOrdenadas;
 
-  // Prepare data for chart — sorted ascending by mm for log scale
-  const chartData = peneirasVisiveis.map(pKey => {
+  // Prepare data for chart — sorted ascending by mm, using log10(mm) as X position
+  const chartDataRaw = peneirasVisiveis.map(pKey => {
     const pInfo = PENEIRAS_MAP[pKey];
     const mmValue = parseFloat(pInfo.mm.replace(',', '.'));
-    const dataPoint = { mm: mmValue, astm: pInfo.astm };
+    const dataPoint = { mm: mmValue, astm: pInfo.astm, logPos: Math.log10(mmValue) };
     ensaio.agregados?.forEach((agg, idx) => {
       dataPoint[`Agregado ${idx + 1}`] = parseFloat(agg.granulometria?.[pKey]?.passante) || 0;
     });
     return dataPoint;
   }).sort((a, b) => a.mm - b.mm);
+
+  const chartData = chartDataRaw;
+  const logTicks = chartData.map(d => d.logPos);
+  const logTickFormatter = (logPos) => {
+    const point = chartData.find(d => Math.abs(d.logPos - logPos) < 0.0001);
+    return point ? point.astm : '';
+  };
 
   const colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'];
 
@@ -179,15 +186,11 @@ export default function RelatorioGranulometriaIndividual({ ensaio, obra, project
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
             <XAxis
-              dataKey="mm"
-              scale="log"
-              domain={['auto', 'auto']}
+              dataKey="logPos"
               type="number"
-              ticks={chartData.map(d => d.mm)}
-              tickFormatter={(mm) => {
-                const point = chartData.find(d => d.mm === mm);
-                return point ? point.astm : mm;
-              }}
+              domain={[logTicks[0] - 0.05, logTicks[logTicks.length - 1] + 0.05]}
+              ticks={logTicks}
+              tickFormatter={logTickFormatter}
               tick={{ fontSize: 9 }}
               label={{ value: 'Peneiras', position: 'insideBottomRight', offset: -5 }}
             />
