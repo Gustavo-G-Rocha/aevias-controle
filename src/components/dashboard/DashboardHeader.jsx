@@ -5,7 +5,7 @@ export default function DashboardHeader({ user, isClienteUser }) {
     <div
       className="mb-8 rounded-xl overflow-hidden relative"
       style={{
-        backgroundImage: 'url(https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/f0f118ebc_Semttulo.jpeg)',
+        backgroundImage: 'url(https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/1ecf83e7e_image.png)',
         backgroundSize: 'cover',
         backgroundPosition: 'center 60%',
       }}
