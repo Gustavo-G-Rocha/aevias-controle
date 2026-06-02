@@ -8,7 +8,7 @@ export default function RelatorioChecklistConcretagemContainer({ children }) {
         @media print {
           @page {
             size: A4 portrait;
-            margin: 12mm 14mm;
+            margin: 8mm 10mm;
           }
           html, body {
             margin: 0 !important;
