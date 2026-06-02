@@ -2,6 +2,8 @@ import React from 'react';
 import NicknameEditor from './NicknameEditor';
 
 export default function DashboardHeader({ user, isClienteUser }) {
+  const displayName = user?.nickname?.trim() || user?.full_name || '';
+
   return (
     <div
       className="mb-8 rounded-xl overflow-hidden relative"
@@ -12,8 +14,9 @@ export default function DashboardHeader({ user, isClienteUser }) {
       }}
     >
       <div className="px-6 py-14" style={{ background: 'linear-gradient(to right, rgba(0,35,59,0.75) 0%, rgba(0,35,59,0.4) 100%)' }}>
+        <p className="text-white/70 text-sm mb-1">Bem-vindo(a),</p>
         <NicknameEditor user={user} />
-        <p className="text-white/70 text-sm mt-1">
+        <p className="text-white/70 text-sm mt-2">
           {isClienteUser
             ? 'Acompanhe os registros das suas obras.'
             : 'Aqui está o resumo das suas atividades.'}
