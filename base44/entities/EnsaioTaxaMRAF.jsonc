@@ -1,0 +1,194 @@
+{
+  "name": "EnsaioTaxaMRAF",
+  "type": "object",
+  "properties": {
+    "obra_id": {
+      "type": "string",
+      "description": "ID da obra"
+    },
+    "data_ensaio": {
+      "type": "string",
+      "format": "date",
+      "description": "Data do ensaio"
+    },
+    "laboratorista_name": {
+      "type": "string",
+      "description": "Nome do laboratorista"
+    },
+    "rodovia": {
+      "type": "string",
+      "description": "Rodovia"
+    },
+    "trecho": {
+      "type": "string",
+      "description": "Trecho"
+    },
+    "placa_caminhao": {
+      "type": "string",
+      "description": "Placa do caminh\u00e3o espargidor"
+    },
+    "material": {
+      "type": "string",
+      "description": "Material utilizado"
+    },
+    "numero_projeto": {
+      "type": "string",
+      "description": "N\u00famero do projeto"
+    },
+    "dimensoes_bandeja": {
+      "type": "object",
+      "description": "Dimens\u00f5es globais da bandeja",
+      "properties": {
+        "lado_1": {
+          "type": "number",
+          "description": "Lado 1 (cm)"
+        },
+        "lado_2": {
+          "type": "number",
+          "description": "Lado 2 (cm)"
+        },
+        "area": {
+          "type": "number",
+          "description": "\u00c1rea calculada (m\u00b2)"
+        }
+      }
+    },
+    "ensaios": {
+      "type": "array",
+      "description": "Ensaios individuais (at\u00e9 4)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "numero": {
+            "type": "number"
+          },
+          "estaca": {
+            "type": "string",
+            "description": "Estaca do ensaio"
+          },
+          "posicao": {
+            "type": "string",
+            "description": "Posi\u00e7\u00e3o"
+          },
+          "peso_bandeja_amostra": {
+            "type": "number",
+            "description": "Peso bandeja+amostra P1 (g)"
+          },
+          "peso_bandeja": {
+            "type": "number",
+            "description": "Peso da bandeja P2 (g)"
+          },
+          "peso_amostra": {
+            "type": "number",
+            "description": "Peso da amostra PA=P1-P2 (g)"
+          },
+          "taxa_mraf_aplicada": {
+            "type": "number",
+            "description": "Taxa de MRAF aplicada Tx (kg/m\u00b2)"
+          },
+          "teor_ligante": {
+            "type": "number",
+            "description": "Teor de ligante L do ensaio de extra\u00e7\u00e3o (%)"
+          },
+          "taxa_ligante": {
+            "type": "number",
+            "description": "Taxa de ligante TL (L/m\u00b2)"
+          },
+          "residuo_emulsao": {
+            "type": "number",
+            "description": "Res\u00edduo da emuls\u00e3o R (%)"
+          },
+          "taxa_emulsao": {
+            "type": "number",
+            "description": "Taxa de emuls\u00e3o TE=TL/R (L/m\u00b2)"
+          },
+          "taxa_agregado": {
+            "type": "number",
+            "description": "Taxa de agregado TA=Tx-TL (kg/m\u00b2)"
+          }
+        }
+      }
+    },
+    "media_taxa_emulsao": {
+      "type": "number",
+      "description": "M\u00e9dia da taxa de emuls\u00e3o (L/m\u00b2)"
+    },
+    "media_taxa_agregado": {
+      "type": "number",
+      "description": "M\u00e9dia da taxa de agregado (kg/m\u00b2)"
+    },
+    "media_taxa_mraf": {
+      "type": "number",
+      "description": "M\u00e9dia da taxa de MRAF aplicada (kg/m\u00b2)"
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "rascunho",
+        "finalizado"
+      ],
+      "default": "rascunho"
+    },
+    "approved": {
+      "type": "boolean",
+      "default": null
+    },
+    "approved_by": {
+      "type": "string"
+    },
+    "approved_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "approver_details": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "position": {
+          "type": "string"
+        },
+        "crea_number": {
+          "type": "string"
+        }
+      }
+    },
+    "rejection_reason": {
+      "type": "string"
+    },
+    "was_rejected": {
+      "type": "boolean",
+      "default": false
+    },
+    "client_signature": {
+      "type": "object",
+      "properties": {
+        "signed_by": {
+          "type": "string"
+        },
+        "signed_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "engineer_name": {
+          "type": "string"
+        },
+        "crea_number": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "obra_id",
+    "data_ensaio"
+  ],
+  "rls": {
+    "read": {},
+    "write": {}
+  }
+}

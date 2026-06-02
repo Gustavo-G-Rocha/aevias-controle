@@ -1,0 +1,146 @@
+{
+  "name": "EnsaioManchaPendulo",
+  "type": "object",
+  "properties": {
+    "obra_id": {
+      "type": "string",
+      "description": "ID da obra"
+    },
+    "data_ensaio": {
+      "type": "string",
+      "format": "date",
+      "description": "Data do ensaio"
+    },
+    "laboratorista_name": {
+      "type": "string",
+      "description": "Nome do laboratorista"
+    },
+    "rodovia": {
+      "type": "string",
+      "description": "Nome da rodovia"
+    },
+    "trecho": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o do trecho"
+    },
+    "camada": {
+      "type": "string",
+      "description": "Camada"
+    },
+    "pista": {
+      "type": "string",
+      "description": "Pista"
+    },
+    "orgao": {
+      "type": "string",
+      "enum": [
+        "DER/PR",
+        "DNIT",
+        "ECO-RODOVIAS"
+      ],
+      "description": "Orgao de especifica\u00e7\u00e3o"
+    },
+    "ensaios_mancha": {
+      "type": "array",
+      "description": "Ensaios de Mancha de Areia (at\u00e9 15)",
+      "items": {
+        "type": "object"
+      }
+    },
+    "ensaios_pendulo": {
+      "type": "array",
+      "description": "Ensaios de P\u00eandulo Brit\u00e2nico (at\u00e9 15)",
+      "items": {
+        "type": "object"
+      }
+    },
+    "limites_mancha": {
+      "type": "string",
+      "description": "Limites estabelecidos para Mancha de Areia",
+      "default": "0,6mm \u2264 HS \u2264 1,2mm"
+    },
+    "limites_pendulo": {
+      "type": "string",
+      "description": "Limites estabelecidos para P\u00eandulo Brit\u00e2nico",
+      "default": "VRD \u2265 47"
+    },
+    "condicao_conformidade": {
+      "type": "string",
+      "enum": [
+        "CONFORME",
+        "N\u00c3O CONFORME"
+      ],
+      "description": "Condi\u00e7\u00e3o de conformidade geral"
+    },
+    "observacoes": {
+      "type": "string",
+      "description": "Observa\u00e7\u00f5es gerais"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "rascunho",
+        "finalizado"
+      ],
+      "default": "rascunho",
+      "description": "Status do registro"
+    },
+    "approved": {
+      "type": "boolean",
+      "default": null,
+      "description": "Status de aprova\u00e7\u00e3o"
+    },
+    "approved_by": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio que aprovou/reprovou"
+    },
+    "approved_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "approver_details": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "position": {
+          "type": "string"
+        },
+        "crea_number": {
+          "type": "string"
+        }
+      }
+    },
+    "rejection_reason": {
+      "type": "string"
+    },
+    "was_rejected": {
+      "type": "boolean",
+      "default": false,
+      "description": "Indica se o registro foi reprovado e editado novamente"
+    },
+    "client_signature": {
+      "type": "object",
+      "properties": {
+        "signed_by": {
+          "type": "string"
+        },
+        "signed_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "engineer_name": {
+          "type": "string"
+        },
+        "crea_number": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "obra_id",
+    "data_ensaio"
+  ]
+}

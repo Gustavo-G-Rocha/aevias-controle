@@ -1,5 +1,5 @@
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { PENEIRAS_MAP } from '@/constants/sieves';
 import { formatDate, buildSignatureProps } from '@/utils/relatorioUtils';
 import SignatureFooter from './SignatureFooter';
@@ -21,20 +21,27 @@ export default function RelatorioGranulometriaIndividual({ ensaio, obra, project
     window.print();
   };
 
-  const peneirasVisiveis = project?.faixa_trabalho 
-    ? Object.keys(project.faixa_trabalho).filter(key => project.faixa_trabalho[key] !== null && project.faixa_trabalho[key] !== undefined)
-    : Object.keys(PENEIRAS_MAP);
+  // Peneiras ordenadas do maior para o menor mm (ordem granulométrica correta)
+  const peneirasOrdenadas = Object.keys(PENEIRAS_MAP).sort((a, b) => {
+    const mmA = parseFloat(PENEIRAS_MAP[a].mm.replace(',', '.'));
+    const mmB = parseFloat(PENEIRAS_MAP[b].mm.replace(',', '.'));
+    return mmB - mmA;
+  });
 
-  // Prepare data for chart
+  const peneirasVisiveis = project?.faixa_trabalho 
+    ? peneirasOrdenadas.filter(key => project.faixa_trabalho[key] !== null && project.faixa_trabalho[key] !== undefined)
+    : peneirasOrdenadas;
+
+  // Prepare data for chart — sorted ascending by mm for log scale
   const chartData = peneirasVisiveis.map(pKey => {
     const pInfo = PENEIRAS_MAP[pKey];
-    const mmValue = parseFloat(pInfo.mm);
+    const mmValue = parseFloat(pInfo.mm.replace(',', '.'));
     const dataPoint = { mm: mmValue, astm: pInfo.astm };
     ensaio.agregados?.forEach((agg, idx) => {
       dataPoint[`Agregado ${idx + 1}`] = parseFloat(agg.granulometria?.[pKey]?.passante) || 0;
     });
     return dataPoint;
-  }).sort((a, b) => b.mm - a.mm);
+  }).sort((a, b) => a.mm - b.mm);
 
   const colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'];
 
@@ -171,9 +178,17 @@ export default function RelatorioGranulometriaIndividual({ ensaio, obra, project
         <ResponsiveContainer width="100%" height={250}>
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-            <XAxis 
-              dataKey="astm" 
-              tick={{ fontSize: 10 }} 
+            <XAxis
+              dataKey="mm"
+              scale="log"
+              domain={['auto', 'auto']}
+              type="number"
+              ticks={chartData.map(d => d.mm)}
+              tickFormatter={(mm) => {
+                const point = chartData.find(d => d.mm === mm);
+                return point ? point.astm : mm;
+              }}
+              tick={{ fontSize: 9 }}
               label={{ value: 'Peneiras', position: 'insideBottomRight', offset: -5 }}
             />
             <YAxis 

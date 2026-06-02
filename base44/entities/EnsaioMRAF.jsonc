@@ -1,5 +1,5 @@
 {
-  "name": "EnsaioCAUQ",
+  "name": "EnsaioMRAF",
   "type": "object",
   "properties": {
     "obra_id": {
@@ -31,10 +31,6 @@
       "type": "string",
       "description": "Local de coleta da amostra"
     },
-    "usina_fornecedora": {
-      "type": "string",
-      "description": "Nome da usina fornecedora"
-    },
     "pedreira": {
       "type": "string",
       "description": "Nome da pedreira"
@@ -51,10 +47,6 @@
       "type": "string",
       "description": "Tipo de ligante asf\u00e1ltico"
     },
-    "temperatura_cap": {
-      "type": "number",
-      "description": "Temperatura do CAP (\u00b0C)"
-    },
     "faixa_especificada": {
       "type": "string",
       "description": "Faixa granulom\u00e9trica especificada"
@@ -68,48 +60,54 @@
       "default": "Afirma Evias",
       "description": "Quem realizou o ensaio"
     },
-    "realizar_ensaio_umidade": {
-      "type": "boolean",
-      "default": false,
-      "description": "Se deve realizar ensaio de umidade"
-    },
     "extracao_ligante": {
       "type": "object",
       "description": "Dados da extra\u00e7\u00e3o de ligante (Rotarex)",
       "properties": {
         "peso_amostra": {
-          "type": "number"
+          "type": "number",
+          "description": "Peso da amostra (g)"
         },
         "amostra_umida": {
-          "type": "number"
+          "type": "number",
+          "description": "Amostra \u00famida (g)"
         },
         "amostra_seca": {
-          "type": "number"
+          "type": "number",
+          "description": "Amostra seca (g)"
         },
         "umidade": {
-          "type": "number"
+          "type": "number",
+          "description": "Umidade calculada (%)"
         },
         "amostra_com_ligante": {
-          "type": "number"
+          "type": "number",
+          "description": "Amostra com ligante (g)"
         },
         "amostra_sem_ligante": {
-          "type": "number"
+          "type": "number",
+          "description": "Amostra sem ligante (g)"
         },
         "fator_correcao": {
           "type": "number",
-          "default": 1
+          "description": "Fator de corre\u00e7\u00e3o",
+          "default": 1.0
         },
         "peso_ligante": {
-          "type": "number"
+          "type": "number",
+          "description": "Peso do ligante calculado (g)"
         },
         "teor_ligante": {
-          "type": "number"
+          "type": "number",
+          "description": "Teor de ligante calculado (%)"
         },
-        "filler_betume": {
-          "type": "number"
+        "residuo_emulsao": {
+          "type": "number",
+          "description": "Res\u00edduo da emuls\u00e3o (%)"
         },
-        "teor_ligante_real": {
-          "type": "number"
+        "percentual_emulsao": {
+          "type": "number",
+          "description": "Percentual de emuls\u00e3o calculado (%)"
         }
       }
     },
@@ -148,9 +146,6 @@
             "peneira_9_5mm": {
               "type": "number"
             },
-            "peneira_6_3mm": {
-              "type": "number"
-            },
             "peneira_4_75mm": {
               "type": "number"
             },
@@ -185,112 +180,9 @@
         }
       }
     },
-    "realizar_densidade_rice": {
-      "type": "boolean",
-      "default": false
-    },
-    "densidade_rice": {
-      "type": "object",
-      "properties": {
-        "frasco_agua": {
-          "type": "number"
-        },
-        "amostra": {
-          "type": "number"
-        },
-        "frasco_agua_amostra": {
-          "type": "number"
-        },
-        "temperatura_agua": {
-          "type": "number"
-        },
-        "densidade_agua": {
-          "type": "number"
-        },
-        "densidade_rice": {
-          "type": "number"
-        }
-      }
-    },
-    "realizar_marshall": {
-      "type": "boolean",
-      "default": false
-    },
-    "corpos_prova_marshall": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "numero": {
-            "type": "number"
-          },
-          "metodo_rompimento": {
-            "type": "string",
-            "enum": [
-              "diametral",
-              "estabilidade_fluencia"
-            ]
-          },
-          "peso_ar": {
-            "type": "number"
-          },
-          "peso_imerso": {
-            "type": "number"
-          },
-          "peso_sss": {
-            "type": "number"
-          },
-          "volume": {
-            "type": "number"
-          },
-          "densidade_aparente": {
-            "type": "number"
-          },
-          "volume_vazios": {
-            "type": "number"
-          },
-          "vcb": {
-            "type": "number"
-          },
-          "vam": {
-            "type": "number"
-          },
-          "rbv": {
-            "type": "number"
-          },
-          "altura": {
-            "type": "number"
-          },
-          "const_prensa": {
-            "type": "number",
-            "default": 1
-          },
-          "rtcd_leitura": {
-            "type": "number"
-          },
-          "rtcd_valor": {
-            "type": "number"
-          },
-          "estabilidade_leitura": {
-            "type": "number"
-          },
-          "estabilidade_corrigida": {
-            "type": "number"
-          },
-          "fluencia_leitura_inicial": {
-            "type": "number"
-          },
-          "fluencia_leitura_final": {
-            "type": "number"
-          },
-          "fluencia": {
-            "type": "number"
-          }
-        }
-      }
-    },
     "observacoes": {
-      "type": "string"
+      "type": "string",
+      "description": "Observa\u00e7\u00f5es gerais"
     },
     "status": {
       "type": "string",
@@ -298,14 +190,17 @@
         "rascunho",
         "finalizado"
       ],
-      "default": "rascunho"
+      "default": "rascunho",
+      "description": "Status do registro: rascunho (em edi\u00e7\u00e3o) ou finalizado (pronto para revis\u00e3o)"
     },
     "approved": {
       "type": "boolean",
-      "default": null
+      "default": null,
+      "description": "Status de aprova\u00e7\u00e3o"
     },
     "approved_by": {
-      "type": "string"
+      "type": "string",
+      "description": "Email do usu\u00e1rio que aprovou/reprovou"
     },
     "approved_date": {
       "type": "string",
@@ -330,7 +225,8 @@
     },
     "was_rejected": {
       "type": "boolean",
-      "default": false
+      "default": false,
+      "description": "Indica se o registro foi reprovado e editado novamente"
     },
     "client_signature": {
       "type": "object",
@@ -353,26 +249,5 @@
   },
   "required": [
     "obra_id"
-  ],
-  "rls": {
-    "create": {},
-    "read": {},
-    "update": {
-      "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
-    },
-    "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
-    }
-  }
+  ]
 }

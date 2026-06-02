@@ -1,0 +1,126 @@
+{
+  "name": "Regional",
+  "type": "object",
+  "properties": {
+    "nome": {
+      "type": "string",
+      "description": "Nome da regional"
+    },
+    "codigo": {
+      "type": "string",
+      "description": "C\u00f3digo identificador da regional"
+    },
+    "descricao": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o da regional"
+    },
+    "responsavel": {
+      "type": "string",
+      "description": "Respons\u00e1vel t\u00e9cnico pela regional"
+    },
+    "cliente": {
+      "type": "string",
+      "description": "Cliente da regional (vale para todas as obras)"
+    },
+    "estado": {
+      "type": "string",
+      "description": "Estado/UF da regional"
+    },
+    "cidade_sede": {
+      "type": "string",
+      "description": "Cidade sede da regional"
+    },
+    "endereco": {
+      "type": "string",
+      "description": "Endere\u00e7o da sede regional"
+    },
+    "telefone": {
+      "type": "string",
+      "description": "Telefone de contato"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email de contato da regional"
+    },
+    "logo_url": {
+      "type": "string",
+      "description": "URL da logo da regional"
+    },
+    "project_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs dos projetos vinculados a esta regional (todas as obras herdam estes projetos)"
+    },
+    "laboratoristas_responsaveis": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de emails dos laboratoristas alocados nesta regional"
+    },
+    "gestores_contrato_responsaveis": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de emails dos Gestores de Contrato respons\u00e1veis por todas as obras desta regional"
+    },
+    "gestor_contrato_responsavel": {
+      "type": "string",
+      "description": "Email do Gestor de Contrato respons\u00e1vel por todas as obras desta regional (descontinuado - usar gestores_contrato_responsaveis)"
+    },
+    "salas_tecnicas_responsaveis": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de emails das salas t\u00e9cnicas respons\u00e1veis por todas as obras desta regional"
+    },
+    "clientes_responsaveis": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de emails dos clientes respons\u00e1veis por todas as obras desta regional"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ativa",
+        "inativa"
+      ],
+      "default": "ativa",
+      "description": "Status da regional"
+    }
+  },
+  "required": [
+    "nome",
+    "codigo"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "custom_condition": {
+            "field": "gestores_contrato_responsaveis",
+            "user_field": "email",
+            "condition": "contains"
+          }
+        }
+      ]
+    }
+  }
+}

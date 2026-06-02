@@ -1,0 +1,210 @@
+{
+  "name": "AcompanhamentoUsinagem",
+  "type": "object",
+  "properties": {
+    "obra_id": {
+      "type": "string",
+      "description": "ID da obra"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "ID do Projeto vinculado"
+    },
+    "data": {
+      "type": "string",
+      "format": "date",
+      "description": "Data do acompanhamento"
+    },
+    "laboratorista_name": {
+      "type": "string",
+      "description": "Nome do laboratorista que criou o registro"
+    },
+    "trecho": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o do trecho"
+    },
+    "pedreira": {
+      "type": "string",
+      "description": "Nome da pedreira"
+    },
+    "numero_projeto": {
+      "type": "string",
+      "description": "N\u00famero do projeto"
+    },
+    "faixa_especificada": {
+      "type": "string",
+      "description": "Faixa granulom\u00e9trica especificada"
+    },
+    "rodovia": {
+      "type": "string",
+      "description": "Nome da rodovia"
+    },
+    "usina": {
+      "type": "string",
+      "description": "Nome da usina"
+    },
+    "ligante_nome": {
+      "type": "string",
+      "description": "Nome do ligante"
+    },
+    "temperatura_ligante": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Temperatura do ligante (CAP) em \u00b0C"
+    },
+    "agregados": {
+      "type": "array",
+      "description": "Lista de agregados",
+      "items": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Nome do agregado"
+          },
+          "composicao": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Composi\u00e7\u00e3o em %"
+          },
+          "umidade": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Umidade em %"
+          },
+          "temperatura_t1": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Temperatura T1 em \u00b0C"
+          },
+          "temperatura_t2": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Temperatura T2 em \u00b0C"
+          }
+        }
+      }
+    },
+    "cargas": {
+      "type": "array",
+      "description": "Lista de cargas acompanhadas",
+      "items": {
+        "type": "object",
+        "properties": {
+          "placa_caminhao": {
+            "type": "string"
+          },
+          "hora_saida": {
+            "type": "string"
+          },
+          "peso": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Peso em toneladas"
+          },
+          "temperatura_1": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Temperatura em \u00b0C"
+          },
+          "temperatura_2": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Temperatura em \u00b0C"
+          },
+          "observacao": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "observacoes_gerais": {
+      "type": "string",
+      "description": "Observa\u00e7\u00f5es gerais"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "rascunho",
+        "finalizado"
+      ],
+      "default": "rascunho",
+      "description": "Status do registro"
+    },
+    "approved": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "default": null,
+      "description": "Status de aprova\u00e7\u00e3o"
+    },
+    "approved_by": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio que aprovou/reprovou"
+    },
+    "approved_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "approver_details": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "position": {
+          "type": "string"
+        },
+        "crea_number": {
+          "type": "string"
+        }
+      }
+    },
+    "rejection_reason": {
+      "type": "string"
+    },
+    "was_rejected": {
+      "type": "boolean",
+      "default": false
+    },
+    "client_signature": {
+      "type": "object",
+      "properties": {
+        "signed_by": {
+          "type": "string"
+        },
+        "signed_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "engineer_name": {
+          "type": "string"
+        },
+        "crea_number": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "obra_id",
+    "data"
+  ]
+}

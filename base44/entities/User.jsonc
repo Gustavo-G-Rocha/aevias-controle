@@ -1,0 +1,73 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "company": {
+      "type": "string",
+      "description": "Empresa do usu\u00e1rio"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Telefone do usu\u00e1rio"
+    },
+    "position": {
+      "type": "string",
+      "description": "Cargo do usu\u00e1rio"
+    },
+    "crea_number": {
+      "type": "string",
+      "description": "N\u00famero do CREA"
+    },
+    "laboratorista_name": {
+      "type": "string",
+      "description": "Nome completo do laboratorista (para assinatura nos ensaios)"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Se o usu\u00e1rio est\u00e1 ativo"
+    },
+    "access_level": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "sala_tecnica_afirmaevias",
+        "gestor_contrato",
+        "user",
+        "cliente"
+      ],
+      "default": "user",
+      "description": "N\u00edvel de acesso funcional do usu\u00e1rio"
+    },
+    "last_login": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Data e hora do \u00faltimo login do usu\u00e1rio"
+    }
+  },
+  "required": [
+    "laboratorista_name"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "gestor_contrato"
+          }
+        }
+      ]
+    }
+  }
+}

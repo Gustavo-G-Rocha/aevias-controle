@@ -1,0 +1,186 @@
+{
+  "name": "AcompanhamentoCarga",
+  "type": "object",
+  "properties": {
+    "obra_id": {
+      "type": "string",
+      "description": "ID da obra"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "ID do Projeto vinculado"
+    },
+    "data": {
+      "type": "string",
+      "format": "date",
+      "description": "Data do acompanhamento"
+    },
+    "jornada": {
+      "type": "object",
+      "description": "Jornada de trabalho do funcion\u00e1rio",
+      "properties": {
+        "horario_inicio": {
+          "type": "string",
+          "description": "Hor\u00e1rio de in\u00edcio do turno (HH:mm)"
+        },
+        "horario_fim": {
+          "type": "string",
+          "description": "Hor\u00e1rio de fim do turno (HH:mm)"
+        }
+      }
+    },
+    "laboratorista_name": {
+      "type": "string",
+      "description": "Nome do laboratorista que criou o registro"
+    },
+    "rodovia": {
+      "type": "string",
+      "description": "Nome da rodovia"
+    },
+    "trecho": {
+      "type": "string",
+      "description": "Trecho"
+    },
+    "sub_trecho": {
+      "type": "string",
+      "description": "Sub-trecho"
+    },
+    "usina_fornecedora": {
+      "type": "string",
+      "description": "Nome da usina fornecedora"
+    },
+    "servico": {
+      "type": "string",
+      "enum": [
+        "remendos",
+        "capa_reperfilagem"
+      ],
+      "description": "Tipo de servi\u00e7o: Remendos ou Capa/Reperfilagem"
+    },
+    "cargas": {
+      "type": "array",
+      "description": "Array de cargas (at\u00e9 20)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "numero_carga": {
+            "type": "number"
+          },
+          "placa": {
+            "type": "string"
+          },
+          "hora_saida": {
+            "type": "string"
+          },
+          "peso_toneladas": {
+            "type": "number"
+          },
+          "hora_chegada": {
+            "type": "string"
+          },
+          "temp_chegada": {
+            "type": "number"
+          },
+          "hora_aplicacao": {
+            "type": "string"
+          },
+          "temp_espalhamento": {
+            "type": "number"
+          },
+          "temp_compactacao": {
+            "type": "number"
+          },
+          "pista": {
+            "type": "string"
+          },
+          "espessura_cm": {
+            "type": "number"
+          },
+          "estaca_inicial": {
+            "type": "string"
+          },
+          "estaca_final": {
+            "type": "string"
+          },
+          "observacoes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "observacoes_gerais": {
+      "type": "string",
+      "description": "Observa\u00e7\u00f5es gerais"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "rascunho",
+        "finalizado"
+      ],
+      "default": "rascunho",
+      "description": "Status do registro: rascunho (em edi\u00e7\u00e3o) ou finalizado (pronto para revis\u00e3o)"
+    },
+    "approved": {
+      "type": "boolean",
+      "default": null,
+      "description": "Status de aprova\u00e7\u00e3o"
+    },
+    "approved_by": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio que aprovou/reprovou"
+    },
+    "approved_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "approver_details": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "position": {
+          "type": "string"
+        },
+        "crea_number": {
+          "type": "string"
+        }
+      }
+    },
+    "rejection_reason": {
+      "type": "string"
+    },
+    "was_rejected": {
+      "type": "boolean",
+      "default": false,
+      "description": "Indica se o registro foi reprovado e editado novamente"
+    },
+    "client_signature": {
+      "type": "object",
+      "properties": {
+        "signed_by": {
+          "type": "string"
+        },
+        "signed_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "engineer_name": {
+          "type": "string"
+        },
+        "crea_number": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "obra_id",
+    "data"
+  ],
+  "rls": {
+    "read": {},
+    "write": {}
+  }
+}

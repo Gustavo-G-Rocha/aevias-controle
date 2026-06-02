@@ -1,0 +1,96 @@
+{
+  "name": "Obra",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nome da obra"
+    },
+    "code": {
+      "type": "string",
+      "description": "C\u00f3digo da obra/contrato"
+    },
+    "regional_id": {
+      "type": "string",
+      "description": "ID da regional a que pertence a obra (herda projetos, cliente e equipe da regional)"
+    },
+    "tipo_obra": {
+      "type": "string",
+      "enum": [
+        "supervisao",
+        "implantacao",
+        "conservacao",
+        "sondagem",
+        "levantamentos"
+      ],
+      "description": "Tipo de obra: Supervis\u00e3o, Implanta\u00e7\u00e3o, Conserva\u00e7\u00e3o, Sondagem ou Levantamentos"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planejamento",
+        "em_andamento",
+        "concluida",
+        "pausada"
+      ],
+      "default": "planejamento",
+      "description": "Status da obra"
+    },
+    "empreiteiras": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Nomes das empreiteiras do contrato - apenas para obras de Supervis\u00e3o"
+    },
+    "clientes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Nomes dos clientes - apenas para obras de Levantamentos e Sondagem"
+    },
+    "usinas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Nomes das usinas que atendem o contrato"
+    },
+    "rodovias": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Nomes das rodovias da obra/contrato"
+    }
+  },
+  "required": [
+    "name",
+    "code",
+    "regional_id",
+    "tipo_obra"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "gestor_contrato"
+          }
+        }
+      ]
+    }
+  }
+}

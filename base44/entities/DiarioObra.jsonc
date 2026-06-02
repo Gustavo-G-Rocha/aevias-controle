@@ -1,0 +1,792 @@
+{
+  "name": "DiarioObra",
+  "type": "object",
+  "properties": {
+    "obra_id": {
+      "type": "string",
+      "description": "ID da obra"
+    },
+    "cliente": {
+      "type": "string",
+      "description": "Nome do cliente (copiado da regional no momento da cria\u00e7\u00e3o)"
+    },
+    "data": {
+      "type": "string",
+      "format": "date",
+      "description": "Data do di\u00e1rio"
+    },
+    "jornada": {
+      "type": "object",
+      "description": "Jornada de trabalho do funcion\u00e1rio",
+      "properties": {
+        "horario_inicio": {
+          "type": "string",
+          "description": "Hor\u00e1rio de in\u00edcio do turno (HH:mm)"
+        },
+        "horario_fim": {
+          "type": "string",
+          "description": "Hor\u00e1rio de fim do turno (HH:mm)"
+        }
+      }
+    },
+    "tipo_local": {
+      "type": "string",
+      "enum": [
+        "usina",
+        "campo"
+      ],
+      "description": "Tipo de local: usina ou campo"
+    },
+    "empreiteira": {
+      "type": "string",
+      "description": "Nome da empreiteira"
+    },
+    "usina_selecionada": {
+      "type": "string",
+      "description": "Nome da usina (quando tipo_local = usina)"
+    },
+    "rodovia": {
+      "type": "string",
+      "description": "Nome da rodovia (quando tipo_local = campo)"
+    },
+    "trecho": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o do trecho (quando tipo_local = campo)"
+    },
+    "condicoes_climaticas": {
+      "type": "string",
+      "enum": [
+        "ensolarado",
+        "nublado",
+        "chuvoso",
+        "garoa",
+        "vento_forte",
+        "neblina"
+      ],
+      "description": "Condi\u00e7\u00f5es clim\u00e1ticas do dia"
+    },
+    "temperatura": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "Temperatura ambiente (\u00b0C)"
+    },
+    "atividades_realizadas": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o das atividades realizadas no dia"
+    },
+    "observacoes": {
+      "type": "string",
+      "description": "Observa\u00e7\u00f5es gerais do dia"
+    },
+    "acoes_corretivas_realizado": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "default": null,
+      "description": "Se foram realizadas a\u00e7\u00f5es corretivas"
+    },
+    "acoes_corretivas_descricao": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o das a\u00e7\u00f5es corretivas realizadas"
+    },
+    "nao_conformidades": {
+      "type": "array",
+      "description": "Lista de n\u00e3o conformidades identificadas",
+      "items": {
+        "type": "object",
+        "properties": {
+          "local_nc": {
+            "type": "string",
+            "description": "Local da NC: CAMPO ou USINA"
+          },
+          "categoria_nc": {
+            "type": "string",
+            "description": "Categoria da NC"
+          },
+          "parametro_nc": {
+            "type": "string",
+            "description": "Par\u00e2metro da NC"
+          },
+          "descricao": {
+            "type": "string",
+            "description": "Descri\u00e7\u00e3o detalhada da NC"
+          }
+        }
+      }
+    },
+    "efetivo_obra_ativo": {
+      "type": "boolean",
+      "default": false,
+      "description": "Se o efetivo de obra deve ser preenchido"
+    },
+    "efetivo_maquinas": {
+      "type": "object",
+      "description": "Efetivo de m\u00e1quinas operantes",
+      "properties": {
+        "motoniveladora": {
+          "type": "number"
+        },
+        "pa_carregadeira": {
+          "type": "number"
+        },
+        "retroescavadeira": {
+          "type": "number"
+        },
+        "escavadeira_hidraulica": {
+          "type": "number"
+        },
+        "mini_carregadeira": {
+          "type": "number"
+        },
+        "extrusora": {
+          "type": "number"
+        },
+        "caminhao_prancha": {
+          "type": "number"
+        },
+        "caminhao_munck": {
+          "type": "number"
+        },
+        "caminhao_sinalizacao": {
+          "type": "number"
+        },
+        "caminhao_pipa": {
+          "type": "number"
+        },
+        "caminhao_basculante": {
+          "type": "number"
+        },
+        "caminhao_cimento": {
+          "type": "number"
+        },
+        "caminhao_viga": {
+          "type": "number"
+        },
+        "caminhao_espargidor": {
+          "type": "number"
+        },
+        "recicladora": {
+          "type": "number"
+        },
+        "vibro_acabadora": {
+          "type": "number"
+        },
+        "rolo_carneiro": {
+          "type": "number"
+        },
+        "rolo_liso": {
+          "type": "number"
+        },
+        "rolo_pneu": {
+          "type": "number"
+        },
+        "tanque_combustivel": {
+          "type": "number"
+        },
+        "comboio": {
+          "type": "number"
+        },
+        "onibus": {
+          "type": "number"
+        },
+        "trator_grade": {
+          "type": "number"
+        },
+        "trator_esteira": {
+          "type": "number"
+        },
+        "veiculo_leve": {
+          "type": "number"
+        },
+        "placa_vibratoria": {
+          "type": "number"
+        }
+      }
+    },
+    "efetivo_colaboradores": {
+      "type": "object",
+      "description": "Efetivo de colaboradores",
+      "properties": {
+        "encarregado": {
+          "type": "number"
+        },
+        "greidista": {
+          "type": "number"
+        },
+        "operadores": {
+          "type": "number"
+        },
+        "motorista": {
+          "type": "number"
+        },
+        "pedreiro": {
+          "type": "number"
+        },
+        "armador": {
+          "type": "number"
+        },
+        "carpinteiro": {
+          "type": "number"
+        },
+        "ajudante": {
+          "type": "number"
+        },
+        "topografo": {
+          "type": "number"
+        },
+        "aux_topografia": {
+          "type": "number"
+        },
+        "laboratorista": {
+          "type": "number"
+        },
+        "aux_laboratorio": {
+          "type": "number"
+        },
+        "spoter": {
+          "type": "number"
+        },
+        "seguranca": {
+          "type": "number"
+        },
+        "apontador": {
+          "type": "number"
+        },
+        "pintor": {
+          "type": "number"
+        },
+        "eletricista": {
+          "type": "number"
+        }
+      }
+    },
+    "fotos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "URLs das fotos do di\u00e1rio de obra"
+    },
+    "laboratorista_name": {
+      "type": "string",
+      "description": "Nome do laboratorista que criou o registro"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "rascunho",
+        "finalizado"
+      ],
+      "default": "rascunho",
+      "description": "Status do registro: rascunho (em edi\u00e7\u00e3o) ou finalizado (pronto para revis\u00e3o)"
+    },
+    "approved": {
+      "type": "boolean",
+      "default": null,
+      "description": "Status de aprova\u00e7\u00e3o: true (aprovado), false (reprovado), null (pendente)"
+    },
+    "approved_by": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio que aprovou/reprovou"
+    },
+    "approved_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Data e hora da aprova\u00e7\u00e3o/reprova\u00e7\u00e3o"
+    },
+    "approver_details": {
+      "type": "object",
+      "description": "Detalhes de quem aprovou",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "position": {
+          "type": "string"
+        },
+        "crea_number": {
+          "type": "string"
+        }
+      }
+    },
+    "rejection_reason": {
+      "type": "string",
+      "description": "Motivo da reprova\u00e7\u00e3o (quando applicable)"
+    },
+    "was_rejected": {
+      "type": "boolean",
+      "default": false,
+      "description": "Indica se o registro foi reprovado e editado novamente"
+    },
+    "client_signature": {
+      "type": "object",
+      "description": "Assinatura do cliente engenheiro",
+      "properties": {
+        "signed_by": {
+          "type": "string"
+        },
+        "signed_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "engineer_name": {
+          "type": "string"
+        },
+        "crea_number": {
+          "type": "string"
+        }
+      }
+    },
+    "checklist_veiculo_ativo": {
+      "type": "boolean",
+      "default": false,
+      "description": "Se o checklist de ve\u00edculo deve ser preenchido"
+    },
+    "checklist_veiculo": {
+      "type": "object",
+      "description": "Dados do checklist de ve\u00edculo de passeio",
+      "properties": {
+        "nome_condutor": {
+          "type": "string"
+        },
+        "tipo_veiculo": {
+          "type": "string",
+          "enum": [
+            "passeio",
+            "picape"
+          ],
+          "default": "passeio"
+        },
+        "veiculo": {
+          "type": "string"
+        },
+        "placa": {
+          "type": "string"
+        },
+        "empresa": {
+          "type": "string"
+        },
+        "hodometro": {
+          "type": "string"
+        },
+        "areas_afetadas": {
+          "type": "string"
+        },
+        "condicoes_gerais": {
+          "type": "object",
+          "properties": {
+            "limpeza_externa": {
+              "type": "string",
+              "enum": [
+                "bom",
+                "medio",
+                "ruim"
+              ]
+            },
+            "limpeza_interna": {
+              "type": "string",
+              "enum": [
+                "bom",
+                "medio",
+                "ruim"
+              ]
+            },
+            "pneus": {
+              "type": "string",
+              "enum": [
+                "bom",
+                "medio",
+                "ruim"
+              ]
+            },
+            "estepe": {
+              "type": "string",
+              "enum": [
+                "bom",
+                "medio",
+                "ruim"
+              ]
+            },
+            "cacamba": {
+              "type": "string",
+              "enum": [
+                "bom",
+                "medio",
+                "ruim"
+              ]
+            }
+          }
+        },
+        "luzes_traseiras": {
+          "type": "object",
+          "properties": {
+            "direita": {
+              "type": "object",
+              "properties": {
+                "da_placa": {
+                  "type": "string",
+                  "enum": [
+                    "sim",
+                    "nao",
+                    "na"
+                  ]
+                },
+                "luz": {
+                  "type": "string",
+                  "enum": [
+                    "sim",
+                    "nao",
+                    "na"
+                  ]
+                },
+                "luz_re": {
+                  "type": "string",
+                  "enum": [
+                    "sim",
+                    "nao",
+                    "na"
+                  ]
+                },
+                "luz_freio": {
+                  "type": "string",
+                  "enum": [
+                    "sim",
+                    "nao",
+                    "na"
+                  ]
+                },
+                "seta": {
+                  "type": "string",
+                  "enum": [
+                    "sim",
+                    "nao",
+                    "na"
+                  ]
+                }
+              }
+            },
+            "esquerda": {
+              "type": "object",
+              "properties": {
+                "luz": {
+                  "type": "string",
+                  "enum": [
+                    "sim",
+                    "nao",
+                    "na"
+                  ]
+                },
+                "luz_re": {
+                  "type": "string",
+                  "enum": [
+                    "sim",
+                    "nao",
+                    "na"
+                  ]
+                },
+                "luz_freio": {
+                  "type": "string",
+                  "enum": [
+                    "sim",
+                    "nao",
+                    "na"
+                  ]
+                },
+                "seta": {
+                  "type": "string",
+                  "enum": [
+                    "sim",
+                    "nao",
+                    "na"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "luzes_dianteiras": {
+          "type": "object",
+          "properties": {
+            "direita": {
+              "type": "object",
+              "properties": {
+                "farol_alto": {
+                  "type": "string",
+                  "enum": [
+                    "sim",
+                    "nao",
+                    "na"
+                  ]
+                },
+                "farol_baixo": {
+                  "type": "string",
+                  "enum": [
+                    "sim",
+                    "nao",
+                    "na"
+                  ]
+                },
+                "seta": {
+                  "type": "string",
+                  "enum": [
+                    "sim",
+                    "nao",
+                    "na"
+                  ]
+                },
+                "neblina": {
+                  "type": "string",
+                  "enum": [
+                    "sim",
+                    "nao",
+                    "na"
+                  ]
+                }
+              }
+            },
+            "esquerda": {
+              "type": "object",
+              "properties": {
+                "farol_alto": {
+                  "type": "string",
+                  "enum": [
+                    "sim",
+                    "nao",
+                    "na"
+                  ]
+                },
+                "farol_baixo": {
+                  "type": "string",
+                  "enum": [
+                    "sim",
+                    "nao",
+                    "na"
+                  ]
+                },
+                "seta": {
+                  "type": "string",
+                  "enum": [
+                    "sim",
+                    "nao",
+                    "na"
+                  ]
+                },
+                "neblina": {
+                  "type": "string",
+                  "enum": [
+                    "sim",
+                    "nao",
+                    "na"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "seguranca": {
+          "type": "object",
+          "properties": {
+            "alarme": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "buzina": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "chave_roda": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "cintos": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "documentos": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "extintor": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "limpadores": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "macaco": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "painel": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "retrovisor_interno": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "retrovisor_direito": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "retrovisor_esquerdo": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "travas": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "triangulo": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            }
+          }
+        },
+        "motor": {
+          "type": "object",
+          "properties": {
+            "acelerador": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "agua_limpador": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "agua_radiador": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "embreagem": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "freio": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "freio_mao": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "oleo_freio": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "oleo_moto": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            },
+            "tanque_partida": {
+              "type": "string",
+              "enum": [
+                "sim",
+                "nao",
+                "na"
+              ]
+            }
+          }
+        },
+        "observacoes": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "obra_id"
+  ]
+}

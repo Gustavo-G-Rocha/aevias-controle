@@ -1,0 +1,374 @@
+{
+  "name": "BoletimSondagem",
+  "type": "object",
+  "properties": {
+    "obra_id": {
+      "type": "string",
+      "description": "ID da obra de sondagem"
+    },
+    "data": {
+      "type": "string",
+      "format": "date"
+    },
+    "laboratorista_name": {
+      "type": "string"
+    },
+    "cliente": {
+      "type": "string"
+    },
+    "pista": {
+      "type": "string"
+    },
+    "bordo": {
+      "type": "string"
+    },
+    "rodovia": {
+      "type": "string"
+    },
+    "km": {
+      "type": "string"
+    },
+    "furo": {
+      "type": "string"
+    },
+    "operador": {
+      "type": "string"
+    },
+    "face_classificacao_1": {
+      "type": "string",
+      "description": "Face da sondagem para classifica\u00e7\u00e3o 1"
+    },
+    "face_classificacao_2": {
+      "type": "string",
+      "description": "Face da sondagem para classifica\u00e7\u00e3o 2"
+    },
+    "camadas": {
+      "type": "array",
+      "description": "Camadas de sondagem",
+      "items": {
+        "type": "object",
+        "properties": {
+          "numero": {
+            "type": "number"
+          },
+          "prof_de": {
+            "type": "number"
+          },
+          "prof_ate": {
+            "type": "number"
+          },
+          "espessura": {
+            "type": "number"
+          },
+          "na": {
+            "type": "number"
+          },
+          "classificacao_1": {
+            "type": "string"
+          },
+          "classificacao_2": {
+            "type": "string"
+          },
+          "prof_de_2": {
+            "type": "number"
+          },
+          "prof_ate_2": {
+            "type": "number"
+          },
+          "espessura_2": {
+            "type": "number"
+          },
+          "na_2": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "camadas_2": {
+      "type": "array",
+      "description": "Camadas separadas para classifica\u00e7\u00e3o 2",
+      "items": {
+        "type": "object",
+        "properties": {
+          "numero": {
+            "type": "number"
+          },
+          "prof_de": {
+            "type": "number"
+          },
+          "prof_ate": {
+            "type": "number"
+          },
+          "espessura": {
+            "type": "number"
+          },
+          "na": {
+            "type": "number"
+          },
+          "classificacao_2": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "umidade_natural": {
+      "type": "object",
+      "description": "Ensaio de umidade natural - DNER-ME 213/94",
+      "properties": {
+        "camada_ensaiada_1": {
+          "type": "string"
+        },
+        "camada_ensaiada_2": {
+          "type": "string"
+        },
+        "no_capsula_1": {
+          "type": "string"
+        },
+        "no_capsula_2": {
+          "type": "string"
+        },
+        "massa_capsula_1": {
+          "type": "number"
+        },
+        "massa_capsula_2": {
+          "type": "number"
+        },
+        "massa_cap_solo_umido_1": {
+          "type": "number"
+        },
+        "massa_cap_solo_umido_2": {
+          "type": "number"
+        },
+        "massa_cap_solo_seco_1": {
+          "type": "number"
+        },
+        "massa_cap_solo_seco_2": {
+          "type": "number"
+        },
+        "massa_agua_1": {
+          "type": "number"
+        },
+        "massa_agua_2": {
+          "type": "number"
+        },
+        "massa_solo_seco_1": {
+          "type": "number"
+        },
+        "massa_solo_seco_2": {
+          "type": "number"
+        },
+        "umidade_1": {
+          "type": "number"
+        },
+        "umidade_2": {
+          "type": "number"
+        }
+      }
+    },
+    "umidade_natural_2": {
+      "type": "object",
+      "description": "Ensaio de umidade natural 2 - DNER-ME 213/94",
+      "properties": {
+        "camada_ensaiada_1": {
+          "type": "string"
+        },
+        "no_capsula_1": {
+          "type": "string"
+        },
+        "no_capsula_2": {
+          "type": "string"
+        },
+        "massa_capsula_1": {
+          "type": "number"
+        },
+        "massa_capsula_2": {
+          "type": "number"
+        },
+        "massa_cap_solo_umido_1": {
+          "type": "number"
+        },
+        "massa_cap_solo_umido_2": {
+          "type": "number"
+        },
+        "massa_cap_solo_seco_1": {
+          "type": "number"
+        },
+        "massa_cap_solo_seco_2": {
+          "type": "number"
+        },
+        "massa_agua_1": {
+          "type": "number"
+        },
+        "massa_agua_2": {
+          "type": "number"
+        },
+        "massa_solo_seco_1": {
+          "type": "number"
+        },
+        "massa_solo_seco_2": {
+          "type": "number"
+        },
+        "umidade_1": {
+          "type": "number"
+        },
+        "umidade_2": {
+          "type": "number"
+        }
+      }
+    },
+    "densidade_in_situ": {
+      "type": "object",
+      "description": "Massa espec\u00edfica aparente in situ - DNER-ME 092/94 (campo legado)",
+      "properties": {
+        "camada_ensaiada": {
+          "type": "string"
+        },
+        "peso_frasco_antes": {
+          "type": "number"
+        },
+        "peso_frasco_depois": {
+          "type": "number"
+        },
+        "peso_areia_deslocada": {
+          "type": "number"
+        },
+        "peso_areia_funil_placa": {
+          "type": "number"
+        },
+        "peso_areia_cavidade": {
+          "type": "number"
+        },
+        "massa_esp_aparente_areia": {
+          "type": "number"
+        },
+        "volume_buraco": {
+          "type": "number"
+        },
+        "peso_solo_recipiente": {
+          "type": "number"
+        },
+        "peso_recipiente": {
+          "type": "number"
+        },
+        "peso_solo": {
+          "type": "number"
+        },
+        "densidade_aparente_solo_umido": {
+          "type": "number"
+        },
+        "peso_solo_umido": {
+          "type": "number"
+        },
+        "peso_solo_seco": {
+          "type": "number"
+        },
+        "peso_agua": {
+          "type": "number"
+        },
+        "teor_umidade": {
+          "type": "number"
+        },
+        "densidade_aparente_solo_seco": {
+          "type": "number"
+        }
+      }
+    },
+    "densidades_in_situ": {
+      "type": "array",
+      "description": "Array de ensaios de massa espec\u00edfica aparente in situ - DNER-ME 092/94",
+      "items": {
+        "type": "object",
+        "properties": {
+          "camada_ensaiada": {
+            "type": "string"
+          },
+          "peso_frasco_antes": {
+            "type": "number"
+          },
+          "peso_frasco_depois": {
+            "type": "number"
+          },
+          "peso_areia_deslocada": {
+            "type": "number"
+          },
+          "peso_areia_funil_placa": {
+            "type": "number"
+          },
+          "peso_areia_cavidade": {
+            "type": "number"
+          },
+          "massa_esp_aparente_areia": {
+            "type": "number"
+          },
+          "volume_buraco": {
+            "type": "number"
+          },
+          "peso_solo_recipiente": {
+            "type": "number"
+          },
+          "peso_recipiente": {
+            "type": "number"
+          },
+          "peso_solo": {
+            "type": "number"
+          },
+          "densidade_aparente_solo_umido": {
+            "type": "number"
+          },
+          "peso_solo_umido": {
+            "type": "number"
+          },
+          "peso_solo_seco": {
+            "type": "number"
+          },
+          "peso_agua": {
+            "type": "number"
+          },
+          "teor_umidade": {
+            "type": "number"
+          },
+          "densidade_aparente_solo_seco": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "fotos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "approved": {
+      "type": "boolean",
+      "default": null
+    },
+    "approved_by": {
+      "type": "string"
+    },
+    "approved_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "approver_details": {
+      "type": "object"
+    },
+    "rejection_reason": {
+      "type": "string"
+    },
+    "client_signature": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "obra_id",
+    "data"
+  ],
+  "rls": {
+    "read": {},
+    "write": {}
+  }
+}
