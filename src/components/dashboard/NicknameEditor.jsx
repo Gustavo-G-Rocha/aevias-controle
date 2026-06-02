@@ -3,13 +3,14 @@ import { Pencil, Check, X, Loader2 } from 'lucide-react';
 import { useNickname } from '@/hooks/useNickname';
 
 export default function NicknameEditor({ user }) {
-  const { editing, value, setValue, saving, openEdit, cancel, save } = useNickname(user);
+  const { editing, value, setValue, saving, error, openEdit, cancel, save } = useNickname(user);
 
   const displayName = user?.nickname?.trim() || user?.full_name || '';
 
   if (editing) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2">
         <input
           autoFocus
           className="bg-white/20 text-white placeholder-white/50 border border-white/40 rounded-md px-3 py-1 text-sm focus:outline-none focus:border-white/70 w-48"
@@ -25,6 +26,8 @@ export default function NicknameEditor({ user }) {
         <button onClick={cancel} className="text-white/60 hover:text-white transition-colors" title="Cancelar">
           <X className="w-4 h-4" />
         </button>
+        </div>
+        {error && <p className="text-red-300 text-xs">{error}</p>}
       </div>
     );
   }
