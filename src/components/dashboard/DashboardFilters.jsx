@@ -9,15 +9,15 @@ export default function DashboardFilters({ filters, setFilters, clearFilters, ha
   const set = (key, value) => setFilters(prev => ({ ...prev, [key]: value === 'todas' || value === 'todos' ? null : value }));
 
   return (
-    <Card className="mb-6 border-0" style={{ backgroundColor: 'var(--color-surface)', borderRadius: 'var(--card-radius)', boxShadow: 'var(--card-shadow)' }}>
+    <Card className="mb-6 border-0" style={{ backgroundColor: 'var(--color-primary)', borderRadius: 'var(--card-radius)', boxShadow: 'var(--card-shadow)' }}>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Filter className="w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
-            <CardTitle className="text-lg" style={{ color: 'var(--color-text)' }}>Filtros</CardTitle>
+            <CardTitle className="text-lg" style={{ color: '#ffffff' }}>Filtros</CardTitle>
           </div>
           {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={clearFilters} style={{ color: 'var(--color-text-muted)' }}>
+            <Button variant="ghost" size="sm" onClick={clearFilters} style={{ color: 'rgba(255,255,255,0.7)' }}>
               <X className="w-4 h-4 mr-2" />
               Limpar Filtros
             </Button>
@@ -28,9 +28,9 @@ export default function DashboardFilters({ filters, setFilters, clearFilters, ha
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Obra */}
           <div>
-            <span className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-text-muted)' }}>Obra</span>
+            <span className="text-sm font-medium mb-2 block" style={{ color: 'rgba(255,255,255,0.7)' }}>Obra</span>
             <Select value={filters.obraId || 'todas'} onValueChange={v => set('obraId', v)}>
-              <SelectTrigger className="border" style={{ backgroundColor: 'var(--color-surface-muted)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}><SelectValue /></SelectTrigger>
+              <SelectTrigger className="border" style={{ backgroundColor: 'rgba(255,255,255,0.1)', borderColor: 'rgba(255,255,255,0.2)', color: '#ffffff' }}><SelectValue /></SelectTrigger>
               <SelectContent style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
                 <SelectItem value="todas">Todas as Obras</SelectItem>
                 {obras.map(obra => <SelectItem key={obra.id} value={obra.id}>{obra.name}</SelectItem>)}
@@ -40,9 +40,9 @@ export default function DashboardFilters({ filters, setFilters, clearFilters, ha
 
           {/* Status */}
           <div>
-            <span className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-text-muted)' }}>Status</span>
+            <span className="text-sm font-medium mb-2 block" style={{ color: 'rgba(255,255,255,0.7)' }}>Status</span>
             <Select value={filters.status || 'todos'} onValueChange={v => set('status', v)}>
-              <SelectTrigger className="border" style={{ backgroundColor: 'var(--color-surface-muted)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}><SelectValue /></SelectTrigger>
+              <SelectTrigger className="border" style={{ backgroundColor: 'rgba(255,255,255,0.1)', borderColor: 'rgba(255,255,255,0.2)', color: '#ffffff' }}><SelectValue /></SelectTrigger>
               <SelectContent style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
                 <SelectItem value="todos">Todos os Status</SelectItem>
                 <SelectItem value="approved">Aprovados</SelectItem>
@@ -54,9 +54,9 @@ export default function DashboardFilters({ filters, setFilters, clearFilters, ha
 
           {/* Tipo de Registro */}
           <div>
-            <span className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-text-muted)' }}>Tipo de Registro</span>
+            <span className="text-sm font-medium mb-2 block" style={{ color: 'rgba(255,255,255,0.7)' }}>Tipo de Registro</span>
             <Select value={filters.tipoRegistro || 'todos'} onValueChange={v => set('tipoRegistro', v)}>
-              <SelectTrigger className="border" style={{ backgroundColor: 'var(--color-surface-muted)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}><SelectValue /></SelectTrigger>
+              <SelectTrigger className="border" style={{ backgroundColor: 'rgba(255,255,255,0.1)', borderColor: 'rgba(255,255,255,0.2)', color: '#ffffff' }}><SelectValue /></SelectTrigger>
               <SelectContent style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
                 <SelectItem value="todos">Todos os Tipos</SelectItem>
                 <SelectItem value="DiarioObra">Diário de Obra</SelectItem>
@@ -73,9 +73,9 @@ export default function DashboardFilters({ filters, setFilters, clearFilters, ha
 
           {/* Período */}
           <div>
-            <span className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-text-muted)' }}>Período</span>
+            <span className="text-sm font-medium mb-2 block" style={{ color: 'rgba(255,255,255,0.7)' }}>Período</span>
             <Select value={filters.periodo} onValueChange={v => setFilters(prev => ({ ...prev, periodo: v }))}>
-              <SelectTrigger className="border" style={{ backgroundColor: 'var(--color-surface-muted)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}><SelectValue /></SelectTrigger>
+              <SelectTrigger className="border" style={{ backgroundColor: 'rgba(255,255,255,0.1)', borderColor: 'rgba(255,255,255,0.2)', color: '#ffffff' }}><SelectValue /></SelectTrigger>
               <SelectContent style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
                 <SelectItem value="1mes">Último Mês</SelectItem>
                 <SelectItem value="3meses">Últimos 3 Meses</SelectItem>
