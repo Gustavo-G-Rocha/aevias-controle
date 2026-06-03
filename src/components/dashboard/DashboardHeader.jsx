@@ -11,7 +11,7 @@ export default function DashboardHeader({ user, isClienteUser }) {
         src="https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/07dc922ec_20260603_100305jpg.jpg"
         alt=""
         className="absolute top-0 right-0 h-full"
-        style={{ width: '50%', objectFit: 'cover', objectPosition: 'center' }}
+        style={{ width: '50%', objectFit: 'cover', objectPosition: 'center 60%' }}
       />
       {/* Filtro azulado apenas sobre a foto */}
       <div className="absolute top-0 right-0 h-full" style={{ width: '50%', background: 'rgba(0,60,120,0.35)', mixBlendMode: 'multiply' }} />
