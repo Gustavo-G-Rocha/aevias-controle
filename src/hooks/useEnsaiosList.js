@@ -84,7 +84,7 @@ export function useEnsaiosList() {
   const loading = loadingUser || loadingAux || loadingRecords;
 
   const { ensaios, obras, projects, allUsers } = useMemo(() => {
-    if (!user || !auxData || !allRecords.length) {
+    if (!user || !auxData) {
       return {
         ensaios: [],
         obras: auxData?.obras ?? [],

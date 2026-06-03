@@ -41,7 +41,7 @@ export const ALL_RECORD_ENTITIES = [
  * @param {number} limit
  * @returns {Promise<object[]>}
  */
-const RECORD_PAGE_SIZE = 500;
+const RECORD_PAGE_SIZE = 2000;
 
 async function loadEntity(entityType) {
   try {
