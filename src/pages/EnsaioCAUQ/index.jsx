@@ -18,8 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Loader2, Save, CheckCircle, FileSpreadsheet } from "lucide-react";
-import ImportEnsaioCAUQDialog from "@/components/forms/ImportEnsaioCAUQDialog";
+import { Loader2, Save, CheckCircle } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { useEnsaioForm } from "@/hooks/useEnsaioForm";
 import { PENEIRAS_CONFIG, filtrarPeneirasPorFaixa } from "@/constants/sieves";
@@ -71,7 +70,6 @@ export default function EnsaioCAUQPage() {
   } = useEnsaioForm(getInitialFormData, 'EnsaioCAUQ', 'ensaio_cauq');
 
   const [saving, setSaving] = useState(false);
-  const [importOpen, setImportOpen] = useState(false);
 
   const selectedProject = useMemo(() =>
     projects.find(p => p.id === formData.project_id),
@@ -106,33 +104,16 @@ export default function EnsaioCAUQPage() {
   }
 
   return (
-    <>
     <div className="p-6 bg-slate-50 min-h-screen">
       <div className="max-w-6xl mx-auto">
         <Card>
           <CardHeader>
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <CardTitle>{editingEnsaio?.id ? "Editar Ensaio de CAUQ" : "Novo Ensaio de CAUQ"}</CardTitle>
-                <CardDescription>
-                  {editingEnsaio?.id
-                    ? `Editando ensaio de ${new Date(editingEnsaio.data_ensaio).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}`
-                    : "Extração, Granulometria e Marshall"}
-                </CardDescription>
-              </div>
-              {!editingEnsaio?.id && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="shrink-0 border-green-600 text-green-700 hover:bg-green-50"
-                  onClick={() => setImportOpen(true)}
-                >
-                  <FileSpreadsheet className="w-4 h-4 mr-1.5" />
-                  Importar Excel
-                </Button>
-              )}
-            </div>
+            <CardTitle>{editingEnsaio?.id ? "Editar Ensaio de CAUQ" : "Novo Ensaio de CAUQ"}</CardTitle>
+            <CardDescription>
+              {editingEnsaio?.id
+                ? `Editando ensaio de ${new Date(editingEnsaio.data_ensaio).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}`
+                : "Extração, Granulometria e Marshall"}
+            </CardDescription>
             <StatusDraftBanner status={formData.status} variant="green" />
             <RejectionBanner rejectionReason={editingEnsaio?.rejection_reason} />
           </CardHeader>
@@ -239,16 +220,5 @@ export default function EnsaioCAUQPage() {
         </Card>
       </div>
     </div>
-
-    <ImportEnsaioCAUQDialog
-      open={importOpen}
-      onOpenChange={setImportOpen}
-      obras={obras}
-      onSuccess={(data) => {
-        setImportOpen(false);
-        navigate(`/EnsaioCAUQ?id=${data.id}`);
-      }}
-    />
-    </>
   );
 }

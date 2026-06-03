@@ -41,14 +41,7 @@ export default function RelatorioCAUQ() {
 
   return (
     <div className="bg-white min-h-screen">
-      <RelatorioCAUQActions
-        ensaio={ensaio}
-        obra={obra}
-        regional={regional}
-        project={project}
-        faixa={faixa}
-        onPrint={handlePrint}
-      />
+      <RelatorioCAUQActions ensaio={ensaio} onPrint={handlePrint} />
 
       <div>
         <div className="w-full max-w-[270mm] mx-auto bg-white shadow-xl print:shadow-none pt-0.5 px-3 pb-0.5 print:pt-0 print:px-0.5 print:pb-0">
