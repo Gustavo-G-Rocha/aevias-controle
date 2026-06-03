@@ -15,7 +15,8 @@ export default function DashboardHeader({ user, isClienteUser }) {
         backgroundColor: '#001f35',
       }}
     >
-      <div className="px-6 pt-16 pb-24" style={{ background: 'linear-gradient(to right, rgba(0,35,59,0.75) 0%, rgba(0,35,59,0.4) 100%)' }}>
+      <div className="absolute inset-0" style={{ background: 'rgba(0,60,120,0.35)', mixBlendMode: 'multiply' }} />
+      <div className="px-6 pt-16 pb-24 relative" style={{ background: 'linear-gradient(to right, rgba(0,35,59,0.75) 0%, rgba(0,35,59,0.4) 100%)' }}>
         <NicknameEditor user={user} />
         <p className="text-white/70 text-sm mt-1 mb-1">Bem-vindo(a),</p>
         <p className="text-white/70 text-sm mt-2">
