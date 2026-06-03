@@ -9,8 +9,10 @@ export default function DashboardHeader({ user, isClienteUser }) {
       className="mb-8 rounded-xl overflow-hidden relative"
       style={{
         backgroundImage: 'url(https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/07dc922ec_20260603_100305jpg.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center 75%',
+        backgroundSize: 'contain',
+        backgroundPosition: 'center right',
+        backgroundRepeat: 'no-repeat',
+        backgroundColor: '#001f35',
       }}
     >
       <div className="px-6 pt-16 pb-24" style={{ background: 'linear-gradient(to right, rgba(0,35,59,0.75) 0%, rgba(0,35,59,0.4) 100%)' }}>
