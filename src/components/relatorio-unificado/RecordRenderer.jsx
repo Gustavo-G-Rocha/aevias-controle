@@ -17,6 +17,7 @@ import RelatorioAcompanhamentoCarga from '@/components/relatorios/RelatorioAcomp
 import RelatorioManchaPendulo from '@/components/relatorios/RelatorioManchaPendulo';
 import RelatorioGranulometriaIndividual from '@/components/relatorios/RelatorioGranulometriaIndividual';
 import RelatorioGranuMistura from '@/components/relatorios/RelatorioGranuMistura';
+import RelatorioMRAF from '@/components/relatorios/RelatorioMRAF';
 
 function DefaultRecordCard({ record }) {
   const typeInfo = getEnsaioTypeInfo(record);
@@ -39,7 +40,7 @@ function DefaultRecordCard({ record }) {
   );
 }
 
-export default function RecordRenderer({ record, obra, regional, project, user }) {
+export default function RecordRenderer({ record, obra, regional, project, faixaGranulometrica, user }) {
   const entityType = record.entityType;
 
   switch (entityType) {
@@ -74,15 +75,7 @@ export default function RecordRenderer({ record, obra, regional, project, user }
     case 'GranuMistura':
       return <RelatorioGranuMistura ensaio={record} obra={obra} regional={regional} project={project} user={user} />;
     case 'EnsaioMRAF':
-      return (
-        <div className="bg-white min-h-screen">
-          <iframe
-            src={`/RelatorioEnsaio?id=${record.id}&tipo=mraf`}
-            className="w-full h-screen border-0"
-            title="Relatório Ensaio MRAF"
-          />
-        </div>
-      );
+      return <RelatorioMRAF ensaio={record} obra={obra} regional={regional} project={project} faixaGranulometrica={faixaGranulometrica} user={user} />;
     case 'EnsaioTaxaMRAF':
       return (
         <div className="bg-white min-h-screen">

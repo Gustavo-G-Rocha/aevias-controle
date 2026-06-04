@@ -12,7 +12,7 @@ import RelatorioUnificadoRecordsList from '@/components/relatorio-unificado/Rela
 export default function RelatorioUnificado() {
   useReportMode();
 
-  const { obra, regional, projects, user, loading: dataLoading, error: dataError } = useRelatorioUnificadoData();
+  const { obra, regional, projects, faixasGranulometricas, user, loading: dataLoading, error: dataError } = useRelatorioUnificadoData();
   const { filters, hasValidFilters } = useRelatorioUnificadoFilters();
   const { records, loading: recordsLoading, error: recordsError } = useRelatorioUnificadoRecords({ filters, hasValidFilters });
   const { handleGoBack, handlePrint } = useRelatorioUnificadoActions();
@@ -59,6 +59,7 @@ export default function RelatorioUnificado() {
         obra={obra}
         regional={regional}
         projects={projects}
+        faixasGranulometricas={faixasGranulometricas}
         user={user}
       />
 

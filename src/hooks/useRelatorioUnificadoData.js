@@ -9,6 +9,7 @@ export function useRelatorioUnificadoData() {
   const [obra, setObra] = useState(null);
   const [regional, setRegional] = useState(null);
   const [projects, setProjects] = useState([]);
+  const [faixasGranulometricas, setFaixasGranulometricas] = useState([]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -37,25 +38,30 @@ export function useRelatorioUnificadoData() {
         setObra(obraData);
 
         // Dados relacionados em paralelo com fallback individual
-        const [regionaisResult, projectsResult, userResult] = await Promise.allSettled([
+        const [regionaisResult, projectsResult, faixasResult, userResult] = await Promise.allSettled([
           base44.entities.Regional.list(),
           base44.entities.Project.list(),
+          base44.entities.FaixaGranulometrica.list(),
           base44.auth.me(),
         ]);
 
         const regionaisData = regionaisResult.status === 'fulfilled' ? regionaisResult.value : [];
         const projectsData  = projectsResult.status  === 'fulfilled' ? projectsResult.value  : [];
+        const faixasData    = faixasResult.status     === 'fulfilled' ? faixasResult.value     : [];
         const currentUser   = userResult.status       === 'fulfilled' ? userResult.value       : null;
 
         if (regionaisResult.status === 'rejected')
           console.warn('[RelatorioUnificado] Regionais não carregadas:', regionaisResult.reason);
         if (projectsResult.status === 'rejected')
           console.warn('[RelatorioUnificado] Projetos não carregados:', projectsResult.reason);
+        if (faixasResult.status === 'rejected')
+          console.warn('[RelatorioUnificado] Faixas granulométricas não carregadas:', faixasResult.reason);
         if (userResult.status === 'rejected')
           console.warn('[RelatorioUnificado] Usuário não carregado:', userResult.reason);
 
         setUser(currentUser);
         setProjects(projectsData);
+        setFaixasGranulometricas(faixasData);
         setRegional(regionaisData.find(r => r.id === obraData.regional_id) ?? null);
 
         setLoading(false);
@@ -69,5 +75,5 @@ export function useRelatorioUnificadoData() {
     load();
   }, []);
 
-  return { obra, regional, projects, user, loading, error };
+  return { obra, regional, projects, faixasGranulometricas, user, loading, error };
 }

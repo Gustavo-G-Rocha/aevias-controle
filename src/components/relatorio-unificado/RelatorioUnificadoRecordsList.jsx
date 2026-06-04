@@ -1,7 +1,7 @@
 import React from 'react';
 import RecordRenderer from './RecordRenderer';
 
-export default function RelatorioUnificadoRecordsList({ records, obra, regional, projects, user }) {
+export default function RelatorioUnificadoRecordsList({ records, obra, regional, projects, faixasGranulometricas = [], user }) {
   if (records.length === 0) {
     return (
       <div className="max-w-5xl mx-auto px-6">
@@ -17,6 +17,9 @@ export default function RelatorioUnificadoRecordsList({ records, obra, regional,
       <div className="space-y-0">
         {records.map((record, index) => {
           const project = projects.find(p => p.id === record.project_id);
+          const faixaGranulometrica = project?.faixa_granulometrica_id
+            ? faixasGranulometricas.find(f => f.id === project.faixa_granulometrica_id) ?? null
+            : null;
           return (
             <div
               key={record.id}
@@ -37,6 +40,7 @@ export default function RelatorioUnificadoRecordsList({ records, obra, regional,
                 obra={obra}
                 regional={regional}
                 project={project}
+                faixaGranulometrica={faixaGranulometrica}
                 user={user}
               />
             </div>
