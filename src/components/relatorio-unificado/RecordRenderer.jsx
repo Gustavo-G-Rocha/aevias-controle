@@ -18,6 +18,7 @@ import RelatorioManchaPendulo from '@/components/relatorios/RelatorioManchaPendu
 import RelatorioGranulometriaIndividual from '@/components/relatorios/RelatorioGranulometriaIndividual';
 import RelatorioGranuMistura from '@/components/relatorios/RelatorioGranuMistura';
 import RelatorioMRAF from '@/components/relatorios/RelatorioMRAF';
+import RelatorioTaxaMRAF from '@/components/relatorios/RelatorioTaxaMRAF';
 
 function DefaultRecordCard({ record }) {
   const typeInfo = getEnsaioTypeInfo(record);
@@ -77,15 +78,7 @@ export default function RecordRenderer({ record, obra, regional, project, faixaG
     case 'EnsaioMRAF':
       return <RelatorioMRAF ensaio={record} obra={obra} regional={regional} project={project} faixaGranulometrica={faixaGranulometrica} user={user} />;
     case 'EnsaioTaxaMRAF':
-      return (
-        <div className="bg-white min-h-screen">
-          <iframe
-            src={`/RelatorioTaxaMRAF?id=${record.id}`}
-            className="w-full h-screen border-0"
-            title="Relatório Taxa de MRAF"
-          />
-        </div>
-      );
+      return <RelatorioTaxaMRAF ensaio={record} obra={obra} regional={regional} user={user} />;
     case 'EnsaioCAUQ':
       return (
         <div className="bg-white min-h-screen">
