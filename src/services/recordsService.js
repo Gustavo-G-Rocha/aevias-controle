@@ -31,6 +31,7 @@ export const ALL_RECORD_ENTITIES = [
   'EnsaioProctor',
   'EnsaioRompimentoConcreto',
   'GranuMistura',
+  'CertificacaoUsina',
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
