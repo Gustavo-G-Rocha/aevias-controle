@@ -15,34 +15,34 @@ export default function ChecklistUsinaHeader({
   regionalSelecionada,
   isEditable,
   isApproved,
-  editingChecklist,
+  editingChecklist
 }) {
   const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleObraChange = (obraId) => {
-    setFormData(prev => ({ ...prev, obra_id: obraId, project_id: "" }));
+    setFormData((prev) => ({ ...prev, obra_id: obraId, project_id: "" }));
   };
 
   const handleProjectChange = (projectId) => {
-    const project = projects.find(p => p.id === projectId);
+    const project = projects.find((p) => p.id === projectId);
     if (!project) {
-      setFormData(prev => ({ ...prev, project_id: "" }));
+      setFormData((prev) => ({ ...prev, project_id: "" }));
       return;
     }
 
-    const pedreiras = project.agregados && Array.isArray(project.agregados)
-      ? [...new Set(project.agregados.map(ag => ag.pedreira).filter(Boolean))].join(' + ')
-      : "";
+    const pedreiras = project.agregados && Array.isArray(project.agregados) ?
+    [...new Set(project.agregados.map((ag) => ag.pedreira).filter(Boolean))].join(' + ') :
+    "";
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       project_id: projectId,
       faixa_especificada: "Não definida",
       ligante: project.ligante?.tipo || "",
       pedreira: pedreiras,
-      controle_agregados: (project.agregados || []).map(ag => ({
+      controle_agregados: (project.agregados || []).map((ag) => ({
         nome: ag.nome,
         estoque_coberto: false,
         estoque_coberto_qtde: 0,
@@ -59,7 +59,7 @@ export default function ChecklistUsinaHeader({
   };
 
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-slate-50 hidden">
       <CardHeader>
         <CardTitle className="text-lg">Dados da Obra e Projeto</CardTitle>
       </CardHeader>
@@ -70,9 +70,9 @@ export default function ChecklistUsinaHeader({
             <Select value={formData.obra_id || ""} onValueChange={handleObraChange} disabled={!isEditable || isApproved || editingChecklist?.id}>
               <SelectTrigger><SelectValue placeholder="Selecione a obra" /></SelectTrigger>
               <SelectContent>
-                {obras.map(obra => {
-                  const regional = regionais.find(r => r.id === obra.regional_id);
-                  return (<SelectItem key={obra.id} value={obra.id}>{obra.name} - {obra.code} {regional && `(${regional.nome})`}</SelectItem>);
+                {obras.map((obra) => {
+                  const regional = regionais.find((r) => r.id === obra.regional_id);
+                  return <SelectItem key={obra.id} value={obra.id}>{obra.name} - {obra.code} {regional && `(${regional.nome})`}</SelectItem>;
                 })}
               </SelectContent>
             </Select>
@@ -83,22 +83,22 @@ export default function ChecklistUsinaHeader({
             <Select value={formData.project_id || ""} onValueChange={handleProjectChange} disabled={!isEditable || isApproved || !formData.obra_id}>
               <SelectTrigger><SelectValue placeholder="Selecione um projeto" /></SelectTrigger>
               <SelectContent>
-                {projetosDisponiveis.filter(p => p.tipo_projeto === 'CAUQ').map(proj => (<SelectItem key={proj.id} value={proj.id}>{proj.name}</SelectItem>))}
+                {projetosDisponiveis.filter((p) => p.tipo_projeto === 'CAUQ').map((proj) => <SelectItem key={proj.id} value={proj.id}>{proj.name}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
         </div>
 
-        {regionalSelecionada && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        {regionalSelecionada &&
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <div className="space-y-1 text-sm">
               <p className="text-blue-800"><strong>📍 Regional:</strong> {regionalSelecionada.nome}</p>
-              {regionalSelecionada.cliente && (
-                <p className="text-blue-800"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>
-              )}
+              {regionalSelecionada.cliente &&
+            <p className="text-blue-800"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>
+            }
             </div>
           </div>
-        )}
+        }
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
@@ -109,8 +109,8 @@ export default function ChecklistUsinaHeader({
               value={formData.data}
               onChange={(e) => handleChange('data', e.target.value)}
               required
-              disabled={!isEditable || isApproved}
-            />
+              disabled={!isEditable || isApproved} />
+            
           </div>
 
           <div>
@@ -119,13 +119,13 @@ export default function ChecklistUsinaHeader({
               id="horario_inicio"
               type="time"
               value={formData.jornada?.horario_inicio || ""}
-              onChange={(e) => setFormData(prev => ({ 
-                ...prev, 
-                jornada: { ...prev.jornada, horario_inicio: e.target.value } 
+              onChange={(e) => setFormData((prev) => ({
+                ...prev,
+                jornada: { ...prev.jornada, horario_inicio: e.target.value }
               }))}
               disabled={!isEditable || isApproved}
-              required
-            />
+              required />
+            
           </div>
 
           <div>
@@ -134,13 +134,13 @@ export default function ChecklistUsinaHeader({
               id="horario_fim"
               type="time"
               value={formData.jornada?.horario_fim || ""}
-              onChange={(e) => setFormData(prev => ({ 
-                ...prev, 
-                jornada: { ...prev.jornada, horario_fim: e.target.value } 
+              onChange={(e) => setFormData((prev) => ({
+                ...prev,
+                jornada: { ...prev.jornada, horario_fim: e.target.value }
               }))}
               disabled={!isEditable || isApproved}
-              required
-            />
+              required />
+            
           </div>
         </div>
 
@@ -150,7 +150,7 @@ export default function ChecklistUsinaHeader({
             <Select value={formData.usina || ""} onValueChange={(v) => handleChange('usina', v)} disabled={!isEditable || isApproved || !obraSelecionada}>
               <SelectTrigger><SelectValue placeholder="Selecione a usina" /></SelectTrigger>
               <SelectContent>
-                {(obraSelecionada?.usinas || []).map((usina) => (<SelectItem key={usina} value={usina}>{usina}</SelectItem>))}
+                {(obraSelecionada?.usinas || []).map((usina) => <SelectItem key={usina} value={usina}>{usina}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
@@ -164,8 +164,8 @@ export default function ChecklistUsinaHeader({
               disabled={!isEditable || isApproved}
               readOnly={!!formData.project_id}
               className={formData.project_id ? "bg-slate-100" : ""}
-              placeholder="Nome da pedreira"
-            />
+              placeholder="Nome da pedreira" />
+            
           </div>
 
           <div>
@@ -189,8 +189,8 @@ export default function ChecklistUsinaHeader({
               onChange={(e) => handleChange('faixa_especificada', e.target.value)}
               disabled={!isEditable || isApproved}
               readOnly={true}
-              className="bg-slate-100"
-            />
+              className="bg-slate-100" />
+            
           </div>
           <div>
             <Label htmlFor="ligante">Ligante Asfáltico</Label>
@@ -201,11 +201,11 @@ export default function ChecklistUsinaHeader({
               disabled={!isEditable || isApproved}
               readOnly={!!formData.project_id}
               className={formData.project_id ? "bg-slate-100" : ""}
-              placeholder="Ex: CAP 50/70"
-            />
+              placeholder="Ex: CAP 50/70" />
+            
           </div>
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card>);
+
 }
