@@ -10,6 +10,33 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, HardHat, Construction, Wrench, FileText, Factory } from "lucide-react";
 
+const TagInput = ({ field, value, setValue, placeholder, badgeClass, items, onAdd, onRemove }) => (
+  <div className="space-y-2">
+    <div className="flex gap-2">
+      <Input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder={placeholder}
+        className="bg-white border-[#00233B]/20 text-[#00233B]"
+        onKeyPress={(e) => {
+          if (e.key === 'Enter') { e.preventDefault(); onAdd(field, value, setValue); }
+        }}
+      />
+      <Button type="button" onClick={() => onAdd(field, value, setValue)} className="bg-[#566E3D] hover:bg-[#566E3D]/90 text-white">
+        <Plus className="w-4 h-4" />
+      </Button>
+    </div>
+    <div className="flex flex-wrap gap-2 mt-2">
+      {items.map((item, index) => (
+        <Badge key={index} variant="secondary" className={`${badgeClass} flex items-center gap-1`}>
+          {item}
+          <button type="button" onClick={() => onRemove(field, index)} className="ml-1 hover:text-red-600">×</button>
+        </Badge>
+      ))}
+    </div>
+  </div>
+);
+
 const ObraForm = React.memo(({ obra, regional, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
     name: obra?.name || "",
@@ -42,33 +69,6 @@ const ObraForm = React.memo(({ obra, regional, onSave, onCancel }) => {
   const removeItem = (field, index) => {
     setFormData(prev => ({ ...prev, [field]: prev[field].filter((_, i) => i !== index) }));
   };
-
-  const TagInput = ({ field, value, setValue, placeholder, badgeClass }) => (
-    <div className="space-y-2">
-      <div className="flex gap-2">
-        <Input
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder={placeholder}
-          className="bg-white border-[#00233B]/20 text-[#00233B]"
-          onKeyPress={(e) => {
-            if (e.key === 'Enter') { e.preventDefault(); addItem(field, value, setValue); }
-          }}
-        />
-        <Button type="button" onClick={() => addItem(field, value, setValue)} className="bg-[#566E3D] hover:bg-[#566E3D]/90 text-white">
-          <Plus className="w-4 h-4" />
-        </Button>
-      </div>
-      <div className="flex flex-wrap gap-2 mt-2">
-        {formData[field].map((item, index) => (
-          <Badge key={index} variant="secondary" className={`${badgeClass} flex items-center gap-1`}>
-            {item}
-            <button type="button" onClick={() => removeItem(field, index)} className="ml-1 hover:text-red-600">×</button>
-          </Badge>
-        ))}
-      </div>
-    </div>
-  );
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -112,19 +112,19 @@ const ObraForm = React.memo(({ obra, regional, onSave, onCancel }) => {
       </div>
 
       {formData.tipo_obra === "supervisao" && (
-        <div><Label>Empreiteiras do Contrato</Label><TagInput field="empreiteiras" value={novaEmpreiteira} setValue={setNovaEmpreiteira} placeholder="Nome da empreiteira" badgeClass="bg-blue-100 text-blue-800" /></div>
+        <div><Label>Empreiteiras do Contrato</Label><TagInput field="empreiteiras" value={novaEmpreiteira} setValue={setNovaEmpreiteira} placeholder="Nome da empreiteira" badgeClass="bg-blue-100 text-blue-800" items={formData.empreiteiras} onAdd={addItem} onRemove={removeItem} /></div>
       )}
 
       {(formData.tipo_obra === "levantamentos" || formData.tipo_obra === "sondagem") && (
-        <div><Label>Clientes da Obra</Label><TagInput field="clientes" value={novoCliente} setValue={setNovoCliente} placeholder="Nome do cliente" badgeClass="bg-teal-100 text-teal-800" /></div>
+        <div><Label>Clientes da Obra</Label><TagInput field="clientes" value={novoCliente} setValue={setNovoCliente} placeholder="Nome do cliente" badgeClass="bg-teal-100 text-teal-800" items={formData.clientes} onAdd={addItem} onRemove={removeItem} /></div>
       )}
 
       {(formData.tipo_obra === "supervisao" || formData.tipo_obra === "implantacao" || formData.tipo_obra === "conservacao" || formData.tipo_obra === "homologacao_usinas") && (
-        <div><Label>Usinas do Contrato</Label><TagInput field="usinas" value={novaUsina} setValue={setNovaUsina} placeholder="Nome da usina" badgeClass="bg-green-100 text-green-800" /></div>
+        <div><Label>Usinas do Contrato</Label><TagInput field="usinas" value={novaUsina} setValue={setNovaUsina} placeholder="Nome da usina" badgeClass="bg-green-100 text-green-800" items={formData.usinas} onAdd={addItem} onRemove={removeItem} /></div>
       )}
 
       {formData.tipo_obra !== "homologacao_usinas" && (
-        <div><Label>Rodovias da Obra</Label><TagInput field="rodovias" value={novaRodovia} setValue={setNovaRodovia} placeholder="Nome da rodovia" badgeClass="bg-purple-100 text-purple-800" /></div>
+        <div><Label>Rodovias da Obra</Label><TagInput field="rodovias" value={novaRodovia} setValue={setNovaRodovia} placeholder="Nome da rodovia" badgeClass="bg-purple-100 text-purple-800" items={formData.rodovias} onAdd={addItem} onRemove={removeItem} /></div>
       )}
 
       <div className="flex justify-end gap-2 pt-4">
