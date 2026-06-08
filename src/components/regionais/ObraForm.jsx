@@ -119,11 +119,13 @@ const ObraForm = React.memo(({ obra, regional, onSave, onCancel }) => {
         <div><Label>Clientes da Obra</Label><TagInput field="clientes" value={novoCliente} setValue={setNovoCliente} placeholder="Nome do cliente" badgeClass="bg-teal-100 text-teal-800" /></div>
       )}
 
-      {(formData.tipo_obra === "supervisao" || formData.tipo_obra === "implantacao" || formData.tipo_obra === "conservacao") && (
+      {(formData.tipo_obra === "supervisao" || formData.tipo_obra === "implantacao" || formData.tipo_obra === "conservacao" || formData.tipo_obra === "homologacao_usinas") && (
         <div><Label>Usinas do Contrato</Label><TagInput field="usinas" value={novaUsina} setValue={setNovaUsina} placeholder="Nome da usina" badgeClass="bg-green-100 text-green-800" /></div>
       )}
 
-      <div><Label>Rodovias da Obra</Label><TagInput field="rodovias" value={novaRodovia} setValue={setNovaRodovia} placeholder="Nome da rodovia" badgeClass="bg-purple-100 text-purple-800" /></div>
+      {formData.tipo_obra !== "homologacao_usinas" && (
+        <div><Label>Rodovias da Obra</Label><TagInput field="rodovias" value={novaRodovia} setValue={setNovaRodovia} placeholder="Nome da rodovia" badgeClass="bg-purple-100 text-purple-800" /></div>
+      )}
 
       <div className="flex justify-end gap-2 pt-4">
         <Button type="button" variant="outline" onClick={onCancel} className="border-[#00233B]/20 text-[#00233B] hover:bg-[#00233B]/5">Cancelar</Button>
