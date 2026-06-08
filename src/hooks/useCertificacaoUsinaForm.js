@@ -1,9 +1,19 @@
 import { useCallback } from 'react';
-import { calcularErro, calcularDesvioPadrao } from '@/utils/certificacaoUsinaUtils';
-import { PENEIRAS_CONFIG } from '@/constants/sieves';
+import { calcularErro, calcularDesvioPadrao, PENEIRAS_GRANULOMETRIA } from '@/utils/certificacaoUsinaUtils';
 
-// Mapa inverso: chave do faixa_trabalho → label (ex: 'peneira_9_5mm' → '3/8"')
-const KEY_TO_LABEL = Object.fromEntries(PENEIRAS_CONFIG.map((p) => [p.key, p.label]));
+// Mapeamento de label (de PENEIRAS_CONFIG) para chave no faixa_trabalho do projeto
+const PENEIRA_KEY_MAP = {
+  '1.1/2"':  'peneira_37_5mm',
+  '1"':      'peneira_25_0mm',
+  '3/4"':    'peneira_19_0mm',
+  '1/2"':    'peneira_12_5mm',
+  '3/8"':    'peneira_9_5mm',
+  'Nº 4':    'peneira_4_75mm',
+  'Nº 8':    'peneira_2_36mm',
+  'Nº 40':   'peneira_0_42mm',
+  'Nº 80':   'peneira_0_18mm',
+  'Nº 200':  'peneira_0_075mm',
+};
 
 function recalcularErroeDP(rows, hasDP = true) {
   const comErro = rows.map((r) => ({
@@ -115,26 +125,20 @@ export function useCertificacaoUsinaForm({ setFormData }) {
       // Relação fíler/betume: campo dedicado no projeto
       fillRows('relacao_filer_betume', project.relacao_filer_betume ?? null);
 
-      // Granulometria: percorre TODAS as peneiras do projeto (faixa_trabalho) na ordem de PENEIRAS_CONFIG
+      // Granulometria: preenche cada peneira com valor da faixa_trabalho do projeto
       const ft = project.faixa_trabalho || {};
-      const savedGran = Array.isArray(prev.ensaios_validacao?.granulometria)
-        ? prev.ensaios_validacao.granulometria
-        : [];
-      // Constrói mapa peneira→obtido a partir dos dados salvos anteriormente
-      const savedByLabel = Object.fromEntries(savedGran.map((r) => [r.peneira, r.obtido ?? null]));
-
-      ev.granulometria = PENEIRAS_CONFIG
-        .filter((p) => ft[p.key] != null)  // apenas peneiras que o projeto tem valor
-        .map((p) => {
-          const projetoVal = parseFloat(ft[p.key]);
-          const obtido = savedByLabel[p.label] ?? null;
-          return {
-            peneira: p.label,
-            projeto: projetoVal,
-            obtido,
-            erro: calcularErro(projetoVal, obtido),
-          };
-        });
+      ev.granulometria = PENEIRAS_GRANULOMETRIA.map((p, i) => {
+        const key = PENEIRA_KEY_MAP[p];
+        const projetoVal = (key && ft[key] != null) ? parseFloat(ft[key]) : null;
+        const saved = (Array.isArray(prev.ensaios_validacao?.granulometria) ? prev.ensaios_validacao.granulometria[i] : null) || {};
+        const obtido = saved.obtido ?? null;
+        return {
+          peneira: p,
+          projeto: projetoVal,
+          obtido,
+          erro: calcularErro(projetoVal, obtido),
+        };
+      });
 
       newData.ensaios_validacao = ev;
       return newData;
