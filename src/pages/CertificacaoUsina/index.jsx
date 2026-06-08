@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
@@ -11,6 +11,7 @@ import ChecklistFooter from "@/components/checklists/ChecklistFooter";
 import StatusDraftBanner from "@/components/forms/StatusDraftBanner";
 import RejectionBanner from "@/components/forms/RejectionBanner";
 import ChecklistUsinaHeader from "@/components/checklists/ChecklistUsinaHeader";
+import { Button } from "@/components/ui/button";
 
 import SecaoDescricao from "@/components/certificacao-usina/SecaoDescricao";
 import SecaoClasseTipo from "@/components/certificacao-usina/SecaoClasseTipo";
@@ -57,7 +58,18 @@ const getInitialFormData = () => ({
   rejection_reason: null,
 });
 
+const PAGES = [
+  { label: "1–4: Identificação e Aspectos Legais" },
+  { label: "5: Saúde e Segurança" },
+  { label: "6: Meio Ambiente" },
+  { label: "7: Laboratório e Estrutura" },
+  { label: "8: Resultado" },
+];
+
 export default function CertificacaoUsinaPage() {
+  const [currentPage, setCurrentPage] = useState(0);
+  const topRef = useRef(null);
+
   const {
     obras, regionais, projects, faixas, user, editingChecklist,
     loading, formData, setFormData, obraSelecionada, regionalSelecionada,
@@ -65,6 +77,11 @@ export default function CertificacaoUsinaPage() {
   } = useChecklistForm(getInitialFormData, "CertificacaoUsina", "certificacao_usina");
 
   const handlers = useCertificacaoUsinaForm({ setFormData });
+
+  const goToPage = (page) => {
+    setCurrentPage(page);
+    setTimeout(() => topRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+  };
 
   const handleSubmit = useCallback(async (e, saveStatus = "finalizado") => {
     e.preventDefault();
@@ -103,7 +120,7 @@ export default function CertificacaoUsinaPage() {
 
   return (
     <div className="p-6 bg-slate-50 min-h-screen">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto" ref={topRef}>
         <Card>
           <CardHeader>
             <CardTitle>
@@ -114,6 +131,24 @@ export default function CertificacaoUsinaPage() {
             </CardDescription>
             <StatusDraftBanner status={formData.status} />
             <RejectionBanner rejectionReason={editingChecklist?.rejection_reason} />
+
+            {/* Navegação por abas/páginas */}
+            <div className="flex flex-wrap gap-1 pt-2">
+              {PAGES.map((p, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => goToPage(i)}
+                  className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                    currentPage === i
+                      ? "bg-[#00233B] text-white border-[#00233B]"
+                      : "bg-white text-[#00233B] border-slate-300 hover:border-[#00233B]"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
           </CardHeader>
 
           <CardContent className="overflow-hidden">
@@ -122,7 +157,7 @@ export default function CertificacaoUsinaPage() {
               onKeyDown={(e) => { if (e.key === "Enter" && e.target.tagName !== "TEXTAREA" && e.target.type !== "submit") e.preventDefault(); }}
               className="space-y-8"
             >
-              {/* Obra */}
+              {/* Obra — aparece em todas as páginas */}
               <ChecklistUsinaHeader
                 formData={formData}
                 setFormData={setFormData}
@@ -137,26 +172,68 @@ export default function CertificacaoUsinaPage() {
                 editingChecklist={editingChecklist}
               />
 
-              <SecaoDescricao formData={formData} onChange={handlers.handleChange} disabled={disabled} />
-              <SecaoClasseTipo formData={formData} onChange={handlers.handleChange} disabled={disabled} />
-              <SecaoAspectosLegais formData={formData} onNestedChange={handlers.handleNestedChange} disabled={disabled} />
-              <SecaoSaudeSeguranca formData={formData} onNestedChange={handlers.handleNestedChange} disabled={disabled} />
-              <SecaoMeioAmbiente formData={formData} onNestedChange={handlers.handleNestedChange} disabled={disabled} />
-              <SecaoLaboratorio formData={formData} onNestedChange={handlers.handleNestedChange} disabled={disabled} />
-              <SecaoAfeicao
-                formData={formData}
-                onNestedChange={handlers.handleNestedChange}
-                onEnsaioValidacaoChange={handlers.handleEnsaioValidacaoChange}
-                onGranulometriaChange={handlers.handleGranulometriaChange}
-                disabled={disabled}
-              />
-              <SecaoEstruturaUsina
-                formData={formData}
-                onNestedChange={handlers.handleNestedChange}
-                handleChange={handlers.handleChange}
-                disabled={disabled}
-              />
-              <SecaoResultado formData={formData} onChange={handlers.handleChange} disabled={disabled} />
+              {/* Página 0: Tópicos 1–4 */}
+              {currentPage === 0 && (<>
+                <SecaoDescricao formData={formData} onChange={handlers.handleChange} disabled={disabled} />
+                <SecaoClasseTipo formData={formData} onChange={handlers.handleChange} disabled={disabled} />
+                <SecaoAspectosLegais formData={formData} onNestedChange={handlers.handleNestedChange} disabled={disabled} />
+              </>)}
+
+              {/* Página 1: Tópico 5 - Saúde e Segurança */}
+              {currentPage === 1 && (
+                <SecaoSaudeSeguranca formData={formData} onNestedChange={handlers.handleNestedChange} disabled={disabled} />
+              )}
+
+              {/* Página 2: Tópico 6 - Meio Ambiente */}
+              {currentPage === 2 && (
+                <SecaoMeioAmbiente formData={formData} onNestedChange={handlers.handleNestedChange} disabled={disabled} />
+              )}
+
+              {/* Página 3: Tópico 7 - Laboratório, Aferição, Estrutura e Usina */}
+              {currentPage === 3 && (<>
+                <SecaoLaboratorio formData={formData} onNestedChange={handlers.handleNestedChange} disabled={disabled} />
+                <SecaoAfeicao
+                  formData={formData}
+                  onNestedChange={handlers.handleNestedChange}
+                  onEnsaioValidacaoChange={handlers.handleEnsaioValidacaoChange}
+                  onGranulometriaChange={handlers.handleGranulometriaChange}
+                  disabled={disabled}
+                />
+                <SecaoEstruturaUsina
+                  formData={formData}
+                  onNestedChange={handlers.handleNestedChange}
+                  handleChange={handlers.handleChange}
+                  disabled={disabled}
+                />
+              </>)}
+
+              {/* Página 4: Tópico 8 - Resultado */}
+              {currentPage === 4 && (
+                <SecaoResultado formData={formData} onChange={handlers.handleChange} disabled={disabled} />
+              )}
+
+              {/* Navegação anterior/próximo + footer */}
+              <div className="flex items-center justify-between pt-2 border-t border-slate-200">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={currentPage === 0}
+                  onClick={() => goToPage(currentPage - 1)}
+                >
+                  ← Anterior
+                </Button>
+                <span className="text-xs text-slate-500">
+                  Página {currentPage + 1} de {PAGES.length}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={currentPage === PAGES.length - 1}
+                  onClick={() => goToPage(currentPage + 1)}
+                >
+                  Próxima →
+                </Button>
+              </div>
 
               <ChecklistFooter
                 isEditable={isEditable}
