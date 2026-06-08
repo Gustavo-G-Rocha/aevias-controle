@@ -5,7 +5,7 @@ import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
 import { useChecklistForm } from "@/hooks/useChecklistForm";
 import { useCertificacaoUsinaForm } from "@/hooks/useCertificacaoUsinaForm";
-import { validarCertificacao } from "@/utils/certificacaoUsinaUtils";
+import { validarCertificacao, VALIDADORES_PAGINA } from "@/utils/certificacaoUsinaUtils";
 import { criarCertificacao, atualizarCertificacao } from "@/services/certificacaoUsinaService";
 import ChecklistFooter from "@/components/checklists/ChecklistFooter";
 import StatusDraftBanner from "@/components/forms/StatusDraftBanner";
@@ -78,7 +78,13 @@ export default function CertificacaoUsinaPage() {
 
   const handlers = useCertificacaoUsinaForm({ setFormData });
 
+  const isPageComplete = (pageIndex) => VALIDADORES_PAGINA[pageIndex]?.(formData) ?? true;
+
   const goToPage = (page) => {
+    // Só permite avançar se todas as páginas anteriores estiverem completas
+    for (let i = 0; i < page; i++) {
+      if (!isPageComplete(i)) return;
+    }
     setCurrentPage(page);
     setTimeout(() => topRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
   };
@@ -143,28 +149,40 @@ export default function CertificacaoUsinaPage() {
               </div>
               {/* Tabs */}
               <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none">
-                {PAGES.map((p, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => goToPage(i)}
-                    className={`flex-shrink-0 flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg border-2 transition-all duration-200 min-w-[90px] ${
-                      currentPage === i
-                        ? "bg-[#00233B] text-white border-[#00233B] shadow-md scale-105"
-                        : i < currentPage
-                        ? "bg-[#BFCF99]/20 text-[#00233B] border-[#BFCF99] hover:bg-[#BFCF99]/40"
-                        : "bg-white text-slate-500 border-slate-200 hover:border-[#00233B] hover:text-[#00233B]"
-                    }`}
-                  >
-                    <span className={`text-base font-bold leading-none ${currentPage === i ? "text-[#BFCF99]" : i < currentPage ? "text-[#00233B]" : "text-slate-400"}`}>
-                      {p.num}
-                    </span>
-                    <span className="text-[10px] leading-tight text-center whitespace-pre-line">{p.label}</span>
-                    {i < currentPage && (
-                      <span className="text-[10px] leading-none text-[#00233B] font-semibold">✓</span>
-                    )}
-                  </button>
-                ))}
+                {PAGES.map((p, i) => {
+                  const complete = isPageComplete(i);
+                  const prevComplete = i === 0 || Array.from({ length: i }, (_, j) => j).every(isPageComplete);
+                  const locked = !prevComplete && i !== currentPage;
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => goToPage(i)}
+                      disabled={locked}
+                      title={locked ? "Complete as seções anteriores para avançar" : undefined}
+                      className={`flex-shrink-0 flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg border-2 transition-all duration-200 min-w-[90px] ${
+                        locked
+                          ? "bg-slate-100 text-slate-300 border-slate-200 cursor-not-allowed"
+                          : currentPage === i
+                          ? "bg-[#00233B] text-white border-[#00233B] shadow-md scale-105"
+                          : complete && i < currentPage
+                          ? "bg-[#BFCF99]/20 text-[#00233B] border-[#BFCF99] hover:bg-[#BFCF99]/40"
+                          : "bg-white text-slate-500 border-slate-200 hover:border-[#00233B] hover:text-[#00233B]"
+                      }`}
+                    >
+                      <span className={`text-base font-bold leading-none ${locked ? "text-slate-300" : currentPage === i ? "text-[#BFCF99]" : i < currentPage ? "text-[#00233B]" : "text-slate-400"}`}>
+                        {locked ? "🔒" : p.num}
+                      </span>
+                      <span className="text-[10px] leading-tight text-center whitespace-pre-line">{p.label}</span>
+                      {!locked && complete && i < currentPage && (
+                        <span className="text-[10px] leading-none text-[#00233B] font-semibold">✓</span>
+                      )}
+                      {!locked && !complete && i === currentPage && (
+                        <span className="text-[10px] leading-none text-orange-500 font-semibold">incompleta</span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </CardHeader>
@@ -246,14 +264,19 @@ export default function CertificacaoUsinaPage() {
                 <span className="text-xs text-slate-500">
                   Página {currentPage + 1} de {PAGES.length}
                 </span>
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={currentPage === PAGES.length - 1}
-                  onClick={() => goToPage(currentPage + 1)}
-                >
-                  Próxima →
-                </Button>
+                <div className="flex flex-col items-end gap-1">
+                  {!isPageComplete(currentPage) && currentPage < PAGES.length - 1 && (
+                    <span className="text-xs text-orange-500">Preencha todos os campos para avançar</span>
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={currentPage === PAGES.length - 1 || !isPageComplete(currentPage)}
+                    onClick={() => goToPage(currentPage + 1)}
+                  >
+                    Próxima →
+                  </Button>
+                </div>
               </div>
 
               <ChecklistFooter
