@@ -51,7 +51,7 @@ function EnsaioTable({ title, rows, onRowChange, disabled, showPeneira = false }
                   className="w-full h-7 px-1 text-xs border-0 bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-400 rounded"
                 />
               </td>
-              <ReadCell value={row.erro} />
+              <ReadCell value={row.erro != null ? row.erro.toFixed(2) : null} />
             </tr>
           ))}
         </tbody>
@@ -62,7 +62,7 @@ function EnsaioTable({ title, rows, onRowChange, disabled, showPeneira = false }
                 Desvio Padrão Amostral:
               </td>
               <td className="border border-slate-300 px-2 py-1 text-xs text-center font-semibold text-slate-700">
-                {dpValue != null ? dpValue : "—"}
+                {dpValue != null ? dpValue.toFixed(3) : "—"}
               </td>
             </tr>
           </tfoot>
