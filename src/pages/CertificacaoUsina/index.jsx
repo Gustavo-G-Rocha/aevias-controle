@@ -197,6 +197,9 @@ export default function CertificacaoUsinaPage() {
                   onNestedChange={handlers.handleNestedChange}
                   onEnsaioValidacaoChange={handlers.handleEnsaioValidacaoChange}
                   onGranulometriaChange={handlers.handleGranulometriaChange}
+                  onPreencherProjeto={handlers.handlePreencherProjeto}
+                  projetosDisponiveis={projetosDisponiveis}
+                  projects={projects}
                   disabled={disabled}
                 />
                 <SecaoEstruturaUsina

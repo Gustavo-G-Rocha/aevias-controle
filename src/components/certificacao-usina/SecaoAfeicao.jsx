@@ -1,8 +1,17 @@
 import React from "react";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ConformeField from "./ConformeField";
 import { PENEIRAS_GRANULOMETRIA } from "@/utils/certificacaoUsinaUtils";
+
+// Célula readonly (calculada)
+function ReadCell({ value }) {
+  return (
+    <td className="border border-slate-300 px-2 py-1 text-xs text-center bg-slate-50 text-slate-500">
+      {value != null ? value : ""}
+    </td>
+  );
+}
 
 function EnsaioTable({ title, rows, onRowChange, disabled, showPeneira = false }) {
   return (
@@ -24,38 +33,28 @@ function EnsaioTable({ title, rows, onRowChange, disabled, showPeneira = false }
               {showPeneira && (
                 <td className="border border-slate-300 px-2 py-1 font-medium">{row.peneira}</td>
               )}
-              {["projeto", "obtido", "erro"].map((col) => (
-                <td key={col} className="border border-slate-300 p-0.5">
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    defaultValue={row[col] != null ? String(row[col]) : ""}
-                    onBlur={(e) => {
-                      const v = e.target.value.replace(',', '.');
-                      const n = v !== '' ? parseFloat(v) : null;
-                      onRowChange(i, col, isNaN(n) ? null : n);
-                    }}
-                    disabled={disabled}
-                    className="w-full h-7 px-1 text-xs border-0 bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-400 rounded"
-                  />
-                </td>
-              ))}
-              {!showPeneira && (
-                <td className="border border-slate-300 p-0.5">
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    defaultValue={row.desvio_padrao != null ? String(row.desvio_padrao) : ""}
-                    onBlur={(e) => {
-                      const v = e.target.value.replace(',', '.');
-                      const n = v !== '' ? parseFloat(v) : null;
-                      onRowChange(i, "desvio_padrao", isNaN(n) ? null : n);
-                    }}
-                    disabled={disabled}
-                    className="w-full h-7 px-1 text-xs border-0 bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-400 rounded"
-                  />
-                </td>
-              )}
+              {/* Projeto: readonly (preenchido pelo projeto) */}
+              <ReadCell value={row.projeto} />
+              {/* Obtido: editável */}
+              <td className="border border-slate-300 p-0.5">
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  key={`${i}-obtido-${row.obtido}`}
+                  defaultValue={row.obtido != null ? String(row.obtido) : ""}
+                  onBlur={(e) => {
+                    const v = e.target.value.replace(',', '.');
+                    const n = v !== '' ? parseFloat(v) : null;
+                    onRowChange(i, "obtido", isNaN(n) ? null : n);
+                  }}
+                  disabled={disabled}
+                  className="w-full h-7 px-1 text-xs border-0 bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-400 rounded"
+                />
+              </td>
+              {/* Erro: readonly calculado */}
+              <ReadCell value={row.erro} />
+              {/* Desv. Pad.: readonly calculado */}
+              {!showPeneira && <ReadCell value={row.desvio_padrao} />}
             </tr>
           ))}
         </tbody>
@@ -64,7 +63,16 @@ function EnsaioTable({ title, rows, onRowChange, disabled, showPeneira = false }
   );
 }
 
-export default function SecaoAfeicao({ formData, onNestedChange, onEnsaioValidacaoChange, onGranulometriaChange, disabled }) {
+export default function SecaoAfeicao({
+  formData,
+  onNestedChange,
+  onEnsaioValidacaoChange,
+  onGranulometriaChange,
+  onPreencherProjeto,
+  projetosDisponiveis,
+  projects,
+  disabled,
+}) {
   const afeicao = formData.afeicao || {};
   const ev = formData.ensaios_validacao || {};
 
@@ -81,6 +89,11 @@ export default function SecaoAfeicao({ formData, onNestedChange, onEnsaioValidac
     );
   };
 
+  const handleProjectSelect = (projectId) => {
+    const project = (projects || []).find((p) => p.id === projectId);
+    if (project && onPreencherProjeto) onPreencherProjeto(project);
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="font-bold text-[#00233B] text-sm bg-slate-100 px-3 py-2 rounded">
@@ -92,13 +105,13 @@ export default function SecaoAfeicao({ formData, onNestedChange, onEnsaioValidac
           <h4 className="text-sm font-semibold text-slate-700">Repetibilidade</h4>
           <div className="flex items-center gap-2">
             <Label className="text-xs text-slate-500 w-36">Desvio padrão obtido:</Label>
-            <Input
+            <input
               type="number"
               step="0.0001"
-              value={afeicao.repetibilidade_desvio_padrao || ""}
+              value={afeicao.repetibilidade_desvio_padrao ?? ""}
               onChange={(e) => onNestedChange("afeicao.repetibilidade_desvio_padrao", e.target.value ? parseFloat(e.target.value) : null)}
               disabled={disabled}
-              className="h-7 text-sm w-24"
+              className="h-7 text-xs w-24 border border-slate-300 rounded px-2"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -116,13 +129,13 @@ export default function SecaoAfeicao({ formData, onNestedChange, onEnsaioValidac
           <h4 className="text-sm font-semibold text-slate-700">Reprodutibilidade</h4>
           <div className="flex items-center gap-2">
             <Label className="text-xs text-slate-500 w-36">Desvio padrão obtido:</Label>
-            <Input
+            <input
               type="number"
               step="0.0001"
-              value={afeicao.reprodutibilidade_desvio_padrao || ""}
+              value={afeicao.reprodutibilidade_desvio_padrao ?? ""}
               onChange={(e) => onNestedChange("afeicao.reprodutibilidade_desvio_padrao", e.target.value ? parseFloat(e.target.value) : null)}
               disabled={disabled}
-              className="h-7 text-sm w-24"
+              className="h-7 text-xs w-24 border border-slate-300 rounded px-2"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -136,6 +149,31 @@ export default function SecaoAfeicao({ formData, onNestedChange, onEnsaioValidac
             />
           </div>
         </div>
+      </div>
+
+      {/* Seleção de projeto para preenchimento automático */}
+      <div className="flex items-center gap-3 px-1 py-2 bg-blue-50 border border-blue-200 rounded">
+        <Label className="text-xs font-semibold text-blue-700 whitespace-nowrap">Projeto (preenchimento automático):</Label>
+        <Select
+          value={formData.afeicao_project_id || ""}
+          onValueChange={(val) => {
+            onNestedChange("afeicao_project_id", val);
+            handleProjectSelect(val);
+          }}
+          disabled={disabled}
+        >
+          <SelectTrigger className="h-8 text-xs max-w-xs">
+            <SelectValue placeholder="Selecione o projeto..." />
+          </SelectTrigger>
+          <SelectContent>
+            {(projetosDisponiveis || projects || []).map((p) => (
+              <SelectItem key={p.id} value={p.id} className="text-xs">
+                {p.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <span className="text-xs text-blue-500">Os valores de Projeto, Erro e Desv. Pad. são calculados automaticamente.</span>
       </div>
 
       <h4 className="text-sm font-semibold text-slate-700 px-1">Ensaios para Validação de Profissionais</h4>
