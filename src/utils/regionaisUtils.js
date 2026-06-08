@@ -102,6 +102,7 @@ export const TIPO_OBRA_LABELS = {
   supervisao: "Supervisão",
   implantacao: "Implantação",
   conservacao: "Conservação",
+  homologacao_usinas: "Homologação de Usinas",
   sondagem: "Sondagem",
   levantamentos: "Levantamentos",
 };
