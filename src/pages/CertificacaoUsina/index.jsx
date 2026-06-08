@@ -59,11 +59,11 @@ const getInitialFormData = () => ({
 });
 
 const PAGES = [
-  { label: "1–4: Identificação e Aspectos Legais" },
-  { label: "5: Saúde e Segurança" },
-  { label: "6: Meio Ambiente" },
-  { label: "7: Laboratório e Estrutura" },
-  { label: "8: Resultado" },
+  { num: "1-4", label: "Identificação e\nAspectos Legais" },
+  { num: "5",   label: "Saúde e\nSegurança" },
+  { num: "6",   label: "Meio\nAmbiente" },
+  { num: "7",   label: "Laboratório\ne Estrutura" },
+  { num: "8",   label: "Resultado" },
 ];
 
 export default function CertificacaoUsinaPage() {
@@ -132,22 +132,40 @@ export default function CertificacaoUsinaPage() {
             <StatusDraftBanner status={formData.status} />
             <RejectionBanner rejectionReason={editingChecklist?.rejection_reason} />
 
-            {/* Navegação por abas/páginas */}
-            <div className="flex flex-wrap gap-1 pt-2">
-              {PAGES.map((p, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => goToPage(i)}
-                  className={`px-3 py-1 text-xs rounded-full border transition-colors ${
-                    currentPage === i
-                      ? "bg-[#00233B] text-white border-[#00233B]"
-                      : "bg-white text-[#00233B] border-slate-300 hover:border-[#00233B]"
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
+            {/* Navegação por seções */}
+            <div className="pt-3">
+              {/* Barra de progresso */}
+              <div className="relative mb-3 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                <div
+                  className="absolute left-0 top-0 h-full bg-[#00233B] rounded-full transition-all duration-300"
+                  style={{ width: `${((currentPage + 1) / PAGES.length) * 100}%` }}
+                />
+              </div>
+              {/* Tabs */}
+              <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none">
+                {PAGES.map((p, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => goToPage(i)}
+                    className={`flex-shrink-0 flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg border-2 transition-all duration-200 min-w-[90px] ${
+                      currentPage === i
+                        ? "bg-[#00233B] text-white border-[#00233B] shadow-md scale-105"
+                        : i < currentPage
+                        ? "bg-[#BFCF99]/20 text-[#00233B] border-[#BFCF99] hover:bg-[#BFCF99]/40"
+                        : "bg-white text-slate-500 border-slate-200 hover:border-[#00233B] hover:text-[#00233B]"
+                    }`}
+                  >
+                    <span className={`text-base font-bold leading-none ${currentPage === i ? "text-[#BFCF99]" : i < currentPage ? "text-[#00233B]" : "text-slate-400"}`}>
+                      {p.num}
+                    </span>
+                    <span className="text-[10px] leading-tight text-center whitespace-pre-line">{p.label}</span>
+                    {i < currentPage && (
+                      <span className="text-[10px] leading-none text-[#00233B] font-semibold">✓</span>
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
           </CardHeader>
 
