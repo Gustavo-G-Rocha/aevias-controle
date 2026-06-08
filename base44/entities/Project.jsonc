@@ -182,6 +182,10 @@
     "densidade_maxima_medida": {
       "type": "number"
     },
+    "relacao_filer_betume": {
+      "type": "number",
+      "description": "Rela\u00e7\u00e3o F\u00edler/Betume de projeto (%)"
+    },
     "volume_vazios": {
       "type": "object",
       "properties": {

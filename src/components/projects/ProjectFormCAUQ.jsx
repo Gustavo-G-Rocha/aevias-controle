@@ -171,6 +171,12 @@ export default function ProjectFormCAUQ({
                 value={formData.densidade_maxima_medida || ''}
                 onChange={(e) => onInputChange('densidade_maxima_medida', e.target.value === '' ? '' : parseFloat(e.target.value))} />
             </div>
+            <div className="space-y-2">
+              <h4 className="font-semibold text-sm">Relação Fíler/Betume (%)</h4>
+              <Input type="number" step="0.01"
+                value={formData.relacao_filer_betume || ''}
+                onChange={(e) => onInputChange('relacao_filer_betume', e.target.value === '' ? '' : parseFloat(e.target.value))} />
+            </div>
 
             <div>
               <h4 className="font-semibold text-sm mb-2">Volume de Vazios (%)</h4>
