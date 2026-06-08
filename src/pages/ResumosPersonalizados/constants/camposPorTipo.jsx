@@ -10,7 +10,8 @@ export const TIPOS_ENSAIO = [
   { value: "ChecklistConcretagem", label: "Checklist de Concretagem" },
   { value: "ChecklistTerraplanagem", label: "Checklist de Terraplanagem" },
   { value: "ChecklistReciclagem", label: "Checklist de Reciclagem" },
-  { value: "DiarioObra", label: "Diário de Obra" }
+  { value: "DiarioObra", label: "Diário de Obra" },
+  { value: "EnsaioMRAF", label: "Ensaio de MRAF" }
 ];
 
 export const CAMPOS_POR_TIPO = {
@@ -335,6 +336,40 @@ export const CAMPOS_POR_TIPO = {
     { key: "ensaios_empreiteira.finura_cimento.quantidade", label: "Finura Cimento - Qtde" },
     { key: "ensaios_empreiteira.finura_cimento.conforme", label: "Finura Cimento - Conforme" },
     { key: "acoes_corretivas_realizado", label: "Ações Corretivas" }
+  ],
+  EnsaioMRAF: [
+    { key: "data_ensaio", label: "Data" },
+    { key: "laboratorista_name", label: "Laboratorista" },
+    { key: "placa_caminhao", label: "Placa Usina/Caminhão" },
+    { key: "rodovia", label: "Rodovia" },
+    { key: "trecho", label: "Trecho" },
+    { key: "faixa_especificada", label: "Faixa" },
+    { key: "tipo_ligante", label: "Tipo Ligante" },
+    { key: "extracao_ligante.teor_ligante", label: "Teor Ligante (%)" },
+    { key: "extracao_ligante.umidade", label: "Umidade (%)" },
+    { key: "extracao_ligante.residuo_emulsao", label: "Resíduo da Emulsão (%)" },
+    { key: "granulometria", label: "Granulometria (% passante)", subfields: [
+      { key: "peneira_75_0mm", label: 'Nº 3"', astm: 'Nº 3"' },
+      { key: "peneira_63_0mm", label: 'Nº 2½"', astm: 'Nº 2½"' },
+      { key: "peneira_50_0mm", label: 'Nº 2"', astm: 'Nº 2"' },
+      { key: "peneira_37_5mm", label: 'Nº 1½"', astm: 'Nº 1½"' },
+      { key: "peneira_25_0mm", label: 'Nº 1"', astm: 'Nº 1"' },
+      { key: "peneira_19_0mm", label: 'Nº ¾"', astm: 'Nº ¾"' },
+      { key: "peneira_16_0mm", label: 'Nº ⅝"', astm: 'Nº ⅝"' },
+      { key: "peneira_12_5mm", label: 'Nº ½"', astm: 'Nº ½"' },
+      { key: "peneira_9_5mm", label: 'Nº ⅜"', astm: 'Nº ⅜"' },
+      { key: "peneira_4_75mm", label: "Nº 4", astm: "Nº 4" },
+      { key: "peneira_2_36mm", label: "Nº 8", astm: "Nº 8" },
+      { key: "peneira_2_0mm", label: "Nº 10", astm: "Nº 10" },
+      { key: "peneira_1_18mm", label: "Nº 16", astm: "Nº 16" },
+      { key: "peneira_0_6mm", label: "Nº 30", astm: "Nº 30" },
+      { key: "peneira_0_42mm", label: "Nº 40", astm: "Nº 40" },
+      { key: "peneira_0_3mm", label: "Nº 50", astm: "Nº 50" },
+      { key: "peneira_0_18mm", label: "Nº 80", astm: "Nº 80" },
+      { key: "peneira_0_15mm", label: "Nº 100", astm: "Nº 100" },
+      { key: "peneira_0_075mm", label: "Nº 200", astm: "Nº 200" }
+    ]},
+    { key: "approved", label: "Status Aprovação" }
   ],
   DiarioObra: [
     { key: "laboratorista_name", label: "Colaborador" },

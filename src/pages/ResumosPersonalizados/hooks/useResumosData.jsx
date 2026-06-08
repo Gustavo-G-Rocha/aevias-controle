@@ -334,8 +334,8 @@ export function useResumosData() {
         todosOsProjetos = await base44.entities.Project.list();
       }
 
-      const peneirasRelevantes = tipo === 'EnsaioCAUQ'
-        ? (CAMPOS_POR_TIPO.EnsaioCAUQ.find(c => c.key === 'granulometria')?.subfields || [])
+      const peneirasRelevantes = (tipo === 'EnsaioCAUQ' || tipo === 'EnsaioMRAF')
+        ? (CAMPOS_POR_TIPO[tipo].find(c => c.key === 'granulometria')?.subfields || [])
         : [];
 
       const resultados = [];
