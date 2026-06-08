@@ -76,11 +76,15 @@ export default function SecaoAfeicao({
   const afeicao = formData.afeicao || {};
   const ev = formData.ensaios_validacao || {};
 
-  // Sempre usa as peneiras canônicas como base; mescla valores salvos pelo índice
-  const granRows = PENEIRAS_GRANULOMETRIA.map((p, i) => {
-    const saved = ev.granulometria?.[i] || {};
-    return { peneira: p, projeto: saved.projeto ?? null, obtido: saved.obtido ?? null, erro: saved.erro ?? null };
-  });
+  // Usa as peneiras salvas (dinâmicas, geradas pelo projeto); fallback para lista fixa se ainda não selecionou projeto
+  const granRows = Array.isArray(ev.granulometria) && ev.granulometria.length > 0
+    ? ev.granulometria.map((row) => ({
+        peneira: row.peneira,
+        projeto: row.projeto ?? null,
+        obtido: row.obtido ?? null,
+        erro: row.erro ?? null,
+      }))
+    : PENEIRAS_GRANULOMETRIA.map((p) => ({ peneira: p, projeto: null, obtido: null, erro: null }));
 
   const ensaioRows = (key, count = 4) => {
     const saved = Array.isArray(ev[key]) ? ev[key] : [];
