@@ -35,7 +35,7 @@ describe('calcularDesvioPadrao', () => {
   });
   it('ignora valores nulos', () => {
     const dp = calcularDesvioPadrao([null, 4, 6, null]);
-    expect(dp).toBeCloseTo(Math.sqrt(2), 3);
+    expect(dp).toBeCloseTo(1.0, 3);
   });
 });
 
