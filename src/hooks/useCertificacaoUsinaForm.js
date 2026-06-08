@@ -8,8 +8,8 @@ function recalcularErroeDP(rows, hasDP = true) {
     erro: calcularErro(r.projeto, r.obtido),
   }));
   if (!hasDP) return comErro;
-  const erros = comErro.map((r) => r.erro);
-  const dp = calcularDesvioPadrao(erros);
+  const obtidos = comErro.map((r) => r.obtido);
+  const dp = calcularDesvioPadrao(obtidos);
   return comErro.map((r) => ({ ...r, desvio_padrao: dp }));
 }
 
