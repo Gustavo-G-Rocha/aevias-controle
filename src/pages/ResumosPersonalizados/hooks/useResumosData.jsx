@@ -72,7 +72,7 @@ export function useResumosData() {
   }, []);
 
   // ── Geração de linhas por tipo ─────────────────────────────────────────────
-  const processarEnsaio = useCallback((ensaio, tipo, campos, todosOsProjetos, peneirasRelevantes) => {
+  const processarEnsaio = (ensaio, tipo, campos, todosOsProjetos, peneirasRelevantes) => {
     const resultados = [];
     const label = getLabelTipo(tipo, TIPOS_ENSAIO);
 
@@ -292,7 +292,7 @@ export function useResumosData() {
     }
 
     return resultados;
-  }, []);
+  };
 
   // ── Carregar dados ─────────────────────────────────────────────────────────
   const carregarDados = useCallback(async () => {
@@ -352,7 +352,7 @@ export function useResumosData() {
     } finally {
       setLoadingData(false);
     }
-  }, [obraId, tipoEnsaioSelecionado, dataInicio, dataFim, laboratoristaFiltro, processarEnsaio]);
+  }, [obraId, tipoEnsaioSelecionado, dataInicio, dataFim, laboratoristaFiltro]);
 
   return {
     user, obras, regionais, loading, loadingData,
