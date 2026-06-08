@@ -54,7 +54,7 @@ const Titulo = () => (
 
 const SecHeader = ({ children }) => (
   <tr>
-    <td colSpan={4} className="bg-[#FBBF24] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400">{children}</td>
+    <td colSpan={4} className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400">{children}</td>
   </tr>
 );
 
@@ -171,7 +171,7 @@ export default function RelatorioCertificacaoUsina() {
         <Titulo />
         {/* 1 - Descrição */}
         <div className="mb-3">
-          <div className="bg-[#FBBF24] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">1 - DESCRIÇÃO</div>
+          <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">1 - DESCRIÇÃO</div>
           <table className="w-full border-collapse text-xs">
             <tbody>
               <tr>
@@ -223,11 +223,11 @@ export default function RelatorioCertificacaoUsina() {
         {/* 2 e 3 */}
         <div className="grid grid-cols-2 gap-3 mb-3">
           <div>
-            <div className="bg-[#FBBF24] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">2 - CLASSE PRETENDIDA</div>
+            <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">2 - CLASSE PRETENDIDA</div>
             <p className="text-sm font-bold px-2">{val(data.classe_usina)}</p>
           </div>
           <div>
-            <div className="bg-[#FBBF24] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">3 - TIPO DE USINA</div>
+            <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">3 - TIPO DE USINA</div>
             <table className="w-full text-xs border-collapse">
               <tbody>
                 <tr>
@@ -245,7 +245,7 @@ export default function RelatorioCertificacaoUsina() {
 
         {/* 4 - Aspectos Legais */}
         <div className="mb-3">
-          <div className="bg-[#FBBF24] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">4 - ASPECTOS LEGAIS DO EMPREENDIMENTO</div>
+          <div className="bg-[#ccc] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">4 - ASPECTOS LEGAIS DO EMPREENDIMENTO</div>
           <table className="w-full border-collapse text-xs">
             <tbody>
               <ConformeRow label="Autorização Ambiental (AA)" value={al.autorizacao_ambiental} />
@@ -255,10 +255,11 @@ export default function RelatorioCertificacaoUsina() {
             </tbody>
           </table>
         </div>
-
+        </PageContainer>
+        <PageContainer pageBreak>
         {/* 5 - SST parcial */}
         <div>
-          <div className="bg-[#FBBF24] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">5 - ASPECTOS DE SAÚDE E SEGURANÇA DO TRABALHO</div>
+          <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">5 - ASPECTOS DE SAÚDE E SEGURANÇA DO TRABALHO</div>
           <table className="w-full border-collapse text-xs">
             <tbody>
               <SubHeader>Treinamentos</SubHeader>
@@ -272,18 +273,7 @@ export default function RelatorioCertificacaoUsina() {
               {ssRow("Compatíveis com atividades", "epis", "compativeis_atividades")}
               {ssRow("Sendo cautelados", "epis", "sendo_cautelados")}
               {ssRow("Extintores - NBR NPT-021", "epis", "extintores_npt021")}
-            </tbody>
-          </table>
-        </div>
-      </PageContainer>
-
-      {/* Página 2: SST continuação */}
-      <PageContainer pageBreak>
-        <Titulo />
-        <div className="bg-[#FBBF24] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">5 - ASPECTOS DE SAÚDE E SEGURANÇA DO TRABALHO (continuação)</div>
-        <table className="w-full border-collapse text-xs">
-          <tbody>
-            <SubHeader>NR-12 - Acessos</SubHeader>
+              <SubHeader>NR-12 - Acessos</SubHeader>
             {ssRow("Dimensionados, construídos e fixados de modo seguro", "acessos", "dimensionados_seguros")}
             {ssRow("Material resistente às intempéries e corrosão", "acessos", "material_resistente")}
             {ssRow("Travessão superior 1,10m a 1,20m", "acessos", "travessao_superior")}
@@ -315,13 +305,14 @@ export default function RelatorioCertificacaoUsina() {
             {ssRow("Dispositivo DR - NBR 5410", "nr10_eletricidade", "dispositivo_dr_nbr5410")}
             {ssRow("Aterramento", "nr10_eletricidade", "aterramento")}
           </tbody>
-        </table>
+          </table>
+          </div>
       </PageContainer>
 
       {/* Página 3: Meio Ambiente */}
       <PageContainer pageBreak>
         <Titulo />
-        <div className="bg-[#FBBF24] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">6 - MEIO AMBIENTE</div>
+        <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">6 - MEIO AMBIENTE</div>
         <table className="w-full border-collapse text-xs">
           <tbody>
             <SubHeader>Ruídos</SubHeader>
@@ -366,7 +357,7 @@ export default function RelatorioCertificacaoUsina() {
       {/* Página 3: Laboratório + Estrutura + Usina */}
       <PageContainer pageBreak>
         <Titulo />
-        <div className="bg-[#FBBF24] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">7.1 LABORATÓRIO</div>
+        <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">7.1 LABORATÓRIO</div>
         <div className="grid grid-cols-2 gap-2 mb-3">
           {Object.entries(EQUIPAMENTOS_LABELS).map(([key, label]) => (
             <ConformeRow key={key} label={label} value={equip[key]} />
@@ -382,7 +373,7 @@ export default function RelatorioCertificacaoUsina() {
           ))}
         </div>
 
-        <div className="bg-[#FBBF24] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-2">7.3 ESTRUTURA E ESPAÇO FÍSICO</div>
+        <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-2">7.3 ESTRUTURA E ESPAÇO FÍSICO</div>
         <table className="w-full border-collapse text-xs mb-3">
           <tbody>
             <ConformeRow label="Baias separadoras" value={ef.baias_separadoras} />
@@ -403,7 +394,7 @@ export default function RelatorioCertificacaoUsina() {
           </tbody>
         </table>
 
-        <div className="bg-[#FBBF24] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-2">7.4 USINA DE ASFALTO</div>
+        <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-2">7.4 USINA DE ASFALTO</div>
         <table className="w-full border-collapse text-xs mb-3">
           <tbody>
             <tr><td className="border border-slate-300 px-2 py-0.5">Tipo</td><td className="border border-slate-300 px-2 py-0.5 font-medium">{val(ua.tipo)}</td>
@@ -422,7 +413,7 @@ export default function RelatorioCertificacaoUsina() {
       {/* Página 4: Aferição + Resultado */}
       <PageContainer>
         <Titulo />
-        <div className="bg-[#FBBF24] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-2">7.2 AFERIÇÃO, REPETIBILIDADE E REPRODUTIBILIDADE</div>
+        <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-2">7.2 AFERIÇÃO, REPETIBILIDADE E REPRODUTIBILIDADE</div>
         <div className="grid grid-cols-2 gap-3 mb-4 text-xs">
           <div className="border border-slate-300 rounded p-2">
             <div className="font-semibold mb-1">Repetibilidade</div>
@@ -453,7 +444,7 @@ export default function RelatorioCertificacaoUsina() {
           </div>
         )}
 
-        <div className="bg-[#FBBF24] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-2">8 - RESULTADO</div>
+        <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-2">8 - RESULTADO</div>
         <div className="text-center py-4 border-2 border-slate-400 rounded">
           <div className="text-sm font-bold text-slate-700 mb-1">Classe atendida:</div>
           <div className="text-2xl font-bold text-[#00233B]">{val(data.resultado_classe)}</div>
