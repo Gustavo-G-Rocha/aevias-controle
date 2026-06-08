@@ -10,9 +10,11 @@ import {
 } from '@/utils/certificacaoUsinaUtils';
 
 describe('calcularErro', () => {
-  it('calcula erro corretamente', () => {
-    expect(calcularErro(10, 12)).toBe(2);
-    expect(calcularErro(5.5, 5.0)).toBeCloseTo(-0.5);
+  it('calcula erro percentual corretamente', () => {
+    // ((12 - 10) / 10) * 100 = 20%
+    expect(calcularErro(10, 12)).toBeCloseTo(20);
+    // ((5.0 - 5.5) / 5.5) * 100 ≈ -9.0909%
+    expect(calcularErro(5.5, 5.0)).toBeCloseTo(-9.0909, 3);
   });
   it('retorna null quando algum valor é null', () => {
     expect(calcularErro(null, 5)).toBeNull();
@@ -21,21 +23,27 @@ describe('calcularErro', () => {
   it('retorna null para valores não numéricos', () => {
     expect(calcularErro('abc', 5)).toBeNull();
   });
+  it('retorna null quando projeto é zero (divisão por zero)', () => {
+    expect(calcularErro(0, 5)).toBeNull();
+  });
 });
 
 describe('calcularDesvioPadrao', () => {
-  it('calcula desvio padrão de lista simples', () => {
+  it('calcula desvio padrão amostral (n-1)', () => {
+    // DP amostral de [2,4,4,4,5,5,7,9]: variância amostral = 4.5714..., dp ≈ 2.138
     const valores = [2, 4, 4, 4, 5, 5, 7, 9];
     const dp = calcularDesvioPadrao(valores);
-    expect(dp).toBeCloseTo(2.0, 1);
+    expect(dp).toBeCloseTo(2.138, 2);
   });
   it('retorna null para menos de 2 valores', () => {
     expect(calcularDesvioPadrao([])).toBeNull();
     expect(calcularDesvioPadrao([5])).toBeNull();
   });
   it('ignora valores nulos', () => {
+    // DP amostral de [4, 6]: variância = (4+4)/1 = 4... espera 1.4142
+    // media=5, soma_sq = (4-5)^2+(6-5)^2 = 2, dp = sqrt(2/1) = sqrt(2) ≈ 1.4142
     const dp = calcularDesvioPadrao([null, 4, 6, null]);
-    expect(dp).toBeCloseTo(1.0, 3);
+    expect(dp).toBeCloseTo(1.4142, 3);
   });
 });
 

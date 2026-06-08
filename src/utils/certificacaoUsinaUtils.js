@@ -33,21 +33,21 @@ export function initGranulometriaRows() {
   }));
 }
 
-/** Calcula erro = obtido - projeto */
+/** Calcula erro percentual = ((obtido - projeto) / projeto) * 100 */
 export function calcularErro(projeto, obtido) {
   if (projeto == null || obtido == null) return null;
   const p = parseFloat(projeto);
   const o = parseFloat(obtido);
-  if (isNaN(p) || isNaN(o)) return null;
-  return parseFloat((o - p).toFixed(4));
+  if (isNaN(p) || isNaN(o) || p === 0) return null;
+  return parseFloat((((o - p) / p) * 100).toFixed(4));
 }
 
-/** Calcula desvio padrão de um array de números */
+/** Calcula desvio padrão amostral (divide por n-1) de um array de números */
 export function calcularDesvioPadrao(valores) {
   const nums = valores.filter((v) => v != null && !isNaN(parseFloat(v))).map(parseFloat);
   if (nums.length < 2) return null;
   const media = nums.reduce((a, b) => a + b, 0) / nums.length;
-  const variancia = nums.reduce((acc, v) => acc + (v - media) ** 2, 0) / nums.length;
+  const variancia = nums.reduce((acc, v) => acc + (v - media) ** 2, 0) / (nums.length - 1);
   return parseFloat(Math.sqrt(variancia).toFixed(4));
 }
 

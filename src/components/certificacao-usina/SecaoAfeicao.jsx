@@ -14,6 +14,9 @@ function ReadCell({ value }) {
 }
 
 function EnsaioTable({ title, rows, onRowChange, disabled, showPeneira = false }) {
+  // Desvio padrão amostral é único por tabela — pega o valor da primeira linha que o tenha
+  const dpValue = !showPeneira ? (rows.find(r => r.desvio_padrao != null)?.desvio_padrao ?? null) : null;
+
   return (
     <div>
       <h4 className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1">{title}</h4>
@@ -23,8 +26,7 @@ function EnsaioTable({ title, rows, onRowChange, disabled, showPeneira = false }
             {showPeneira && <th className="border border-slate-300 px-2 py-1">Peneira</th>}
             <th className="border border-slate-300 px-2 py-1">Projeto</th>
             <th className="border border-slate-300 px-2 py-1">Obtido</th>
-            <th className="border border-slate-300 px-2 py-1">Erro</th>
-            {!showPeneira && <th className="border border-slate-300 px-2 py-1">Desv. Pad.</th>}
+            <th className="border border-slate-300 px-2 py-1">Erro (%)</th>
           </tr>
         </thead>
         <tbody>
@@ -33,9 +35,7 @@ function EnsaioTable({ title, rows, onRowChange, disabled, showPeneira = false }
               {showPeneira && (
                 <td className="border border-slate-300 px-2 py-1 font-medium">{row.peneira}</td>
               )}
-              {/* Projeto: readonly (preenchido pelo projeto) */}
               <ReadCell value={row.projeto} />
-              {/* Obtido: editável */}
               <td className="border border-slate-300 p-0.5">
                 <input
                   type="text"
@@ -51,13 +51,22 @@ function EnsaioTable({ title, rows, onRowChange, disabled, showPeneira = false }
                   className="w-full h-7 px-1 text-xs border-0 bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-400 rounded"
                 />
               </td>
-              {/* Erro: readonly calculado */}
               <ReadCell value={row.erro} />
-              {/* Desv. Pad.: readonly calculado */}
-              {!showPeneira && <ReadCell value={row.desvio_padrao} />}
             </tr>
           ))}
         </tbody>
+        {!showPeneira && (
+          <tfoot>
+            <tr className="bg-slate-100">
+              <td colSpan={3} className="border border-slate-300 px-2 py-1 text-xs font-semibold text-right text-slate-600">
+                Desvio Padrão Amostral:
+              </td>
+              <td className="border border-slate-300 px-2 py-1 text-xs text-center font-semibold text-slate-700">
+                {dpValue != null ? dpValue : "—"}
+              </td>
+            </tr>
+          </tfoot>
+        )}
       </table>
     </div>
   );
@@ -177,7 +186,7 @@ export default function SecaoAfeicao({
             ))}
           </SelectContent>
         </Select>
-        <span className="text-xs text-blue-500">Os valores de Projeto, Erro e Desv. Pad. são calculados automaticamente.</span>
+        <span className="text-xs text-blue-500">Os valores de Projeto, Erro (%) e Desvio Padrão Amostral são calculados automaticamente.</span>
       </div>
 
       <h4 className="text-sm font-semibold text-slate-700 px-1">Ensaios para Validação de Profissionais</h4>
