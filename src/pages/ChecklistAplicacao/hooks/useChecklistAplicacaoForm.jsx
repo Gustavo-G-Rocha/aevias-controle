@@ -121,6 +121,7 @@ export function useChecklistAplicacaoForm({
         status: saveStatus,
         laboratorista_name: user?.laboratorista_name || user?.full_name,
         inspetor_campo: user?.laboratorista_name || user?.full_name,
+        fotos: (formData.fotos || []).map(f => (typeof f === 'string' ? f : (f?.url || ''))).filter(Boolean),
       };
 
       if (editingChecklist) {

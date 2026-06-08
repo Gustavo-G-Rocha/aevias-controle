@@ -134,7 +134,11 @@ export default function ChecklistUsinaPage() {
     const validation = validateChecklistForm(formData, saveStatus);
     if (!validation.valid) { alert(validation.message); return; }
 
-    const dataToSave = { ...formData, status: saveStatus };
+    const dataToSave = {
+      ...formData,
+      status: saveStatus,
+      fotos: (formData.fotos || []).map(f => (typeof f === 'string' ? f : (f?.url || ''))).filter(Boolean),
+    };
 
     try {
       if (editingChecklist?.id) {

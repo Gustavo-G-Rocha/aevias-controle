@@ -54,6 +54,7 @@ export const buildDataToSave = (formData, saveStatus) => {
       ...p,
       temperatura_ambiente: p.temperatura_ambiente ? parseFloat(p.temperatura_ambiente) : null,
     })),
+    fotos: (formData.fotos || []).map(f => (typeof f === 'string' ? f : (f?.url || ''))).filter(Boolean),
     ensaios_empreiteira: {
       ...formData.ensaios_empreiteira,
       compactacao_proctor: serializeEnsaio(formData.ensaios_empreiteira.compactacao_proctor),

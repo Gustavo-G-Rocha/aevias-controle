@@ -136,7 +136,12 @@ export function useDiarioObra() {
       }
     }
 
-    const dataToSave = { ...formData, status: saveStatus, temperatura: formData.temperatura === "" ? null : Number(formData.temperatura) };
+    const dataToSave = {
+      ...formData,
+      status: saveStatus,
+      temperatura: formData.temperatura === "" ? null : Number(formData.temperatura),
+      fotos: (formData.fotos || []).map(f => (typeof f === 'string' ? f : (f?.url || ''))).filter(Boolean),
+    };
 
     try {
       if (editingDiarioOriginal?.id) {

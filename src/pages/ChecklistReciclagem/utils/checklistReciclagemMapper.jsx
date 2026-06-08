@@ -27,6 +27,7 @@ export const validateForm = (formData, saveStatus) => {
 export const buildDataToSave = (formData, saveStatus) => ({
   ...formData,
   status: saveStatus,
+  fotos: (formData.fotos || []).map(f => (typeof f === 'string' ? f : (f?.url || ''))).filter(Boolean),
   periodos_clima: formData.periodos_clima.map(p => ({
     ...p,
     temperatura_ambiente: p.temperatura_ambiente ? parseFloat(p.temperatura_ambiente) : null,
