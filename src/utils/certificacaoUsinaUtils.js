@@ -46,7 +46,7 @@ export function calcularDesvioPadrao(valores) {
   const nums = valores.filter((v) => v != null && !isNaN(parseFloat(v))).map(parseFloat);
   if (nums.length < 2) return null;
   const media = nums.reduce((a, b) => a + b, 0) / nums.length;
-  const variancia = nums.reduce((acc, v) => acc + (v - media) ** 2, 0) / nums.length;
+  const variancia = nums.reduce((acc, v) => acc + (v - media) ** 2, 0) / (nums.length - 1);
   return parseFloat(Math.sqrt(variancia).toFixed(4));
 }
 
