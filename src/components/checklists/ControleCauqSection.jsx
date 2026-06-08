@@ -1,17 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
 // Uncontrolled input — stores value locally, never resets from parent
 function ResultInput({ value, onCommit, disabled, placeholder, style }) {
-  const inputRef = React.useRef(null);
+  const inputRef = useRef(null);
 
-  // Set initial value only on mount
+  // Sync value when it changes externally (e.g. loading saved data)
   useEffect(() => {
-    if (inputRef.current && value != null && value !== '') {
-      inputRef.current.value = String(value);
+    if (inputRef.current) {
+      const current = inputRef.current.value;
+      const incoming = value != null ? String(value) : '';
+      if (current !== incoming) {
+        inputRef.current.value = incoming;
+      }
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <input
@@ -127,7 +131,7 @@ export default function ControleCauqSection({
                         <div className="flex flex-wrap gap-1">
                           {Array.from({ length: quantidade }).map((_, resultIndex) => (
                             <ResultInput
-                              key={`result-${resultIndex}`}
+                              key={`result-${ensaio.key}-${resultIndex}`}
                               value={resultados[resultIndex]}
                               onCommit={(v) => handleNestedChange(
                                 `controle_cauq.${ensaio.key}.resultados.${resultIndex}`,
