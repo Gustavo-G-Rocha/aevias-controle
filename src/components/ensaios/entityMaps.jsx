@@ -25,4 +25,5 @@ export const getEntityMap = () => ({
   "EnsaioProctor": base44.entities.EnsaioProctor,
   "EnsaioRompimentoConcreto": base44.entities.EnsaioRompimentoConcreto,
   "GranuMistura": base44.entities.GranuMistura,
+  "CertificacaoUsina": base44.entities.CertificacaoUsina,
 });

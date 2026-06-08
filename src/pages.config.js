@@ -47,6 +47,8 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import CertificacaoUsina from './pages/CertificacaoUsina/index';
+import RelatorioCertificacaoUsina from './pages/RelatorioCertificacaoUsina';
 import AcompanhamentoCarga from './pages/AcompanhamentoCarga';
 import AcompanhamentoUsinagem from './pages/AcompanhamentoUsinagem';
 import BoletimSondagem from './pages/BoletimSondagem';
@@ -121,6 +123,8 @@ import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "CertificacaoUsina": CertificacaoUsina,
+    "RelatorioCertificacaoUsina": RelatorioCertificacaoUsina,
     "AcompanhamentoCarga": AcompanhamentoCarga,
     "AcompanhamentoUsinagem": AcompanhamentoUsinagem,
     "BoletimSondagem": BoletimSondagem,

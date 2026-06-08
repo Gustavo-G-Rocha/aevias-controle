@@ -91,6 +91,11 @@ export const ENTITY_CONFIG = {
     color: '#3498DB',
     description: 'Novo ensaio viga Benkelman',
   },
+  CertificacaoUsina: {
+    label: 'Certificação de Usina',
+    color: '#7C3AED',
+    description: 'Nova certificação de usina',
+  },
   Obra: {
     label: 'Obra',
     color: '#00233B',

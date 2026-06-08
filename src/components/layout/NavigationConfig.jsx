@@ -145,7 +145,9 @@ export const ENSAIOS_POR_TIPO_OBRA = [
     nome: "Homologação de Usinas",
     icon: Factory,
     tipo_obra: "homologacao_usinas",
-    ensaios: [],
+    ensaios: [
+      { title: "Certificação de Usina", url: createPageUrl("CertificacaoUsina"), icon: FileText },
+    ],
   },
 ];
 

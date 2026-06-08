@@ -29,6 +29,7 @@ const ENSAIO_CONFIG = {
   EnsaioProctor:                { name: "Ensaio Proctor",               icon: FlaskConical, dateField: "data_ensaio",      reportPage: "RelatorioProctor" },
   EnsaioRompimentoConcreto:     { name: "Rompimento Concreto",          icon: FlaskConical, dateField: "data_ensaio",      reportPage: "RelatorioRompimentoConcreto" },
   GranuMistura:                 { name: "Granulometria da Mistura",     icon: FlaskConical, dateField: "data_ensaio",      reportPage: "RelatorioGranuMistura" },
+  CertificacaoUsina:            { name: "Certificação de Usina",        icon: ClipboardList,dateField: "data_vistoria",     reportPage: "RelatorioCertificacaoUsina" },
 };
 
 const FALLBACK = { name: "Ensaio Desconhecido", icon: FileText, dateField: "created_date", reportPage: null };
