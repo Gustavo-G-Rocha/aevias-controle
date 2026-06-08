@@ -8,8 +8,9 @@ export const OPCOES_POSSUI = ["Possui", "Não possui"];
 
 export const CLASSES_USINA = ["Classe I", "Classe II", "Classe III"];
 
+// Labels das peneiras usadas na certificação — devem bater EXATAMENTE com PENEIRAS_CONFIG
 export const PENEIRAS_GRANULOMETRIA = [
-  '1 1/2"', '1"', '3/4"', '1/2"', '3/8"', '#4', '#10', '#40', '#80', '#200',
+  '1.1/2"', '1"', '3/4"', '1/2"', '3/8"', 'Nº 4', 'Nº 8', 'Nº 40', 'Nº 80', 'Nº 200',
 ];
 
 /** Inicializa array de linhas para tabela de ensaios de validação */

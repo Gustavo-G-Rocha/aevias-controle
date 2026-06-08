@@ -1,18 +1,18 @@
 import { useCallback } from 'react';
 import { calcularErro, calcularDesvioPadrao, PENEIRAS_GRANULOMETRIA } from '@/utils/certificacaoUsinaUtils';
 
-// Mapeamento de peneira para chave no faixa_trabalho do projeto
+// Mapeamento de label (de PENEIRAS_CONFIG) para chave no faixa_trabalho do projeto
 const PENEIRA_KEY_MAP = {
-  '1 1/2"': 'peneira_37_5mm',
-  '1"':     'peneira_25_0mm',
-  '3/4"':   'peneira_19_0mm',
-  '1/2"':   'peneira_12_5mm',
-  '3/8"':   'peneira_9_5mm',
-  '#4':     'peneira_4_75mm',
-  '#10':    'peneira_2_36mm',
-  '#40':    'peneira_0_42mm',
-  '#80':    'peneira_0_18mm',
-  '#200':   'peneira_0_075mm',
+  '1.1/2"':  'peneira_37_5mm',
+  '1"':      'peneira_25_0mm',
+  '3/4"':    'peneira_19_0mm',
+  '1/2"':    'peneira_12_5mm',
+  '3/8"':    'peneira_9_5mm',
+  'Nº 4':    'peneira_4_75mm',
+  'Nº 8':    'peneira_2_36mm',
+  'Nº 40':   'peneira_0_42mm',
+  'Nº 80':   'peneira_0_18mm',
+  'Nº 200':  'peneira_0_075mm',
 };
 
 function recalcularErroeDP(rows, hasDP = true) {
@@ -78,13 +78,15 @@ export function useCertificacaoUsinaForm({ setFormData }) {
   const handleGranulometriaChange = useCallback((rowIndex, col, value) => {
     setFormData((prev) => {
       const newData = JSON.parse(JSON.stringify(prev));
-      let rows = PENEIRAS_GRANULOMETRIA.map((p, i) => {
-        const saved = newData.ensaios_validacao?.granulometria?.[i] || {};
-        return { peneira: p, projeto: saved.projeto ?? null, obtido: saved.obtido ?? null, erro: saved.erro ?? null };
-      });
+      // Preserva as linhas dinâmicas salvas no estado
+      let rows = Array.isArray(newData.ensaios_validacao?.granulometria)
+        ? [...newData.ensaios_validacao.granulometria]
+        : [];
       const str = String(value ?? '').replace(',', '.').trim();
       const n = str !== '' ? parseFloat(str) : null;
-      rows[rowIndex] = { ...rows[rowIndex], [col]: (n !== null && isNaN(n)) ? null : n };
+      if (rows[rowIndex]) {
+        rows[rowIndex] = { ...rows[rowIndex], [col]: (n !== null && isNaN(n)) ? null : n };
+      }
       // Recalcula erro (sem DP para granulometria)
       rows = recalcularErroeDP(rows, false);
       newData.ensaios_validacao = { ...(newData.ensaios_validacao || {}), granulometria: rows };
@@ -120,8 +122,8 @@ export function useCertificacaoUsinaForm({ setFormData }) {
       fillRows('densidade_rice', project.densidade_maxima_medida ?? null);
       // Densidade aparente
       fillRows('densidade_aparente', project.massa_especifica_aparente ?? null);
-      // Relação fíler/betume: usa rbv.otimo como proxy (ou null)
-      fillRows('relacao_filer_betume', project.rbv?.otimo ?? null);
+      // Relação fíler/betume: campo dedicado no projeto
+      fillRows('relacao_filer_betume', project.relacao_filer_betume ?? null);
 
       // Granulometria: preenche cada peneira com valor da faixa_trabalho do projeto
       const ft = project.faixa_trabalho || {};
