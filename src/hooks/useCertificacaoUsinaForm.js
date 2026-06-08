@@ -35,8 +35,9 @@ export function useCertificacaoUsinaForm({ setFormData }) {
       while (ensaios[ensaioKey].length <= rowIndex) {
         ensaios[ensaioKey].push({ projeto: null, obtido: null, erro: null, desvio_padrao: null });
       }
-      const parsed = value !== '' ? parseFloat(String(value).replace(',', '.')) : null;
-      ensaios[ensaioKey][rowIndex] = { ...ensaios[ensaioKey][rowIndex], [col]: parsed };
+      const str = String(value ?? '').replace(',', '.').trim();
+      const n = str !== '' ? parseFloat(str) : null;
+      ensaios[ensaioKey][rowIndex] = { ...ensaios[ensaioKey][rowIndex], [col]: (n !== null && isNaN(n)) ? null : n };
       newData.ensaios_validacao = ensaios;
       return newData;
     });
@@ -46,11 +47,13 @@ export function useCertificacaoUsinaForm({ setFormData }) {
   const handleGranulometriaChange = useCallback((rowIndex, col, value) => {
     setFormData((prev) => {
       const newData = JSON.parse(JSON.stringify(prev));
-      const rows = newData.ensaios_validacao?.granulometria || [];
-      while (rows.length <= rowIndex) rows.push({ peneira: '', projeto: null, obtido: null, erro: null });
-      const parsed = value !== '' ? parseFloat(String(value).replace(',', '.')) : null;
-      rows[rowIndex] = { ...rows[rowIndex], [col]: parsed };
-      newData.ensaios_validacao = { ...(newData.ensaios_validacao || {}), granulometria: rows };
+      const existing = newData.ensaios_validacao?.granulometria || [];
+      // Preenche linhas faltantes preservando a peneira já salva (ou vazia)
+      while (existing.length <= rowIndex) existing.push({ peneira: '', projeto: null, obtido: null, erro: null });
+      const str = String(value ?? '').replace(',', '.').trim();
+      const n = str !== '' ? parseFloat(str) : null;
+      existing[rowIndex] = { ...existing[rowIndex], [col]: (n !== null && isNaN(n)) ? null : n };
+      newData.ensaios_validacao = { ...(newData.ensaios_validacao || {}), granulometria: existing };
       return newData;
     });
   }, [setFormData]);
