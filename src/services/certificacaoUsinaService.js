@@ -9,7 +9,7 @@ export async function listarCertificacoesPorObra(obraId) {
 }
 
 export async function obterCertificacaoById(id) {
-  return base44.entities.CertificacaoUsina.read(id);
+  return base44.entities.CertificacaoUsina.get(id);
 }
 
 export async function criarCertificacao(data) {
