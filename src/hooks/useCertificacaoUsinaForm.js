@@ -31,9 +31,12 @@ export function useCertificacaoUsinaForm({ setFormData }) {
     setFormData((prev) => {
       const newData = JSON.parse(JSON.stringify(prev));
       const ensaios = newData.ensaios_validacao || {};
-      if (!Array.isArray(ensaios[ensaioKey])) ensaios[ensaioKey] = [];
-      while (ensaios[ensaioKey].length <= rowIndex) {
-        ensaios[ensaioKey].push({ projeto: null, obtido: null, erro: null, desvio_padrao: null });
+      // Garante sempre 4 linhas fixas
+      if (!Array.isArray(ensaios[ensaioKey]) || ensaios[ensaioKey].length < 4) {
+        const existing = Array.isArray(ensaios[ensaioKey]) ? ensaios[ensaioKey] : [];
+        ensaios[ensaioKey] = Array.from({ length: 4 }, (_, i) =>
+          existing[i] || { projeto: null, obtido: null, erro: null, desvio_padrao: null }
+        );
       }
       const str = String(value ?? '').replace(',', '.').trim();
       const n = str !== '' ? parseFloat(str) : null;

@@ -74,8 +74,12 @@ export default function SecaoAfeicao({ formData, onNestedChange, onEnsaioValidac
     return { peneira: p, projeto: saved.projeto ?? null, obtido: saved.obtido ?? null, erro: saved.erro ?? null };
   });
 
-  const ensaioRows = (key, count = 4) =>
-    ev[key]?.length ? ev[key] : Array.from({ length: count }, () => ({ projeto: null, obtido: null, erro: null, desvio_padrao: null }));
+  const ensaioRows = (key, count = 4) => {
+    const saved = Array.isArray(ev[key]) ? ev[key] : [];
+    return Array.from({ length: Math.max(count, saved.length) }, (_, i) =>
+      saved[i] || { projeto: null, obtido: null, erro: null, desvio_padrao: null }
+    );
+  };
 
   return (
     <div className="space-y-4">
