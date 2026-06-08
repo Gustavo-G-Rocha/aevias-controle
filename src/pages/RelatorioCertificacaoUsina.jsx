@@ -46,21 +46,37 @@ const PageContainer = ({ children, pageBreak = false }) => (
 );
 
 const Titulo = () => (
-  <div className="text-center mb-4 border-2 border-slate-800">
-    <div className="bg-slate-100 text-xs font-bold py-1 border-b border-slate-400">CHECK LIST</div>
-    <div className="text-sm font-bold py-1">PADRONIZAÇÃO E CERTIFICAÇÃO DE USINAS DE MISTURAS ASFÁLTICAS</div>
+  <div className="mb-5 border-2 border-[#00233B] rounded overflow-hidden">
+    {/* Logo header */}
+    <div className="flex items-center justify-between px-4 py-3" style={{ backgroundColor: '#00233B' }}>
+      <img
+        src="https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/2754f7c59_AE_-_Logo_Hor_Negativo.png"
+        alt="Afirmaevias"
+        style={{ height: '36px', width: 'auto' }}
+      />
+      <div className="text-right">
+        <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#BFCF99' }}>Check List</div>
+        <div className="text-[9px] uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.7)' }}>Certificação de Usinas</div>
+      </div>
+    </div>
+    {/* Título principal */}
+    <div className="text-center py-2 px-3" style={{ backgroundColor: '#BFCF99' }}>
+      <div className="text-xs font-bold uppercase tracking-wide" style={{ color: '#00233B' }}>
+        Padronização e Certificação de Usinas de Misturas Asfálticas
+      </div>
+    </div>
   </div>
 );
 
 const SecHeader = ({ children }) => (
   <tr>
-    <td colSpan={4} className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400">{children}</td>
+    <td colSpan={4} className="font-bold text-xs py-1 px-2 border border-[#00233B]" style={{ backgroundColor: '#00233B', color: '#ffffff' }}>{children}</td>
   </tr>
 );
 
 const SubHeader = ({ children }) => (
   <tr>
-    <td colSpan={4} className="bg-slate-200 text-slate-700 font-semibold text-xs py-0.5 px-2 border border-slate-300">{children}</td>
+    <td colSpan={4} className="font-semibold text-xs py-0.5 px-2 border border-[#BFCF99]" style={{ backgroundColor: '#BFCF99', color: '#00233B' }}>{children}</td>
   </tr>
 );
 
@@ -130,7 +146,7 @@ export default function RelatorioCertificacaoUsina() {
     if (!rows?.length) return null;
     return (
       <div className="mb-3">
-        <div className="text-xs font-semibold text-slate-700 mb-1">{title}</div>
+        <div className="text-xs font-semibold px-1 py-0.5 mb-1" style={{ color: '#00233B', borderBottom: '1px solid #BFCF99' }}>{title}</div>
         <table className="w-full border-collapse text-xs">
           <thead>
             <tr className="bg-slate-100">
@@ -171,7 +187,7 @@ export default function RelatorioCertificacaoUsina() {
         <Titulo />
         {/* 1 - Descrição */}
         <div className="mb-3">
-          <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">1 - DESCRIÇÃO</div>
+          <div className="font-bold text-xs py-1.5 px-2 mb-1 border-l-4" style={{ backgroundColor: '#00233B', color: '#ffffff', borderLeftColor: '#BFCF99' }}>1 - DESCRIÇÃO</div>
           <table className="w-full border-collapse text-xs">
             <tbody>
               <tr>
@@ -223,11 +239,11 @@ export default function RelatorioCertificacaoUsina() {
         {/* 2 e 3 */}
         <div className="grid grid-cols-2 gap-3 mb-3">
           <div>
-            <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">2 - CLASSE PRETENDIDA</div>
+            <div className="font-bold text-xs py-1.5 px-2 mb-1 border-l-4" style={{ backgroundColor: '#00233B', color: '#ffffff', borderLeftColor: '#BFCF99' }}>2 - CLASSE PRETENDIDA</div>
             <p className="text-sm font-bold px-2">{val(data.classe_usina)}</p>
           </div>
           <div>
-            <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">3 - TIPO DE USINA</div>
+            <div className="font-bold text-xs py-1.5 px-2 mb-1 border-l-4" style={{ backgroundColor: '#00233B', color: '#ffffff', borderLeftColor: '#BFCF99' }}>3 - TIPO DE USINA</div>
             <table className="w-full text-xs border-collapse">
               <tbody>
                 <tr>
@@ -245,7 +261,7 @@ export default function RelatorioCertificacaoUsina() {
 
         {/* 4 - Aspectos Legais */}
         <div className="mb-3">
-          <div className="bg-[#ccc] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">4 - ASPECTOS LEGAIS DO EMPREENDIMENTO</div>
+          <div className="font-bold text-xs py-1.5 px-2 mb-1 border-l-4" style={{ backgroundColor: '#00233B', color: '#ffffff', borderLeftColor: '#BFCF99' }}>4 - ASPECTOS LEGAIS DO EMPREENDIMENTO</div>
           <table className="w-full border-collapse text-xs">
             <tbody>
               <ConformeRow label="Autorização Ambiental (AA)" value={al.autorizacao_ambiental} />
@@ -259,7 +275,7 @@ export default function RelatorioCertificacaoUsina() {
         <PageContainer pageBreak>
         {/* 5 - SST parcial */}
         <div>
-          <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">5 - ASPECTOS DE SAÚDE E SEGURANÇA DO TRABALHO</div>
+          <div className="font-bold text-xs py-1.5 px-2 mb-1 border-l-4" style={{ backgroundColor: '#00233B', color: '#ffffff', borderLeftColor: '#BFCF99' }}>5 - ASPECTOS DE SAÚDE E SEGURANÇA DO TRABALHO</div>
           <table className="w-full border-collapse text-xs">
             <tbody>
               <SubHeader>Treinamentos</SubHeader>
@@ -312,7 +328,7 @@ export default function RelatorioCertificacaoUsina() {
       {/* Página 3: Meio Ambiente */}
       <PageContainer pageBreak>
         <Titulo />
-        <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">6 - MEIO AMBIENTE</div>
+        <div className="font-bold text-xs py-1.5 px-2 mb-1 border-l-4" style={{ backgroundColor: '#00233B', color: '#ffffff', borderLeftColor: '#BFCF99' }}>6 - MEIO AMBIENTE</div>
         <table className="w-full border-collapse text-xs">
           <tbody>
             <SubHeader>Ruídos</SubHeader>
@@ -357,14 +373,14 @@ export default function RelatorioCertificacaoUsina() {
       {/* Página 3: Laboratório + Estrutura + Usina */}
       <PageContainer pageBreak>
         <Titulo />
-        <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">7.1 LABORATÓRIO</div>
+        <div className="font-bold text-xs py-1.5 px-2 mb-1 border-l-4" style={{ backgroundColor: '#00233B', color: '#ffffff', borderLeftColor: '#BFCF99' }}>7.1 LABORATÓRIO</div>
         <div className="grid grid-cols-2 gap-2 mb-3">
           {Object.entries(EQUIPAMENTOS_LABELS).map(([key, label]) => (
             <ConformeRow key={key} label={label} value={equip[key]} />
           ))}
         </div>
         <div className="mb-3">
-          <div className="text-xs font-semibold text-slate-600 mb-1">Profissionais</div>
+          <div className="text-xs font-semibold px-2 py-0.5 mb-1" style={{ backgroundColor: '#BFCF99', color: '#00233B' }}>Profissionais</div>
           {[["laboratorista", "Laboratorista"], ["auxiliar_laboratorio", "Auxiliar de Laboratório"], ["encarregado_laboratorio", "Encarregado de Laboratório"]].map(([key, label]) => (
             <div key={key} className="text-xs mb-0.5">
               <span className="font-medium">{label}:</span>{" "}
@@ -373,7 +389,7 @@ export default function RelatorioCertificacaoUsina() {
           ))}
         </div>
 
-        <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-2">7.3 ESTRUTURA E ESPAÇO FÍSICO</div>
+        <div className="font-bold text-xs py-1.5 px-2 mb-2 border-l-4" style={{ backgroundColor: '#00233B', color: '#ffffff', borderLeftColor: '#BFCF99' }}>7.3 ESTRUTURA E ESPAÇO FÍSICO</div>
         <table className="w-full border-collapse text-xs mb-3">
           <tbody>
             <ConformeRow label="Baias separadoras" value={ef.baias_separadoras} />
@@ -394,7 +410,7 @@ export default function RelatorioCertificacaoUsina() {
           </tbody>
         </table>
 
-        <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-2">7.4 USINA DE ASFALTO</div>
+        <div className="font-bold text-xs py-1.5 px-2 mb-2 border-l-4" style={{ backgroundColor: '#00233B', color: '#ffffff', borderLeftColor: '#BFCF99' }}>7.4 USINA DE ASFALTO</div>
         <table className="w-full border-collapse text-xs mb-3">
           <tbody>
             <tr><td className="border border-slate-300 px-2 py-0.5">Tipo</td><td className="border border-slate-300 px-2 py-0.5 font-medium">{val(ua.tipo)}</td>
@@ -413,7 +429,7 @@ export default function RelatorioCertificacaoUsina() {
       {/* Página 4: Aferição + Resultado */}
       <PageContainer>
         <Titulo />
-        <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-2">7.2 AFERIÇÃO, REPETIBILIDADE E REPRODUTIBILIDADE</div>
+        <div className="font-bold text-xs py-1.5 px-2 mb-2 border-l-4" style={{ backgroundColor: '#00233B', color: '#ffffff', borderLeftColor: '#BFCF99' }}>7.2 AFERIÇÃO, REPETIBILIDADE E REPRODUTIBILIDADE</div>
         <div className="grid grid-cols-2 gap-3 mb-4 text-xs">
           <div className="border border-slate-300 rounded p-2">
             <div className="font-semibold mb-1">Repetibilidade</div>
@@ -427,7 +443,7 @@ export default function RelatorioCertificacaoUsina() {
           </div>
         </div>
 
-        <div className="text-xs font-semibold text-slate-700 mb-2">Ensaios para Validação de Profissionais</div>
+        <div className="text-xs font-semibold px-2 py-1 mb-2" style={{ backgroundColor: '#BFCF99', color: '#00233B' }}>Ensaios para Validação de Profissionais</div>
         <div className="grid grid-cols-2 gap-3 mb-4">
           {renderEnsaioTable("Granulometria", ev.granulometria, true)}
           {renderEnsaioTable("Teor de Ligante (Rotarex)", ev.teor_ligante_rotarex)}
@@ -444,7 +460,7 @@ export default function RelatorioCertificacaoUsina() {
           </div>
         )}
 
-        <div className="bg-[#CCC] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-2">8 - RESULTADO</div>
+        <div className="font-bold text-xs py-1.5 px-2 mb-2 border-l-4" style={{ backgroundColor: '#00233B', color: '#ffffff', borderLeftColor: '#BFCF99' }}>8 - RESULTADO</div>
         <div className="text-center py-4 border-2 border-slate-400 rounded">
           <div className="text-sm font-bold text-slate-700 mb-1">Classe atendida:</div>
           <div className="text-2xl font-bold text-[#00233B]">{val(data.resultado_classe)}</div>
