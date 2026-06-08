@@ -10,6 +10,11 @@ export default function ProjectFormConcrete({
 }) {
   if (tipoProjetoAtual !== 'CARTA_TRACO_CONCRETO') return null;
 
+  const ct = formData.carta_traco_concreto || {};
+  const handleChange = (field, value) => {
+    onInputChange('carta_traco_concreto', { ...ct, [field]: value });
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -22,8 +27,8 @@ export default function ProjectFormConcrete({
             <Input
               id="fck"
               type="number"
-              value={formData.fck || ''}
-              onChange={(e) => onInputChange('fck', parseFloat(e.target.value))}
+              value={ct.fck || ''}
+              onChange={(e) => handleChange('fck', parseFloat(e.target.value))}
               required
             />
           </div>
@@ -31,8 +36,8 @@ export default function ProjectFormConcrete({
             <Label htmlFor="tipo_cimento">Tipo de Cimento</Label>
             <Input
               id="tipo_cimento"
-              value={formData.tipo_cimento || ''}
-              onChange={(e) => onInputChange('tipo_cimento', e.target.value)}
+              value={ct.tipo_cimento || ''}
+              onChange={(e) => handleChange('tipo_cimento', e.target.value)}
             />
           </div>
         </div>
@@ -44,8 +49,8 @@ export default function ProjectFormConcrete({
               id="slump_projeto"
               type="number"
               step="0.5"
-              value={formData.slump_projeto || ''}
-              onChange={(e) => onInputChange('slump_projeto', parseFloat(e.target.value))}
+              value={ct.slump_projeto || ''}
+              onChange={(e) => handleChange('slump_projeto', parseFloat(e.target.value))}
             />
           </div>
           <div>
@@ -53,8 +58,8 @@ export default function ProjectFormConcrete({
             <Input
               id="consumo_agua"
               type="number"
-              value={formData.consumo_agua || ''}
-              onChange={(e) => onInputChange('consumo_agua', parseFloat(e.target.value))}
+              value={ct.consumo_agua || ''}
+              onChange={(e) => handleChange('consumo_agua', parseFloat(e.target.value))}
             />
           </div>
         </div>
@@ -66,8 +71,8 @@ export default function ProjectFormConcrete({
               id="slump_minimo"
               type="number"
               step="0.5"
-              value={formData.slump_minimo || ''}
-              onChange={(e) => onInputChange('slump_minimo', parseFloat(e.target.value))}
+              value={ct.slump_minimo || ''}
+              onChange={(e) => handleChange('slump_minimo', parseFloat(e.target.value))}
             />
           </div>
           <div>
@@ -76,8 +81,8 @@ export default function ProjectFormConcrete({
               id="slump_maximo"
               type="number"
               step="0.5"
-              value={formData.slump_maximo || ''}
-              onChange={(e) => onInputChange('slump_maximo', parseFloat(e.target.value))}
+              value={ct.slump_maximo || ''}
+              onChange={(e) => handleChange('slump_maximo', parseFloat(e.target.value))}
             />
           </div>
         </div>
@@ -87,16 +92,16 @@ export default function ProjectFormConcrete({
             <Label htmlFor="tipo_aditivo">Tipo de Aditivo</Label>
             <Input
               id="tipo_aditivo"
-              value={formData.tipo_aditivo || ''}
-              onChange={(e) => onInputChange('tipo_aditivo', e.target.value)}
+              value={ct.tipo_aditivo || ''}
+              onChange={(e) => handleChange('tipo_aditivo', e.target.value)}
             />
           </div>
           <div>
             <Label htmlFor="concreteira">Concreteira Fornecedora</Label>
             <Input
               id="concreteira"
-              value={formData.concreteira || ''}
-              onChange={(e) => onInputChange('concreteira', e.target.value)}
+              value={ct.concreteira || ''}
+              onChange={(e) => handleChange('concreteira', e.target.value)}
             />
           </div>
         </div>
