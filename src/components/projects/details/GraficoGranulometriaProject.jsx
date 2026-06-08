@@ -34,28 +34,58 @@ export default function GraficoGranulometriaProject({ project, faixaEspecificaca
     return entry;
   });
 
+  const ticks = data.map(d => d.abertura);
+
   return (
-    <ResponsiveContainer width="100%" height={280}>
-      <LineChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+    <ResponsiveContainer width="100%" height={300}>
+      <LineChart data={data} margin={{ top: 24, right: 20, left: 10, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#00233B20" />
-        <XAxis dataKey="label" tick={{ fontSize: 10 }} />
-        <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} unit="%" />
-        <Tooltip formatter={(v) => `${v}%`} />
+        {/* Eixo X superior (ticks no topo) */}
+        <XAxis
+          xAxisId="top"
+          orientation="top"
+          dataKey="abertura"
+          type="number"
+          scale="log"
+          domain={['dataMin', 'dataMax']}
+          ticks={ticks}
+          tickFormatter={(v) => String(v).replace('.', ',')}
+          tick={{ fontSize: 9 }}
+          allowDuplicatedCategory={false}
+        />
+        {/* Eixo X inferior (ticks na base) */}
+        <XAxis
+          xAxisId="bottom"
+          orientation="bottom"
+          dataKey="abertura"
+          type="number"
+          scale="log"
+          domain={['dataMin', 'dataMax']}
+          ticks={ticks}
+          tickFormatter={(v) => String(v).replace('.', ',')}
+          tick={{ fontSize: 9 }}
+          allowDuplicatedCategory={false}
+        />
+        <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} unit="%" label={{ value: '% Passando da Mistura', angle: -90, position: 'insideLeft', offset: 10, style: { fontSize: 10 } }} />
+        <Tooltip
+          labelFormatter={(v) => `${String(v).replace('.', ',')} mm`}
+          formatter={(val) => [`${val}%`]}
+        />
         <Legend wrapperStyle={{ fontSize: 11 }} />
         {data.some(d => d.espMin !== undefined) && (
-          <Line type="monotone" dataKey="espMin" name="Esp. Mín" stroke="#94a3b8" strokeDasharray="4 2" dot={false} />
+          <Line xAxisId="bottom" type="monotone" dataKey="espMin" name="Esp. Mín" stroke="#94a3b8" strokeDasharray="4 2" dot={false} />
         )}
         {data.some(d => d.espMax !== undefined) && (
-          <Line type="monotone" dataKey="espMax" name="Esp. Máx" stroke="#94a3b8" strokeDasharray="4 2" dot={false} />
+          <Line xAxisId="bottom" type="monotone" dataKey="espMax" name="Esp. Máx" stroke="#94a3b8" strokeDasharray="4 2" dot={false} />
         )}
         {data.some(d => d.min !== undefined) && (
-          <Line type="monotone" dataKey="min" name="Mín Trabalho" stroke="#BFCF99" strokeWidth={1.5} dot={false} />
+          <Line xAxisId="bottom" type="monotone" dataKey="min" name="Mín Trabalho" stroke="#BFCF99" strokeWidth={1.5} dot={{ r: 3 }} />
         )}
         {data.some(d => d.max !== undefined) && (
-          <Line type="monotone" dataKey="max" name="Máx Trabalho" stroke="#BFCF99" strokeWidth={1.5} dot={false} />
+          <Line xAxisId="bottom" type="monotone" dataKey="max" name="Máx Trabalho" stroke="#BFCF99" strokeWidth={1.5} dot={{ r: 3 }} />
         )}
         {data.some(d => d.mistura !== undefined) && (
-          <Line type="monotone" dataKey="mistura" name="Mistura" stroke="#00233B" strokeWidth={2.5} dot={{ r: 3 }} />
+          <Line xAxisId="bottom" type="monotone" dataKey="mistura" name="Mistura" stroke="#00233B" strokeWidth={2.5} dot={{ r: 3 }} />
         )}
       </LineChart>
     </ResponsiveContainer>
