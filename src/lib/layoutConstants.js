@@ -48,6 +48,7 @@ export const REPORT_PAGES = new Set([
   "RelatorioRompimentoConcreto",
   "RelatorioGranuMistura",
   "RelatorioUnificado",
+  "RelatorioCertificacaoUsina",
 ]);
 
 /** Returns the tab zone key for a given pathname, or null */
