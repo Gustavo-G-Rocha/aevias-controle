@@ -6,11 +6,12 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { PENEIRAS_CONFIG } from "@/constants/sieves";
 
 export default function GraficoGranulometriaProject({ project, faixaEspecificacao }) {
-  const peneirasComDados = PENEIRAS_CONFIG.filter(p => {
-    return project.faixa_trabalho?.[p.key] !== undefined ||
-      project.faixa_trabalho_min?.[p.key] !== undefined ||
-      project.faixa_trabalho_max?.[p.key] !== undefined;
-  });
+  const hasValue = (v) => v !== undefined && v !== null;
+  const peneirasComDados = PENEIRAS_CONFIG.filter(p =>
+    hasValue(project.faixa_trabalho?.[p.key]) ||
+    hasValue(project.faixa_trabalho_min?.[p.key]) ||
+    hasValue(project.faixa_trabalho_max?.[p.key])
+  );
 
   if (!peneirasComDados.length) return null;
 
