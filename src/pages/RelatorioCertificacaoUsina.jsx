@@ -38,8 +38,8 @@ const val = (v) => v || "-";
 
 const PageContainer = ({ children, pageBreak = false }) => (
   <div
-    className="bg-white mx-auto print:shadow-none"
-    style={{ width: "210mm", minHeight: "297mm", padding: "14mm 14mm 12mm", breakAfter: pageBreak ? "page" : "auto", pageBreakAfter: pageBreak ? "always" : "auto", boxSizing: "border-box" }}
+    className="bg-white mx-auto print:shadow-none mb-4 print:mb-0"
+    style={{ width: "210mm", padding: "14mm 14mm 12mm", breakAfter: pageBreak ? "page" : "auto", pageBreakAfter: pageBreak ? "always" : "auto", boxSizing: "border-box" }}
   >
     {children}
   </div>
@@ -277,10 +277,11 @@ export default function RelatorioCertificacaoUsina() {
         </div>
       </PageContainer>
 
-      {/* Página 2: SST continuação + Meio Ambiente */}
+      {/* Página 2: SST continuação */}
       <PageContainer pageBreak>
         <Titulo />
-        <table className="w-full border-collapse text-xs mb-3">
+        <div className="bg-[#FBBF24] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">5 - ASPECTOS DE SAÚDE E SEGURANÇA DO TRABALHO (continuação)</div>
+        <table className="w-full border-collapse text-xs">
           <tbody>
             <SubHeader>NR-12 - Acessos</SubHeader>
             {ssRow("Dimensionados, construídos e fixados de modo seguro", "acessos", "dimensionados_seguros")}
@@ -315,7 +316,11 @@ export default function RelatorioCertificacaoUsina() {
             {ssRow("Aterramento", "nr10_eletricidade", "aterramento")}
           </tbody>
         </table>
+      </PageContainer>
 
+      {/* Página 3: Meio Ambiente */}
+      <PageContainer pageBreak>
+        <Titulo />
         <div className="bg-[#FBBF24] text-[#00233B] font-bold text-xs py-1 px-2 border border-slate-400 mb-1">6 - MEIO AMBIENTE</div>
         <table className="w-full border-collapse text-xs">
           <tbody>
@@ -328,14 +333,30 @@ export default function RelatorioCertificacaoUsina() {
             {maRow("Resolução SEMA nº016/2014", "emissao_atmosferica", "resolucao_sema_016_2014")}
             {maRow("Monitoramento fumaça preta diesel", "emissao_atmosferica", "monitoramento_fumaca_preta")}
             {maRow("Filtro material particulado", "emissao_atmosferica", "filtro_material_particulado")}
-            <SubHeader>Efluentes / Resíduos / Contaminação</SubHeader>
+            <SubHeader>Efluentes líquidos</SubHeader>
             {maRow("Fossa séptica NBR 7229", "efluentes_liquidos", "fossa_septica_nbr7229")}
+            {maRow("Manutenção de fossas", "efluentes_liquidos", "manutencao_fossas")}
             {maRow("Óleo lubrificante em tambores", "efluentes_liquidos", "oleo_lubrificante_tambores")}
             {maRow("Óleo destinado a recicladoras licenciadas", "efluentes_liquidos", "oleo_recicladoras_licenciadas")}
+            {maRow("Efluentes CONAMA 357", "efluentes_liquidos", "efluentes_conama_357")}
+            {maRow("Armazenamento de combustíveis", "efluentes_liquidos", "armazenamento_combustiveis")}
+            {maRow("Sem sinais de vazamentos", "efluentes_liquidos", "sem_sinais_vazamentos")}
+            <SubHeader>Resíduos sólidos</SubHeader>
             {maRow("Coleta seletiva", "residuos_solidos", "coleta_seletiva")}
+            {maRow("Transporte licenciado", "residuos_solidos", "transporte_licenciado")}
+            {maRow("Destinação licenciada", "residuos_solidos", "destinacao_licenciada")}
+            {maRow("Licenças arquivadas", "residuos_solidos", "licencas_arquivadas")}
             {maRow("MTR's emitidas", "residuos_solidos", "mtr_emitidas")}
+            <SubHeader>Contaminação / Produtos Perigosos</SubHeader>
             {maRow("PAE disponível", "contaminacao_produtos_perigosos", "plano_atendimento_emergencias")}
             {maRow("FISPQ's disponíveis", "contaminacao_produtos_perigosos", "fispqs_disponiveis")}
+            {maRow("Funcionários treinados FISPQ's", "contaminacao_produtos_perigosos", "funcionarios_treinados_fispqs")}
+            {maRow("Kits de emergência", "contaminacao_produtos_perigosos", "kits_emergencia")}
+            <SubHeader>Considerações gerais</SubHeader>
+            {maRow("Autorização supressão vegetação", "consideracoes_gerais", "autorizacao_supressao_vegetacao")}
+            {maRow("Vegetação remanescente", "consideracoes_gerais", "vegetacao_remanescente")}
+            {maRow("Estruturas de contenção", "consideracoes_gerais", "estruturas_contencao")}
+            {maRow("Outorga de captação", "consideracoes_gerais", "outorga_captacao")}
             {maRow("DDSMA realizados", "consideracoes_gerais", "ddsma")}
             {maRow("APR com aspectos ambientais", "consideracoes_gerais", "apr_aspectos_ambientais")}
           </tbody>
