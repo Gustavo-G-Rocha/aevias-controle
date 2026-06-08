@@ -13,6 +13,7 @@ import {
   Gauge,
   BarChart3,
   TrendingUp,
+  Factory,
 } from "lucide-react";
 
 export const MAIN_NAVIGATION = [
@@ -139,6 +140,12 @@ export const ENSAIOS_POR_TIPO_OBRA = [
       { title: "Mancha + Pêndulo", url: createPageUrl("EnsaioManchaPendulo"), icon: Gauge },
       { title: "Viga Benkelman", url: createPageUrl("EnsaioVigaBenkelman"), icon: Gauge },
     ],
+  },
+  {
+    nome: "Homologação de Usinas",
+    icon: Factory,
+    tipo_obra: "homologacao_usinas",
+    ensaios: [],
   },
 ];
 

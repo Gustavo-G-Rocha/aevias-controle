@@ -72,4 +72,5 @@ export const ALL_OBRA_TYPE_STUBS = [
   { tipo_obra: 'conservacao' },
   { tipo_obra: 'sondagem' },
   { tipo_obra: 'levantamentos' },
+  { tipo_obra: 'homologacao_usinas' },
 ];

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, HardHat, Construction, Wrench, FileText } from "lucide-react";
+import { Plus, HardHat, Construction, Wrench, FileText, Factory } from "lucide-react";
 
 const ObraForm = React.memo(({ obra, regional, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -92,6 +92,7 @@ const ObraForm = React.memo(({ obra, regional, onSave, onCancel }) => {
             <SelectItem value="conservacao"><div className="flex items-center gap-2"><Wrench className="w-4 h-4 text-amber-600" />Conservação</div></SelectItem>
             <SelectItem value="sondagem"><div className="flex items-center gap-2"><FileText className="w-4 h-4 text-purple-600" />Sondagem</div></SelectItem>
             <SelectItem value="levantamentos"><div className="flex items-center gap-2"><FileText className="w-4 h-4 text-teal-600" />Levantamentos</div></SelectItem>
+            <SelectItem value="homologacao_usinas"><div className="flex items-center gap-2"><Factory className="w-4 h-4 text-orange-600" />Homologação de Usinas</div></SelectItem>
           </SelectContent>
         </Select>
         <p className="text-xs text-[#00233B]/60 mt-1">Define quais ensaios estarão disponíveis para esta obra</p>
