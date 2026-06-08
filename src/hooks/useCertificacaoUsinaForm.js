@@ -1,19 +1,6 @@
 import { useCallback } from 'react';
-import { calcularErro, calcularDesvioPadrao, PENEIRAS_GRANULOMETRIA } from '@/utils/certificacaoUsinaUtils';
-
-// Mapeamento de label (de PENEIRAS_CONFIG) para chave no faixa_trabalho do projeto
-const PENEIRA_KEY_MAP = {
-  '1.1/2"':  'peneira_37_5mm',
-  '1"':      'peneira_25_0mm',
-  '3/4"':    'peneira_19_0mm',
-  '1/2"':    'peneira_12_5mm',
-  '3/8"':    'peneira_9_5mm',
-  'Nº 4':    'peneira_4_75mm',
-  'Nº 8':    'peneira_2_36mm',
-  'Nº 40':   'peneira_0_42mm',
-  'Nº 80':   'peneira_0_18mm',
-  'Nº 200':  'peneira_0_075mm',
-};
+import { calcularErro, calcularDesvioPadrao } from '@/utils/certificacaoUsinaUtils';
+import { PENEIRAS_CONFIG } from '@/constants/sieves';
 
 function recalcularErroeDP(rows, hasDP = true) {
   const comErro = rows.map((r) => ({
@@ -125,20 +112,25 @@ export function useCertificacaoUsinaForm({ setFormData }) {
       // Relação fíler/betume: campo dedicado no projeto
       fillRows('relacao_filer_betume', project.relacao_filer_betume ?? null);
 
-      // Granulometria: preenche cada peneira com valor da faixa_trabalho do projeto
+      // Granulometria: usa TODAS as peneiras de PENEIRAS_CONFIG que o projeto tem valor em faixa_trabalho
       const ft = project.faixa_trabalho || {};
-      ev.granulometria = PENEIRAS_GRANULOMETRIA.map((p, i) => {
-        const key = PENEIRA_KEY_MAP[p];
-        const projetoVal = (key && ft[key] != null) ? parseFloat(ft[key]) : null;
-        const saved = (Array.isArray(prev.ensaios_validacao?.granulometria) ? prev.ensaios_validacao.granulometria[i] : null) || {};
-        const obtido = saved.obtido ?? null;
-        return {
-          peneira: p,
-          projeto: projetoVal,
-          obtido,
-          erro: calcularErro(projetoVal, obtido),
-        };
-      });
+      const prevGran = Array.isArray(prev.ensaios_validacao?.granulometria)
+        ? prev.ensaios_validacao.granulometria
+        : [];
+      ev.granulometria = PENEIRAS_CONFIG
+        .filter(({ key }) => ft[key] != null)
+        .map(({ key, label }) => {
+          const projetoVal = parseFloat(ft[key]);
+          // preserva "obtido" já digitado pelo usuário (busca por label)
+          const prevRow = prevGran.find((r) => r.peneira === label) || {};
+          const obtido = prevRow.obtido ?? null;
+          return {
+            peneira: label,
+            projeto: isNaN(projetoVal) ? null : projetoVal,
+            obtido,
+            erro: calcularErro(projetoVal, obtido),
+          };
+        });
 
       newData.ensaios_validacao = ev;
       return newData;
