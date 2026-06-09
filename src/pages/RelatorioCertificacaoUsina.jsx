@@ -303,7 +303,8 @@ export default function RelatorioCertificacaoUsina() {
         <div>
           <div className="font-bold text-xs py-1.5 px-2 mb-1 border-l-4" style={{ backgroundColor: '#00233B', color: '#ffffff', borderLeftColor: '#BFCF99' }}>5 - ASPECTOS DE SAÚDE E SEGURANÇA DO TRABALHO (continuação)</div>
           <table className="w-full border-collapse text-xs">
-            <SubHeader>Escadas do tipo marinheiro</SubHeader>
+            <tbody>
+              <SubHeader>Escadas do tipo marinheiro</SubHeader>
             {ssRow("Possuem gaiolas de proteção, caso possuam altura superior a 3,50m instaladas a partir de 2,0m do piso", "escadas_marinheiro", "gaiolas_protecao")}
             {ssRow("Possuem corrimão ou continuação dos montantes da escada ultrapassando a plataforma em 1,10m a 1,20m", "escadas_marinheiro", "corrimao_montantes")}
             {ssRow("Possuem largura de 0,40m a 0,60m", "escadas_marinheiro", "largura_040_060m")}
