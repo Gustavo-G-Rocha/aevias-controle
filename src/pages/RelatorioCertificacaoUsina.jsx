@@ -406,6 +406,7 @@ export default function RelatorioCertificacaoUsina() {
         </SectionTable>
 
         {/* ── 7.1 LABORATÓRIO ─────────────────────────────────────────────── */}
+        <SecTitle breakBefore>7 - REQUISITOS TÉCNICOS E DE CONTROLE TECNOLÓGICO PARA OPERAÇÃO DA USINA DE ASFALTO</SecTitle>
         <SecTitle breakBefore>7.1 LABORATÓRIO</SecTitle>
         <SectionTable>
           {Object.entries(EQUIPAMENTOS_LABELS).map(([key, label]) => (
