@@ -178,7 +178,7 @@ export default function RelatorioCertificacaoUsina() {
   const pageStyle = {
     width: "210mm",
     margin: "0 auto",
-    padding: "14mm 14mm 14mm",
+    padding: "10mm 15mm",
     backgroundColor: "#fff",
     boxSizing: "border-box",
     fontFamily: "Arial, sans-serif",

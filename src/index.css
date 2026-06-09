@@ -1,6 +1,6 @@
 @media print {
   @page {
-    margin: 15mm 14mm;
+    margin: 10mm 15mm;
     size: A4;
   }
 
