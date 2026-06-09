@@ -39,7 +39,7 @@ const val = (v) => v || "-";
 const PageContainer = ({ children, pageBreak = false }) => (
   <div
     className="bg-white mx-auto print:shadow-none mb-4 print:mb-0"
-    style={{ width: "210mm", minHeight: "297mm", padding: "14mm 14mm 12mm", breakAfter: pageBreak ? "page" : "auto", pageBreakAfter: pageBreak ? "always" : "auto", boxSizing: "border-box" }}
+    style={{ width: "210mm", padding: "14mm 14mm 12mm", breakAfter: pageBreak ? "page" : "auto", pageBreakAfter: pageBreak ? "always" : "auto", boxSizing: "border-box" }}
   >
     {children}
   </div>
@@ -75,8 +75,8 @@ const SecHeader = ({ children }) => (
 );
 
 const SubHeader = ({ children }) => (
-  <tr>
-    <td colSpan={4} className="font-semibold text-xs py-0.5 px-2 border border-[#BFCF99]" style={{ backgroundColor: '#BFCF99', color: '#00233B' }}>{children}</td>
+  <tr style={{ breakInside: "avoid", breakBefore: "avoid" }}>
+    <td colSpan={4} className="font-semibold text-xs py-0.5 px-2" style={{ backgroundColor: '#BFCF99', color: '#00233B', borderWidth: "1px", borderStyle: "solid", borderColor: "#BFCF99" }}>{children}</td>
   </tr>
 );
 
@@ -88,13 +88,15 @@ const ItemRow = ({ label, value, colSpan = false }) => (
   </tr>
 );
 
+const tdStyle = { borderWidth: "1px", borderStyle: "solid", borderColor: "#cbd5e1" };
+
 const ConformeRow = ({ label, value }) => {
   const isC = value === "Conforme" || value === "Sim" || value === "Possui";
   const isNC = value === "Não conforme" || value === "Não" || value === "Não possui";
   return (
-    <tr>
-      <td className="text-xs py-0.5 px-2 border border-slate-300 leading-tight" style={{ width: "70%" }}>{label}</td>
-      <td className={`text-xs py-0.5 px-2 border border-slate-300 text-center font-medium ${isC ? "text-green-700" : isNC ? "text-red-700" : "text-slate-400"}`}>
+    <tr style={{ breakInside: "avoid" }}>
+      <td className="text-xs py-0.5 px-2 leading-tight" style={{ ...tdStyle, width: "70%" }}>{label}</td>
+      <td className={`text-xs py-0.5 px-2 text-center font-medium ${isC ? "text-green-700" : isNC ? "text-red-700" : "text-slate-400"}`} style={tdStyle}>
         {val(value)}
       </td>
     </tr>
