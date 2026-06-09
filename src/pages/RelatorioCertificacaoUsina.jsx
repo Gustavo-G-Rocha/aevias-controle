@@ -512,30 +512,45 @@ export default function RelatorioCertificacaoUsina() {
 
         {/* ── 7.4 USINA DE ASFALTO ────────────────────────────────────────── */}
         <SecTitle>7.4 USINA DE ASFALTO</SecTitle>
-        <SectionTable>
-          <InfoRow label="Tipo" value={ua.tipo} label2="Modelo" value2={ua.modelo} />
-          <InfoRow label="Ano" value={ua.ano_fabricacao} label2="Cap. nominal (t/h)" value2={ua.capacidade_nominal} />
-          <InfoRow label="Prod. nominal (t/h)" value={ua.producao_nominal} label2="Prod. efetiva (t/h)" value2={ua.producao_efetiva} />
-          <InfoRow label="Umidade (%)" value={ua.umidade_pct} label2="Altitude (m)" value2={ua.altitude_m} />
-          <InfoRow label="Retido nº8 (%)" value={ua.material_retido_n8} label2="Temp. final massa (°C)" value2={ua.temperatura_final_massa} />
-          <tr style={{ breakInside: "avoid" }}>
-            <td style={{ ...td, color: "#475569", width: "20%" }}>Fonte elétrica</td>
-            <td style={{ ...td, fontWeight: 600 }} colSpan={3}>{val(ua.fonte_eletrica)}{ua.observacoes_fonte ? ` — ${ua.observacoes_fonte}` : ""}</td>
-          </tr>
-          <tr style={{ breakInside: "avoid" }}>
-            <td style={{ ...td, color: "#475569", width: "20%" }}>Combustível</td>
-            <td style={{ ...td, fontWeight: 600 }} colSpan={3}>{val(ua.tipo_combustivel)}</td>
-          </tr>
-          <InfoRow label="Dosagem da mistura" value={ua.dosagem_mistura} label2="Operação" value2={ua.operacao} />
-          <ConformeRow label="Secagem contra-fluxo" value={ua.secagem_contra_fluxo} />
-          <ConformeRow label="Filtro de mangas – verificação executada" value={ua.filtro_verificacao_executado} />
-          <ConformeRow label="Filtro de mangas – conforme" value={ua.filtro_conforme} />
-          <ConformeRow label="Dosador de finos retornados" value={ua.dosador_finos_retornados} />
-          <ConformeRow label="Dosador de fíler" value={ua.dosador_filler} />
-          <ConformeRow label="Sistema destorroamento RAP" value={ua.sistema_destorroamento_rap} />
-          <ConformeRow label="Classificação RAP em frações" value={ua.classificacao_rap_fracoes} />
-          <ConformeRow label="Projeto WMA" value={ua.projeto_wma} />
-        </SectionTable>
+<SectionTable>
+  <InfoRow label="Tipo" value={ua.tipo} label2="Modelo" value2={ua.modelo} />
+  <InfoRow label="Ano" value={ua.ano_fabricacao} label2="Cap. nominal (t/h)" value2={ua.capacidade_nominal} />
+  <InfoRow label="Prod. nominal (t/h)" value={ua.producao_nominal} label2="Prod. efetiva (t/h)" value2={ua.producao_efetiva} />
+  <InfoRow label="Umidade (%)" value={ua.umidade_pct} label2="Altitude (m)" value2={ua.altitude_m} />
+  <InfoRow label="Retido nº8 (%)" value={ua.material_retido_n8} label2="Temp. final massa (°C)" value2={ua.temperatura_final_massa} />
+  
+  <tr style={{ breakInside: "avoid" }}>
+    <td style={{ ...td, color: "#475569", width: "20%" }}>Fonte elétrica</td>
+    <td style={{ ...td, fontWeight: 600 }} colSpan={3}>{val(ua.fonte_eletrica)}{ua.observacoes_fonte ? ` — ${ua.observacoes_fonte}` : ""}</td>
+  </tr>
+  <tr style={{ breakInside: "avoid" }}>
+    <td style={{ ...td, color: "#475569", width: "20%" }}>Combustível</td>
+    <td style={{ ...td, fontWeight: 600 }} colSpan={3}>{val(ua.tipo_combustivel)}</td>
+  </tr>
+  
+  <InfoRow label="Dosagem da mistura" value={ua.dosagem_mistura} label2="Operação" value2={ua.operacao} />
+
+  {/* Refatoração manual das linhas usando colSpan={3} */}
+  {[
+    { label: "Secagem contra-fluxo", val: ua.secagem_contra_fluxo },
+    { label: "Filtro de mangas – verificação executada", val: ua.filtro_verificacao_executado },
+    { label: "Filtro de mangas – conforme", val: ua.filtro_conforme },
+    { label: "Dosador de finos retornados", val: ua.dosador_finos_retornados },
+    { label: "Dosador de fíler", val: ua.dosador_filler },
+    { label: "Sistema destorroamento RAP", val: ua.sistema_destorroamento_rap },
+    { label: "Classificação RAP em frações", val: ua.classificacao_rap_fracoes },
+    { label: "Projeto WMA", val: ua.projeto_wma },
+  ].map((item, idx) => (
+    <tr key={idx} style={{ breakInside: "avoid" }}>
+      <td style={{ ...td, color: "#475569" }}>{item.label}</td>
+      <td style={{ ...td, fontWeight: 700, textAlign: "center" }} colSpan={3}>
+        <span style={{ color: item.val === "Sim" || item.val === true ? "#15803d" : "#b91c1c" }}>
+          {item.val ? "Sim" : "Não"}
+        </span>
+      </td>
+    </tr>
+  ))}
+</SectionTable>
 
         {/* ── 8 - RESULTADO ───────────────────────────────────────────────── */}
         <SecTitle>8 - RESULTADO</SecTitle>
