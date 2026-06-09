@@ -55,8 +55,8 @@ const Titulo = () => (
         style={{ height: '40px', width: 'auto' }}
       />
       <div className="text-right">
-        <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#00233B' }}>Check List</div>
-        <div className="text-[9px] uppercase tracking-wide" style={{ color: '#BFCF99' }}>Certificação de Usinas</div>
+        <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#00233B' }}>Checklist</div>
+        <div className="text-[9px] uppercase tracking-wide" style={{ color: '#00233B' }}>Certificação de Usinas</div>
       </div>
     </div>
     {/* Título principal */}
