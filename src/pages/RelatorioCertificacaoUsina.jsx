@@ -233,7 +233,7 @@ export default function RelatorioCertificacaoUsina() {
         </SectionTable>
 
         {/* ── 5 - SST ─────────────────────────────────────────────────────── */}
-        <SecTitle breakBefore>5 - ASPECTOS DE SAÚDE E SEGURANÇA DO TRABALHO</SecTitle>
+        <SecTitle>5 - ASPECTOS DE SAÚDE E SEGURANÇA DO TRABALHO</SecTitle>
 
         <SubTitle>Treinamentos</SubTitle>
         <SectionTable>
@@ -515,7 +515,7 @@ export default function RelatorioCertificacaoUsina() {
         </SectionTable>
 
         {/* ── 8 - RESULTADO ───────────────────────────────────────────────── */}
-        <SecTitle breakBefore>8 - RESULTADO</SecTitle>
+        <SecTitle>8 - RESULTADO</SecTitle>
 
         {(data.observacoes_resultado || data.observacoes_gerais) && (
           <div style={{ fontSize: "11px", marginBottom: "10px", padding: "6px 8px", border: "1px solid #e2e8f0", borderRadius: "4px" }}>
