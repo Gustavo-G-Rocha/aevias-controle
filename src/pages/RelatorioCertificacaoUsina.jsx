@@ -176,7 +176,8 @@ export default function RelatorioCertificacaoUsina() {
 
   // Wrapper único — fluxo contínuo, o navegador/PDF gerencia as quebras
   const pageStyle = {
-    width: "210mm",
+    width: "100%",
+    maxWidth: "210mm",
     margin: "0 auto",
     padding: "10mm 15mm",
     backgroundColor: "#fff",
@@ -193,7 +194,7 @@ export default function RelatorioCertificacaoUsina() {
         </Button>
       </div>
 
-      <div style={pageStyle}>
+      <div style={pageStyle} data-print-container>
         <Titulo />
 
         {/* ── 1 - DESCRIÇÃO ───────────────────────────────────────────────── */}

@@ -26,6 +26,13 @@
     padding: 0 !important;
     background: white !important;
   }
+
+  /* Remove padding do wrapper do relatório — margens vêm do @page */
+  [data-print-container] {
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+  }
 }
 
 @tailwind base;
