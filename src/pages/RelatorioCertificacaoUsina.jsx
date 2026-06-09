@@ -280,79 +280,83 @@ export default function RelatorioCertificacaoUsina() {
           <table className="w-full border-collapse text-xs">
             <tbody>
               <SubHeader>Treinamentos</SubHeader>
-              {ssRow("Eletricistas - NR-10", "treinamentos", "nr10_eletricistas")}
-              {ssRow("Operadores - NR-11 e NR-12", "treinamentos", "nr11_nr12_operadores")}
-              {ssRow("Integração (NR-18)", "treinamentos", "nr18_integracao")}
-              {ssRow("Trabalho em altura (NR-35)", "treinamentos", "nr35_altura")}
-              {ssRow("FISPQ's produtos químicos", "treinamentos", "fispq_quimicos")}
-              <SubHeader>EPIs</SubHeader>
-              {ssRow("Aprovados pelo Ministério do Trabalho", "epis", "aprovados_ministerio")}
-              {ssRow("Compatíveis com atividades", "epis", "compativeis_atividades")}
-              {ssRow("Sendo cautelados", "epis", "sendo_cautelados")}
-              {ssRow("Extintores - NBR NPT-021", "epis", "extintores_npt021")}
+              {ssRow("Os eletricistas possuem treinamento em NR-10", "treinamentos", "nr10_eletricistas")}
+              {ssRow("Os operadores de máquinas e equipamentos possuem treinamento em NR-11 e NR-12", "treinamentos", "nr11_nr12_operadores")}
+              {ssRow("Todos os funcionários possuem treinamento de integração (NR-18)", "treinamentos", "nr18_integracao")}
+              {ssRow("Os funcionários que desenvolvem atividades acima de 2,0m de altura possuem treinamento em NR-35", "treinamentos", "nr35_altura")}
+              {ssRow("Os funcionários que manipulam produtos químicos possuem treinamento das FISPQ's", "treinamentos", "fispq_quimicos")}
+              <SubHeader>Equipamentos de proteção individual e coletiva</SubHeader>
+              {ssRow("Os EPI's entregues aos funcionários são aprovados pelo Ministério do Trabalho", "epis", "aprovados_ministerio")}
+              {ssRow("Os EPI's entregues aos funcionários são compatíveis com as atividades desempenhadas", "epis", "compativeis_atividades")}
+              {ssRow("Os EPI's entregues aos funcionários estão sendo cautelados", "epis", "sendo_cautelados")}
+              {ssRow("Os extintores estão instalados conforme norma do Corpo de Bombeiros NPT-021", "epis", "extintores_npt021")}
               <SubHeader>NR-12 - Acessos</SubHeader>
-            {ssRow("Dimensionados, construídos e fixados de modo seguro", "acessos", "dimensionados_seguros")}
-            {ssRow("Material resistente às intempéries e corrosão", "acessos", "material_resistente")}
-            {ssRow("Travessão superior 1,10m a 1,20m", "acessos", "travessao_superior")}
-            {ssRow("Sem superfície plana no travessão", "acessos", "sem_superficie_plana")}
-            {ssRow("Rodapé + travessão intermediário", "acessos", "rodape_travessao_intermediario")}
-            {ssRow("Largura de 0,60m", "acessos", "largura_060m")}
-            <SubHeader>Escadas tipo marinheiro</SubHeader>
-            {ssRow("Gaiolas de proteção (h > 3,50m)", "escadas_marinheiro", "gaiolas_protecao")}
-            {ssRow("Corrimão/montantes", "escadas_marinheiro", "corrimao_montantes")}
-            {ssRow("Largura 0,40m a 0,60m", "escadas_marinheiro", "largura_040_060m")}
-            {ssRow("Altura máx. 10m (único lance)", "escadas_marinheiro", "altura_max_10m")}
-            {ssRow("Altura máx. 6m entre plataformas", "escadas_marinheiro", "altura_max_6m_plataformas")}
-            {ssRow("Espaçamento barras 0,25m a 0,30m", "escadas_marinheiro", "espacamento_barras_025_030m")}
-            {ssRow("Espaçamento piso/primeira barra ≤ 0,60m", "escadas_marinheiro", "espacamento_piso_primeira_barra")}
-            {ssRow("Distância estrutura ≥ 0,15m", "escadas_marinheiro", "distancia_estrutura_015m")}
-            {ssRow("Diâmetro das barras", "escadas_marinheiro", "diametro_barras")}
-            {ssRow("Barras antideslizamento", "escadas_marinheiro", "barras_antideslizamento")}
+            {ssRow("Os meios de acesso da usina são dimensionados, construídos e fixados de modo seguro e resistente", "acessos", "dimensionados_seguros")}
+            {ssRow("Os meios de acesso são construídos de material resistente às intempéries e corrosão", "acessos", "material_resistente")}
+            {ssRow("Os meios de acesso possuem travessão superior instalado de 1,10m a 1,20m de altura em relação ao piso por toda a extensão, em ambos os lados", "acessos", "travessao_superior")}
+            {ssRow("Os meios de acesso não possuem travessão com superfície plana", "acessos", "sem_superficie_plana")}
+            {ssRow("Os meios de acesso possuem rodapé de, no mínimo 0,20m de altura e travessão intermediário a 0,70m de altura em relação ao piso", "acessos", "rodape_travessao_intermediario")}
+            {ssRow("As passarelas, plataformas e rampas têm largura de 0,60m", "acessos", "largura_060m")}
+            <SubHeader>Escadas do tipo marinheiro</SubHeader>
+            {ssRow("Possuem gaiolas de proteção, caso possuam altura superior a 3,50m instaladas a partir de 2,0m do piso", "escadas_marinheiro", "gaiolas_protecao")}
+            {ssRow("Possuem corrimão ou continuação dos montantes da escada ultrapassando a plataforma em 1,10m a 1,20m", "escadas_marinheiro", "corrimao_montantes")}
+            {ssRow("Possuem largura de 0,40m a 0,60m", "escadas_marinheiro", "largura_040_060m")}
+            {ssRow("Possuem altura total máxima de 10m se for de um único lance", "escadas_marinheiro", "altura_max_10m")}
+            {ssRow("Possuem altura máxima de 6m entre duas plataformas de descanso, se for de múltiplos lances", "escadas_marinheiro", "altura_max_6m_plataformas")}
+            {ssRow("Possuem espaçamento entre barras horizontais de 0,25m a 0,30m", "escadas_marinheiro", "espacamento_barras_025_030m")}
+            {ssRow("Possuem espaçamento entre o piso da máquina ou da edificação e a primeira barra não superior a 0,55m", "escadas_marinheiro", "espacamento_piso_primeira_barra")}
+            {ssRow("Possuem distância em relação à estrutura em que é fixada de, no mínimo 0,15m", "escadas_marinheiro", "distancia_estrutura_015m")}
+            {ssRow("Possuem barras horizontais de 0,025m a 0,038m de diâmetro ou espessura", "escadas_marinheiro", "diametro_barras")}
+            {ssRow("Possuem barras horizontais com superfícies, formas ou ranhuras a fim de prevenir deslizamentos", "escadas_marinheiro", "barras_antideslizamento")}
             <SubHeader>Gaiolas de proteção</SubHeader>
-            {ssRow("Diâmetro 0,65m a 0,80m", "gaiolas_protecao", "diametro_065_080m")}
-            {ssRow("Barras verticais espaçamento", "gaiolas_protecao", "barras_verticais_espacamento")}
-            {ssRow("Vãos entre arcos", "gaiolas_protecao", "vaos_arcos")}
-            <SubHeader>Instalações elétricas / Quadros / Dispositivos</SubHeader>
-            {ssRow("Condutores - resistência mecânica", "instalacoes_eletricas", "condutores_resistencia_mecanica")}
-            {ssRow("Condutores - proteção rompimento", "instalacoes_eletricas", "condutores_protecao_rompimento")}
-            {ssRow("Condutores - localização adequada", "instalacoes_eletricas", "condutores_localizacao")}
-            {ssRow("Condutores - em trânsito protegidos", "instalacoes_eletricas", "condutores_transito")}
-            {ssRow("Condutores - sem riscos", "instalacoes_eletricas", "condutores_sem_riscos")}
-            {ssRow("Condutores - material não propaga fogo", "instalacoes_eletricas", "condutores_material_nao_propaga_fogo")}
-            {ssRow("Quadros - porta fechada", "instalacoes_eletricas", "quadros_porta_fechada")}
-            {ssRow("Quadros - sinalização choque elétrico", "instalacoes_eletricas", "quadros_sinalizacao_choque")}
-            {ssRow("Quadros - conservação", "instalacoes_eletricas", "quadros_conservacao")}
-            {ssRow("Quadros - identificação circuitos", "instalacoes_eletricas", "quadros_identificacao_circuitos")}
-            {ssRow("Quadros - proteção sobretensão", "instalacoes_eletricas", "quadros_protecao_sobretensao")}
-            {ssRow("Dispositivos - sem zona perigosa", "instalacoes_eletricas", "dispositivos_sem_zona_perigosa")}
-            {ssRow("Dispositivos - emergência por terceiros", "instalacoes_eletricas", "dispositivos_emergencia")}
-            {ssRow("Dispositivos - sem acionamento involuntário", "instalacoes_eletricas", "dispositivos_sem_acionamento_involuntario")}
-            {ssRow("Dispositivos - sem burla", "instalacoes_eletricas", "dispositivos_sem_burla")}
-            {ssRow("Dispositivos - sem funcionamento automático", "instalacoes_eletricas", "dispositivos_sem_funcionamento_automatico")}
-            <SubHeader>Sistemas de segurança / Proteções</SubHeader>
-            {ssRow("Proteções fixas e móveis interligadas", "sistemas_seguranca", "protecoes_fixas_moveis")}
-            {ssRow("Engrenagens protegidas", "sistemas_seguranca", "engrenagens_protegidas")}
-            {ssRow("Proteções - funções durante vida útil", "protecoes", "funcoes_vida_util")}
-            {ssRow("Proteções - materiais de contenção", "protecoes", "materiais_contencao")}
-            {ssRow("Proteções - fixação e estabilidade", "protecoes", "fixacao_estabilidade")}
-            {ssRow("Proteções - sem esmagamento", "protecoes", "sem_esmagamento")}
-            {ssRow("Proteções - sem arestas cortantes", "protecoes", "sem_arestas_cortantes")}
-            {ssRow("Proteções - resistem condições ambientais", "protecoes", "resistem_condicoes_ambientais")}
-            {ssRow("Proteções - dificultam burla", "protecoes", "dificulta_burla")}
-            {ssRow("Proteções - higiene e limpeza", "protecoes", "higiene_limpeza")}
-            {ssRow("Proteções - impedem acesso a perigo", "protecoes", "impedem_acesso_perigo")}
-            {ssRow("Proteções - intertravamento protegidos", "protecoes", "intertravamento_protegidos")}
-            <SubHeader>NR-35 / NR-10</SubHeader>
-            {ssRow("Treinamento NR-35 trabalhadores em altura", "nr35_trabalho_altura", "treinamento_nr35")}
-            {ssRow("ASO - apto para trabalho em altura", "nr35_trabalho_altura", "aso_apto_altura")}
-            {ssRow("Análise de risco", "nr35_trabalho_altura", "analise_risco")}
-            {ssRow("Permissão de trabalho", "nr35_trabalho_altura", "permissao_trabalho")}
-            {ssRow("Cinto de segurança e talabarte", "nr35_trabalho_altura", "cinto_talabarte")}
-            {ssRow("Prontuários instalações ≥ 75kW", "nr10_eletricidade", "prontuarios_75kw")}
-            {ssRow("Esquema unifilar por profissional habilitado", "nr10_eletricidade", "esquema_unifilar")}
-            {ssRow("Dispositivo DR - NBR 5410", "nr10_eletricidade", "dispositivo_dr_nbr5410")}
-            {ssRow("Aterramento", "nr10_eletricidade", "aterramento")}
-            {ssRow("Treinamento NR-10", "nr10_eletricidade", "treinamento_nr10")}
+            {ssRow("Têm diâmetro de 0,65 a 0,80m", "gaiolas_protecao", "diametro_065_080m")}
+            {ssRow("Possuem barras verticais com espaçamento máximo de 0,30m entre si e distância máxima de 1,50m entre arcos", "gaiolas_protecao", "barras_verticais_espacamento")}
+            {ssRow("Possuem vãos entre arcos de, no máximo, 0,30m dotadas de barra vertical de sustentação dos arcos", "gaiolas_protecao", "vaos_arcos")}
+            <SubHeader>Instalações e dispositivos elétricos - Condutores de alimentação elétrica</SubHeader>
+            {ssRow("Oferecem resistência mecânica", "instalacoes_eletricas", "condutores_resistencia_mecanica")}
+            {ssRow("Possuem proteção contra a possibilidade de rompimento mecânico, de contatos abrasivos e de contato com lubrificantes, combustíveis e calor", "instalacoes_eletricas", "condutores_protecao_rompimento")}
+            {ssRow("Têm localização de forma que nenhum segmento fique em contato com as partes móveis ou cantos vivos", "instalacoes_eletricas", "condutores_localizacao")}
+            {ssRow("Não dificultam o trânsito de pessoas e materiais ou a operação das máquinas", "instalacoes_eletricas", "condutores_transito")}
+            {ssRow("Não oferecem quaisquer outros tipos de riscos na sua localização", "instalacoes_eletricas", "condutores_sem_riscos")}
+            {ssRow("São construídos de materiais que não propaguem fogo", "instalacoes_eletricas", "condutores_material_nao_propaga_fogo")}
+            <SubHeader>Quadros ou Painéis de comando e potência</SubHeader>
+            {ssRow("Possuem porta de acesso mantida permanentemente fechada, exceto em manutenções", "instalacoes_eletricas", "quadros_porta_fechada")}
+            {ssRow("Possuem sinalização quanto ao perigo de choque elétrico e restrição de acesso por pessoas não autorizadas", "instalacoes_eletricas", "quadros_sinalizacao_choque")}
+            {ssRow("São mantidos em bom estado de conservação, limpos e livres de objetos e ferramentas", "instalacoes_eletricas", "quadros_conservacao")}
+            {ssRow("Possuem proteção e identificação dos circuitos", "instalacoes_eletricas", "quadros_identificacao_circuitos")}
+            {ssRow("Possuem dispositivo protetor contra sobretensão quando a elevação da tensão puder ocasionar risco de acidentes", "instalacoes_eletricas", "quadros_protecao_sobretensao")}
+            <SubHeader>Dispositivos de partida, acionamento e parada</SubHeader>
+            {ssRow("Não se localizam em zonas perigosas", "instalacoes_eletricas", "dispositivos_sem_zona_perigosa")}
+            {ssRow("Podem ser acionados ou desligados em caso de emergência por outra pessoa que não seja o operador", "instalacoes_eletricas", "dispositivos_emergencia")}
+            {ssRow("Impedem o acionamento ou desligamento involuntário pelo operador ou por qualquer outra forma acidental", "instalacoes_eletricas", "dispositivos_sem_acionamento_involuntario")}
+            {ssRow("É dificultado a burla", "instalacoes_eletricas", "dispositivos_sem_burla")}
+            {ssRow("Possuem dispositivos que impeçam seu funcionamento automático ao serem energizadas", "instalacoes_eletricas", "dispositivos_sem_funcionamento_automatico")}
+            <SubHeader>Sistemas de segurança</SubHeader>
+            {ssRow("Possui proteções fixas, proteções móveis e dispositivos de segurança interligados, que protejam a saúde e a integridade física dos funcionários", "sistemas_seguranca", "protecoes_fixas_moveis")}
+            {ssRow("Todas as engrenagens, polias, correntes, rodas dentadas e outras peças móveis estão protegidas", "sistemas_seguranca", "engrenagens_protegidas")}
+            <SubHeader>Proteções</SubHeader>
+            {ssRow("Cumprem suas funções durante a vida útil ou possibilitam a reposição de partes danificadas", "protecoes", "funcoes_vida_util")}
+            {ssRow("São construídas de materiais resistentes e adequados à contenção de projeção de peças, materiais e partículas", "protecoes", "materiais_contencao")}
+            {ssRow("Possuem fixação firme e garantia de estabilidade e resistência mecânica", "protecoes", "fixacao_estabilidade")}
+            {ssRow("Não criam pontos de esmagamento ou agarramento com partes da máquina ou com outras proteções", "protecoes", "sem_esmagamento")}
+            {ssRow("Não possuem extremidades e arestas cortantes ou outras saliências perigosas", "protecoes", "sem_arestas_cortantes")}
+            {ssRow("Resistem às condições ambientais do local onde estão instaladas", "protecoes", "resistem_condicoes_ambientais")}
+            {ssRow("Dificulta-se a burla", "protecoes", "dificulta_burla")}
+            {ssRow("Proporcionam condições de higiene e limpeza", "protecoes", "higiene_limpeza")}
+            {ssRow("Impedem o acesso à zona de perigo", "protecoes", "impedem_acesso_perigo")}
+            {ssRow("Têm seus dispositivos de intertravamento protegidos adequadamente contra sujidade, poeiras e corrosão", "protecoes", "intertravamento_protegidos")}
+            <SubHeader>NR-35 – Trabalho em altura</SubHeader>
+            {ssRow("Todos os funcionários autorizados a realizar trabalho em altura possuem treinamento em NR-35", "nr35_trabalho_altura", "treinamento_nr35")}
+            {ssRow("Os ASO's dos funcionários que realizam trabalho em altura constam aptos para trabalho em altura", "nr35_trabalho_altura", "aso_apto_altura")}
+            {ssRow("Antes do início das atividades foi feita a Análise de Risco", "nr35_trabalho_altura", "analise_risco")}
+            {ssRow("As atividades não rotineiras são previamente autorizadas através de Permissão de Trabalho", "nr35_trabalho_altura", "permissao_trabalho")}
+            {ssRow("Os funcionários estão fazendo o uso do cinto de segurança e talabarte compatível", "nr35_trabalho_altura", "cinto_talabarte")}
+            <SubHeader>NR-10 – Segurança em instalações e serviços em eletricidade</SubHeader>
+            {ssRow("Para instalação elétrica superior a 75kW possui prontuários de instalações elétricas, incluindo o sistema de proteção contra descargas atmosféricas", "nr10_eletricidade", "prontuarios_75kw")}
+            {ssRow("Os painéis elétricos devem possuir esquema unifilar elaborado por profissional legalmente habilitado", "nr10_eletricidade", "esquema_unifilar")}
+            {ssRow("Nos painéis elétricos estão instalados dispositivo DR (disjuntor residual) conforme NBR 5410", "nr10_eletricidade", "dispositivo_dr_nbr5410")}
+            {ssRow("As instalações e equipamentos estão aterrados", "nr10_eletricidade", "aterramento")}
+            {ssRow("Os eletricistas receberão treinamento de NR-10", "nr10_eletricidade", "treinamento_nr10")}
           </tbody>
           </table>
           </div>
@@ -365,40 +369,40 @@ export default function RelatorioCertificacaoUsina() {
         <table className="w-full border-collapse text-xs">
           <tbody>
             <SubHeader>Ruídos</SubHeader>
-            {maRow("Medição semestral NBR 10.151/2019", "ruidos", "medicao_semestral_nbr10151")}
-            {maRow("Horários e intensidade conforme legislação", "ruidos", "horarios_intensidade_municipio")}
-            {maRow("Manutenções periódicas máquinas", "ruidos", "manutencao_maquinas")}
+            {maRow("Estão sendo realizadas semestralmente a medição de ruídos conforme NBR 10.151/2019", "ruidos", "medicao_semestral_nbr10151")}
+            {maRow("Estão sendo respeitados os horários e a intensidade de ruído conforme legislação municipal", "ruidos", "horarios_intensidade_municipio")}
+            {maRow("Estão sendo feitas as manutenções periódicas das máquinas e equipamentos", "ruidos", "manutencao_maquinas")}
             <SubHeader>Emissão atmosférica</SubHeader>
-            {maRow("Medição poluentes chaminé semestral", "emissao_atmosferica", "medicao_poluentes_chamine")}
-            {maRow("Resolução SEMA nº016/2014", "emissao_atmosferica", "resolucao_sema_016_2014")}
-            {maRow("Monitoramento fumaça preta diesel", "emissao_atmosferica", "monitoramento_fumaca_preta")}
-            {maRow("Filtro material particulado", "emissao_atmosferica", "filtro_material_particulado")}
-            <SubHeader>Efluentes líquidos</SubHeader>
-            {maRow("Fossa séptica NBR 7229", "efluentes_liquidos", "fossa_septica_nbr7229")}
-            {maRow("Manutenção de fossas", "efluentes_liquidos", "manutencao_fossas")}
-            {maRow("Óleo lubrificante em tambores", "efluentes_liquidos", "oleo_lubrificante_tambores")}
-            {maRow("Óleo destinado a recicladoras licenciadas", "efluentes_liquidos", "oleo_recicladoras_licenciadas")}
-            {maRow("Efluentes CONAMA 357", "efluentes_liquidos", "efluentes_conama_357")}
-            {maRow("Armazenamento de combustíveis", "efluentes_liquidos", "armazenamento_combustiveis")}
-            {maRow("Sem sinais de vazamentos", "efluentes_liquidos", "sem_sinais_vazamentos")}
-            <SubHeader>Resíduos sólidos</SubHeader>
-            {maRow("Coleta seletiva", "residuos_solidos", "coleta_seletiva")}
-            {maRow("Transporte licenciado", "residuos_solidos", "transporte_licenciado")}
-            {maRow("Destinação licenciada", "residuos_solidos", "destinacao_licenciada")}
-            {maRow("Licenças arquivadas", "residuos_solidos", "licencas_arquivadas")}
-            {maRow("MTR's emitidas", "residuos_solidos", "mtr_emitidas")}
-            <SubHeader>Contaminação / Produtos Perigosos</SubHeader>
-            {maRow("PAE disponível", "contaminacao_produtos_perigosos", "plano_atendimento_emergencias")}
-            {maRow("FISPQ's disponíveis", "contaminacao_produtos_perigosos", "fispqs_disponiveis")}
-            {maRow("Funcionários treinados FISPQ's", "contaminacao_produtos_perigosos", "funcionarios_treinados_fispqs")}
-            {maRow("Kits de emergência", "contaminacao_produtos_perigosos", "kits_emergencia")}
+            {maRow("É realizada a medição de poluentes na chaminé da usina com periodicidade semestral", "emissao_atmosferica", "medicao_poluentes_chamine")}
+            {maRow("Estão sendo atendidos os valores especificados na resolução SEMA nº016/2014", "emissao_atmosferica", "resolucao_sema_016_2014")}
+            {maRow("É realizado o monitoramento do índice de fumaça preta dos equipamentos que utilizam diesel", "emissao_atmosferica", "monitoramento_fumaca_preta")}
+            {maRow("A usina possui filtro para material particulado", "emissao_atmosferica", "filtro_material_particulado")}
+            <SubHeader>Efluentes Líquidos</SubHeader>
+            {maRow("Possui fossa séptica de acordo com a norma NBR 7229 em local onde não possui rede de esgoto", "efluentes_liquidos", "fossa_septica_nbr7229")}
+            {maRow("É promovida a manutenção e limpeza por empresas licenciadas e especializadas das fossas sépticas", "efluentes_liquidos", "manutencao_fossas")}
+            {maRow("O óleo lubrificante, já utilizado, é estocado em tambores, e acondicionados em local coberto, delimitado por bacias de contenção", "efluentes_liquidos", "oleo_lubrificante_tambores")}
+            {maRow("O óleo usado é destinado única e exclusivamente a empresa recicladoras de óleo, devidamente licenciadas pelo órgão ambiental", "efluentes_liquidos", "oleo_recicladoras_licenciadas")}
+            {maRow("Os efluentes lançados seguem as condições e padrões de lançamento de efluentes conforme Resolução CONAMA 357/05", "efluentes_liquidos", "efluentes_conama_357")}
+            {maRow("A utilização e o armazenamento de substâncias combustíveis e oleosas são realizadas em locais adequados", "efluentes_liquidos", "armazenamento_combustiveis")}
+            {maRow("Não existem sinais de vazamentos/transbordamentos das unidades de armazenamento e tratamento de efluentes", "efluentes_liquidos", "sem_sinais_vazamentos")}
+            <SubHeader>Resíduos Sólidos</SubHeader>
+            {maRow("São disponibilizados mecanismos de coleta seletiva", "residuos_solidos", "coleta_seletiva")}
+            {maRow("O transporte de resíduos são realizados por empresas licenciadas", "residuos_solidos", "transporte_licenciado")}
+            {maRow("A destinação final dos resíduos é realizada por empresa licenciada", "residuos_solidos", "destinacao_licenciada")}
+            {maRow("As licenças do transporte e destinação dos resíduos são arquivadas", "residuos_solidos", "licencas_arquivadas")}
+            {maRow("Estão sendo emitidas as MTR's dos resíduos transportados", "residuos_solidos", "mtr_emitidas")}
+            <SubHeader>Contaminação com produtos perigosos</SubHeader>
+            {maRow("É disponibilizado o Plano de Atendimento a Emergências - PAE", "contaminacao_produtos_perigosos", "plano_atendimento_emergencias")}
+            {maRow("São disponibilizadas as FISPQ's dos produtos químicos", "contaminacao_produtos_perigosos", "fispqs_disponiveis")}
+            {maRow("Os funcionários que manuseiam produtos químicos são treinados nas FISPQ's", "contaminacao_produtos_perigosos", "funcionarios_treinados_fispqs")}
+            {maRow("São mantidos kit's de emergência caso ocorra acidente ambiental", "contaminacao_produtos_perigosos", "kits_emergencia")}
             <SubHeader>Considerações gerais</SubHeader>
-            {maRow("Autorização supressão vegetação", "consideracoes_gerais", "autorizacao_supressao_vegetacao")}
-            {maRow("Vegetação remanescente", "consideracoes_gerais", "vegetacao_remanescente")}
-            {maRow("Estruturas de contenção", "consideracoes_gerais", "estruturas_contencao")}
-            {maRow("Outorga de captação", "consideracoes_gerais", "outorga_captacao")}
-            {maRow("DDSMA realizados", "consideracoes_gerais", "ddsma")}
-            {maRow("APR com aspectos ambientais", "consideracoes_gerais", "apr_aspectos_ambientais")}
+            {maRow("Foi solicitada a Autorização de Supressão de Vegetação junto ao órgão ambiental caso haja necessidade de desmatamento", "consideracoes_gerais", "autorizacao_supressao_vegetacao")}
+            {maRow("A vegetação remanescente na usina e seu entorno é mantida sem interferência, sendo verificado se há interferência negativa com a fauna na usina e seu entorno.", "consideracoes_gerais", "vegetacao_remanescente")}
+            {maRow("São frequentemente verificadas as estruturas de contenção (bacias de contenção, canaletas de drenagem, etc.) a fim de mantê-las desobstruídas.", "consideracoes_gerais", "estruturas_contencao")}
+            {maRow("As captações superficiais possuem outorga de direito de uso de recursos hídricos, verificando o atendimento às condicionantes da outorga.", "consideracoes_gerais", "outorga_captacao")}
+            {maRow("São realizados DDSMA (Diálogo Diário de Segurança e Meio Ambiente) a respeito de meio ambiente.", "consideracoes_gerais", "ddsma")}
+            {maRow("Foram elaboradas as Análises Preliminares de Riscos abordando os aspectos e impactos ambientais da usina.", "consideracoes_gerais", "apr_aspectos_ambientais")}
           </tbody>
         </table>
       </PageContainer>
