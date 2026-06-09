@@ -90,26 +90,47 @@ const SectionTable = ({ children }) => (
 );
 
 const Titulo = () => (
-  <div style={{ border: "2px solid #00233B", borderRadius: "4px", overflow: "hidden", marginBottom: "14px" }}>
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 14px", backgroundColor: "#fff" }}>
-      <img
-        src="https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/882a69c33_AE-LogoHorPrincipal_1.png"
-        alt="Afirmaevias"
-        style={{ height: "38px", width: "auto" }}
-      />
-      <div style={{ textAlign: "right" }}>
-        <div style={{ fontSize: "9px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: "#00233B" }}>Checklist</div>
-        <div style={{ fontSize: "8px", textTransform: "uppercase", color: "#00233B" }}>Certificação de Usinas</div>
-      </div>
+  <div 
+    style={{ 
+      border: "2px solid #00233B", 
+      borderRadius: "4px", 
+      backgroundColor: "#fff",
+      display: "flex", 
+      alignItems: "center", 
+      justifyContent: "space-between", 
+      padding: "8px 14px",
+      marginBottom: "14px" 
+    }}
+  >
+    <img
+      src="https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/882a69c33_AE-LogoHorPrincipal_1.png"
+      alt="Afirmaevias Engenharia Viária"
+      style={{ height: "32px", width: "auto" }}
+    />
+    <div 
+      style={{ 
+        flex: 1, 
+        textAlign: "center", 
+        padding: "0 20px",
+        fontSize: "10px", 
+        fontWeight: 700, 
+        textTransform: "uppercase", 
+        letterSpacing: "0.5px", 
+        color: "#00233B" 
+      }}
+    >
+      Padronização e Certificação de Usinas de Misturas Asfálticas
     </div>
-    <div style={{ textAlign: "center", padding: "5px 12px", borderTop: "1px solid #e2e8f0", backgroundColor: "#fff" }}>
-      <div style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", color: "#00233B" }}>
-        Padronização e Certificação de Usinas de Misturas Asfálticas
+    <div style={{ textAlign: "right", minWidth: "120px" }}>
+      <div style={{ fontSize: "9px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: "#00233B" }}>
+        Checklist
+      </div>
+      <div style={{ fontSize: "8px", textTransform: "uppercase", color: "#00233B", whiteSpace: "nowrap" }}>
+        Certificação de Usinas
       </div>
     </div>
   </div>
 );
-
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function RelatorioCertificacaoUsina() {
