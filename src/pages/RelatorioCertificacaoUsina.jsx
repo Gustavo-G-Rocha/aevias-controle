@@ -39,7 +39,7 @@ const val = (v) => v || "-";
 const PageContainer = ({ children, pageBreak = false }) => (
   <div
     className="bg-white mx-auto print:shadow-none mb-4 print:mb-0"
-    style={{ width: "210mm", padding: "14mm 14mm 12mm", breakAfter: pageBreak ? "page" : "auto", pageBreakAfter: pageBreak ? "always" : "auto", boxSizing: "border-box" }}
+    style={{ width: "210mm", minHeight: "297mm", padding: "14mm 14mm 12mm", breakAfter: pageBreak ? "page" : "auto", pageBreakAfter: pageBreak ? "always" : "auto", boxSizing: "border-box" }}
   >
     {children}
   </div>
