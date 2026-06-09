@@ -271,11 +271,8 @@ export default function RelatorioCertificacaoUsina() {
             </tbody>
           </table>
         </div>
-        </PageContainer>
-        <PageContainer pageBreak>
-        <Titulo />
-        {/* 5 - SST */}
-        <div>
+        {/* 5 - SST começa na página 1 */}
+        <div className="mt-3">
           <div className="font-bold text-xs py-1.5 px-2 mb-1 border-l-4" style={{ backgroundColor: '#00233B', color: '#ffffff', borderLeftColor: '#BFCF99' }}>5 - ASPECTOS DE SAÚDE E SEGURANÇA DO TRABALHO</div>
           <table className="w-full border-collapse text-xs">
             <tbody>
@@ -290,6 +287,16 @@ export default function RelatorioCertificacaoUsina() {
               {ssRow("Os EPI's entregues aos funcionários são compatíveis com as atividades desempenhadas", "epis", "compativeis_atividades")}
               {ssRow("Os EPI's entregues aos funcionários estão sendo cautelados", "epis", "sendo_cautelados")}
               {ssRow("Os extintores estão instalados conforme norma do Corpo de Bombeiros NPT-021", "epis", "extintores_npt021")}
+            </tbody>
+          </table>
+        </div>
+        </PageContainer>
+        <PageContainer pageBreak>
+        <Titulo />
+        <div>
+          <div className="font-bold text-xs py-1.5 px-2 mb-1 border-l-4" style={{ backgroundColor: '#00233B', color: '#ffffff', borderLeftColor: '#BFCF99' }}>5 - ASPECTOS DE SAÚDE E SEGURANÇA DO TRABALHO (continuação)</div>
+          <table className="w-full border-collapse text-xs">
+            <tbody>
               <SubHeader>NR-12 - Acessos</SubHeader>
             {ssRow("Os meios de acesso da usina são dimensionados, construídos e fixados de modo seguro e resistente", "acessos", "dimensionados_seguros")}
             {ssRow("Os meios de acesso são construídos de material resistente às intempéries e corrosão", "acessos", "material_resistente")}
