@@ -1,12 +1,30 @@
 @media print {
   @page {
-    margin: 0;
+    margin: 15mm 14mm;
+    size: A4;
   }
 
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
+  }
+
+  /* Remove fundo cinza — apenas branco */
+  body {
+    background: white !important;
+    padding: 0 !important;
+  }
+
+  /* Ocultar toolbar de impressão */
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Container principal sem padding extra */
+  body > #root > div {
+    padding: 0 !important;
+    background: white !important;
   }
 }
 
