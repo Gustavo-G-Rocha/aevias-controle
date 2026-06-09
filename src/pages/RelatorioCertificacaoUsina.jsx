@@ -48,19 +48,19 @@ const PageContainer = ({ children, pageBreak = false }) => (
 const Titulo = () => (
   <div className="mb-5 border-2 border-[#00233B] rounded overflow-hidden">
     {/* Logo header */}
-    <div className="flex items-center justify-between px-4 py-3" style={{ backgroundColor: '#00233B' }}>
+    <div className="flex items-center justify-between px-4 py-3 bg-white">
       <img
-        src="https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/2754f7c59_AE_-_Logo_Hor_Negativo.png"
+        src="https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/882a69c33_AE-LogoHorPrincipal_1.png"
         alt="Afirmaevias"
-        style={{ height: '36px', width: 'auto' }}
+        style={{ height: '40px', width: 'auto' }}
       />
       <div className="text-right">
-        <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#BFCF99' }}>Check List</div>
-        <div className="text-[9px] uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.7)' }}>Certificação de Usinas</div>
+        <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#00233B' }}>Check List</div>
+        <div className="text-[9px] uppercase tracking-wide" style={{ color: '#BFCF99' }}>Certificação de Usinas</div>
       </div>
     </div>
     {/* Título principal */}
-    <div className="text-center py-2 px-3" style={{ backgroundColor: '#BFCF99' }}>
+    <div className="text-center py-2 px-3 bg-white border-t border-slate-200">
       <div className="text-xs font-bold uppercase tracking-wide" style={{ color: '#00233B' }}>
         Padronização e Certificação de Usinas de Misturas Asfálticas
       </div>
