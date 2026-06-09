@@ -317,7 +317,7 @@ export default function RelatorioCertificacaoUsina() {
           {ssRow("Possui proteções fixas, proteções móveis e dispositivos de segurança interligados, que protejam a saúde e a integridade física dos funcionários", "sistemas_seguranca", "protecoes_fixas_moveis")}
           {ssRow("Todas as engrenagens, polias, correntes, rodas dentadas e outras peças móveis estão protegidas", "sistemas_seguranca", "engrenagens_protegidas")}
         </SectionTable>
-
+        <breakBefore>
         <SubTitle>Proteções</SubTitle>
         <SectionTable>
           {ssRow("Cumprem suas funções durante a vida útil ou possibilitam a reposição de partes danificadas", "protecoes", "funcoes_vida_util")}
@@ -407,8 +407,8 @@ export default function RelatorioCertificacaoUsina() {
         </SectionTable>
 
         {/* ── 7.1 LABORATÓRIO ─────────────────────────────────────────────── */}
-        <SecTitle breakBefore>7 - REQUISITOS TÉCNICOS E DE CONTROLE TECNOLÓGICO PARA OPERAÇÃO DA USINA DE ASFALTO</SecTitle>
-        <SecTitle breakBefore>7.1 LABORATÓRIO</SecTitle>
+        <SecTitle>7 - REQUISITOS TÉCNICOS E DE CONTROLE TECNOLÓGICO PARA OPERAÇÃO DA USINA DE ASFALTO</SecTitle>
+        <SecTitle>7.1 LABORATÓRIO</SecTitle>
         <SectionTable>
           {Object.entries(EQUIPAMENTOS_LABELS).map(([key, label]) => (
             <ConformeRow key={key} label={label} value={equip[key]} />
