@@ -48,6 +48,8 @@ const SecTitle = ({ children, breakBefore = false }) => (
       borderLeft: "4px solid #BFCF99", marginBottom: "4px", marginTop: breakBefore ? "0" : "10px",
       breakBefore: breakBefore ? "page" : "auto",
       pageBreakBefore: breakBefore ? "always" : "auto",
+      breakAfter: "avoid",
+      pageBreakAfter: "avoid",
     }}
   >
     {children}
@@ -55,7 +57,7 @@ const SecTitle = ({ children, breakBefore = false }) => (
 );
 
 const SubTitle = ({ children }) => (
-  <div style={{ backgroundColor: "#BFCF99", color: "#00233B", fontWeight: 600, fontSize: "11px", padding: "3px 8px", marginTop: "4px", marginBottom: "2px" }}>
+  <div style={{ backgroundColor: "#BFCF99", color: "#00233B", fontWeight: 600, fontSize: "11px", padding: "3px 8px", marginTop: "4px", marginBottom: "2px", breakAfter: "avoid", pageBreakAfter: "avoid" }}>
     {children}
   </div>
 );
