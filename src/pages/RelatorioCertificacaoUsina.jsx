@@ -287,7 +287,14 @@ export default function RelatorioCertificacaoUsina() {
               {ssRow("Os EPI's entregues aos funcionários são compatíveis com as atividades desempenhadas", "epis", "compativeis_atividades")}
               {ssRow("Os EPI's entregues aos funcionários estão sendo cautelados", "epis", "sendo_cautelados")}
               {ssRow("Os extintores estão instalados conforme norma do Corpo de Bombeiros NPT-021", "epis", "extintores_npt021")}
-            </tbody>
+              <SubHeader>NR-12 - Acessos</SubHeader>
+              {ssRow("Os meios de acesso da usina são dimensionados, construídos e fixados de modo seguro e resistente", "acessos", "dimensionados_seguros")}
+              {ssRow("Os meios de acesso são construídos de material resistente às intempéries e corrosão", "acessos", "material_resistente")}
+              {ssRow("Os meios de acesso possuem travessão superior instalado de 1,10m a 1,20m de altura em relação ao piso por toda a extensão, em ambos os lados", "acessos", "travessao_superior")}
+              {ssRow("Os meios de acesso não possuem travessão com superfície plana", "acessos", "sem_superficie_plana")}
+              {ssRow("Os meios de acesso possuem rodapé de, no mínimo 0,20m de altura e travessão intermediário a 0,70m de altura em relação ao piso", "acessos", "rodape_travessao_intermediario")}
+              {ssRow("As passarelas, plataformas e rampas têm largura de 0,60m", "acessos", "largura_060m")}
+        </tbody>
           </table>
         </div>
         </PageContainer>
@@ -296,14 +303,6 @@ export default function RelatorioCertificacaoUsina() {
         <div>
           <div className="font-bold text-xs py-1.5 px-2 mb-1 border-l-4" style={{ backgroundColor: '#00233B', color: '#ffffff', borderLeftColor: '#BFCF99' }}>5 - ASPECTOS DE SAÚDE E SEGURANÇA DO TRABALHO (continuação)</div>
           <table className="w-full border-collapse text-xs">
-            <tbody>
-              <SubHeader>NR-12 - Acessos</SubHeader>
-            {ssRow("Os meios de acesso da usina são dimensionados, construídos e fixados de modo seguro e resistente", "acessos", "dimensionados_seguros")}
-            {ssRow("Os meios de acesso são construídos de material resistente às intempéries e corrosão", "acessos", "material_resistente")}
-            {ssRow("Os meios de acesso possuem travessão superior instalado de 1,10m a 1,20m de altura em relação ao piso por toda a extensão, em ambos os lados", "acessos", "travessao_superior")}
-            {ssRow("Os meios de acesso não possuem travessão com superfície plana", "acessos", "sem_superficie_plana")}
-            {ssRow("Os meios de acesso possuem rodapé de, no mínimo 0,20m de altura e travessão intermediário a 0,70m de altura em relação ao piso", "acessos", "rodape_travessao_intermediario")}
-            {ssRow("As passarelas, plataformas e rampas têm largura de 0,60m", "acessos", "largura_060m")}
             <SubHeader>Escadas do tipo marinheiro</SubHeader>
             {ssRow("Possuem gaiolas de proteção, caso possuam altura superior a 3,50m instaladas a partir de 2,0m do piso", "escadas_marinheiro", "gaiolas_protecao")}
             {ssRow("Possuem corrimão ou continuação dos montantes da escada ultrapassando a plataforma em 1,10m a 1,20m", "escadas_marinheiro", "corrimao_montantes")}
