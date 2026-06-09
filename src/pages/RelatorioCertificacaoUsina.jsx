@@ -542,7 +542,7 @@ export default function RelatorioCertificacaoUsina() {
     { label: "Projeto WMA", val: ua.projeto_wma },
   ].map((item, idx) => (
     <tr key={idx} style={{ breakInside: "avoid" }}>
-      <td style={{ ...td, color: "#475569" }}>{item.label}</td>
+      <td style={{ ...td, color: "#475569", width: "50%"}}>{item.label}</td>
       <td style={{ ...td, fontWeight: 700, textAlign: "center" }} colSpan={3}>
         <span style={{ color: item.val === "Sim" || item.val === true ? "#15803d" : "#b91c1c" }}>
           {item.val ? "Sim" : "Não"}
