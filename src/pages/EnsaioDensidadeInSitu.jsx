@@ -26,7 +26,8 @@ export default function EnsaioDensidadeInSituPage() {
   const { saving, handleSubmit } = useEnsaioDensidadeActions(formData, user, editingEnsaio);
 
   const handleSaveProgress = (e) => {
-    handleSubmit(e, "rascunho");
+    e?.preventDefault();
+    handleSubmit({ preventDefault: () => {} }, "rascunho");
   };
 
   const isApproved = editingEnsaio?.approved === true;
