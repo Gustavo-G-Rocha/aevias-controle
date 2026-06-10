@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
+import { toast } from "sonner";
 
 export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
   const [saving, setSaving] = useState(false);
@@ -51,14 +52,13 @@ export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
         }
 
         await base44.entities.EnsaioDensidadeInSitu.update(ee.id, updateData);
-        setTimeout(() => alert(successMessage), 0);
       } else {
         await base44.entities.EnsaioDensidadeInSitu.create(dataToSave);
-        const msg = saveStatus === "rascunho" ? "Progresso salvo!" : "Ensaio criado com sucesso!";
-        setTimeout(() => alert(msg), 0);
       }
 
-      if (saveStatus === "finalizado") {
+      if (saveStatus === "rascunho") {
+        toast.success("Progresso salvo! O ensaio está em execução.");
+      } else {
         navigate(createPageUrl('MeusEnsaios'));
       }
     } catch (error) {
