@@ -33,7 +33,6 @@ export default function EnsaioDensidadeActions({ formData, setFormData, isEditab
             <SaveProgressButton
               onClick={onSaveProgress}
               saving={saving}
-              disabled={!formData.obra_id || !formData.data_ensaio}
               label="Salvar Progresso"
               savingLabel="Salvando..."
             />
