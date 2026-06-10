@@ -7,6 +7,7 @@ import { useChecklistForm } from "@/hooks/useChecklistForm";
 import { useCertificacaoUsinaForm } from "@/hooks/useCertificacaoUsinaForm";
 import { validarCertificacao, VALIDADORES_PAGINA } from "@/utils/certificacaoUsinaUtils";
 import { criarCertificacao, atualizarCertificacao } from "@/services/certificacaoUsinaService";
+import { uploadMultipleFiles } from "@/utils/imageUpload";
 import ChecklistFooter from "@/components/checklists/ChecklistFooter";
 import StatusDraftBanner from "@/components/forms/StatusDraftBanner";
 import RejectionBanner from "@/components/forms/RejectionBanner";
@@ -22,6 +23,7 @@ import SecaoLaboratorio from "@/components/certificacao-usina/SecaoLaboratorio";
 import SecaoAfeicao from "@/components/certificacao-usina/SecaoAfeicao";
 import SecaoEstruturaUsina from "@/components/certificacao-usina/SecaoEstruturaUsina";
 import SecaoResultado from "@/components/certificacao-usina/SecaoResultado";
+import SecaoFotos from "@/components/certificacao-usina/SecaoFotos";
 
 const getInitialFormData = () => ({
   obra_id: "",
@@ -53,6 +55,7 @@ const getInitialFormData = () => ({
   resultado_classe: "",
   observacoes_resultado: "",
   observacoes_gerais: "",
+  fotos: [],
   status: "rascunho",
   approved: null,
   rejection_reason: null,
@@ -64,10 +67,13 @@ const PAGES = [
   { num: "6",   label: "Meio\nAmbiente" },
   { num: "7",   label: "Laboratório\ne Estrutura" },
   { num: "8",   label: "Resultado" },
+  { num: "📷",  label: "Relatório\nFotográfico" },
 ];
 
 export default function CertificacaoUsinaPage() {
   const [currentPage, setCurrentPage] = useState(0);
+  const [loadingUpload, setLoadingUpload] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState([]);
   const topRef = useRef(null);
 
   const {
@@ -77,6 +83,25 @@ export default function CertificacaoUsinaPage() {
   } = useChecklistForm(getInitialFormData, "CertificacaoUsina", "certificacao_usina");
 
   const handlers = useCertificacaoUsinaForm({ setFormData });
+
+  const handleFileChange = useCallback(async (e) => {
+    const files = Array.from(e.target.files).filter(f => f.type.startsWith("image/"));
+    if (!files.length) return;
+    setLoadingUpload(true);
+    setUploadProgress(files.map((file, i) => ({ id: i, fileName: file.name, status: "pending", error: null })));
+    const { urls, errors } = await uploadMultipleFiles(files, (i, status, err) => {
+      setUploadProgress(prev => prev.map(p => p.id === i ? { ...p, status, error: err || null } : p));
+    });
+    if (urls.length > 0) setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...urls] }));
+    if (errors.length > 0) alert(`${urls.length} de ${files.length} fotos enviadas.\n\nErros:\n` + errors.map(e => `• ${e.fileName}: ${e.error}`).join("\n"));
+    setLoadingUpload(false);
+    setUploadProgress([]);
+    e.target.value = "";
+  }, [setFormData]);
+
+  const handleRemovePhoto = useCallback((index) => {
+    setFormData(prev => ({ ...prev, fotos: (prev.fotos || []).filter((_, i) => i !== index) }));
+  }, [setFormData]);
 
   const isPageComplete = (pageIndex) => VALIDADORES_PAGINA[pageIndex]?.(formData) ?? true;
 
@@ -251,6 +276,19 @@ export default function CertificacaoUsinaPage() {
                 <SecaoResultado formData={formData} onChange={handlers.handleChange} disabled={disabled} />
               )}
 
+              {/* Página 5: Relatório Fotográfico */}
+              {currentPage === 5 && (
+                <SecaoFotos
+                  fotos={formData.fotos || []}
+                  onFileChange={handleFileChange}
+                  onRemove={handleRemovePhoto}
+                  loading={loadingUpload}
+                  progress={uploadProgress}
+                  isEditable={isEditable}
+                  isApproved={isApproved}
+                />
+              )}
+
               {/* Navegação anterior/próximo + footer */}
               <div className="flex items-center justify-between pt-2 border-t border-slate-200">
                 <Button
@@ -271,7 +309,7 @@ export default function CertificacaoUsinaPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    disabled={currentPage === PAGES.length - 1 || !isPageComplete(currentPage)}
+                    disabled={currentPage === PAGES.length - 1 || (!isPageComplete(currentPage) && currentPage < PAGES.length - 2) || loadingUpload}
                     onClick={() => goToPage(currentPage + 1)}
                   >
                     Próxima →

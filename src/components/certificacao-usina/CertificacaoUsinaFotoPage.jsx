@@ -1,0 +1,116 @@
+const DEFAULT_LOGO = "https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/882a69c33_AE-LogoHorPrincipal_1.png";
+
+/**
+ * Página fotográfica para o relatório de Certificação de Usina.
+ * Exibe até 6 fotos por página em grid 2x3.
+ * Segue o mesmo padrão do DiarioFotoPage.
+ */
+export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
+  const dataVistoria = data.data_vistoria
+    ? new Date(data.data_vistoria).toLocaleDateString("pt-BR", { timeZone: "UTC" })
+    : "-";
+
+  return (
+    <div
+      style={{
+        breakBefore: "page",
+        pageBreakBefore: "always",
+        padding: "10mm 15mm",
+        minHeight: "29.7cm",
+        display: "flex",
+        flexDirection: "column",
+        fontFamily: "Arial, sans-serif",
+        backgroundColor: "#fff",
+      }}
+    >
+      {/* Cabeçalho */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr 1fr",
+          alignItems: "center",
+          borderBottom: "2px solid #00233B",
+          paddingBottom: "12px",
+          marginBottom: "16px",
+        }}
+      >
+        <div>
+          <img src={DEFAULT_LOGO} alt="Afirmaevias" style={{ height: "32px", width: "auto" }} />
+        </div>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: "14px", fontWeight: 700, color: "#00233B" }}>Relatório Fotográfico</div>
+          <div style={{ fontSize: "10px", color: "#475569", marginTop: "2px" }}>
+            Certificação de Usina — {data.razao_social || ""}
+          </div>
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <div
+            style={{
+              display: "inline-block",
+              border: "1px solid #cbd5e1",
+              borderRadius: "4px",
+              padding: "4px 8px",
+              fontSize: "10px",
+              fontWeight: 600,
+              color: "#00233B",
+            }}
+          >
+            {dataVistoria}
+          </div>
+        </div>
+      </div>
+
+      {/* Grid de fotos (2 colunas) */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "12px",
+          flex: 1,
+        }}
+      >
+        {chunk.map((fotoUrl, fotoIndex) => (
+          <div
+            key={fotoIndex}
+            style={{
+              border: "1px solid #e2e8f0",
+              borderRadius: "6px",
+              padding: "6px",
+              breakInside: "avoid",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: "#f8fafc",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: "4px",
+                overflow: "hidden",
+              }}
+            >
+              <img
+                src={fotoUrl}
+                alt={`Foto ${pageIndex * 6 + fotoIndex + 1}`}
+                style={{ width: "100%", height: "auto", maxHeight: "260px", objectFit: "contain" }}
+              />
+            </div>
+            <p
+              style={{
+                textAlign: "center",
+                fontSize: "10px",
+                marginTop: "6px",
+                fontWeight: 500,
+                color: "#475569",
+              }}
+            >
+              Foto {pageIndex * 6 + fotoIndex + 1}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

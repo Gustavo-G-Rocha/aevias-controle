@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import CertificacaoUsinaFotoPage from "@/components/certificacao-usina/CertificacaoUsinaFotoPage";
 import { Loader2, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { obterCertificacaoById } from "@/services/certificacaoUsinaService";
@@ -567,6 +568,23 @@ export default function RelatorioCertificacaoUsina() {
           <div style={{ fontSize: "28px", fontWeight: 700, color: "#00233B" }}>{val(data.resultado_classe)}</div>
         </div>
       </div>
+
+      {/* ── RELATÓRIO FOTOGRÁFICO ─────────────────────────────────────────── */}
+      {Array.isArray(data.fotos) && data.fotos.length > 0 && (() => {
+        const FOTOS_POR_PAGINA = 6;
+        const chunks = [];
+        for (let i = 0; i < data.fotos.length; i += FOTOS_POR_PAGINA) {
+          chunks.push(data.fotos.slice(i, i + FOTOS_POR_PAGINA));
+        }
+        return chunks.map((chunk, idx) => (
+          <CertificacaoUsinaFotoPage
+            key={idx}
+            chunk={chunk}
+            pageIndex={idx}
+            data={data}
+          />
+        ));
+      })()}
     </div>
   );
 }
