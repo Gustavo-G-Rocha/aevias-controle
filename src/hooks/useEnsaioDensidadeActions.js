@@ -11,9 +11,7 @@ export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = useCallback(async (e, saveStatus = "finalizado") => {
-    e.preventDefault();
-
+  const save = useCallback(async (saveStatus = "finalizado") => {
     if (!formData.obra_id || !formData.data_ensaio) {
       alert("Preencha todos os campos obrigatórios (Obra, Data).");
       return;
@@ -58,5 +56,14 @@ export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
     }
   }, [formData, user, editingEnsaio, navigate]);
 
-  return { saving, handleSubmit };
+  const handleSubmit = useCallback((e) => {
+    e.preventDefault();
+    save("finalizado");
+  }, [save]);
+
+  const handleSaveProgress = useCallback(() => {
+    save("rascunho");
+  }, [save]);
+
+  return { saving, handleSubmit, handleSaveProgress };
 }

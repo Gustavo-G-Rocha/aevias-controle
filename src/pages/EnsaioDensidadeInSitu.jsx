@@ -23,12 +23,7 @@ export default function EnsaioDensidadeInSituPage() {
     removerFuro,
   } = useEnsaioDensidadeForm(formData, setFormData);
 
-  const { saving, handleSubmit } = useEnsaioDensidadeActions(formData, user, editingEnsaio);
-
-  const handleSaveProgress = (e) => {
-    e?.preventDefault();
-    handleSubmit({ preventDefault: () => {} }, "rascunho");
-  };
+  const { saving, handleSubmit, handleSaveProgress } = useEnsaioDensidadeActions(formData, user, editingEnsaio);
 
   const isApproved = editingEnsaio?.approved === true;
   const isEditable = !isApproved;
