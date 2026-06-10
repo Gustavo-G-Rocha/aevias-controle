@@ -2,8 +2,8 @@ const DEFAULT_LOGO = "https://media.base44.com/images/public/68a7599ee3fb9205cfb
 
 /**
  * Página fotográfica para o relatório de Certificação de Usina.
- * Exibe até 6 fotos por página em grid 3x2 (3 linhas, 2 colunas).
- * Segue o mesmo padrão do DiarioFotoPage.
+ * Exibe até 6 fotos por página em grid 2 colunas × 3 linhas.
+ * O padding de página é gerenciado pelo wrapper externo (pageStyle).
  */
 export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
   const dataVistoria = data.data_vistoria
@@ -15,10 +15,8 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
       style={{
         breakBefore: "page",
         pageBreakBefore: "always",
-        padding: "10mm 15mm",
         fontFamily: "Arial, sans-serif",
         backgroundColor: "#fff",
-        boxSizing: "border-box",
       }}
     >
       {/* Cabeçalho */}
@@ -28,15 +26,15 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
           gridTemplateColumns: "1fr 1fr 1fr",
           alignItems: "center",
           borderBottom: "2px solid #00233B",
-          paddingBottom: "12px",
-          marginBottom: "16px",
+          paddingBottom: "10px",
+          marginBottom: "14px",
         }}
       >
         <div>
-          <img src={DEFAULT_LOGO} alt="Afirmaevias" style={{ height: "32px", width: "auto" }} />
+          <img src={DEFAULT_LOGO} alt="Afirmaevias" style={{ height: "28px", width: "auto" }} />
         </div>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: "14px", fontWeight: 700, color: "#00233B" }}>Relatório Fotográfico</div>
+          <div style={{ fontSize: "13px", fontWeight: 700, color: "#00233B" }}>Relatório Fotográfico</div>
           <div style={{ fontSize: "10px", color: "#475569", marginTop: "2px" }}>
             Certificação de Usina — {data.razao_social || ""}
           </div>
@@ -47,7 +45,7 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
               display: "inline-block",
               border: "1px solid #cbd5e1",
               borderRadius: "4px",
-              padding: "4px 8px",
+              padding: "3px 8px",
               fontSize: "10px",
               fontWeight: 600,
               color: "#00233B",
@@ -58,12 +56,12 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
         </div>
       </div>
 
-      {/* Grid de fotos: 2 colunas × 3 linhas = 6 fotos por página */}
+      {/* Grid: 2 colunas × 3 linhas = 6 fotos por página */}
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          gridTemplateRows: "repeat(3, 1fr)",
+          gridTemplateRows: "repeat(3, auto)",
           gap: "10px",
         }}
       >
@@ -75,6 +73,7 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
               borderRadius: "6px",
               padding: "6px",
               breakInside: "avoid",
+              pageBreakInside: "avoid",
               display: "flex",
               flexDirection: "column",
             }}
@@ -84,7 +83,7 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
                 backgroundColor: "#f8fafc",
                 borderRadius: "4px",
                 overflow: "hidden",
-                height: "160px",
+                height: "155px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -93,15 +92,14 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
               <img
                 src={fotoUrl}
                 alt={`Foto ${pageIndex * 6 + fotoIndex + 1}`}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               />
             </div>
             <p
               style={{
                 textAlign: "center",
                 fontSize: "10px",
-                marginTop: "4px",
-                marginBottom: 0,
+                margin: "4px 0 0 0",
                 fontWeight: 500,
                 color: "#475569",
               }}

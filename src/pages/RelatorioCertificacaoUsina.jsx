@@ -451,7 +451,7 @@ export default function RelatorioCertificacaoUsina() {
         </SectionTable>
 
         {/* ── 7.2 AFERIÇÃO ────────────────────────────────────────────────── */}
-        <SecTitle>7.2 AFERIÇÃO, REPETIBILIDADE E REPRODUTIBILIDADE</SecTitle>
+        <SecTitle breakBefore>7.2 AFERIÇÃO, REPETIBILIDADE E REPRODUTIBILIDADE</SecTitle>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "10px" }}>
           <div style={{ border: "1px solid #cbd5e1", borderRadius: "4px", padding: "8px", fontSize: "11px" }}>
             <div style={{ fontWeight: 600, marginBottom: "4px", color: "#00233B" }}>Repetibilidade</div>
@@ -476,7 +476,7 @@ export default function RelatorioCertificacaoUsina() {
         </div>
 
         {/* ── 7.3 ESTRUTURA FÍSICA ────────────────────────────────────────── */}
-        <SecTitle>7.3 ESTRUTURA E ESPAÇO FÍSICO</SecTitle>
+        <SecTitle breakBefore>7.3 ESTRUTURA E ESPAÇO FÍSICO</SecTitle>
         <SectionTable>
           <ConformeRow label="Baias separadoras" value={ef.baias_separadoras} />
           <ConformeRow label="Identificação pilhas" value={ef.identificacao_pilhas} />
@@ -577,12 +577,13 @@ export default function RelatorioCertificacaoUsina() {
           chunks.push(data.fotos.slice(i, i + FOTOS_POR_PAGINA));
         }
         return chunks.map((chunk, idx) => (
-          <CertificacaoUsinaFotoPage
-            key={idx}
-            chunk={chunk}
-            pageIndex={idx}
-            data={data}
-          />
+          <div key={idx} style={{ ...pageStyle, marginTop: 0, paddingTop: 0 }}>
+            <CertificacaoUsinaFotoPage
+              chunk={chunk}
+              pageIndex={idx}
+              data={data}
+            />
+          </div>
         ));
       })()}
     </div>
