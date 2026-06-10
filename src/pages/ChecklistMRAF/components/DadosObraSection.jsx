@@ -21,7 +21,7 @@ export default function DadosObraSection({
               disabled={!isEditable || isApproved || editingChecklist?.id}>
               <SelectTrigger className="h-11"><SelectValue placeholder="Selecione a obra" /></SelectTrigger>
               <SelectContent>
-                {obras.map(obra => {
+                {(obras || []).map(obra => {
                   const regional = regionais.find(r => r.id === obra.regional_id);
                   return (
                     <SelectItem key={obra.id} value={obra.id}>
@@ -38,7 +38,7 @@ export default function DadosObraSection({
               disabled={!isEditable || isApproved || !formData.obra_id}>
               <SelectTrigger className="h-11"><SelectValue placeholder="Selecione um projeto" /></SelectTrigger>
               <SelectContent>
-                {projetosDisponiveis.map(proj => (
+                {(projetosDisponiveis || []).map(proj => (
                   <SelectItem key={proj.id} value={proj.id}>{proj.name}</SelectItem>
                 ))}
               </SelectContent>
