@@ -51,13 +51,16 @@ export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
         }
 
         await base44.entities.EnsaioDensidadeInSitu.update(ee.id, updateData);
-        alert(successMessage);
+        setTimeout(() => alert(successMessage), 0);
       } else {
         await base44.entities.EnsaioDensidadeInSitu.create(dataToSave);
-        alert(saveStatus === "rascunho" ? "Progresso salvo!" : "Ensaio criado com sucesso!");
+        const msg = saveStatus === "rascunho" ? "Progresso salvo!" : "Ensaio criado com sucesso!";
+        setTimeout(() => alert(msg), 0);
       }
 
-      navigate(createPageUrl('MeusEnsaios'));
+      if (saveStatus === "finalizado") {
+        navigate(createPageUrl('MeusEnsaios'));
+      }
     } catch (error) {
       console.error("Erro ao salvar ensaio:", error);
       alert(`Erro ao salvar ensaio: ${error.message || 'Erro desconhecido'}`);
@@ -71,7 +74,8 @@ export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
     save("finalizado");
   };
 
-  const handleSaveProgress = () => {
+  const handleSaveProgress = (e) => {
+    if (e) e.preventDefault();
     save("rascunho");
   };
 
