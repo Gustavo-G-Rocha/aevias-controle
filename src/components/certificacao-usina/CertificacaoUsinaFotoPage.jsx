@@ -2,7 +2,7 @@ const DEFAULT_LOGO = "https://media.base44.com/images/public/68a7599ee3fb9205cfb
 
 /**
  * Página fotográfica para o relatório de Certificação de Usina.
- * Exibe até 6 fotos por página em grid 2x3.
+ * Exibe até 6 fotos por página em grid 3x2 (3 linhas, 2 colunas).
  * Segue o mesmo padrão do DiarioFotoPage.
  */
 export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
@@ -16,11 +16,9 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
         breakBefore: "page",
         pageBreakBefore: "always",
         padding: "10mm 15mm",
-        minHeight: "29.7cm",
-        display: "flex",
-        flexDirection: "column",
         fontFamily: "Arial, sans-serif",
         backgroundColor: "#fff",
+        boxSizing: "border-box",
       }}
     >
       {/* Cabeçalho */}
@@ -60,13 +58,13 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
         </div>
       </div>
 
-      {/* Grid de fotos (2 colunas) */}
+      {/* Grid de fotos: 2 colunas × 3 linhas = 6 fotos por página */}
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          gap: "12px",
-          flex: 1,
+          gridTemplateRows: "repeat(3, 1fr)",
+          gap: "10px",
         }}
       >
         {chunk.map((fotoUrl, fotoIndex) => (
@@ -84,24 +82,26 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
             <div
               style={{
                 backgroundColor: "#f8fafc",
+                borderRadius: "4px",
+                overflow: "hidden",
+                height: "160px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                borderRadius: "4px",
-                overflow: "hidden",
               }}
             >
               <img
                 src={fotoUrl}
                 alt={`Foto ${pageIndex * 6 + fotoIndex + 1}`}
-                style={{ width: "100%", height: "auto", maxHeight: "260px", objectFit: "contain" }}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             </div>
             <p
               style={{
                 textAlign: "center",
                 fontSize: "10px",
-                marginTop: "6px",
+                marginTop: "4px",
+                marginBottom: 0,
                 fontWeight: 500,
                 color: "#475569",
               }}
