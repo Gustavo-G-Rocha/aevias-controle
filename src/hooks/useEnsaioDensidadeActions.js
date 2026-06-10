@@ -59,8 +59,9 @@ export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
       if (saveStatus === "rascunho") {
         toast.success("Progresso salvo! O ensaio está em execução.");
       } else {
-        navigate(createPageUrl('MeusEnsaios'));
+        toast.success("Ensaio finalizado com sucesso!");
       }
+      navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
       console.error("Erro ao salvar ensaio:", error);
       alert(`Erro ao salvar ensaio: ${error.message || 'Erro desconhecido'}`);
