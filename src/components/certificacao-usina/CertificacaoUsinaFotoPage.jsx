@@ -61,8 +61,9 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          gridTemplateRows: "repeat(3, auto)",
+          gridTemplateRows: "repeat(3, 1fr)",
           gap: "10px",
+          minHeight: "220mm",
         }}
       >
         {chunk.map((fotoUrl, fotoIndex) => (
@@ -83,10 +84,8 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
                 backgroundColor: "#f8fafc",
                 borderRadius: "4px",
                 overflow: "hidden",
-                height: "155px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                flex: 1,
+                minHeight: "60px",
               }}
             >
               <img
