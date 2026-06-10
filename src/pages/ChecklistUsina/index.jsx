@@ -193,13 +193,14 @@ export default function ChecklistUsinaPage() {
                 setFormData={setFormData}
                 obras={obras}
                 regionais={regionais}
-                projects={projects}
                 projetosDisponiveis={projetosDisponiveis}
                 obraSelecionada={obraSelecionada}
                 regionalSelecionada={regionalSelecionada}
                 isEditable={isEditable}
                 isApproved={isApproved}
                 editingChecklist={editingChecklist}
+                onObraChange={handlers.handleObraChange}
+                onProjectChange={handlers.handleProjectChange}
               />
 
               <ControleAgregadosSection

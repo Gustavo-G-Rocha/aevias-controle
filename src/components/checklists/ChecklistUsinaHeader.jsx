@@ -9,53 +9,17 @@ export default function ChecklistUsinaHeader({
   setFormData,
   obras,
   regionais,
-  projects,
   projetosDisponiveis,
   obraSelecionada,
   regionalSelecionada,
   isEditable,
   isApproved,
-  editingChecklist
+  editingChecklist,
+  onObraChange,
+  onProjectChange,
 }) {
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleObraChange = (obraId) => {
-    setFormData((prev) => ({ ...prev, obra_id: obraId, project_id: "" }));
-  };
-
-  const handleProjectChange = (projectId) => {
-    const project = projects.find((p) => p.id === projectId);
-    if (!project) {
-      setFormData((prev) => ({ ...prev, project_id: "" }));
-      return;
-    }
-
-    const pedreiras = project.agregados && Array.isArray(project.agregados) ?
-    [...new Set(project.agregados.map((ag) => ag.pedreira).filter(Boolean))].join(' + ') :
-    "";
-
-    setFormData((prev) => ({
-      ...prev,
-      project_id: projectId,
-      faixa_especificada: "Não definida",
-      ligante: project.ligante?.tipo || "",
-      pedreira: pedreiras,
-      controle_agregados: (project.agregados || []).map((ag) => ({
-        nome: ag.nome,
-        estoque_coberto: false,
-        estoque_coberto_qtde: 0,
-        material_homogeneizado: false,
-        material_homogeneizado_qtde: 0,
-        granulometria_individual: false,
-        granulometria_individual_qtde: 0
-      })),
-      controle_ligante: {
-        ...prev.controle_ligante,
-        fornecedor: project.ligante?.fornecedor || ""
-      }
-    }));
   };
 
   return (
@@ -65,7 +29,7 @@ export default function ChecklistUsinaHeader({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div>
             <Label className="text-base">Obra *</Label>
-            <Select value={formData.obra_id || ""} onValueChange={handleObraChange}
+            <Select value={formData.obra_id || ""} onValueChange={onObraChange}
               disabled={!isEditable || isApproved || !!editingChecklist?.id}>
               <SelectTrigger className="h-11"><SelectValue placeholder="Selecione a obra" /></SelectTrigger>
               <SelectContent>
@@ -82,7 +46,7 @@ export default function ChecklistUsinaHeader({
           </div>
           <div>
             <Label className="text-base">Projeto Vinculado *</Label>
-            <Select value={formData.project_id || ""} onValueChange={handleProjectChange}
+            <Select value={formData.project_id || ""} onValueChange={onProjectChange}
               disabled={!isEditable || isApproved || !formData.obra_id}>
               <SelectTrigger className="h-11"><SelectValue placeholder="Selecione um projeto" /></SelectTrigger>
               <SelectContent>
@@ -126,9 +90,13 @@ export default function ChecklistUsinaHeader({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div>
             <Label className="text-base">Usina *</Label>
-            <Input value={formData.usina || ""} onChange={(e) => handleChange('usina', e.target.value)}
-              disabled={!isEditable || isApproved} required placeholder="Nome da usina"
-              className="bg-white border-slate-200 text-slate-700 h-11 text-base" />
+            <Select value={formData.usina || ""} onValueChange={(v) => handleChange('usina', v)}
+              disabled={!isEditable || isApproved || !obraSelecionada}>
+              <SelectTrigger className="h-11"><SelectValue placeholder="Selecione a usina" /></SelectTrigger>
+              <SelectContent>
+                {(obraSelecionada?.usinas || []).map((u, i) => <SelectItem key={i} value={u}>{u}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Label className="text-base">Rodovia *</Label>
