@@ -28,7 +28,8 @@ export function useAuxData({ needsRegionais = true, needsUsers = false } = {}) {
   return useQuery({
     queryKey: QUERY_KEYS.auxData({ needsRegionais, needsUsers }),
     queryFn: () => loadAuxData({ needsRegionais, needsUsers }),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 10 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
   });
 }
 
@@ -37,6 +38,7 @@ export function useAllRecords() {
   return useQuery({
     queryKey: QUERY_KEYS.allRecords,
     queryFn: () => loadAllRecords(),
-    staleTime: 3 * 60 * 1000,
+    staleTime: 10 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
   });
 }

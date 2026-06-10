@@ -88,17 +88,27 @@ export function deduplicateRecords(records) {
  * @param {'dashboard' | 'list'} mode - controla o limite por entidade
  * @returns {Promise<object[]>} array normalizado com `entityType`
  */
+const BATCH_SIZE = 5; // máximo de requests simultâneos por lote
+
+async function loadEntitiesInBatches(entityList) {
+  const allResults = [];
+  for (let i = 0; i < entityList.length; i += BATCH_SIZE) {
+    const batch = entityList.slice(i, i + BATCH_SIZE);
+    const settled = await Promise.allSettled(batch.map(type => loadEntity(type)));
+    settled.forEach((r, idx) => {
+      if (r.status === 'rejected') {
+        console.warn(`[recordsService] loadAllRecords: ${batch[idx]} rejeitou:`, r.reason?.message || r.reason);
+        allResults.push([]);
+      } else {
+        allResults.push(r.value);
+      }
+    });
+  }
+  return allResults;
+}
+
 export async function loadAllRecords() {
-  const settled = await Promise.allSettled(
-    ALL_RECORD_ENTITIES.map(type => loadEntity(type))
-  );
-  const results = settled.map((r, i) => {
-    if (r.status === 'rejected') {
-      console.warn(`[recordsService] loadAllRecords: ${ALL_RECORD_ENTITIES[i]} rejeitou:`, r.reason?.message || r.reason);
-      return [];
-    }
-    return r.value;
-  });
+  const results = await loadEntitiesInBatches(ALL_RECORD_ENTITIES);
   const normalized = normalizeRecords(results, ALL_RECORD_ENTITIES);
   return deduplicateRecords(normalized);
 }
