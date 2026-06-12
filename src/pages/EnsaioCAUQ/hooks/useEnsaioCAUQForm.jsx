@@ -157,22 +157,22 @@ export function useEnsaioCAUQForm({
   ]);
 
   // ── cálculo automático: filler/betume ───────────────────────────────────────
+  // Fórmula: (% PASSANTE na peneira 200) / (Teor de ligante real)
   useEffect(() => {
     const teorReal = formData.extracao_ligante.teor_ligante_real;
-    const pesoRetido200 = formData.granulometria.peso_retido_peneiras?.peneira_0_075mm;
+    const amostraSemLigante = formData.extracao_ligante.amostra_sem_ligante;
 
-    if (teorReal && pesoRetido200 != null) {
-      const pesoTotal = Object.values(formData.granulometria.peso_retido_peneiras || {})
+    if (teorReal && amostraSemLigante > 0) {
+      const somaRetidos = Object.values(formData.granulometria.peso_retido_peneiras || {})
         .reduce((sum, val) => sum + (val || 0), 0);
 
-      if (pesoTotal > 0) {
-        const pct200 = (pesoRetido200 / pesoTotal) * 100;
-        const fillerBetume = pct200 / teorReal;
-        handleNestedChange('extracao_ligante', 'filler_betume', parseFloat(fillerBetume.toFixed(2)));
-      }
+      const pctPassante200 = ((amostraSemLigante - somaRetidos) / amostraSemLigante) * 100;
+      const fillerBetume = pctPassante200 / teorReal;
+      handleNestedChange('extracao_ligante', 'filler_betume', parseFloat(fillerBetume.toFixed(2)));
     }
   }, [
     formData.extracao_ligante.teor_ligante_real,
+    formData.extracao_ligante.amostra_sem_ligante,
     formData.granulometria.peso_retido_peneiras,
     handleNestedChange,
   ]);
