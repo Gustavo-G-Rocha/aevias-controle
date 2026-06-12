@@ -140,7 +140,7 @@ export function useChecklistUsinaForm({ formData, setFormData, projects, faixas,
   }, []);
 
   const handleNestedChange = useCallback((sectionOrPath, fieldOrValue, valueOrDecimals = null) => {
-    if (typeof fieldOrValue === 'string' && !fieldOrValue.includes('.')) {
+    if (typeof fieldOrValue === 'string' && !sectionOrPath.includes('.')) {
       setFormData(prev => ({
         ...prev,
         [sectionOrPath]: { ...prev[sectionOrPath], [fieldOrValue]: valueOrDecimals },
