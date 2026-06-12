@@ -22,12 +22,25 @@ export function useEnsaioVigaBenkelmanForm(setFormData) {
       leitura_inicial_global: value,
       faixas: value ? prev.faixas.map(faixa => ({
         ...faixa,
-        levantamentos: faixa.levantamentos.map(lev => ({
-          ...lev,
-          bordo_esquerdo: { ...lev.bordo_esquerdo, leitura_inicial: value },
-          eixo:           { ...lev.eixo,           leitura_inicial: value },
-          bordo_direito:  { ...lev.bordo_direito,  leitura_inicial: value },
-        })),
+        levantamentos: faixa.levantamentos.map(lev => {
+          const atualizarLado = (lado) => {
+            const ini = parseFloat(value) || 0;
+            const fim = parseFloat(lado.leitura_final) || 0;
+            const dif = ini - fim;
+            return {
+              ...lado,
+              leitura_inicial: value,
+              diferenca: dif,
+              deflexao: dif * (parseFloat(prev.cte_viga) || 0.01),
+            };
+          };
+          return {
+            ...lev,
+            bordo_esquerdo: atualizarLado(lev.bordo_esquerdo),
+            eixo:           atualizarLado(lev.eixo),
+            bordo_direito:  atualizarLado(lev.bordo_direito),
+          };
+        }),
       })) : prev.faixas,
     }));
   }, [setFormData]);

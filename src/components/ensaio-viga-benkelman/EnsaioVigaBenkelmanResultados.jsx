@@ -69,27 +69,39 @@ export default function EnsaioVigaBenkelmanResultados({
                   <table className="w-full border-collapse text-sm">
                     <colgroup>
                       <col style={{ width: '120px' }} />
-                      <col style={{ width: '100px' }} />
-                      <col style={{ width: '100px' }} />
-                      <col style={{ width: '100px' }} />
-                      <col style={{ width: '100px' }} />
-                      <col style={{ width: '100px' }} />
-                      <col style={{ width: '100px' }} />
+                      <col style={{ width: '65px' }} />
+                      <col style={{ width: '65px' }} />
+                      <col style={{ width: '65px' }} />
+                      <col style={{ width: '65px' }} />
+                      <col style={{ width: '65px' }} />
+                      <col style={{ width: '65px' }} />
+                      <col style={{ width: '65px' }} />
+                      <col style={{ width: '65px' }} />
+                      <col style={{ width: '65px' }} />
+                      <col style={{ width: '65px' }} />
+                      <col style={{ width: '65px' }} />
+                      <col style={{ width: '65px' }} />
                     </colgroup>
                     <thead>
                       <tr className="bg-[#00233B]/10 border border-[#00233B]/20">
                         <th rowSpan="2" className="border border-[#00233B]/20 px-3 py-2 text-[#00233B] font-bold text-center">Estaca / km</th>
-                        <th colSpan="2" className="border border-[#00233B]/20 px-3 py-2 text-[#00233B] font-bold text-center">BORDO ESQUERDO</th>
-                        <th colSpan="2" className="border border-[#00233B]/20 px-3 py-2 text-[#00233B] font-bold text-center">EIXO</th>
-                        <th colSpan="2" className="border border-[#00233B]/20 px-3 py-2 text-[#00233B] font-bold text-center">BORDO DIREITO</th>
+                        <th colSpan="4" className="border border-[#00233B]/20 px-3 py-2 text-[#00233B] font-bold text-center">BORDO ESQUERDO</th>
+                        <th colSpan="4" className="border border-[#00233B]/20 px-3 py-2 text-[#00233B] font-bold text-center">EIXO</th>
+                        <th colSpan="4" className="border border-[#00233B]/20 px-3 py-2 text-[#00233B] font-bold text-center">BORDO DIREITO</th>
                       </tr>
                       <tr className="bg-[#00233B]/5 border border-[#00233B]/20">
                         <th className="border border-[#00233B]/20 px-2 py-1 text-[#00233B] font-semibold text-center">L. Inicial (A)</th>
                         <th className="border border-[#00233B]/20 px-2 py-1 text-[#00233B] font-semibold text-center">L. Final (B)</th>
+                        <th className="border border-[#00233B]/20 px-2 py-1 text-[#00233B] font-semibold text-center">Dif. (C = A - B)</th>
+                        <th className="border border-[#00233B]/20 px-2 py-1 text-[#00233B] font-semibold text-center">Defl. (x10⁻²mm)</th>
                         <th className="border border-[#00233B]/20 px-2 py-1 text-[#00233B] font-semibold text-center">L. Inicial (A)</th>
                         <th className="border border-[#00233B]/20 px-2 py-1 text-[#00233B] font-semibold text-center">L. Final (B)</th>
+                        <th className="border border-[#00233B]/20 px-2 py-1 text-[#00233B] font-semibold text-center">Dif. (C = A - B)</th>
+                        <th className="border border-[#00233B]/20 px-2 py-1 text-[#00233B] font-semibold text-center">Defl. (x10⁻²mm)</th>
                         <th className="border border-[#00233B]/20 px-2 py-1 text-[#00233B] font-semibold text-center">L. Inicial (A)</th>
                         <th className="border border-[#00233B]/20 px-2 py-1 text-[#00233B] font-semibold text-center">L. Final (B)</th>
+                        <th className="border border-[#00233B]/20 px-2 py-1 text-[#00233B] font-semibold text-center">Dif. (C = A - B)</th>
+                        <th className="border border-[#00233B]/20 px-2 py-1 text-[#00233B] font-semibold text-center">Defl. (x10⁻²mm)</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -104,23 +116,44 @@ export default function EnsaioVigaBenkelmanResultados({
                             <td className="border border-[#00233B]/20 px-3 py-2 text-center font-semibold">
                               <Input value={lev.estaca_km} onChange={(e) => onUpdateLevantamento(faixa.id, idx, null, 'estaca_km', e.target.value)} placeholder="Estaca" className="bg-white/20 border-white/30 text-[#00233B] h-9 text-sm text-center" />
                             </td>
+                            {/* BORDO ESQUERDO */}
                             <td className="border border-[#00233B]/20 px-2 py-2">
                               <Input type="number" step="0.01" value={lev.bordo_esquerdo.leitura_inicial} onChange={(e) => onUpdateLevantamento(faixa.id, idx, 'bordo_esquerdo', 'leitura_inicial', e.target.value)} className="bg-white/20 border-white/30 text-[#00233B] h-9 text-center text-sm" />
                             </td>
                             <td className="border border-[#00233B]/20 px-2 py-2">
                               <Input type="number" step="0.01" value={lev.bordo_esquerdo.leitura_final} onChange={(e) => onUpdateLevantamento(faixa.id, idx, 'bordo_esquerdo', 'leitura_final', e.target.value)} className="bg-white/20 border-white/30 text-[#00233B] h-9 text-center text-sm" />
                             </td>
-                            <td className={`border border-[#00233B]/20 px-2 py-2 ${lev.eixo.deflexao > def_admissivel && def_admissivel > 0 ? 'text-red-700 font-bold' : ''}`}>
+                            <td className="border border-[#00233B]/20 px-2 py-2 text-center text-sm font-medium text-[#00233B]">
+                              {lev.bordo_esquerdo.diferenca || 0}
+                            </td>
+                            <td className={`border border-[#00233B]/20 px-2 py-2 text-center text-sm font-bold ${lev.bordo_esquerdo.deflexao > def_admissivel && def_admissivel > 0 ? 'text-red-600' : 'text-[#00233B]'}`}>
+                              {lev.bordo_esquerdo.deflexao || 0}
+                            </td>
+                            {/* EIXO */}
+                            <td className="border border-[#00233B]/20 px-2 py-2">
                               <Input type="number" step="0.01" value={lev.eixo.leitura_inicial} onChange={(e) => onUpdateLevantamento(faixa.id, idx, 'eixo', 'leitura_inicial', e.target.value)} className="bg-white/20 border-white/30 text-[#00233B] h-9 text-center text-sm" />
                             </td>
-                            <td className={`border border-[#00233B]/20 px-2 py-2 ${lev.eixo.deflexao > def_admissivel && def_admissivel > 0 ? 'text-red-700 font-bold' : ''}`}>
+                            <td className="border border-[#00233B]/20 px-2 py-2">
                               <Input type="number" step="0.01" value={lev.eixo.leitura_final} onChange={(e) => onUpdateLevantamento(faixa.id, idx, 'eixo', 'leitura_final', e.target.value)} className="bg-white/20 border-white/30 text-[#00233B] h-9 text-center text-sm" />
                             </td>
+                            <td className="border border-[#00233B]/20 px-2 py-2 text-center text-sm font-medium text-[#00233B]">
+                              {lev.eixo.diferenca || 0}
+                            </td>
+                            <td className={`border border-[#00233B]/20 px-2 py-2 text-center text-sm font-bold ${lev.eixo.deflexao > def_admissivel && def_admissivel > 0 ? 'text-red-600' : 'text-[#00233B]'}`}>
+                              {lev.eixo.deflexao || 0}
+                            </td>
+                            {/* BORDO DIREITO */}
                             <td className="border border-[#00233B]/20 px-2 py-2">
                               <Input type="number" step="0.01" value={lev.bordo_direito.leitura_inicial} onChange={(e) => onUpdateLevantamento(faixa.id, idx, 'bordo_direito', 'leitura_inicial', e.target.value)} className="bg-white/20 border-white/30 text-[#00233B] h-9 text-center text-sm" />
                             </td>
                             <td className="border border-[#00233B]/20 px-2 py-2">
                               <Input type="number" step="0.01" value={lev.bordo_direito.leitura_final} onChange={(e) => onUpdateLevantamento(faixa.id, idx, 'bordo_direito', 'leitura_final', e.target.value)} className="bg-white/20 border-white/30 text-[#00233B] h-9 text-center text-sm" />
+                            </td>
+                            <td className="border border-[#00233B]/20 px-2 py-2 text-center text-sm font-medium text-[#00233B]">
+                              {lev.bordo_direito.diferenca || 0}
+                            </td>
+                            <td className={`border border-[#00233B]/20 px-2 py-2 text-center text-sm font-bold ${lev.bordo_direito.deflexao > def_admissivel && def_admissivel > 0 ? 'text-red-600' : 'text-[#00233B]'}`}>
+                              {lev.bordo_direito.deflexao || 0}
                             </td>
                           </tr>
                         );
@@ -142,7 +175,7 @@ export default function EnsaioVigaBenkelmanResultados({
                           <p className="text-xs font-bold text-[#00233B] text-center bg-[#00233B]/10 rounded px-2 py-1 mb-2">
                             {lado === 'bordo_esquerdo' ? 'BORDO ESQUERDO' : lado === 'eixo' ? 'EIXO' : 'BORDO DIREITO'}
                           </p>
-                          <div className="grid grid-cols-2 gap-2">
+                          <div className="grid grid-cols-2 gap-2 mb-2">
                             <div>
                               <span className="block text-xs text-[#00233B]/70 mb-1">L. Inicial (A)</span>
                               <Input type="number" step="0.01" value={lev[lado].leitura_inicial} onChange={(e) => onUpdateLevantamento(faixa.id, idx, lado, 'leitura_inicial', e.target.value)} className="bg-white/20 border-white/30 text-[#00233B] h-9 text-sm" />
@@ -150,6 +183,16 @@ export default function EnsaioVigaBenkelmanResultados({
                             <div>
                               <span className="block text-xs text-[#00233B]/70 mb-1">L. Final (B)</span>
                               <Input type="number" step="0.01" value={lev[lado].leitura_final} onChange={(e) => onUpdateLevantamento(faixa.id, idx, lado, 'leitura_final', e.target.value)} className="bg-white/20 border-white/30 text-[#00233B] h-9 text-sm" />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="bg-[#00233B]/5 rounded p-2 text-center">
+                              <span className="block text-xs text-[#00233B]/60">Dif. (A - B)</span>
+                              <span className="text-sm font-medium text-[#00233B]">{lev[lado].diferenca || 0}</span>
+                            </div>
+                            <div className={`rounded p-2 text-center ${lev[lado].deflexao > def_admissivel && def_admissivel > 0 ? 'bg-red-100/30' : 'bg-[#00233B]/5'}`}>
+                              <span className="block text-xs text-[#00233B]/60">Defl. (x10⁻²mm)</span>
+                              <span className={`text-sm font-bold ${lev[lado].deflexao > def_admissivel && def_admissivel > 0 ? 'text-red-600' : 'text-[#00233B]'}`}>{lev[lado].deflexao || 0}</span>
                             </div>
                           </div>
                         </div>
