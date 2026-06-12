@@ -167,7 +167,7 @@ export function useEnsaioCAUQForm({
 
       if (pesoTotal > 0) {
         const pct200 = (pesoRetido200 / pesoTotal) * 100;
-        const fillerBetume = (pct200 * (100 - teorReal)) / (100 * teorReal);
+        const fillerBetume = pct200 / teorReal;
         handleNestedChange('extracao_ligante', 'filler_betume', parseFloat(fillerBetume.toFixed(2)));
       }
     }
