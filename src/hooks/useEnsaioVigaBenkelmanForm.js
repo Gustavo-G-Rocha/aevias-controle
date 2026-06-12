@@ -12,6 +12,31 @@ export function useEnsaioVigaBenkelmanForm(setFormData) {
     setFormData(prev => ({ ...prev, [field]: value }));
   }, [setFormData]);
 
+  const handleCteVigaChange = useCallback((value) => {
+    setFormData(prev => {
+      const novaCte = parseFloat(value) || 0;
+      return {
+        ...prev,
+        cte_viga: value,
+        faixas: prev.faixas.map(faixa => ({
+          ...faixa,
+          levantamentos: faixa.levantamentos.map(lev => {
+            const recalcularDeflexao = (lado) => ({
+              ...lado,
+              deflexao: lado.diferenca * novaCte,
+            });
+            return {
+              ...lev,
+              bordo_esquerdo: recalcularDeflexao(lev.bordo_esquerdo),
+              eixo:           recalcularDeflexao(lev.eixo),
+              bordo_direito:  recalcularDeflexao(lev.bordo_direito),
+            };
+          }),
+        })),
+      };
+    });
+  }, [setFormData]);
+
   const handleObraChange = useCallback((obraId, obras) => {
     setFormData(prev => ({ ...prev, obra_id: obraId, rodovia: '' }));
   }, [setFormData]);
@@ -103,6 +128,7 @@ export function useEnsaioVigaBenkelmanForm(setFormData) {
     activeFaixaTab,
     setActiveFaixaTab,
     handleInputChange,
+    handleCteVigaChange,
     handleObraChange,
     handleLeituraInicialChange,
     addFaixa,

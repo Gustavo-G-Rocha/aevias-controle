@@ -15,6 +15,7 @@ export default function EnsaioVigaBenkelman() {
     activeFaixaTab,
     setActiveFaixaTab,
     handleInputChange,
+    handleCteVigaChange,
     handleObraChange,
     handleLeituraInicialChange,
     addFaixa,
@@ -37,6 +38,7 @@ export default function EnsaioVigaBenkelman() {
           obras={obras}
           onObraChange={(id) => handleObraChange(id, obras)}
           onInputChange={handleInputChange}
+          onCteVigaChange={handleCteVigaChange}
           onLeituraInicialChange={handleLeituraInicialChange}
         />
 

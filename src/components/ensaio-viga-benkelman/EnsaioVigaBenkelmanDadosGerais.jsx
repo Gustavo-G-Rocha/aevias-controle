@@ -7,6 +7,7 @@ export default function EnsaioVigaBenkelmanDadosGerais({
   obras,
   onObraChange,
   onInputChange,
+  onCteVigaChange,
   onLeituraInicialChange,
 }) {
   const obraAtual = obras.find(o => o.id === formData.obra_id);
@@ -101,7 +102,7 @@ export default function EnsaioVigaBenkelmanDadosGerais({
             </div>
             <div>
               <span className="block text-sm font-medium text-[#00233B] mb-2">CTE. VIGA</span>
-              <Input value={formData.cte_viga} onChange={(e) => onInputChange('cte_viga', e.target.value)} placeholder="Digitar" className="bg-white/10 border-white/20 text-[#00233B]" />
+              <Input value={formData.cte_viga} onChange={(e) => onCteVigaChange(e.target.value)} placeholder="Digitar" className="bg-white/10 border-white/20 text-[#00233B]" />
             </div>
             <div>
               <label htmlFor="def_admissivel" className="block text-sm font-medium text-[#00233B] mb-2">DEF. ADMISSÍVEL</label>
