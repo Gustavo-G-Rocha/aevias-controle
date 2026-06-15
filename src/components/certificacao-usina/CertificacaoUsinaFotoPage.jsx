@@ -95,7 +95,7 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
               <img
                 src={fotoUrl}
                 alt={`Foto ${pageIndex * 6 + fotoIndex + 1}`}
-                style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", display: "block" }}
+                style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
               />
             </div>
             <p
