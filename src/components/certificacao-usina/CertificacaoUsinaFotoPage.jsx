@@ -62,8 +62,8 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
           gridTemplateRows: "repeat(3, 1fr)",
-          gap: "10px",
-          minHeight: "220mm",
+          gap: "6px",
+          minHeight: "200mm",
         }}
       >
         {chunk.map((fotoUrl, fotoIndex) => (
@@ -72,7 +72,7 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
             style={{
               border: "1px solid #e2e8f0",
               borderRadius: "6px",
-              padding: "6px",
+              padding: "4px",
               breakInside: "avoid",
               pageBreakInside: "avoid",
               display: "flex",
@@ -85,7 +85,7 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
                 borderRadius: "4px",
                 overflow: "hidden",
                 width: "100%",
-                height: "160px",
+                height: "145px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -101,7 +101,7 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
               style={{
                 textAlign: "center",
                 fontSize: "10px",
-                margin: "4px 0 0 0",
+                margin: "2px 0 0 0",
                 fontWeight: 500,
                 color: "#475569",
               }}
