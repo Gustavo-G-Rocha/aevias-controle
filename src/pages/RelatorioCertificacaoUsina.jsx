@@ -577,7 +577,7 @@ export default function RelatorioCertificacaoUsina() {
           chunks.push(data.fotos.slice(i, i + FOTOS_POR_PAGINA));
         }
         return chunks.map((chunk, idx) => (
-          <div key={idx} style={{ ...pageStyle, marginTop: 0, paddingTop: 0 }}>
+          <div key={idx} style={{ ...pageStyle, padding: "10mm" }}>
             <CertificacaoUsinaFotoPage
               chunk={chunk}
               pageIndex={idx}
