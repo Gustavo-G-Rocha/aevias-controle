@@ -94,21 +94,25 @@ export default function DadosObraSection({ formData, handleChange, obras, region
               <div className="space-y-2">
                 <Label>Rodovia *</Label>
                 {obraSelecionada?.rodovias?.length > 0 ? (
-                  <div className="border rounded-md p-2 space-y-1 max-h-40 overflow-y-auto bg-background">
-                    {obraSelecionada.rodovias.map(rodovia => {
-                      const selected = (formData.rodovia || "").split(" - ").map(r => r.trim()).filter(Boolean);
-                      const isChecked = selected.includes(rodovia);
-                      return (
-                        <label key={rodovia} className={`flex items-center gap-2 px-2 py-1 rounded cursor-pointer hover:bg-slate-50 ${disabled ? "opacity-50 pointer-events-none" : ""}`}>
-                          <input type="checkbox" checked={isChecked} onChange={() => {
-                            const newSel = isChecked ? selected.filter(r => r !== rodovia) : [...selected, rodovia];
-                            handleChange("rodovia", newSel.join(" - "));
-                          }} className="rounded" />
-                          <span className="text-sm">{rodovia}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
+                  <>
+                    <div className="border rounded-md p-2 space-y-1 max-h-40 overflow-y-auto bg-background">
+                      {obraSelecionada.rodovias.map(rodovia => {
+                        const selected = (formData.rodovia || "").split(" - ").map(r => r.trim()).filter(Boolean);
+                        const isChecked = selected.includes(rodovia);
+                        const maxReached = selected.length >= 2 && !isChecked;
+                        return (
+                          <label key={rodovia} className={`flex items-center gap-2 px-2 py-1 rounded ${disabled || maxReached ? "opacity-50 pointer-events-none" : "cursor-pointer hover:bg-slate-50"}`}>
+                            <input type="checkbox" checked={isChecked} disabled={maxReached} onChange={() => {
+                              const newSel = isChecked ? selected.filter(r => r !== rodovia) : [...selected, rodovia];
+                              handleChange("rodovia", newSel.join(" - "));
+                            }} className="rounded" />
+                            <span className="text-sm">{rodovia}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                    <p className="text-xs text-gray-400">Máximo 2 rodovias</p>
+                  </>
                 ) : <div className="border rounded-md p-2 text-sm text-gray-500">Nenhuma rodovia cadastrada</div>}
                 {formData.rodovia && <p className="text-xs text-gray-500">Selecionadas: {formData.rodovia}</p>}
               </div>
