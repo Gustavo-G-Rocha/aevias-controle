@@ -42,6 +42,7 @@ const CargaContent = ({ carga }) => (
       <tbody>
         {[
           { label: 'Slump Test', key: 'slump_test' },
+          { label: 'Flow Test', key: 'flow_test' },
           { label: 'Espessura da Camada', key: 'espessura_camada' },
         ].map(({ label, key }) => {
           const ensaio = carga[key];

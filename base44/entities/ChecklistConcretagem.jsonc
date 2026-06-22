@@ -117,6 +117,23 @@
               }
             }
           },
+          "flow_test": {
+            "type": "object",
+            "properties": {
+              "realizado": {
+                "type": "boolean"
+              },
+              "resultado": {
+                "type": "number"
+              },
+              "limite": {
+                "type": "string"
+              },
+              "conforme": {
+                "type": "boolean"
+              }
+            }
+          },
           "espessura_camada": {
             "type": "object",
             "properties": {

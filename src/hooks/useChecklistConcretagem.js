@@ -30,6 +30,7 @@ export const getInitialFormData = () => ({
       nota_fiscal: "",
       placa_betoneira: "",
       slump_test: { realizado: false, resultado: null, limite: "", conforme: null },
+      flow_test: { realizado: false, resultado: null, limite: "", conforme: null },
       espessura_camada: { realizado: false, resultado: null, limite: "", conforme: null },
       equipamento_lancamento: "",
       superficie_tratada_limpa: null,
@@ -191,6 +192,7 @@ export function useChecklistConcretagem() {
         numero_carga: prev.cargas_concreto.length + 1,
         nota_fiscal: "", placa_betoneira: "",
         slump_test: { realizado: false, resultado: null, limite: slumpLimite, conforme: null },
+        flow_test: { realizado: false, resultado: null, limite: "", conforme: null },
         espessura_camada: { realizado: false, resultado: null, limite: "", conforme: null },
         equipamento_lancamento: "", superficie_tratada_limpa: null, adensamento_realizado: null,
         observacoes_lancamento: "", moldado_fiscalizacao: false, corpos_prova: [],
@@ -208,7 +210,7 @@ export function useChecklistConcretagem() {
       const newCargas = [...prev.cargas_concreto];
       if (field.includes(".")) {
         const [parent, child] = field.split(".");
-        newCargas[index] = { ...newCargas[index], [parent]: { ...newCargas[index][parent], [child]: value } };
+        newCargas[index] = { ...newCargas[index], [parent]: { ...(newCargas[index][parent] || {}), [child]: value } };
         if (parent === "slump_test" && child === "resultado") {
           newCargas[index].slump_test.conforme = checkSlumpConformidade(value, prev.project_id);
         }
@@ -321,6 +323,7 @@ export function useChecklistConcretagem() {
       cargas_concreto: formData.cargas_concreto.map(c => ({
         ...c,
         slump_test: { ...c.slump_test, resultado: c.slump_test.resultado !== null && c.slump_test.resultado !== "" ? parseFloat(c.slump_test.resultado) : null },
+        flow_test: { ...c.flow_test, resultado: c.flow_test.resultado !== null && c.flow_test.resultado !== "" ? parseFloat(c.flow_test.resultado) : null },
         espessura_camada: { ...c.espessura_camada, resultado: c.espessura_camada.resultado !== null && c.espessura_camada.resultado !== "" ? parseFloat(c.espessura_camada.resultado) : null },
         corpos_prova: c.corpos_prova.map(cp => ({ ...cp, dias_ruptura: cp.dias_ruptura != null ? parseInt(cp.dias_ruptura) : null })),
       })),

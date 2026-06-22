@@ -77,6 +77,40 @@ export default function CargaConcretoCard({
                       : <span className="text-slate-500">-</span>}
                   </td>
                 </tr>
+                {/* Flow Test */}
+                <tr>
+                  <td className="border border-slate-300 px-2 py-2 font-medium bg-slate-50">Flow Test</td>
+                  <td className="border border-slate-300 px-2 py-1 text-center">
+                    <input type="checkbox" checked={carga.flow_test?.realizado}
+                      onChange={(e) => onCargaChange(index, "flow_test.realizado", e.target.checked)} className="w-4 h-4" />
+                  </td>
+                  <td className="border border-slate-300 px-1 py-1">
+                    <Input type="number" step="0.1" value={carga.flow_test?.resultado || ""}
+                      onChange={(e) => onCargaChange(index, "flow_test.resultado", e.target.value)}
+                      disabled={!carga.flow_test?.realizado} className="h-8 text-sm" placeholder="Resultado" />
+                  </td>
+                  <td className="border border-slate-300 px-1 py-1">
+                    <Input value={carga.flow_test?.limite || ""}
+                      onChange={(e) => onCargaChange(index, "flow_test.limite", e.target.value)}
+                      disabled={!carga.flow_test?.realizado} className="h-8 text-sm" placeholder="Limite manual" />
+                  </td>
+                  <td className="border border-slate-300 px-2 py-1 text-center">
+                    <div className="flex gap-2 justify-center">
+                      <label className="flex items-center gap-1 cursor-pointer">
+                        <input type="checkbox" checked={carga.flow_test?.conforme === true}
+                          onChange={(e) => onCargaChange(index, "flow_test.conforme", e.target.checked ? true : null)}
+                          disabled={!carga.flow_test?.realizado} className="w-4 h-4 accent-green-500" />
+                        <span className="text-xs text-green-600">✓</span>
+                      </label>
+                      <label className="flex items-center gap-1 cursor-pointer">
+                        <input type="checkbox" checked={carga.flow_test?.conforme === false}
+                          onChange={(e) => onCargaChange(index, "flow_test.conforme", e.target.checked ? false : null)}
+                          disabled={!carga.flow_test?.realizado} className="w-4 h-4 accent-red-500" />
+                        <span className="text-xs text-red-600">✗</span>
+                      </label>
+                    </div>
+                  </td>
+                </tr>
                 {/* Espessura da Camada */}
                 <tr>
                   <td className="border border-slate-300 px-2 py-2 font-medium bg-slate-50">Espessura da Camada</td>
