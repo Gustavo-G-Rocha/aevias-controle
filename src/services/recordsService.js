@@ -71,12 +71,30 @@ export function normalizeRecords(results, entityTypes) {
   return out;
 }
 
-// Deduplicação por ID — evita registros duplicados em caso de race conditions
+// Chaves de dedup semântico por entidade — evita contagem dupla de registros duplicados na base
+const SEMANTIC_DEDUP_KEYS = {
+  DiarioObra:               ['obra_id', 'data', 'laboratorista_name', 'tipo_local', 'trecho'],
+  ChecklistConcretagem:     ['obra_id', 'data', 'laboratorista_name', 'concreteira', 'estrutura'],
+  ChecklistTerraplanagem:   ['obra_id', 'data', 'laboratorista_name', 'camada'],
+  ChecklistUsina:           ['obra_id', 'data', 'laboratorista_name', 'usina'],
+  ChecklistAplicacao:       ['obra_id', 'data', 'laboratorista_name'],
+};
+
+// Deduplicação por ID + chave semântica para entidades com registros duplicados na base
 export function deduplicateRecords(records) {
   const seen = new Set();
+  const seenSemantic = new Map();
   return records.filter(r => {
     if (seen.has(r.id)) return false;
     seen.add(r.id);
+
+    const keyFields = SEMANTIC_DEDUP_KEYS[r.entityType];
+    if (keyFields) {
+      const key = keyFields.map(f => r[f] ?? '').join('||');
+      if (seenSemantic.has(key)) return false;
+      seenSemantic.set(key, true);
+    }
+
     return true;
   });
 }
