@@ -82,7 +82,7 @@ export default function CertificacaoUsinaPage() {
     projetosDisponiveis, isApproved, isEditable, clearSavedData, navigate,
   } = useChecklistForm(getInitialFormData, "CertificacaoUsina", "certificacao_usina");
 
-  const handlers = useCertificacaoUsinaForm({ setFormData });
+  const handlers = useCertificacaoUsinaForm({ setFormData, projects, faixas });
 
   const handleFileChange = useCallback(async (e) => {
     const files = Array.from(e.target.files).filter(f => f.type.startsWith("image/"));
@@ -231,6 +231,8 @@ export default function CertificacaoUsinaPage() {
                 isEditable={isEditable}
                 isApproved={isApproved}
                 editingChecklist={editingChecklist}
+                onObraChange={handlers.handleObraChange}
+                onProjectChange={handlers.handleProjectChange}
               />
 
               {/* Página 0: Tópicos 1–4 */}

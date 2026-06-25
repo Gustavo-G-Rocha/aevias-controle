@@ -2,6 +2,11 @@ import { useCallback } from 'react';
 import { calcularErro, calcularDesvioPadrao } from '@/utils/certificacaoUsinaUtils';
 import { PENEIRAS_CONFIG } from '@/constants/sieves';
 
+export function buildPedreiraDoProjeto(project) {
+  if (!project?.agregados || !Array.isArray(project.agregados)) return '';
+  return [...new Set(project.agregados.map(ag => ag.pedreira).filter(Boolean))].join(' + ');
+}
+
 function recalcularErroeDP(rows, hasDP = true) {
   const comErro = rows.map((r) => ({
     ...r,
@@ -16,11 +21,41 @@ function recalcularErroeDP(rows, hasDP = true) {
 /**
  * Hook com handlers para o formulário de Certificação de Usinas.
  */
-export function useCertificacaoUsinaForm({ setFormData }) {
+export function useCertificacaoUsinaForm({ setFormData, projects = [], faixas = [] }) {
 
   const handleChange = useCallback((field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   }, [setFormData]);
+
+  /** Ao trocar obra, limpa project_id e campos derivados */
+  const handleObraChange = useCallback((obraId) => {
+    setFormData(prev => ({
+      ...prev,
+      obra_id: obraId,
+      project_id: '',
+      pedreira: '',
+      faixa_especificada: '',
+      ligante: '',
+    }));
+  }, [setFormData]);
+
+  /** Ao trocar projeto, preenche pedreira, faixa e ligante automaticamente */
+  const handleProjectChange = useCallback((projectId) => {
+    const project = projects.find(p => p.id === projectId);
+    if (!project) {
+      setFormData(prev => ({ ...prev, project_id: '' }));
+      return;
+    }
+    const faixa = faixas.find(f => f.id === project.faixa_granulometrica_id);
+    const pedreira = buildPedreiraDoProjeto(project);
+    setFormData(prev => ({
+      ...prev,
+      project_id: projectId,
+      pedreira,
+      faixa_especificada: faixa ? faixa.nome : (prev.faixa_especificada || ''),
+      ligante: project.ligante?.tipo || prev.ligante || '',
+    }));
+  }, [projects, faixas, setFormData]);
 
   /** Atualiza campo aninhado: path = "saude_seguranca.treinamentos.nr10_eletricistas" */
   const handleNestedChange = useCallback((path, value) => {
@@ -139,6 +174,8 @@ export function useCertificacaoUsinaForm({ setFormData }) {
 
   return {
     handleChange,
+    handleObraChange,
+    handleProjectChange,
     handleNestedChange,
     handleEnsaioValidacaoChange,
     handleGranulometriaChange,
