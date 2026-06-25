@@ -54,12 +54,27 @@ export default function SecaoEstruturaUsina({ formData, onNestedChange, handleCh
             <Input value={ef.piso_outro || ""} onChange={(e) => nested("estrutura_fisica.piso_outro", e.target.value)} disabled={disabled} placeholder="Especificar..." className="h-7 text-sm mt-1" />
           )}
         </FieldRow>
-        <FieldRow label="Cobertura do pó de pedra">
-          <RadioGroup options={["Fixa", "Móvel (lona)", "S/ cobertura"]} value={ef.cobertura_po_pedra} onChange={(v) => nested("estrutura_fisica.cobertura_po_pedra", v)} disabled={disabled} />
-        </FieldRow>
         <FieldRow label="Quantidade de silos">
           <RadioGroup options={["4 ou mais", "3 ou mais", "Menos de 3"]} value={ef.quantidade_silos} onChange={(v) => nested("estrutura_fisica.quantidade_silos", v)} disabled={disabled} />
         </FieldRow>
+        {ef.quantidade_silos && (() => {
+          const qtd = ef.quantidade_silos === "4 ou mais" ? 4 : ef.quantidade_silos === "3 ou mais" ? 3 : 2;
+          const coberturas = Array.isArray(ef.coberturas_po_pedra) ? ef.coberturas_po_pedra : Array(qtd).fill(null);
+          return Array.from({ length: qtd }, (_, i) => (
+            <FieldRow key={i} label={`Cobertura do pó de pedra – Silo ${i + 1}`}>
+              <RadioGroup
+                options={["Fixa", "Móvel (lona)", "S/ cobertura"]}
+                value={coberturas[i] ?? null}
+                onChange={(v) => {
+                  const next = [...(Array.isArray(ef.coberturas_po_pedra) ? ef.coberturas_po_pedra : Array(qtd).fill(null))];
+                  next[i] = v;
+                  nested("estrutura_fisica.coberturas_po_pedra", next);
+                }}
+                disabled={disabled}
+              />
+            </FieldRow>
+          ));
+        })()}
         <FieldRow label="Tamanho em relação a concha da pá carregadeira">
           <RadioGroup options={["No mínimo 1,25X", "No mínimo 1,1X", "Menos de 1,1X"]} value={ef.tamanho_relacao_concha} onChange={(v) => nested("estrutura_fisica.tamanho_relacao_concha", v)} disabled={disabled} />
         </FieldRow>
