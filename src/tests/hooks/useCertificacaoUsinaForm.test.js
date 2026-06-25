@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { buildPedreiraDoProjeto } from '@/hooks/useCertificacaoUsinaForm';
+// Import the getInitialFormData defaults indirectly via the page module
+// We test the shape expected from the page's DEFAULT_* constants by verifying
+// that a freshly constructed initial form has the expected default values.
+// These constants are module-level (not exported) so we test the observable behaviour.
 
 describe('buildPedreiraDoProjeto', () => {
   it('retorna string vazia para projeto sem agregados', () => {
