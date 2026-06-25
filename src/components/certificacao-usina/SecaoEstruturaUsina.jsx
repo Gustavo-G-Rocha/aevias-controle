@@ -59,14 +59,19 @@ export default function SecaoEstruturaUsina({ formData, onNestedChange, handleCh
         </FieldRow>
         {ef.quantidade_silos && (() => {
           const qtd = ef.quantidade_silos === "4 ou mais" ? 4 : ef.quantidade_silos === "3 ou mais" ? 3 : 2;
-          const coberturas = Array.isArray(ef.coberturas_po_pedra) ? ef.coberturas_po_pedra : Array(qtd).fill(null);
-          return Array.from({ length: qtd }, (_, i) => (
+          // Garante que o array sempre tem exatamente `qtd` posições
+          const coberturas = Array.from({ length: qtd }, (_, i) =>
+            Array.isArray(ef.coberturas_po_pedra) ? (ef.coberturas_po_pedra[i] ?? null) : null
+          );
+          return coberturas.map((cob, i) => (
             <FieldRow key={i} label={`Cobertura do pó de pedra – Silo ${i + 1}`}>
               <RadioGroup
                 options={["Fixa", "Móvel (lona)", "S/ cobertura"]}
-                value={coberturas[i] ?? null}
+                value={cob}
                 onChange={(v) => {
-                  const next = [...(Array.isArray(ef.coberturas_po_pedra) ? ef.coberturas_po_pedra : Array(qtd).fill(null))];
+                  const next = Array.from({ length: qtd }, (_, j) =>
+                    Array.isArray(ef.coberturas_po_pedra) ? (ef.coberturas_po_pedra[j] ?? null) : null
+                  );
                   next[i] = v;
                   nested("estrutura_fisica.coberturas_po_pedra", next);
                 }}
