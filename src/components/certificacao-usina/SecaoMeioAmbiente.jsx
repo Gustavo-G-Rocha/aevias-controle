@@ -36,7 +36,6 @@ export default function SecaoMeioAmbiente({ formData, onNestedChange, disabled }
             {row("É realizado o monitoramento do índice de fumaça preta dos equipamentos que utilizam diesel", "emissao_atmosferica", "monitoramento_fumaca_preta")}
             {row("A usina possui filtro para material particulado", "emissao_atmosferica", "filtro_material_particulado")}
             {row("Existe meta de redução de carbono?", "emissao_atmosferica", "meta_reducao_carbono")}
-            {row("Existe meta de redução de carbono?", "emissao_atmosferica", "meta_reducao_carbono")}
 
             <SubSectionTitle>Efluentes Líquidos</SubSectionTitle>
             {row("Possui fossa séptica de acordo com a norma NBR 7229 em local onde não possui rede de esgoto", "efluentes_liquidos", "fossa_septica_nbr7229")}
@@ -69,8 +68,6 @@ export default function SecaoMeioAmbiente({ formData, onNestedChange, disabled }
             {row("Existe plano de gerenciamento de resíduos?", "consideracoes_gerais", "plano_gerenciamento_residuos")}
             {row("São realizados DDSMA (Diálogo Diário de Segurança e Meio Ambiente) a respeito de meio ambiente.", "consideracoes_gerais", "ddsma")}
             {row("Foram elaboradas as Análises Preliminares de Riscos abordando os aspectos e impactos ambientais da usina.", "consideracoes_gerais", "apr_aspectos_ambientais")}
-            {row("Existe captação de chuvas?", "consideracoes_gerais", "captacao_chuvas")}
-            {row("Existe plano de gerenciamento de resíduos?", "consideracoes_gerais", "plano_gerenciamento_residuos")}
           </tbody>
         </table>
       </div>
