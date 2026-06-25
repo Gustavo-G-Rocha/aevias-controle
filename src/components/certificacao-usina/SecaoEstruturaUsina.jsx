@@ -180,6 +180,9 @@ export default function SecaoEstruturaUsina({ formData, onNestedChange, handleCh
         <FieldRow label="Projeto de misturas mornas (WMA)">
           <ConformeField value={ua.projeto_wma} onChange={(v) => nested("usina_asfalto.projeto_wma", v)} disabled={disabled} opcao1="Sim" opcao2="Não" />
         </FieldRow>
+        <FieldRow label="A mistura utiliza CAL?">
+          <ConformeField value={ua.utiliza_cal} onChange={(v) => nested("usina_asfalto.utiliza_cal", v)} disabled={disabled} opcao1="Sim" opcao2="Não" />
+        </FieldRow>
       </div>
     </div>
   );
