@@ -6,7 +6,7 @@ import SubSectionTitle from "./SubSectionTitle";
 export default function SecaoMeioAmbiente({ formData, onNestedChange, disabled }) {
   const ma = formData.meio_ambiente || {};
 
-  const row = (label, section, key) => (
+  const row = (label, section, key, opcao1 = "Sim", opcao2 = "Não") => (
     <ChecklistRow
       key={key}
       label={label}
@@ -14,6 +14,8 @@ export default function SecaoMeioAmbiente({ formData, onNestedChange, disabled }
       value={(ma[section] || {})[key]}
       onChange={onNestedChange}
       disabled={disabled}
+      opcao1={opcao1}
+      opcao2={opcao2}
     />
   );
 
