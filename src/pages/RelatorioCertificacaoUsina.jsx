@@ -540,7 +540,7 @@ export default function RelatorioCertificacaoUsina() {
     { label: "Dosador de fíler", val: ua.dosador_filler },
     { label: "Sistema destorroamento RAP", val: ua.sistema_destorroamento_rap },
     { label: "Classificação RAP em frações", val: ua.classificacao_rap_fracoes },
-    { label: "Projeto WMA", val: ua.projeto_wma },
+    { label: "Projeto Morno", val: ua.projeto_wma },
   ].map((item, idx) => (
     <tr key={idx} style={{ breakInside: "avoid" }}>
       <td style={{ ...td, color: "#475569", width: "50%"}}>{item.label}</td>
