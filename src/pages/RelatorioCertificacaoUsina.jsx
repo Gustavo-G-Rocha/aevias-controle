@@ -484,10 +484,20 @@ export default function RelatorioCertificacaoUsina() {
             <td style={{ ...td, width: "72%", color: "#475569" }}>Piso</td>
             <td style={{ ...td, width: "28%", fontWeight: 600, textAlign: "center" }}>{val(ef.piso_tipo)}{ef.piso_outro ? ` — ${ef.piso_outro}` : ""}</td>
           </tr>
-          <tr style={{ breakInside: "avoid" }}>
-            <td style={{ ...td, color: "#475569" }}>Cobertura do pó de pedra</td>
-            <td style={{ ...td, fontWeight: 600, textAlign: "center" }}>{val(ef.cobertura_po_pedra)}</td>
-          </tr>
+          {Array.isArray(ef.coberturas_po_pedra) && ef.coberturas_po_pedra.length > 0
+            ? ef.coberturas_po_pedra.map((cob, i) => (
+                <tr key={i} style={{ breakInside: "avoid" }}>
+                  <td style={{ ...td, color: "#475569" }}>Cobertura do pó de pedra – Silo {i + 1}</td>
+                  <td style={{ ...td, fontWeight: 600, textAlign: "center" }}>{val(cob)}</td>
+                </tr>
+              ))
+            : (
+                <tr style={{ breakInside: "avoid" }}>
+                  <td style={{ ...td, color: "#475569" }}>Cobertura do pó de pedra</td>
+                  <td style={{ ...td, fontWeight: 600, textAlign: "center" }}>{val(ef.cobertura_po_pedra)}</td>
+                </tr>
+              )
+          }
           <tr style={{ breakInside: "avoid" }}>
             <td style={{ ...td, color: "#475569" }}>Quantidade de silos</td>
             <td style={{ ...td, fontWeight: 600, textAlign: "center" }}>{val(ef.quantidade_silos)}</td>
