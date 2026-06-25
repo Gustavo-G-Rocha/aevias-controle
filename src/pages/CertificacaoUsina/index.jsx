@@ -82,7 +82,12 @@ export default function CertificacaoUsinaPage() {
     projetosDisponiveis, isApproved, isEditable, clearSavedData, navigate,
   } = useChecklistForm(getInitialFormData, "CertificacaoUsina", "certificacao_usina");
 
-  const handlers = useCertificacaoUsinaForm({ setFormData, projects, faixas });
+  const setFormDataAndClear = useCallback((updater) => {
+    setCamposVazios([]);
+    setFormData(updater);
+  }, [setFormData]);
+
+  const handlers = useCertificacaoUsinaForm({ setFormData: setFormDataAndClear, projects, faixas });
 
   const handleFileChange = useCallback(async (e) => {
     const files = Array.from(e.target.files).filter(f => f.type.startsWith("image/"));
@@ -103,13 +108,57 @@ export default function CertificacaoUsinaPage() {
     setFormData(prev => ({ ...prev, fotos: (prev.fotos || []).filter((_, i) => i !== index) }));
   }, [setFormData]);
 
+  const [camposVazios, setCamposVazios] = useState([]);
+
   const isPageComplete = (pageIndex) => VALIDADORES_PAGINA[pageIndex]?.(formData) ?? true;
 
+  /** Retorna lista de labels dos campos obrigatórios vazios na página atual */
+  const getCamposVaziosPagina0 = () => {
+    const labels = {
+      razao_social: "Razão Social",
+      localizacao: "Localização",
+      interessado: "Interessado",
+      responsavel_tecnico: "Responsável Técnico",
+      data_vistoria: "Data da Vistoria",
+      avaliador: "Avaliador",
+      cnpj: "CNPJ",
+      classe_usina: "Classe de Usina",
+      tipo_dosagem: "Tipo de Dosagem",
+      tipo_secagem: "Tipo de Secagem",
+    };
+    const aspectoLabels = {
+      autorizacao_ambiental: "Autorização Ambiental",
+      licenca_previa: "Licença Prévia",
+      licenca_instalacao: "Licença de Instalação",
+      licenca_operacao: "Licença de Operação",
+    };
+    const al = formData.aspectos_legais || {};
+    return [
+      ...Object.entries(labels).filter(([k]) => !formData[k]).map(([, l]) => l),
+      ...Object.entries(aspectoLabels).filter(([k]) => !al[k]).map(([, l]) => l),
+    ];
+  };
+
+  const getCamposVaziosByPage = (page) => {
+    if (page === 0) return getCamposVaziosPagina0();
+    // Páginas 1-4: checklist de sim/não — indicar seção incompleta
+    const nomes = ["Saúde e Segurança", "Meio Ambiente", "Laboratório e Estrutura", "Resultado"];
+    return [`Seção "${nomes[page - 1]}" incompleta — preencha todos os campos`];
+  };
+
   const goToPage = (page) => {
-    // Só permite avançar se todas as páginas anteriores estiverem completas
-    for (let i = 0; i < page; i++) {
-      if (!isPageComplete(i)) return;
+    // Ao avançar, mostrar campos vazios da página atual
+    if (page > currentPage && !isPageComplete(currentPage)) {
+      setCamposVazios(getCamposVaziosByPage(currentPage));
+      return;
     }
+    // Ao navegar por tab, só permite se as anteriores estiverem completas
+    if (page > currentPage + 1) {
+      for (let i = 0; i < page; i++) {
+        if (!isPageComplete(i)) return;
+      }
+    }
+    setCamposVazios([]);
     setCurrentPage(page);
     setTimeout(() => topRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
   };
@@ -291,32 +340,37 @@ export default function CertificacaoUsinaPage() {
                 />
               )}
 
+              {/* Campos obrigatórios vazios */}
+              {camposVazios.length > 0 && (
+                <div className="rounded-md border border-orange-300 bg-orange-50 px-4 py-3 text-sm text-orange-800">
+                  <p className="font-semibold mb-1">Preencha os campos obrigatórios antes de avançar:</p>
+                  <ul className="list-disc list-inside space-y-0.5">
+                    {camposVazios.map((c, i) => <li key={i}>{c}</li>)}
+                  </ul>
+                </div>
+              )}
+
               {/* Navegação anterior/próximo + footer */}
               <div className="flex items-center justify-between pt-2 border-t border-slate-200">
                 <Button
                   type="button"
                   variant="outline"
                   disabled={currentPage === 0}
-                  onClick={() => goToPage(currentPage - 1)}
+                  onClick={() => { setCamposVazios([]); goToPage(currentPage - 1); }}
                 >
                   ← Anterior
                 </Button>
                 <span className="text-xs text-slate-500">
                   Página {currentPage + 1} de {PAGES.length}
                 </span>
-                <div className="flex flex-col items-end gap-1">
-                  {!isPageComplete(currentPage) && currentPage < PAGES.length - 1 && (
-                    <span className="text-xs text-orange-500">Preencha todos os campos para avançar</span>
-                  )}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={currentPage === PAGES.length - 1 || (!isPageComplete(currentPage) && currentPage < PAGES.length - 2) || loadingUpload}
-                    onClick={() => goToPage(currentPage + 1)}
-                  >
-                    Próxima →
-                  </Button>
-                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={currentPage === PAGES.length - 1 || loadingUpload}
+                  onClick={() => goToPage(currentPage + 1)}
+                >
+                  Próxima →
+                </Button>
               </div>
 
               <ChecklistFooter
