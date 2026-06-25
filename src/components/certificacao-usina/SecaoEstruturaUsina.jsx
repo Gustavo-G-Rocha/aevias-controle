@@ -41,7 +41,7 @@ export default function SecaoEstruturaUsina({ formData, onNestedChange, handleCh
       <h3 className="font-bold text-[#00233B] text-sm bg-slate-100 px-3 py-2 rounded">
         7.3 ESTRUTURA E ESPAÇO FÍSICO
       </h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-1">
+      <div className="grid grid-cols-1 gap-4 px-1">
         <FieldRow label="Baias separadoras de agregado">
           <ConformeField value={ef.baias_separadoras} onChange={(v) => nested("estrutura_fisica.baias_separadoras", v)} disabled={disabled} opcao1="Sim" opcao2="Não" />
         </FieldRow>
@@ -96,6 +96,11 @@ export default function SecaoEstruturaUsina({ formData, onNestedChange, handleCh
         <FieldRow label="Agitadores">
           <ConformeField value={ef.agitadores} onChange={(v) => nested("estrutura_fisica.agitadores", v)} disabled={disabled} opcao1="Sim" opcao2="Não" />
         </FieldRow>
+        {ef.agitadores === "Sim" && (
+          <FieldRow label="Tipo de agitador">
+            <RadioGroup options={["Vertical", "Horizontal"]} value={ef.agitadores_tipo} onChange={(v) => nested("estrutura_fisica.agitadores_tipo", v)} disabled={disabled} />
+          </FieldRow>
+        )}
         <FieldRow label="Bacia de contenção">
           <ConformeField value={ef.bacia_contencao} onChange={(v) => nested("estrutura_fisica.bacia_contencao", v)} disabled={disabled} opcao1="Sim" opcao2="Não" />
         </FieldRow>
