@@ -35,6 +35,8 @@ export default function SecaoMeioAmbiente({ formData, onNestedChange, disabled }
             {row("Estão sendo atendidos os valores especificados na resolução SEMA nº016/2014", "emissao_atmosferica", "resolucao_sema_016_2014")}
             {row("É realizado o monitoramento do índice de fumaça preta dos equipamentos que utilizam diesel", "emissao_atmosferica", "monitoramento_fumaca_preta")}
             {row("A usina possui filtro para material particulado", "emissao_atmosferica", "filtro_material_particulado")}
+            {row("Existe meta de redução de carbono?", "emissao_atmosferica", "meta_reducao_carbono")}
+            {row("Existe meta de redução de carbono?", "emissao_atmosferica", "meta_reducao_carbono")}
 
             <SubSectionTitle>Efluentes Líquidos</SubSectionTitle>
             {row("Possui fossa séptica de acordo com a norma NBR 7229 em local onde não possui rede de esgoto", "efluentes_liquidos", "fossa_septica_nbr7229")}
@@ -63,8 +65,12 @@ export default function SecaoMeioAmbiente({ formData, onNestedChange, disabled }
             {row("A vegetação remanescente na usina e seu entorno é mantida sem interferência, sendo verificado se há interferência negativa com a fauna na usina e seu entorno.", "consideracoes_gerais", "vegetacao_remanescente")}
             {row("São frequentemente verificadas as estruturas de contenção (bacias de contenção, canaletas de drenagem, etc.) a fim de mantê-las desobstruídas.", "consideracoes_gerais", "estruturas_contencao")}
             {row("As captações superficiais possuem outorga de direito de uso de recursos hídricos, verificando o atendimento às condicionantes da outorga.", "consideracoes_gerais", "outorga_captacao")}
+            {row("Existe captação de chuvas?", "consideracoes_gerais", "captacao_chuvas")}
+            {row("Existe plano de gerenciamento de resíduos?", "consideracoes_gerais", "plano_gerenciamento_residuos")}
             {row("São realizados DDSMA (Diálogo Diário de Segurança e Meio Ambiente) a respeito de meio ambiente.", "consideracoes_gerais", "ddsma")}
             {row("Foram elaboradas as Análises Preliminares de Riscos abordando os aspectos e impactos ambientais da usina.", "consideracoes_gerais", "apr_aspectos_ambientais")}
+            {row("Existe captação de chuvas?", "consideracoes_gerais", "captacao_chuvas")}
+            {row("Existe plano de gerenciamento de resíduos?", "consideracoes_gerais", "plano_gerenciamento_residuos")}
           </tbody>
         </table>
       </div>

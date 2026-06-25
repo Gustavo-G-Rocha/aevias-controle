@@ -102,6 +102,20 @@
             "Sim",
             "N\u00e3o"
           ]
+        },
+        "usina_em_pedreira": {
+          "type": "string",
+          "enum": [
+            "Sim",
+            "N\u00e3o"
+          ]
+        },
+        "licenciamento_pedreira": {
+          "type": "string",
+          "enum": [
+            "Sim",
+            "N\u00e3o"
+          ]
         }
       }
     },
@@ -111,7 +125,122 @@
     },
     "meio_ambiente": {
       "type": "object",
-      "description": "Se\u00e7\u00e3o 6 - Meio Ambiente"
+      "description": "Se\u00e7\u00e3o 6 - Meio Ambiente",
+      "properties": {
+        "ruidos": {
+          "type": "object"
+        },
+        "emissao_atmosferica": {
+          "type": "object",
+          "properties": {
+            "medicao_poluentes_chamine": {
+              "type": "string",
+              "enum": [
+                "Sim",
+                "N\u00e3o"
+              ]
+            },
+            "resolucao_sema_016_2014": {
+              "type": "string",
+              "enum": [
+                "Sim",
+                "N\u00e3o"
+              ]
+            },
+            "monitoramento_fumaca_preta": {
+              "type": "string",
+              "enum": [
+                "Sim",
+                "N\u00e3o"
+              ]
+            },
+            "filtro_material_particulado": {
+              "type": "string",
+              "enum": [
+                "Sim",
+                "N\u00e3o"
+              ]
+            },
+            "meta_reducao_carbono": {
+              "type": "string",
+              "enum": [
+                "Sim",
+                "N\u00e3o"
+              ]
+            }
+          }
+        },
+        "efluentes_liquidos": {
+          "type": "object"
+        },
+        "residuos_solidos": {
+          "type": "object"
+        },
+        "contaminacao_produtos_perigosos": {
+          "type": "object"
+        },
+        "consideracoes_gerais": {
+          "type": "object",
+          "properties": {
+            "autorizacao_supressao_vegetacao": {
+              "type": "string",
+              "enum": [
+                "Sim",
+                "N\u00e3o"
+              ]
+            },
+            "vegetacao_remanescente": {
+              "type": "string",
+              "enum": [
+                "Sim",
+                "N\u00e3o"
+              ]
+            },
+            "estruturas_contencao": {
+              "type": "string",
+              "enum": [
+                "Sim",
+                "N\u00e3o"
+              ]
+            },
+            "outorga_captacao": {
+              "type": "string",
+              "enum": [
+                "Sim",
+                "N\u00e3o"
+              ]
+            },
+            "ddsma": {
+              "type": "string",
+              "enum": [
+                "Sim",
+                "N\u00e3o"
+              ]
+            },
+            "apr_aspectos_ambientais": {
+              "type": "string",
+              "enum": [
+                "Sim",
+                "N\u00e3o"
+              ]
+            },
+            "captacao_chuvas": {
+              "type": "string",
+              "enum": [
+                "Sim",
+                "N\u00e3o"
+              ]
+            },
+            "plano_gerenciamento_residuos": {
+              "type": "string",
+              "enum": [
+                "Sim",
+                "N\u00e3o"
+              ]
+            }
+          }
+        }
+      }
     },
     "laboratorio": {
       "type": "object",
@@ -127,7 +256,137 @@
     },
     "usina_asfalto": {
       "type": "object",
-      "description": "Se\u00e7\u00e3o 7.4 - Usina de asfalto"
+      "description": "Se\u00e7\u00e3o 7.4 - Usina de asfalto",
+      "properties": {
+        "tipo": {
+          "type": "string"
+        },
+        "modelo": {
+          "type": "string"
+        },
+        "ano_fabricacao": {
+          "type": "string"
+        },
+        "capacidade_nominal": {
+          "type": "number"
+        },
+        "fonte_eletrica": {
+          "type": "string"
+        },
+        "observacoes_fonte": {
+          "type": "string"
+        },
+        "producao_nominal": {
+          "type": "number"
+        },
+        "umidade_pct": {
+          "type": "number"
+        },
+        "altitude_m": {
+          "type": "number"
+        },
+        "material_retido_n8": {
+          "type": "number"
+        },
+        "temperatura_final_massa": {
+          "type": "number"
+        },
+        "producao_efetiva": {
+          "type": "number"
+        },
+        "secagem_contra_fluxo": {
+          "type": "string",
+          "enum": [
+            "Sim",
+            "N\u00e3o"
+          ]
+        },
+        "dosagem_mistura": {
+          "type": "string"
+        },
+        "tipo_combustivel": {
+          "type": "string"
+        },
+        "filtro_verificacao_executado": {
+          "type": "string",
+          "enum": [
+            "Sim",
+            "N\u00e3o"
+          ]
+        },
+        "filtro_conforme": {
+          "type": "string",
+          "enum": [
+            "Sim",
+            "N\u00e3o"
+          ]
+        },
+        "dosador_finos_retornados": {
+          "type": "string",
+          "enum": [
+            "Sim",
+            "N\u00e3o"
+          ]
+        },
+        "dosador_filler": {
+          "type": "string"
+        },
+        "sistema_destorroamento_rap": {
+          "type": "string",
+          "enum": [
+            "Sim",
+            "N\u00e3o"
+          ]
+        },
+        "classificacao_rap_fracoes": {
+          "type": "string",
+          "enum": [
+            "Sim",
+            "N\u00e3o"
+          ]
+        },
+        "operacao": {
+          "type": "string"
+        },
+        "projeto_wma": {
+          "type": "string",
+          "enum": [
+            "Sim",
+            "N\u00e3o"
+          ]
+        },
+        "utiliza_cal": {
+          "type": "string",
+          "enum": [
+            "Sim",
+            "N\u00e3o"
+          ]
+        },
+        "utiliza_rap": {
+          "type": "string",
+          "enum": [
+            "Sim",
+            "N\u00e3o"
+          ]
+        },
+        "silo_especifico_rap": {
+          "type": "string",
+          "enum": [
+            "Sim",
+            "N\u00e3o"
+          ]
+        },
+        "sistema_dosagem_rap": {
+          "type": "string",
+          "enum": [
+            "Sim",
+            "N\u00e3o"
+          ]
+        },
+        "percentual_rap": {
+          "type": "number"
+        }
+      }
     },
     "ensaios_validacao": {
       "type": "object",

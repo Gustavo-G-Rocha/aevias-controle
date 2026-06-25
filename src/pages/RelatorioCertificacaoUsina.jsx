@@ -255,6 +255,9 @@ export default function RelatorioCertificacaoUsina() {
           <ConformeRow label="Licença Prévia (LP)" value={al.licenca_previa} />
           <ConformeRow label="Licença de Instalação (LI)" value={al.licenca_instalacao} />
           <ConformeRow label="Licença de Operação (LO)" value={al.licenca_operacao} />
+          <SubTitle>Instalação da Usina</SubTitle>
+          <ConformeRow label="Usina está instalada dentro de uma pedreira?" value={al.usina_em_pedreira} />
+          <ConformeRow label="Existe licenciamento da pedreira?" value={al.licenciamento_pedreira} />
         </SectionTable>
 
         {/* ── 5 - SST ─────────────────────────────────────────────────────── */}
@@ -389,6 +392,7 @@ export default function RelatorioCertificacaoUsina() {
           {maRow("Estão sendo atendidos os valores especificados na resolução SEMA nº016/2014", "emissao_atmosferica", "resolucao_sema_016_2014")}
           {maRow("É realizado o monitoramento do índice de fumaça preta dos equipamentos que utilizam diesel", "emissao_atmosferica", "monitoramento_fumaca_preta")}
           {maRow("A usina possui filtro para material particulado", "emissao_atmosferica", "filtro_material_particulado")}
+          {maRow("Existe meta de redução de carbono?", "emissao_atmosferica", "meta_reducao_carbono")}
         </SectionTable>
 
         <SubTitle>Efluentes Líquidos</SubTitle>
@@ -427,6 +431,8 @@ export default function RelatorioCertificacaoUsina() {
           {maRow("As captações superficiais possuem outorga de direito de uso de recursos hídricos, verificando o atendimento às condicionantes da outorga.", "consideracoes_gerais", "outorga_captacao")}
           {maRow("São realizados DDSMA (Diálogo Diário de Segurança e Meio Ambiente) a respeito de meio ambiente.", "consideracoes_gerais", "ddsma")}
           {maRow("Foram elaboradas as Análises Preliminares de Riscos abordando os aspectos e impactos ambientais da usina.", "consideracoes_gerais", "apr_aspectos_ambientais")}
+          {maRow("Existe captação de chuvas?", "consideracoes_gerais", "captacao_chuvas")}
+          {maRow("Existe plano de gerenciamento de resíduos?", "consideracoes_gerais", "plano_gerenciamento_residuos")}
         </SectionTable>
 
         {/* ── 7.1 LABORATÓRIO ─────────────────────────────────────────────── */}
@@ -558,6 +564,7 @@ export default function RelatorioCertificacaoUsina() {
     { label: "Classificação RAP em frações", val: ua.classificacao_rap_fracoes },
     { label: "Projeto Morno", val: ua.projeto_wma },
     { label: "A mistura utiliza CAL?", val: ua.utiliza_cal },
+    { label: "Usina utiliza RAP?", val: ua.utiliza_rap },
   ].map((item, idx) => (
     <tr key={idx} style={{ breakInside: "avoid" }}>
       <td style={{ ...td, color: "#475569", width: "50%"}}>{item.label}</td>
@@ -568,6 +575,32 @@ export default function RelatorioCertificacaoUsina() {
       </td>
     </tr>
   ))}
+  {ua.utiliza_rap === "Sim" && (
+    <>
+      <tr style={{ breakInside: "avoid" }}>
+        <td style={{ ...td, color: "#475569", width: "50%"}}>Possui silo específico para RAP?</td>
+        <td style={{ ...td, fontWeight: 700, textAlign: "center" }} colSpan={3}>
+          <span style={{ color: ua.silo_especifico_rap === "Sim" ? "#15803d" : "#b91c1c" }}>
+            {ua.silo_especifico_rap || "Não"}
+          </span>
+        </td>
+      </tr>
+      <tr style={{ breakInside: "avoid" }}>
+        <td style={{ ...td, color: "#475569", width: "50%"}}>Possui sistema automatizado de dosagem de RAP?</td>
+        <td style={{ ...td, fontWeight: 700, textAlign: "center" }} colSpan={3}>
+          <span style={{ color: ua.sistema_dosagem_rap === "Sim" ? "#15803d" : "#b91c1c" }}>
+            {ua.sistema_dosagem_rap || "Não"}
+          </span>
+        </td>
+      </tr>
+      <tr style={{ breakInside: "avoid" }}>
+        <td style={{ ...td, color: "#475569", width: "50%"}}>Qual % utilizado de RAP?</td>
+        <td style={{ ...td, fontWeight: 700, textAlign: "center" }} colSpan={3}>
+          {ua.percentual_rap ? `${ua.percentual_rap}%` : "-"}
+        </td>
+      </tr>
+    </>
+  )}
 </SectionTable>
 
         {/* ── 8 - RESULTADO ───────────────────────────────────────────────── */}

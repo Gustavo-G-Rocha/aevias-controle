@@ -188,6 +188,22 @@ export default function SecaoEstruturaUsina({ formData, onNestedChange, handleCh
         <FieldRow label="A mistura utiliza CAL?">
           <ConformeField value={ua.utiliza_cal} onChange={(v) => nested("usina_asfalto.utiliza_cal", v)} disabled={disabled} opcao1="Sim" opcao2="Não" />
         </FieldRow>
+        <FieldRow label="Usina utiliza RAP?">
+          <ConformeField value={ua.utiliza_rap} onChange={(v) => nested("usina_asfalto.utiliza_rap", v)} disabled={disabled} opcao1="Sim" opcao2="Não" />
+        </FieldRow>
+        {ua.utiliza_rap === "Sim" && (
+          <>
+            <FieldRow label="Possui silo específico para RAP?">
+              <ConformeField value={ua.silo_especifico_rap} onChange={(v) => nested("usina_asfalto.silo_especifico_rap", v)} disabled={disabled} opcao1="Sim" opcao2="Não" />
+            </FieldRow>
+            <FieldRow label="Possui sistema automatizado de dosagem de RAP?">
+              <ConformeField value={ua.sistema_dosagem_rap} onChange={(v) => nested("usina_asfalto.sistema_dosagem_rap", v)} disabled={disabled} opcao1="Sim" opcao2="Não" />
+            </FieldRow>
+            <FieldRow label="Qual % utilizado de RAP?">
+              <Input type="number" value={ua.percentual_rap || ""} onChange={(e) => nested("usina_asfalto.percentual_rap", e.target.value ? parseFloat(e.target.value) : null)} disabled={disabled} className="h-8 text-sm" />
+            </FieldRow>
+          </>
+        )}
       </div>
     </div>
   );

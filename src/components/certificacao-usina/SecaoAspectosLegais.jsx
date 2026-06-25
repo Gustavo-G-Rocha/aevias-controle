@@ -31,6 +31,9 @@ export default function SecaoAspectosLegais({ formData, onNestedChange, disabled
             {row("Licença Prévia (LP)", "licenca_previa")}
             {row("Licença de Instalação (LI)", "licenca_instalacao")}
             {row("Licença de Operação (LO)", "licenca_operacao")}
+            <SectionTitle>Instalação da Usina</SectionTitle>
+            {row("Usina está instalada dentro de uma pedreira?", "usina_em_pedreira")}
+            {row("Existe licenciamento da pedreira?", "licenciamento_pedreira")}
           </tbody>
         </table>
       </div>
