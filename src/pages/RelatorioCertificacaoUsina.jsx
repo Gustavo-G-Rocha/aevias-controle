@@ -255,7 +255,9 @@ export default function RelatorioCertificacaoUsina() {
           <ConformeRow label="Licença Prévia (LP)" value={al.licenca_previa} />
           <ConformeRow label="Licença de Instalação (LI)" value={al.licenca_instalacao} />
           <ConformeRow label="Licença de Operação (LO)" value={al.licenca_operacao} />
-          <SubTitle>Instalação da Usina</SubTitle>
+        </SectionTable>
+        <SubTitle>Instalação da Usina</SubTitle>
+        <SectionTable>
           <ConformeRow label="Usina está instalada dentro de uma pedreira?" value={al.usina_em_pedreira} />
           <ConformeRow label="Existe licenciamento da pedreira?" value={al.licenciamento_pedreira} />
         </SectionTable>
