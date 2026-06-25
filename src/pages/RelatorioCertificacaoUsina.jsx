@@ -508,6 +508,12 @@ export default function RelatorioCertificacaoUsina() {
           <ConformeRow label="Termômetros internos" value={ef.termometros_internos} />
           <ConformeRow label="Bomba de engrenagem" value={ef.bomba_engrenagem} />
           <ConformeRow label="Agitadores" value={ef.agitadores} />
+          {ef.agitadores === "Sim" && (
+            <tr style={{ breakInside: "avoid" }}>
+              <td style={{ ...td, color: "#475569" }}>Tipo de agitador</td>
+              <td style={{ ...td, fontWeight: 600, textAlign: "center" }}>{val(ef.agitadores_tipo)}</td>
+            </tr>
+          )}
           <ConformeRow label="Bacia de contenção" value={ef.bacia_contencao} />
         </SectionTable>
 
@@ -541,6 +547,7 @@ export default function RelatorioCertificacaoUsina() {
     { label: "Sistema destorroamento RAP", val: ua.sistema_destorroamento_rap },
     { label: "Classificação RAP em frações", val: ua.classificacao_rap_fracoes },
     { label: "Projeto Morno", val: ua.projeto_wma },
+    { label: "A mistura utiliza CAL?", val: ua.utiliza_cal },
   ].map((item, idx) => (
     <tr key={idx} style={{ breakInside: "avoid" }}>
       <td style={{ ...td, color: "#475569", width: "50%"}}>{item.label}</td>
