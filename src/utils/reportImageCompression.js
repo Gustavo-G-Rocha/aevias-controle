@@ -59,14 +59,25 @@ export async function compressImage(photoUrl, opts = {}) {
 }
 
 /**
- * Comprime um array de URLs de imagem em paralelo.
+ * Comprime um array de URLs de imagem de forma SEQUENCIAL (uma por vez).
+ *
+ * O carregamento sequencial evita picos de rede/memória e travamento da UI
+ * ao gerar relatórios com muitas imagens (o carregamento paralelo anterior
+ * disparava todas as requisições simultaneamente). A ordem final é preservada
+ * e o resultado de cada imagem é idêntico ao da compressão individual.
+ *
  * @param {string[]} urls - Array de URLs
  * @param {object} opts   - Mesmas opções de compressImage
- * @returns {Promise<string[]>} Array de dataURLs comprimidas
+ * @returns {Promise<string[]>} Array de dataURLs comprimidas, na ordem original
  */
 export async function compressImages(urls, opts = {}) {
   const valid = (urls || []).filter(u => u && u.trim() !== '');
-  return Promise.all(valid.map(url => compressImage(url, opts)));
+  const results = [];
+  for (const url of valid) {
+    // eslint-disable-next-line no-await-in-loop
+    results.push(await compressImage(url, opts));
+  }
+  return results;
 }
 
 /**

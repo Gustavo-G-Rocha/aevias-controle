@@ -8,6 +8,7 @@ import MRAFHeader from './checklist-mraf/MRAFHeader';
 import MRAFPhotosPage from './checklist-mraf/MRAFPhotosPage';
 import MRAFActionsPage from './checklist-mraf/MRAFActionsPage';
 import { createPhotoPages, shouldShowActionsPage } from '@/utils/relatorioChecklistMRAFUtils';
+import { compressImages } from '@/utils/reportImageCompression';
 
 const SectionTitle = ({ children }) => <ReportSectionTitle size="sm">{children}</ReportSectionTitle>;
 
@@ -35,55 +36,9 @@ export default function RelatorioChecklistMRAF({ checklist, obra, regional, proj
   const [isCompressing, setIsCompressing] = React.useState(true);
 
   React.useEffect(() => {
-    const compressImages = async () => {
-      if (!checklist?.fotos || checklist.fotos.length === 0) {
-        setIsCompressing(false);
-        return;
-      }
-
-      const compressed = await Promise.all(
-        checklist.fotos.map(async (photoUrl) => {
-          try {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            
-            await new Promise((resolve, reject) => {
-              img.onload = resolve;
-              img.onerror = reject;
-              img.src = photoUrl;
-            });
-
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            const maxWidth = 800;
-            const maxHeight = 600;
-            let width = img.width;
-            let height = img.height;
-            
-            if (width > maxWidth || height > maxHeight) {
-              const ratio = Math.min(maxWidth / width, maxHeight / height);
-              width = width * ratio;
-              height = height * ratio;
-            }
-            
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(img, 0, 0, width, height);
-            
-            return canvas.toDataURL('image/jpeg', 0.5);
-          } catch (error) {
-            console.error('Erro ao comprimir imagem:', error);
-            return photoUrl;
-          }
-        })
-      );
-
-      setCompressedPhotos(compressed);
-      setIsCompressing(false);
-    };
-
-    compressImages();
+    compressImages(checklist?.fotos || [], { maxWidth: 800, maxHeight: 600, quality: 0.5 })
+      .then(photos => setCompressedPhotos(photos))
+      .finally(() => setIsCompressing(false));
   }, [checklist?.fotos]);
 
   if (isCompressing) {

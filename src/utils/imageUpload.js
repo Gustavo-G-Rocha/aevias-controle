@@ -1,10 +1,11 @@
 import { base44 } from '@/api/base44Client';
+import { MAX_UPLOAD_WIDTH, UPLOAD_QUALITY } from '@/constants/imageConfig';
 
 /**
  * Comprime uma imagem antes do upload usando Canvas API.
  * Reduz fotos de câmera de ~5-10MB para ~200-500KB.
  */
-export async function compressImage(file, maxWidth = 1920, quality = 0.82) {
+export async function compressImage(file, maxWidth = MAX_UPLOAD_WIDTH, quality = UPLOAD_QUALITY) {
   // Só comprimir imagens
   if (!file.type.startsWith('image/')) return file;
 

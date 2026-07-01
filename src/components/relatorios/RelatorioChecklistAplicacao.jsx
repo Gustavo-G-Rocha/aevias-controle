@@ -11,6 +11,7 @@ import MedicoesGeometricasPage from '@/components/relatorio-checklist-aplicacao/
 import ActionsPageAplicacao from '@/components/relatorio-checklist-aplicacao/ActionsPageAplicacao';
 
 import { temAcoesCorretivas, buildFooterPropsAplicacao } from '@/utils/relatorioChecklistAplicacaoUtils';
+import { compressImages } from '@/utils/reportImageCompression';
 
 export default function RelatorioChecklistAplicacao({ checklist, obra, regional, user, creatorUser }) {
   const [compressedPhotos, setCompressedPhotos] = React.useState([]);
@@ -18,59 +19,27 @@ export default function RelatorioChecklistAplicacao({ checklist, obra, regional,
   const [isCompressing, setIsCompressing] = React.useState(true);
 
   React.useEffect(() => {
-    const compressImages = async () => {
+    const run = async () => {
       const hasFotos = checklist?.fotos && checklist.fotos.length > 0;
       const medicoesFotos = Array.isArray(checklist?.medicoes_geometricas) ? checklist.medicoes_geometricas : [];
       const hasMedicoes = medicoesFotos.length > 0;
 
       if (!hasFotos && !hasMedicoes) { setIsCompressing(false); return; }
 
-      const compressImage = async (photoUrl, isHighQuality = false) => {
-        try {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; img.src = photoUrl; });
-
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          const maxWidth = isHighQuality ? 1200 : 800;
-          const maxHeight = isHighQuality ? 900 : 600;
-          let width = img.width;
-          let height = img.height;
-
-          if (width > maxWidth || height > maxHeight) {
-            const ratio = Math.min(maxWidth / width, maxHeight / height);
-            width = width * ratio; height = height * ratio;
-          }
-
-          canvas.width = width; canvas.height = height;
-          ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, width, height);
-          ctx.drawImage(img, 0, 0, width, height);
-          return canvas.toDataURL('image/jpeg', isHighQuality ? 0.85 : 0.6);
-        } catch (error) {
-          console.error('Erro ao comprimir imagem:', error);
-          return photoUrl;
-        }
-      };
-
       if (hasFotos) {
-        const compressed = await Promise.all(
-          checklist.fotos.filter(p => p && p.trim() !== '').map(url => compressImage(url, false))
-        );
+        const compressed = await compressImages(checklist.fotos, { maxWidth: 800, maxHeight: 600, quality: 0.6, whiteBg: true });
         setCompressedPhotos(compressed);
       }
 
       if (hasMedicoes) {
-        const compressed = await Promise.all(
-          medicoesFotos.filter(m => m && m.trim() !== '').map(url => compressImage(url, true))
-        );
+        const compressed = await compressImages(medicoesFotos, { maxWidth: 1200, maxHeight: 900, quality: 0.85, whiteBg: true });
         setCompressedMedicoes(compressed);
       }
 
       setIsCompressing(false);
     };
 
-    compressImages();
+    run();
   }, [checklist?.fotos, checklist?.medicoes_geometricas, checklist?.medicoes_geometricas?.length]);
 
   if (!checklist) return <div className="p-8">Dados do checklist não encontrados.</div>;
