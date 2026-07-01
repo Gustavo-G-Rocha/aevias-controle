@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider } from '@/lib/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { useTheme } from '@/hooks/useTheme';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -55,6 +56,8 @@ function AuthenticatedApp() {
 
 
 function App() {
+  // Mantém a classe .dark sincronizada com a preferência do usuário em runtime.
+  useTheme();
 
   return (
     <AuthProvider>

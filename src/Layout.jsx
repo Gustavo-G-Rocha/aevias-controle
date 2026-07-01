@@ -94,7 +94,7 @@ const AppLayout = ({ children }) => {
 
 export default function Layout({ children, currentPageName }) {
   if (REPORT_PAGES.has(currentPageName)) {
-    return <>{children}</>;
+    return <div className="report-scope">{children}</div>;
   }
   return <AppLayout>{children}</AppLayout>;
 }

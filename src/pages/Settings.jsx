@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sun, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ThemeSelector from "@/components/settings/ThemeSelector";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,28 +31,20 @@ export default function Settings() {
         <p className="mt-1" style={{ color: 'var(--color-text-muted)' }}>Personalize a aparência do aplicativo</p>
       </div>
 
-      <Card className="bg-white/20 backdrop-blur-lg border border-white/20 text-[#00233B]">
+      <Card className="backdrop-blur-lg border" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}>
         <CardHeader>
           <CardTitle className="text-lg font-semibold flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
             <Sun className="w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
             Tema
           </CardTitle>
-          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>O aplicativo utiliza o tema claro.</p>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Escolha entre o tema claro e escuro.</p>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-3 p-4 rounded-xl border-2 border-[#BFCF99] bg-[#BFCF99]/20 w-fit">
-            <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--color-primary)' }}>
-              <Sun className="w-6 h-6" style={{ color: 'var(--color-secondary)' }} />
-            </div>
-            <div>
-              <p className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>Claro</p>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-subtle)' }}>Tema claro ativo</p>
-            </div>
-          </div>
+          <ThemeSelector />
         </CardContent>
       </Card>
 
-      <Card className="bg-white/20 backdrop-blur-lg border border-red-200/30 text-[#00233B]">
+      <Card className="backdrop-blur-lg border" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-danger)', color: 'var(--color-text)' }}>
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-red-600 flex items-center gap-2">
             <Trash2 className="w-5 h-5" />
