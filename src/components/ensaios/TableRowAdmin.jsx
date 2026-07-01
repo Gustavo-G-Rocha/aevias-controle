@@ -2,13 +2,15 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, CheckCircle, XCircle, Trash2 } from "lucide-react";
+import { FileText, CheckCircle, XCircle, Trash2, Pencil } from "lucide-react";
 import { Link as RouterLink } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components/ensaios/ensaioMappers";
 import { getLocalInfo, getLaboratoristaInfo, getEmpireiteiraInfo, getNaoConformidades, getStatusInfo } from "@/components/ensaios/utils";
 import { CopyIdButton } from "@/components/ensaios/TableFilters";
+import { canGestorPreencherResultado } from "@/utils/certificacaoUsinaAccess";
 
-const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, allUsers, obras, onApprove, onReject, onDelete }) => {
+const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, allUsers, obras, user, regionais = [], onApprove, onReject, onDelete }) => {
   const status = getStatusInfo(ensaio);
   const { name, icon: TypeIcon } = getEnsaioTypeInfo(ensaio);
   const reportUrl = getReportLink(ensaio);
@@ -18,6 +20,10 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
   const naoConformidades = getNaoConformidades(ensaio);
   const temAcoesCorretivas = ensaio.acoes_corretivas_realizado === true;
   const temDeflexaoExcessiva = ensaio.tem_deflexao_excessiva === true;
+  // Gestor da regional pode reabrir a Certificação de Usina para preencher o Resultado
+  const podeEditarCertificacao =
+    ensaio.entityType === "CertificacaoUsina" &&
+    canGestorPreencherResultado(user, ensaio, obra, regionais);
 
   return (
     <tr className={`border-b border-white/10 hover:bg-black/5 ${index % 2 === 0 ? 'bg-transparent' : 'bg-black/[0.02]'}`}>
@@ -66,6 +72,11 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
             </div>
           )}
           {canApprove && ensaio.status === 'rascunho' && <span className="text-xs italic text-[#00233B]/60 ml-2">Em execução</span>}
+          {podeEditarCertificacao && (
+            <Button asChild size="sm" style={{ backgroundColor: '#00233B' }} className="text-white hover:opacity-90 h-7 px-2" title="Editar / Preencher Resultado">
+              <RouterLink to={createPageUrl(`CertificacaoUsina?editId=${ensaio.id}`)}><Pencil className="w-3 h-3" /></RouterLink>
+            </Button>
+          )}
           {canApprove && (
             <Button size="sm" variant="destructive" className="h-7 px-2" onClick={() => onDelete(ensaio)} title="Excluir">
               <Trash2 className="w-3 h-3" />

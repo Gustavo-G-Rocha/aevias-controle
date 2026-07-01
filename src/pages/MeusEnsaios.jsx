@@ -9,7 +9,7 @@ import LaboratoristaInterface from "@/components/ensaios/LaboratoristaInterface"
 import { DialogTrigger } from "@/components/ui/dialog";
 
 export default function MeusEnsaios() {
-  const { ensaios, obras, projects, allUsers, user, loading, reload } = useEnsaiosList();
+  const { ensaios, obras, projects, allUsers, regionais, user, loading, reload } = useEnsaiosList();
   const { handleApprove, handleReject, handleDelete } = useEnsaiosActions(user, obras, reload);
 
   const _isAdmin = isAdmin(user);
@@ -63,6 +63,7 @@ export default function MeusEnsaios() {
             canApprove={canApprove}
             canCreate={canCreate}
             allUsers={allUsers}
+            regionais={regionais}
           />
         ) : _isCliente ? (
           <ClienteInterface

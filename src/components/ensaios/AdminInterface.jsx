@@ -13,7 +13,7 @@ import { useTableFilters } from "@/hooks/useTableFilters";
 import TableRowAdmin from "@/components/ensaios/TableRowAdmin";
 import EnsaiosTableHeader from "@/components/ensaios/EnsaiosTableHeader";
 
-const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReject, onDelete, user, canApprove, canCreate, allUsers }) => {
+const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReject, onDelete, user, canApprove, canCreate, allUsers, regionais = [] }) => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [reprovingEnsaio, setReprovingEnsaio] = useState(null);
   const [deletingEnsaio, setDeletingEnsaio] = useState(null);
@@ -128,6 +128,8 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
                     canApprove={canApprove}
                     allUsers={allUsers}
                     obras={obras}
+                    user={user}
+                    regionais={regionais}
                     onApprove={onApprove}
                     onReject={() => setReprovingEnsaio(ensaio)}
                     onDelete={() => setDeletingEnsaio(ensaio)}

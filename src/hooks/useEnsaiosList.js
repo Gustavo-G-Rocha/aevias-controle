@@ -83,13 +83,14 @@ export function useEnsaiosList() {
 
   const loading = loadingUser || loadingAux || loadingRecords;
 
-  const { ensaios, obras, projects, allUsers } = useMemo(() => {
+  const { ensaios, obras, projects, allUsers, regionais } = useMemo(() => {
     if (!user || !auxData) {
       return {
         ensaios: [],
         obras: auxData?.obras ?? [],
         projects: auxData?.projects ?? [],
         allUsers: auxData?.users ?? [],
+        regionais: auxData?.regionais ?? [],
       };
     }
 
@@ -107,8 +108,9 @@ export function useEnsaiosList() {
       obras: auxData.obras,
       projects: auxData.projects,
       allUsers: auxData.users ?? [],
+      regionais: auxData.regionais ?? [],
     };
   }, [user, auxData, allRecords]);
 
-  return { ensaios, obras, projects, allUsers, user, loading, reload };
+  return { ensaios, obras, projects, allUsers, regionais, user, loading, reload };
 }
