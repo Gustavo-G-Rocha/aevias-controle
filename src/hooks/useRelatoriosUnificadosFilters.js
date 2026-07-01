@@ -1,9 +1,10 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import {
   extractLaboratoristas,
   filterRecordsByDateRange,
 } from "@/utils/relatoriosUnificadosUtils";
+import { resolveUserIdentity } from "@/utils/userIdentityResolver";
 import { loadRecordsByObra } from "@/services/recordsService";
 
 export const useRelatoriosUnificadosFilters = () => {
@@ -68,10 +69,23 @@ export const useRelatoriosUnificadosFilters = () => {
     }
   }, [obraSelecionada, dataInicio, dataFim, loadLaboratoristas, loadFiltrosObra]);
 
-  const toggleLaboratorista = useCallback((lab) => {
-    setLaboratoristasChecked((prev) =>
-      prev.includes(lab) ? prev.filter((l) => l !== lab) : [...prev, lab]
-    );
+  // Lista "resolvida": agrupa registros duplicados da mesma pessoa
+  // (nome + email com nome nulo, variação de domínio) em um único item.
+  const laboratoristasResolvidos = useMemo(
+    () => resolveUserIdentity(laboratoristasDisponiveis),
+    [laboratoristasDisponiveis]
+  );
+
+  // Alterna um GRUPO de identidade: marca/desmarca todos os seus identificadores.
+  const toggleLaboratorista = useCallback((identifiers) => {
+    const ids = Array.isArray(identifiers) ? identifiers : [identifiers];
+    setLaboratoristasChecked((prev) => {
+      const allChecked = ids.every((id) => prev.includes(id));
+      if (allChecked) {
+        return prev.filter((l) => !ids.includes(l));
+      }
+      return Array.from(new Set([...prev, ...ids]));
+    });
   }, []);
 
   const clearFilters = useCallback(() => {
@@ -98,6 +112,7 @@ export const useRelatoriosUnificadosFilters = () => {
     tipoRegistro,
     setTipoRegistro,
     laboratoristasDisponiveis,
+    laboratoristasResolvidos,
     laboratoristasChecked,
     setLaboratoristasChecked,
     loadingLaboratoristas,

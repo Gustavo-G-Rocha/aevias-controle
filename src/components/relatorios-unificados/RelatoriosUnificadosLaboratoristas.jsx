@@ -8,10 +8,15 @@ export default function RelatoriosUnificadosLaboratoristas({
   dataFim,
   loadingLaboratoristas,
   laboratoristasDisponiveis,
+  laboratoristasResolvidos,
   laboratoristasChecked,
   setLaboratoristasChecked,
   toggleLaboratorista,
 }) {
+  // Um item por pessoa física; cada item pode agrupar vários identificadores.
+  const isGroupChecked = (identifiers) =>
+    identifiers.length > 0 && identifiers.every((id) => laboratoristasChecked.includes(id));
+
   return (
     <div className="space-y-2">
       <Label>Laboratoristas *</Label>
@@ -24,7 +29,7 @@ export default function RelatoriosUnificadosLaboratoristas({
           <Loader2 className="w-4 h-4 animate-spin" /> Carregando
           laboratoristas...
         </div>
-      ) : laboratoristasDisponiveis.length === 0 ? (
+      ) : laboratoristasResolvidos.length === 0 ? (
         <p className="text-sm text-slate-400 italic">
           Nenhum laboratorista encontrado no período selecionado.
         </p>
@@ -48,18 +53,18 @@ export default function RelatoriosUnificadosLaboratoristas({
               Desmarcar todos
             </button>
           </div>
-          {laboratoristasDisponiveis.map((lab) => (
+          {laboratoristasResolvidos.map((lab) => (
             <label
-              key={lab}
+              key={lab.displayName}
               className="flex items-center gap-2 cursor-pointer hover:bg-white px-2 py-1 rounded"
             >
               <input
                 type="checkbox"
-                checked={laboratoristasChecked.includes(lab)}
-                onChange={() => toggleLaboratorista(lab)}
+                checked={isGroupChecked(lab.identifiers)}
+                onChange={() => toggleLaboratorista(lab.identifiers)}
                 className="rounded"
               />
-              <span className="text-sm text-[#00233B]">{lab}</span>
+              <span className="text-sm text-[#00233B]">{lab.displayName}</span>
             </label>
           ))}
         </div>

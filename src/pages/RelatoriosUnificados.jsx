@@ -27,6 +27,7 @@ export default function RelatoriosUnificados() {
     tipoRegistro,
     setTipoRegistro,
     laboratoristasDisponiveis,
+    laboratoristasResolvidos,
     laboratoristasChecked,
     setLaboratoristasChecked,
     loadingLaboratoristas,
@@ -137,6 +138,7 @@ export default function RelatoriosUnificados() {
             dataFim={dataFim}
             loadingLaboratoristas={loadingLaboratoristas}
             laboratoristasDisponiveis={laboratoristasDisponiveis}
+            laboratoristasResolvidos={laboratoristasResolvidos}
             laboratoristasChecked={laboratoristasChecked}
             setLaboratoristasChecked={setLaboratoristasChecked}
             toggleLaboratorista={toggleLaboratorista}
