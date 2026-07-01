@@ -12,7 +12,7 @@ import { uploadMultipleFiles } from "@/utils/imageUpload";
 import ChecklistFooter from "@/components/checklists/ChecklistFooter";
 import StatusDraftBanner from "@/components/forms/StatusDraftBanner";
 import RejectionBanner from "@/components/forms/RejectionBanner";
-import ChecklistUsinaHeader from "@/components/checklists/ChecklistUsinaHeader";
+import CertificacaoUsinaHeader from "@/components/certificacao-usina/CertificacaoUsinaHeader";
 import { Button } from "@/components/ui/button";
 
 import SecaoDescricao from "@/components/certificacao-usina/SecaoDescricao";
@@ -128,7 +128,7 @@ export default function CertificacaoUsinaPage() {
 
   const {
     obras, regionais, projects, faixas, user, editingChecklist,
-    loading, formData, setFormData, obraSelecionada, regionalSelecionada,
+    loading, formData, setFormData, regionalSelecionada,
     projetosDisponiveis, isApproved, isEditable, extraCanEdit, clearSavedData, navigate,
   } = useChecklistForm(
     getInitialFormData,
@@ -347,20 +347,16 @@ export default function CertificacaoUsinaPage() {
               className="space-y-8"
             >
               {/* Obra — aparece em todas as páginas */}
-              <ChecklistUsinaHeader
+              <CertificacaoUsinaHeader
                 formData={formData}
-                setFormData={setFormData}
                 obras={obras}
                 regionais={regionais}
-                projects={projects}
-                projetosDisponiveis={projetosDisponiveis}
-                obraSelecionada={obraSelecionada}
                 regionalSelecionada={regionalSelecionada}
                 isEditable={isEditable}
                 isApproved={isApproved}
                 editingChecklist={editingChecklist}
-                onObraChange={handlers.handleObraChange}
-                onProjectChange={handlers.handleProjectChange}
+                onObraChange={(v) => handlers.handleChange("obra_id", v)}
+                onDataChange={(v) => handlers.handleChange("data_vistoria", v)}
               />
 
               {/* Tópicos 1–4 */}
