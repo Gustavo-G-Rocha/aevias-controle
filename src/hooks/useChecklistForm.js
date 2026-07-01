@@ -10,7 +10,7 @@ import { createPageUrl } from "@/utils";
  * Hook reutilizável para formulários de checklist
  * Gerencia carregamento de dados, persistência, edição e permissões
  */
-export function useChecklistForm(getInitialFormData, entityName, storageName) {
+export function useChecklistForm(getInitialFormData, entityName, storageName, canEditExtra = null) {
   const [obras, setObras] = useState([]);
   const [regionais, setRegionais] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -18,6 +18,7 @@ export function useChecklistForm(getInitialFormData, entityName, storageName) {
   const [user, setUser] = useState(null);
   const [allUsers, setAllUsers] = useState([]);
   const [editingChecklist, setEditingChecklist] = useState(null);
+  const [obraDoRegistro, setObraDoRegistro] = useState(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState(getInitialFormData());
 
@@ -90,7 +91,12 @@ export function useChecklistForm(getInitialFormData, entityName, storageName) {
           setEditingChecklist(checklistToEdit);
 
           const isOwnerCheck = checklistToEdit.created_by?.toLowerCase() === userData.email?.toLowerCase() || checklistToEdit.created_by_id === userData.id;
-          if (userData.role === 'admin' || (isOwnerCheck && (checklistToEdit.status === 'rascunho' || checklistToEdit.approved === false || checklistToEdit.approved === null))) {
+          const obraRegistroAtual = obrasData.find(o => o.id === checklistToEdit.obra_id) || null;
+          setObraDoRegistro(obraRegistroAtual);
+          const extraCanEdit = typeof canEditExtra === 'function'
+            ? canEditExtra(userData, checklistToEdit, obraRegistroAtual, regionaisData)
+            : false;
+          if (userData.role === 'admin' || extraCanEdit || (isOwnerCheck && (checklistToEdit.status === 'rascunho' || checklistToEdit.approved === false || checklistToEdit.approved === null))) {
             const initialForm = getInitialFormData();
             // Deep-merge object fields so saved records don't lose keys added after initial save
           const mergedObjectFields = {};
@@ -148,9 +154,16 @@ export function useChecklistForm(getInitialFormData, entityName, storageName) {
 
   // Permissões — calculadas apenas quando user já foi carregado
   const isApproved = formData.approved === true && formData.status !== 'rascunho';
+
+  const extraCanEdit = useMemo(() => {
+    if (loading || !editingChecklist?.id || typeof canEditExtra !== 'function') return false;
+    return canEditExtra(user, editingChecklist, obraDoRegistro, regionais);
+  }, [loading, user, editingChecklist, obraDoRegistro, regionais, canEditExtra]);
+
   const userCanEdit = loading ? false : (
     user?.role === 'admin' ||
     !editingChecklist?.id ||
+    extraCanEdit ||
     (
       (
         formData.created_by?.toLowerCase() === user?.email?.toLowerCase() ||
@@ -180,6 +193,7 @@ export function useChecklistForm(getInitialFormData, entityName, storageName) {
     isApproved,
     userCanEdit,
     isEditable,
+    extraCanEdit,
     clearSavedData,
     navigate,
   };

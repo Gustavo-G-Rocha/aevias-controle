@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
@@ -6,6 +6,7 @@ import { createPageUrl } from "@/utils";
 import { useChecklistForm } from "@/hooks/useChecklistForm";
 import { useCertificacaoUsinaForm } from "@/hooks/useCertificacaoUsinaForm";
 import { validarCertificacao, VALIDADORES_PAGINA } from "@/utils/certificacaoUsinaUtils";
+import { canGestorPreencherResultado, laboratoristaDeveOcultarResultado } from "@/utils/certificacaoUsinaAccess";
 import { criarCertificacao, atualizarCertificacao } from "@/services/certificacaoUsinaService";
 import { uploadMultipleFiles } from "@/utils/imageUpload";
 import ChecklistFooter from "@/components/checklists/ChecklistFooter";
@@ -109,13 +110,14 @@ const getInitialFormData = () => ({
   rejection_reason: null,
 });
 
-const PAGES = [
-  { num: "1-4", label: "Identificação e\nAspectos Legais" },
-  { num: "5",   label: "Saúde e\nSegurança" },
-  { num: "6",   label: "Meio\nAmbiente" },
-  { num: "7",   label: "Laboratório\ne Estrutura" },
-  { num: "8",   label: "Resultado" },
-  { num: "📷",  label: "Relatório\nFotográfico" },
+// Cada página referencia sua seção (key) e o validador correspondente pelo índice-base.
+const ALL_PAGES = [
+  { key: "identificacao", num: "1-4", label: "Identificação e\nAspectos Legais", validatorIndex: 0 },
+  { key: "saude",         num: "5",   label: "Saúde e\nSegurança",              validatorIndex: 1 },
+  { key: "meio_ambiente", num: "6",   label: "Meio\nAmbiente",                   validatorIndex: 2 },
+  { key: "laboratorio",   num: "7",   label: "Laboratório\ne Estrutura",         validatorIndex: 3 },
+  { key: "resultado",     num: "8",   label: "Resultado",                        validatorIndex: 4 },
+  { key: "fotos",         num: "📷",  label: "Relatório\nFotográfico",           validatorIndex: null },
 ];
 
 export default function CertificacaoUsinaPage() {
@@ -127,8 +129,22 @@ export default function CertificacaoUsinaPage() {
   const {
     obras, regionais, projects, faixas, user, editingChecklist,
     loading, formData, setFormData, obraSelecionada, regionalSelecionada,
-    projetosDisponiveis, isApproved, isEditable, clearSavedData, navigate,
-  } = useChecklistForm(getInitialFormData, "CertificacaoUsina", "certificacao_usina");
+    projetosDisponiveis, isApproved, isEditable, extraCanEdit, clearSavedData, navigate,
+  } = useChecklistForm(
+    getInitialFormData,
+    "CertificacaoUsina",
+    "certificacao_usina",
+    canGestorPreencherResultado,
+  );
+
+  // Laboratorista não preenche a etapa de Resultado — ela pertence ao Gestor de Contrato.
+  const ocultarResultado = laboratoristaDeveOcultarResultado(user);
+
+  // Páginas visíveis conforme o perfil (laboratorista não vê a aba de Resultado).
+  const PAGES = useMemo(
+    () => ALL_PAGES.filter((p) => !(p.key === "resultado" && ocultarResultado)),
+    [ocultarResultado],
+  );
 
   const setFormDataAndClear = useCallback((updater) => {
     setCamposVazios([]);
@@ -158,7 +174,11 @@ export default function CertificacaoUsinaPage() {
 
   const [camposVazios, setCamposVazios] = useState([]);
 
-  const isPageComplete = (pageIndex) => VALIDADORES_PAGINA[pageIndex]?.(formData) ?? true;
+  const isPageComplete = (pageIndex) => {
+    const validatorIndex = PAGES[pageIndex]?.validatorIndex;
+    if (validatorIndex == null) return true;
+    return VALIDADORES_PAGINA[validatorIndex]?.(formData) ?? true;
+  };
 
   /** Retorna lista de labels dos campos obrigatórios vazios na página atual */
   const getCamposVaziosPagina0 = () => {
@@ -188,10 +208,16 @@ export default function CertificacaoUsinaPage() {
   };
 
   const getCamposVaziosByPage = (page) => {
-    if (page === 0) return getCamposVaziosPagina0();
-    // Páginas 1-4: checklist de sim/não — indicar seção incompleta
-    const nomes = ["Saúde e Segurança", "Meio Ambiente", "Laboratório e Estrutura", "Resultado"];
-    return [`Seção "${nomes[page - 1]}" incompleta — preencha todos os campos`];
+    const pageKey = PAGES[page]?.key;
+    if (pageKey === "identificacao") return getCamposVaziosPagina0();
+    // Demais páginas: checklist — indicar seção incompleta
+    const nomes = {
+      saude: "Saúde e Segurança",
+      meio_ambiente: "Meio Ambiente",
+      laboratorio: "Laboratório e Estrutura",
+      resultado: "Resultado",
+    };
+    return [`Seção "${nomes[pageKey] || ""}" incompleta — preencha todos os campos`];
   };
 
   const goToPage = (page) => {
@@ -244,7 +270,12 @@ export default function CertificacaoUsinaPage() {
     return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin" /></div>;
   }
 
-  const disabled = !isEditable || isApproved;
+  // Edição geral (todas as seções exceto Resultado). O gestor liberado via
+  // extraCanEdit só pode mexer no Resultado, então para ele as demais ficam travadas.
+  const disabled = !isEditable || isApproved || extraCanEdit;
+  // Só o gestor liberado, ou admin/owner com edição habilitada, preenche o Resultado.
+  const podeEditarResultado = !ocultarResultado && (isEditable || extraCanEdit) && !isApproved;
+  const currentPageKey = PAGES[currentPage]?.key;
 
   return (
     <div className="p-6 bg-slate-50 min-h-screen">
@@ -332,25 +363,25 @@ export default function CertificacaoUsinaPage() {
                 onProjectChange={handlers.handleProjectChange}
               />
 
-              {/* Página 0: Tópicos 1–4 */}
-              {currentPage === 0 && (<>
+              {/* Tópicos 1–4 */}
+              {currentPageKey === "identificacao" && (<>
                 <SecaoDescricao formData={formData} onChange={handlers.handleChange} disabled={disabled} />
                 <SecaoClasseTipo formData={formData} onChange={handlers.handleChange} disabled={disabled} />
                 <SecaoAspectosLegais formData={formData} onNestedChange={handlers.handleNestedChange} disabled={disabled} />
               </>)}
 
-              {/* Página 1: Tópico 5 - Saúde e Segurança */}
-              {currentPage === 1 && (
+              {/* Tópico 5 - Saúde e Segurança */}
+              {currentPageKey === "saude" && (
                 <SecaoSaudeSeguranca formData={formData} onNestedChange={handlers.handleNestedChange} disabled={disabled} />
               )}
 
-              {/* Página 2: Tópico 6 - Meio Ambiente */}
-              {currentPage === 2 && (
+              {/* Tópico 6 - Meio Ambiente */}
+              {currentPageKey === "meio_ambiente" && (
                 <SecaoMeioAmbiente formData={formData} onNestedChange={handlers.handleNestedChange} disabled={disabled} />
               )}
 
-              {/* Página 3: Tópico 7 - Laboratório, Aferição, Estrutura e Usina */}
-              {currentPage === 3 && (<>
+              {/* Tópico 7 - Laboratório, Aferição, Estrutura e Usina */}
+              {currentPageKey === "laboratorio" && (<>
                 <SecaoLaboratorio formData={formData} onNestedChange={handlers.handleNestedChange} disabled={disabled} />
                 <SecaoAfeicao
                   formData={formData}
@@ -370,13 +401,13 @@ export default function CertificacaoUsinaPage() {
                 />
               </>)}
 
-              {/* Página 4: Tópico 8 - Resultado */}
-              {currentPage === 4 && (
-                <SecaoResultado formData={formData} onChange={handlers.handleChange} disabled={disabled} />
+              {/* Tópico 8 - Resultado (preenchido pelo Gestor de Contrato) */}
+              {currentPageKey === "resultado" && (
+                <SecaoResultado formData={formData} onChange={handlers.handleChange} disabled={!podeEditarResultado} />
               )}
 
-              {/* Página 5: Relatório Fotográfico */}
-              {currentPage === 5 && (
+              {/* Relatório Fotográfico */}
+              {currentPageKey === "fotos" && (
                 <SecaoFotos
                   fotos={formData.fotos || []}
                   onFileChange={handleFileChange}
