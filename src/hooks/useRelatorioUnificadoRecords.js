@@ -75,8 +75,11 @@ export function useRelatorioUnificadoRecords(filters) {
           })
           .filter(r => {
             if (!filters.filters.laboratoristas.length) return true;
-            const lab = r.laboratorista_name || r.created_by;
-            return filters.filters.laboratoristas.includes(lab);
+            // O registro pode ter sido salvo sem laboratorista_name; nesse caso
+            // a lista pode conter tanto o nome quanto o email (created_by).
+            // Aceita se qualquer um dos identificadores do registro casar.
+            const identificadores = [r.laboratorista_name, r.created_by].filter(Boolean);
+            return identificadores.some(id => filters.filters.laboratoristas.includes(id));
           })
           .filter(r => {
             if (!filters.filters.rodovia) return true;
