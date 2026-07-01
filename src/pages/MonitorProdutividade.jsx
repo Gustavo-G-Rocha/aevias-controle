@@ -137,8 +137,8 @@ export default function MonitorProdutividade() {
       <div className="p-6 min-h-screen bg-transparent">
         <div className="max-w-7xl mx-auto">
           <div className="text-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#00233B]/50" />
-            <p className="text-[#00233B]/80 mt-2">Carregando dados...</p>
+            <Loader2 className="w-8 h-8 animate-spin mx-auto" style={{ color: 'var(--color-text-subtle)' }} />
+            <p className="mt-2" style={{ color: 'var(--color-text-muted)' }}>Carregando dados...</p>
           </div>
         </div>
       </div>
@@ -149,10 +149,10 @@ export default function MonitorProdutividade() {
     return (
       <div className="p-6 min-h-screen bg-transparent">
         <div className="max-w-7xl mx-auto">
-          <Card className="bg-red-50 border-red-200">
+          <Card style={{ backgroundColor: 'var(--color-danger-bg)', borderColor: 'var(--color-danger)' }}>
             <CardContent className="p-6">
-              <h2 className="text-xl font-bold text-red-800">Acesso Negado</h2>
-              <p className="text-red-600 mt-2">Esta página é exclusiva para administradores.</p>
+              <h2 className="text-xl font-bold" style={{ color: 'var(--color-danger)' }}>Acesso Negado</h2>
+              <p className="mt-2" style={{ color: 'var(--color-danger)' }}>Esta página é exclusiva para administradores.</p>
             </CardContent>
           </Card>
         </div>
@@ -164,21 +164,21 @@ export default function MonitorProdutividade() {
     <div className="p-6 min-h-screen bg-transparent">
       <div className="max-w-7xl mx-auto space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#00233B]">Monitor de Produtividade</h1>
-          <p className="text-[#00233B]/80 mt-1">Acompanhamento da produtividade dos Gestores de Contrato</p>
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text)' }}>Monitor de Produtividade</h1>
+          <p className="mt-1" style={{ color: 'var(--color-text-muted)' }}>Acompanhamento da produtividade dos Gestores de Contrato</p>
         </div>
 
         {/* Lista de gestores */}
         <div className="space-y-4">
           {gestoresData.map((gestorData) => (
-            <Card key={gestorData.gestor.id} className="bg-white/20 backdrop-blur-lg border border-white/20">
+            <Card key={gestorData.gestor.id} className="backdrop-blur-lg" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-lg text-[#00233B]">
+                    <CardTitle className="text-lg" style={{ color: 'var(--color-text)' }}>
                       {gestorData.gestor.laboratorista_name || gestorData.gestor.full_name}
                     </CardTitle>
-                    <p className="text-sm text-[#00233B]/70 mt-1">{gestorData.gestor.email}</p>
+                    <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>{gestorData.gestor.email}</p>
                     <div className="flex gap-2 mt-2">
                       {gestorData.regionais.map(r => (
                         <Badge key={r.id} variant="outline" className="text-xs">
@@ -187,36 +187,41 @@ export default function MonitorProdutividade() {
                       ))}
                     </div>
                   </div>
-                  <Badge className={`${
-                    parseFloat(gestorData.taxaAprovacao) >= 80 ? 'bg-[#566E3D]/10 text-[#566E3D]' :
-                    parseFloat(gestorData.taxaAprovacao) >= 50 ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
+                  <Badge
+                    className="border"
+                    style={
+                      parseFloat(gestorData.taxaAprovacao) >= 80
+                        ? { backgroundColor: 'var(--color-success-bg)', color: 'var(--color-success)', borderColor: 'var(--color-success)' }
+                        : parseFloat(gestorData.taxaAprovacao) >= 50
+                        ? { backgroundColor: 'var(--color-warning-bg)', color: 'var(--color-warning)', borderColor: 'var(--color-warning)' }
+                        : { backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }
+                    }
+                  >
                     {gestorData.taxaAprovacao}% aprovação
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                  <div className="text-center p-3 bg-black/5 rounded-lg">
-                    <div className="text-xs text-[#00233B]/70 mb-1">Obras</div>
-                    <div className="text-xl font-bold text-[#00233B]">{gestorData.totalObras}</div>
+                  <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'var(--color-surface-muted)' }}>
+                    <div className="text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>Obras</div>
+                    <div className="text-xl font-bold" style={{ color: 'var(--color-text)' }}>{gestorData.totalObras}</div>
                   </div>
-                  <div className="text-center p-3 bg-black/5 rounded-lg">
-                    <div className="text-xs text-[#00233B]/70 mb-1">Registros Criados</div>
-                    <div className="text-xl font-bold text-[#00233B]">{gestorData.registrosCriados}</div>
+                  <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'var(--color-surface-muted)' }}>
+                    <div className="text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>Registros Criados</div>
+                    <div className="text-xl font-bold" style={{ color: 'var(--color-text)' }}>{gestorData.registrosCriados}</div>
                   </div>
-                  <div className="text-center p-3 bg-[#566E3D]/10 rounded-lg">
-                    <div className="text-xs text-[#566E3D]/90 mb-1">Aprovados</div>
-                    <div className="text-xl font-bold text-[#566E3D]">{gestorData.registrosAprovados}</div>
+                  <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'var(--color-success-bg)' }}>
+                    <div className="text-xs mb-1" style={{ color: 'var(--color-success)' }}>Aprovados</div>
+                    <div className="text-xl font-bold" style={{ color: 'var(--color-success)' }}>{gestorData.registrosAprovados}</div>
                   </div>
-                  <div className="text-center p-3 bg-yellow-100/50 rounded-lg">
-                    <div className="text-xs text-yellow-800/90 mb-1">Pendentes</div>
-                    <div className="text-xl font-bold text-yellow-800">{gestorData.registrosPendentes}</div>
+                  <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'var(--color-warning-bg)' }}>
+                    <div className="text-xs mb-1" style={{ color: 'var(--color-warning)' }}>Pendentes</div>
+                    <div className="text-xl font-bold" style={{ color: 'var(--color-warning)' }}>{gestorData.registrosPendentes}</div>
                   </div>
-                  <div className="text-center p-3 bg-red-100/50 rounded-lg">
-                    <div className="text-xs text-red-800/90 mb-1">Reprovados</div>
-                    <div className="text-xl font-bold text-red-800">{gestorData.registrosReprovados}</div>
+                  <div className="text-center p-3 rounded-lg" style={{ backgroundColor: 'var(--color-danger-bg)' }}>
+                    <div className="text-xs mb-1" style={{ color: 'var(--color-danger)' }}>Reprovados</div>
+                    <div className="text-xl font-bold" style={{ color: 'var(--color-danger)' }}>{gestorData.registrosReprovados}</div>
                   </div>
                 </div>
               </CardContent>
@@ -225,13 +230,13 @@ export default function MonitorProdutividade() {
         </div>
 
         {gestoresData.length === 0 && (
-          <Card className="bg-white/20 backdrop-blur-lg border border-white/20">
+          <Card className="backdrop-blur-lg" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
             <CardContent className="p-12 text-center">
-              <Users className="w-12 h-12 text-[#00233B]/30 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-[#00233B] mb-2">
+              <Users className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--color-text-subtle)' }} />
+              <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
                 Nenhum gestor encontrado
               </h3>
-              <p className="text-[#00233B]/70">
+              <p style={{ color: 'var(--color-text-muted)' }}>
                 Não há gestores de contrato cadastrados no sistema.
               </p>
             </CardContent>
