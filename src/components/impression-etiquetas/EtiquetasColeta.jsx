@@ -59,7 +59,7 @@ function EtiquetaColetaItem({ etiqueta }) {
   return (
     <div className="p-3 print:p-3 bg-white" style={{ border: '0.5mm solid #000' }}>
       {/* Header */}
-      <div className="grid grid-cols-[100px_1fr_120px] gap-0 mb-1 print:mb-1 pb-1 print:pb-1" style={{ borderBottom: '0.5mm solid #000', alignItems: 'stretch' }}>
+      <div className="grid grid-cols-[90px_1fr_95px] gap-0 mb-1 print:mb-1 pb-1 print:pb-1" style={{ borderBottom: '0.5mm solid #000', alignItems: 'stretch' }}>
         <div className="flex items-center justify-center px-1" style={{ borderRight: '0.5mm solid #000' }}>
           <picture>
             <source srcSet={LOGO_URL} />
@@ -75,18 +75,18 @@ function EtiquetaColetaItem({ etiqueta }) {
           <table className="w-full text-[7px] print:text-[6px]" style={{ borderCollapse: 'collapse', borderSpacing: 0 }}>
             <tbody>
               <tr>
-                <td colSpan={2} className="text-center font-semibold" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.3mm 1.2mm' }}>Identificação do Doc nº</td>
+                <td colSpan={2} className="text-center font-semibold" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.2mm 1mm' }}>Identificação do Doc nº</td>
               </tr>
               <tr>
-                <td colSpan={2} className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.3mm 1.2mm' }}>FORM 060</td>
+                <td colSpan={2} className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.2mm 1mm' }}>FORM 060</td>
               </tr>
               <tr>
-                <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.3mm 1.2mm', width: '50%' }}>Emissão</td>
-                <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.3mm 1.2mm', width: '50%' }}>Revisão</td>
+                <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.2mm 1mm', width: '50%' }}>Emissão</td>
+                <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.2mm 1mm', width: '50%' }}>Revisão</td>
               </tr>
               <tr>
-                <td className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.3mm 1.2mm' }}>20/01/2025</td>
-                <td className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.3mm 1.2mm' }}>01</td>
+                <td className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.2mm 1mm' }}>20/01/2025</td>
+                <td className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.2mm 1mm' }}>01</td>
               </tr>
             </tbody>
           </table>
@@ -132,14 +132,14 @@ function EtiquetaColetaItem({ etiqueta }) {
       </table>
 
       {/* Ensaios Solicitados */}
-      <div className="mb-2 print:mb-1.5" style={{ border: '0.5mm solid #000' }}>
-        <div className="bg-[#BFCF99] font-bold text-[#00233B] text-xs print:text-[10px] text-center" style={{ borderBottom: '0.5mm solid #000', paddingLeft: '4mm', paddingRight: '4mm', paddingTop: '1.5mm', paddingBottom: '1.5mm' }}>
+      <div className="mb-1 print:mb-1" style={{ border: '0.5mm solid #000' }}>
+        <div className="bg-[#BFCF99] font-bold text-[#00233B] text-[10px] print:text-[9px] text-center" style={{ borderBottom: '0.5mm solid #000', paddingLeft: '3mm', paddingRight: '3mm', paddingTop: '1mm', paddingBottom: '1mm' }}>
           ENSAIOS SOLICITADOS
         </div>
-        <div className="bg-white text-xs print:text-[10px] min-h-[18px] print:min-h-[16px] flex items-center gap-1.5" style={{ paddingLeft: '4mm', paddingRight: '4mm', paddingTop: '2mm', paddingBottom: '2mm' }}>
+        <div className="bg-white text-[10px] print:text-[9px] min-h-[14px] print:min-h-[12px] flex items-center gap-1.5" style={{ paddingLeft: '3mm', paddingRight: '3mm', paddingTop: '1mm', paddingBottom: '1mm' }}>
           {etiqueta.ensaios && etiqueta.ensaios.length > 0 ? (
             <>
-              <span className="font-bold text-sm">✓</span>
+              <span className="font-bold text-xs">✓</span>
               <span className="flex-1">{etiqueta.ensaios.join(', ')}</span>
             </>
           ) : null}
