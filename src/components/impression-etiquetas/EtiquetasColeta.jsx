@@ -5,9 +5,9 @@ import { calcularPaginasColeta, getEtiquetasPageColeta } from '@/utils/impressio
 const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68a7599ee3fb9205cfb852ec/47ee9630a_AE-LogoVerPrincipal_1.png';
 
 const CELL_STYLES = {
-  label: { border: '0.5mm solid #000', height: '28px', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1.5mm', paddingBottom: '1.5mm', fontWeight: 'bold', backgroundColor: '#fff' },
-  value: { border: '0.5mm solid #000', height: '28px', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1.5mm', paddingBottom: '1.5mm', backgroundColor: '#fff' },
-  highlight: { border: '0.5mm solid #000', height: '28px', backgroundColor: '#C4D69B', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1.5mm', paddingBottom: '1.5mm' },
+  label: { border: '0.5mm solid #000', height: '22px', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1mm', paddingBottom: '1mm', fontWeight: 'bold', backgroundColor: '#fff' },
+  value: { border: '0.5mm solid #000', height: '22px', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1mm', paddingBottom: '1mm', backgroundColor: '#fff' },
+  highlight: { border: '0.5mm solid #000', height: '22px', backgroundColor: '#C4D69B', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1mm', paddingBottom: '1mm' },
 };
 
 export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
@@ -57,13 +57,13 @@ export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
 
 function EtiquetaColetaItem({ etiqueta }) {
   return (
-    <div className="p-4 print:p-5 bg-white" style={{ border: '0.5mm solid #000' }}>
+    <div className="p-3 print:p-3 bg-white" style={{ border: '0.5mm solid #000' }}>
       {/* Header */}
-      <div className="grid grid-cols-[100px_1fr_120px] gap-0 mb-2 print:mb-2 pb-2 print:pb-1.5" style={{ borderBottom: '0.5mm solid #000', alignItems: 'stretch' }}>
+      <div className="grid grid-cols-[100px_1fr_120px] gap-0 mb-1 print:mb-1 pb-1 print:pb-1" style={{ borderBottom: '0.5mm solid #000', alignItems: 'stretch' }}>
         <div className="flex items-center justify-center pr-2" style={{ borderRight: '0.5mm solid #000' }}>
           <picture>
             <source srcSet={LOGO_URL} />
-            <img src={LOGO_URL} alt="AfirmaEvias" className="h-9 print:h-8 w-auto object-contain" width="auto" height="36" />
+            <img src={LOGO_URL} alt="AfirmaEvias" className="h-7 print:h-6 w-auto object-contain" width="auto" height="28" />
           </picture>
         </div>
         <div className="flex items-center justify-center px-2" style={{ borderRight: '0.5mm solid #000' }}>
@@ -75,18 +75,18 @@ function EtiquetaColetaItem({ etiqueta }) {
           <table className="w-full text-[8px] print:text-[7px]" style={{ borderCollapse: 'collapse', borderSpacing: 0 }}>
             <tbody>
               <tr>
-                <td colSpan={2} className="text-center font-semibold" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.5mm 1.5mm' }}>Identificação do Doc nº</td>
+                <td colSpan={2} className="text-center font-semibold" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.3mm 1.2mm' }}>Identificação do Doc nº</td>
               </tr>
               <tr>
-                <td colSpan={2} className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.5mm 1.5mm' }}>FORM 060</td>
+                <td colSpan={2} className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.3mm 1.2mm' }}>FORM 060</td>
               </tr>
               <tr>
-                <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.5mm 1.5mm', width: '50%' }}>Emissão</td>
-                <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.5mm 1.5mm', width: '50%' }}>Revisão</td>
+                <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.3mm 1.2mm', width: '50%' }}>Emissão</td>
+                <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.3mm 1.2mm', width: '50%' }}>Revisão</td>
               </tr>
               <tr>
-                <td className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.5mm 1.5mm' }}>20/01/2025</td>
-                <td className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.5mm 1.5mm' }}>01</td>
+                <td className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.3mm 1.2mm' }}>20/01/2025</td>
+                <td className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.3mm 1.2mm' }}>01</td>
               </tr>
             </tbody>
           </table>
@@ -148,8 +148,8 @@ function EtiquetaColetaItem({ etiqueta }) {
 
       {/* Rodapé */}
       <div className="bg-white text-xs print:text-[10px]" style={{ border: '0.5mm solid #000' }}>
-        <div className="font-bold" style={{ height: '32px', display: 'flex', alignItems: 'center', paddingLeft: '4mm', paddingRight: '4mm' }}>RESPONSÁVEL COLETA:</div>
-        <div className="font-bold" style={{ height: '32px', display: 'flex', alignItems: 'center', paddingLeft: '4mm', paddingRight: '4mm' }}>DATA:</div>
+        <div className="font-bold" style={{ height: '26px', display: 'flex', alignItems: 'center', paddingLeft: '4mm', paddingRight: '4mm' }}>RESPONSÁVEL COLETA:</div>
+        <div className="font-bold" style={{ height: '26px', display: 'flex', alignItems: 'center', paddingLeft: '4mm', paddingRight: '4mm' }}>DATA:</div>
       </div>
     </div>
   );
