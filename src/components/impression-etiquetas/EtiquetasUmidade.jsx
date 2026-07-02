@@ -8,10 +8,10 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
   return (
     <div className="bg-white min-h-screen p-4 print:p-0">
       <div className="mb-4 print:hidden flex gap-2 sticky top-0 bg-white z-10 py-2">
-        <Button onClick={onPrint} className="bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90">
+        <Button onClick={onPrint}>
           🖨️ Imprimir
         </Button>
-        <Button onClick={onVoltar} variant="outline" className="border-[#BFCF99] text-[#00233B]">
+        <Button onClick={onVoltar} variant="outline">
           ← Voltar
         </Button>
       </div>

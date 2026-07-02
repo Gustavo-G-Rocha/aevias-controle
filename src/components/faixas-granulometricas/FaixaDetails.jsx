@@ -9,7 +9,7 @@ const FaixaDetails = React.memo(({ faixa }) => {
 
   return (
     <div className="space-y-6 text-foreground">
-      <Card className="bg-[#F2F1EF]/80 backdrop-blur-lg border-white/20">
+      <Card className="bg-card/80 backdrop-blur-lg border-white/20">
         <CardHeader className="pb-3">
           <div className="flex justify-between items-start">
             <div className="flex items-center gap-3">
@@ -37,7 +37,7 @@ const FaixaDetails = React.memo(({ faixa }) => {
         </CardContent>
       </Card>
 
-      <Card className="bg-[#F2F1EF]/80 backdrop-blur-lg border-white/20">
+      <Card className="bg-card/80 backdrop-blur-lg border-white/20">
         <CardHeader>
           <CardTitle className="text-foreground">Faixa Granulométrica</CardTitle>
         </CardHeader>

@@ -184,8 +184,8 @@ const FaixaForm = React.memo(({ faixa: editingFaixa, onSave, onCancel }) => {
 
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onCancel} className="hover:bg-black/10 border-white/20 text-foreground">Cancelar</Button>
-        <Button type="submit" className="bg-muted text-[#F2F1EF] hover:bg-muted/90">
-          <Save className="w-4 h-4 mr-2 text-[#BFCF99]" />
+        <Button type="submit" className="">
+          <Save className="w-4 h-4 mr-2 text-primary-foreground" />
           Salvar
         </Button>
       </DialogFooter>

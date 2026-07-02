@@ -10,7 +10,7 @@ export default function ChartCard({ title, icon: Icon, subtitle, children }) {
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-foreground text-base flex items-center gap-2">
-          <Icon className="w-4 h-4 text-[#BFCF99]" />
+          <Icon className="w-4 h-4 text-secondary" />
           {title}
           {subtitle && <span className="text-xs font-normal text-muted-foreground ml-1">({subtitle})</span>}
         </CardTitle>

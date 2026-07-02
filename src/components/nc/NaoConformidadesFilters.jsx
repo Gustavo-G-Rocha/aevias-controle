@@ -31,7 +31,7 @@ export default function NaoConformidadesFilters({
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-foreground text-sm flex items-center gap-2">
-            <Filter className="w-4 h-4 text-[#BFCF99]" />
+            <Filter className="w-4 h-4 text-secondary" />
             Filtros
           </CardTitle>
         </CardHeader>

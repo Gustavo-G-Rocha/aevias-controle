@@ -43,7 +43,7 @@ export default function NaoConformidadesTable({ rncsVisiveis, cncsVisiveis, tabe
       <Card>
         <CardHeader>
           <CardTitle className="text-foreground text-base flex items-center gap-2">
-            <ClipboardList className="w-4 h-4 text-[#BFCF99]" />
+            <ClipboardList className="w-4 h-4 text-secondary" />
             Ocorrências Detalhadas
             {total > 0 && <Badge className="bg-secondary/20/40 text-foreground text-xs ml-2">{total}</Badge>}
           </CardTitle>
@@ -132,7 +132,7 @@ export default function NaoConformidadesTable({ rncsVisiveis, cncsVisiveis, tabe
       <Card>
         <CardHeader>
           <CardTitle className="text-foreground text-base flex items-center gap-2">
-            <FileText className="w-4 h-4 text-[#BFCF99]" />
+            <FileText className="w-4 h-4 text-secondary" />
             Tabela Resumo de NCs por Obra
             {hasActiveFilter && <Badge className="bg-secondary/20/40 text-foreground text-xs ml-2">{tabelaResumo.length} obra(s)</Badge>}
           </CardTitle>

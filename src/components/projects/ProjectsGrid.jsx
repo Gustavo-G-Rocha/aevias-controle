@@ -19,7 +19,7 @@ export default function ProjectsGrid({
       <Card className="bg-card/20 backdrop-blur-lg border border-white/20 text-foreground">
         <CardContent className="flex flex-col items-center justify-center py-16">
           <div className="w-16 h-16 bg-black/5 rounded-full flex items-center justify-center mb-4">
-            <Search className="w-8 h-8 text-[#BFCF99]" />
+            <Search className="w-8 h-8 text-secondary" />
           </div>
           <h3 className="text-lg font-semibold text-foreground mb-2">
             Nenhum projeto encontrado

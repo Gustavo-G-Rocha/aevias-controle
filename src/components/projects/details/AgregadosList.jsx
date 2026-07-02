@@ -10,7 +10,7 @@ export default function AgregadosList({ agregados }) {
   return (
     <div className="space-y-4">
       {agregados.map((agr, i) => (
-        <div key={i} className="p-4 bg-[#F2F1EF] rounded-lg border border-border/10">
+        <div key={i} className="p-4 bg-card rounded-lg border border-border/10">
           <div className="flex justify-between items-start mb-3">
             <h4 className="font-semibold text-foreground">{agr.nome || `Agregado ${i + 1}`}</h4>
             {agr.percentual_mistura !== undefined && agr.percentual_mistura !== null && (

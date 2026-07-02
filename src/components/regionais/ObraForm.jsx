@@ -129,7 +129,7 @@ const ObraForm = React.memo(({ obra, regional, onSave, onCancel }) => {
 
       <div className="flex justify-end gap-2 pt-4">
         <Button type="button" variant="outline" onClick={onCancel} className="border-border/20 text-foreground hover:bg-muted/5">Cancelar</Button>
-        <Button type="submit" className="bg-muted hover:bg-muted/90 text-[#F2F1EF]">{obra ? "Atualizar Obra" : "Criar Obra"}</Button>
+        <Button type="submit" className="">{obra ? "Atualizar Obra" : "Criar Obra"}</Button>
       </div>
     </form>
   );

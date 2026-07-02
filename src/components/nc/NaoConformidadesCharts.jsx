@@ -35,7 +35,7 @@ export default function NaoConformidadesCharts({
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-foreground text-base flex items-center gap-2">
-            <CalendarIcon className="w-4 h-4 text-[#BFCF99]" />
+            <CalendarIcon className="w-4 h-4 text-secondary" />
             Evolução Temporal de NCs por Obra
             <span className="text-xs font-normal text-muted-foreground ml-1">(top 6 obras)</span>
           </CardTitle>

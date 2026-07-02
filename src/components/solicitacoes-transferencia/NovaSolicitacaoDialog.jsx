@@ -35,7 +35,7 @@ export const NovaSolicitacaoDialog = React.memo(({ isOpen, onClose, onSubmit, re
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#F2F1EF]/80 backdrop-blur-lg border-white/20 max-w-2xl">
+      <DialogContent className="bg-card/80 backdrop-blur-lg border-white/20 max-w-2xl">
         <DialogHeader>
           <DialogTitle>Nova Solicitação de Transferência</DialogTitle>
         </DialogHeader>
@@ -84,7 +84,7 @@ export const NovaSolicitacaoDialog = React.memo(({ isOpen, onClose, onSubmit, re
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onClose(false)}>Cancelar</Button>
-            <Button type="submit" className="bg-muted text-[#F2F1EF] hover:bg-muted/90">
+            <Button type="submit" className="">
               Enviar Solicitação
             </Button>
           </DialogFooter>

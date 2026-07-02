@@ -31,7 +31,7 @@ export default function UploadSection({
 
         <div className="bg-card rounded-lg shadow-lg border border-border p-8">
           <div className="border-2 border-dashed border-secondary/30 rounded-lg p-12 text-center">
-            <Upload className="w-16 h-16 text-[#BFCF99] mx-auto mb-4" />
+            <Upload className="w-16 h-16 text-secondary mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-foreground mb-2">Carregue a Planilha de Etiquetas</h2>
             <p className="text-muted-foreground mb-6">
               {getDescricaoColunas(tipoEtiqueta)}
@@ -48,7 +48,7 @@ export default function UploadSection({
 
             <Button
               onClick={() => document.getElementById('file-input').click()}
-              className="bg-muted text-[#F2F1EF] hover:bg-muted/90 cursor-pointer dark:bg-secondary/20 dark:text-foreground"
+              className="cursor-pointer"
               disabled={loading}
             >
               {loading ? <Loader className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
@@ -56,7 +56,7 @@ export default function UploadSection({
             </Button>
 
             {erro && (
-              <div className="mt-4 p-3 bg-red-100 border border-red-300 rounded text-destructive">
+              <div className="mt-4 p-3 bg-destructive/10 border border-destructive/30 rounded text-destructive">
                 {erro}
               </div>
             )}
@@ -71,7 +71,7 @@ export default function UploadSection({
                 </div>
                 <Button
                   onClick={onShowRender}
-                  className="bg-secondary/20 text-foreground hover:bg-secondary/20/90 font-semibold"
+                  className="font-semibold"
                 >
                   Gerar Etiquetas →
                 </Button>

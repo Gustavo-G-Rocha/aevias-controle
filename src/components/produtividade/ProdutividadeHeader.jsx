@@ -18,7 +18,7 @@ export default function ProdutividadeHeader({
     <CardHeader>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Calendar className="w-6 h-6 text-[#BFCF99]" />
+          <Calendar className="w-6 h-6 text-primary-foreground" />
           <CardTitle className="text-2xl text-foreground">
             Produtividade dos Laboratoristas
           </CardTitle>
@@ -46,7 +46,7 @@ export default function ProdutividadeHeader({
           {cacheDiasCount > 0 && userCanEdit && (
             <Button
               onClick={onSaveCache}
-              className="bg-muted text-[#F2F1EF] hover:bg-muted/90 ml-4"
+              className=" ml-4"
             >
               Salvar {cacheDiasCount} alterações
             </Button>

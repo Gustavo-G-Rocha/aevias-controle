@@ -49,7 +49,7 @@ export default function Projects() {
     return (
       <div className="flex justify-center items-center h-screen bg-transparent">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#BFCF99]" />
+          <Loader2 className="w-8 h-8 animate-spin mx-auto text-secondary" />
           <p className="text-muted-foreground mt-2">Carregando projetos...</p>
         </div>
       </div>

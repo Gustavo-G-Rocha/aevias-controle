@@ -14,9 +14,9 @@ export default function ProjectsHeader({ canManage, onNewProject }) {
       {canManage && (
         <Button
           onClick={onNewProject}
-          className="bg-muted text-[#F2F1EF] hover:bg-muted/90"
+          className=""
         >
-          <Plus className="w-4 h-4 mr-2 text-[#BFCF99]" />
+          <Plus className="w-4 h-4 mr-2 text-primary-foreground" />
           Novo Projeto
         </Button>
       )}

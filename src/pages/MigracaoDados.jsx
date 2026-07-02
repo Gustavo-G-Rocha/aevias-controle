@@ -194,8 +194,8 @@ export default function MigracaoDados() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button onClick={handleRunMigration} className="w-full sm:w-auto bg-muted text-[#F2F1EF] hover:bg-muted/90">
-                <DatabaseZap className="w-4 h-4 mr-2 text-[#BFCF99]" />
+              <Button onClick={handleRunMigration} className="w-full sm:w-auto ">
+                <DatabaseZap className="w-4 h-4 mr-2 text-primary-foreground" />
                 Executar Migração
               </Button>
                <Button onClick={handleCleanMigration} variant="destructive" className="w-full sm:w-auto">

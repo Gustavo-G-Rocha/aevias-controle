@@ -50,7 +50,7 @@ export const SolicitacaoCard = React.memo(({ solicitacao, onApprove, onReject, c
           <div className="flex justify-between items-start">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <UserIcon className="w-4 h-4 text-[#BFCF99]" />
+                <UserIcon className="w-4 h-4 text-secondary" />
                 <span className="font-semibold text-foreground">{solicitacao.laboratorista_name}</span>
               </div>
               <p className="text-sm text-foreground/70">{solicitacao.laboratorista_email}</p>
@@ -130,7 +130,7 @@ export const SolicitacaoCard = React.memo(({ solicitacao, onApprove, onReject, c
                     Rejeitar
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="bg-[#F2F1EF]/80 backdrop-blur-lg border-white/20">
+                <DialogContent className="bg-card/80 backdrop-blur-lg border-white/20">
                   <DialogHeader>
                     <DialogTitle>Rejeitar Solicitação</DialogTitle>
                   </DialogHeader>

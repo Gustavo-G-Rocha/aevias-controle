@@ -17,7 +17,7 @@ export default function FiltrosCard({
     <Card>
       <CardHeader>
         <CardTitle className="text-foreground flex items-center gap-2">
-          <Filter className="w-5 h-5 text-[#BFCF99]" />
+          <Filter className="w-5 h-5 text-secondary" />
           Filtros
         </CardTitle>
       </CardHeader>

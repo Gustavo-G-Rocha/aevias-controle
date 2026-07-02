@@ -29,7 +29,7 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
     <tr className={`border-b border-border hover:bg-muted/50 ${index % 2 === 0 ? 'bg-transparent' : 'bg-muted/20'}`}>
       <td className="px-2 py-2">
         <div className="font-medium text-foreground flex items-center gap-1 text-xs">
-          <TypeIcon className="w-3 h-3 text-[#BFCF99]" />
+          <TypeIcon className="w-3 h-3 text-secondary" />
           <span className="truncate max-w-[120px]" title={name}>{name}</span>
           <CopyIdButton id={ensaio.id} />
           {naoConformidades.length > 0 && <span className="text-destructive cursor-help" title={`Não conformidades:\n${naoConformidades.join('\n')}`}>⚠️</span>}

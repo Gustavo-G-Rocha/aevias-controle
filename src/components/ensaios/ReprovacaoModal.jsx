@@ -25,7 +25,7 @@ export const ReprovacaoModal = React.memo(({ ensaio, isOpen, onClose, onReprove 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#F2F1EF]/80 backdrop-blur-lg border-white/20 text-foreground">
+      <DialogContent className="bg-card/80 backdrop-blur-lg border-white/20 text-foreground">
         <DialogHeader>
           <DialogTitle>Reprovar Registro</DialogTitle>
         </DialogHeader>

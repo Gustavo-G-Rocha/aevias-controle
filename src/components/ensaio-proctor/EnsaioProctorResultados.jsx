@@ -111,7 +111,7 @@ export default function EnsaioProctorResultados({
           <div className="bg-secondary/20/20 border border-secondary/30/40 rounded-lg p-3 mt-4">
             <p className="text-sm text-foreground">
               <span className="font-semibold">Umidade Média: </span>
-              <span className="text-[#BFCF99] font-bold">{form.umidade_media != null ? Number(form.umidade_media).toFixed(2) : '-'}%</span>
+              <span className="text-secondary font-bold">{form.umidade_media != null ? Number(form.umidade_media).toFixed(2) : '-'}%</span>
             </p>
           </div>
         </CardContent>
@@ -300,14 +300,14 @@ export default function EnsaioProctorResultados({
             <div>
               <Label className="text-foreground">
                 Densidade Máxima Seca (g/cm³)
-                {densMaxAuto && <span className="ml-2 text-xs text-[#BFCF99] font-normal">(calculado: {densMaxAuto})</span>}
+                {densMaxAuto && <span className="ml-2 text-xs text-secondary font-normal">(calculado: {densMaxAuto})</span>}
               </Label>
               <Input type="number" step="0.0001" value={form.densidade_maxima_seca || densMaxAuto} onChange={(e) => setForm(prev => ({ ...prev, densidade_maxima_seca: e.target.value }))} placeholder={densMaxAuto || "—"} />
             </div>
             <div>
               <Label className="text-foreground">
                 Umidade Ótima (%)
-                {umidOtimaAuto && <span className="ml-2 text-xs text-[#BFCF99] font-normal">(calculado: {umidOtimaAuto})</span>}
+                {umidOtimaAuto && <span className="ml-2 text-xs text-secondary font-normal">(calculado: {umidOtimaAuto})</span>}
               </Label>
               <Input type="number" step="0.01" value={form.umidade_otima || umidOtimaAuto} onChange={(e) => setForm(prev => ({ ...prev, umidade_otima: e.target.value }))} placeholder={umidOtimaAuto || "—"} />
             </div>

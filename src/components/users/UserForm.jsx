@@ -165,7 +165,7 @@ const UserForm = React.memo(({ user: editingUser, onSave, onCancel, currentUser,
           <Button type="button" variant="outline" onClick={onCancel} className="hover:bg-black/10">
             Cancelar
           </Button>
-          <Button type="submit" className="bg-muted text-[#F2F1EF] hover:bg-muted/90">
+          <Button type="submit" className="">
             {editingUser ? "Salvar Alterações" : "Cadastrar e Enviar Convite"}
           </Button>
         </DialogFooter>

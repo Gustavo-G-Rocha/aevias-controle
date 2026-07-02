@@ -221,7 +221,7 @@ export default function RegionalForm({ regional, users, projects, onSave, onCanc
 
             <div className="flex justify-end gap-2 pt-4">
                 <Button type="button" variant="outline" onClick={onCancel} className="hover:bg-black/10 border-border/20 text-foreground">Cancelar</Button>
-                <Button type="submit" className="bg-muted hover:bg-muted/90 text-[#F2F1EF]">
+                <Button type="submit" className="">
                     {regional ? "Atualizar Regional" : "Criar Regional"}
                 </Button>
             </div>

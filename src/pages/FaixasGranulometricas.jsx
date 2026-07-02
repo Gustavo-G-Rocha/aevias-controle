@@ -62,7 +62,7 @@ export default function FaixasGranulometricasPage() {
     return (
       <div className="flex justify-center items-center h-screen bg-transparent">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#BFCF99]" />
+          <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary-foreground" />
           <p className="text-muted-foreground mt-2">Carregando faixas granulométricas...</p>
         </div>
       </div>
@@ -86,7 +86,7 @@ export default function FaixasGranulometricasPage() {
               if (!isOpen) setEditingFaixa(null);
             }}>
               <DialogTrigger asChild>
-                <Button className="bg-muted text-[#F2F1EF] hover:bg-muted/90">
+                <Button className="">
                   <Plus className="w-4 h-4 mr-2" />
                   Nova Faixa
                 </Button>
@@ -111,7 +111,7 @@ export default function FaixasGranulometricasPage() {
           <CardContent className="p-4">
             <div className="flex gap-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-[#BFCF99]" />
+                <Search className="absolute left-3 top-3 h-4 w-4 text-primary-foreground" />
                 <Input
                   placeholder="Pesquisar faixas granulométricas..."
                   value={searchTerm}
@@ -191,12 +191,12 @@ export default function FaixasGranulometricasPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                     <Button variant="ghost" size="sm" onClick={() => setSelectedFaixa(faixa)} className="text-foreground">
-                      <Eye className="w-4 h-4 mr-1 text-[#BFCF99]" /> Ver
+                      <Eye className="w-4 h-4 mr-1 text-primary-foreground" /> Ver
                     </Button>
                     {canManage && (
                       <>
                         <Button variant="ghost" size="sm" onClick={() => handleEdit(faixa)} className="text-foreground">
-                          <Edit className="w-4 h-4 mr-1 text-[#BFCF99]" /> Editar
+                          <Edit className="w-4 h-4 mr-1 text-primary-foreground" /> Editar
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => handleDelete(faixa.id, loadData)} className="text-red-500 hover:text-destructive hover:bg-red-500/10">
                           <Trash2 className="w-4 h-4 mr-1" /> Excluir

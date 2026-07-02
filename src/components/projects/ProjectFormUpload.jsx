@@ -81,7 +81,7 @@ export default function ProjectFormUpload({
               <span className="text-sm">Analisando arquivo e extraindo dados...</span>
             </div>
           ) : (
-            <label className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-[#F2F1EF] rounded-lg cursor-pointer hover:bg-muted/90 transition-colors">
+            <label className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-primary-foreground rounded-lg cursor-pointer hover:bg-muted/90 transition-colors">
               <FileUp className="w-4 h-4" />
               <span className="text-sm font-medium">Escolher Arquivo do Projeto</span>
               <input

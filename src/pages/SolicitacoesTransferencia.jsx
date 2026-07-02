@@ -36,7 +36,7 @@ export default function SolicitacoesTransferenciaPage() {
     return (
       <div className="flex justify-center items-center h-screen bg-transparent">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#BFCF99]" />
+          <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary-foreground" />
           <p className="text-muted-foreground mt-2">Carregando solicitações...</p>
         </div>
       </div>
@@ -77,7 +77,7 @@ export default function SolicitacoesTransferenciaPage() {
           {isLaboratorista && (
             <Button
               onClick={() => setIsDialogOpen(true)}
-              className="bg-muted text-[#F2F1EF] hover:bg-muted/90"
+              className=""
               disabled={!regionalAtual}
               title={!regionalAtual ? "Você precisa estar alocado em uma regional para solicitar transferência" : ""}
             >
