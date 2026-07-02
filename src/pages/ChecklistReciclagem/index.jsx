@@ -40,20 +40,20 @@ export default function ChecklistReciclagem() {
                 : 'Controle Tecnológico de Reciclagem'}
             </CardDescription>
             {formData.status === 'rascunho' && (
-              <div className="mt-4 flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <AlertTriangle className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
+              <div className="mt-4 flex items-start gap-3 p-4 bg-blue-600 border border-blue-700 rounded-lg">
+                <AlertTriangle className="w-5 h-5 text-white mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-semibold text-blue-800">Em Rascunho</p>
-                  <p className="text-sm text-blue-700">Este registro ainda está em edição e não será visível aos gestores até que você o finalize.</p>
+                  <p className="font-semibold text-white">Em Rascunho</p>
+                  <p className="text-sm text-white/90">Este registro ainda está em edição e não será visível aos gestores até que você o finalize.</p>
                 </div>
               </div>
             )}
             {formData.approved === false && formData.rejection_reason && (
-              <div className="mt-4 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <XCircle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
+              <div className="mt-4 flex items-start gap-3 p-4 bg-red-600 border border-red-700 rounded-lg">
+                <XCircle className="w-5 h-5 text-white mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-semibold text-red-800">Registro Reprovado</p>
-                  <p className="text-sm text-red-700">{formData.rejection_reason}</p>
+                  <p className="font-semibold text-white">Registro Reprovado</p>
+                  <p className="text-sm text-white/90">{formData.rejection_reason}</p>
                 </div>
               </div>
             )}

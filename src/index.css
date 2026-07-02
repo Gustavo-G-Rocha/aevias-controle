@@ -491,4 +491,74 @@
     color: #ffffff;
   }
 
+  /* ─────────────────────────────────────────────────────────────
+     DARK MODE — Remapear textos e bordas cinza-escuro para claro.
+     Classes text-slate-500/600/700 e text-gray-500/600/700 são
+     cinzas-escuros que ficam invisíveis sobre o fundo escuro do card.
+     border-slate-300/200 e border-gray-300/200 também somem.
+     Remapeia para tons claros; depois restaura para escuro dentro
+     de superfícies claras (bg-slate-50, bg-white, etc.) onde
+     texto/borda escuros são corretos e legíveis.
+     ───────────────────────────────────────────────────────────── */
+
+  /* Remapear texto cinza-escuro → claro (em fundo escuro do card) */
+  .dark .text-slate-500,
+  .dark .text-slate-600,
+  .dark .text-slate-700,
+  .dark .text-slate-800,
+  .dark .text-gray-500,
+  .dark .text-gray-600,
+  .dark .text-gray-700,
+  .dark .text-gray-800 {
+    color: #94A3B8;
+  }
+
+  /* Remapear bordas cinza-claras → borda escura visível (em fundo escuro) */
+  .dark .border-slate-300,
+  .dark .border-slate-200,
+  .dark .border-gray-300,
+  .dark .border-gray-200 {
+    border-color: #33587A;
+  }
+
+  /* Restaurar texto escuro dentro de superfícies claras (descendentes) */
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100, .bg-orange-50, .bg-green-50, .bg-blue-50, .bg-red-50) .text-slate-500,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100, .bg-orange-50, .bg-green-50, .bg-blue-50, .bg-red-50) .text-slate-600,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100, .bg-orange-50, .bg-green-50, .bg-blue-50, .bg-red-50) .text-slate-700,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100, .bg-orange-50, .bg-green-50, .bg-blue-50, .bg-red-50) .text-slate-800,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100, .bg-orange-50, .bg-green-50, .bg-blue-50, .bg-red-50) .text-gray-500,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100, .bg-orange-50, .bg-green-50, .bg-blue-50, .bg-red-50) .text-gray-600,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100, .bg-orange-50, .bg-green-50, .bg-blue-50, .bg-red-50) .text-gray-700,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100, .bg-orange-50, .bg-green-50, .bg-blue-50, .bg-red-50) .text-gray-800 {
+    color: #475569;
+  }
+
+  /* Restaurar texto escuro no mesmo elemento (ex.: input bg-white text-slate-700) */
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).text-slate-500,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).text-slate-600,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).text-slate-700,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).text-slate-800,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).text-gray-500,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).text-gray-600,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).text-gray-700,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).text-gray-800 {
+    color: #334155;
+  }
+
+  /* Restaurar bordas claras dentro de superfícies claras (descendentes) */
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100) .border-slate-300,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100) .border-slate-200,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100) .border-gray-300,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100) .border-gray-200 {
+    border-color: #CBD5E1;
+  }
+
+  /* Restaurar bordas claras no mesmo elemento (ex.: input bg-white border-slate-200) */
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).border-slate-300,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).border-slate-200,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).border-gray-300,
+  .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).border-gray-200 {
+    border-color: #CBD5E1;
+  }
+
 }

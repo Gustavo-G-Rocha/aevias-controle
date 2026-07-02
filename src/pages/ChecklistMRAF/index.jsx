@@ -56,11 +56,11 @@ export default function ChecklistMRAFPage() {
               </div>
             )}
             {editingChecklist?.rejection_reason && (
-              <div className="mt-4 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
+              <div className="mt-4 flex items-start gap-3 p-4 bg-red-600 border border-red-700 rounded-lg">
+                <AlertTriangle className="w-5 h-5 text-white mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-semibold text-red-800">Motivo da Reprovação:</p>
-                  <p className="text-sm text-red-700">{editingChecklist.rejection_reason}</p>
+                  <p className="font-semibold text-white">Motivo da Reprovação:</p>
+                  <p className="text-sm text-white/90">{editingChecklist.rejection_reason}</p>
                 </div>
               </div>
             )}
