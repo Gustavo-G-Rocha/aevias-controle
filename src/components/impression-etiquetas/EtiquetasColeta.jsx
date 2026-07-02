@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { calcularPaginasColeta, getEtiquetasPageColeta } from '@/utils/impressionEtiquetasUtils';
 
 const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68a7599ee3fb9205cfb852ec/47ee9630a_AE-LogoVerPrincipal_1.png';
 
@@ -10,6 +11,8 @@ const CELL_STYLES = {
 };
 
 export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
+  const numPages = calcularPaginasColeta(etiquetas.length);
+
   return (
     <div className="bg-white min-h-screen p-4 print:p-0 print:min-h-0">
       <div className="mb-4 print:hidden flex gap-2 sticky top-0 bg-white z-10 py-2">
@@ -21,19 +24,30 @@ export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
         </Button>
       </div>
 
-      <div className="etiquetas-grid grid grid-cols-2 gap-x-2 gap-y-4 print:gap-x-1.5 print:gap-y-2">
-        {etiquetas.map((etiqueta, idx) =>
-          <EtiquetaColetaItem key={idx} etiqueta={etiqueta} />
+      <div>
+        {Array.from({ length: numPages }).map((_, pageIdx) =>
+        <div key={pageIdx} className="page-container">
+            <div className="grid grid-cols-2 gap-x-2 gap-y-4 print:gap-x-1.5 print:gap-y-2">
+              {getEtiquetasPageColeta(etiquetas, pageIdx).map((etiqueta, idx) =>
+            <EtiquetaColetaItem key={pageIdx * 6 + idx} etiqueta={etiqueta} />
+            )}
+            </div>
+          </div>
         )}
       </div>
 
       <style>{`
+        .page-container { padding: 8px; display: block !important; }
+        .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
         @page { size: A4; margin: 6mm 3mm; }
-        .etiquetas-grid > * { break-inside: avoid; page-break-inside: avoid; }
-        @media screen { .etiquetas-grid { padding: 8px; } }
+        @media screen { .page-container { min-height: 100vh; margin-bottom: 20px; border: 1px solid #e5e7eb; } }
         @media print {
-          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; overflow: visible !important; }
+          *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
+          html, body, div, section, main { overflow: visible !important; -ms-overflow-style: none !important; scrollbar-width: none !important; }
           .min-h-screen { min-height: 0 !important; }
+          .page-container { padding: 4px; max-height: 272mm; overflow: hidden !important; }
+          .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
           .print\\:hidden { display: none !important; }
           header, nav, aside, .no-print, [data-sidebar], [data-sidebar="sidebar"], [data-sidebar="provider"] { display: none !important; }
           main { padding-left: 0 !important; margin-left: 0 !important; }
