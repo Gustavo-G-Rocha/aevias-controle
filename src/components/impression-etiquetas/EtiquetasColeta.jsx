@@ -61,7 +61,7 @@ function EtiquetaColetaItem({ etiqueta }) {
     <div className="p-3 print:p-3 bg-white" style={{ border: '0.5mm solid #000' }}>
       {/* Header */}
       <div className="grid grid-cols-[90px_1fr_95px] gap-0 mb-1 print:mb-1 pb-1 print:pb-1" style={{ borderBottom: '0.5mm solid #000', alignItems: 'stretch' }}>
-        <div className="flex items-center justify-center mx-auto" style={{ borderRight: '0.5mm solid #000' }}>
+        <div className="flex items-center justify-center" style={{ borderRight: '0.5mm solid #000' }}>
           <picture>
             <source srcSet={LOGO_URL} />
             <img src={LOGO_URL} alt="AfirmaEvias" className="h-6 print:h-5 w-auto object-contain" width="auto" height="24" />
