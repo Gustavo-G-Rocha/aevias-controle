@@ -29,7 +29,7 @@ export default function ChecklistConcretagem() {
   const selectedProject = projects.find(p => p.id === formData.project_id);
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-transparent min-h-screen">
       <div className="max-w-6xl mx-auto">
         <Card>
           <CardHeader>
@@ -40,11 +40,11 @@ export default function ChecklistConcretagem() {
                 : "Controle Tecnológico de Concreto"}
             </CardDescription>
             {formData.status === "rascunho" && (
-              <div className="mt-4 flex items-start gap-3 p-4 bg-blue-600 border border-blue-700 rounded-lg">
-                <AlertTriangle className="w-5 h-5 text-white mt-0.5 shrink-0" />
+              <div className="mt-4 flex items-start gap-3 p-4 bg-primary/10 border border-primary/20 rounded-lg">
+                <AlertTriangle className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-semibold text-white">Em Rascunho</p>
-                  <p className="text-sm text-white/90">Este registro ainda está em edição e não será visível aos gestores até que você o finalize.</p>
+                  <p className="font-semibold text-primary">Em Rascunho</p>
+                  <p className="text-sm text-muted-foreground">Este registro ainda está em edição e não será visível aos gestores até que você o finalize.</p>
                 </div>
               </div>
             )}
@@ -84,7 +84,7 @@ export default function ChecklistConcretagem() {
                 <Textarea value={formData.observacoes_gerais}
                   onChange={(e) => setFormData(prev => ({ ...prev, observacoes_gerais: e.target.value }))}
                   rows={3} placeholder="Observações gerais..." maxLength="500" />
-                <p className="text-xs text-right text-slate-500 mt-1">{formData.observacoes_gerais?.length || 0} / 500</p>
+                <p className="text-xs text-right text-muted-foreground mt-1">{formData.observacoes_gerais?.length || 0} / 500</p>
               </div>
 
               <AcoesCorretivasNC
@@ -105,15 +105,15 @@ export default function ChecklistConcretagem() {
                   <Input id="fotos" type="file" multiple accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                     onChange={handleFileChange} disabled={uploadingPhotos} className="hidden" />
                   <Label htmlFor="fotos"
-                    className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm cursor-pointer hover:bg-slate-50 ${uploadingPhotos ? "opacity-50 cursor-not-allowed" : ""}`}>
-                    <span className="truncate text-slate-500">{selectedFileNames}</span>
-                    <span className="flex-shrink-0 ml-4 px-3 py-1 rounded-md text-sm font-semibold bg-blue-50 text-blue-700">
+                    className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm cursor-pointer hover:bg-muted ${uploadingPhotos ? "opacity-50 cursor-not-allowed" : ""}`}>
+                    <span className="truncate text-muted-foreground">{selectedFileNames}</span>
+                    <span className="flex-shrink-0 ml-4 px-3 py-1 rounded-md text-sm font-semibold bg-muted text-muted-foreground">
                       {uploadingPhotos ? "Enviando..." : "Escolher Ficheiros"}
                     </span>
                   </Label>
                 </div>
                 {uploadingPhotos && (
-                  <div className="flex items-center gap-2 text-sm text-slate-600 mt-2">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
                     <Loader2 className="w-4 h-4 animate-spin" /><span>Fazendo upload das fotos...</span>
                   </div>
                 )}
@@ -136,10 +136,10 @@ export default function ChecklistConcretagem() {
                 <Button type="button" variant="outline" onClick={handleCancel}>Cancelar</Button>
                 <Button type="button" variant="outline" disabled={saving || uploadingPhotos}
                   onClick={(e) => handleSubmit(e, "rascunho")}
-                  className="border-blue-500 text-blue-600 hover:bg-blue-50">
+                  >
                   <Save className="mr-2 h-4 w-4" /> Salvar Progresso
                 </Button>
-                <Button type="submit" disabled={saving || uploadingPhotos} className="bg-blue-600 hover:bg-blue-700">
+                <Button type="submit" disabled={saving || uploadingPhotos}>
                   {saving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Salvando...</> : <><Save className="mr-2 h-4 w-4" />Finalizar</>}
                 </Button>
               </div>

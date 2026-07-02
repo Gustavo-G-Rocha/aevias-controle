@@ -21,8 +21,8 @@ const EnsaioForm = ({ ensaio, obras, projects, onSave, onCancel }) => {
         }}>
             {/* Form fields will be rendered here based on the entity schema */}
             <div className="flex justify-end gap-2 mt-4">
-                <Button type="button" variant="outline" onClick={onCancel} className="hover:bg-black/10">Cancelar</Button>
-                <Button type="submit" className="bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90">Salvar</Button>
+                <Button type="button" variant="outline" onClick={onCancel}>Cancelar</Button>
+                <Button type="submit">Salvar</Button>
             </div>
         </form>
     );
@@ -136,18 +136,18 @@ export default function EnsaioDensidadePage() {
   return (
     <div className="p-6 space-y-6 bg-transparent min-h-screen">
       <div className="max-w-4xl mx-auto">
-        <Card className="bg-white/20 backdrop-blur-lg border border-white/20 text-[#00233B]">
+        <Card className="bg-card border border-border text-card-foreground">
           <CardHeader>
-            <CardTitle className="text-[#00233B]">{editingEnsaio ? 'Editar Ensaio de Densidade' : 'Novo Ensaio: Densidade CP Extraído'}</CardTitle>
-            <CardDescription className="text-[#00233B]/80">
+            <CardTitle>{editingEnsaio ? 'Editar Ensaio de Densidade' : 'Novo Ensaio: Densidade CP Extraído'}</CardTitle>
+            <CardDescription className="text-muted-foreground">
               {editingEnsaio ? `Editando amostra: ${editingEnsaio.sample_id}` : "Preencha as informações para registrar um novo ensaio."}
             </CardDescription>
              {editingEnsaio?.rejection_reason && (
-                <div className="mt-4 flex items-start gap-2 p-3 bg-red-50/50 border border-red-200/50 rounded-lg">
-                    <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
+                <div className="mt-4 flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                    <AlertTriangle className="w-5 h-5 text-destructive mt-0.5 shrink-0" />
                     <div>
-                        <p className="font-semibold text-red-800">Motivo da Reprovação:</p>
-                        <p className="text-sm text-red-700">{editingEnsaio.rejection_reason}</p>
+                        <p className="font-semibold text-destructive">Motivo da Reprovação:</p>
+                        <p className="text-sm text-muted-foreground">{editingEnsaio.rejection_reason}</p>
                     </div>
                 </div>
             )}

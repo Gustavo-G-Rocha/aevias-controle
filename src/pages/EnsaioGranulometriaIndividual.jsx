@@ -43,7 +43,7 @@ export default function EnsaioGranulometriaIndividualPage() {
   }
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-transparent min-h-screen">
       <div className="max-w-6xl mx-auto">
         <Card>
           <EnsaioGranIndividualHeader editingEnsaio={editingEnsaio} formData={formData} />

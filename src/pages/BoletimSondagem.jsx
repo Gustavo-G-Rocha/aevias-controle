@@ -35,7 +35,7 @@ export default function BoletimSondagemPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-transparent">
-        <Loader2 className="w-8 h-8 animate-spin text-[#00233B]/50" />
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -43,7 +43,7 @@ export default function BoletimSondagemPage() {
   return (
     <div className="p-6 space-y-6 bg-transparent min-h-screen">
       <div className="max-w-6xl mx-auto">
-        <Card className="bg-white/20 backdrop-blur-lg border border-white/20 text-[#00233B]">
+        <Card className="bg-card border border-border text-card-foreground">
           <BoletimSondagemHeader editingBoletim={editingBoletim} />
 
           <CardContent>

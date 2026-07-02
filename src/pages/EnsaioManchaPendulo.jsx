@@ -45,18 +45,18 @@ export default function EnsaioManchaPendulo() {
   } = useEnsaioManchaPenduloActions(isEditMode, editId, formData);
 
   if (loading) {
-    return <div className="p-8">Carregando...</div>;
+    return <div className="p-8 text-muted-foreground">Carregando...</div>;
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-transparent min-h-screen">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <Button variant="ghost" onClick={() => navigate(createPageUrl('MeusEnsaios'))}>
           <ArrowLeft className="w-4 h-4 mr-2" />
           Voltar
         </Button>
-        <h1 className="text-2xl font-bold text-slate-800">
+        <h1 className="text-2xl font-bold text-foreground">
           {isEditMode ? 'Editar' : 'Novo'} Ensaio de Macrotextura e Microtextura
         </h1>
       </div>
@@ -97,7 +97,7 @@ export default function EnsaioManchaPendulo() {
           <Save className="w-4 h-4 mr-2" />
           Salvar Progresso
         </Button>
-        <Button onClick={() => handleSave(true)} disabled={saving} className="bg-green-600 hover:bg-green-700">
+        <Button onClick={() => handleSave(true)} disabled={saving}>
           <CheckCircle className="w-4 h-4 mr-2" />
           Finalizar Ensaio
         </Button>

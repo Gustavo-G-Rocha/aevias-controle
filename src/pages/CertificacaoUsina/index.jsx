@@ -278,7 +278,7 @@ export default function CertificacaoUsinaPage() {
   const currentPageKey = PAGES[currentPage]?.key;
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-transparent min-h-screen">
       <div className="max-w-6xl mx-auto" ref={topRef}>
         <Card>
           <CardHeader>
@@ -294,9 +294,9 @@ export default function CertificacaoUsinaPage() {
             {/* Navegação por seções */}
             <div className="pt-3">
               {/* Barra de progresso */}
-              <div className="relative mb-3 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+              <div className="relative mb-3 h-1.5 bg-muted rounded-full overflow-hidden">
                 <div
-                  className="absolute left-0 top-0 h-full bg-[#00233B] rounded-full transition-all duration-300"
+                  className="absolute left-0 top-0 h-full bg-primary rounded-full transition-all duration-300"
                   style={{ width: `${((currentPage + 1) / PAGES.length) * 100}%` }}
                 />
               </div>
@@ -315,20 +315,20 @@ export default function CertificacaoUsinaPage() {
                       title={locked ? "Complete as seções anteriores para avançar" : undefined}
                       className={`flex-shrink-0 flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg border-2 transition-all duration-200 min-w-[90px] ${
                         locked
-                          ? "bg-slate-100 text-slate-300 border-slate-200 cursor-not-allowed"
+                          ? "bg-muted text-muted-foreground/50 border-border cursor-not-allowed"
                           : currentPage === i
-                          ? "bg-[#00233B] text-white border-[#00233B] shadow-md scale-105"
+                          ? "bg-primary text-primary-foreground border-primary shadow-md scale-105"
                           : complete && i < currentPage
-                          ? "bg-[#BFCF99]/20 text-[#00233B] border-[#BFCF99] hover:bg-[#BFCF99]/40"
-                          : "bg-white text-slate-500 border-slate-200 hover:border-[#00233B] hover:text-[#00233B]"
+                          ? "bg-secondary/20 text-foreground border-secondary hover:bg-secondary/40"
+                          : "bg-background text-muted-foreground border-border hover:border-primary hover:text-foreground"
                       }`}
                     >
-                      <span className={`text-base font-bold leading-none ${locked ? "text-slate-300" : currentPage === i ? "text-[#BFCF99]" : i < currentPage ? "text-[#00233B]" : "text-slate-400"}`}>
+                      <span className={`text-base font-bold leading-none ${locked ? "text-muted-foreground/50" : currentPage === i ? "text-secondary" : i < currentPage ? "text-foreground" : "text-muted-foreground/70"}`}>
                         {locked ? "🔒" : p.num}
                       </span>
                       <span className="text-[10px] leading-tight text-center whitespace-pre-line">{p.label}</span>
                       {!locked && complete && i < currentPage && (
-                        <span className="text-[10px] leading-none text-[#00233B] font-semibold">✓</span>
+                        <span className="text-[10px] leading-none text-foreground font-semibold">✓</span>
                       )}
                       {!locked && !complete && i === currentPage && (
                         <span className="text-[10px] leading-none text-orange-500 font-semibold">incompleta</span>
@@ -417,7 +417,7 @@ export default function CertificacaoUsinaPage() {
 
               {/* Campos obrigatórios vazios */}
               {camposVazios.length > 0 && (
-                <div className="rounded-md border border-orange-300 bg-orange-50 px-4 py-3 text-sm text-orange-800">
+                <div className="rounded-md border border-orange-500/30 bg-orange-500/10 px-4 py-3 text-sm text-orange-600">
                   <p className="font-semibold mb-1">Preencha os campos obrigatórios antes de avançar:</p>
                   <ul className="list-disc list-inside space-y-0.5">
                     {camposVazios.map((c, i) => <li key={i}>{c}</li>)}
@@ -426,7 +426,7 @@ export default function CertificacaoUsinaPage() {
               )}
 
               {/* Navegação anterior/próximo + footer */}
-              <div className="flex items-center justify-between pt-2 border-t border-slate-200">
+              <div className="flex items-center justify-between pt-2 border-t border-border">
                 <Button
                   type="button"
                   variant="outline"
@@ -435,7 +435,7 @@ export default function CertificacaoUsinaPage() {
                 >
                   ← Anterior
                 </Button>
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-muted-foreground">
                   Página {currentPage + 1} de {PAGES.length}
                 </span>
                 <Button

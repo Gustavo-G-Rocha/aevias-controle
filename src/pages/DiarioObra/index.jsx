@@ -25,7 +25,7 @@ export default function DiarioObraPage() {
   }
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-transparent min-h-screen">
       <div className="max-w-4xl mx-auto">
         <Card>
           <CardHeader>
@@ -43,20 +43,20 @@ export default function DiarioObraPage() {
             >
               {/* Banners de status */}
               {formData.status === "rascunho" && (
-                <div className="flex items-start gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <AlertTriangle className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
+                <div className="flex items-start gap-2 p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                  <AlertTriangle className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                   <div>
-                    <p className="font-semibold text-blue-800">Em Rascunho</p>
-                    <p className="text-sm text-blue-700">Este registro ainda está em edição e não será visível aos gestores até que você o finalize.</p>
+                    <p className="font-semibold text-primary">Em Rascunho</p>
+                    <p className="text-sm text-muted-foreground">Este registro ainda está em edição e não será visível aos gestores até que você o finalize.</p>
                   </div>
                 </div>
               )}
               {formData.rejection_reason && (
-                <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
+                <div className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                  <AlertTriangle className="w-5 h-5 text-destructive mt-0.5 shrink-0" />
                   <div>
-                    <p className="font-semibold text-red-800">Motivo da Reprovação:</p>
-                    <p className="text-sm text-red-700">{formData.rejection_reason}</p>
+                    <p className="font-semibold text-destructive">Motivo da Reprovação:</p>
+                    <p className="text-sm text-muted-foreground">{formData.rejection_reason}</p>
                   </div>
                 </div>
               )}
@@ -124,7 +124,7 @@ export default function DiarioObraPage() {
                   <>
                     <Button type="button" variant="outline" disabled={loadingUpload}
                       onClick={(e) => handleSubmit(e, "rascunho")}
-                      className="border-blue-500 text-blue-600 hover:bg-blue-50">
+                      >
                       <Save className="mr-2 h-4 w-4" /> Salvar Progresso
                     </Button>
                     <Button type="button" disabled={loadingUpload} onClick={(e) => handleSubmit(e, "finalizado")}>

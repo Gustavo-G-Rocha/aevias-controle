@@ -29,7 +29,7 @@ export default function ChecklistReciclagem() {
   }
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-transparent min-h-screen">
       <div className="max-w-6xl mx-auto">
         <Card>
           <CardHeader>
@@ -40,20 +40,20 @@ export default function ChecklistReciclagem() {
                 : 'Controle Tecnológico de Reciclagem'}
             </CardDescription>
             {formData.status === 'rascunho' && (
-              <div className="mt-4 flex items-start gap-3 p-4 bg-blue-600 border border-blue-700 rounded-lg">
-                <AlertTriangle className="w-5 h-5 text-white mt-0.5 shrink-0" />
+              <div className="mt-4 flex items-start gap-3 p-4 bg-primary/10 border border-primary/20 rounded-lg">
+                <AlertTriangle className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-semibold text-white">Em Rascunho</p>
-                  <p className="text-sm text-white/90">Este registro ainda está em edição e não será visível aos gestores até que você o finalize.</p>
+                  <p className="font-semibold text-primary">Em Rascunho</p>
+                  <p className="text-sm text-muted-foreground">Este registro ainda está em edição e não será visível aos gestores até que você o finalize.</p>
                 </div>
               </div>
             )}
             {formData.approved === false && formData.rejection_reason && (
-              <div className="mt-4 flex items-start gap-3 p-4 bg-red-600 border border-red-700 rounded-lg">
-                <XCircle className="w-5 h-5 text-white mt-0.5 shrink-0" />
+              <div className="mt-4 flex items-start gap-3 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <XCircle className="w-5 h-5 text-destructive mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-semibold text-white">Registro Reprovado</p>
-                  <p className="text-sm text-white/90">{formData.rejection_reason}</p>
+                  <p className="font-semibold text-destructive">Registro Reprovado</p>
+                  <p className="text-sm text-muted-foreground">{formData.rejection_reason}</p>
                 </div>
               </div>
             )}
@@ -94,7 +94,7 @@ export default function ChecklistReciclagem() {
                 <Textarea value={formData.observacoes_gerais} disabled={!isEditable}
                   onChange={(e) => setFormData(prev => ({ ...prev, observacoes_gerais: e.target.value }))}
                   rows={3} placeholder="Observações gerais sobre o checklist..." maxLength={500} />
-                <p className="text-xs text-right text-slate-500 mt-1">{formData.observacoes_gerais?.length || 0} / 500</p>
+                <p className="text-xs text-right text-muted-foreground mt-1">{formData.observacoes_gerais?.length || 0} / 500</p>
               </div>
 
               <AcoesCorretivasNC
@@ -117,16 +117,16 @@ export default function ChecklistReciclagem() {
                     <Input id="fotos-rec" type="file" multiple accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                       onChange={handleFileChange} disabled={uploadingPhotos} className="hidden" />
                     <Label htmlFor="fotos-rec"
-                      className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm cursor-pointer hover:bg-slate-50 ${uploadingPhotos ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                      <span className="truncate text-slate-500">{selectedFileNames}</span>
-                      <span className="flex-shrink-0 ml-4 px-3 py-1 rounded-md text-sm font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100">
+                      className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm cursor-pointer hover:bg-muted ${uploadingPhotos ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                      <span className="truncate text-muted-foreground">{selectedFileNames}</span>
+                      <span className="flex-shrink-0 ml-4 px-3 py-1 rounded-md text-sm font-semibold bg-muted text-muted-foreground">
                         {uploadingPhotos ? 'Enviando...' : 'Escolher Ficheiros'}
                       </span>
                     </Label>
                   </div>
                 )}
                 {uploadingPhotos && (
-                  <div className="flex items-center gap-2 text-sm text-blue-600 mt-2">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
                     <Loader2 className="w-4 h-4 animate-spin" /><span>Fazendo upload das fotos...</span>
                   </div>
                 )}

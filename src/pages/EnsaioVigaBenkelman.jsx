@@ -26,7 +26,7 @@ export default function EnsaioVigaBenkelman() {
 
   const { saving, handleSave } = useEnsaioVigaBenkelmanActions(formData, editId);
 
-  if (loading) return <div className="p-6 text-center">Carregando...</div>;
+  if (loading) return <div className="p-6 text-center text-muted-foreground">Carregando...</div>;
 
   return (
     <div className="p-6 bg-transparent min-h-screen">

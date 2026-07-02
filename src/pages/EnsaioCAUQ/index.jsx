@@ -104,7 +104,7 @@ export default function EnsaioCAUQPage() {
   }
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-transparent min-h-screen">
       <div className="max-w-6xl mx-auto">
         <Card>
           <CardHeader>
@@ -198,11 +198,11 @@ export default function EnsaioCAUQPage() {
                     <Button type="button" variant="outline"
                       onClick={handlers.handleSaveProgress}
                       disabled={saving || !formData.obra_id}
-                      className="border-[#BFCF99] text-[#00233B] hover:bg-[#BFCF99]/10">
+                      >
                       {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                       Salvar Progresso
                     </Button>
-                    <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={saving}>
+                    <Button type="submit" disabled={saving}>
                       {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
                       Finalizar Registro
                     </Button>

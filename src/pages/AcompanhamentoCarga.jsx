@@ -33,8 +33,8 @@ export default function AcompanhamentoCarga() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-        <Loader2 className="w-8 h-8 animate-spin text-[#00233B]" />
+      <div className="flex items-center justify-center min-h-screen bg-transparent">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -45,11 +45,11 @@ export default function AcompanhamentoCarga() {
   const canEdit             = calcCanEdit(editMode, formData, user?.email);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+    <div className="min-h-screen bg-transparent p-4 space-y-6">
       <div className="max-w-7xl mx-auto">
         <AcompanhamentoCargaHeader editMode={editMode} />
 
-        <Card className="bg-white/40 backdrop-blur-lg border-white/20">
+        <Card className="bg-card border border-border text-card-foreground">
           <CardContent className="p-6 space-y-6">
             <AcompanhamentoCargaDadosObra
               formData={formData}
