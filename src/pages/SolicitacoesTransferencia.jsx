@@ -34,24 +34,24 @@ export default function SolicitacoesTransferenciaPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-slate-50">
+      <div className="flex justify-center items-center h-screen bg-transparent">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-slate-400" />
-          <p className="text-slate-600 mt-2">Carregando solicitações...</p>
+          <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#BFCF99]" />
+          <p className="text-muted-foreground mt-2">Carregando solicitações...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-transparent min-h-screen">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-start mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-[#00233B] mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Transferências de Regional
             </h1>
-            <p className="text-[#00233B]/80">
+            <p className="text-muted-foreground">
               {canManage 
                 ? userAccessLevel === 'admin'
                   ? "Gerencie as solicitações de transferência entre regionais"
@@ -113,13 +113,13 @@ export default function SolicitacoesTransferenciaPage() {
                 />
               ))
             ) : (
-              <Card className="bg-white/20 backdrop-blur-lg border border-white/20">
+              <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
-                  <Clock className="w-16 h-16 text-[#00233B]/30 mb-4" />
-                  <h3 className="text-lg font-semibold text-[#00233B] mb-2">
+                  <Clock className="w-16 h-16 text-muted-foreground/40 mb-4" />
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
                     Nenhuma solicitação pendente
                   </h3>
-                  <p className="text-[#00233B]/70 text-center">
+                  <p className="text-muted-foreground text-center">
                     {isLaboratorista 
                       ? "Você não possui solicitações pendentes no momento."
                       : "Não há solicitações aguardando aprovação para suas regionais."}
@@ -140,10 +140,10 @@ export default function SolicitacoesTransferenciaPage() {
                 />
               ))
             ) : (
-              <Card className="bg-white/20 backdrop-blur-lg border border-white/20">
+              <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
-                  <CheckCircle className="w-16 h-16 text-[#566E3D]/30 mb-4" />
-                  <h3 className="text-lg font-semibold text-[#00233B] mb-2">
+                  <CheckCircle className="w-16 h-16 text-[#566E3D]/40 mb-4" />
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
                     Nenhuma solicitação aprovada
                   </h3>
                 </CardContent>
@@ -162,10 +162,10 @@ export default function SolicitacoesTransferenciaPage() {
                 />
               ))
             ) : (
-              <Card className="bg-white/20 backdrop-blur-lg border border-white/20">
+              <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
-                  <XCircle className="w-16 h-16 text-[#800020]/30 mb-4" />
-                  <h3 className="text-lg font-semibold text-[#00233B] mb-2">
+                  <XCircle className="w-16 h-16 text-[#800020]/40 mb-4" />
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
                     Nenhuma solicitação rejeitada
                   </h3>
                 </CardContent>

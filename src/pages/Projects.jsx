@@ -111,9 +111,9 @@ export default function Projects() {
           open={!!selectedProject}
           onOpenChange={() => setSelectedProject(null)}
         >
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-lg border-white/20 text-[#00233B]">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-[#00233B]">
+              <DialogTitle className="text-foreground">
                 Detalhes do Projeto
               </DialogTitle>
             </DialogHeader>
