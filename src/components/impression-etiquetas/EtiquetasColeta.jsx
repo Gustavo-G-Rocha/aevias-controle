@@ -48,7 +48,8 @@ export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
           .page-container { padding: 4px; page-break-after: always !important; overflow: visible !important; }
           .page-container:last-child { page-break-after: auto !important; }
           .print\\:hidden { display: none !important; }
-          header, nav, .no-print { display: none !important; }
+          header, nav, aside, .no-print, [data-sidebar], [data-sidebar="sidebar"], [data-sidebar="provider"] { display: none !important; }
+          main { padding-left: 0 !important; margin-left: 0 !important; }
         }
       `}</style>
     </div>
