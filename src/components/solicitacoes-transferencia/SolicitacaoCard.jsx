@@ -89,7 +89,7 @@ export const SolicitacaoCard = React.memo(({ solicitacao, onApprove, onReject, c
 
           {solicitacao.status === 'aprovada' && solicitacao.aprovado_em && (
             <div className="bg-[#566E3D]/10 border border-[#566E3D]/30 rounded p-2">
-              <p className="text-sm text-secondary">
+              <p className="text-sm text-foreground">
                 <CheckCircle className="w-4 h-4 inline mr-1" />
                 Aprovada por {solicitacao.aprovado_por} em {format(new Date(solicitacao.aprovado_em), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
               </p>

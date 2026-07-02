@@ -88,7 +88,7 @@ export default function NaoConformidadesTable({ rncsVisiveis, cncsVisiveis, tabe
                   {displayRows.map((row, i) => (
                     <tr key={i} className="border-b border-border/50 hover:bg-muted/50 transition-colors">
                       <td className="py-2 px-3 whitespace-nowrap">
-                        <Badge className={row._kind === 'rnc' ? "bg-red-100 text-destructive font-normal" : "bg-blue-100 text-primary font-normal"}>
+                        <Badge className={row._kind === 'rnc' ? "bg-destructive/10 text-destructive font-normal" : "bg-primary/10 text-primary font-normal"}>
                           {row.tipoLabel}
                         </Badge>
                       </td>
