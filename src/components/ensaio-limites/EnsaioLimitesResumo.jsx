@@ -1,6 +1,6 @@
 import React from 'react';
 
-const sectionHeader = 'bg-[#00233B]/10 text-[#00233B] text-center font-bold text-xs py-1 border border-[#00233B]/20 mb-2 rounded';
+const sectionHeader = 'bg-muted/10 text-foreground text-center font-bold text-xs py-1 border border-border/20 mb-2 rounded';
 
 export function ResumoSection({
   pctPedregulho, pctAreiaGrossaMedia, pctAreiaFina, pctSilteArgila,
@@ -22,9 +22,9 @@ export function ResumoSection({
             { label: 'Índice de Grupo (IG)', value: igCalc != null ? `${igCalc}` : '-' },
             { label: 'Classificação HRB', value: classificacaoHRB },
           ].map(row => (
-            <tr key={row.label} className={row.highlight ? 'bg-[#BFCF99]/20' : 'bg-white/10'}>
-              <td className="border border-[#00233B]/20 px-2 py-1.5 font-medium text-[#00233B] w-3/4">{row.label}</td>
-              <td className="border border-[#00233B]/20 px-2 py-1.5 text-center font-bold text-[#00233B]">{row.value}</td>
+            <tr key={row.label} className={row.highlight ? 'bg-secondary/20/20' : 'bg-card/10'}>
+              <td className="border border-border/20 px-2 py-1.5 font-medium text-foreground w-3/4">{row.label}</td>
+              <td className="border border-border/20 px-2 py-1.5 text-center font-bold text-foreground">{row.value}</td>
             </tr>
           ))}
         </tbody>

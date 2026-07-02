@@ -31,7 +31,7 @@ const NavLink = ({ to, children, className }) => {
 };
 
 // Classes reutilizáveis
-const activeItemCls = "!bg-white [&_span]:!text-black [&_svg]:!text-black";
+const activeItemCls = "!bg-card [&_span]:!text-black [&_svg]:!text-black";
 const inactiveIconStyle = { color: 'var(--color-sidebar-text-muted)' };
 const inactiveTextStyle = { color: 'var(--color-sidebar-text)' };
 

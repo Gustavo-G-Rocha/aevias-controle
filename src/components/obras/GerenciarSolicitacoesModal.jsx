@@ -25,7 +25,7 @@ import { base44 } from "@/api/base44Client";
 const statusConfig = {
   pendente: { icon: Clock, color: "bg-yellow-100 text-yellow-800", label: "Pendente" },
   aprovada: { icon: CheckCircle, color: "bg-green-100 text-green-800", label: "Aprovada" },
-  rejeitada: { icon: XCircle, color: "bg-red-100 text-red-800", label: "Rejeitada" }
+  rejeitada: { icon: XCircle, color: "bg-red-100 text-destructive", label: "Rejeitada" }
 };
 
 const SolicitacaoCard = ({ solicitacao, onAprovar, onRejeitar, user }) => {
@@ -75,7 +75,7 @@ const SolicitacaoCard = ({ solicitacao, onAprovar, onRejeitar, user }) => {
   };
 
   return (
-    <Card className="border-slate-200">
+    <Card className="border-border">
       <CardContent className="p-3 sm:p-4">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
@@ -83,8 +83,8 @@ const SolicitacaoCard = ({ solicitacao, onAprovar, onRejeitar, user }) => {
               <UserIcon className="w-5 h-5 text-blue-600" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="font-semibold text-slate-900 text-sm sm:text-base truncate">{solicitacao.laboratorista_name}</p>
-              <p className="text-xs sm:text-sm text-slate-500 break-all">{solicitacao.laboratorista_email}</p>
+              <p className="font-semibold text-foreground text-sm sm:text-base truncate">{solicitacao.laboratorista_name}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground break-all">{solicitacao.laboratorista_email}</p>
             </div>
           </div>
           <Badge className={`${status.color} shrink-0 self-start sm:self-auto`}>
@@ -97,8 +97,8 @@ const SolicitacaoCard = ({ solicitacao, onAprovar, onRejeitar, user }) => {
           <div className="flex items-start gap-2 text-xs sm:text-sm">
             <MapPin className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
             <div className="min-w-0 flex-1">
-              <span className="font-medium text-slate-700">De:</span>
-              <span className="text-slate-900 ml-1 break-words">{solicitacao.regional_atual_nome}</span>
+              <span className="font-medium text-foreground">De:</span>
+              <span className="text-foreground ml-1 break-words">{solicitacao.regional_atual_nome}</span>
             </div>
           </div>
           
@@ -109,26 +109,26 @@ const SolicitacaoCard = ({ solicitacao, onAprovar, onRejeitar, user }) => {
           <div className="flex items-start gap-2 text-xs sm:text-sm">
             <MapPin className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
             <div className="min-w-0 flex-1">
-              <span className="font-medium text-slate-700">Para:</span>
+              <span className="font-medium text-foreground">Para:</span>
               <span className="text-blue-900 font-semibold ml-1 break-words">{solicitacao.regional_destino_nome}</span>
             </div>
           </div>
 
-          <div className="mt-3 p-3 bg-slate-50 rounded-lg">
-            <p className="text-xs sm:text-sm font-medium text-slate-700 mb-1">Motivo:</p>
-            <p className="text-xs sm:text-sm text-slate-600 break-words">{solicitacao.motivo}</p>
+          <div className="mt-3 p-3 bg-muted/30 rounded-lg">
+            <p className="text-xs sm:text-sm font-medium text-foreground mb-1">Motivo:</p>
+            <p className="text-xs sm:text-sm text-muted-foreground break-words">{solicitacao.motivo}</p>
           </div>
 
           {solicitacao.status !== 'pendente' && (
-            <div className="mt-3 p-3 bg-slate-50 rounded-lg">
-              <p className="text-xs sm:text-sm font-medium text-slate-700 break-words">
+            <div className="mt-3 p-3 bg-muted/30 rounded-lg">
+              <p className="text-xs sm:text-sm font-medium text-foreground break-words">
                 {solicitacao.status === 'aprovada' ? 'Aprovado' : 'Rejeitado'} por: {solicitacao.aprovado_por}
               </p>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 {new Date(solicitacao.aprovado_em).toLocaleString('pt-BR')}
               </p>
               {solicitacao.motivo_rejeicao && (
-                <p className="text-xs sm:text-sm text-red-700 mt-2 break-words">
+                <p className="text-xs sm:text-sm text-destructive mt-2 break-words">
                   Motivo da rejeição: {solicitacao.motivo_rejeicao}
                 </p>
               )}
@@ -363,10 +363,10 @@ export default function GerenciarSolicitacoesModal({ isOpen, onClose, user, onUp
         ) : (
           <div className="text-center py-12 px-4">
             <AlertCircle className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-base sm:text-lg font-medium text-slate-700 mb-2">
+            <h3 className="text-base sm:text-lg font-medium text-foreground mb-2">
               Nenhuma solicitação {filtro !== "todas" ? filtro : ""}
             </h3>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted-foreground">
               {filtro === "pendente" 
                 ? "Não há solicitações pendentes de aprovação no momento."
                 : "Não há solicitações nesta categoria."}

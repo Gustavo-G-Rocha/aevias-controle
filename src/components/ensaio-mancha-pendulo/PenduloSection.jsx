@@ -76,10 +76,10 @@ export default function PenduloSection({ formData, onPenduloChange }) {
                     <td className="border border-border p-1">
                       <Input type="number" value={ensaio.leitura_5 || ''} onChange={(e) => onPenduloChange(index, 'leitura_5', parseFloat(e.target.value))} className="h-8 text-xs min-w-[60px]" />
                     </td>
-                    <td className="border border-border p-1 text-center bg-slate-50">{ensaio.maxima || ''}</td>
-                    <td className="border border-border p-1 text-center bg-slate-50">{ensaio.minima || ''}</td>
-                    <td className="border border-border p-1 text-center bg-slate-50">{ensaio.vrd || ''}</td>
-                    <td className="border border-border p-1 text-center bg-slate-50">{ensaio.classe || ''}</td>
+                    <td className="border border-border p-1 text-center bg-muted/30">{ensaio.maxima || ''}</td>
+                    <td className="border border-border p-1 text-center bg-muted/30">{ensaio.minima || ''}</td>
+                    <td className="border border-border p-1 text-center bg-muted/30">{ensaio.vrd || ''}</td>
+                    <td className="border border-border p-1 text-center bg-muted/30">{ensaio.classe || ''}</td>
                   </tr>
                 );
               })}

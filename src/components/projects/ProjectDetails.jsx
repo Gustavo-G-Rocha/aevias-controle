@@ -30,9 +30,9 @@ import TabelaMarshall from "@/components/projects/details/TabelaMarshall";
 import CartaTracoSection from "@/components/projects/details/CartaTracoSection";
 
 const BADGE_COLORS = {
-  CAUQ: 'bg-[#00233B] text-white',
+  CAUQ: 'bg-muted text-white',
   MRAF: 'bg-[#566E3D] text-white',
-  CARTA_TRACO_CONCRETO: 'bg-orange-500 text-white',
+  CARTA_TRACO_CONCRETO: 'bg-card0 text-white',
 };
 
 export default function ProjectDetails({ project, faixas }) {
@@ -50,14 +50,14 @@ export default function ProjectDetails({ project, faixas }) {
       {/* Cabeçalho */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-2xl font-bold text-[#00233B]">{project.name}</h2>
+          <h2 className="text-2xl font-bold text-foreground">{project.name}</h2>
           <Badge className={badgeClass}>{badgeLabel}</Badge>
         </div>
-        {project.description && <p className="text-sm text-[#00233B]/80">{project.description}</p>}
-        {project.location && <p className="text-sm text-[#00233B]/60 mt-1">📍 {project.location}</p>}
+        {project.description && <p className="text-sm text-foreground/80">{project.description}</p>}
+        {project.location && <p className="text-sm text-foreground/60 mt-1">📍 {project.location}</p>}
       </div>
 
-      <Separator className="bg-[#00233B]/20" />
+      <Separator className="bg-muted/20" />
 
       {/* Informações básicas */}
       <DetailSection title="📋 Informações Básicas">
@@ -69,7 +69,7 @@ export default function ProjectDetails({ project, faixas }) {
         {!isCartaTraco && faixa && <DetailItem label="Faixa Granulométrica" value={faixa.nome} />}
       </DetailSection>
 
-      <Separator className="bg-[#00233B]/20" />
+      <Separator className="bg-muted/20" />
 
       {/* ── CARTA TRAÇO ─────────────────────────────────────────────────────── */}
       {isCartaTraco && (
@@ -77,7 +77,7 @@ export default function ProjectDetails({ project, faixas }) {
           <DetailSection title="🏗️ Especificações da Carta Traço">
             <CartaTracoSection project={project} />
           </DetailSection>
-          <Separator className="bg-[#00233B]/20" />
+          <Separator className="bg-muted/20" />
         </>
       )}
 
@@ -89,7 +89,7 @@ export default function ProjectDetails({ project, faixas }) {
               <DetailSection title="🪨 Agregados">
                 <AgregadosList agregados={project.agregados} />
               </DetailSection>
-              <Separator className="bg-[#00233B]/20" />
+              <Separator className="bg-muted/20" />
             </>
           )}
 
@@ -98,7 +98,7 @@ export default function ProjectDetails({ project, faixas }) {
               <DetailSection title="🛢️ Ligante Asfáltico">
                 <LiganteInfo ligante={project.ligante} />
               </DetailSection>
-              <Separator className="bg-[#00233B]/20" />
+              <Separator className="bg-muted/20" />
             </>
           )}
 
@@ -119,7 +119,7 @@ export default function ProjectDetails({ project, faixas }) {
                     unit="g/cm³" />
                 </div>
               </DetailSection>
-              <Separator className="bg-[#00233B]/20" />
+              <Separator className="bg-muted/20" />
             </>
           )}
 
@@ -128,7 +128,7 @@ export default function ProjectDetails({ project, faixas }) {
               <DetailSection title="🌡️ Controle de Temperaturas">
                 <TemperaturasControl temperaturas={project.temperaturas} />
               </DetailSection>
-              <Separator className="bg-[#00233B]/20" />
+              <Separator className="bg-muted/20" />
             </>
           )}
 
@@ -142,7 +142,7 @@ export default function ProjectDetails({ project, faixas }) {
                 </div>
                 <FaixaEspecificacaoTable faixaEspecificacao={faixa} />
               </DetailSection>
-              <Separator className="bg-[#00233B]/20" />
+              <Separator className="bg-muted/20" />
             </>
           )}
 
@@ -156,12 +156,12 @@ export default function ProjectDetails({ project, faixas }) {
                 />
                 {project.faixa_trabalho && faixa && (
                   <div className="mt-6">
-                    <h4 className="font-semibold text-[#00233B] mb-3">Gráfico da Faixa de Trabalho</h4>
+                    <h4 className="font-semibold text-foreground mb-3">Gráfico da Faixa de Trabalho</h4>
                     <GraficoGranulometriaProject project={project} faixaEspecificacao={faixa} />
                   </div>
                 )}
               </DetailSection>
-              <Separator className="bg-[#00233B]/20" />
+              <Separator className="bg-muted/20" />
             </>
           )}
 

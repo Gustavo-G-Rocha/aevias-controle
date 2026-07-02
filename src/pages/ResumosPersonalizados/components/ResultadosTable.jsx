@@ -28,7 +28,7 @@ export default function ResultadosTable({
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="bg-[#00233B] text-white">
+              <tr className="bg-muted text-white">
                 <th className="border border-white/20 px-2 py-2 text-left">Tipo</th>
                 <th className="border border-white/20 px-2 py-2 text-left">Data</th>
                 {tipoEnsaioSelecionado === 'ChecklistAplicacao' && (

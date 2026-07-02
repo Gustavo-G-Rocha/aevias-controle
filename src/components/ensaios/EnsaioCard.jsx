@@ -47,7 +47,7 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
       const msg = temAcoesCorretivas
         ? `Não conformidades:\n${naoConformidades.join('\n')}\n\n✓ Ações corretivas foram realizadas`
         : `Não conformidades:\n${naoConformidades.join('\n')}`;
-      return <span className="text-red-600 cursor-help text-xl" title={msg}>⚠️</span>;
+      return <span className="text-destructive cursor-help text-xl" title={msg}>⚠️</span>;
     }
     if (temDeflexaoExcessiva) return <span className="cursor-help text-xl" title="Pontos com deflexão acima do limite admissível">🟡</span>;
     if (temAcoesCorretivas) return <span className="text-orange-500 cursor-help text-xl" title="Ações corretivas realizadas">⚠️</span>;
@@ -71,7 +71,7 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
                 <status.icon className="w-3 h-3" />
                 {status.text}
               </Badge>
-              {status.wasRejected && <Badge className="bg-orange-100/80 text-orange-800 border border-orange-300/50 text-xs">🔄 Editado após reprovação</Badge>}
+              {status.wasRejected && <Badge className="bg-orange-100/80 text-orange-800 border border-border/50 text-xs">🔄 Editado após reprovação</Badge>}
               {jaAssinado && <Badge className="bg-muted/50  border border-border text-xs">✍️ Assinado por você</Badge>}
             </div>
           </div>
@@ -127,9 +127,9 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
             )}
 
             {ensaio.rejection_reason && (
-              <div className="text-sm bg-red-600/10 p-2 rounded border border-red-600/20">
-                <span className="font-medium text-red-600">Motivo da Reprovação: </span>
-                <span className="text-red-600/80">{ensaio.rejection_reason}</span>
+              <div className="text-sm bg-destructive/10 p-2 rounded border border-destructive/20">
+                <span className="font-medium text-destructive">Motivo da Reprovação: </span>
+                <span className="text-destructive/80">{ensaio.rejection_reason}</span>
               </div>
             )}
           </div>

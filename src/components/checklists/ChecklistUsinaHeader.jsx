@@ -23,7 +23,7 @@ export default function ChecklistUsinaHeader({
   };
 
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader className="pb-4"><CardTitle className="text-xl">Dados da Obra e Projeto</CardTitle></CardHeader>
       <CardContent className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -59,15 +59,15 @@ export default function ChecklistUsinaHeader({
           <div>
             <Label className="text-base">Data *</Label>
             <Input type="date" value={formData.data} onChange={(e) => handleChange('data', e.target.value)}
-              required disabled={!isEditable || isApproved} className="bg-white border-slate-200 text-slate-700 h-11 text-base" />
+              required disabled={!isEditable || isApproved} className="bg-card border-border text-foreground h-11 text-base" />
           </div>
         </div>
 
         {regionalSelecionada && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-1 text-sm">
-            <p className="text-blue-800"><strong>📍 Regional:</strong> {regionalSelecionada.nome}</p>
+            <p className="text-secondary"><strong>📍 Regional:</strong> {regionalSelecionada.nome}</p>
             {regionalSelecionada.cliente && (
-              <p className="text-blue-800"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>
+              <p className="text-secondary"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>
             )}
           </div>
         )}
@@ -87,13 +87,13 @@ export default function ChecklistUsinaHeader({
             <Label className="text-base">Pedreira *</Label>
             <Input value={formData.pedreira || ""} onChange={(e) => handleChange('pedreira', e.target.value)}
               disabled={!isEditable || isApproved} required placeholder="Nome da pedreira"
-              className="bg-white border-slate-200 text-slate-700 h-11 text-base" />
+              className="bg-card border-border text-foreground h-11 text-base" />
           </div>
           <div>
             <Label className="text-base">Ligante Asfáltico *</Label>
             <Input value={formData.ligante || ""} onChange={(e) => handleChange('ligante', e.target.value)}
               disabled={!isEditable || isApproved} required placeholder="Ex: CAP 50-70"
-              className="bg-white border-slate-200 text-slate-700 h-11 text-base" />
+              className="bg-card border-border text-foreground h-11 text-base" />
           </div>
         </div>
       </CardContent>

@@ -27,7 +27,7 @@ export default function AcompanhamentoUsinagemHeader({ editingId, rejectionReaso
       </div>
 
       {rejectionReason && (
-        <Card className="border-red-700 bg-red-600">
+        <Card className="border-destructive/20 bg-destructive/10">
           <CardContent className="pt-6">
             <p className="text-sm font-semibold text-white mb-1">Motivo da Reprovação:</p>
             <p className="text-sm text-white/90">{rejectionReason}</p>

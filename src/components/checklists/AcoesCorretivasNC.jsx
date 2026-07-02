@@ -17,9 +17,9 @@ export default function AcoesCorretivasNC({
 }) {
   const radioName = `acoes_corretivas_${instanceId}`;
   return (
-    <Card className="bg-orange-50 border-orange-200 text-slate-900">
+    <Card className="bg-card border-border">
       <CardHeader>
-        <CardTitle className="text-base text-slate-900">Ações Corretivas / Não Conformidades</CardTitle>
+        <CardTitle className="text-base text-foreground">Ações Corretivas / Não Conformidades</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Ações Corretivas */}
@@ -58,7 +58,7 @@ export default function AcoesCorretivasNC({
           </div>
 
           {acoesRealizadas === true && (
-            <div className="space-y-2 p-4 border-2 border-orange-300 rounded-lg bg-white">
+            <div className="space-y-2 p-4 border-2 border-border rounded-lg bg-muted/30">
               <Label htmlFor="acoes_descricao">Descrição das Ações Corretivas *</Label>
               <Textarea
                 id="acoes_descricao"
@@ -69,7 +69,7 @@ export default function AcoesCorretivasNC({
                 placeholder="Descreva as ações corretivas..."
                 maxLength="500"
               />
-              <p className="text-xs text-right text-slate-500 mt-1">
+              <p className="text-xs text-right text-muted-foreground mt-1">
                 {acoesDescricao?.length || 0} / 500
               </p>
             </div>

@@ -29,11 +29,11 @@ export default function ResultadosSection({ formData, onInputChange }) {
 
         <div>
           <Label>Condição de Conformidade</Label>
-          <div className="p-3 bg-slate-50 rounded border">
-            <p className={`text-lg font-bold ${formData.condicao_conformidade === 'CONFORME' ? 'text-green-700' : formData.condicao_conformidade === 'NÃO CONFORME' ? 'text-red-700' : 'text-slate-400'}`}>
+          <div className="p-3 bg-muted/30 rounded border">
+            <p className={`text-lg font-bold ${formData.condicao_conformidade === 'CONFORME' ? 'text-green-700' : formData.condicao_conformidade === 'NÃO CONFORME' ? 'text-destructive' : 'text-slate-400'}`}>
               {formData.condicao_conformidade || 'Aguardando dados dos ensaios'}
             </p>
-            <p className="text-xs text-slate-500 mt-1">Avaliado automaticamente com base nos limites do órgão selecionado</p>
+            <p className="text-xs text-muted-foreground mt-1">Avaliado automaticamente com base nos limites do órgão selecionado</p>
           </div>
         </div>
 

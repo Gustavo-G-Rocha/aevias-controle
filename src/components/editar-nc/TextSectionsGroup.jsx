@@ -6,9 +6,9 @@ export default function TextSectionsGroup({ form, updateForm }) {
   return (
     <>
       {/* Descrição */}
-      <Card className="bg-white/20 backdrop-blur-lg border border-white/20">
+      <Card className="bg-card/20 backdrop-blur-lg border border-white/20">
         <CardHeader>
-          <CardTitle className="text-[#00233B] text-base bg-[#BFCF99]/30 px-3 py-1 rounded">
+          <CardTitle className="text-foreground text-base bg-secondary/20/30 px-3 py-1 rounded">
             DESCRIÇÃO DA NÃO CONFORMIDADE
           </CardTitle>
         </CardHeader>
@@ -17,15 +17,15 @@ export default function TextSectionsGroup({ form, updateForm }) {
             value={form.descricao_nc}
             onChange={(e) => updateForm("descricao_nc", e.target.value)}
             rows={6}
-            className="bg-white/50 border-white/20 text-[#00233B]"
+            className="bg-card/50 border-white/20 text-foreground"
           />
         </CardContent>
       </Card>
 
       {/* Ações */}
-      <Card className="bg-white/20 backdrop-blur-lg border border-white/20">
+      <Card className="bg-card/20 backdrop-blur-lg border border-white/20">
         <CardHeader>
-          <CardTitle className="text-[#00233B] text-base bg-[#BFCF99]/30 px-3 py-1 rounded">
+          <CardTitle className="text-foreground text-base bg-secondary/20/30 px-3 py-1 rounded">
             AÇÕES
           </CardTitle>
         </CardHeader>
@@ -34,7 +34,7 @@ export default function TextSectionsGroup({ form, updateForm }) {
             value={form.acoes}
             onChange={(e) => updateForm("acoes", e.target.value)}
             rows={4}
-            className="bg-white/50 border-white/20 text-[#00233B]"
+            className="bg-card/50 border-white/20 text-foreground"
           />
         </CardContent>
       </Card>

@@ -46,7 +46,7 @@ export default function Settings() {
 
       <Card className="backdrop-blur-lg border" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-danger)', color: 'var(--color-text)' }}>
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-red-600 flex items-center gap-2">
+          <CardTitle className="text-lg font-semibold text-destructive flex items-center gap-2">
             <Trash2 className="w-5 h-5" />
             Zona de Perigo
           </CardTitle>

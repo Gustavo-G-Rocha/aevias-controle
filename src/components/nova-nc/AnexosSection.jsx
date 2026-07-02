@@ -17,7 +17,7 @@ export function AnexosSection({
   return (
     <Card className="bg-transparent">
       <CardHeader>
-        <CardTitle className="text-primary text-base bg-[#BFCF99]/30 px-3 py-1 rounded">
+        <CardTitle className="text-primary text-base bg-secondary/20/30 px-3 py-1 rounded">
           ANEXOS DO GESTOR
         </CardTitle>
       </CardHeader>
@@ -117,7 +117,7 @@ export function AnexosSection({
                   <button
                     type="button"
                     onClick={() => setPdfs(prev => prev.filter((_, idx) => idx !== i))}
-                    className="text-red-500 hover:text-red-700"
+                    className="text-red-500 hover:text-destructive"
                   >
                     <X className="w-4 h-4" />
                   </button>

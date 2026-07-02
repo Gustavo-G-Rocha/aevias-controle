@@ -13,10 +13,10 @@ export default function GestaoNCList({
 }) {
   if (filtradas.length === 0) {
     return (
-      <Card className="bg-white/20 backdrop-blur-lg border border-white/20">
+      <Card className="bg-card/20 backdrop-blur-lg border border-white/20">
         <CardContent className="flex flex-col items-center justify-center py-16">
-          <AlertTriangle className="w-14 h-14 text-[#00233B]/30 mb-4" />
-          <p className="text-[#00233B]/60 text-center">
+          <AlertTriangle className="w-14 h-14 text-foreground/30 mb-4" />
+          <p className="text-foreground/60 text-center">
             Nenhuma não conformidade encontrada.
           </p>
         </CardContent>

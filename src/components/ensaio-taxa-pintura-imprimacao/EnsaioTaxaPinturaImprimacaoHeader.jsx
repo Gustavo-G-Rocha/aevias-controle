@@ -14,7 +14,7 @@ export default function EnsaioTaxaPinturaImprimacaoHeader({ editingEnsaio }) {
         DNIT 145/2012 - ES
       </CardDescription>
       {editingEnsaio?.rejection_reason && (
-        <div className="mt-4 flex items-start gap-2 p-3 bg-red-600 border border-red-700 rounded-lg">
+        <div className="mt-4 flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
           <AlertTriangle className="w-5 h-5 text-white mt-0.5 shrink-0" />
           <div>
             <p className="font-semibold text-white">Motivo da Reprovação:</p>

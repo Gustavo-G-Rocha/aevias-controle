@@ -39,8 +39,8 @@ export default function SecaoLaboratorio({ formData, onNestedChange, disabled })
     const possuiKey = `${key}_possui`;
     const qtdeKey = `${key}_quantidade`;
     return (
-      <tr key={key} className="border-b border-slate-200 hover:bg-muted/30/50">
-        <td className="py-2 px-3 text-sm text-slate-700">{label}</td>
+      <tr key={key} className="border-b border-border hover:bg-muted/30/50">
+        <td className="py-2 px-3 text-sm text-foreground">{label}</td>
         <td className="py-2 px-3">
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-1 cursor-pointer text-sm">
@@ -61,11 +61,11 @@ export default function SecaoLaboratorio({ formData, onNestedChange, disabled })
                 disabled={disabled}
                 className="accent-red-600"
               />
-              <span className="text-red-700 font-medium">Não possui</span>
+              <span className="text-destructive font-medium">Não possui</span>
             </label>
             {prof[possuiKey] === true && (
               <div className="flex items-center gap-1">
-                <Label className="text-xs text-slate-500">Qtde:</Label>
+                <Label className="text-xs text-muted-foreground">Qtde:</Label>
                 <Input
                   type="number"
                   min="0"
@@ -84,11 +84,11 @@ export default function SecaoLaboratorio({ formData, onNestedChange, disabled })
 
   return (
     <div className="space-y-2">
-      <h3 className="font-bold text-[#00233B] text-sm bg-slate-100 px-3 py-2 rounded">
+      <h3 className="font-bold text-foreground text-sm bg-muted px-3 py-2 rounded">
         7.1 LABORATÓRIO
       </h3>
       <div className="overflow-x-auto">
-        <table className="w-full border border-slate-300 rounded">
+        <table className="w-full border border-border rounded">
           <tbody>
             <SubSectionTitle>Equipamentos Mínimos</SubSectionTitle>
             {EQUIPAMENTOS.map((eq) => (

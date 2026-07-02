@@ -84,7 +84,7 @@ export default function ProjectFormMRAF({
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse">
                 <thead>
-                  <tr className="bg-slate-100">
+                  <tr className="bg-muted">
                     <th className="border px-2 py-1 text-left">Peneira</th>
                     <th className="border px-2 py-1">Esp. Mín (%)</th>
                     <th className="border px-2 py-1">Esp. Máx (%)</th>
@@ -95,10 +95,10 @@ export default function ProjectFormMRAF({
                 </thead>
                 <tbody>
                   {peneirasDisponiveis.map(p => (
-                    <tr key={p.key} className="hover:bg-slate-50">
+                    <tr key={p.key} className="hover:bg-muted/30">
                       <td className="border px-2 py-1 font-medium">{p.nome} ({p.astm})</td>
-                      <td className="border px-1 py-1 text-center text-slate-500">{p.especificacao_min ?? '-'}</td>
-                      <td className="border px-1 py-1 text-center text-slate-500">{p.especificacao_max ?? '-'}</td>
+                      <td className="border px-1 py-1 text-center text-muted-foreground">{p.especificacao_min ?? '-'}</td>
+                      <td className="border px-1 py-1 text-center text-muted-foreground">{p.especificacao_max ?? '-'}</td>
                       <td className="border px-1 py-1">
                         <Input type="number" step="0.1" className="h-7 text-xs px-1"
                           value={formData.faixa_trabalho_min?.[p.key] ?? ''}

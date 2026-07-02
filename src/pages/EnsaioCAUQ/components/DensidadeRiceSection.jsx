@@ -74,7 +74,7 @@ export default function DensidadeRiceSection({ formData, isEditable, isApproved,
         </CardContent>
       ) : (
         <CardContent>
-          <p className="text-center text-slate-500 py-6 italic">
+          <p className="text-center text-muted-foreground py-6 italic">
             Marque a opção "Realizar Rice?" para incluir o ensaio de densidade Rice
           </p>
         </CardContent>

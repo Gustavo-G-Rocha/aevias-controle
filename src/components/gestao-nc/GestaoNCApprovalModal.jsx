@@ -24,9 +24,9 @@ export default function GestaoNCApprovalModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white/95 backdrop-blur-lg border-white/20">
+      <DialogContent className="bg-card/95 backdrop-blur-lg border-white/20">
         <DialogHeader>
-          <DialogTitle className="text-[#00233B]">
+          <DialogTitle className="text-foreground">
             {isApprove ? "Aprovar NC" : "Reprovar NC"}
           </DialogTitle>
           <DialogDescription>
@@ -38,7 +38,7 @@ export default function GestaoNCApprovalModal({
 
         {!isApprove && (
           <div className="space-y-2">
-            <label htmlFor="rejection_reason" className="text-sm font-medium text-[#00233B]">
+            <label htmlFor="rejection_reason" className="text-sm font-medium text-foreground">
               Motivo da reprovação *
             </label>
             <Textarea
@@ -46,7 +46,7 @@ export default function GestaoNCApprovalModal({
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               placeholder="Descreva o motivo da reprovação..."
-              className="min-h-[100px] bg-white/50 border-white/30 text-[#00233B]"
+              className="min-h-[100px] bg-card/50 border-white/30 text-foreground"
             />
           </div>
         )}
@@ -55,7 +55,7 @@ export default function GestaoNCApprovalModal({
           <Button
             variant="outline"
             onClick={onCancel}
-            className="border-white/30 text-[#00233B]"
+            className="border-white/30 text-foreground"
           >
             Cancelar
           </Button>
@@ -64,7 +64,7 @@ export default function GestaoNCApprovalModal({
             className={
               isApprove
                 ? "bg-green-600 hover:bg-green-700 text-white"
-                : "bg-red-600 hover:bg-red-700 text-white"
+                : "bg-destructive hover:bg-destructive/90 text-destructive-foreground"
             }
           >
             {isApprove ? "Confirmar Aprovação" : "Confirmar Reprovação"}

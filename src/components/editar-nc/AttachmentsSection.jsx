@@ -23,22 +23,22 @@ export default function AttachmentsSection({
   };
 
   return (
-    <Card className="bg-white/20 backdrop-blur-lg border border-white/20">
+    <Card className="bg-card/20 backdrop-blur-lg border border-white/20">
       <CardHeader>
-        <CardTitle className="text-[#00233B] text-base bg-[#BFCF99]/30 px-3 py-1 rounded">
+        <CardTitle className="text-foreground text-base bg-secondary/20/30 px-3 py-1 rounded">
           ANEXOS
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Fotos */}
         <div>
-          <Label className="text-[#00233B] mb-2 block">Fotos</Label>
+          <Label className="text-foreground mb-2 block">Fotos</Label>
           <label className="flex items-center gap-2 cursor-pointer w-fit">
             <Button
               asChild
               variant="outline"
               size="sm"
-              className="border-white/20 text-[#00233B]"
+              className="border-white/20 text-foreground"
               disabled={uploadingFotos}
             >
               <span>
@@ -91,13 +91,13 @@ export default function AttachmentsSection({
 
         {/* PDFs */}
         <div>
-          <Label className="text-[#00233B] mb-2 block">PDFs</Label>
+          <Label className="text-foreground mb-2 block">PDFs</Label>
           <label className="flex items-center gap-2 cursor-pointer w-fit">
             <Button
               asChild
               variant="outline"
               size="sm"
-              className="border-white/20 text-[#00233B]"
+              className="border-white/20 text-foreground"
               disabled={uploadingPdfs}
             >
               <span>
@@ -128,7 +128,7 @@ export default function AttachmentsSection({
               {pdfs.map((pdf, i) => (
                 <li
                   key={i}
-                  className="flex items-center gap-2 text-sm text-[#00233B] bg-white/30 rounded px-3 py-2"
+                  className="flex items-center gap-2 text-sm text-foreground bg-card/30 rounded px-3 py-2"
                 >
                   <FileUp className="w-4 h-4 text-[#BFCF99] shrink-0" />
                   <span className="flex-1 truncate">{pdf.nome}</span>
@@ -137,7 +137,7 @@ export default function AttachmentsSection({
                     onClick={() =>
                       setPdfs((prev) => removePdfByIndex(prev, i))
                     }
-                    className="text-red-500 hover:text-red-700"
+                    className="text-red-500 hover:text-destructive"
                   >
                     <X className="w-4 h-4" />
                   </button>

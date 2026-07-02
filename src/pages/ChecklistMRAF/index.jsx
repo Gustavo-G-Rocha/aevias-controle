@@ -47,20 +47,20 @@ export default function ChecklistMRAFPage() {
             </CardDescription>
 
             {formData.status === 'rascunho' && (
-              <div className="mt-4 flex items-start gap-3 p-4 bg-blue-600 border border-blue-700 rounded-lg">
-                <AlertTriangle className="w-5 h-5 text-white mt-0.5 shrink-0" />
+              <div className="mt-4 flex items-start gap-3 p-4 bg-secondary/10 border border-secondary/30 rounded-lg">
+                <AlertTriangle className="w-5 h-5 text-secondary mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-semibold text-white">Em Rascunho</p>
-                  <p className="text-sm text-white/90">Este registro ainda está em edição e não será visível aos gestores até que você o finalize.</p>
+                  <p className="font-semibold text-secondary">Em Rascunho</p>
+                  <p className="text-sm text-muted-foreground">Este registro ainda está em edição e não será visível aos gestores até que você o finalize.</p>
                 </div>
               </div>
             )}
             {editingChecklist?.rejection_reason && (
-              <div className="mt-4 flex items-start gap-3 p-4 bg-red-600 border border-red-700 rounded-lg">
-                <AlertTriangle className="w-5 h-5 text-white mt-0.5 shrink-0" />
+              <div className="mt-4 flex items-start gap-3 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <AlertTriangle className="w-5 h-5 text-destructive mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-semibold text-white">Motivo da Reprovação:</p>
-                  <p className="text-sm text-white/90">{editingChecklist.rejection_reason}</p>
+                  <p className="font-semibold text-destructive">Motivo da Reprovação:</p>
+                  <p className="text-sm text-muted-foreground">{editingChecklist.rejection_reason}</p>
                 </div>
               </div>
             )}
@@ -117,8 +117,8 @@ export default function ChecklistMRAFPage() {
                 <Textarea value={formData.observacoes_gerais} onChange={(e) => handleChange('observacoes_gerais', e.target.value)}
                   disabled={!isEditable || isApproved} rows={4} maxLength={1000}
                   placeholder="Observações gerais sobre a aplicação..."
-                  className="bg-white border-slate-200 text-slate-700 text-base" />
-                <p className="text-sm text-right text-slate-600 mt-1">{formData.observacoes_gerais?.length || 0} / 1000 caracteres</p>
+                  className="text-base" />
+                <p className="text-sm text-right text-muted-foreground mt-1">{formData.observacoes_gerais?.length || 0} / 1000 caracteres</p>
               </div>
 
               <AcoesCorretivasNC
@@ -140,9 +140,9 @@ export default function ChecklistMRAFPage() {
                     <Input id="fotos" type="file" multiple accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                       onChange={handleFileChange} disabled={loadingUpload} className="hidden" />
                     <Label htmlFor="fotos"
-                      className={`flex items-center justify-between w-full h-12 px-4 py-3 border border-slate-200 bg-white rounded-md text-base cursor-pointer hover:bg-slate-50 ${loadingUpload ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                      <span className="truncate text-slate-700">{selectedFileNames}</span>
-                      <span className="flex-shrink-0 ml-4 px-4 py-2 text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">
+                      className={`flex items-center justify-between w-full h-12 px-4 py-3 border border-input bg-background rounded-md text-base cursor-pointer hover:bg-muted ${loadingUpload ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                      <span className="truncate text-muted-foreground">{selectedFileNames}</span>
+                      <span className="flex-shrink-0 ml-4 px-4 py-2 text-sm font-semibold bg-muted text-muted-foreground hover:bg-muted/80">
                         {loadingUpload ? 'Enviando...' : 'Escolher Ficheiros'}
                       </span>
                     </Label>
@@ -158,7 +158,7 @@ export default function ChecklistMRAFPage() {
                           {progress.status === 'success' && <CheckCircle className="w-3 h-3 text-green-500" />}
                           {progress.status === 'error' && <XCircle className="w-3 h-3 text-red-500" />}
                         </span>
-                        <span className={progress.status === 'error' ? 'text-red-700' : 'text-slate-700'}>
+                        <span className={progress.status === 'error' ? 'text-destructive' : 'text-muted-foreground'}>
                           {progress.fileName} - {progress.status === 'pending' && 'Aguardando'}
                           {progress.status === 'uploading' && 'Enviando...'}
                           {progress.status === 'success' && 'Sucesso'}
@@ -173,7 +173,7 @@ export default function ChecklistMRAFPage() {
                     <div key={index} className="relative group">
                       <picture>
                         <source srcSet={url} />
-                        <img src={url} alt={`Foto ${index + 1}`} className="w-full h-32 object-cover rounded-md border border-slate-200" loading="lazy" width="auto" height="128" />
+                        <img src={url} alt={`Foto ${index + 1}`} className="w-full h-32 object-cover rounded-md border border-border" loading="lazy" width="auto" height="128" />
                       </picture>
                       {isEditable && !isApproved && (
                         <Button type="button" variant="destructive" size="icon"

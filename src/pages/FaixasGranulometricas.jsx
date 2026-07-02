@@ -86,7 +86,7 @@ export default function FaixasGranulometricasPage() {
               if (!isOpen) setEditingFaixa(null);
             }}>
               <DialogTrigger asChild>
-                <Button className="bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90">
+                <Button className="bg-muted text-[#F2F1EF] hover:bg-muted/90">
                   <Plus className="w-4 h-4 mr-2" />
                   Nova Faixa
                 </Button>
@@ -116,7 +116,7 @@ export default function FaixasGranulometricasPage() {
                   placeholder="Pesquisar faixas granulométricas..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 focus:border-[#BFCF99] focus:ring-[#BFCF99]"
+                  className="pl-10 focus:border-secondary/30 focus:ring-[#BFCF99]"
                 />
               </div>
               <Select value={tipoFilter} onValueChange={setTipoFilter}>
@@ -127,7 +127,7 @@ export default function FaixasGranulometricasPage() {
                   <SelectItem value="all">Todos os tipos</SelectItem>
                   <SelectItem value="CAUQ">
                     <div className="flex items-center gap-2">
-                      <Badge className="bg-blue-500">CAUQ</Badge>
+                      <Badge className="bg-primary/100">CAUQ</Badge>
                     </div>
                   </SelectItem>
                   <SelectItem value="MRAF">
@@ -142,7 +142,7 @@ export default function FaixasGranulometricasPage() {
                   </SelectItem>
                   <SelectItem value="CAMADAS_GRANULARES">
                     <div className="flex items-center gap-2">
-                      <Badge className="bg-orange-500">CAMADAS GRANULARES</Badge>
+                      <Badge className="bg-card0">CAMADAS GRANULARES</Badge>
                     </div>
                   </SelectItem>
                 </SelectContent>
@@ -184,7 +184,7 @@ export default function FaixasGranulometricasPage() {
                     <Badge className={
                       faixa.status === 'ativo' 
                         ? "bg-green-200/50 text-green-800" 
-                        : "bg-red-200/50 text-red-800"
+                        : "bg-red-200/50 text-destructive"
                     }>
                       {faixa.status || 'ativo'}
                     </Badge>
@@ -198,7 +198,7 @@ export default function FaixasGranulometricasPage() {
                         <Button variant="ghost" size="sm" onClick={() => handleEdit(faixa)} className="text-foreground">
                           <Edit className="w-4 h-4 mr-1 text-[#BFCF99]" /> Editar
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDelete(faixa.id, loadData)} className="text-red-500 hover:text-red-700 hover:bg-red-500/10">
+                        <Button variant="ghost" size="sm" onClick={() => handleDelete(faixa.id, loadData)} className="text-red-500 hover:text-destructive hover:bg-red-500/10">
                           <Trash2 className="w-4 h-4 mr-1" /> Excluir
                         </Button>
                       </>

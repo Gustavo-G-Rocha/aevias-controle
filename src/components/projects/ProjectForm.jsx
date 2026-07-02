@@ -295,11 +295,11 @@ export default function ProjectForm({ project, faixas, regionais, user, onSave, 
         </>
       )}
 
-      <div className="flex justify-end gap-3 pt-4 sticky bottom-0 bg-white border-t p-4 -mx-2">
+      <div className="flex justify-end gap-3 pt-4 sticky bottom-0 bg-card border-t p-4 -mx-2">
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
         </Button>
-        <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+        <Button type="submit" className="">
           Salvar Projeto
         </Button>
       </div>

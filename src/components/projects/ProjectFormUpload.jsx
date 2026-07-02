@@ -64,24 +64,24 @@ export default function ProjectFormUpload({
   if (!shouldShow) return null;
 
   return (
-    <div className="p-4 border-2 border-dashed border-[#BFCF99] rounded-lg bg-[#BFCF99]/5">
+    <div className="p-4 border-2 border-dashed border-secondary/30 rounded-lg bg-secondary/20/5">
       <div className="flex items-start gap-3 mb-3">
-        <Sparkles className="w-5 h-5 text-[#00233B] mt-1" />
+        <Sparkles className="w-5 h-5 text-foreground mt-1" />
         <div className="flex-1">
-          <h3 className="font-semibold text-[#00233B] mb-1">
+          <h3 className="font-semibold text-foreground mb-1">
             Agente de IA - Preenchimento Automático
           </h3>
-          <p className="text-sm text-[#00233B]/80 mb-3">
+          <p className="text-sm text-foreground/80 mb-3">
             Faça upload de um arquivo do projeto (PDF, imagem, documento) e deixe a IA preencher os parâmetros automaticamente.
           </p>
 
           {isExtracting ? (
-            <div className="flex items-center gap-2 text-[#00233B]">
+            <div className="flex items-center gap-2 text-foreground">
               <Loader2 className="w-4 h-4 animate-spin" />
               <span className="text-sm">Analisando arquivo e extraindo dados...</span>
             </div>
           ) : (
-            <label className="inline-flex items-center gap-2 px-4 py-2 bg-[#00233B] text-[#F2F1EF] rounded-lg cursor-pointer hover:bg-[#00233B]/90 transition-colors">
+            <label className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-[#F2F1EF] rounded-lg cursor-pointer hover:bg-muted/90 transition-colors">
               <FileUp className="w-4 h-4" />
               <span className="text-sm font-medium">Escolher Arquivo do Projeto</span>
               <input
@@ -102,7 +102,7 @@ export default function ProjectFormUpload({
           )}
 
           {extractionError && (
-            <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-800">
+            <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-destructive">
               {extractionError}
             </div>
           )}

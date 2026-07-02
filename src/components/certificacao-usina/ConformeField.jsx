@@ -33,7 +33,7 @@ export default function ConformeField({
           disabled={disabled}
           className="accent-red-600"
         />
-        <span className="text-red-700 font-medium">{opcao2}</span>
+        <span className="text-destructive font-medium">{opcao2}</span>
       </label>
     </div>
   );

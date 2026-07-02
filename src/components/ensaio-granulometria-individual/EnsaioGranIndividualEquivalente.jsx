@@ -7,7 +7,7 @@ export default function EnsaioGranIndividualEquivalente({
   equivalente_areia, isEditable, isApproved, onMedicaoChange,
 }) {
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader>
         <CardTitle className="text-lg">Equivalente de Areia</CardTitle>
         <CardDescription>DNIT 450/2024</CardDescription>

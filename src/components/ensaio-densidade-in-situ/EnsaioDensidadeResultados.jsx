@@ -12,7 +12,7 @@ function FuroCard({ furo, index, isEditable, substituicao_retido_3_4, onFuroChan
         <div className="flex justify-between items-center">
           <CardTitle className="text-base">Furo {furo.numero}</CardTitle>
           {isEditable && podeRemover && (
-            <Button type="button" variant="ghost" size="sm" onClick={onRemover} className="text-red-500 hover:text-red-700">
+            <Button type="button" variant="ghost" size="sm" onClick={onRemover} className="text-red-500 hover:text-destructive">
               <Trash2 className="w-4 h-4" />
             </Button>
           )}

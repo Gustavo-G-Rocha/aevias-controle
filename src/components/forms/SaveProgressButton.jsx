@@ -12,7 +12,7 @@ export default function SaveProgressButton({
   disabled = false,
   label = "Salvar Progresso",
   savingLabel = "Salvando...",
-  className = "bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90"
+  className = "bg-muted text-[#F2F1EF] hover:bg-muted/90"
 }) {
   return (
     <Button

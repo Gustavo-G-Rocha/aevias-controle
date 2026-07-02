@@ -58,20 +58,20 @@ export default function NaoConformidadesForm({
       </div>
 
       {naoConformidades.length === 0 ? (
-        <p className="text-sm text-slate-500 italic">Nenhuma não conformidade registrada.</p>
+        <p className="text-sm text-muted-foreground italic">Nenhuma não conformidade registrada.</p>
       ) : (
         <div className="space-y-4">
           {naoConformidades.map((nc, index) => (
             <div key={index} className="p-4 border-2 border-red-200 rounded-lg bg-red-50/50 space-y-3">
               <div className="flex items-center justify-between mb-2">
-                <Label className="text-sm font-semibold text-red-800">NC #{index + 1}</Label>
+                <Label className="text-sm font-semibold text-destructive">NC #{index + 1}</Label>
                 {!disabled && (
                   <Button
                     type="button"
                     size="sm"
                     variant="ghost"
                     onClick={() => handleRemoveNC(index)}
-                    className="h-7 text-red-600 hover:text-red-700 hover:bg-red-100"
+                    className="h-7 text-destructive hover:text-destructive hover:bg-red-100"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -86,7 +86,7 @@ export default function NaoConformidadesForm({
                     value={nc.local_nc || ""}
                     onChange={(e) => handleNCChange(index, 'local_nc', e.target.value)}
                     disabled={disabled || locaisPermitidos.length === 1}
-                    className="flex h-9 w-full rounded-md border border-input bg-white px-2 py-1 text-sm disabled:opacity-50"
+                    className="flex h-9 w-full rounded-md border border-input bg-card px-2 py-1 text-sm disabled:opacity-50"
                   >
                     <option value="">Selecione</option>
                     {locaisPermitidos.map(local => (
@@ -102,7 +102,7 @@ export default function NaoConformidadesForm({
                     value={nc.categoria_nc || ""}
                     onChange={(e) => handleNCChange(index, 'categoria_nc', e.target.value)}
                     disabled={disabled || !nc.local_nc}
-                    className="flex h-9 w-full rounded-md border border-input bg-white px-2 py-1 text-sm disabled:opacity-50"
+                    className="flex h-9 w-full rounded-md border border-input bg-card px-2 py-1 text-sm disabled:opacity-50"
                   >
                     <option value="">Selecione</option>
                     {getCategoriasByLocal(nc.local_nc).map(cat => (
@@ -119,7 +119,7 @@ export default function NaoConformidadesForm({
                       value={nc.parametro_nc || ""}
                       onChange={(e) => handleNCChange(index, 'parametro_nc', e.target.value)}
                       disabled={disabled || !nc.categoria_nc}
-                      className="flex h-9 w-full rounded-md border border-input bg-white px-2 py-1 text-sm disabled:opacity-50"
+                      className="flex h-9 w-full rounded-md border border-input bg-card px-2 py-1 text-sm disabled:opacity-50"
                     >
                       <option value="">Selecione</option>
                       {getParametrosByLocalCategoria(nc.local_nc, nc.categoria_nc).map(param => (
@@ -133,7 +133,7 @@ export default function NaoConformidadesForm({
                       onChange={(e) => handleNCChange(index, 'parametro_nc', e.target.value)}
                       disabled={disabled || !nc.categoria_nc}
                       placeholder="Digite o parâmetro..."
-                      className="flex h-9 w-full rounded-md border border-input bg-white px-2 py-1 text-sm disabled:opacity-50"
+                      className="flex h-9 w-full rounded-md border border-input bg-card px-2 py-1 text-sm disabled:opacity-50"
                     />
                   )}
                 </div>

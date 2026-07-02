@@ -23,7 +23,7 @@ export default function ProjectFormGranular({
             value={formData.melhorador_utilizado || ''}
             onChange={(e) => onInputChange('melhorador_utilizado', e.target.value)}
           />
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Ex: Cimento, cal, betume, etc.
           </p>
         </div>

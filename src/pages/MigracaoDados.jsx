@@ -167,7 +167,7 @@ export default function MigracaoDados() {
             </div>
 
             {resultadoRemocao && (
-              <div className={`p-3 rounded-lg border text-sm ${resultadoRemocao.success ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
+              <div className={`p-3 rounded-lg border text-sm ${resultadoRemocao.success ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-destructive'}`}>
                 {resultadoRemocao.success ? (
                   resultadoRemocao.regionais.length > 0 ? (
                     <>
@@ -194,7 +194,7 @@ export default function MigracaoDados() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button onClick={handleRunMigration} className="w-full sm:w-auto bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90">
+              <Button onClick={handleRunMigration} className="w-full sm:w-auto bg-muted text-[#F2F1EF] hover:bg-muted/90">
                 <DatabaseZap className="w-4 h-4 mr-2 text-[#BFCF99]" />
                 Executar Migração
               </Button>

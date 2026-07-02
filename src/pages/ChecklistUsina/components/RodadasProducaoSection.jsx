@@ -36,7 +36,7 @@ export default function RodadasProducaoSection({
                 {canEdit && rodadas.length > 1 && (
                   <Button type="button" variant="ghost" size="sm"
                     onClick={() => onRemoverRodada(index)}
-                    className="text-red-500 hover:text-red-700">
+                    className="text-red-500 hover:text-destructive">
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 )}

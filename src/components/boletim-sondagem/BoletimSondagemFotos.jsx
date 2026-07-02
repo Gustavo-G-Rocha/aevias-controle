@@ -10,7 +10,7 @@ export default function BoletimSondagemFotos({ fotos, isEditable, uploadingPhoto
       {isEditable && (
         <div className="mt-2">
           <input id="fotos-upload" type="file" multiple accept="image/*" onChange={onUpload} disabled={uploadingPhoto} className="hidden" />
-          <label htmlFor="fotos-upload" className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-border bg-muted/20 rounded-md text-sm cursor-pointer hover:bg-white/50 ${uploadingPhoto ? 'opacity-50 cursor-not-allowed' : ''}`}>
+          <label htmlFor="fotos-upload" className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-border bg-muted/20 rounded-md text-sm cursor-pointer hover:bg-card/50 ${uploadingPhoto ? 'opacity-50 cursor-not-allowed' : ''}`}>
             <span className="text-muted-foreground/70">{uploadingPhoto ? 'Enviando...' : 'Selecionar fotos'}</span>
             <span className="px-3 py-1 rounded-md text-sm font-semibold bg-muted text-muted-foreground hover:bg-muted/70">
               {uploadingPhoto ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Escolher Ficheiros'}

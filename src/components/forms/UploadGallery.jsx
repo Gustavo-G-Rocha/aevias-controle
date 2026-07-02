@@ -53,9 +53,9 @@ export default function UploadGallery({
           />
           <Label
             htmlFor={inputId}
-            className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm cursor-pointer hover:bg-slate-50 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm cursor-pointer hover:bg-muted/30 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
           >
-            <span className="truncate text-slate-500">{fileNames}</span>
+            <span className="truncate text-muted-foreground">{fileNames}</span>
             <span className="flex-shrink-0 ml-4 px-3 py-1 rounded-md text-sm font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100">
               {loading ? "Enviando..." : "Escolher Ficheiros"}
             </span>
@@ -78,7 +78,7 @@ export default function UploadGallery({
                 {p.status === "success" && <CheckCircle className="w-3 h-3 text-green-500" />}
                 {p.status === "error" && <XCircle className="w-3 h-3 text-red-500" />}
               </span>
-              <span className={p.status === "error" ? "text-red-600" : "text-gray-600"}>
+              <span className={p.status === "error" ? "text-destructive" : "text-gray-600"}>
                 {p.fileName} —{" "}
                 {p.status === "pending" && "Aguardando"}
                 {p.status === "uploading" && "Enviando..."}
@@ -123,7 +123,7 @@ export default function UploadGallery({
                 const fotoNormalizada = normalizarFoto(foto);
                 return (
                   <div key={`legenda-${i}`} className="flex flex-col gap-1">
-                    <label htmlFor={`legenda-${i}`} className="text-sm font-medium text-slate-700">
+                    <label htmlFor={`legenda-${i}`} className="text-sm font-medium text-foreground">
                       Legenda da Foto {i + 1}
                     </label>
                     <input

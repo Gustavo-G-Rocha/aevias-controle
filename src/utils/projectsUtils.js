@@ -112,8 +112,8 @@ export const canManageProjects = (userAccessLevel) => {
  * Status color mapping
  */
 export const STATUS_COLORS = {
-  ativo: "bg-[#566E3D]/30 text-[#00233B]",
-  inativo: "bg-red-400/20 text-red-800",
+  ativo: "bg-[#566E3D]/30 text-foreground",
+  inativo: "bg-red-400/20 text-destructive",
   pausado: "bg-yellow-400/20 text-yellow-800",
 };
 
@@ -121,10 +121,10 @@ export const STATUS_COLORS = {
  * Project type color mapping
  */
 export const TIPO_PROJETO_COLORS = {
-  CAUQ: "bg-[#00233B] text-white",
+  CAUQ: "bg-muted text-white",
   MRAF: "bg-[#566E3D] text-white",
   BGS: "bg-purple-500 text-white",
-  CARTA_TRACO_CONCRETO: "bg-orange-500 text-white",
+  CARTA_TRACO_CONCRETO: "bg-card0 text-white",
   CAMADAS_GRANULARES: "bg-amber-500 text-white",
 };
 

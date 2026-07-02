@@ -42,7 +42,7 @@ export const NovaSolicitacaoDialog = React.memo(({ isOpen, onClose, onSubmit, re
         <form onSubmit={handleSubmit} className="space-y-4">
           {regionalAtual && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <p className="text-sm text-blue-800">
+              <p className="text-sm text-secondary">
                 <strong>Regional Atual:</strong> {regionalAtual.nome}
               </p>
             </div>
@@ -55,7 +55,7 @@ export const NovaSolicitacaoDialog = React.memo(({ isOpen, onClose, onSubmit, re
               value={formData.regional_destino_id}
               onChange={(e) => setFormData(prev => ({ ...prev, regional_destino_id: e.target.value }))}
               required
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+              className="flex h-10 w-full rounded-md border border-border bg-card px-3 py-2 text-sm"
             >
               <option value="">Selecione a regional de destino</option>
               {regionaisDisponiveis.map(regional => (
@@ -77,14 +77,14 @@ export const NovaSolicitacaoDialog = React.memo(({ isOpen, onClose, onSubmit, re
               required
               maxLength="500"
             />
-            <p className="text-xs text-right text-slate-500 mt-1">
+            <p className="text-xs text-right text-muted-foreground mt-1">
               {formData.motivo.length} / 500
             </p>
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onClose(false)}>Cancelar</Button>
-            <Button type="submit" className="bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90">
+            <Button type="submit" className="bg-muted text-[#F2F1EF] hover:bg-muted/90">
               Enviar Solicitação
             </Button>
           </DialogFooter>

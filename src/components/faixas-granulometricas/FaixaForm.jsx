@@ -57,7 +57,7 @@ const FaixaForm = React.memo(({ faixa: editingFaixa, onSave, onCancel }) => {
   }, [faixa, onSave]);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 text-[#00233B]">
+    <form onSubmit={handleSubmit} className="space-y-6 text-foreground">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="tipo">Tipo *</Label>
@@ -86,7 +86,7 @@ const FaixaForm = React.memo(({ faixa: editingFaixa, onSave, onCancel }) => {
               </SelectItem>
               <SelectItem value="CAMADAS_GRANULARES">
                 <div className="flex items-center gap-2">
-                  <Badge className="bg-orange-500">CAMADAS GRANULARES</Badge>
+                  <Badge className="bg-card0">CAMADAS GRANULARES</Badge>
                   <span>Camadas Granulares</span>
                 </div>
               </SelectItem>
@@ -101,7 +101,7 @@ const FaixaForm = React.memo(({ faixa: editingFaixa, onSave, onCancel }) => {
             onChange={(e) => handleInputChange("nome", e.target.value)}
             placeholder="Ex: Faixa III, Faixa B"
             required
-            className="bg-transparent border-white/20 placeholder:text-[#00233B]/60 focus:border-[#BFCF99] focus:ring-[#BFCF99]"
+            className="bg-transparent border-white/20 placeholder:text-foreground/60 focus:border-secondary/30 focus:ring-[#BFCF99]"
           />
         </div>
         <div>
@@ -112,7 +112,7 @@ const FaixaForm = React.memo(({ faixa: editingFaixa, onSave, onCancel }) => {
             onChange={(e) => handleInputChange("especificacao", e.target.value)}
             placeholder="Ex: ES-P 14/05, DNIT 031/2006"
             required
-            className="bg-transparent border-white/20 placeholder:text-[#00233B]/60 focus:border-[#BFCF99] focus:ring-[#BFCF99]"
+            className="bg-transparent border-white/20 placeholder:text-foreground/60 focus:border-secondary/30 focus:ring-[#BFCF99]"
           />
         </div>
         <div>
@@ -123,7 +123,7 @@ const FaixaForm = React.memo(({ faixa: editingFaixa, onSave, onCancel }) => {
             onChange={(e) => handleInputChange("orgao", e.target.value)}
             placeholder="Ex: DER/PR, DNIT, ABNT"
             required
-            className="bg-transparent border-white/20 placeholder:text-[#00233B]/60 focus:border-[#BFCF99] focus:ring-[#BFCF99]"
+            className="bg-transparent border-white/20 placeholder:text-foreground/60 focus:border-secondary/30 focus:ring-[#BFCF99]"
           />
         </div>
         <div>
@@ -160,7 +160,7 @@ const FaixaForm = React.memo(({ faixa: editingFaixa, onSave, onCancel }) => {
                 value={peneira.min}
                 onChange={(e) => handlePeneiraChange(index, "min", e.target.value)}
                 required
-                className="bg-transparent border-white/20 placeholder:text-[#00233B]/60 focus:border-[#BFCF99] focus:ring-[#BFCF99]"
+                className="bg-transparent border-white/20 placeholder:text-foreground/60 focus:border-secondary/30 focus:ring-[#BFCF99]"
               />
               <Input
                 type="number"
@@ -169,7 +169,7 @@ const FaixaForm = React.memo(({ faixa: editingFaixa, onSave, onCancel }) => {
                 value={peneira.max}
                 onChange={(e) => handlePeneiraChange(index, "max", e.target.value)}
                 required
-                className="bg-transparent border-white/20 placeholder:text-[#00233B]/60 focus:border-[#BFCF99] focus:ring-[#BFCF99]"
+                className="bg-transparent border-white/20 placeholder:text-foreground/60 focus:border-secondary/30 focus:ring-[#BFCF99]"
               />
               <Button type="button" variant="ghost" size="icon" onClick={() => removePeneira(index)} className="text-red-500 hover:bg-red-500/10">
                 <Trash2 className="w-4 h-4" />
@@ -177,14 +177,14 @@ const FaixaForm = React.memo(({ faixa: editingFaixa, onSave, onCancel }) => {
             </div>
           ))}
         </div>
-        <Button type="button" onClick={addPeneira} variant="outline" className="mt-4 hover:bg-black/10 text-[#00233B] border-white/20">
+        <Button type="button" onClick={addPeneira} variant="outline" className="mt-4 hover:bg-black/10 text-foreground border-white/20">
           <Plus className="w-4 h-4 mr-2" /> Adicionar Peneira
         </Button>
       </div>
 
       <DialogFooter>
-        <Button type="button" variant="outline" onClick={onCancel} className="hover:bg-black/10 border-white/20 text-[#00233B]">Cancelar</Button>
-        <Button type="submit" className="bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90">
+        <Button type="button" variant="outline" onClick={onCancel} className="hover:bg-black/10 border-white/20 text-foreground">Cancelar</Button>
+        <Button type="submit" className="bg-muted text-[#F2F1EF] hover:bg-muted/90">
           <Save className="w-4 h-4 mr-2 text-[#BFCF99]" />
           Salvar
         </Button>

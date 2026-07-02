@@ -60,7 +60,7 @@ export default function ControleCauqSection({
   ];
 
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader>
         <CardTitle className="text-lg">Controle de CAUQ</CardTitle>
       </CardHeader>
@@ -68,18 +68,18 @@ export default function ControleCauqSection({
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-slate-100">
-                <th className="border border-slate-300 px-2 py-2 text-sm text-left">Ensaio</th>
-                <th className="border border-slate-300 px-2 py-2 text-sm">Realizado</th>
-                <th className="border border-slate-300 px-2 py-2 text-sm">Qtde</th>
-                <th className="border border-slate-300 px-2 py-2 text-sm">Resultado(s)</th>
-                <th className="border border-slate-300 px-2 py-2 text-sm">Padrão do Projeto</th>
-                <th className="border border-slate-300 px-1 text-xs text-center" colSpan="2">Conformidade</th>
+              <tr className="bg-muted">
+                <th className="border border-border px-2 py-2 text-sm text-left">Ensaio</th>
+                <th className="border border-border px-2 py-2 text-sm">Realizado</th>
+                <th className="border border-border px-2 py-2 text-sm">Qtde</th>
+                <th className="border border-border px-2 py-2 text-sm">Resultado(s)</th>
+                <th className="border border-border px-2 py-2 text-sm">Padrão do Projeto</th>
+                <th className="border border-border px-1 text-xs text-center" colSpan="2">Conformidade</th>
               </tr>
-              <tr className="bg-slate-100">
+              <tr className="bg-muted">
                 <th colSpan="5"></th>
-                <th className="border border-slate-300 px-2 py-1 text-xs text-center">✓</th>
-                <th className="border border-slate-300 px-2 py-1 text-xs text-center">✗</th>
+                <th className="border border-border px-2 py-1 text-xs text-center">✓</th>
+                <th className="border border-border px-2 py-1 text-xs text-center">✗</th>
               </tr>
             </thead>
             <tbody className="text-sm">
@@ -100,8 +100,8 @@ export default function ControleCauqSection({
                 
                 return (
                   <tr key={ensaio.key}>
-                    <td className="border border-slate-300 px-2 py-2 font-medium">{ensaio.label}</td>
-                    <td className="border border-slate-300 px-2 py-1 text-center">
+                    <td className="border border-border px-2 py-2 font-medium">{ensaio.label}</td>
+                    <td className="border border-border px-2 py-1 text-center">
                       {('realizado' in (formData.controle_cauq[ensaio.key] ?? {})) && (
                        <input
                          type="checkbox"
@@ -112,7 +112,7 @@ export default function ControleCauqSection({
                        />
                       )}
                     </td>
-                    <td className="border border-slate-300 px-1 py-1">
+                    <td className="border border-border px-1 py-1">
                       {('quantidade' in (formData.controle_cauq[ensaio.key] ?? {})) && (
                         <Input
                           type="number"
@@ -126,7 +126,7 @@ export default function ControleCauqSection({
                         />
                       )}
                     </td>
-                    <td className="border border-slate-300 px-1 py-1">
+                    <td className="border border-border px-1 py-1">
                       {!ensaio.noResult && ('resultados' in (formData.controle_cauq[ensaio.key] ?? {})) && quantidade > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {Array.from({ length: quantidade }).map((_, resultIndex) => (
@@ -146,10 +146,10 @@ export default function ControleCauqSection({
                         </div>
                       ) : null}
                     </td>
-                    <td className={`border border-slate-300 px-2 py-1 text-center text-xs ${selectedProject ? 'bg-blue-50 text-blue-800' : 'bg-slate-100 text-slate-500'}`}>
+                    <td className={`border border-border px-2 py-1 text-center text-xs ${selectedProject ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
                       {ensaio.padrao}
                     </td>
-                    <td className="border border-slate-300 px-2 py-1 text-center">
+                    <td className="border border-border px-2 py-1 text-center">
                       {('conforme' in (formData.controle_cauq[ensaio.key] ?? {})) && !ensaio.noConformity ? (
                         <input
                           type="checkbox"
@@ -164,7 +164,7 @@ export default function ControleCauqSection({
                         />
                       ) : null}
                     </td>
-                    <td className="border border-slate-300 px-2 py-1 text-center">
+                    <td className="border border-border px-2 py-1 text-center">
                       {('conforme' in (formData.controle_cauq[ensaio.key] ?? {})) && !ensaio.noConformity ? (
                         <input
                           type="checkbox"

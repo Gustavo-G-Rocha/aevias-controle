@@ -63,7 +63,7 @@ export default function SecaoFotos({
                     {p.status === "success" && <CheckCircle className="w-3 h-3 text-green-500" />}
                     {p.status === "error" && <XCircle className="w-3 h-3 text-red-500" />}
                   </span>
-                  <span className={p.status === "error" ? "text-red-600" : "text-gray-600"}>
+                  <span className={p.status === "error" ? "text-destructive" : "text-gray-600"}>
                     {p.fileName} —{" "}
                     {p.status === "pending" && "Aguardando"}
                     {p.status === "uploading" && "Enviando..."}

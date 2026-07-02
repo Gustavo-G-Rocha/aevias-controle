@@ -77,7 +77,7 @@ export function MarcaDiaDialog({ open, dia, onSave, onClose }) {
             <Button
               variant="secondary"
               onClick={() => onSave('N/A')}
-              className="bg-blue-400 hover:bg-blue-500 text-white"
+              className="bg-blue-400 hover:bg-muted/300 text-white"
             >
               N/A
             </Button>

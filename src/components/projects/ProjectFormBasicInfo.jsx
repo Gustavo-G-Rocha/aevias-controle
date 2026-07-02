@@ -50,7 +50,7 @@ export default function ProjectFormBasicInfo({
               </SelectItem>
               <SelectItem value="CARTA_TRACO_CONCRETO">
                 <div className="flex items-center gap-2">
-                  <Badge className="bg-orange-500">CARTA TRAÇO</Badge>
+                  <Badge className="bg-card0">CARTA TRAÇO</Badge>
                   <span>Carta Traço de Concreto</span>
                 </div>
               </SelectItem>
@@ -63,7 +63,7 @@ export default function ProjectFormBasicInfo({
             </SelectContent>
           </Select>
           {!!project && (
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               O tipo de projeto não pode ser alterado após a criação
             </p>
           )}
@@ -84,7 +84,7 @@ export default function ProjectFormBasicInfo({
                 {regionaisFiltradas.map(regional => (
                   <SelectItem key={regional.id} value={regional.id}>
                     <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="bg-[#BFCF99]/30 text-[#00233B]">
+                      <Badge variant="secondary" className="bg-secondary/20/30 text-foreground">
                         {regional.codigo}
                       </Badge>
                       <span>{regional.nome}</span>
@@ -93,7 +93,7 @@ export default function ProjectFormBasicInfo({
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Selecione a regional à qual este projeto será vinculado
             </p>
           </div>

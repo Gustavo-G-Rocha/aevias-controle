@@ -10,7 +10,7 @@ export default function ProjectsFiltersBar({
   onTipoChange,
 }) {
   return (
-    <Card className="mb-6 bg-white/20 backdrop-blur-lg border border-white/20">
+    <Card className="mb-6 bg-card/20 backdrop-blur-lg border border-white/20">
       <CardContent className="p-4">
         <div className="flex flex-col md:flex-row gap-3">
           <div className="relative flex-1">
@@ -19,13 +19,13 @@ export default function ProjectsFiltersBar({
               placeholder="Pesquisar projetos..."
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10 bg-transparent border-white/20 placeholder:text-[#00233B]/60 focus:border-[#BFCF99] focus:ring-[#BFCF99] text-[#00233B]"
+              className="pl-10 bg-transparent border-white/20 placeholder:text-foreground/60 focus:border-secondary/30 focus:ring-[#BFCF99] text-foreground"
             />
           </div>
           <select
             value={tipoFilter}
             onChange={(e) => onTipoChange(e.target.value)}
-            className="h-10 rounded-md border border-white/20 bg-white/30 px-3 py-2 text-sm text-[#00233B] focus:outline-none focus:ring-1 focus:ring-[#BFCF99]"
+            className="h-10 rounded-md border border-white/20 bg-card/30 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-[#BFCF99]"
           >
             <option value="all">Todos os tipos</option>
             <option value="CAUQ">CAUQ</option>

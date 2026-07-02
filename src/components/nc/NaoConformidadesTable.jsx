@@ -45,7 +45,7 @@ export default function NaoConformidadesTable({ rncsVisiveis, cncsVisiveis, tabe
           <CardTitle className="text-foreground text-base flex items-center gap-2">
             <ClipboardList className="w-4 h-4 text-[#BFCF99]" />
             Ocorrências Detalhadas
-            {total > 0 && <Badge className="bg-[#BFCF99]/40 text-foreground text-xs ml-2">{total}</Badge>}
+            {total > 0 && <Badge className="bg-secondary/20/40 text-foreground text-xs ml-2">{total}</Badge>}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -88,7 +88,7 @@ export default function NaoConformidadesTable({ rncsVisiveis, cncsVisiveis, tabe
                   {displayRows.map((row, i) => (
                     <tr key={i} className="border-b border-border/50 hover:bg-muted/50 transition-colors">
                       <td className="py-2 px-3 whitespace-nowrap">
-                        <Badge className={row._kind === 'rnc' ? "bg-red-100 text-red-800 font-normal" : "bg-blue-100 text-blue-800 font-normal"}>
+                        <Badge className={row._kind === 'rnc' ? "bg-red-100 text-destructive font-normal" : "bg-blue-100 text-primary font-normal"}>
                           {row.tipoLabel}
                         </Badge>
                       </td>
@@ -134,7 +134,7 @@ export default function NaoConformidadesTable({ rncsVisiveis, cncsVisiveis, tabe
           <CardTitle className="text-foreground text-base flex items-center gap-2">
             <FileText className="w-4 h-4 text-[#BFCF99]" />
             Tabela Resumo de NCs por Obra
-            {hasActiveFilter && <Badge className="bg-[#BFCF99]/40 text-foreground text-xs ml-2">{tabelaResumo.length} obra(s)</Badge>}
+            {hasActiveFilter && <Badge className="bg-secondary/20/40 text-foreground text-xs ml-2">{tabelaResumo.length} obra(s)</Badge>}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -145,7 +145,7 @@ export default function NaoConformidadesTable({ rncsVisiveis, cncsVisiveis, tabe
                   <tr className="border-b border-border">
                     <th className="text-left py-2 px-3 text-foreground font-semibold text-xs uppercase tracking-wide">Obra</th>
                     <th className="text-center py-2 px-3 text-foreground font-semibold text-xs uppercase tracking-wide">Total RNC</th>
-                    <th className="text-center py-2 px-3 text-red-600 font-semibold text-xs uppercase tracking-wide">Abertas</th>
+                    <th className="text-center py-2 px-3 text-destructive font-semibold text-xs uppercase tracking-wide">Abertas</th>
                     <th className="text-center py-2 px-3 text-amber-600 font-semibold text-xs uppercase tracking-wide">Em Tratativa</th>
                     <th className="text-center py-2 px-3 text-green-600 font-semibold text-xs uppercase tracking-wide">Finalizadas</th>
                     <th className="text-center py-2 px-3 text-gray-500 font-semibold text-xs uppercase tracking-wide">Canceladas</th>
@@ -154,17 +154,17 @@ export default function NaoConformidadesTable({ rncsVisiveis, cncsVisiveis, tabe
                 </thead>
                 <tbody>
                   {tabelaResumo.map((row, i) => (
-                    <tr key={i} className={`border-b border-border/50 transition-colors cursor-pointer ${filtroObraId === row.obra.id ? 'bg-[#BFCF99]/20' : 'hover:bg-muted/50'}`} onClick={() => onObraClick({ obraId: row.obra.id })}>
+                    <tr key={i} className={`border-b border-border/50 transition-colors cursor-pointer ${filtroObraId === row.obra.id ? 'bg-secondary/20/20' : 'hover:bg-muted/50'}`} onClick={() => onObraClick({ obraId: row.obra.id })}>
                       <td className="py-2.5 px-3">
                         <p className="font-medium text-foreground">{row.obra.name}</p>
                         <p className="text-xs text-muted-foreground">{row.obra.code}</p>
                       </td>
                       <td className="text-center py-2.5 px-3 font-bold text-foreground">{row.totalRnc}</td>
-                      <td className="text-center py-2.5 px-3">{row.abertas > 0 ? <Badge className="bg-red-100 text-red-700">{row.abertas}</Badge> : <span className="text-muted-foreground/40">—</span>}</td>
+                      <td className="text-center py-2.5 px-3">{row.abertas > 0 ? <Badge className="bg-red-100 text-destructive">{row.abertas}</Badge> : <span className="text-muted-foreground/40">—</span>}</td>
                       <td className="text-center py-2.5 px-3">{row.emTratativa > 0 ? <Badge className="bg-amber-100 text-amber-700">{row.emTratativa}</Badge> : <span className="text-muted-foreground/40">—</span>}</td>
                       <td className="text-center py-2.5 px-3">{row.finalizadas > 0 ? <Badge className="bg-green-100 text-green-700">{row.finalizadas}</Badge> : <span className="text-muted-foreground/40">—</span>}</td>
-                      <td className="text-center py-2.5 px-3">{row.canceladas > 0 ? <Badge className="bg-gray-100 text-gray-600">{row.canceladas}</Badge> : <span className="text-muted-foreground/40">—</span>}</td>
-                      <td className="text-center py-2.5 px-3">{row.paramChecklist > 0 ? <Badge className="bg-blue-100 text-blue-700">{row.paramChecklist}</Badge> : <span className="text-muted-foreground/40">—</span>}</td>
+                      <td className="text-center py-2.5 px-3">{row.canceladas > 0 ? <Badge className="bg-muted text-gray-600">{row.canceladas}</Badge> : <span className="text-muted-foreground/40">—</span>}</td>
+                      <td className="text-center py-2.5 px-3">{row.paramChecklist > 0 ? <Badge className="bg-blue-100 text-primary">{row.paramChecklist}</Badge> : <span className="text-muted-foreground/40">—</span>}</td>
                     </tr>
                   ))}
                 </tbody>

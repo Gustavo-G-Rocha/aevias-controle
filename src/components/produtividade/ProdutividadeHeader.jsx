@@ -28,7 +28,7 @@ export default function ProdutividadeHeader({
             variant="outline"
             size="icon"
             onClick={onPreviousMonth}
-            className="border-[#BFCF99]/30 hover:bg-[#BFCF99]/10"
+            className="border-secondary/30/30 hover:bg-secondary/20/10"
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
@@ -39,14 +39,14 @@ export default function ProdutividadeHeader({
             variant="outline"
             size="icon"
             onClick={onNextMonth}
-            className="border-[#BFCF99]/30 hover:bg-[#BFCF99]/10"
+            className="border-secondary/30/30 hover:bg-secondary/20/10"
           >
             <ChevronRight className="w-4 h-4" />
           </Button>
           {cacheDiasCount > 0 && userCanEdit && (
             <Button
               onClick={onSaveCache}
-              className="bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90 ml-4"
+              className="bg-muted text-[#F2F1EF] hover:bg-muted/90 ml-4"
             >
               Salvar {cacheDiasCount} alterações
             </Button>

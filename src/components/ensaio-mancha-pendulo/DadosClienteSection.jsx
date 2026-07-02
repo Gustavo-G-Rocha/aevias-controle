@@ -91,7 +91,7 @@ export default function DadosClienteSection({
 
           <div>
             <Label>Laboratorista</Label>
-            <Input value={formData.laboratorista_name} readOnly className="bg-slate-50" />
+            <Input value={formData.laboratorista_name} readOnly className="bg-muted/30" />
           </div>
         </div>
       </CardContent>

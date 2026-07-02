@@ -59,7 +59,7 @@ export default function SolicitarTransferenciaModal({
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-800">
+            <p className="text-sm text-secondary">
               <strong>Regional Atual:</strong> {regionalAtual?.nome} - {regionalAtual?.codigo}
             </p>
             <p className="text-xs text-blue-700 mt-2">
@@ -109,7 +109,7 @@ export default function SolicitarTransferenciaModal({
                   rows={4}
                   required
                 />
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Seja claro e objetivo ao explicar o motivo da transferência
                 </p>
               </div>

@@ -12,8 +12,8 @@ import { TIPOS_CHECKLIST, OUTROS_TIPOS_REGISTRO, RNC_PAGE } from "./naoConformid
  */
 export function buildKpiItems(rncsVisiveis, cncsVisiveis) {
   return [
-    { label: "Total de RNCs", value: rncsVisiveis.length, color: "text-[#00233B]" },
-    { label: "RNCs Abertas", value: rncsVisiveis.filter(r => r.status === 'aberta').length, color: "text-red-600" },
+    { label: "Total de RNCs", value: rncsVisiveis.length, color: "text-foreground" },
+    { label: "RNCs Abertas", value: rncsVisiveis.filter(r => r.status === 'aberta').length, color: "text-destructive" },
     { label: "Em Tratativa", value: rncsVisiveis.filter(r => r.status === 'em_tratativa').length, color: "text-amber-600" },
     { label: "NCs em Registros", value: cncsVisiveis.length, color: "text-blue-600" },
   ];

@@ -127,7 +127,7 @@ function CorpoProvaCard({ cp, index, metodo, onUpdate, onRemove }) {
 
 export default function EnsaioSondagemResultados({ formData, addCorpoProva, removeCorpoProva, updateCorpoProva }) {
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader>
         <CardTitle className="text-lg">Corpos de Prova</CardTitle>
         <CardDescription>Adicione até 10 corpos de prova</CardDescription>
@@ -145,7 +145,7 @@ export default function EnsaioSondagemResultados({ formData, addCorpoProva, remo
         ))}
 
         {formData.corpos_prova.length === 0 && (
-          <div className="text-center py-12 text-slate-500">
+          <div className="text-center py-12 text-muted-foreground">
             <p>Nenhum corpo de prova adicionado.</p>
             <p className="text-sm">Clique em "Adicionar CP" abaixo para começar.</p>
           </div>
@@ -156,7 +156,7 @@ export default function EnsaioSondagemResultados({ formData, addCorpoProva, remo
             type="button"
             onClick={addCorpoProva}
             disabled={formData.corpos_prova.length >= 10}
-            className="bg-blue-600 hover:bg-blue-700"
+            className=""
           >
             <Plus className="w-4 h-4 mr-2" />
             Adicionar CP

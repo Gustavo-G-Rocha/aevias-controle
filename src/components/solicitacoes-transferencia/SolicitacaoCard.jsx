@@ -44,16 +44,16 @@ export const SolicitacaoCard = React.memo(({ solicitacao, onApprove, onReject, c
   }, [solicitacao, motivoRejeicao, onReject]);
 
   return (
-    <Card className="hover:shadow-md transition-shadow bg-white/20 backdrop-blur-lg border border-white/20">
+    <Card className="hover:shadow-md transition-shadow bg-card/20 backdrop-blur-lg border border-white/20">
       <CardContent className="p-4">
         <div className="space-y-4">
           <div className="flex justify-between items-start">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
                 <UserIcon className="w-4 h-4 text-[#BFCF99]" />
-                <span className="font-semibold text-[#00233B]">{solicitacao.laboratorista_name}</span>
+                <span className="font-semibold text-foreground">{solicitacao.laboratorista_name}</span>
               </div>
-              <p className="text-sm text-[#00233B]/70">{solicitacao.laboratorista_email}</p>
+              <p className="text-sm text-foreground/70">{solicitacao.laboratorista_email}</p>
             </div>
             <Badge className={`${statusInfo.className} gap-1`}>
               <StatusIcon className="w-3 h-3" />
@@ -63,33 +63,33 @@ export const SolicitacaoCard = React.memo(({ solicitacao, onApprove, onReject, c
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 bg-black/5 rounded-lg">
             <div>
-              <p className="text-xs font-medium text-[#00233B]/70 mb-1">Regional Atual</p>
+              <p className="text-xs font-medium text-foreground/70 mb-1">Regional Atual</p>
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-[#800020]" />
-                <span className="font-medium text-[#00233B]">{regionalAtual?.nome || solicitacao.regional_atual_nome}</span>
+                <span className="font-medium text-foreground">{regionalAtual?.nome || solicitacao.regional_atual_nome}</span>
               </div>
             </div>
             <div>
-              <p className="text-xs font-medium text-[#00233B]/70 mb-1">Regional Destino</p>
+              <p className="text-xs font-medium text-foreground/70 mb-1">Regional Destino</p>
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-[#566E3D]" />
-                <span className="font-medium text-[#00233B]">{regionalDestino?.nome || solicitacao.regional_destino_nome}</span>
+                <MapPin className="w-4 h-4 text-secondary" />
+                <span className="font-medium text-foreground">{regionalDestino?.nome || solicitacao.regional_destino_nome}</span>
               </div>
             </div>
           </div>
 
           <div>
-            <p className="text-xs font-medium text-[#00233B]/70 mb-1">Motivo da Solicitação</p>
-            <p className="text-sm text-[#00233B] bg-white/30 p-2 rounded">{solicitacao.motivo}</p>
+            <p className="text-xs font-medium text-foreground/70 mb-1">Motivo da Solicitação</p>
+            <p className="text-sm text-foreground bg-card/30 p-2 rounded">{solicitacao.motivo}</p>
           </div>
 
-          <div className="text-xs text-[#00233B]/60">
+          <div className="text-xs text-foreground/60">
             Solicitado em {format(new Date(solicitacao.created_date), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR })}
           </div>
 
           {solicitacao.status === 'aprovada' && solicitacao.aprovado_em && (
             <div className="bg-[#566E3D]/10 border border-[#566E3D]/30 rounded p-2">
-              <p className="text-sm text-[#566E3D]">
+              <p className="text-sm text-secondary">
                 <CheckCircle className="w-4 h-4 inline mr-1" />
                 Aprovada por {solicitacao.aprovado_por} em {format(new Date(solicitacao.aprovado_em), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
               </p>

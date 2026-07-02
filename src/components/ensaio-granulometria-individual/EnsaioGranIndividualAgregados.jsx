@@ -13,7 +13,7 @@ export default function EnsaioGranIndividualAgregados({
   onAdd, onRemove,
 }) {
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg">Agregados (até 4)</CardTitle>
@@ -26,13 +26,13 @@ export default function EnsaioGranIndividualAgregados({
       </CardHeader>
       <CardContent className="space-y-6">
         {agregados.map((agregado, index) => (
-          <Card key={index} className="border-2 border-slate-200">
+          <Card key={index} className="border-2 border-border">
             <CardHeader className="pb-3">
               <div className="flex justify-between items-center">
                 <CardTitle className="text-base">Agregado {index + 1}</CardTitle>
                 {isEditable && !isApproved && agregados.length > 1 && (
                   <Button type="button" variant="ghost" size="sm"
-                    onClick={() => onRemove(index)} className="text-red-500 hover:text-red-700">
+                    onClick={() => onRemove(index)} className="text-red-500 hover:text-destructive">
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 )}
@@ -77,7 +77,7 @@ export default function EnsaioGranIndividualAgregados({
                 <Label className="font-semibold">Granulometria</Label>
                 <div className="mt-2 overflow-x-auto">
                   <table className="w-full border-collapse border text-sm">
-                    <thead className="bg-slate-200">
+                    <thead className="bg-muted">
                       <tr>
                         <th className="border p-2">ASTM</th>
                         <th className="border p-2">mm</th>
@@ -99,7 +99,7 @@ export default function EnsaioGranIndividualAgregados({
                                 disabled={!isEditable || isApproved} />
                             </td>
                             <td className="border p-2">
-                              <Input type="number" step="0.01" className="h-8 bg-gray-50"
+                              <Input type="number" step="0.01" className="h-8 bg-muted/30"
                                 value={agregado.granulometria?.[peneiraKey]?.passante || ""} disabled />
                             </td>
                           </tr>

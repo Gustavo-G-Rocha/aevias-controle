@@ -77,35 +77,35 @@ export default function ControleAplicacaoSection({ controle, isEditable, onNeste
 
         {/* Tabela de ensaios */}
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-slate-300 text-sm min-w-[700px]">
+          <table className="w-full border-collapse border border-border text-sm min-w-[700px]">
             <thead className="bg-muted/30">
               <tr>
-                <th className="border border-slate-300 px-2 py-2 text-left">Ensaio</th>
-                <th className="border border-slate-300 px-2 py-2 text-center">Realizado</th>
-                <th className="border border-slate-300 px-2 py-2 text-center">Qtde</th>
-                <th className="border border-slate-300 px-2 py-2 text-center">Frequência</th>
-                <th className="border border-slate-300 px-2 py-2 text-center">Limite</th>
-                <th className="border border-slate-300 px-2 py-2 text-center">Conforme</th>
+                <th className="border border-border px-2 py-2 text-left">Ensaio</th>
+                <th className="border border-border px-2 py-2 text-center">Realizado</th>
+                <th className="border border-border px-2 py-2 text-center">Qtde</th>
+                <th className="border border-border px-2 py-2 text-center">Frequência</th>
+                <th className="border border-border px-2 py-2 text-center">Limite</th>
+                <th className="border border-border px-2 py-2 text-center">Conforme</th>
               </tr>
             </thead>
             <tbody>
               {/* Temperatura de aplicação */}
               <tr>
-                <td className="border border-slate-300 px-2 py-2">Temperatura de aplicação das cargas (°C)</td>
-                <td className="border border-slate-300 px-2 py-1 text-center">
+                <td className="border border-border px-2 py-2">Temperatura de aplicação das cargas (°C)</td>
+                <td className="border border-border px-2 py-1 text-center">
                   <input type="checkbox" checked={controle.temp_aplicacao_cargas.realizado}
                     onChange={(e) => onDeepChange('controle_aplicacao', 'temp_aplicacao_cargas', 'realizado', e.target.checked)}
                     disabled={!canEdit} className="w-4 h-4" />
                 </td>
-                <td className="border border-slate-300 px-2 py-1">
+                <td className="border border-border px-2 py-1">
                   <Input type="number" min="0"
                     value={controle.temp_aplicacao_cargas.quantidade || ''}
                     onChange={(e) => onDeepChange('controle_aplicacao', 'temp_aplicacao_cargas', 'quantidade', e.target.value ? parseInt(e.target.value) : 0)}
                     disabled={!canEdit} className="h-8 text-sm" />
                 </td>
-                <td className="border border-slate-300 px-2 py-2 text-center text-xs">2 por carga</td>
-                <td className="border border-slate-300 px-2 py-2 text-center text-xs">Estabelecida em projeto</td>
-                <td className="border border-slate-300 px-2 py-1 text-center">
+                <td className="border border-border px-2 py-2 text-center text-xs">2 por carga</td>
+                <td className="border border-border px-2 py-2 text-center text-xs">Estabelecida em projeto</td>
+                <td className="border border-border px-2 py-1 text-center">
                   <input type="checkbox" checked={controle.temp_aplicacao_cargas.conforme || false}
                     onChange={(e) => onDeepChange('controle_aplicacao', 'temp_aplicacao_cargas', 'conforme', e.target.checked)}
                     disabled={!canEdit} className="w-4 h-4" />
@@ -114,21 +114,21 @@ export default function ControleAplicacaoSection({ controle, isEditable, onNeste
 
               {/* Espessura da camada */}
               <tr>
-                <td className="border border-slate-300 px-2 py-2">Espessura da camada (cm)</td>
-                <td className="border border-slate-300 px-2 py-1 text-center">
+                <td className="border border-border px-2 py-2">Espessura da camada (cm)</td>
+                <td className="border border-border px-2 py-1 text-center">
                   <input type="checkbox" checked={controle.espessura_camada.realizado}
                     onChange={(e) => onDeepChange('controle_aplicacao', 'espessura_camada', 'realizado', e.target.checked)}
                     disabled={!canEdit} className="w-4 h-4" />
                 </td>
-                <td className="border border-slate-300 px-2 py-1">
+                <td className="border border-border px-2 py-1">
                   <Input type="number" min="0"
                     value={controle.espessura_camada.quantidade || ''}
                     onChange={(e) => onDeepChange('controle_aplicacao', 'espessura_camada', 'quantidade', e.target.value ? parseInt(e.target.value) : 0)}
                     disabled={!canEdit} className="h-8 text-sm" />
                 </td>
-                <td className="border border-slate-300 px-2 py-2 text-center text-xs">Para cada carga aplicada</td>
-                <td className="border border-slate-300 px-2 py-2 text-center text-xs">Estabelecida em projeto</td>
-                <td className="border border-slate-300 px-2 py-1 text-center">
+                <td className="border border-border px-2 py-2 text-center text-xs">Para cada carga aplicada</td>
+                <td className="border border-border px-2 py-2 text-center text-xs">Estabelecida em projeto</td>
+                <td className="border border-border px-2 py-1 text-center">
                   <input type="checkbox" checked={controle.espessura_camada.conforme || false}
                     onChange={(e) => onDeepChange('controle_aplicacao', 'espessura_camada', 'conforme', e.target.checked)}
                     disabled={!canEdit} className="w-4 h-4" />

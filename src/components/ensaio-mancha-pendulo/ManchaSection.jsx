@@ -69,11 +69,11 @@ export default function ManchaSection({ formData, onManchaChange }) {
                     <td className="border border-border p-1">
                       <Input type="number" step="0.1" value={ensaio.d4 || ''} onChange={(e) => onManchaChange(index, 'd4', parseFloat(e.target.value))} className="h-8 text-xs min-w-[70px]" />
                     </td>
-                    <td className="border border-border p-1 text-center bg-slate-50">{ensaio.d_media?.toFixed(1) || ''}</td>
-                    <td className="border border-border p-1 text-center bg-slate-50">{ensaio.area?.toFixed(2) || ''}</td>
-                    <td className="border border-border p-1 text-center bg-slate-50">{ensaio.hs_cm?.toFixed(2) || ''}</td>
-                    <td className="border border-border p-1 text-center bg-slate-50">{ensaio.hs_mm?.toFixed(2) || ''}</td>
-                    <td className="border border-border p-1 text-center bg-slate-50 text-xs">{ensaio.tipo_superficie || ''}</td>
+                    <td className="border border-border p-1 text-center bg-muted/30">{ensaio.d_media?.toFixed(1) || ''}</td>
+                    <td className="border border-border p-1 text-center bg-muted/30">{ensaio.area?.toFixed(2) || ''}</td>
+                    <td className="border border-border p-1 text-center bg-muted/30">{ensaio.hs_cm?.toFixed(2) || ''}</td>
+                    <td className="border border-border p-1 text-center bg-muted/30">{ensaio.hs_mm?.toFixed(2) || ''}</td>
+                    <td className="border border-border p-1 text-center bg-muted/30 text-xs">{ensaio.tipo_superficie || ''}</td>
                   </tr>
                 );
               })}

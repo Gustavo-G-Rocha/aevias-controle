@@ -92,7 +92,7 @@ const UserForm = React.memo(({ user: editingUser, onSave, onCancel, currentUser,
               onChange={(e) => handleInputChange("email", e.target.value)}
               placeholder="usuario@empresa.com" required disabled={!!editingUser} />
             {!editingUser && (
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Apenas emails dos domínios autorizados pela empresa são aceitos
               </p>
             )}
@@ -112,7 +112,7 @@ const UserForm = React.memo(({ user: editingUser, onSave, onCancel, currentUser,
               onChange={(e) => handleInputChange("position", e.target.value)}
               placeholder="Ex: Engenheiro, Técnico, Analista" />
             {formData.access_level === 'cliente' && (
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 <strong>Engenheiros</strong> poderão assinar registros para dar ciência
               </p>
             )}
@@ -165,7 +165,7 @@ const UserForm = React.memo(({ user: editingUser, onSave, onCancel, currentUser,
           <Button type="button" variant="outline" onClick={onCancel} className="hover:bg-black/10">
             Cancelar
           </Button>
-          <Button type="submit" className="bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90">
+          <Button type="submit" className="bg-muted text-[#F2F1EF] hover:bg-muted/90">
             {editingUser ? "Salvar Alterações" : "Cadastrar e Enviar Convite"}
           </Button>
         </DialogFooter>

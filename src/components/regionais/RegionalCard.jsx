@@ -189,7 +189,7 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
                           <div className="mt-2">
                             <p className="text-xs mb-1" style={{ color: 'var(--color-text-subtle)' }}>Empreiteiras:</p>
                             <div className="flex flex-wrap gap-1">
-                              {obra.empreiteiras.map(emp => <Badge key={emp} variant="secondary" className="bg-blue-100 text-blue-800 text-xs">{emp}</Badge>)}
+                              {obra.empreiteiras.map(emp => <Badge key={emp} variant="secondary" className="bg-blue-100 text-secondary text-xs">{emp}</Badge>)}
                             </div>
                           </div>
                         )}

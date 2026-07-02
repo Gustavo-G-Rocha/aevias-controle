@@ -63,7 +63,7 @@ export default function PullToRefresh({ children }) {
           style={{ height: pullDistance, opacity: progress }}
         >
           <div
-            className={`w-8 h-8 rounded-full border-2 border-[#BFCF99] border-t-transparent flex items-center justify-center ${
+            className={`w-8 h-8 rounded-full border-2 border-secondary/30 border-t-transparent flex items-center justify-center ${
               refreshing ? "animate-spin" : ""
             }`}
             style={{

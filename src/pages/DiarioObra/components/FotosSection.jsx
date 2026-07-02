@@ -32,7 +32,7 @@ export default function FotosSection({ formData, handleFileChange, handleRemoveP
                     {p.status === "success" && <CheckCircle className="w-3 h-3 text-green-500" />}
                     {p.status === "error" && <XCircle className="w-3 h-3 text-red-500" />}
                   </span>
-                  <span className={p.status === "error" ? "text-red-600" : "text-muted-foreground"}>
+                  <span className={p.status === "error" ? "text-destructive" : "text-muted-foreground"}>
                     {p.fileName} - {p.status === "pending" ? "Aguardando" : p.status === "uploading" ? "Enviando..." : p.status === "success" ? "Sucesso" : `Erro: ${p.error}`}
                   </span>
                 </div>

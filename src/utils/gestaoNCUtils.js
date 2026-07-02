@@ -2,7 +2,7 @@
  * Cores para badges de status
  */
 export const STATUS_COLORS = {
-  aberta: "bg-red-100 text-red-700",
+  aberta: "bg-red-100 text-destructive",
   em_tratativa: "bg-yellow-100 text-yellow-700",
   encerrada: "bg-green-100 text-green-700",
   cancelada: "bg-gray-100 text-gray-600",

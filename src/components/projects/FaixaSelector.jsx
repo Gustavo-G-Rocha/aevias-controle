@@ -38,13 +38,13 @@ export default function FaixaSelector({
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{faixa.nome}</span>
                   {faixa.especificacao && (
-                    <span className="text-xs text-slate-500">({faixa.especificacao})</span>
+                    <span className="text-xs text-muted-foreground">({faixa.especificacao})</span>
                   )}
                 </div>
               </SelectItem>
             ))
           ) : (
-            <div className="px-2 py-1.5 text-sm text-slate-500">
+            <div className="px-2 py-1.5 text-sm text-muted-foreground">
               Nenhuma faixa disponível
             </div>
           )}
@@ -52,7 +52,7 @@ export default function FaixaSelector({
       </Select>
 
       {faixaSelecionada && (
-        <div className="text-xs text-slate-600 mt-1 flex items-start gap-2">
+        <div className="text-xs text-muted-foreground mt-1 flex items-start gap-2">
           <AlertCircle className="w-3 h-3 mt-0.5 flex-shrink-0" />
           <span>
             {faixaSelecionada.peneiras?.length || 0} peneiras disponíveis para esta faixa

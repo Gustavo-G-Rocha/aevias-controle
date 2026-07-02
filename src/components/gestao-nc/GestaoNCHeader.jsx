@@ -10,7 +10,7 @@ export default function GestaoNCHeader({ canCreateNC }) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
-        <AlertTriangle className="w-7 h-7 text-red-600" />
+        <AlertTriangle className="w-7 h-7 text-destructive" />
         <div>
           <h1 className="text-3xl font-bold text-foreground">Gestão de NCs</h1>
           <p className="text-muted-foreground text-sm mt-1">
@@ -21,7 +21,7 @@ export default function GestaoNCHeader({ canCreateNC }) {
       {canCreateNC && (
         <Button
           onClick={() => navigate(createPageUrl("NovaNC"))}
-          className="bg-[#00233B] text-white hover:bg-[#00233B]/90"
+          className="bg-muted text-white hover:bg-muted/90"
         >
           <Plus className="w-4 h-4 mr-2" />
           Nova NC

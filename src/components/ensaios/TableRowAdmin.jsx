@@ -32,7 +32,7 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
           <TypeIcon className="w-3 h-3 text-[#BFCF99]" />
           <span className="truncate max-w-[120px]" title={name}>{name}</span>
           <CopyIdButton id={ensaio.id} />
-          {naoConformidades.length > 0 && <span className="text-red-600 cursor-help" title={`Não conformidades:\n${naoConformidades.join('\n')}`}>⚠️</span>}
+          {naoConformidades.length > 0 && <span className="text-destructive cursor-help" title={`Não conformidades:\n${naoConformidades.join('\n')}`}>⚠️</span>}
           {!naoConformidades.length && temDeflexaoExcessiva && <span className="cursor-help" title="Pontos com deflexão acima do limite admissível">🟡</span>}
           {!naoConformidades.length && !temDeflexaoExcessiva && temAcoesCorretivas && <span className="text-orange-500 cursor-help" title="Ações corretivas realizadas">⚠️</span>}
         </div>

@@ -17,25 +17,25 @@ const toArray = (resultados) => {
 
 const CalcRow = ({ label, qtde, resultados, conforme, onQtdeChange, onConformeChange }) => (
   <tr>
-    <td className="border border-slate-300 px-2 py-2 bg-slate-50">{label}</td>
-    <td className="border border-slate-300 px-2 py-1 text-center">-</td>
-    <td className="border border-slate-300 px-1 py-1">
+    <td className="border border-border px-2 py-2 bg-muted/30">{label}</td>
+    <td className="border border-border px-2 py-1 text-center">-</td>
+    <td className="border border-border px-1 py-1">
       <Input type="number" min="0" max="3" value={qtde} onChange={onQtdeChange} className="h-8 text-sm text-center" placeholder="" />
     </td>
-    <td className="border border-slate-300 px-1 py-2">
+    <td className="border border-border px-1 py-2">
       <div className="flex flex-wrap gap-1">
         {Array.from({ length: qtde }).map((_, idx) => (
-          <div key={idx} className="h-8 flex items-center px-2 bg-slate-100 rounded border border-slate-300 text-sm text-center font-medium"
+          <div key={idx} className="h-8 flex items-center px-2 bg-muted rounded border border-border text-sm text-center font-medium"
             style={{ width: qtde > 1 ? '90px' : '100%' }}>
             {resultados[idx] ?? '-'}
           </div>
         ))}
       </div>
     </td>
-    <td className="border border-slate-300 px-2 py-1 text-center">
+    <td className="border border-border px-2 py-1 text-center">
       <input type="checkbox" checked={conforme === true} onChange={(e) => onConformeChange(e.target.checked ? true : null)} className="w-4 h-4 accent-green-500" />
     </td>
-    <td className="border border-slate-300 px-2 py-1 text-center">
+    <td className="border border-border px-2 py-1 text-center">
       <input type="checkbox" checked={conforme === false} onChange={(e) => onConformeChange(e.target.checked ? false : null)} className="w-4 h-4 accent-red-500" />
     </td>
   </tr>
@@ -71,19 +71,19 @@ export default function EnsaiosEmpreiteiraSection({ formData, onEnsaioChange, se
   const uisResultados = toArray(formData.umidade_in_situ_resultados);
 
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader><CardTitle className="text-lg">Ensaios da Camada Realizados pela Empreiteira</CardTitle></CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-slate-300 text-sm">
+          <table className="w-full border-collapse border border-border text-sm">
             <thead>
-              <tr className="bg-slate-100">
-                <th className="border border-slate-300 px-2 py-2 text-left font-medium">Ensaios</th>
-                <th className="border border-slate-300 px-2 py-2 text-center font-medium w-20">Realizado</th>
-                <th className="border border-slate-300 px-2 py-2 text-center font-medium w-16">Qtde</th>
-                <th className="border border-slate-300 px-2 py-2 text-left font-medium">Resultado(s)</th>
-                <th className="border border-slate-300 px-2 py-2 text-center font-medium w-10">✓</th>
-                <th className="border border-slate-300 px-2 py-2 text-center font-medium w-10">✗</th>
+              <tr className="bg-muted">
+                <th className="border border-border px-2 py-2 text-left font-medium">Ensaios</th>
+                <th className="border border-border px-2 py-2 text-center font-medium w-20">Realizado</th>
+                <th className="border border-border px-2 py-2 text-center font-medium w-16">Qtde</th>
+                <th className="border border-border px-2 py-2 text-left font-medium">Resultado(s)</th>
+                <th className="border border-border px-2 py-2 text-center font-medium w-10">✓</th>
+                <th className="border border-border px-2 py-2 text-center font-medium w-10">✗</th>
               </tr>
             </thead>
             <tbody>
@@ -94,12 +94,12 @@ export default function EnsaiosEmpreiteiraSection({ formData, onEnsaioChange, se
                 const isGranulometria = key === 'granulometria';
                 return (
                   <tr key={key}>
-                    <td className="border border-slate-300 px-2 py-2 bg-slate-50">{label}</td>
-                    <td className="border border-slate-300 px-2 py-1 text-center">
+                    <td className="border border-border px-2 py-2 bg-muted/30">{label}</td>
+                    <td className="border border-border px-2 py-1 text-center">
                       <input type="checkbox" checked={e.realizado || false}
                         onChange={(ev) => onEnsaioChange(key, 'realizado', ev.target.checked)} className="w-4 h-4" />
                     </td>
-                    <td className="border border-slate-300 px-1 py-1">
+                    <td className="border border-border px-1 py-1">
                       {isGranulometria ? <span className="text-slate-400 text-xs px-2">-</span> : (
                         <Input type="number" min="0" max="3" value={qtde ?? ''}
                           onChange={(ev) => {
@@ -112,7 +112,7 @@ export default function EnsaiosEmpreiteiraSection({ formData, onEnsaioChange, se
                           disabled={!e.realizado} className="h-8 text-sm text-center" />
                       )}
                     </td>
-                    <td className="border border-slate-300 px-1 py-2">
+                    <td className="border border-border px-1 py-2">
                       {isGranulometria ? <span className="text-slate-400 text-xs px-2">-</span> : (
                         e.realizado && qtde > 0 ? (
                           <div className="flex flex-wrap gap-1">
@@ -128,12 +128,12 @@ export default function EnsaiosEmpreiteiraSection({ formData, onEnsaioChange, se
                         ) : <span className="text-slate-400 text-xs px-2">-</span>
                       )}
                     </td>
-                    <td className="border border-slate-300 px-2 py-1 text-center">
+                    <td className="border border-border px-2 py-1 text-center">
                       <input type="checkbox" checked={e.conforme === true}
                         onChange={(ev) => onEnsaioChange(key, 'conforme', ev.target.checked ? true : null)}
                         disabled={!e.realizado} className="w-4 h-4 accent-green-500" />
                     </td>
-                    <td className="border border-slate-300 px-2 py-1 text-center">
+                    <td className="border border-border px-2 py-1 text-center">
                       <input type="checkbox" checked={e.conforme === false}
                         onChange={(ev) => onEnsaioChange(key, 'conforme', ev.target.checked ? false : null)}
                         disabled={!e.realizado} className="w-4 h-4 accent-red-500" />
@@ -144,9 +144,9 @@ export default function EnsaiosEmpreiteiraSection({ formData, onEnsaioChange, se
 
               {/* Umidade Ótima */}
               <tr>
-                <td className="border border-slate-300 px-2 py-2 bg-slate-50">Umidade Ótima (%)</td>
-                <td className="border border-slate-300 px-2 py-1 text-center">-</td>
-                <td className="border border-slate-300 px-1 py-1">
+                <td className="border border-border px-2 py-2 bg-muted/30">Umidade Ótima (%)</td>
+                <td className="border border-border px-2 py-1 text-center">-</td>
+                <td className="border border-border px-1 py-1">
                   <Input type="number" min="0" max="3" value={uoQtde}
                     onChange={(e) => {
                       const n = Math.max(0, Math.min(3, parseInt(e.target.value) || 0));
@@ -155,7 +155,7 @@ export default function EnsaiosEmpreiteiraSection({ formData, onEnsaioChange, se
                     }}
                     className="h-8 text-sm text-center" />
                 </td>
-                <td className="border border-slate-300 px-1 py-2">
+                <td className="border border-border px-1 py-2">
                   <div className="flex flex-wrap gap-1">
                     {Array.from({ length: uoQtde }).map((_, idx) => (
                       <Input key={idx} type="number" step="0.01" value={uoResultados[idx] ?? ''}
@@ -169,15 +169,15 @@ export default function EnsaiosEmpreiteiraSection({ formData, onEnsaioChange, se
                     ))}
                   </div>
                 </td>
-                <td className="border border-slate-300 px-2 py-1 text-center">-</td>
-                <td className="border border-slate-300 px-2 py-1 text-center">-</td>
+                <td className="border border-border px-2 py-1 text-center">-</td>
+                <td className="border border-border px-2 py-1 text-center">-</td>
               </tr>
 
               {/* Umidade In Situ */}
               <tr>
-                <td className="border border-slate-300 px-2 py-2 bg-slate-50">Umidade In Situ (%)</td>
-                <td className="border border-slate-300 px-2 py-1 text-center">-</td>
-                <td className="border border-slate-300 px-1 py-1">
+                <td className="border border-border px-2 py-2 bg-muted/30">Umidade In Situ (%)</td>
+                <td className="border border-border px-2 py-1 text-center">-</td>
+                <td className="border border-border px-1 py-1">
                   <Input type="number" min="0" max="3" value={uisQtde}
                     onChange={(e) => {
                       const n = Math.max(0, Math.min(3, parseInt(e.target.value) || 0));
@@ -186,7 +186,7 @@ export default function EnsaiosEmpreiteiraSection({ formData, onEnsaioChange, se
                     }}
                     className="h-8 text-sm text-center" />
                 </td>
-                <td className="border border-slate-300 px-1 py-2">
+                <td className="border border-border px-1 py-2">
                   <div className="flex flex-wrap gap-1">
                     {Array.from({ length: uisQtde }).map((_, idx) => (
                       <Input key={idx} type="number" step="0.01" value={uisResultados[idx] ?? ''}
@@ -200,8 +200,8 @@ export default function EnsaiosEmpreiteiraSection({ formData, onEnsaioChange, se
                     ))}
                   </div>
                 </td>
-                <td className="border border-slate-300 px-2 py-1 text-center">-</td>
-                <td className="border border-slate-300 px-2 py-1 text-center">-</td>
+                <td className="border border-border px-2 py-1 text-center">-</td>
+                <td className="border border-border px-2 py-1 text-center">-</td>
               </tr>
 
               {/* Variação de Umidade */}

@@ -36,34 +36,34 @@ export default function ControleAgregadosSection({
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-slate-100">
-                <th className="border border-slate-300 px-2 py-2 text-sm font-medium text-left">Agregado</th>
-                <th className="border border-slate-300 px-2 py-2 text-sm font-medium text-center">Estoque Coberto?</th>
-                <th className="border border-slate-300 px-2 py-2 text-sm font-medium text-center">Material Homogeneizado?</th>
-                <th className="border border-slate-300 px-2 py-2 text-sm font-medium text-center">Granulometria Individual?</th>
-                <th className="border border-slate-300 px-2 py-2 text-sm font-medium text-center">Qtde Granulometria</th>
+              <tr className="bg-muted">
+                <th className="border border-border px-2 py-2 text-sm font-medium text-left">Agregado</th>
+                <th className="border border-border px-2 py-2 text-sm font-medium text-center">Estoque Coberto?</th>
+                <th className="border border-border px-2 py-2 text-sm font-medium text-center">Material Homogeneizado?</th>
+                <th className="border border-border px-2 py-2 text-sm font-medium text-center">Granulometria Individual?</th>
+                <th className="border border-border px-2 py-2 text-sm font-medium text-center">Qtde Granulometria</th>
               </tr>
             </thead>
             <tbody>
               {formData.controle_agregados.length > 0 ? formData.controle_agregados.map((agregado, index) => (
                 <tr key={index}>
-                  <td className="border border-slate-300 px-2 py-2 font-medium bg-muted/30">{agregado.nome}</td>
-                  <td className="border border-slate-300 px-2 py-1 text-center">
+                  <td className="border border-border px-2 py-2 font-medium bg-muted/30">{agregado.nome}</td>
+                  <td className="border border-border px-2 py-1 text-center">
                     <input type="checkbox" checked={agregado.estoque_coberto}
                       onChange={(e) => onAgregadoChange(index, 'estoque_coberto', e.target.checked)}
                       disabled={!canEdit} className="w-4 h-4" />
                   </td>
-                  <td className="border border-slate-300 px-2 py-1 text-center">
+                  <td className="border border-border px-2 py-1 text-center">
                     <input type="checkbox" checked={agregado.material_homogeneizado}
                       onChange={(e) => onAgregadoChange(index, 'material_homogeneizado', e.target.checked)}
                       disabled={!canEdit} className="w-4 h-4" />
                   </td>
-                  <td className="border border-slate-300 px-2 py-1 text-center">
+                  <td className="border border-border px-2 py-1 text-center">
                     <input type="checkbox" checked={agregado.granulometria_individual}
                       onChange={(e) => onAgregadoChange(index, 'granulometria_individual', e.target.checked)}
                       disabled={!canEdit} className="w-4 h-4" />
                   </td>
-                  <td className="border border-slate-300 px-1 py-1 w-28">
+                  <td className="border border-border px-1 py-1 w-28">
                     <Input type="number" min="0"
                       value={agregado.granulometria_individual_qtde || ''}
                       onChange={(e) => onAgregadoChange(index, 'granulometria_individual_qtde', e.target.value ? parseInt(e.target.value) : 0)}
@@ -72,7 +72,7 @@ export default function ControleAgregadosSection({
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan="5" className="text-center py-4 text-slate-500 italic">
+                  <td colSpan="5" className="text-center py-4 text-muted-foreground italic">
                     {formData.project_id ? 'Nenhum agregado cadastrado neste projeto.' : 'Selecione um projeto para carregar os agregados.'}
                   </td>
                 </tr>
@@ -116,7 +116,7 @@ export default function ControleAgregadosSection({
                   <div className="space-y-2">
                     {formData.equivalente_areia_resultados.map((resultado, index) => (
                       <div key={`ea-${index}`} className="flex items-center gap-2">
-                        <Label className="text-xs text-slate-600 w-20 shrink-0">Ensaio {index + 1}:</Label>
+                        <Label className="text-xs text-muted-foreground w-20 shrink-0">Ensaio {index + 1}:</Label>
                         <Input type="number" step="0.1" min="0" max="100"
                           value={resultado ?? ''}
                           onChange={(e) => onEquivalenteAreiaResultadoChange(index, e.target.value)}
@@ -124,7 +124,7 @@ export default function ControleAgregadosSection({
                         {canEdit && (
                           <Button type="button" size="sm" variant="ghost"
                             onClick={() => onEquivalenteAreiaRemoveResultado(index)}
-                            className="h-9 px-2 text-red-500 hover:text-red-700 hover:bg-red-50 shrink-0">
+                            className="h-9 px-2 text-red-500 hover:text-destructive hover:bg-red-50 shrink-0">
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         )}
@@ -132,7 +132,7 @@ export default function ControleAgregadosSection({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-500 italic">Clique em "Adicionar Ensaio" para registrar os resultados (máximo 3)</p>
+                  <p className="text-sm text-muted-foreground italic">Clique em "Adicionar Ensaio" para registrar os resultados (máximo 3)</p>
                 )}
               </div>
             )}
@@ -143,7 +143,7 @@ export default function ControleAgregadosSection({
             <Textarea id="obs_agregados" value={formData.observacoes_agregados}
               onChange={(e) => onObservacoesChange(e.target.value)}
               disabled={!canEdit} rows={2} maxLength="500" />
-            <p className="text-xs text-right text-slate-500 mt-1">{formData.observacoes_agregados?.length || 0} / 500</p>
+            <p className="text-xs text-right text-muted-foreground mt-1">{formData.observacoes_agregados?.length || 0} / 500</p>
           </div>
         </div>
       </CardContent>

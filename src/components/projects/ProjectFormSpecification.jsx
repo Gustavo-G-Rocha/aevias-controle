@@ -41,7 +41,7 @@ export default function ProjectFormSpecification({
                 <SelectItem key={faixa.id} value={faixa.id}>
                   <div className="flex items-center gap-2">
                     <span>{faixa.nome}</span>
-                    <span className="text-xs text-slate-500">({faixa.especificacao})</span>
+                    <span className="text-xs text-muted-foreground">({faixa.especificacao})</span>
                   </div>
                 </SelectItem>
               ))}
@@ -62,7 +62,7 @@ export default function ProjectFormSpecification({
                 onEquivalenteChange ? onEquivalenteChange(val) : onInputChange?.('equivalente_areia_minimo', val);
               }}
             />
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Limite mínimo aceitável para ensaios
             </p>
           </div>

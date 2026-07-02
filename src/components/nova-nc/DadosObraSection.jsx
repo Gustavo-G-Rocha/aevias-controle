@@ -21,7 +21,7 @@ export function DadosObraSection({
   return (
     <Card className="bg-transparent border-border">
       <CardHeader>
-        <CardTitle className="text-primary text-base bg-[#BFCF99]/30 px-3 py-1 rounded">
+        <CardTitle className="text-primary text-base bg-secondary/20/30 px-3 py-1 rounded">
           DADOS DA OBRA
         </CardTitle>
       </CardHeader>
@@ -131,7 +131,7 @@ export function DadosObraSection({
                     <div
                       key={c.id}
                       className={`flex items-center justify-between px-3 py-2 text-xs hover:bg-muted/50 transition-colors ${
-                        checklistId === c.id ? "bg-[#BFCF99]/20" : ""
+                        checklistId === c.id ? "bg-secondary/20/20" : ""
                       }`}
                     >
                       <div className="flex-1 min-w-0">

@@ -7,8 +7,8 @@ const DetailItem = ({ label, value }) => {
     if (!value) return null;
     return (
         <div>
-            <p className="text-sm font-medium text-[#00233B]/80">{label}</p>
-            <p className="text-sm text-[#00233B]">{value}</p>
+            <p className="text-sm font-medium text-foreground/80">{label}</p>
+            <p className="text-sm text-foreground">{value}</p>
         </div>
     );
 };
@@ -26,10 +26,10 @@ const DetailList = ({ label, items, allItems, displayKey, valueKey }) => {
 
     return (
         <div>
-            <p className="text-sm font-medium text-[#00233B]/80 mb-2">{label}</p>
+            <p className="text-sm font-medium text-foreground/80 mb-2">{label}</p>
             <div className="flex flex-wrap gap-2">
                 {resolvedItems.map((item, index) => (
-                    <Badge key={index} variant="secondary" className="bg-black/5 text-[#00233B]">{item}</Badge>
+                    <Badge key={index} variant="secondary" className="bg-black/5 text-foreground">{item}</Badge>
                 ))}
             </div>
         </div>
@@ -70,11 +70,11 @@ export default function RegionalDetails({ regional, users, projects }) {
     return (
         <div className="space-y-6">
             <div className="space-y-1">
-                <h3 className="text-2xl font-bold text-[#00233B]">{regional.nome}</h3>
-                <p className="text-[#00233B]/80">{regional.codigo}</p>
+                <h3 className="text-2xl font-bold text-foreground">{regional.nome}</h3>
+                <p className="text-foreground/80">{regional.codigo}</p>
             </div>
 
-            <Separator className="bg-white/20" />
+            <Separator className="bg-card/20" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <DetailItem label="Cliente" value={regional.cliente} />
@@ -83,25 +83,25 @@ export default function RegionalDetails({ regional, users, projects }) {
                 <DetailItem label="Status" value={regional.status === 'ativa' ? 'Ativa' : 'Inativa'} />
             </div>
 
-            <Separator className="bg-white/20" />
+            <Separator className="bg-card/20" />
             
             <div className="space-y-4">
                 <DetailItem label="Gestor de Contrato" value={gestor?.laboratorista_name || regional.gestor_contrato_responsavel} />
 
                 {projetosVinculados.length > 0 && (
                     <div className="space-y-3">
-                        <p className="text-sm font-medium text-[#00233B]/80">Projetos Vinculados ({projetosVinculados.length})</p>
+                        <p className="text-sm font-medium text-foreground/80">Projetos Vinculados ({projetosVinculados.length})</p>
                         
                         {/* Projetos CAUQ */}
                         {projetosVinculados.filter(p => p.tipo_projeto === 'CAUQ').length > 0 && (
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
                                     <FileText className="w-4 h-4 text-blue-600" />
-                                    <p className="text-sm font-medium text-blue-800">Projetos CAUQ</p>
+                                    <p className="text-sm font-medium text-secondary">Projetos CAUQ</p>
                                 </div>
                                 <div className="flex flex-wrap gap-2 ml-6">
                                     {projetosVinculados.filter(p => p.tipo_projeto === 'CAUQ').map((projeto) => (
-                                        <Badge key={projeto.id} variant="secondary" className="bg-blue-100 text-blue-800">
+                                        <Badge key={projeto.id} variant="secondary" className="bg-blue-100 text-secondary">
                                             {projeto.name}
                                         </Badge>
                                     ))}

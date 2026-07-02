@@ -16,15 +16,15 @@ export default function ProjectsGrid({
 }) {
   if (filteredProjects.length === 0) {
     return (
-      <Card className="bg-white/20 backdrop-blur-lg border border-white/20 text-[#00233B]">
+      <Card className="bg-card/20 backdrop-blur-lg border border-white/20 text-foreground">
         <CardContent className="flex flex-col items-center justify-center py-16">
           <div className="w-16 h-16 bg-black/5 rounded-full flex items-center justify-center mb-4">
             <Search className="w-8 h-8 text-[#BFCF99]" />
           </div>
-          <h3 className="text-lg font-semibold text-[#00233B] mb-2">
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             Nenhum projeto encontrado
           </h3>
-          <p className="text-[#00233B]/80 text-center">
+          <p className="text-foreground/80 text-center">
             {searchTerm
               ? "Tente ajustar seus filtros de pesquisa."
               : "Comece criando seu primeiro projeto."}

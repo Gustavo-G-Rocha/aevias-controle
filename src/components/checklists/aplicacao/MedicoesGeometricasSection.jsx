@@ -37,7 +37,7 @@ export default function MedicoesGeometricasSection({ medicoes_geometricas, onCha
 
   return (
     <div className="border-t pt-4">
-      <h3 className="text-lg font-semibold text-[#00233B] mb-4">Medição Geométrica de Campo</h3>
+      <h3 className="text-lg font-semibold text-foreground mb-4">Medição Geométrica de Campo</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
@@ -69,12 +69,12 @@ export default function MedicoesGeometricasSection({ medicoes_geometricas, onCha
       {medicoes.length > 0 && (
         <div className="space-y-4">
           {medicoes.map((medicao, index) => (
-            <Card key={`medicao-${index}`} className="border-2 border-[#BFCF99]/30">
+            <Card key={`medicao-${index}`} className="border-2 border-secondary/30/30">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm">Medição #{index + 1}</CardTitle>
                   {!disabled && (
-                    <Button type="button" variant="ghost" size="sm" onClick={() => removeMedicao(index)} className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                    <Button type="button" variant="ghost" size="sm" onClick={() => removeMedicao(index)} className="text-destructive hover:text-destructive hover:bg-red-50">
                       <X className="w-4 h-4" />
                     </Button>
                   )}

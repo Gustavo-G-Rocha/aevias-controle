@@ -54,7 +54,7 @@ export default function EnsaiosEmpreiteiraSection({ ensaios, onChange, isEditabl
                         <label className="flex items-center gap-1 cursor-pointer">
                           <input type="checkbox" checked={e.conforme === false} disabled={!e.realizado || !isEditable}
                             onChange={(ev) => onChange(key, 'conforme', ev.target.checked ? false : null)} className="w-4 h-4 accent-red-500" />
-                          <span className="text-xs text-red-600">✗</span>
+                          <span className="text-xs text-destructive">✗</span>
                         </label>
                       </div>
                     </td>

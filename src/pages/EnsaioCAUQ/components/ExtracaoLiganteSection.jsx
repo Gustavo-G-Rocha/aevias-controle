@@ -53,7 +53,7 @@ export default function ExtracaoLiganteSection({ formData, isEditable, isApprove
               <div>
                 <Label>Umidade (%)</Label>
                 <Input type="number" step="0.01"
-                  value={formData.extracao_ligante.umidade || ''} readOnly className="bg-slate-100" />
+                  value={formData.extracao_ligante.umidade || ''} readOnly className="bg-muted" />
               </div>
             </>
           )}
@@ -87,13 +87,13 @@ export default function ExtracaoLiganteSection({ formData, isEditable, isApprove
           <div>
             <Label>Peso do Ligante (g)</Label>
             <Input type="number" step="0.01"
-              value={formData.extracao_ligante.peso_ligante || ''} readOnly className="bg-slate-100" />
+              value={formData.extracao_ligante.peso_ligante || ''} readOnly className="bg-muted" />
           </div>
 
           <div>
             <Label>Teor de Ligante (%)</Label>
             <Input type="number" step="0.01"
-              value={formData.extracao_ligante.teor_ligante || ''} readOnly className="bg-slate-100" />
+              value={formData.extracao_ligante.teor_ligante || ''} readOnly className="bg-muted" />
           </div>
 
           <div>

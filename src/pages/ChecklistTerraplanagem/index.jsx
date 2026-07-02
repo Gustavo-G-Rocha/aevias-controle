@@ -28,7 +28,7 @@ export default function ChecklistTerraplanagem() {
   }
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-transparent min-h-screen">
       <div className="max-w-6xl mx-auto">
         <Card>
           <CardHeader>
@@ -40,7 +40,7 @@ export default function ChecklistTerraplanagem() {
             </CardDescription>
 
             {formData.status === 'rascunho' && (
-              <div className="mt-4 flex items-start gap-3 p-4 bg-blue-600 border border-blue-700 rounded-lg">
+              <div className="mt-4 flex items-start gap-3 p-4 bg-secondary/10 border border-secondary/30 rounded-lg">
                 <AlertTriangle className="w-5 h-5 text-white mt-0.5 shrink-0" />
                 <div>
                   <p className="font-semibold text-white">Em Rascunho</p>
@@ -49,7 +49,7 @@ export default function ChecklistTerraplanagem() {
               </div>
             )}
             {formData.approved === false && formData.rejection_reason && (
-              <div className="mt-4 flex items-start gap-3 p-4 bg-red-600 border border-red-700 rounded-lg">
+              <div className="mt-4 flex items-start gap-3 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
                 <XCircle className="w-5 h-5 text-white mt-0.5 shrink-0" />
                 <div>
                   <p className="font-semibold text-white">Registro Reprovado</p>
@@ -99,7 +99,7 @@ export default function ChecklistTerraplanagem() {
                   placeholder="Observações gerais sobre o checklist..."
                   maxLength="500"
                 />
-                <p className="text-xs text-right text-slate-500 mt-1">{formData.observacoes_gerais?.length || 0} / 500</p>
+                <p className="text-xs text-right text-muted-foreground mt-1">{formData.observacoes_gerais?.length || 0} / 500</p>
               </div>
 
               <AcoesCorretivasNC

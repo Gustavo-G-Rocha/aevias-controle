@@ -39,7 +39,7 @@ export default function GestaoNCCard({
           <div className="flex-1 space-y-1">
             <div className="flex items-center gap-3 flex-wrap">
               {nc.numero_rnc && (
-                <span className="text-sm font-bold text-foreground bg-[#BFCF99]/30 px-2 py-0.5 rounded">
+                <span className="text-sm font-bold text-foreground bg-secondary/20/30 px-2 py-0.5 rounded">
                   {nc.numero_rnc}
                 </span>
               )}
@@ -99,7 +99,7 @@ export default function GestaoNCCard({
                     <Button
                       size="sm"
                       onClick={() => onApproval(nc, "reject")}
-                      className="flex-1 bg-red-600 hover:bg-red-700 text-white h-7 px-2"
+                      className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground h-7 px-2"
                     >
                       <XCircle className="w-3 h-3 mr-1" />
                       Reprovar
@@ -138,7 +138,7 @@ export default function GestaoNCCard({
               </div>
             ) : nc.cliente_aprovacao === "reprovada" ? (
               <div className="flex flex-col gap-1">
-                <Badge className="bg-red-100 text-red-700 text-center">
+                <Badge className="bg-red-100 text-destructive text-center">
                   Reprovada - Editar e Reenviar
                 </Badge>
                 {(isGestor || isAdmin) && (
@@ -173,8 +173,8 @@ export default function GestaoNCCard({
             {/* Rejection Reason */}
             {nc.cliente_aprovacao === "reprovada" && nc.cliente_reprovacao_motivo && (
               <div className="bg-red-50 border border-red-200 rounded p-2 text-xs">
-                <p className="font-semibold text-red-800 mb-1">Motivo da Reprovação:</p>
-                <p className="text-red-700">{nc.cliente_reprovacao_motivo}</p>
+                <p className="font-semibold text-destructive mb-1">Motivo da Reprovação:</p>
+                <p className="text-destructive">{nc.cliente_reprovacao_motivo}</p>
               </div>
             )}
 

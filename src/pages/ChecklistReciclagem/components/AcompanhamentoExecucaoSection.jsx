@@ -39,7 +39,7 @@ export default function AcompanhamentoExecucaoSection({ acompanhamento, onCheckb
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-border text-sm">
             <thead>
-              <tr className="bg-slate-100">
+              <tr className="bg-muted">
                 <th className="border border-border px-2 py-2 text-left font-medium">Controle</th>
                 <th className="border border-border px-2 py-2 text-center font-medium w-32">Resposta</th>
                 <th className="border border-border px-2 py-2 text-left font-medium">Observações</th>
@@ -47,7 +47,7 @@ export default function AcompanhamentoExecucaoSection({ acompanhamento, onCheckb
             </thead>
             <tbody>
               <tr>
-                <td className="border border-border px-2 py-2 bg-slate-50">Foi realizado remoção de material existente?</td>
+                <td className="border border-border px-2 py-2 bg-muted/30">Foi realizado remoção de material existente?</td>
                 <td className="border border-border px-2 py-2">
                   <CheckboxGroup value={acompanhamento.remocao_material_existente} onChange={(opt) => onCheckboxChange('acompanhamento_execucao', 'remocao_material_existente', opt)} />
                 </td>
@@ -57,7 +57,7 @@ export default function AcompanhamentoExecucaoSection({ acompanhamento, onCheckb
                 </td>
               </tr>
               <tr>
-                <td className="border border-border px-2 py-2 bg-slate-50">Foi espalhado material novo para construção da camada?</td>
+                <td className="border border-border px-2 py-2 bg-muted/30">Foi espalhado material novo para construção da camada?</td>
                 <td className="border border-border px-2 py-2">
                   <CheckboxGroup value={acompanhamento.espalhamento_material_novo} onChange={(opt) => onCheckboxChange('acompanhamento_execucao', 'espalhamento_material_novo', opt)} />
                 </td>
@@ -67,7 +67,7 @@ export default function AcompanhamentoExecucaoSection({ acompanhamento, onCheckb
                 </td>
               </tr>
               <tr>
-                <td className="border border-border px-2 py-2 bg-slate-50">
+                <td className="border border-border px-2 py-2 bg-muted/30">
                   A compactação da camada foi realizada em conformidade à energia de projeto?
                   <div className="flex gap-4 mt-2 ml-4">
                     {ROLOS.map(([rolo, label]) => (
@@ -85,28 +85,28 @@ export default function AcompanhamentoExecucaoSection({ acompanhamento, onCheckb
                 <td className="border border-border px-2 py-2"></td>
               </tr>
               <tr>
-                <td className="border border-border px-2 py-2 bg-slate-50">Foi realizado ensaio de viga Benkelman para liberação da camada?</td>
+                <td className="border border-border px-2 py-2 bg-muted/30">Foi realizado ensaio de viga Benkelman para liberação da camada?</td>
                 <td className="border border-border px-2 py-2">
                   <CheckboxGroup value={acompanhamento.ensaio_viga_benkelman} onChange={(opt) => onCheckboxChange('acompanhamento_execucao', 'ensaio_viga_benkelman', opt)} />
                 </td>
                 <td className="border border-border px-2 py-2"></td>
               </tr>
               <tr>
-                <td className="border border-border px-2 py-2 bg-slate-50">Espessura Reciclada?</td>
+                <td className="border border-border px-2 py-2 bg-muted/30">Espessura Reciclada?</td>
                 <td className="border border-border px-2 py-2" colSpan="2">
                   <Input placeholder="Informe a espessura" value={acompanhamento.espessura_reciclada || ""} disabled={!isEditable}
                     onChange={(e) => setAcomp({ espessura_reciclada: e.target.value })} className="h-8 text-sm" />
                 </td>
               </tr>
               <tr>
-                <td className="border border-border px-2 py-2 bg-slate-50">Foi realizado teste de carga para liberação da camada?</td>
+                <td className="border border-border px-2 py-2 bg-muted/30">Foi realizado teste de carga para liberação da camada?</td>
                 <td className="border border-border px-2 py-2">
                   <CheckboxGroup value={acompanhamento.teste_carga} onChange={(opt) => onCheckboxChange('acompanhamento_execucao', 'teste_carga', opt)} />
                 </td>
                 <td className="border border-border px-2 py-2"></td>
               </tr>
               <tr>
-                <td className="border border-border px-2 py-2 bg-slate-50">Há algum ponto de falha de compactação (borrachudo)?</td>
+                <td className="border border-border px-2 py-2 bg-muted/30">Há algum ponto de falha de compactação (borrachudo)?</td>
                 <td className="border border-border px-2 py-2">
                   <CheckboxGroup value={acompanhamento.falha_compactacao} onChange={(opt) => onCheckboxChange('acompanhamento_execucao', 'falha_compactacao', opt)} />
                 </td>

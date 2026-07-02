@@ -117,7 +117,7 @@ export default function DadosObraSection({
           <Label>Ligante *</Label>
           <Input value={formData.ligante} onChange={(e) => onChange('ligante', e.target.value)}
             disabled={!isEditable} readOnly={!!selectedProject}
-            className={selectedProject ? "bg-slate-100" : ""}
+            className={selectedProject ? "bg-muted" : ""}
             placeholder="Tipo de ligante" required />
         </div>
 
@@ -125,7 +125,7 @@ export default function DadosObraSection({
           <Label>Pedreira *</Label>
           <Input value={formData.pedreira} onChange={(e) => onChange('pedreira', e.target.value)}
             disabled={!isEditable} readOnly={!!selectedProject}
-            className={selectedProject ? "bg-slate-100" : ""}
+            className={selectedProject ? "bg-muted" : ""}
             placeholder="Nome da pedreira" required />
         </div>
 

@@ -60,7 +60,7 @@ export default function SolicitacoesTransferenciaPage() {
             </p>
             {isLaboratorista && regionalAtual && (
               <div className="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p className="text-sm text-blue-800">
+                <p className="text-sm text-secondary">
                   <strong>Sua Regional Atual:</strong> {regionalAtual.nome}
                 </p>
               </div>
@@ -77,7 +77,7 @@ export default function SolicitacoesTransferenciaPage() {
           {isLaboratorista && (
             <Button
               onClick={() => setIsDialogOpen(true)}
-              className="bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90"
+              className="bg-muted text-[#F2F1EF] hover:bg-muted/90"
               disabled={!regionalAtual}
               title={!regionalAtual ? "Você precisa estar alocado em uma regional para solicitar transferência" : ""}
             >
@@ -88,7 +88,7 @@ export default function SolicitacoesTransferenciaPage() {
         </div>
 
         <Tabs defaultValue="pendentes" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-white/20 backdrop-blur-lg border border-white/20">
+          <TabsList className="grid w-full grid-cols-3 bg-card/20 backdrop-blur-lg border border-white/20">
             <TabsTrigger value="pendentes">
               Pendentes <Badge className="ml-2">{solicitacoesPendentes.length}</Badge>
             </TabsTrigger>
@@ -142,7 +142,7 @@ export default function SolicitacoesTransferenciaPage() {
             ) : (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
-                  <CheckCircle className="w-16 h-16 text-[#566E3D]/40 mb-4" />
+                  <CheckCircle className="w-16 h-16 text-secondary/40 mb-4" />
                   <h3 className="text-lg font-semibold text-foreground mb-2">
                     Nenhuma solicitação aprovada
                   </h3>

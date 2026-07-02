@@ -27,12 +27,12 @@ export const TIPO_CORES = {
   CAUQ: "bg-blue-500 text-white",
   MRAF: "bg-green-500 text-white",
   BGS: "bg-purple-500 text-white",
-  CAMADAS_GRANULARES: "bg-orange-500 text-white"
+  CAMADAS_GRANULARES: "bg-card0 text-white"
 };
 
 export const STATUS_CORES = {
   ativo: "bg-green-200/50 text-green-800",
-  inativo: "bg-red-200/50 text-red-800"
+  inativo: "bg-red-200/50 text-destructive"
 };
 
 // Utility functions

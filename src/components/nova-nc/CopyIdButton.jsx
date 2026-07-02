@@ -16,7 +16,7 @@ export function CopyIdButton({ id }) {
       type="button"
       onClick={handleCopy}
       title="Copiar ID"
-      className="inline-flex items-center gap-1 text-[10px] font-mono bg-black/10 hover:bg-[#BFCF99]/40 px-1.5 py-0.5 rounded transition-colors"
+      className="inline-flex items-center gap-1 text-[10px] font-mono bg-black/10 hover:bg-secondary/20/40 px-1.5 py-0.5 rounded transition-colors"
     >
       {copied ? <Check className="w-3 h-3 text-green-600" /> : <Copy className="w-3 h-3" />}
       <span className="truncate max-w-[80px]">{id}</span>

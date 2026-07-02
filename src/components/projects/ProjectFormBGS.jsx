@@ -25,7 +25,7 @@ export default function ProjectFormBGS({ formData, peneirasCarregadas, peneirasD
                 onChange={(e) => onInputChange?.('densidade_seca_max', e.target.value === '' ? '' : parseFloat(e.target.value))}
                 placeholder="Ex: 2.150"
               />
-              <p className="text-xs text-slate-500 mt-1">Valor de referência para ensaios de densidade in situ</p>
+              <p className="text-xs text-muted-foreground mt-1">Valor de referência para ensaios de densidade in situ</p>
             </div>
             <div>
               <Label htmlFor="umidade_otima_bgs">Umidade Ótima (%)</Label>
@@ -49,15 +49,15 @@ export default function ProjectFormBGS({ formData, peneirasCarregadas, peneirasD
             <CardTitle className="text-base">Faixa de Trabalho (% Passante)</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-slate-500 mb-4">
+            <p className="text-xs text-muted-foreground mb-4">
               Informe os limites mínimo e máximo de passante para cada peneira relevante.
             </p>
             {/* Cabeçalho das colunas */}
             <div className="flex items-center gap-2 mb-1 border-b pb-2">
-              <span className="text-xs font-semibold text-slate-500 w-28 shrink-0">Peneira</span>
-              <span className="text-xs font-semibold text-slate-500 flex-1 text-center">Mín (%)</span>
-              <span className="text-xs font-semibold text-slate-500 flex-1 text-center">Ótimo (%)</span>
-              <span className="text-xs font-semibold text-slate-500 flex-1 text-center">Máx (%)</span>
+              <span className="text-xs font-semibold text-muted-foreground w-28 shrink-0">Peneira</span>
+              <span className="text-xs font-semibold text-muted-foreground flex-1 text-center">Mín (%)</span>
+              <span className="text-xs font-semibold text-muted-foreground flex-1 text-center">Ótimo (%)</span>
+              <span className="text-xs font-semibold text-muted-foreground flex-1 text-center">Máx (%)</span>
             </div>
             <div className="space-y-2">
               {peneirasDisponiveis.map(p => (
@@ -109,7 +109,7 @@ export default function ProjectFormBGS({ formData, peneirasCarregadas, peneirasD
           {formData.agregados.length > 0 ? (
             <div className="space-y-4">
               {formData.agregados.map((agregado, index) => (
-                <div key={index} className="p-4 border rounded-lg bg-slate-50">
+                <div key={index} className="p-4 border rounded-lg bg-muted/30">
                   <div className="flex justify-between items-center mb-3">
                     <h5 className="font-semibold text-sm">Agregado {index + 1}</h5>
                     <Button

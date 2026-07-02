@@ -108,14 +108,14 @@ export default function NaoConformidadesFilters({
       {/* Active filter badges */}
       {hasActiveFilter && (
         <div className="flex flex-wrap gap-2">
-          {filtroStatus && <Badge className="bg-[#BFCF99]/30 text-foreground border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroStatus(null)}>Status: {STATUS_LABELS[filtroStatus]} <X className="w-3 h-3"/></Badge>}
-          {filtroParametro && <Badge className="bg-[#BFCF99]/30 text-foreground border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroParametro(null)}>Parâmetro: {filtroParametro} <X className="w-3 h-3"/></Badge>}
-          {filtroObraId && <Badge className="bg-[#BFCF99]/30 text-foreground border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroObraId(null)}>Obra: {obras.find(o => o.id === filtroObraId)?.name} <X className="w-3 h-3"/></Badge>}
-          {filtroEmpreiteira && <Badge className="bg-[#BFCF99]/30 text-foreground border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroEmpreiteira(null)}>Empreiteira: {filtroEmpreiteira} <X className="w-3 h-3"/></Badge>}
-          {filtroRodovia && <Badge className="bg-[#BFCF99]/30 text-foreground border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroRodovia(null)}>Rodovia: {filtroRodovia} <X className="w-3 h-3"/></Badge>}
-          {filtroUsina && <Badge className="bg-[#BFCF99]/30 text-foreground border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroUsina(null)}>Usina: {filtroUsina} <X className="w-3 h-3"/></Badge>}
-          {filtroDataInicial && <Badge className="bg-[#BFCF99]/30 text-foreground border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroDataInicial(null)}>De: {format(filtroDataInicial, 'dd/MM/yyyy')} <X className="w-3 h-3"/></Badge>}
-          {filtroDataFinal && <Badge className="bg-[#BFCF99]/30 text-foreground border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroDataFinal(null)}>Até: {format(filtroDataFinal, 'dd/MM/yyyy')} <X className="w-3 h-3"/></Badge>}
+          {filtroStatus && <Badge className="bg-secondary/20/30 text-foreground border border-secondary/30/50 cursor-pointer gap-1" onClick={() => setFiltroStatus(null)}>Status: {STATUS_LABELS[filtroStatus]} <X className="w-3 h-3"/></Badge>}
+          {filtroParametro && <Badge className="bg-secondary/20/30 text-foreground border border-secondary/30/50 cursor-pointer gap-1" onClick={() => setFiltroParametro(null)}>Parâmetro: {filtroParametro} <X className="w-3 h-3"/></Badge>}
+          {filtroObraId && <Badge className="bg-secondary/20/30 text-foreground border border-secondary/30/50 cursor-pointer gap-1" onClick={() => setFiltroObraId(null)}>Obra: {obras.find(o => o.id === filtroObraId)?.name} <X className="w-3 h-3"/></Badge>}
+          {filtroEmpreiteira && <Badge className="bg-secondary/20/30 text-foreground border border-secondary/30/50 cursor-pointer gap-1" onClick={() => setFiltroEmpreiteira(null)}>Empreiteira: {filtroEmpreiteira} <X className="w-3 h-3"/></Badge>}
+          {filtroRodovia && <Badge className="bg-secondary/20/30 text-foreground border border-secondary/30/50 cursor-pointer gap-1" onClick={() => setFiltroRodovia(null)}>Rodovia: {filtroRodovia} <X className="w-3 h-3"/></Badge>}
+          {filtroUsina && <Badge className="bg-secondary/20/30 text-foreground border border-secondary/30/50 cursor-pointer gap-1" onClick={() => setFiltroUsina(null)}>Usina: {filtroUsina} <X className="w-3 h-3"/></Badge>}
+          {filtroDataInicial && <Badge className="bg-secondary/20/30 text-foreground border border-secondary/30/50 cursor-pointer gap-1" onClick={() => setFiltroDataInicial(null)}>De: {format(filtroDataInicial, 'dd/MM/yyyy')} <X className="w-3 h-3"/></Badge>}
+          {filtroDataFinal && <Badge className="bg-secondary/20/30 text-foreground border border-secondary/30/50 cursor-pointer gap-1" onClick={() => setFiltroDataFinal(null)}>Até: {format(filtroDataFinal, 'dd/MM/yyyy')} <X className="w-3 h-3"/></Badge>}
         </div>
       )}
     </>

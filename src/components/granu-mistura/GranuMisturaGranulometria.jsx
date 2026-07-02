@@ -39,7 +39,7 @@ export default function GranuMisturaGranulometria({
               </tr>
               {(showFaixaTrabalho || showEspecificacao) && (
                 <tr>
-                  <th colSpan="5" className="border border-border bg-slate-50"></th>
+                  <th colSpan="5" className="border border-border bg-muted/30"></th>
                   {showFaixaTrabalho && (
                     <>
                       <th className="border border-border px-2 py-1">MÍN. (%)</th>
@@ -64,7 +64,7 @@ export default function GranuMisturaGranulometria({
                 const ft  = getFaixaTrabalho(selectedProject, pKey, pKeyAlt);
                 const esp = getEspecificacao(faixaAtiva, pKey, pKeyAlt);
                 return (
-                  <tr key={idx} className="hover:bg-slate-50">
+                  <tr key={idx} className="hover:bg-muted/30">
                     <td className="border border-border px-2 py-1 text-center font-medium">{peneira.astm}</td>
                     <td className="border border-border px-2 py-1 text-center">{peneira.abertura_mm}</td>
                     <td className="border border-border px-1 py-1">
@@ -72,12 +72,12 @@ export default function GranuMisturaGranulometria({
                         onChange={e => handlePeneiraChange(idx, "retido_g", e.target.value)}
                         disabled={isApproved} className="h-6 text-[9px] text-center p-1" />
                     </td>
-                    <td className="border border-border px-2 py-1 text-center bg-gray-50 text-[9px]">{peneiraData.passante_g || "-"}</td>
-                    <td className="border border-border px-2 py-1 text-center bg-gray-50 font-bold text-[9px]">{peneiraData.passante_pct || "-"}</td>
+                    <td className="border border-border px-2 py-1 text-center bg-muted/30 text-[9px]">{peneiraData.passante_g || "-"}</td>
+                    <td className="border border-border px-2 py-1 text-center bg-muted/30 font-bold text-[9px]">{peneiraData.passante_pct || "-"}</td>
                     {showFaixaTrabalho && (
                       <>
-                        <td className="border border-border px-2 py-1 text-center text-blue-700 text-[9px]">{ft.min ?? "-"}</td>
-                        <td className="border border-border px-2 py-1 text-center text-blue-700 text-[9px]">{ft.max ?? "-"}</td>
+                        <td className="border border-border px-2 py-1 text-center text-primary text-[9px]">{ft.min ?? "-"}</td>
+                        <td className="border border-border px-2 py-1 text-center text-primary text-[9px]">{ft.max ?? "-"}</td>
                       </>
                     )}
                     {showEspecificacao && (

@@ -31,7 +31,7 @@ function EnsaioTable({ title, rows, onRowChange, disabled, showPeneira = false }
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={i} className="hover:bg-slate-50">
+            <tr key={i} className="hover:bg-muted/30">
               {showPeneira && (
                 <td className="border border-border px-2 py-1 font-medium">{row.peneira}</td>
               )}
@@ -61,7 +61,7 @@ function EnsaioTable({ title, rows, onRowChange, disabled, showPeneira = false }
               <td colSpan={3} className="border border-border px-2 py-1 text-xs font-semibold text-right text-muted-foreground">
                 Desvio Padrão Amostral:
               </td>
-              <td className="border border-border px-2 py-1 text-xs text-center font-semibold text-slate-700">
+              <td className="border border-border px-2 py-1 text-xs text-center font-semibold text-foreground">
                 {dpValue != null ? dpValue.toFixed(3) : "—"}
               </td>
             </tr>
@@ -109,13 +109,13 @@ export default function SecaoAfeicao({
 
   return (
     <div className="space-y-4">
-      <h3 className="font-bold text-[#00233B] text-sm bg-muted px-3 py-2 rounded">
+      <h3 className="font-bold text-foreground text-sm bg-muted px-3 py-2 rounded">
         7.2 AFERIÇÃO, REPETIBILIDADE E REPRODUTIBILIDADE
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-1">
-        <div className="space-y-2 p-3 border border-slate-200 rounded">
-          <h4 className="text-sm font-semibold text-slate-700">Repetibilidade</h4>
+        <div className="space-y-2 p-3 border border-border rounded">
+          <h4 className="text-sm font-semibold text-foreground">Repetibilidade</h4>
           <div className="flex items-center gap-2">
             <Label className="text-xs text-muted-foreground w-36">Desvio padrão obtido:</Label>
             <input
@@ -138,8 +138,8 @@ export default function SecaoAfeicao({
             />
           </div>
         </div>
-        <div className="space-y-2 p-3 border border-slate-200 rounded">
-          <h4 className="text-sm font-semibold text-slate-700">Reprodutibilidade</h4>
+        <div className="space-y-2 p-3 border border-border rounded">
+          <h4 className="text-sm font-semibold text-foreground">Reprodutibilidade</h4>
           <div className="flex items-center gap-2">
             <Label className="text-xs text-muted-foreground w-36">Desvio padrão obtido:</Label>
             <input
@@ -165,8 +165,8 @@ export default function SecaoAfeicao({
       </div>
 
       {/* Seleção de projeto para preenchimento automático */}
-      <div className="flex items-center gap-3 px-1 py-2 bg-blue-50 border border-blue-200 rounded">
-        <Label className="text-xs font-semibold text-blue-700 whitespace-nowrap">Projeto (preenchimento automático):</Label>
+      <div className="flex items-center gap-3 px-1 py-2 bg-primary/10 border border-primary/20 rounded">
+        <Label className="text-xs font-semibold text-primary whitespace-nowrap">Projeto (preenchimento automático):</Label>
         <Select
           value={formData.afeicao_project_id || ""}
           onValueChange={(val) => {
@@ -189,7 +189,7 @@ export default function SecaoAfeicao({
         <span className="text-xs text-blue-500">Os valores de Projeto, Erro (%) e Desvio Padrão Amostral são calculados automaticamente.</span>
       </div>
 
-      <h4 className="text-sm font-semibold text-slate-700 px-1">Ensaios para Validação de Profissionais</h4>
+      <h4 className="text-sm font-semibold text-foreground px-1">Ensaios para Validação de Profissionais</h4>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-1">
         <EnsaioTable
           title="Granulometria"

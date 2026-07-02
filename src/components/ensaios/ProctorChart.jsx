@@ -56,9 +56,9 @@ const CustomTooltip = ({ active, payload }) => {
   const d = payload[0]?.payload;
   if (!d) return null;
   return (
-    <div className="bg-white border border-[#00233B]/20 rounded-lg p-2 text-xs shadow">
-      <p className="font-semibold text-[#00233B]">Umidade: {Number(d.x ?? d.umidade).toFixed(2)}%</p>
-      <p className="text-[#00233B]/80">γd: {Number(d.y ?? d.densidade).toFixed(4)} g/cm³</p>
+    <div className="bg-card border border-border/20 rounded-lg p-2 text-xs shadow">
+      <p className="font-semibold text-foreground">Umidade: {Number(d.x ?? d.umidade).toFixed(2)}%</p>
+      <p className="text-foreground/80">γd: {Number(d.y ?? d.densidade).toFixed(4)} g/cm³</p>
     </div>
   );
 };
@@ -83,7 +83,7 @@ export default function ProctorChart({ points, parabola, validCount }) {
 
   if (points.length === 0) {
     return (
-      <div className="flex items-center justify-center h-48 text-[#00233B]/50 text-sm">
+      <div className="flex items-center justify-center h-48 text-foreground/50 text-sm">
         Preencha ao menos 3 pontos para visualizar o gráfico
       </div>
     );

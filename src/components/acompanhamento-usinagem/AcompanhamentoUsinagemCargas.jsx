@@ -73,7 +73,7 @@ export default function AcompanhamentoUsinagemCargas({
                     {isEditable && (
                       <td className="border border-border p-2 text-center">
                         <Button variant="ghost" size="sm" onClick={() => removerCarga(index)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-600/10">
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10">
                           <X className="w-4 h-4" />
                         </Button>
                       </td>

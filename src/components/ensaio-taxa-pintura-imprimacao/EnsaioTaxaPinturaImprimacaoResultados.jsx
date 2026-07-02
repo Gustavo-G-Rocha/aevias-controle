@@ -44,7 +44,7 @@ export default function EnsaioTaxaPinturaImprimacaoResultados({
                     variant="ghost"
                     size="sm"
                     onClick={() => onRemoverEnsaio(index, formData.ensaios.length)}
-                    className="text-red-500 hover:text-red-700"
+                    className="text-red-500 hover:text-destructive"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>

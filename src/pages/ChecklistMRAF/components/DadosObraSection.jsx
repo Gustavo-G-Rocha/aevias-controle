@@ -47,7 +47,7 @@ export default function DadosObraSection({
           <div>
             <Label className="text-base">Data *</Label>
             <Input type="date" value={formData.data} onChange={(e) => handleChange('data', e.target.value)}
-              required disabled={!isEditable || isApproved} className="bg-white border-slate-200 text-slate-700 h-11 text-base" />
+              required disabled={!isEditable || isApproved} className="bg-card border-border text-foreground h-11 text-base" />
           </div>
         </div>
 
@@ -56,13 +56,13 @@ export default function DadosObraSection({
             <Label className="text-base">Horário Início *</Label>
             <Input type="time" value={formData.jornada?.horario_inicio || ""}
               onChange={(e) => setFormData(prev => ({ ...prev, jornada: { ...prev.jornada, horario_inicio: e.target.value } }))}
-              disabled={!isEditable || isApproved} required className="bg-white border-slate-200 text-slate-700 h-11 text-base" />
+              disabled={!isEditable || isApproved} required className="bg-card border-border text-foreground h-11 text-base" />
           </div>
           <div>
             <Label className="text-base">Horário Fim *</Label>
             <Input type="time" value={formData.jornada?.horario_fim || ""}
               onChange={(e) => setFormData(prev => ({ ...prev, jornada: { ...prev.jornada, horario_fim: e.target.value } }))}
-              disabled={!isEditable || isApproved} required className="bg-white border-slate-200 text-slate-700 h-11 text-base" />
+              disabled={!isEditable || isApproved} required className="bg-card border-border text-foreground h-11 text-base" />
           </div>
         </div>
 
@@ -90,7 +90,7 @@ export default function DadosObraSection({
             <Label className="text-base">Trecho *</Label>
             <Input value={formData.trecho} onChange={(e) => handleChange('trecho', e.target.value)}
               required disabled={!isEditable || isApproved} placeholder="Descrição do trecho"
-              className="bg-white border-slate-200 text-slate-700 h-11 text-base" />
+              className="bg-card border-border text-foreground h-11 text-base" />
           </div>
           <div>
             <Label className="text-base">Empreiteira *</Label>
@@ -106,20 +106,20 @@ export default function DadosObraSection({
             <Label className="text-base">Pedreira *</Label>
             <Input value={formData.pedreira} onChange={(e) => handleChange('pedreira', e.target.value)}
               disabled={!isEditable || isApproved} required placeholder="Nome da pedreira"
-              className="bg-white border-slate-200 text-slate-700 h-11 text-base" />
+              className="bg-card border-border text-foreground h-11 text-base" />
           </div>
           <div>
             <Label className="text-base">Faixa Especificada</Label>
             <Input value={formData.faixa_especificada} onChange={(e) => handleChange('faixa_especificada', e.target.value)}
               disabled={!isEditable || isApproved} readOnly
-              className="bg-slate-100 border-slate-200 text-slate-700 h-11 text-base" />
+              className="bg-muted border-border text-foreground h-11 text-base" />
           </div>
           <div>
             <Label className="text-base">Ligante Asfáltico *</Label>
             <Input value={formData.ligante} onChange={(e) => handleChange('ligante', e.target.value)}
               disabled={!isEditable || isApproved} readOnly={!!selectedProject} required
               placeholder="Ex: Emulsão RL-1C"
-              className={selectedProject ? "bg-slate-100 h-11 text-base" : "bg-white border-slate-200 text-slate-700 h-11 text-base"} />
+              className={selectedProject ? "bg-muted h-11 text-base" : "bg-card border-border text-foreground h-11 text-base"} />
           </div>
           <div>
             <Label className="text-base">Ensaio realizado por: *</Label>

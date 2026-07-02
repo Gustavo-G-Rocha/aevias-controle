@@ -47,7 +47,7 @@ export default function NovaNcPage() {
     <div className="p-6 bg-transparent min-h-screen">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center gap-3">
-          <AlertTriangle className="w-7 h-7 text-red-600" />
+          <AlertTriangle className="w-7 h-7 text-destructive" />
           <div>
             <h1 className="text-3xl font-bold text-primary">Nova Não Conformidade</h1>
             <p className="text-muted-foreground text-sm mt-1">Relatório de Não Conformidade (RNC)</p>
@@ -98,7 +98,7 @@ export default function NovaNcPage() {
           <Button
             onClick={handleSaveWrapper}
             disabled={saving}
-            className="bg-[#00233B] text-white hover:bg-[#00233B]/90"
+            className="bg-muted text-white hover:bg-muted/90"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
             Salvar NC

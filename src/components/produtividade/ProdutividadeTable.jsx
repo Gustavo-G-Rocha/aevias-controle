@@ -42,7 +42,7 @@ const DayCell = memo(function DayCell({ registros, markedStatus, futureDay, user
               key={idx}
               type="button"
               disabled={!userCanEdit}
-              className={`${temInfo ? 'bg-green-500' : 'bg-orange-500'} text-white text-[10px] px-1 py-0.5 rounded font-medium ${userCanEdit ? 'cursor-pointer hover:opacity-80' : ''} text-left w-full`}
+              className={`${temInfo ? 'bg-green-500' : 'bg-card0'} text-white text-[10px] px-1 py-0.5 rounded font-medium ${userCanEdit ? 'cursor-pointer hover:opacity-80' : ''} text-left w-full`}
               title={`${reg.tipo}${temInfo ? ' - ' + info : ' - Sem empreiteira/usina'}`}
               onClick={() => onEditClick(reg)}
             >
@@ -80,7 +80,7 @@ const DayCell = memo(function DayCell({ registros, markedStatus, futureDay, user
     <button
       type="button"
       disabled={!userCanEdit}
-      className="bg-yellow-400 text-[#00233B] text-xs px-1 py-1 rounded font-bold cursor-pointer hover:bg-yellow-500 transition-colors w-full"
+      className="bg-yellow-400 text-foreground text-xs px-1 py-1 rounded font-bold cursor-pointer hover:bg-yellow-500 transition-colors w-full"
       onClick={onMarkerClick}
     >
       -

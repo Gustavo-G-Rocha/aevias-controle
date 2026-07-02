@@ -81,12 +81,12 @@ export default function SolicitarTransferenciaRegionalModal({
 
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Regional Atual */}
-          <div className="bg-slate-50 p-3 sm:p-4 rounded-lg border border-slate-200">
+          <div className="bg-muted/30 p-3 sm:p-4 rounded-lg border border-border">
             <div className="flex items-center gap-2 mb-2">
-              <MapPin className="w-4 h-4 text-slate-600 shrink-0" />
-              <span className="font-semibold text-slate-700 text-sm sm:text-base">Regional Atual:</span>
+              <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
+              <span className="font-semibold text-foreground text-sm sm:text-base">Regional Atual:</span>
             </div>
-            <p className="text-slate-900 ml-6 text-sm sm:text-base break-words">
+            <p className="text-foreground ml-6 text-sm sm:text-base break-words">
               {regionalAtual?.nome} - {regionalAtual?.codigo}
             </p>
           </div>
@@ -101,7 +101,7 @@ export default function SolicitarTransferenciaRegionalModal({
               value={regionalDestinoId}
               onChange={(e) => setRegionalDestinoId(e.target.value)}
               required
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-md border border-border bg-card px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <option value="">Selecione a nova regional</option>
               {regionaisDisponiveis.length > 0 ? (
@@ -114,7 +114,7 @@ export default function SolicitarTransferenciaRegionalModal({
                 <option value="" disabled>Nenhuma regional disponível</option>
               )}
             </select>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               Selecione a regional para qual você deseja ser transferido
             </p>
           </div>
@@ -133,14 +133,14 @@ export default function SolicitarTransferenciaRegionalModal({
               required
               className="text-sm sm:text-base resize-none"
             />
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               Seja claro sobre o motivo da transferência para facilitar a análise
             </p>
           </div>
 
           {/* Informação Importante */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
-            <p className="text-xs sm:text-sm text-blue-800 leading-relaxed">
+            <p className="text-xs sm:text-sm text-secondary leading-relaxed">
               <strong>ℹ️ Importante:</strong> Sua solicitação será analisada pelo gestor de contrato ou sala técnica responsável. 
               Você será notificado quando houver uma resposta.
             </p>
@@ -159,7 +159,7 @@ export default function SolicitarTransferenciaRegionalModal({
             </Button>
             <Button
               type="submit"
-              className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto order-1 sm:order-2"
+              className=" w-full sm:w-auto order-1 sm:order-2"
               disabled={loading || regionaisDisponiveis.length === 0}
             >
               {loading ? "Enviando..." : "Enviar Solicitação"}

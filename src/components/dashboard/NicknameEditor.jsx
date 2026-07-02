@@ -13,7 +13,7 @@ export default function NicknameEditor({ user }) {
         <div className="flex items-center gap-2">
         <input
           autoFocus
-          className="bg-white/20 text-white placeholder-white/50 border border-white/40 rounded-md px-3 py-1 text-sm focus:outline-none focus:border-white/70 w-48"
+          className="bg-card/20 text-white placeholder-white/50 border border-white/40 rounded-md px-3 py-1 text-sm focus:outline-none focus:border-white/70 w-48"
           placeholder="Seu apelido..."
           value={value}
           onChange={e => setValue(e.target.value)}

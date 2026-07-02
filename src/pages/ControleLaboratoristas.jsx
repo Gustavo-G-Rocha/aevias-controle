@@ -216,7 +216,7 @@ export default function ControleLaboratoristas() {
               <Users className="w-5 h-5" />
               Laboratoristas ({laboratoristasFiltrados.length})
             </CardTitle>
-            <Badge variant="secondary" className="bg-[#BFCF99]/20 text-foreground">
+            <Badge variant="secondary" className="bg-secondary/20/20 text-foreground">
               {registros.length} registros totais
             </Badge>
           </div>
@@ -257,8 +257,8 @@ export default function ControleLaboratoristas() {
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center gap-2">
-                          <XCircle className="w-4 h-4 text-red-600" />
-                          <span className="font-medium text-red-700">{lab.reprovados}</span>
+                          <XCircle className="w-4 h-4 text-destructive" />
+                          <span className="font-medium text-destructive">{lab.reprovados}</span>
                         </div>
                       </TableCell>
                       <TableCell className="text-center">
@@ -266,7 +266,7 @@ export default function ControleLaboratoristas() {
                           <TrendingDown className="w-4 h-4 text-orange-600" />
                           <span className={`font-bold ${
                             parseFloat(lab.percentualReprovacao) > 20
-                              ? 'text-red-600'
+                              ? 'text-destructive'
                               : parseFloat(lab.percentualReprovacao) > 10
                                 ? 'text-orange-600'
                                 : 'text-green-600'

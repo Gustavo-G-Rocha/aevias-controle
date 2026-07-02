@@ -18,7 +18,7 @@ export default function CargaConcretoCard({
           <CardTitle className="text-base">Carga {carga.numero_carga}</CardTitle>
           {canRemove && (
             <Button type="button" variant="ghost" size="sm" onClick={onRemove}
-              className="text-red-500 hover:text-red-700 p-0 h-auto">
+              className="text-red-500 hover:text-destructive p-0 h-auto">
               <Trash2 className="w-4 h-4" />
             </Button>
           )}
@@ -40,61 +40,61 @@ export default function CargaConcretoCard({
         <div className="border-t pt-4">
           <div className="flex items-center justify-between mb-3">
             <h4 className="font-semibold">Ensaios de Qualidade</h4>
-            <p className="text-xs text-slate-600 italic">Determinar a conformidade dos parâmetros</p>
+            <p className="text-xs text-muted-foreground italic">Determinar a conformidade dos parâmetros</p>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-slate-300 text-sm">
+            <table className="w-full border-collapse border border-border text-sm">
               <thead>
-                <tr className="bg-slate-100">
-                  <th className="border border-slate-300 px-2 py-2 text-left font-medium">Ensaio</th>
-                  <th className="border border-slate-300 px-2 py-2 text-center font-medium w-24">Realizado</th>
-                  <th className="border border-slate-300 px-2 py-2 text-center font-medium">Resultado (cm)</th>
-                  <th className="border border-slate-300 px-2 py-2 text-center font-medium">Padrão do Projeto</th>
-                  <th className="border border-slate-300 px-2 py-2 text-center font-medium w-24">Conformidade</th>
+                <tr className="bg-muted">
+                  <th className="border border-border px-2 py-2 text-left font-medium">Ensaio</th>
+                  <th className="border border-border px-2 py-2 text-center font-medium w-24">Realizado</th>
+                  <th className="border border-border px-2 py-2 text-center font-medium">Resultado (cm)</th>
+                  <th className="border border-border px-2 py-2 text-center font-medium">Padrão do Projeto</th>
+                  <th className="border border-border px-2 py-2 text-center font-medium w-24">Conformidade</th>
                 </tr>
               </thead>
               <tbody>
                 {/* Slump Test */}
                 <tr>
-                  <td className="border border-slate-300 px-2 py-2 font-medium bg-slate-50">Slump Test</td>
-                  <td className="border border-slate-300 px-2 py-1 text-center">
+                  <td className="border border-border px-2 py-2 font-medium bg-muted/30">Slump Test</td>
+                  <td className="border border-border px-2 py-1 text-center">
                     <input type="checkbox" checked={carga.slump_test.realizado}
                       onChange={(e) => onCargaChange(index, "slump_test.realizado", e.target.checked)} className="w-4 h-4" />
                   </td>
-                  <td className="border border-slate-300 px-1 py-1">
+                  <td className="border border-border px-1 py-1">
                     <Input type="number" step="0.1" value={carga.slump_test.resultado || ""}
                       onChange={(e) => onCargaChange(index, "slump_test.resultado", e.target.value)}
                       disabled={!carga.slump_test.realizado || !selectedProject} className="h-8 text-sm" placeholder="Resultado" />
                   </td>
-                  <td className={`border border-slate-300 px-2 py-1 text-center text-xs ${selectedProject ? "bg-blue-50 text-blue-800" : "bg-slate-100 text-slate-500"}`}>
+                  <td className={`border border-border px-2 py-1 text-center text-xs ${selectedProject ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
                     {carga.slump_test.limite || "N/A"}
                   </td>
-                  <td className="border border-slate-300 px-2 py-1 text-center">
+                  <td className="border border-border px-2 py-1 text-center">
                     {carga.slump_test.realizado
                       ? carga.slump_test.conforme === true ? <span className="text-green-600 font-bold text-xl">✓</span>
-                        : carga.slump_test.conforme === false ? <span className="text-red-600 font-bold text-xl">✗</span>
-                        : <span className="text-slate-500">-</span>
-                      : <span className="text-slate-500">-</span>}
+                        : carga.slump_test.conforme === false ? <span className="text-destructive font-bold text-xl">✗</span>
+                        : <span className="text-muted-foreground">-</span>
+                      : <span className="text-muted-foreground">-</span>}
                   </td>
                 </tr>
                 {/* Flow Test */}
                 <tr>
-                  <td className="border border-slate-300 px-2 py-2 font-medium bg-slate-50">Flow Test</td>
-                  <td className="border border-slate-300 px-2 py-1 text-center">
+                  <td className="border border-border px-2 py-2 font-medium bg-muted/30">Flow Test</td>
+                  <td className="border border-border px-2 py-1 text-center">
                     <input type="checkbox" checked={carga.flow_test?.realizado}
                       onChange={(e) => onCargaChange(index, "flow_test.realizado", e.target.checked)} className="w-4 h-4" />
                   </td>
-                  <td className="border border-slate-300 px-1 py-1">
+                  <td className="border border-border px-1 py-1">
                     <Input type="number" step="0.1" value={carga.flow_test?.resultado || ""}
                       onChange={(e) => onCargaChange(index, "flow_test.resultado", e.target.value)}
                       disabled={!carga.flow_test?.realizado} className="h-8 text-sm" placeholder="Resultado" />
                   </td>
-                  <td className="border border-slate-300 px-1 py-1">
+                  <td className="border border-border px-1 py-1">
                     <Input value={carga.flow_test?.limite || ""}
                       onChange={(e) => onCargaChange(index, "flow_test.limite", e.target.value)}
                       disabled={!carga.flow_test?.realizado} className="h-8 text-sm" placeholder="Limite manual" />
                   </td>
-                  <td className="border border-slate-300 px-2 py-1 text-center">
+                  <td className="border border-border px-2 py-1 text-center">
                     <div className="flex gap-2 justify-center">
                       <label className="flex items-center gap-1 cursor-pointer">
                         <input type="checkbox" checked={carga.flow_test?.conforme === true}
@@ -106,29 +106,29 @@ export default function CargaConcretoCard({
                         <input type="checkbox" checked={carga.flow_test?.conforme === false}
                           onChange={(e) => onCargaChange(index, "flow_test.conforme", e.target.checked ? false : null)}
                           disabled={!carga.flow_test?.realizado} className="w-4 h-4 accent-red-500" />
-                        <span className="text-xs text-red-600">✗</span>
+                        <span className="text-xs text-destructive">✗</span>
                       </label>
                     </div>
                   </td>
                 </tr>
                 {/* Espessura da Camada */}
                 <tr>
-                  <td className="border border-slate-300 px-2 py-2 font-medium bg-slate-50">Espessura da Camada</td>
-                  <td className="border border-slate-300 px-2 py-1 text-center">
+                  <td className="border border-border px-2 py-2 font-medium bg-muted/30">Espessura da Camada</td>
+                  <td className="border border-border px-2 py-1 text-center">
                     <input type="checkbox" checked={carga.espessura_camada.realizado}
                       onChange={(e) => onCargaChange(index, "espessura_camada.realizado", e.target.checked)} className="w-4 h-4" />
                   </td>
-                  <td className="border border-slate-300 px-1 py-1">
+                  <td className="border border-border px-1 py-1">
                     <Input type="number" step="0.1" value={carga.espessura_camada.resultado || ""}
                       onChange={(e) => onCargaChange(index, "espessura_camada.resultado", e.target.value)}
                       disabled={!carga.espessura_camada.realizado} className="h-8 text-sm" placeholder="Resultado" />
                   </td>
-                  <td className="border border-slate-300 px-1 py-1">
+                  <td className="border border-border px-1 py-1">
                     <Input value={carga.espessura_camada.limite}
                       onChange={(e) => onCargaChange(index, "espessura_camada.limite", e.target.value)}
                       disabled={!carga.espessura_camada.realizado} className="h-8 text-sm" placeholder="Limite manual" />
                   </td>
-                  <td className="border border-slate-300 px-2 py-1 text-center">
+                  <td className="border border-border px-2 py-1 text-center">
                     <div className="flex gap-2 justify-center">
                       <label className="flex items-center gap-1 cursor-pointer">
                         <input type="checkbox" checked={carga.espessura_camada.conforme === true}
@@ -140,7 +140,7 @@ export default function CargaConcretoCard({
                         <input type="checkbox" checked={carga.espessura_camada.conforme === false}
                           onChange={(e) => onCargaChange(index, "espessura_camada.conforme", e.target.checked ? false : null)}
                           disabled={!carga.espessura_camada.realizado} className="w-4 h-4 accent-red-500" />
-                        <span className="text-xs text-red-600">✗</span>
+                        <span className="text-xs text-destructive">✗</span>
                       </label>
                     </div>
                   </td>
@@ -164,12 +164,12 @@ export default function CargaConcretoCard({
         <div className="border-t pt-4 space-y-3">
           <h4 className="font-semibold">Acompanhamento Lançamento Concreto</h4>
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-slate-300 text-sm">
+            <table className="w-full border-collapse border border-border text-sm">
               <thead>
-                <tr className="bg-slate-100">
-                  <th className="border border-slate-300 px-2 py-2 text-left font-medium">Serviço</th>
-                  <th className="border border-slate-300 px-2 py-2 text-center font-medium w-20">Sim</th>
-                  <th className="border border-slate-300 px-2 py-2 text-center font-medium w-20">Não</th>
+                <tr className="bg-muted">
+                  <th className="border border-border px-2 py-2 text-left font-medium">Serviço</th>
+                  <th className="border border-border px-2 py-2 text-center font-medium w-20">Sim</th>
+                  <th className="border border-border px-2 py-2 text-center font-medium w-20">Não</th>
                 </tr>
               </thead>
               <tbody>
@@ -178,13 +178,13 @@ export default function CargaConcretoCard({
                   { label: "Foi realizado adensamento do concreto?", field: "adensamento_realizado" },
                 ].map(({ label, field }) => (
                   <tr key={field}>
-                    <td className="border border-slate-300 px-2 py-2 font-medium bg-slate-50">{label}</td>
-                    <td className="border border-slate-300 px-2 py-1 text-center">
+                    <td className="border border-border px-2 py-2 font-medium bg-muted/30">{label}</td>
+                    <td className="border border-border px-2 py-1 text-center">
                       <input type="checkbox" checked={carga[field] === true}
                         onChange={(e) => onCargaChange(index, field, e.target.checked ? true : null)}
                         className="w-4 h-4 accent-green-500" />
                     </td>
-                    <td className="border border-slate-300 px-2 py-1 text-center">
+                    <td className="border border-border px-2 py-1 text-center">
                       <input type="checkbox" checked={carga[field] === false}
                         onChange={(e) => onCargaChange(index, field, e.target.checked ? false : null)}
                         className="w-4 h-4 accent-red-500" />
@@ -212,24 +212,24 @@ export default function CargaConcretoCard({
             <div className="space-y-3">
               <Label className="font-semibold">Configuração dos Corpos de Prova</Label>
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse border border-slate-300 text-sm">
-                  <thead className="bg-slate-100">
+                <table className="w-full border-collapse border border-border text-sm">
+                  <thead className="bg-muted">
                     <tr>
-                      <th className="border border-slate-300 p-2 text-center font-medium">Dias para Ruptura</th>
-                      <th className="border border-slate-300 p-2 text-center font-medium">Quantidade de CPs</th>
-                      <th className="border border-slate-300 p-2 text-center font-medium">Tipo de Ruptura</th>
+                      <th className="border border-border p-2 text-center font-medium">Dias para Ruptura</th>
+                      <th className="border border-border p-2 text-center font-medium">Quantidade de CPs</th>
+                      <th className="border border-border p-2 text-center font-medium">Tipo de Ruptura</th>
                     </tr>
                   </thead>
                   <tbody>
                     {[3, 7, 28, 63].map((dias) => (
                       <tr key={dias}>
-                        <td className="border border-slate-300 p-2 text-center font-medium bg-slate-50">{dias} dias</td>
-                        <td className="border border-slate-300 p-2">
+                        <td className="border border-border p-2 text-center font-medium bg-muted/30">{dias} dias</td>
+                        <td className="border border-border p-2">
                           <Input type="number" min="0" max="10" value={getQuantidadeCPs(index, dias)}
                             onChange={(e) => onCPConfigChange(index, dias, "quantidade", e.target.value)}
                             className="h-9 text-center" placeholder="0" />
                         </td>
-                        <td className="border border-slate-300 p-2">
+                        <td className="border border-border p-2">
                           <Select value={getTipoRupturaCPs(index, dias)}
                             onValueChange={(v) => onCPConfigChange(index, dias, "tipo_ruptura", v)}
                             disabled={getQuantidadeCPs(index, dias) === 0}>
@@ -247,8 +247,8 @@ export default function CargaConcretoCard({
                 </table>
               </div>
               {carga.corpos_prova?.length > 0 && (
-                <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
-                  <p className="text-sm text-blue-800">
+                <div className="mt-2 p-2 bg-primary/10 border border-primary/20 rounded">
+                  <p className="text-sm text-primary">
                     <strong>Total de CPs moldados:</strong> {carga.corpos_prova.length}
                     {[3, 7, 28, 63].map(d => carga.corpos_prova.filter(cp => cp.dias_ruptura === d).length > 0
                       ? ` | ${d} dias: ${carga.corpos_prova.filter(cp => cp.dias_ruptura === d).length}` : "").join("")}

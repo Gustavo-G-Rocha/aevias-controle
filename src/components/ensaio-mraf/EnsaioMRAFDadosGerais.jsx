@@ -60,9 +60,9 @@ export default function EnsaioMRAFDadosGerais({
         {regionalSelecionada && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-2">
             <div className="space-y-0.5 text-sm">
-              <p className="text-blue-800"><strong>📍 Regional:</strong> {regionalSelecionada.nome}</p>
+              <p className="text-secondary"><strong>📍 Regional:</strong> {regionalSelecionada.nome}</p>
               {regionalSelecionada.cliente && (
-                <p className="text-blue-800"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>
+                <p className="text-secondary"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>
               )}
             </div>
           </div>
@@ -166,7 +166,7 @@ export default function EnsaioMRAFDadosGerais({
               onChange={(e) => handleChange('faixa_especificada', e.target.value)}
               disabled={!isEditable || isApproved}
               readOnly={!!selectedProject}
-              className={selectedProject ? "bg-slate-100" : ""}
+              className={selectedProject ? "bg-muted" : ""}
             />
           </div>
         </div>
@@ -180,7 +180,7 @@ export default function EnsaioMRAFDadosGerais({
               onChange={(e) => handleChange('tipo_ligante', e.target.value)}
               disabled={!isEditable || isApproved}
               readOnly={!!selectedProject}
-              className={selectedProject ? "bg-slate-100" : ""}
+              className={selectedProject ? "bg-muted" : ""}
             />
           </div>
           <div>

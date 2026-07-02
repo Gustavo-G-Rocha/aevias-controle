@@ -78,15 +78,15 @@ export default function ProctorCBRExpansao({ form, setForm }) {
   return (
     <div className="space-y-6">
       {/* CÁLCULO DO ISC/CBR */}
-      <Card className="bg-white/20 backdrop-blur-lg border-white/20">
+      <Card className="bg-card/20 backdrop-blur-lg border-white/20">
         <CardHeader>
-          <CardTitle className="text-lg text-[#00233B]">Cálculo do ISC/CBR</CardTitle>
-          <p className="text-xs text-[#00233B]/60">ABNT NBR 9895 / DNIT 172 — Penetrações em mm</p>
+          <CardTitle className="text-lg text-foreground">Cálculo do ISC/CBR</CardTitle>
+          <p className="text-xs text-foreground/60">ABNT NBR 9895 / DNIT 172 — Penetrações em mm</p>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Fator do Anel Global */}
-          <div className="flex items-center gap-4 bg-[#BFCF99]/10 border border-[#BFCF99]/30 rounded-lg p-3">
-            <span className="text-sm font-semibold text-[#00233B] whitespace-nowrap">Constante do Anel (kgf/div):</span>
+          <div className="flex items-center gap-4 bg-secondary/20/10 border border-secondary/30/30 rounded-lg p-3">
+            <span className="text-sm font-semibold text-foreground whitespace-nowrap">Constante do Anel (kgf/div):</span>
             <input
               type="number"
               step="0.0001"
@@ -100,14 +100,14 @@ export default function ProctorCBRExpansao({ form, setForm }) {
           {(form.cbr_cilindros || []).map((cil, cidx) => {
             const { pressoes, isc254, isc508, isc } = calcCBR(cil, form.cbr_fator_anel);
             return (
-              <div key={cil.cilindro_numero ?? cidx} className="border border-[#00233B]/20 rounded-lg overflow-hidden">
+              <div key={cil.cilindro_numero ?? cidx} className="border border-border/20 rounded-lg overflow-hidden">
                 {/* Header */}
-                <div className="bg-[#00233B]/10 px-3 py-2 flex items-center gap-4">
-                  <span className="font-semibold text-[#00233B] text-sm">
+                <div className="bg-muted/10 px-3 py-2 flex items-center gap-4">
+                  <span className="font-semibold text-foreground text-sm">
                     Cilindro {cilindroNomes[cidx] || cidx + 1}
                   </span>
                   {isc != null && (
-                    <span className="ml-auto text-sm font-bold text-[#00233B]">ISC = {isc.toFixed(1)}%</span>
+                    <span className="ml-auto text-sm font-bold text-foreground">ISC = {isc.toFixed(1)}%</span>
                   )}
                 </div>
 
@@ -115,25 +115,25 @@ export default function ProctorCBRExpansao({ form, setForm }) {
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs border-collapse">
                     <thead>
-                      <tr className="bg-[#00233B]/5">
-                        <th className="border border-[#00233B]/20 px-2 py-1 text-left text-[#00233B] w-32">Penetração (mm)</th>
+                      <tr className="bg-muted/5">
+                        <th className="border border-border/20 px-2 py-1 text-left text-foreground w-32">Penetração (mm)</th>
                         {PENETRACOES.map(p => (
-                          <th key={p} className={`border border-[#00233B]/20 px-2 py-1 text-center text-[#00233B] ${p === 2.54 || p === 5.08 ? 'bg-[#BFCF99]/20 font-bold' : ''}`}>{p}</th>
+                          <th key={p} className={`border border-border/20 px-2 py-1 text-center text-foreground ${p === 2.54 || p === 5.08 ? 'bg-secondary/20/20 font-bold' : ''}`}>{p}</th>
                         ))}
                       </tr>
-                      <tr className="bg-[#00233B]/5">
-                        <th className="border border-[#00233B]/20 px-2 py-1 text-left text-[#00233B]">Tempo (min)</th>
+                      <tr className="bg-muted/5">
+                        <th className="border border-border/20 px-2 py-1 text-left text-foreground">Tempo (min)</th>
                         {TEMPOS.map(t => (
-                          <th key={t} className="border border-[#00233B]/20 px-2 py-1 text-center text-[#00233B]/70 font-normal">{t}</th>
+                          <th key={t} className="border border-border/20 px-2 py-1 text-center text-foreground/70 font-normal">{t}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {/* Leitura do anel */}
-                      <tr className="bg-white/20">
-                        <td className="border border-[#00233B]/20 px-2 py-1 font-medium text-[#00233B]">Leitura do anel</td>
+                      <tr className="bg-card/20">
+                        <td className="border border-border/20 px-2 py-1 font-medium text-foreground">Leitura do anel</td>
                         {Array(9).fill(null).map((_, pidx) => (
-                          <td key={pidx} className={`border border-[#00233B]/20 px-1 py-1 ${pidx === 3 || pidx === 5 ? 'bg-[#BFCF99]/10' : ''}`}>
+                          <td key={pidx} className={`border border-border/20 px-1 py-1 ${pidx === 3 || pidx === 5 ? 'bg-secondary/20/10' : ''}`}>
                             <Input
                               type="number" step="0.01"
                               value={(cil.leituras || [])[pidx] || ''}
@@ -144,34 +144,34 @@ export default function ProctorCBRExpansao({ form, setForm }) {
                         ))}
                       </tr>
                       {/* Pressão Padrão */}
-                      <tr className="bg-gray-100/30">
-                        <td className="border border-[#00233B]/20 px-2 py-1 text-[#00233B]">
+                      <tr className="bg-muted/30">
+                        <td className="border border-border/20 px-2 py-1 text-foreground">
                           <div className="text-xs">Pressão</div>
-                          <div className="text-[10px] text-[#00233B]/60">Padrão (kgf/cm²)</div>
+                          <div className="text-[10px] text-foreground/60">Padrão (kgf/cm²)</div>
                         </td>
                         {PENETRACOES.map((_, pidx) => (
-                          <td key={pidx} className={`border border-[#00233B]/20 px-2 py-1 text-center text-xs font-semibold text-[#00233B] ${pidx === 3 || pidx === 5 ? 'bg-[#BFCF99]/20' : ''}`}>
+                          <td key={pidx} className={`border border-border/20 px-2 py-1 text-center text-xs font-semibold text-foreground ${pidx === 3 || pidx === 5 ? 'bg-secondary/20/20' : ''}`}>
                             {PRESSAO_PADRAO[pidx] ?? ''}
                           </td>
                         ))}
                       </tr>
                       {/* Pressão Corrigida */}
-                      <tr className="bg-gray-100/30">
-                        <td className="border border-[#00233B]/20 px-2 py-1 text-[#00233B]">
+                      <tr className="bg-muted/30">
+                        <td className="border border-border/20 px-2 py-1 text-foreground">
                           <div className="text-xs">Pressão</div>
-                          <div className="text-[10px] text-[#00233B]/60">Corrigida (kgf/cm²)</div>
+                          <div className="text-[10px] text-foreground/60">Corrigida (kgf/cm²)</div>
                         </td>
                         {pressoes.map((p, pidx) => (
-                          <td key={`pressao-${pidx}`} className={`border border-[#00233B]/20 px-2 py-1 text-center text-xs font-semibold text-gray-600 ${pidx === 3 || pidx === 5 ? 'bg-[#BFCF99]/20' : ''}`}>
+                          <td key={`pressao-${pidx}`} className={`border border-border/20 px-2 py-1 text-center text-xs font-semibold text-gray-600 ${pidx === 3 || pidx === 5 ? 'bg-secondary/20/20' : ''}`}>
                             {p != null ? p.toFixed(2) : '—'}
                           </td>
                         ))}
                       </tr>
                       {/* ISC */}
-                      <tr className="bg-[#BFCF99]/10">
-                        <td className="border border-[#00233B]/20 px-2 py-1 font-bold text-[#00233B]">ISC (%)</td>
+                      <tr className="bg-secondary/20/10">
+                        <td className="border border-border/20 px-2 py-1 font-bold text-foreground">ISC (%)</td>
                         {PENETRACOES.map((_, pidx) => (
-                          <td key={pidx} className={`border border-[#00233B]/20 px-2 py-1 text-center font-bold text-[#00233B] ${pidx === 3 || pidx === 5 ? 'bg-[#BFCF99]/30' : ''}`}>
+                          <td key={pidx} className={`border border-border/20 px-2 py-1 text-center font-bold text-foreground ${pidx === 3 || pidx === 5 ? 'bg-secondary/20/30' : ''}`}>
                             {pidx === 3 && isc254 != null ? isc254.toFixed(1) : ''}
                             {pidx === 5 && isc508 != null ? isc508.toFixed(1) : ''}
                           </td>
@@ -187,15 +187,15 @@ export default function ProctorCBRExpansao({ form, setForm }) {
       </Card>
 
       {/* EXPANSÃO */}
-      <Card className="bg-white/20 backdrop-blur-lg border-white/20">
+      <Card className="bg-card/20 backdrop-blur-lg border-white/20">
         <CardHeader>
-          <CardTitle className="text-lg text-[#00233B]">Expansão</CardTitle>
-          <p className="text-xs text-[#00233B]/60">ABNT NBR 9895 / DNIT 172</p>
+          <CardTitle className="text-lg text-foreground">Expansão</CardTitle>
+          <p className="text-xs text-foreground/60">ABNT NBR 9895 / DNIT 172</p>
         </CardHeader>
         <CardContent>
           {/* Altura Inicial Global */}
-          <div className="flex items-center gap-4 bg-[#BFCF99]/10 border border-[#BFCF99]/30 rounded-lg p-3 mb-4">
-            <span className="text-sm font-semibold text-[#00233B] whitespace-nowrap">Altura Inicial (mm):</span>
+          <div className="flex items-center gap-4 bg-secondary/20/10 border border-secondary/30/30 rounded-lg p-3 mb-4">
+            <span className="text-sm font-semibold text-foreground whitespace-nowrap">Altura Inicial (mm):</span>
             <input
               type="number"
               step="0.01"
@@ -214,38 +214,38 @@ export default function ProctorCBRExpansao({ form, setForm }) {
           <div className="overflow-x-auto">
             <table className="w-full text-xs border-collapse">
               <thead>
-                <tr className="bg-[#00233B]/10">
-                  <th className="border border-[#00233B]/20 px-2 py-2 text-[#00233B]">Hora</th>
-                  <th className="border border-[#00233B]/20 px-2 py-2 text-[#00233B]">Cilindro</th>
-                  <th className="border border-[#00233B]/20 px-2 py-2 text-[#00233B] bg-[#BFCF99]/10">1° dia</th>
-                  <th className="border border-[#00233B]/20 px-2 py-2 text-[#00233B] bg-[#BFCF99]/10">2° dia</th>
-                  <th className="border border-[#00233B]/20 px-2 py-2 text-[#00233B] bg-[#BFCF99]/10">3° dia</th>
-                  <th className="border border-[#00233B]/20 px-2 py-2 text-[#00233B] bg-[#BFCF99]/10">4° dia</th>
-                  <th className="border border-[#00233B]/20 px-2 py-2 text-[#00233B]">Diferença (mm)</th>
-                  <th className="border border-[#00233B]/20 px-2 py-2 text-[#00233B] font-bold">Expansão (%)</th>
+                <tr className="bg-muted/10">
+                  <th className="border border-border/20 px-2 py-2 text-foreground">Hora</th>
+                  <th className="border border-border/20 px-2 py-2 text-foreground">Cilindro</th>
+                  <th className="border border-border/20 px-2 py-2 text-foreground bg-secondary/20/10">1° dia</th>
+                  <th className="border border-border/20 px-2 py-2 text-foreground bg-secondary/20/10">2° dia</th>
+                  <th className="border border-border/20 px-2 py-2 text-foreground bg-secondary/20/10">3° dia</th>
+                  <th className="border border-border/20 px-2 py-2 text-foreground bg-secondary/20/10">4° dia</th>
+                  <th className="border border-border/20 px-2 py-2 text-foreground">Diferença (mm)</th>
+                  <th className="border border-border/20 px-2 py-2 text-foreground font-bold">Expansão (%)</th>
                 </tr>
               </thead>
               <tbody>
                 {(form.expansao_cilindros || []).map((exp, idx) => {
                   const { diferenca, expansao_pct } = calcExpansao(exp);
                   return (
-                    <tr key={idx} className={idx % 2 === 0 ? 'bg-white/20' : 'bg-white/10'}>
-                      <td className="border border-[#00233B]/20 px-1 py-1">
+                    <tr key={idx} className={idx % 2 === 0 ? 'bg-card/20' : 'bg-card/10'}>
+                      <td className="border border-border/20 px-1 py-1">
                         <Input type="time" value={exp.hora || ''} onChange={e => updateExpansao(idx, 'hora', e.target.value)} className="h-7 text-xs p-1 w-24" />
                       </td>
-                      <td className="border border-[#00233B]/20 px-2 py-1 text-center font-semibold text-[#00233B]">
+                      <td className="border border-border/20 px-2 py-1 text-center font-semibold text-foreground">
                         {cilindroNomes[idx] || idx + 1}
                       </td>
 
                       {['leitura_1dia','leitura_2dia','leitura_3dia','leitura_4dia'].map(field => (
-                        <td key={field} className="border border-[#00233B]/20 px-1 py-1 bg-[#BFCF99]/5">
+                        <td key={field} className="border border-border/20 px-1 py-1 bg-secondary/20/5">
                           <Input type="number" step="0.01" value={exp[field] || ''} onChange={e => updateExpansao(idx, field, e.target.value)} className="h-7 text-xs p-1 w-20" />
                         </td>
                       ))}
-                      <td className="border border-[#00233B]/20 px-2 py-1 text-center font-semibold text-gray-600">
+                      <td className="border border-border/20 px-2 py-1 text-center font-semibold text-gray-600">
                         {diferenca != null ? diferenca.toFixed(2) : '—'}
                       </td>
-                      <td className="border border-[#00233B]/20 px-2 py-1 text-center font-bold text-[#00233B]">
+                      <td className="border border-border/20 px-2 py-1 text-center font-bold text-foreground">
                         {expansao_pct != null ? expansao_pct.toFixed(1) : '—'}
                       </td>
                     </tr>

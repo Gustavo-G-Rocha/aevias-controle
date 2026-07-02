@@ -26,14 +26,14 @@ export const ExclusaoModal = React.memo(({ ensaio, isOpen, onClose, onDelete }) 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#F2F1EF]/80 backdrop-blur-lg border-white/20 text-[#00233B]">
+      <DialogContent className="bg-[#F2F1EF]/80 backdrop-blur-lg border-white/20 text-foreground">
         <DialogHeader>
-          <DialogTitle className="text-red-600">Excluir Registro</DialogTitle>
+          <DialogTitle className="text-destructive">Excluir Registro</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-sm text-red-800 font-semibold mb-2">⚠️ Atenção: Esta ação é irreversível!</p>
-            <p className="text-sm text-red-700">
+            <p className="text-sm text-destructive font-semibold mb-2">⚠️ Atenção: Esta ação é irreversível!</p>
+            <p className="text-sm text-destructive">
               Você está prestes a excluir permanentemente este registro. Todos os dados serão perdidos.
             </p>
           </div>

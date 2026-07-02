@@ -74,7 +74,7 @@ function CorpoProvaCard({ cp, index, isEditable, isApproved, onCorpoProvaChange,
                 value={cp[field] ?? (defaultVal ?? '')}
                 onChange={readOnly ? undefined : (e) => onCorpoProvaChange(index, field, e.target.value ? parseFloat(e.target.value) : (defaultVal ?? null))}
                 readOnly={readOnly} disabled={!canEdit && !readOnly}
-                className={`h-9 ${readOnly ? 'bg-slate-100' : ''}`} />
+                className={`h-9 ${readOnly ? 'bg-muted' : ''}`} />
             </div>
           ))}
         </div>
@@ -173,7 +173,7 @@ export default function MarshallSection({
       </CardHeader>
       <CardContent className="space-y-6">
         {!formData.realizar_marshall ? (
-          <p className="text-center text-slate-500 py-8 italic">
+          <p className="text-center text-muted-foreground py-8 italic">
             Marque a opção "Realizar Marshall?" para incluir o ensaio Marshall
           </p>
         ) : (
@@ -186,7 +186,7 @@ export default function MarshallSection({
               </div>
             )}
             {formData.corpos_prova_marshall.length === 0 ? (
-              <p className="text-center text-slate-500 py-4 italic">
+              <p className="text-center text-muted-foreground py-4 italic">
                 Clique em "Adicionar CP Marshall" para incluir corpos de prova ao ensaio
               </p>
             ) : (

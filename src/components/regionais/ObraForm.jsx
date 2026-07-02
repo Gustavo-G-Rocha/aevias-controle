@@ -17,7 +17,7 @@ const TagInput = ({ field, value, setValue, placeholder, badgeClass, items, onAd
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
-        className="bg-white border-[#00233B]/20 text-[#00233B]"
+        className="bg-card border-border/20 text-foreground"
         onKeyPress={(e) => {
           if (e.key === 'Enter') { e.preventDefault(); onAdd(field, value, setValue); }
         }}
@@ -30,7 +30,7 @@ const TagInput = ({ field, value, setValue, placeholder, badgeClass, items, onAd
       {items.map((item, index) => (
         <Badge key={index} variant="secondary" className={`${badgeClass} flex items-center gap-1`}>
           {item}
-          <button type="button" onClick={() => onRemove(field, index)} className="ml-1 hover:text-red-600">×</button>
+          <button type="button" onClick={() => onRemove(field, index)} className="ml-1 hover:text-destructive">×</button>
         </Badge>
       ))}
     </div>
@@ -74,19 +74,19 @@ const ObraForm = React.memo(({ obra, regional, onSave, onCancel }) => {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Label htmlFor="name">Nome da Obra *</Label>
-        <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required className="bg-white border-[#00233B]/20 text-[#00233B]" />
+        <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required className="bg-card border-border/20 text-foreground" />
       </div>
 
       <div>
         <Label htmlFor="code">Código da Obra *</Label>
-        <Input id="code" value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} required className="bg-white border-[#00233B]/20 text-[#00233B]" />
+        <Input id="code" value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} required className="bg-card border-border/20 text-foreground" />
       </div>
 
       <div>
         <Label htmlFor="tipo_obra">Tipo de Obra *</Label>
         <Select value={formData.tipo_obra} onValueChange={(value) => setFormData({ ...formData, tipo_obra: value })}>
-          <SelectTrigger className="bg-white border-[#00233B]/20 text-[#00233B]"><SelectValue placeholder="Selecione o tipo de obra" /></SelectTrigger>
-          <SelectContent className="bg-white border-[#00233B]/20 text-[#00233B]">
+          <SelectTrigger className="bg-card border-border/20 text-foreground"><SelectValue placeholder="Selecione o tipo de obra" /></SelectTrigger>
+          <SelectContent className="bg-card border-border/20 text-foreground">
             <SelectItem value="supervisao"><div className="flex items-center gap-2"><HardHat className="w-4 h-4 text-blue-600" />Supervisão</div></SelectItem>
             <SelectItem value="implantacao"><div className="flex items-center gap-2"><Construction className="w-4 h-4 text-green-600" />Implantação</div></SelectItem>
             <SelectItem value="conservacao"><div className="flex items-center gap-2"><Wrench className="w-4 h-4 text-amber-600" />Conservação</div></SelectItem>
@@ -95,14 +95,14 @@ const ObraForm = React.memo(({ obra, regional, onSave, onCancel }) => {
             <SelectItem value="homologacao_usinas"><div className="flex items-center gap-2"><Factory className="w-4 h-4 text-orange-600" />Homologação de Usinas</div></SelectItem>
           </SelectContent>
         </Select>
-        <p className="text-xs text-[#00233B]/60 mt-1">Define quais ensaios estarão disponíveis para esta obra</p>
+        <p className="text-xs text-foreground/60 mt-1">Define quais ensaios estarão disponíveis para esta obra</p>
       </div>
 
       <div>
         <Label htmlFor="status">Status</Label>
         <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
-          <SelectTrigger className="bg-white border-[#00233B]/20 text-[#00233B]"><SelectValue /></SelectTrigger>
-          <SelectContent className="bg-white border-[#00233B]/20 text-[#00233B]">
+          <SelectTrigger className="bg-card border-border/20 text-foreground"><SelectValue /></SelectTrigger>
+          <SelectContent className="bg-card border-border/20 text-foreground">
             <SelectItem value="planejamento">Planejamento</SelectItem>
             <SelectItem value="em_andamento">Em Andamento</SelectItem>
             <SelectItem value="concluida">Concluída</SelectItem>
@@ -112,7 +112,7 @@ const ObraForm = React.memo(({ obra, regional, onSave, onCancel }) => {
       </div>
 
       {formData.tipo_obra === "supervisao" && (
-        <div><Label>Empreiteiras do Contrato</Label><TagInput field="empreiteiras" value={novaEmpreiteira} setValue={setNovaEmpreiteira} placeholder="Nome da empreiteira" badgeClass="bg-blue-100 text-blue-800" items={formData.empreiteiras} onAdd={addItem} onRemove={removeItem} /></div>
+        <div><Label>Empreiteiras do Contrato</Label><TagInput field="empreiteiras" value={novaEmpreiteira} setValue={setNovaEmpreiteira} placeholder="Nome da empreiteira" badgeClass="bg-blue-100 text-secondary" items={formData.empreiteiras} onAdd={addItem} onRemove={removeItem} /></div>
       )}
 
       {(formData.tipo_obra === "levantamentos" || formData.tipo_obra === "sondagem") && (
@@ -128,8 +128,8 @@ const ObraForm = React.memo(({ obra, regional, onSave, onCancel }) => {
       )}
 
       <div className="flex justify-end gap-2 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel} className="border-[#00233B]/20 text-[#00233B] hover:bg-[#00233B]/5">Cancelar</Button>
-        <Button type="submit" className="bg-[#00233B] hover:bg-[#00233B]/90 text-[#F2F1EF]">{obra ? "Atualizar Obra" : "Criar Obra"}</Button>
+        <Button type="button" variant="outline" onClick={onCancel} className="border-border/20 text-foreground hover:bg-muted/5">Cancelar</Button>
+        <Button type="submit" className="bg-muted hover:bg-muted/90 text-[#F2F1EF]">{obra ? "Atualizar Obra" : "Criar Obra"}</Button>
       </div>
     </form>
   );

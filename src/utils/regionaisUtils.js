@@ -87,14 +87,14 @@ export function getProjetosNaRegional(projects, regional) {
 // ── Constantes de apresentação ─────────────────────────────────────────────────
 
 export const STATUS_COLORS_REGIONAL = {
-  ativa: "bg-[#566E3D]/10 text-[#566E3D] border-[#566E3D]/30",
+  ativa: "bg-[#566E3D]/10 text-secondary border-[#566E3D]/30",
   inativa: "bg-[#800020]/10 text-[#800020] border-[#800020]/30",
 };
 
 export const STATUS_COLORS_OBRA = {
   planejamento: "bg-blue-500/10 text-blue-700 border-blue-500/30",
-  em_andamento: "bg-[#566E3D]/10 text-[#566E3D] border-[#566E3D]/30",
-  concluida: "bg-[#00233B]/10 text-[#00233B] border-[#00233B]/30",
+  em_andamento: "bg-[#566E3D]/10 text-secondary border-[#566E3D]/30",
+  concluida: "bg-muted/10 text-foreground border-border/30",
   pausada: "bg-amber-500/10 text-amber-700 border-amber-500/30",
 };
 

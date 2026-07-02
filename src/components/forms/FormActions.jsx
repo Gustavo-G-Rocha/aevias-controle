@@ -41,7 +41,7 @@ export default function FormActions({
             variant="outline"
             disabled={loading || saving}
             onClick={onSaveProgress}
-            className="border-blue-500 text-blue-600 hover:bg-blue-50"
+
           >
             <Save className="mr-2 h-4 w-4" />
             Salvar Progresso
@@ -51,7 +51,7 @@ export default function FormActions({
             type={onFinalize ? "button" : "submit"}
             disabled={loading || saving}
             onClick={onFinalize}
-            className="bg-blue-600 hover:bg-blue-700"
+
           >
             {saving ? (
               <>

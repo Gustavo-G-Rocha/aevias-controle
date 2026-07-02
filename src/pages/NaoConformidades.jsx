@@ -53,7 +53,7 @@ export default function NaoConformidadesPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <AlertTriangle className="w-7 h-7 text-red-600" />
+            <AlertTriangle className="w-7 h-7 text-destructive" />
             <div>
               <h1 className="text-3xl font-bold text-foreground">Dashboard de Não Conformidades</h1>
               <p className="text-muted-foreground text-sm mt-1">Visão geral de todas as obras</p>

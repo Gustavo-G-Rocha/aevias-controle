@@ -77,7 +77,7 @@ export default function ControleLiganteSection({ formData, isEditable, isApprove
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label>Fornecedor</Label>
-              <Input value={ligante?.fornecedor || ''} disabled className="bg-slate-100"
+              <Input value={ligante?.fornecedor || ''} disabled className="bg-muted"
                 placeholder="Preenchido automaticamente pelo projeto" />
             </div>
             <div>
@@ -105,7 +105,7 @@ export default function ControleLiganteSection({ formData, isEditable, isApprove
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-slate-100">
+                  <tr className="bg-muted">
                     <th className="border border-border px-3 py-2 text-left font-semibold">Ensaio</th>
                     <th className="border border-border px-3 py-2 text-center font-semibold">Unidade</th>
                     <th className="border border-border px-3 py-2 text-center font-semibold">Resultado</th>

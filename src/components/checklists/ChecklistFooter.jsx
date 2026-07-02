@@ -23,7 +23,7 @@ export default function ChecklistFooter({
             variant="outline"
             disabled={loadingUpload}
             onClick={onSaveProgress}
-            className="border-blue-500 text-blue-600 hover:bg-blue-50"
+
           >
             <Save className="mr-2 h-4 w-4" /> Salvar Progresso
           </Button>
@@ -31,7 +31,7 @@ export default function ChecklistFooter({
             type={onFinalize ? "button" : "submit"}
             disabled={loadingUpload}
             onClick={onFinalize}
-            className="bg-blue-600 hover:bg-blue-700"
+
           >
             <Save className="mr-2 h-4 w-4" /> Finalizar
           </Button>

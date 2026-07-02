@@ -8,7 +8,7 @@ import { DadosAmostraSection } from '@/components/ensaio-limites/DadosAmostraSec
 
 export { defaultLimites } from '@/utils/ensaioLimitesConstantes';
 
-const sectionHeader = 'bg-[#00233B]/10 text-[#00233B] text-center font-bold text-xs py-1 border border-[#00233B]/20 mb-2 rounded';
+const sectionHeader = 'bg-muted/10 text-foreground text-center font-bold text-xs py-1 border border-border/20 mb-2 rounded';
 
 export default function EnsaioLimites({ data, onChange }) {
   const { set, setNested } = useEnsaioLimitesForm(data, onChange);

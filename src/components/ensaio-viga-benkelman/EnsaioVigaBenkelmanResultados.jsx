@@ -126,7 +126,7 @@ export default function EnsaioVigaBenkelmanResultados({
                             <td className="border border-border px-2 py-2 text-center text-sm font-medium text-foreground">
                               {lev.bordo_esquerdo.diferenca || 0}
                             </td>
-                            <td className={`border border-border px-2 py-2 text-center text-sm font-bold ${lev.bordo_esquerdo.deflexao > def_admissivel && def_admissivel > 0 ? 'text-red-600' : 'text-foreground'}`}>
+                            <td className={`border border-border px-2 py-2 text-center text-sm font-bold ${lev.bordo_esquerdo.deflexao > def_admissivel && def_admissivel > 0 ? 'text-destructive' : 'text-foreground'}`}>
                               {lev.bordo_esquerdo.deflexao || 0}
                             </td>
                             {/* EIXO */}
@@ -139,7 +139,7 @@ export default function EnsaioVigaBenkelmanResultados({
                             <td className="border border-border px-2 py-2 text-center text-sm font-medium text-foreground">
                               {lev.eixo.diferenca || 0}
                             </td>
-                            <td className={`border border-border px-2 py-2 text-center text-sm font-bold ${lev.eixo.deflexao > def_admissivel && def_admissivel > 0 ? 'text-red-600' : 'text-foreground'}`}>
+                            <td className={`border border-border px-2 py-2 text-center text-sm font-bold ${lev.eixo.deflexao > def_admissivel && def_admissivel > 0 ? 'text-destructive' : 'text-foreground'}`}>
                               {lev.eixo.deflexao || 0}
                             </td>
                             {/* BORDO DIREITO */}
@@ -152,7 +152,7 @@ export default function EnsaioVigaBenkelmanResultados({
                             <td className="border border-border px-2 py-2 text-center text-sm font-medium text-foreground">
                               {lev.bordo_direito.diferenca || 0}
                             </td>
-                            <td className={`border border-border px-2 py-2 text-center text-sm font-bold ${lev.bordo_direito.deflexao > def_admissivel && def_admissivel > 0 ? 'text-red-600' : 'text-foreground'}`}>
+                            <td className={`border border-border px-2 py-2 text-center text-sm font-bold ${lev.bordo_direito.deflexao > def_admissivel && def_admissivel > 0 ? 'text-destructive' : 'text-foreground'}`}>
                               {lev.bordo_direito.deflexao || 0}
                             </td>
                           </tr>
@@ -192,7 +192,7 @@ export default function EnsaioVigaBenkelmanResultados({
                             </div>
                             <div className={`rounded p-2 text-center ${lev[lado].deflexao > def_admissivel && def_admissivel > 0 ? 'bg-destructive/10' : 'bg-muted/30'}`}>
                               <span className="block text-xs text-muted-foreground/70">Defl. (x10⁻²mm)</span>
-                              <span className={`text-sm font-bold ${lev[lado].deflexao > def_admissivel && def_admissivel > 0 ? 'text-red-600' : 'text-foreground'}`}>{lev[lado].deflexao || 0}</span>
+                              <span className={`text-sm font-bold ${lev[lado].deflexao > def_admissivel && def_admissivel > 0 ? 'text-destructive' : 'text-foreground'}`}>{lev[lado].deflexao || 0}</span>
                             </div>
                           </div>
                         </div>

@@ -3,7 +3,7 @@ export const STATUS_INFO = {
   aprovada: {
     text: "Aprovada",
     icon: "CheckCircle",
-    className: "bg-[#566E3D]/10 text-[#566E3D] border border-[#566E3D]/30"
+    className: "bg-[#566E3D]/10 text-secondary border border-[#566E3D]/30"
   },
   rejeitada: {
     text: "Rejeitada",

@@ -11,7 +11,7 @@ export const Pagination = React.memo(({ currentPage, totalPages, onPageChange })
         size="sm"
         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
         disabled={currentPage === 1}
-        className="text-[#00233B] border-white/20 hover:bg-black/10"
+        className="text-foreground border-white/20 hover:bg-black/10"
       >
         Anterior
       </Button>
@@ -23,10 +23,10 @@ export const Pagination = React.memo(({ currentPage, totalPages, onPageChange })
                            (page >= currentPage - 1 && page <= currentPage + 1);
           
           if (!showPage && page === currentPage - 2) {
-            return <span key={page} className="px-2 text-[#00233B]/50">...</span>;
+            return <span key={page} className="px-2 text-foreground/50">...</span>;
           }
           if (!showPage && page === currentPage + 2) {
-            return <span key={page} className="px-2 text-[#00233B]/50">...</span>;
+            return <span key={page} className="px-2 text-foreground/50">...</span>;
           }
           if (!showPage) return null;
 
@@ -36,7 +36,7 @@ export const Pagination = React.memo(({ currentPage, totalPages, onPageChange })
               variant={currentPage === page ? "default" : "outline"}
               size="sm"
               onClick={() => onPageChange(page)}
-              className={currentPage === page ? "bg-[#00233B] text-white" : "text-[#00233B] border-white/20 hover:bg-black/10"}
+              className={currentPage === page ? "bg-muted text-white" : "text-foreground border-white/20 hover:bg-black/10"}
             >
               {page}
             </Button>
@@ -48,7 +48,7 @@ export const Pagination = React.memo(({ currentPage, totalPages, onPageChange })
         size="sm"
         onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
         disabled={currentPage === totalPages}
-        className="text-[#00233B] border-white/20 hover:bg-black/10"
+        className="text-foreground border-white/20 hover:bg-black/10"
       >
         Próxima
       </Button>

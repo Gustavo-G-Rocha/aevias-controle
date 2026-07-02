@@ -23,22 +23,22 @@ export default function AcompanhamentoExecucaoSection({ acompanhamento, onCheckb
   ];
 
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader><CardTitle className="text-lg">Acompanhamento Execução da Camada</CardTitle></CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-slate-300 text-sm">
+          <table className="w-full border-collapse border border-border text-sm">
             <thead>
-              <tr className="bg-slate-100">
-                <th className="border border-slate-300 px-2 py-2 text-left font-medium">Controle</th>
-                <th className="border border-slate-300 px-2 py-2 text-center font-medium w-32">Resposta</th>
+              <tr className="bg-muted">
+                <th className="border border-border px-2 py-2 text-left font-medium">Controle</th>
+                <th className="border border-border px-2 py-2 text-center font-medium w-32">Resposta</th>
               </tr>
             </thead>
             <tbody>
               {rows.map(({ field, label }) => (
                 <tr key={field}>
-                  <td className="border border-slate-300 px-2 py-2 bg-slate-50">{label}</td>
-                  <td className="border border-slate-300 px-2 py-2">
+                  <td className="border border-border px-2 py-2 bg-muted/30">{label}</td>
+                  <td className="border border-border px-2 py-2">
                     <CheckboxGroup
                       value={acompanhamento[field]}
                       onChange={(opt) => onCheckboxChange(field, opt)}
@@ -47,7 +47,7 @@ export default function AcompanhamentoExecucaoSection({ acompanhamento, onCheckb
                 </tr>
               ))}
               <tr>
-                <td className="border border-slate-300 px-2 py-2 bg-slate-50">
+                <td className="border border-border px-2 py-2 bg-muted/30">
                   A compactação da camada foi realizada em conformidade à energia de projeto?
                   <div className="flex gap-4 mt-2 ml-4">
                     {[['rolo_liso', 'ROLO LISO'], ['rolo_pneu', 'ROLO DE PNEU'], ['rolo_pe_carneiro', 'ROLO PÉ DE CARNEIRO']].map(([rolo, label]) => (
@@ -58,7 +58,7 @@ export default function AcompanhamentoExecucaoSection({ acompanhamento, onCheckb
                     ))}
                   </div>
                 </td>
-                <td className="border border-slate-300 px-2 py-2">
+                <td className="border border-border px-2 py-2">
                   <CheckboxGroup
                     value={acompanhamento.compactacao_conforme_projeto}
                     onChange={(opt) => onCheckboxChange('compactacao_conforme_projeto', opt)}

@@ -10,8 +10,8 @@ export default function TemperaturasControl({ temperaturas }) {
   if (!temperaturas || Object.keys(temperaturas).length === 0) return null;
 
   return (
-    <div className="p-4 bg-[#F2F1EF] rounded-lg border border-[#00233B]/10 space-y-3">
-      <h4 className="font-semibold text-[#00233B]">Temperaturas de Controle</h4>
+    <div className="p-4 bg-[#F2F1EF] rounded-lg border border-border/10 space-y-3">
+      <h4 className="font-semibold text-foreground">Temperaturas de Controle</h4>
       {temperaturas.mistura && (
         <DetailRange label="Mistura" min={temperaturas.mistura.min} max={temperaturas.mistura.max} unit="°C" />
       )}

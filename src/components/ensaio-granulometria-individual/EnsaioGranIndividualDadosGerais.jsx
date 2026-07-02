@@ -76,9 +76,9 @@ export default function EnsaioGranIndividualDadosGerais({
           {regionalSelecionada && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-2">
               <div className="space-y-0.5 text-sm">
-                <p className="text-blue-800"><strong>📍 Regional:</strong> {regionalSelecionada.nome}</p>
+                <p className="text-secondary"><strong>📍 Regional:</strong> {regionalSelecionada.nome}</p>
                 {regionalSelecionada.cliente && (
-                  <p className="text-blue-800"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>
+                  <p className="text-secondary"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>
                 )}
               </div>
             </div>

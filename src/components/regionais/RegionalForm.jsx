@@ -28,7 +28,7 @@ const MultiSelect = ({ options, selected, onSelectedChange, placeholder }) => {
                 <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between h-auto min-h-[40px]">
                     <div className="flex flex-wrap gap-1">
                         {selectedOptions.length > 0 ? selectedOptions.map(option => (
-                            <Badge key={option.value} variant="secondary" className="bg-black/10 text-[#00233B]">
+                            <Badge key={option.value} variant="secondary" className="bg-black/10 text-foreground">
                                 {option.label}
                             </Badge>
                         )) : placeholder}
@@ -220,8 +220,8 @@ export default function RegionalForm({ regional, users, projects, onSave, onCanc
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="outline" onClick={onCancel} className="hover:bg-black/10 border-[#00233B]/20 text-[#00233B]">Cancelar</Button>
-                <Button type="submit" className="bg-[#00233B] hover:bg-[#00233B]/90 text-[#F2F1EF]">
+                <Button type="button" variant="outline" onClick={onCancel} className="hover:bg-black/10 border-border/20 text-foreground">Cancelar</Button>
+                <Button type="submit" className="bg-muted hover:bg-muted/90 text-[#F2F1EF]">
                     {regional ? "Atualizar Regional" : "Criar Regional"}
                 </Button>
             </div>

@@ -7,10 +7,10 @@ export default function RejectionAlert({ motivo }) {
   return (
     <Card className="bg-red-50/50 backdrop-blur-lg border-2 border-red-300">
       <CardContent className="pt-4">
-        <p className="font-semibold text-red-800 mb-2">
+        <p className="font-semibold text-destructive mb-2">
           Motivo da Reprovação pelo Cliente:
         </p>
-        <p className="text-red-700">{motivo}</p>
+        <p className="text-destructive">{motivo}</p>
       </CardContent>
     </Card>
   );

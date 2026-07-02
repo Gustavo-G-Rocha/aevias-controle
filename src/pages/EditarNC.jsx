@@ -37,7 +37,7 @@ export default function EditarNCPage() {
   if (loading || !nc) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-slate-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -51,10 +51,10 @@ export default function EditarNCPage() {
         <div className="flex items-center gap-3">
           <AlertTriangle className="w-7 h-7 text-orange-600" />
           <div>
-            <h1 className="text-3xl font-bold text-[#00233B]">
+            <h1 className="text-3xl font-bold text-foreground">
               Editar Não Conformidade
             </h1>
-            <p className="text-[#00233B]/70 text-sm mt-1">
+            <p className="text-foreground/70 text-sm mt-1">
               RNC: {nc.numero_rnc || "—"}
             </p>
           </div>
@@ -91,14 +91,14 @@ export default function EditarNCPage() {
           <Button
             variant="outline"
             onClick={() => window.history.back()}
-            className="border-white/20 text-[#00233B]"
+            className="border-white/20 text-foreground"
           >
             Cancelar
           </Button>
           <Button
             onClick={() => handleSave(form, fotos, pdfs)}
             disabled={saving}
-            className="bg-[#00233B] text-white hover:bg-[#00233B]/90"
+            className="bg-muted text-white hover:bg-muted/90"
           >
             {saving ? (
               <Loader2 className="w-4 h-4 animate-spin mr-2" />

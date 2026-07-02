@@ -88,7 +88,7 @@ export default function ProjectCard({
               onClick={() => onView(project)}
               className="text-foreground hover:bg-[#566E3D]/10"
             >
-              <Eye className="w-4 h-4 mr-1 text-[#566E3D]" />
+              <Eye className="w-4 h-4 mr-1 text-secondary" />
               Ver
             </Button>
             {canManage && (
@@ -107,7 +107,7 @@ export default function ProjectCard({
                     variant="ghost"
                     size="sm"
                     onClick={() => onDelete(project)}
-                    className="text-red-600 hover:bg-red-500/10"
+                    className="text-destructive hover:bg-red-500/10"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>

@@ -5,7 +5,7 @@ import { STATUS_LABELS, countNCsByStatus } from "@/utils/gestaoNCUtils";
 export default function GestaoNCSummary({ ncs }) {
   const statusList = ["aberta", "em_tratativa", "encerrada", "cancelada"];
   const statusColors = {
-    aberta: "text-red-600",
+    aberta: "text-destructive",
     em_tratativa: "text-yellow-600",
     encerrada: "text-green-600",
     cancelada: "text-gray-500",

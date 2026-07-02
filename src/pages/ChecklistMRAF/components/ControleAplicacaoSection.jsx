@@ -15,12 +15,12 @@ export default function ControleAplicacaoSection({ data, onChange, isEditable, i
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-slate-700 mb-4">Controle de Aplicação</h3>
+      <h3 className="text-lg font-semibold text-foreground mb-4">Controle de Aplicação</h3>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
         <div>
           <Label className="text-base">km/estaca inicial</Label>
           <Input value={data.km_estaca_inicial} onChange={(e) => set('km_estaca_inicial', e.target.value)}
-            disabled={disabled} className="bg-white border-slate-200 text-slate-700 h-11 text-base" />
+            disabled={disabled} className="h-11 text-base" />
         </div>
         <div>
           <Label className="text-base">Lado inicial</Label>
@@ -34,7 +34,7 @@ export default function ControleAplicacaoSection({ data, onChange, isEditable, i
         <div>
           <Label className="text-base">km/estaca final</Label>
           <Input value={data.km_estaca_final} onChange={(e) => set('km_estaca_final', e.target.value)}
-            disabled={disabled} className="bg-white border-slate-200 text-slate-700 h-11 text-base" />
+            disabled={disabled} className="h-11 text-base" />
         </div>
         <div>
           <Label className="text-base">Lado final</Label>
@@ -49,15 +49,15 @@ export default function ControleAplicacaoSection({ data, onChange, isEditable, i
           <Label className="text-base">Quantidade aplicada (m²)</Label>
           <Input type="number" value={data.quantidade_aplicada_m2 || ''}
             onChange={(e) => set('quantidade_aplicada_m2', e.target.value ? parseFloat(e.target.value) : null)}
-            disabled={disabled} className="bg-white border-slate-200 text-slate-700 h-11 text-base" />
+            disabled={disabled} className="h-11 text-base" />
         </div>
       </div>
       <div className="mt-3">
         <Label className="text-base">Observações</Label>
         <Textarea value={data.observacoes} onChange={(e) => set('observacoes', e.target.value)}
           disabled={disabled} rows={4} maxLength={500}
-          className="bg-white border-slate-200 text-slate-700 text-base" />
-        <p className="text-sm text-right text-slate-600 mt-1">{data.observacoes?.length || 0} / 500 caracteres</p>
+          className="text-base" />
+        <p className="text-sm text-right text-muted-foreground mt-1">{data.observacoes?.length || 0} / 500 caracteres</p>
       </div>
     </div>
   );

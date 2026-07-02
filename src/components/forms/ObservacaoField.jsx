@@ -27,7 +27,7 @@ export default function ObservacaoField({
         maxLength={maxLength}
         placeholder={placeholder}
       />
-      <p className="text-xs text-right text-slate-500 mt-1">
+      <p className="text-xs text-right text-muted-foreground mt-1">
         {(value || "").length} / {maxLength}
       </p>
     </div>

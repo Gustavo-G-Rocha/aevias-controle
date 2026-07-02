@@ -36,7 +36,7 @@ export default function EnsaioSondagemDadosGerais({ formData, setFormData, obras
       </Card>
 
       {/* Dados da Obra */}
-      <Card className="bg-slate-50">
+      <Card className="bg-muted/30">
         <CardHeader>
           <CardTitle className="text-lg">Dados da Obra</CardTitle>
         </CardHeader>
@@ -138,7 +138,7 @@ export default function EnsaioSondagemDadosGerais({ formData, setFormData, obras
       </Card>
 
       {/* Parâmetros de Projeto */}
-      <Card className="bg-slate-50">
+      <Card className="bg-muted/30">
         <CardHeader>
           <CardTitle className="text-lg">Parâmetros de Projeto</CardTitle>
         </CardHeader>

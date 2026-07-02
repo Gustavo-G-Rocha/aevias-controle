@@ -417,7 +417,7 @@ export default function CertificacaoUsinaPage() {
 
               {/* Campos obrigatórios vazios */}
               {camposVazios.length > 0 && (
-                <div className="rounded-md border border-orange-500/30 bg-orange-500/10 px-4 py-3 text-sm text-orange-600">
+                <div className="rounded-md border border-orange-500/30 bg-card0/10 px-4 py-3 text-sm text-orange-600">
                   <p className="font-semibold mb-1">Preencha os campos obrigatórios antes de avançar:</p>
                   <ul className="list-disc list-inside space-y-0.5">
                     {camposVazios.map((c, i) => <li key={i}>{c}</li>)}
