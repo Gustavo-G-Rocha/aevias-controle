@@ -183,14 +183,17 @@ export function filtrarObrasParaTrado(obrasData, regionaisData, currentUser) {
   const accessLevel = currentUser.access_level || (currentUser.role === 'admin' ? 'admin' : 'user');
 
   if (accessLevel === 'user') {
-    const regional = regionaisData.find(r =>
-      (r.laboratoristas_responsaveis || []).some(
-        e => e.toLowerCase() === currentUser.email.toLowerCase()
+    const emailLower = (currentUser.email || '').toLowerCase();
+    const regionaisIds = regionaisData
+      .filter(r =>
+        (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+        (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
       )
-    );
-    if (!regional) return [];
+      .map(r => r.id);
+    if (regionaisIds.length === 0) return [];
+    const regionaisSet = new Set(regionaisIds);
     return obrasData.filter(
-      o => o.regional_id === regional.id && o.status === 'em_andamento' && o.tipo_obra === 'sondagem'
+      o => regionaisSet.has(o.regional_id) && o.status === 'em_andamento' && o.tipo_obra === 'sondagem'
     );
   }
 

@@ -69,13 +69,16 @@ const TIPOS_OBRA_VALIDOS = ['implantacao', 'conservacao', 'supervisao'];
 export function filtrarObras(obras, user, regionais) {
   const nivel = user?.access_level || (user?.role === 'admin' ? 'admin' : 'user');
   if (nivel === 'user') {
-    const regional = regionais.find(r =>
-      (r.laboratoristas_responsaveis || []).some(
-        e => e.toLowerCase() === (user?.email || '').toLowerCase()
+    const emailLower = (user?.email || '').toLowerCase();
+    const regionaisIds = regionais
+      .filter(r =>
+        (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+        (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
       )
-    );
-    if (!regional) return [];
-    return obras.filter(o => o.regional_id === regional.id && TIPOS_OBRA_VALIDOS.includes(o.tipo_obra));
+      .map(r => r.id);
+    if (regionaisIds.length === 0) return [];
+    const regionaisSet = new Set(regionaisIds);
+    return obras.filter(o => regionaisSet.has(o.regional_id) && TIPOS_OBRA_VALIDOS.includes(o.tipo_obra));
   }
   return obras.filter(o => TIPOS_OBRA_VALIDOS.includes(o.tipo_obra));
 }

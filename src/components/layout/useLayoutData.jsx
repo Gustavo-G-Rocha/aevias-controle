@@ -31,7 +31,10 @@ export function useLayoutData() {
 
         const emailLower = userData.email.toLowerCase();
         const regionaisIds = regionaisData
-          .filter(r => (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower))
+          .filter(r =>
+            (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+            (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+          )
           .map(r => r.id);
 
         const regionaisSet = new Set(regionaisIds);

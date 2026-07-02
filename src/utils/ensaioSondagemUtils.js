@@ -254,12 +254,17 @@ export const validarArquivoFoto = (file) => {
 export const filtrarObrasPorAcesso = (obrasData, regionaisData, userData) => {
   const accessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
   if (accessLevel === 'user') {
-    const regional = regionaisData.find(r =>
-      (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === userData.email.toLowerCase())
-    );
-    if (!regional) return [];
+    const emailLower = (userData.email || '').toLowerCase();
+    const regionaisIds = regionaisData
+      .filter(r =>
+        (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+        (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+      )
+      .map(r => r.id);
+    if (regionaisIds.length === 0) return [];
+    const regionaisSet = new Set(regionaisIds);
     return obrasData.filter(o =>
-      o.regional_id === regional.id &&
+      regionaisSet.has(o.regional_id) &&
       o.status === 'em_andamento' &&
       (o.tipo_obra === 'implantacao' || o.tipo_obra === 'supervisao')
     );

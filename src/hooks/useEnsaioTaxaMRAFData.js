@@ -41,11 +41,16 @@ export const useEnsaioTaxaMRAFData = () => {
 
       // Filtrar obras por access_level
       if (accessLevel === 'user') {
-        const regional = regionaisData.find(r =>
-          (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === currentUser.email.toLowerCase())
-        );
-        availableObras = regional
-          ? availableObras.filter(o => o.regional_id === regional.id && o.status === 'em_andamento')
+        const emailLower = currentUser.email.toLowerCase();
+        const regionaisIds = regionaisData
+          .filter(r =>
+            (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+            (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+          )
+          .map(r => r.id);
+        const regionaisSet = new Set(regionaisIds);
+        availableObras = regionaisIds.length > 0
+          ? availableObras.filter(o => regionaisSet.has(o.regional_id) && o.status === 'em_andamento')
           : [];
       }
 

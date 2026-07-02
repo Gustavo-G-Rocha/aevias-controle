@@ -176,11 +176,14 @@ export function filtrarObrasVigaBenkelman(obrasData, regionaisData, userData) {
   const userAccessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
   if (userAccessLevel !== 'user') return obrasData;
 
-  const regionalDoLab = regionaisData.find(r =>
-    (r.laboratoristas_responsaveis || []).some(
-      email => email.toLowerCase() === (userData.email || '').toLowerCase()
+  const emailLower = (userData.email || '').toLowerCase();
+  const regionaisIds = regionaisData
+    .filter(r =>
+      (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+      (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
     )
-  );
-  if (!regionalDoLab) return [];
-  return obrasData.filter(o => o.regional_id === regionalDoLab.id);
+    .map(r => r.id);
+  if (regionaisIds.length === 0) return [];
+  const regionaisSet = new Set(regionaisIds);
+  return obrasData.filter(o => regionaisSet.has(o.regional_id));
 }

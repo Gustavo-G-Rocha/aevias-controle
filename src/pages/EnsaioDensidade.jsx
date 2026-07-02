@@ -52,14 +52,18 @@ export default function EnsaioDensidadePage() {
         const currentUserAccessLevel = currentUser.access_level || (currentUser.role === 'admin' ? 'admin' : 'user');
         if (currentUserAccessLevel === 'user') {
           const regionaisData = await base44.entities.Regional.list();
-          const regionalDoLaboratorista = regionaisData.find(regional => {
-            const laboratoristas = regional.laboratoristas_responsaveis || [];
-            return laboratoristas.some(email => email.toLowerCase() === currentUser.email.toLowerCase());
-          });
+          const emailLower = currentUser.email.toLowerCase();
+          const regionaisIds = regionaisData
+            .filter(r =>
+              (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+              (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+            )
+            .map(r => r.id);
           
-          if (regionalDoLaboratorista) {
+          if (regionaisIds.length > 0) {
+            const regionaisSet = new Set(regionaisIds);
             obrasData = obrasData.filter(obra => 
-              obra.regional_id === regionalDoLaboratorista.id &&
+              regionaisSet.has(obra.regional_id) &&
               obra.status === 'em_andamento'
             );
           } else {

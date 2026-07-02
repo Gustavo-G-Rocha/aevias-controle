@@ -58,14 +58,18 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
         // Filtrar obras disponíveis
         let availableObras = obrasData;
         if (currentUserAccessLevel === 'user') {
-          const regionalDoLaboratorista = regionaisData.find(regional => {
-            const laboratoristas = regional.laboratoristas_responsaveis || [];
-            return laboratoristas.some(email => email.toLowerCase() === userData.email.toLowerCase());
-          });
+          const emailLower = userData.email.toLowerCase();
+          const regionaisIds = regionaisData
+            .filter(r =>
+              (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+              (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+            )
+            .map(r => r.id);
 
-          if (regionalDoLaboratorista) {
+          if (regionaisIds.length > 0) {
+            const regionaisSet = new Set(regionaisIds);
             availableObras = obrasData.filter(obra =>
-              obra.regional_id === regionalDoLaboratorista.id &&
+              regionaisSet.has(obra.regional_id) &&
               obra.status === 'em_andamento' &&
               (filtroTipoObra ? filtroTipoObra.includes(obra.tipo_obra) : true)
             );

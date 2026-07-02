@@ -175,18 +175,20 @@ export function filtrarObrasDisponiveis(obrasData, regionaisData, currentUser) {
     currentUser.access_level || (currentUser.role === 'admin' ? 'admin' : 'user');
 
   if (accessLevel === 'user') {
-    const regionalDoLaboratorista = regionaisData.find(regional => {
-      const laboratoristas = regional.laboratoristas_responsaveis || [];
-      return laboratoristas.some(
-        email => email.toLowerCase() === currentUser.email.toLowerCase()
-      );
-    });
+    const emailLower = (currentUser.email || '').toLowerCase();
+    const regionaisIds = regionaisData
+      .filter(r =>
+        (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+        (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+      )
+      .map(r => r.id);
 
-    if (!regionalDoLaboratorista) return [];
+    if (regionaisIds.length === 0) return [];
+    const regionaisSet = new Set(regionaisIds);
 
     return obrasData.filter(
       obra =>
-        obra.regional_id === regionalDoLaboratorista.id &&
+        regionaisSet.has(obra.regional_id) &&
         obra.status === 'em_andamento' &&
         (obra.tipo_obra === 'implantacao' || obra.tipo_obra === 'conservacao')
     );

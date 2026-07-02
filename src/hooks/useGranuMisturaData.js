@@ -37,11 +37,16 @@ export function useGranuMisturaData() {
       const userAccessLevel = currentUser.access_level || (currentUser.role === "admin" ? "admin" : "user");
       let availableObras = obrasData;
       if (userAccessLevel === "user") {
-        const reg = regionaisData.find(r =>
-          (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === currentUser.email.toLowerCase())
-        );
-        availableObras = reg
-          ? obrasData.filter(o => o.regional_id === reg.id && o.status === "em_andamento")
+        const emailLower = currentUser.email.toLowerCase();
+        const regionaisIds = regionaisData
+          .filter(r =>
+            (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+            (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+          )
+          .map(r => r.id);
+        const regionaisSet = new Set(regionaisIds);
+        availableObras = regionaisIds.length > 0
+          ? obrasData.filter(o => regionaisSet.has(o.regional_id) && o.status === "em_andamento")
           : [];
       }
 

@@ -114,14 +114,17 @@ export function filtrarObrasDisponiveis(obrasData, regionaisData, userData) {
   const accessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
 
   if (accessLevel === 'user') {
-    const regionalDoLab = regionaisData.find(r =>
-      (r.laboratoristas_responsaveis || []).some(
-        e => e.toLowerCase() === (userData?.email || '').toLowerCase()
+    const emailLower = (userData?.email || '').toLowerCase();
+    const regionaisIds = regionaisData
+      .filter(r =>
+        (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+        (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
       )
-    );
-    if (!regionalDoLab) return [];
+      .map(r => r.id);
+    if (regionaisIds.length === 0) return [];
+    const regionaisSet = new Set(regionaisIds);
     return obrasData.filter(o =>
-      o.regional_id === regionalDoLab.id &&
+      regionaisSet.has(o.regional_id) &&
       o.status === 'em_andamento' &&
       TIPOS_OBRA_VALIDOS.includes(o.tipo_obra)
     );

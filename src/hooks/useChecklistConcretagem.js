@@ -128,12 +128,16 @@ export function useChecklistConcretagem() {
 
       if (userAccessLevel === "user") {
         const emailLower = userData.email.toLowerCase();
-        const regionalDoLab = regionaisData.find(r =>
-          (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-        );
-        if (regionalDoLab) {
+        const regionaisIds = regionaisData
+          .filter(r =>
+            (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+            (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+          )
+          .map(r => r.id);
+        if (regionaisIds.length > 0) {
+          const regionaisSet = new Set(regionaisIds);
           setObras(obrasData.filter(o =>
-            o.regional_id === regionalDoLab.id && o.status === "em_andamento" && o.tipo_obra === "supervisao"
+            regionaisSet.has(o.regional_id) && o.status === "em_andamento" && o.tipo_obra === "supervisao"
           ));
         } else {
           setObras([]);

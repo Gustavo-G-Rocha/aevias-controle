@@ -182,13 +182,17 @@ export const filterObrasPorAcesso = (obras, user, regionais, isAdmin, userAccess
   );
 
   if (!isAdmin && userAccessLevel === 'user') {
-    const regionalDoLaboratorista = regionais.find(regional => {
-      const laboratoristas = regional.laboratoristas_responsaveis || [];
-      return laboratoristas.some(email => email.toLowerCase() === user.email.toLowerCase());
-    });
+    const emailLower = (user.email || '').toLowerCase();
+    const regionaisIds = regionais
+      .filter(r =>
+        (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+        (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+      )
+      .map(r => r.id);
 
-    if (regionalDoLaboratorista) {
-      obrasDisponiveis = obrasDisponiveis.filter(obra => obra.regional_id === regionalDoLaboratorista.id);
+    if (regionaisIds.length > 0) {
+      const regionaisSet = new Set(regionaisIds);
+      obrasDisponiveis = obrasDisponiveis.filter(obra => regionaisSet.has(obra.regional_id));
     } else {
       obrasDisponiveis = [];
     }
