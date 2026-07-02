@@ -101,8 +101,8 @@ export default function ChecklistAplicacaoPage() {
     return (
       <div className="flex justify-center items-center h-screen bg-transparent">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#00233B]/50" />
-          <p className="text-[#00233B]/80 mt-2">Carregando checklist...</p>
+          <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
+          <p className="text-muted-foreground mt-2">Carregando checklist...</p>
         </div>
       </div>
     );
@@ -111,14 +111,14 @@ export default function ChecklistAplicacaoPage() {
   return (
     <div className="p-6 space-y-6 bg-transparent min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <Card className="bg-white/20 backdrop-blur-lg border border-white/20 text-[#00233B]">
+        <Card className="bg-card border border-border text-card-foreground">
           <CardHeader>
             <div className="flex justify-between items-start">
               <div>
-                <CardTitle className="text-[#00233B] text-2xl">
+                <CardTitle className="text-2xl">
                   {editingChecklist ? 'Editar Checklist de Aplicação' : 'Novo Checklist de Aplicação'}
                 </CardTitle>
-                <CardDescription className="text-[#00233B]/80">
+                <CardDescription>
                   {editingChecklist
                     ? `Editando checklist de ${new Date(editingChecklist.data).toLocaleDateString('pt-BR')}`
                     : "Preencha as informações do controle tecnológico de aplicação"}
@@ -126,7 +126,7 @@ export default function ChecklistAplicacaoPage() {
               </div>
               {editingChecklist && (
                 <Link to={createPageUrl(`RelatorioChecklistAplicacao?id=${editingChecklist.id}`)} target="_blank">
-                  <Button variant="outline" size="sm" className="text-[#00233B] hover:bg-black/10">
+                  <Button variant="outline" size="sm">
                     <Eye className="w-4 h-4 mr-2" /> Ver PDF
                   </Button>
                 </Link>
