@@ -1,8 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
+import { useQuery } from "@tanstack/react-query";
+import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import {
   getInitialForm,
   getInitialPeneiras,
@@ -12,79 +14,77 @@ export function useGranuMisturaData() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [loading, setLoading]                   = useState(true);
-  const [user, setUser]                         = useState(null);
-  const [obras, setObras]                       = useState([]);
-  const [regionais, setRegionais]               = useState([]);
-  const [projects, setProjects]                 = useState([]);
-  const [faixasDisponiveis, setFaixasDisponiveis] = useState([]);
-  const [editingId, setEditingId]               = useState(null);
-  const [formData, setFormData]                 = useState(getInitialForm);
+  const [editLoading, setEditLoading] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState(getInitialForm);
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
+  const { data: user, isLoading: loadingUser } = useCurrentUser();
+  const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true });
 
-      const [obrasData, regionaisData, projectsData, faixasData] = await Promise.all([
-        base44.entities.Obra.list(),
-        base44.entities.Regional.list(),
-        base44.entities.Project.list(),
-        base44.entities.FaixaGranulometrica.list(),
-      ]);
+  // FaixaGranulometrica — cache próprio (não está no useAuxData)
+  const { data: faixasDisponiveis } = useQuery({
+    queryKey: ['faixasGranulometricas'],
+    queryFn: () => base44.entities.FaixaGranulometrica.list(),
+    staleTime: 10 * 60 * 1000,
+  });
 
-      const userAccessLevel = currentUser.access_level || (currentUser.role === "admin" ? "admin" : "user");
-      let availableObras = obrasData;
-      if (userAccessLevel === "user") {
-        const emailLower = currentUser.email.toLowerCase();
-        const regionaisIds = regionaisData
-          .filter(r =>
-            (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-            (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-          )
-          .map(r => r.id);
-        const regionaisSet = new Set(regionaisIds);
-        availableObras = regionaisIds.length > 0
-          ? obrasData.filter(o => regionaisSet.has(o.regional_id) && o.status === "em_andamento")
-          : [];
-      }
+  const regionais = auxData?.regionais ?? [];
+  const projects = auxData?.projects ?? [];
 
-      setObras(availableObras);
-      setRegionais(regionaisData);
-      setProjects(projectsData);
-      setFaixasDisponiveis(faixasData);
-
-      const params = new URLSearchParams(location.search);
-      const editId = params.get("editId");
-
-      if (editId) {
-        const rec = await base44.entities.GranuMistura.get(editId);
-        if (currentUser.role === "admin" || (rec.created_by === currentUser.email && (rec.status === "rascunho" || rec.approved === false))) {
-          setEditingId(editId);
-          setFormData({ ...getInitialForm(), ...rec, peneiras: rec.peneiras || getInitialPeneiras() });
-        } else {
-          alert("Sem permissão para editar.");
-          navigate(createPageUrl("MeusEnsaios"));
-        }
-      } else {
-        setFormData(prev => ({
-          ...prev,
-          laboratorista_name: currentUser.laboratorista_name || currentUser.full_name || "",
-        }));
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Erro ao carregar dados.");
-    } finally {
-      setLoading(false);
+  const obras = useMemo(() => {
+    if (!auxData?.obras || !user) return [];
+    const userAccessLevel = user.access_level || (user.role === "admin" ? "admin" : "user");
+    if (userAccessLevel === "user") {
+      const emailLower = user.email.toLowerCase();
+      const regionaisIds = regionais
+        .filter(r =>
+          (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+          (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+        )
+        .map(r => r.id);
+      const regionaisSet = new Set(regionaisIds);
+      return regionaisIds.length > 0
+        ? auxData.obras.filter(o => regionaisSet.has(o.regional_id) && o.status === "em_andamento")
+        : [];
     }
-  }, [location.search, navigate]);
+    return auxData.obras;
+  }, [auxData?.obras, regionais, user]);
 
-  useEffect(() => { loadData(); }, [loadData]);
+  useEffect(() => {
+    if (loadingUser || loadingAux || !user) return;
+
+    const params = new URLSearchParams(location.search);
+    const editId = params.get("editId");
+
+    if (editId) {
+      setEditLoading(true);
+      base44.entities.GranuMistura.get(editId)
+        .then(rec => {
+          if (user.role === "admin" || (rec.created_by === user.email && (rec.status === "rascunho" || rec.approved === false))) {
+            setEditingId(editId);
+            setFormData({ ...getInitialForm(), ...rec, peneiras: rec.peneiras || getInitialPeneiras() });
+          } else {
+            alert("Sem permissão para editar.");
+            navigate(createPageUrl("MeusEnsaios"));
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert("Erro ao carregar dados.");
+        })
+        .finally(() => setEditLoading(false));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        laboratorista_name: user.laboratorista_name || user.full_name || "",
+      }));
+    }
+  }, [location.search, loadingUser, loadingAux, user?.id, navigate]);
+
+  const loading = loadingUser || loadingAux || editLoading;
 
   return {
-    loading, user, obras, regionais, projects, faixasDisponiveis,
+    loading, user, obras, regionais, projects, faixasDisponiveis: faixasDisponiveis ?? [],
     editingId, formData, setFormData,
   };
 }

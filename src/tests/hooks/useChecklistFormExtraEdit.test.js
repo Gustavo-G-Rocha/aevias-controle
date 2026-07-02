@@ -25,7 +25,7 @@ describe('useChecklistForm — suporte a canEditExtra', () => {
   });
 
   it('mantém o bypass de admin e a checagem de owner existentes', () => {
-    expect(src).toContain("userData.role === 'admin'");
+    expect(src).toContain("user.role === 'admin'");
     expect(src).toContain('isOwnerCheck');
   });
 

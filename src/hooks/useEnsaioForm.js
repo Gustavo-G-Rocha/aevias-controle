@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { useQuery } from "@tanstack/react-query";
 import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { createPageUrl } from "@/utils";
+import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 
 /**
  * Hook reutilizável para formulários de ensaios individuais
@@ -13,15 +15,12 @@ import { createPageUrl } from "@/utils";
  * - Retorna `editingEnsaio` em vez de `editingChecklist`
  * - Usa base44.entities para carregar entidade (não dynamic import)
  * - filtroTipoObra opcional para filtrar obras por tipo
+ *
+ * Usa React Query (cache compartilhado via useAuxData) para evitar chamadas redundantes.
  */
 export function useEnsaioForm(getInitialFormData, entityName, storageName, { filtroTipoObra } = {}) {
-  const [obras, setObras] = useState([]);
-  const [regionais, setRegionais] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [faixas, setFaixas] = useState([]);
-  const [user, setUser] = useState(null);
   const [editingEnsaio, setEditingEnsaio] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [editLoading, setEditLoading] = useState(false);
   const [formData, setFormData] = useState(getInitialFormData);
 
   const location = useLocation();
@@ -29,70 +28,62 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
 
   const { clearSavedData } = useFormPersistence(storageName, formData, setFormData, !!editingEnsaio);
 
+  const { data: user, isLoading: loadingUser } = useCurrentUser();
+  const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true });
+
+  // FaixaGranulometrica — cache próprio (não está no useAuxData)
+  const { data: faixas } = useQuery({
+    queryKey: ['faixasGranulometricas'],
+    queryFn: () => base44.entities.FaixaGranulometrica.list(),
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const regionais = auxData?.regionais ?? [];
+  const projects = auxData?.projects ?? [];
+
+  const obras = useMemo(() => {
+    if (!auxData?.obras || !user) return [];
+    const currentUserAccessLevel = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
+    let availableObras = auxData.obras;
+    if (currentUserAccessLevel === 'user') {
+      const emailLower = user.email.toLowerCase();
+      const regionaisIds = regionais
+        .filter(r =>
+          (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+          (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+        )
+        .map(r => r.id);
+      if (regionaisIds.length > 0) {
+        const regionaisSet = new Set(regionaisIds);
+        availableObras = auxData.obras.filter(obra =>
+          regionaisSet.has(obra.regional_id) &&
+          obra.status === 'em_andamento' &&
+          (filtroTipoObra ? filtroTipoObra.includes(obra.tipo_obra) : true)
+        );
+      } else {
+        availableObras = [];
+      }
+    } else if (filtroTipoObra) {
+      availableObras = auxData.obras.filter(obra => filtroTipoObra.includes(obra.tipo_obra));
+    }
+    return availableObras;
+  }, [auxData?.obras, regionais, user, filtroTipoObra]);
+
+  // Carregar ensaio para edição se editId presente
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const userData = await base44.auth.me();
-        setUser(userData);
+    if (loadingUser || loadingAux || !user) return;
 
-        const currentUserAccessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
+    const params = new URLSearchParams(location.search);
+    const editId = params.get('editId');
 
-        let faixasData = [];
-        try {
-          faixasData = await base44.entities.FaixaGranulometrica.list();
-        } catch (faixasError) {
-          console.warn(`[${entityName}] Faixas indisponíveis:`, faixasError?.message);
-        }
-
-        const [obrasData, regionaisData, projectsData] = await Promise.all([
-          base44.entities.Obra.list(),
-          base44.entities.Regional.list(),
-          base44.entities.Project.list()
-        ]);
-
-        setRegionais(regionaisData);
-        setProjects(projectsData);
-        setFaixas(faixasData);
-
-        // Filtrar obras disponíveis
-        let availableObras = obrasData;
-        if (currentUserAccessLevel === 'user') {
-          const emailLower = userData.email.toLowerCase();
-          const regionaisIds = regionaisData
-            .filter(r =>
-              (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-              (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-            )
-            .map(r => r.id);
-
-          if (regionaisIds.length > 0) {
-            const regionaisSet = new Set(regionaisIds);
-            availableObras = obrasData.filter(obra =>
-              regionaisSet.has(obra.regional_id) &&
-              obra.status === 'em_andamento' &&
-              (filtroTipoObra ? filtroTipoObra.includes(obra.tipo_obra) : true)
-            );
-          } else {
-            availableObras = [];
-          }
-        } else if (filtroTipoObra) {
-          availableObras = obrasData.filter(obra => filtroTipoObra.includes(obra.tipo_obra));
-        }
-        setObras(availableObras);
-
-        // Carregar ensaio para edição se editId presente
-        const params = new URLSearchParams(location.search);
-        const editId = params.get('editId');
-
-        if (editId) {
-          const ensaioToEdit = await base44.entities[entityName].get(editId);
+    if (editId) {
+      setEditLoading(true);
+      base44.entities[entityName].get(editId)
+        .then(ensaioToEdit => {
           setEditingEnsaio(ensaioToEdit);
-
-          // Permite editar se: admin, ou criador com status rascunho/finalizado não aprovado, ou reprovado
-          const isCreator = ensaioToEdit.created_by === userData.email;
+          const isCreator = ensaioToEdit.created_by === user.email;
           const canEditStatus = ensaioToEdit.status === 'rascunho' || ensaioToEdit.status === 'finalizado' || ensaioToEdit.approved === false;
-          const hasPermission = userData.role === 'admin' || (isCreator && canEditStatus);
+          const hasPermission = user.role === 'admin' || (isCreator && canEditStatus);
 
           if (hasPermission) {
             const initialForm = getInitialFormData();
@@ -107,25 +98,22 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
             alert("Você não tem permissão para editar este registro.");
             navigate(createPageUrl('MeusEnsaios'));
           }
-        } else {
-          const initialNewFormData = getInitialFormData();
-          if (availableObras.length > 0) {
-            initialNewFormData.obra_id = availableObras[0].id;
-          }
-          setFormData(initialNewFormData);
-          setEditingEnsaio(null);
-        }
-      } catch (error) {
-        console.error(`[${entityName}] Erro ao carregar:`, error?.message);
-        alert("Erro ao carregar os dados.");
-        navigate(createPageUrl('MeusEnsaios'));
-      } finally {
-        setLoading(false);
+        })
+        .catch(error => {
+          console.error(`[${entityName}] Erro ao carregar:`, error?.message);
+          alert("Erro ao carregar os dados.");
+          navigate(createPageUrl('MeusEnsaios'));
+        })
+        .finally(() => setEditLoading(false));
+    } else {
+      const initialNewFormData = getInitialFormData();
+      if (obras.length > 0) {
+        initialNewFormData.obra_id = obras[0].id;
       }
-    };
-
-    loadData();
-  }, [location.search]);
+      setFormData(initialNewFormData);
+      setEditingEnsaio(null);
+    }
+  }, [location.search, loadingUser, loadingAux, user?.id, obras, entityName, navigate]);
 
   const obraSelecionada = useMemo(() => obras.find(o => o.id === formData.obra_id), [obras, formData.obra_id]);
   const regionalSelecionada = useMemo(() => obraSelecionada ? regionais.find(r => r.id === obraSelecionada.regional_id) : null, [obraSelecionada, regionais]);
@@ -137,6 +125,7 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
     );
   }, [regionalSelecionada, projects]);
 
+  const loading = loadingUser || loadingAux || editLoading;
   const isApproved = formData.approved === true;
   const userCanEdit = user?.role === 'admin' || (formData.created_by === user?.email && (formData.status === 'rascunho' || formData.status === 'finalizado' || formData.approved === false));
   const isEditable = !editingEnsaio?.id || userCanEdit;
@@ -145,7 +134,7 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
     obras,
     regionais,
     projects,
-    faixas,
+    faixas: faixas ?? [],
     user,
     editingEnsaio,
     setEditingEnsaio,

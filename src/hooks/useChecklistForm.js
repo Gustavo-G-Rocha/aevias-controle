@@ -1,25 +1,20 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { useQuery } from "@tanstack/react-query";
 import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { createPageUrl } from "@/utils";
-
-
+import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 
 /**
  * Hook reutilizável para formulários de checklist
- * Gerencia carregamento de dados, persistência, edição e permissões
+ * Gerencia carregamento de dados, persistência, edição e permissões.
+ * Usa React Query (cache compartilhado via useAuxData) para evitar chamadas redundantes.
  */
 export function useChecklistForm(getInitialFormData, entityName, storageName, canEditExtra = null) {
-  const [obras, setObras] = useState([]);
-  const [regionais, setRegionais] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [faixas, setFaixas] = useState([]);
-  const [user, setUser] = useState(null);
-  const [allUsers, setAllUsers] = useState([]);
   const [editingChecklist, setEditingChecklist] = useState(null);
   const [obraDoRegistro, setObraDoRegistro] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [editLoading, setEditLoading] = useState(false);
   const [formData, setFormData] = useState(getInitialFormData());
 
   const location = useLocation();
@@ -27,122 +22,100 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
 
   const { clearSavedData } = useFormPersistence(storageName, formData, setFormData, !!editingChecklist);
 
-  // Carregar dados na montagem
+  const { data: user, isLoading: loadingUser } = useCurrentUser();
+  const isAdmin = user?.role === 'admin';
+  const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true, needsUsers: true });
+
+  // FaixaGranulometrica — cache próprio (não está no useAuxData)
+  const { data: faixas } = useQuery({
+    queryKey: ['faixasGranulometricas'],
+    queryFn: () => base44.entities.FaixaGranulometrica.list(),
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const regionais = auxData?.regionais ?? [];
+  const projects = auxData?.projects ?? [];
+  const allUsers = isAdmin ? (auxData?.users ?? []) : (user ? [user] : []);
+
+  const obras = useMemo(() => {
+    if (!auxData?.obras || !user) return [];
+    if (!isAdmin) {
+      const emailLower = user.email.toLowerCase();
+      const regionaisIds = regionais
+        .filter(r =>
+          (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+          (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+        )
+        .map(r => r.id);
+      if (regionaisIds.length > 0) {
+        const regionaisSet = new Set(regionaisIds);
+        return auxData.obras.filter(obra =>
+          regionaisSet.has(obra.regional_id) &&
+          obra.status === 'em_andamento'
+        );
+      }
+      return [];
+    }
+    return auxData.obras;
+  }, [auxData?.obras, regionais, user, isAdmin]);
+
+  // Carregar checklist para edição se editId presente
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const userData = await base44.auth.me();
-        setUser(userData);
+    if (loadingUser || loadingAux || !user) return;
 
-        const isAdmin = userData?.role === 'admin';
+    const params = new URLSearchParams(location.search);
+    const editId = params.get('editId');
 
-        // Carregar dados em paralelo
-        const dataPromises = [
-          base44.entities.Obra.list(),
-          base44.entities.Regional.list(),
-          base44.entities.Project.list()
-        ];
-
-        let faixasData = [];
-        try {
-          faixasData = await base44.entities.FaixaGranulometrica.list();
-        } catch (faixasError) {
-          console.warn(`[${entityName}] Faixas indisponíveis:`, faixasError?.message);
-        }
-
-        if (isAdmin) {
-          dataPromises.push(base44.entities.User.list());
-        }
-
-        const loadedData = await Promise.all(dataPromises);
-        const [obrasData, regionaisData, projectsData, allUsersDataFetchedIfAdmin] = loadedData;
-
-        setRegionais(regionaisData);
-        setProjects(projectsData);
-        setFaixas(faixasData);
-        setAllUsers(isAdmin ? allUsersDataFetchedIfAdmin : [userData]);
-
-        // Filtrar obras disponíveis para o usuário
-        let availableObras = obrasData;
-        if (!isAdmin) {
-          const emailLower = userData.email.toLowerCase();
-          const regionaisIds = regionaisData
-            .filter(r =>
-              (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-              (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-            )
-            .map(r => r.id);
-
-          if (regionaisIds.length > 0) {
-            const regionaisSet = new Set(regionaisIds);
-            availableObras = obrasData.filter(obra =>
-              regionaisSet.has(obra.regional_id) &&
-              obra.status === 'em_andamento'
-            );
-          } else {
-            availableObras = [];
-          }
-        }
-        setObras(availableObras);
-
-        // Carregar checklist para edição se editId presente
-        const params = new URLSearchParams(location.search);
-        const editId = params.get('editId');
-
-        if (editId) {
-          const checklistToEdit = await base44.entities[entityName].get(editId);
+    if (editId) {
+      setEditLoading(true);
+      base44.entities[entityName].get(editId)
+        .then(checklistToEdit => {
           setEditingChecklist(checklistToEdit);
-
-          const isOwnerCheck = checklistToEdit.created_by?.toLowerCase() === userData.email?.toLowerCase() || checklistToEdit.created_by_id === userData.id;
-          const obraRegistroAtual = obrasData.find(o => o.id === checklistToEdit.obra_id) || null;
+          const isOwnerCheck = checklistToEdit.created_by?.toLowerCase() === user.email?.toLowerCase() || checklistToEdit.created_by_id === user.id;
+          // Busca na lista completa (não filtrada) para encontrar a obra mesmo se não estiver em_andamento
+          const obraRegistroAtual = (auxData?.obras || []).find(o => o.id === checklistToEdit.obra_id) || null;
           setObraDoRegistro(obraRegistroAtual);
           const extraCanEdit = typeof canEditExtra === 'function'
-            ? canEditExtra(userData, checklistToEdit, obraRegistroAtual, regionaisData)
+            ? canEditExtra(user, checklistToEdit, obraRegistroAtual, regionais)
             : false;
-          if (userData.role === 'admin' || extraCanEdit || (isOwnerCheck && (checklistToEdit.status === 'rascunho' || checklistToEdit.approved === false || checklistToEdit.approved === null))) {
+          if (user.role === 'admin' || extraCanEdit || (isOwnerCheck && (checklistToEdit.status === 'rascunho' || checklistToEdit.approved === false || checklistToEdit.approved === null))) {
             const initialForm = getInitialFormData();
             // Deep-merge object fields so saved records don't lose keys added after initial save
-          const mergedObjectFields = {};
-          for (const key of Object.keys(initialForm)) {
-            if (initialForm[key] !== null && typeof initialForm[key] === 'object' && !Array.isArray(initialForm[key])) {
-              mergedObjectFields[key] = { ...initialForm[key], ...(checklistToEdit[key] || {}) };
+            const mergedObjectFields = {};
+            for (const key of Object.keys(initialForm)) {
+              if (initialForm[key] !== null && typeof initialForm[key] === 'object' && !Array.isArray(initialForm[key])) {
+                mergedObjectFields[key] = { ...initialForm[key], ...(checklistToEdit[key] || {}) };
+              }
             }
-          }
-
-          const loadedFormData = {
+            const loadedFormData = {
               ...initialForm,
               ...checklistToEdit,
               ...mergedObjectFields,
               data: checklistToEdit.data ? new Date(checklistToEdit.data).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
               fotos: Array.isArray(checklistToEdit.fotos) ? checklistToEdit.fotos : [],
             };
-
             setFormData(loadedFormData);
           } else {
             alert("Você não tem permissão para editar este registro.");
             navigate(createPageUrl('MeusEnsaios'));
           }
-        } else {
-          const initialNewFormData = getInitialFormData();
-          initialNewFormData.inspetor_campo = userData.laboratorista_name || userData.full_name;
-          if (availableObras.length > 0) {
-            initialNewFormData.obra_id = availableObras[0].id;
-          }
-          setFormData(initialNewFormData);
-          setEditingChecklist(null);
-        }
-      } catch (error) {
-        console.error(`[${entityName}] Erro ao carregar:`, error?.message);
-        alert("Erro ao carregar os dados.");
-        navigate(createPageUrl('MeusEnsaios'));
-      } finally {
-        setLoading(false);
+        })
+        .catch(error => {
+          console.error(`[${entityName}] Erro ao carregar:`, error?.message);
+          alert("Erro ao carregar os dados.");
+          navigate(createPageUrl('MeusEnsaios'));
+        })
+        .finally(() => setEditLoading(false));
+    } else {
+      const initialNewFormData = getInitialFormData();
+      initialNewFormData.inspetor_campo = user.laboratorista_name || user.full_name;
+      if (obras.length > 0) {
+        initialNewFormData.obra_id = obras[0].id;
       }
-    };
-
-    loadData();
-  }, [location.search, entityName, navigate]);
+      setFormData(initialNewFormData);
+      setEditingChecklist(null);
+    }
+  }, [location.search, loadingUser, loadingAux, user?.id, obras, auxData, entityName, navigate, canEditExtra, regionais]);
 
   // Helpers para obra/regional/projetos
   const obraSelecionada = useMemo(() => obras.find(o => o.id === formData.obra_id), [obras, formData.obra_id]);
@@ -157,6 +130,7 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
   }, [regionalSelecionada, projects]);
 
   // Permissões — calculadas apenas quando user já foi carregado
+  const loading = loadingUser || loadingAux || editLoading;
   const isApproved = formData.approved === true && formData.status !== 'rascunho';
 
   const extraCanEdit = useMemo(() => {
@@ -184,7 +158,7 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
     obras,
     regionais,
     projects,
-    faixas,
+    faixas: faixas ?? [],
     user,
     allUsers,
     editingChecklist,

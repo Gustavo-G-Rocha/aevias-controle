@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { uploadMultipleFiles } from "@/utils/imageUpload";
 import { createPageUrl } from "@/utils";
+import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 
 export const getInitialFormData = () => ({
   obra_id: "",
@@ -70,12 +71,34 @@ export function useDiarioObra() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [obras, setObras] = useState([]);
-  const [regionais, setRegionais] = useState([]);
-  const [user, setUser] = useState(null);
   const [editingDiarioOriginal, setEditingDiarioOriginal] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [editLoading, setEditLoading] = useState(false);
   const [formData, setFormData] = useState(getInitialFormData());
+
+  const { data: user, isLoading: loadingUser } = useCurrentUser();
+  const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true });
+
+  const regionais = auxData?.regionais ?? [];
+
+  const obras = useMemo(() => {
+    if (!auxData?.obras || !user) return [];
+    const emailLower = user.email.toLowerCase();
+    const regionaisDoUsuario = regionais
+      .filter(r =>
+        (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+        (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+      )
+      .map(r => r.id);
+    if (regionaisDoUsuario.length > 0) {
+      const regionaisSet = new Set(regionaisDoUsuario);
+      return auxData.obras.filter(o => regionaisSet.has(o.regional_id) && o.status === "em_andamento");
+    } else if (user.role !== "admin") {
+      return [];
+    }
+    return auxData.obras;
+  }, [auxData?.obras, regionais, user]);
+
+  const loading = loadingUser || loadingAux || editLoading;
   const [loadingUpload, setLoadingUpload] = useState(false);
   const [selectedFileNames, setSelectedFileNames] = useState("Nenhum ficheiro selecionado");
   const [uploadProgress, setUploadProgress] = useState([]);
@@ -167,45 +190,17 @@ export function useDiarioObra() {
   }, [navigate]);
 
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const currentUser = await base44.auth.me();
-        setUser(currentUser);
+    if (loadingUser || loadingAux || !user) return;
 
-        const [obrasData, regionaisData] = await Promise.all([base44.entities.Obra.list(), base44.entities.Regional.list()]);
-        setRegionais(regionaisData);
+    const params = new URLSearchParams(location.search);
+    const editId = params.get("editId");
 
-        let availableObras = obrasData;
-
-        // Verifica se o usuário está alocado em alguma regional (como laboratorista OU sala técnica)
-        const emailLower = currentUser.email.toLowerCase();
-        const regionaisDoUsuario = regionaisData
-          .filter(r =>
-            (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-            (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-          )
-          .map(r => r.id);
-
-        // Se está alocado em alguma regional, filtra por essas regionais
-        if (regionaisDoUsuario.length > 0) {
-          const regionaisSet = new Set(regionaisDoUsuario);
-          availableObras = obrasData.filter(o => regionaisSet.has(o.regional_id) && o.status === "em_andamento");
-        } else if (currentUser.role !== "admin") {
-          // Não é admin e não tem regional: não vê nenhuma obra
-          availableObras = [];
-        }
-        // admin puro sem regional alocada: vê todas (availableObras = obrasData)
-
-        setObras(availableObras);
-
-        const params = new URLSearchParams(location.search);
-        const editId = params.get("editId");
-
-        if (editId) {
-          const diarioToEdit = await base44.entities.DiarioObra.get(editId);
+    if (editId) {
+      setEditLoading(true);
+      base44.entities.DiarioObra.get(editId)
+        .then(diarioToEdit => {
           setEditingDiarioOriginal(diarioToEdit);
-          if (currentUser.role === "admin" || (diarioToEdit.created_by === currentUser.email && diarioToEdit.approved !== true)) {
+          if (user.role === "admin" || (diarioToEdit.created_by === user.email && diarioToEdit.approved !== true)) {
             setFormData({
               ...getInitialFormData(), ...diarioToEdit,
               data: diarioToEdit.data ? new Date(diarioToEdit.data).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
@@ -216,22 +211,20 @@ export function useDiarioObra() {
             alert("Você não tem permissão para editar este registro.");
             navigate(createPageUrl("MeusEnsaios"));
           }
-        } else {
-          const initial = getInitialFormData();
-          if (availableObras.length > 0) initial.obra_id = availableObras[0].id;
-          setFormData(initial);
-          setEditingDiarioOriginal(null);
-        }
-      } catch (error) {
-        console.error("[DiarioObra] Erro ao carregar:", error?.message || error);
-        alert("Não foi possível carregar os dados.");
-        navigate(createPageUrl("MeusEnsaios"));
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, [location.search, navigate]);
+        })
+        .catch(error => {
+          console.error("[DiarioObra] Erro ao carregar:", error?.message || error);
+          alert("Não foi possível carregar os dados.");
+          navigate(createPageUrl("MeusEnsaios"));
+        })
+        .finally(() => setEditLoading(false));
+    } else {
+      const initial = getInitialFormData();
+      if (obras.length > 0) initial.obra_id = obras[0].id;
+      setFormData(initial);
+      setEditingDiarioOriginal(null);
+    }
+  }, [location.search, loadingUser, loadingAux, user?.id, obras, navigate]);
 
   const isApproved = formData.approved === true;
   const userCanEdit = user?.role === "admin" || (formData.created_by === user?.email && formData.approved !== true);

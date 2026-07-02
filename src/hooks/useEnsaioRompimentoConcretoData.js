@@ -1,9 +1,11 @@
 /**
  * Hook de carregamento inicial para EnsaioRompimentoConcreto.
+ * Usa React Query (cache compartilhado via useAuxData) para evitar chamadas redundantes.
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { useCurrentUser, useAuxData } from '@/hooks/useQueryData';
 import {
   FORM_INITIAL,
   filtrarObras,
@@ -16,43 +18,39 @@ export function useEnsaioRompimentoConcretoData() {
   const editId = searchParams.get('id');
 
   const [loading,       setLoading]       = useState(true);
-  const [obras,         setObras]         = useState([]);
-  const [projects,      setProjects]      = useState([]);
   const [formData,      setFormData]      = useState(FORM_INITIAL);
   const [series,        setSeries]        = useState([]);
   const [seriesFlexao,  setSeriesFlexao]  = useState([]);
 
-  // ── Initial load ──
+  const { data: user, isLoading: loadingUser } = useCurrentUser();
+  const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true });
+
+  const obras = useMemo(() => {
+    if (!auxData?.obras || !user) return [];
+    return filtrarObras(auxData.obras, user, auxData.regionais);
+  }, [auxData, user]);
+
+  const projects = useMemo(() => {
+    if (!auxData?.projects) return [];
+    return auxData.projects.filter(p => p.tipo_projeto === 'CARTA_TRACO_CONCRETO');
+  }, [auxData?.projects]);
+
+  // ── Edit load ──
   useEffect(() => {
-    const init = async () => {
-      try {
-        const user = await base44.auth.me();
-        const [obrasData, projectsData, regionaisData] = await Promise.all([
-          base44.entities.Obra.list(),
-          base44.entities.Project.list(),
-          base44.entities.Regional.list(),
-        ]);
+    if (loadingUser || loadingAux || !user) return;
 
-        const obrasFiltradas  = filtrarObras(obrasData, user, regionaisData);
-        const projetosConcreto = projectsData.filter(p => p.tipo_projeto === 'CARTA_TRACO_CONCRETO');
-
-        setObras(obrasFiltradas);
-        setProjects(projetosConcreto);
-
-        if (editId) {
-          const ensaio = await base44.entities.EnsaioRompimentoConcreto.get(editId);
+    if (editId) {
+      base44.entities.EnsaioRompimentoConcreto.get(editId)
+        .then(ensaio => {
           setFormData({ ...ensaio, compressao_axial: ensaio.compressao_axial || [], tracao_flexao: ensaio.tracao_flexao || [] });
-        } else {
-          setFormData(prev => ({ ...prev, laboratorista_name: user.laboratorista_name || user.full_name }));
-        }
-      } catch (error) {
-        console.error('Erro ao carregar dados:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    init();
-  }, [editId]);
+        })
+        .catch(error => console.error('Erro ao carregar dados:', error))
+        .finally(() => setLoading(false));
+    } else {
+      setFormData(prev => ({ ...prev, laboratorista_name: user.laboratorista_name || user.full_name }));
+      setLoading(false);
+    }
+  }, [editId, loadingUser, loadingAux, user?.id]);
 
   // ── Reconstruct series from formData when editing ──
   useEffect(() => {

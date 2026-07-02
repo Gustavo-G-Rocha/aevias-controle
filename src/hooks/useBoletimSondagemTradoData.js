@@ -2,11 +2,13 @@
  * Hook de carregamento inicial para BoletimSondagemTrado.
  * Busca user, obras (filtradas por acesso) e regionais.
  * Trata modo de edição (editId na query string).
+ * Usa React Query (cache compartilhado via useAuxData) para evitar chamadas redundantes.
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
+import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import {
   getInitialFormData,
   getDensidadeInicial,
@@ -15,40 +17,35 @@ import {
 
 export function useBoletimSondagemTradoData() {
   const [formData, setFormData] = useState(getInitialFormData());
-  const [obras, setObras] = useState([]);
-  const [regionais, setRegionais] = useState([]);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [editingBoletim, setEditingBoletim] = useState(null);
+  const [editLoading, setEditLoading] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
 
+  const { data: user, isLoading: loadingUser } = useCurrentUser();
+  const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true });
+
+  const regionais = auxData?.regionais ?? [];
+
+  const obras = useMemo(() => {
+    if (!auxData?.obras || !user) return [];
+    return filtrarObrasParaTrado(auxData.obras, regionais, user);
+  }, [auxData?.obras, regionais, user]);
+
   useEffect(() => {
-    const loadInitialData = async () => {
-      setLoading(true);
-      try {
-        const currentUser = await base44.auth.me();
-        setUser(currentUser);
+    if (loadingUser || loadingAux || !user) return;
 
-        const [obrasData, regionaisData] = await Promise.all([
-          base44.entities.Obra.list(),
-          base44.entities.Regional.list(),
-        ]);
+    const params = new URLSearchParams(location.search);
+    const editId = params.get('editId');
 
-        const availableObras = filtrarObrasParaTrado(obrasData, regionaisData, currentUser);
-
-        setObras(availableObras);
-        setRegionais(regionaisData);
-
-        const params = new URLSearchParams(location.search);
-        const editId = params.get('editId');
-
-        if (editId) {
-          const boletimToEdit = await base44.entities.BoletimSondagemTrado.get(editId);
+    if (editId) {
+      setEditLoading(true);
+      base44.entities.BoletimSondagemTrado.get(editId)
+        .then(boletimToEdit => {
           if (
-            currentUser.role === 'admin' ||
-            (boletimToEdit.created_by === currentUser.email && boletimToEdit.approved !== true)
+            user.role === 'admin' ||
+            (boletimToEdit.created_by === user.email && boletimToEdit.approved !== true)
           ) {
             setEditingBoletim(boletimToEdit);
             const initial = getInitialFormData();
@@ -72,27 +69,26 @@ export function useBoletimSondagemTradoData() {
             alert("Você não tem permissão para editar este registro.");
             navigate(createPageUrl('MeusEnsaios'));
           }
-        } else {
-          const firstObra = availableObras.length > 0 ? availableObras[0] : null;
-          const regional = firstObra ? regionaisData.find(r => r.id === firstObra.regional_id) : null;
-          setFormData(prev => ({
-            ...prev,
-            operador: currentUser.laboratorista_name || currentUser.full_name,
-            obra_id: firstObra?.id || "",
-            cliente: regional?.cliente || "",
-          }));
-        }
-      } catch (error) {
-        console.error("Erro ao carregar dados:", error);
-        alert("Erro ao carregar dados.");
-        navigate(createPageUrl('MeusEnsaios'));
-      } finally {
-        setLoading(false);
-      }
-    };
+        })
+        .catch(err => {
+          console.error("Erro ao carregar dados:", err);
+          alert("Erro ao carregar dados.");
+          navigate(createPageUrl('MeusEnsaios'));
+        })
+        .finally(() => setEditLoading(false));
+    } else {
+      const firstObra = obras.length > 0 ? obras[0] : null;
+      const regional = firstObra ? regionais.find(r => r.id === firstObra.regional_id) : null;
+      setFormData(prev => ({
+        ...prev,
+        operador: user.laboratorista_name || user.full_name,
+        obra_id: firstObra?.id || "",
+        cliente: regional?.cliente || "",
+      }));
+    }
+  }, [location.search, loadingUser, loadingAux, user?.id, obras, regionais, navigate]);
 
-    loadInitialData();
-  }, [location.search]);
+  const loading = loadingUser || loadingAux || editLoading;
 
   return { formData, setFormData, obras, regionais, user, loading, editingBoletim };
 }

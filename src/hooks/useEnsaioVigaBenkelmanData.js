@@ -1,10 +1,12 @@
 /**
  * Hook de carregamento inicial para EnsaioVigaBenkelman.
  * Busca user, obras (filtradas), regionais e registro para edição.
+ * Usa React Query (cache compartilhado via useAuxData) para evitar chamadas redundantes.
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { useCurrentUser, useAuxData } from '@/hooks/useQueryData';
 import { getInitialForm, filtrarObrasVigaBenkelman, reconstruirFaixas } from '@/utils/ensaioVigaBenkelmanUtils';
 
 export function useEnsaioVigaBenkelmanData() {
@@ -12,25 +14,22 @@ export function useEnsaioVigaBenkelmanData() {
   const editId = searchParams.get('editId');
 
   const [loading, setLoading] = useState(true);
-  const [user, setUser]   = useState(null);
-  const [obras, setObras] = useState([]);
   const [formData, setFormData] = useState(getInitialForm());
 
+  const { data: user, isLoading: loadingUser } = useCurrentUser();
+  const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true });
+
+  const obras = useMemo(() => {
+    if (!auxData?.obras || !user) return [];
+    return filtrarObrasVigaBenkelman(auxData.obras, auxData.regionais, user);
+  }, [auxData, user]);
+
   useEffect(() => {
-    const load = async () => {
-      try {
-        const currentUser = await base44.auth.me();
-        setUser(currentUser);
+    if (loadingUser || loadingAux || !user) return;
 
-        const [obrasData, regionaisData] = await Promise.all([
-          base44.entities.Obra.list(),
-          base44.entities.Regional.list(),
-        ]);
-
-        setObras(filtrarObrasVigaBenkelman(obrasData, regionaisData, currentUser));
-
-        if (editId) {
-          const ensaio = await base44.entities.EnsaioVigaBenkelman.get(editId);
+    if (editId) {
+      base44.entities.EnsaioVigaBenkelman.get(editId)
+        .then(ensaio => {
           const faixasReconstruidas = reconstruirFaixas(
             ensaio.levantamentos,
             ensaio.leitura_inicial_global
@@ -41,21 +40,17 @@ export function useEnsaioVigaBenkelmanData() {
             faixas: faixasReconstruidas,
             nextFaixaId: faixasReconstruidas.length + 1,
           });
-        } else {
-          setFormData(prev => ({
-            ...prev,
-            laboratorista_name: currentUser.laboratorista_name || currentUser.full_name,
-          }));
-        }
-      } catch (err) {
-        console.error('Erro ao carregar dados:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    load();
-  }, [editId]);
+        })
+        .catch(err => console.error('Erro ao carregar dados:', err))
+        .finally(() => setLoading(false));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        laboratorista_name: user.laboratorista_name || user.full_name,
+      }));
+      setLoading(false);
+    }
+  }, [editId, loadingUser, loadingAux, user?.id]);
 
   return { loading, user, obras, formData, setFormData, editId };
 }

@@ -1,10 +1,12 @@
 /**
  * Hook de carregamento de dados iniciais do Ensaio de Sondagem.
+ * Usa React Query (cache compartilhado via useAuxData) para evitar chamadas redundantes.
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
+import { base44 } from "@/api/base44Client";
+import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import {
   getInitialFormData,
   filtrarObrasPorAcesso,
@@ -13,48 +15,42 @@ import {
 
 export function useEnsaioSondagemData() {
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
-  const [obras, setObras] = useState([]);
   const [projects, setProjects] = useState([]);
-  const [allProjects, setAllProjects] = useState([]);
-  const [regionais, setRegionais] = useState([]);
   const [editingEnsaio, setEditingEnsaio] = useState(null);
   const [formData, setFormData] = useState(getInitialFormData());
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Carregamento inicial
+  const { data: user, isLoading: loadingUser } = useCurrentUser();
+  const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true });
+
+  const regionais = auxData?.regionais ?? [];
+  const allProjects = auxData?.projects ?? [];
+
+  const obras = useMemo(() => {
+    if (!auxData?.obras || !user) return [];
+    return filtrarObrasPorAcesso(auxData.obras, regionais, user);
+  }, [auxData?.obras, regionais, user]);
+
+  // Carregamento inicial — preenche laboratorista e carrega ensaio para edição
   useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      try {
-        const [userData, obrasData, projectsData, regionaisData] = await Promise.all([
-          base44.auth.me(),
-          base44.entities.Obra.list(),
-          base44.entities.Project.list(),
-          base44.entities.Regional.list(),
-        ]);
+    if (loadingUser || loadingAux || !user) return;
 
-        setUser(userData);
-        setRegionais(regionaisData);
-        setAllProjects(projectsData);
-        setObras(filtrarObrasPorAcesso(obrasData, regionaisData, userData));
+    setFormData(prev => ({
+      ...prev,
+      laboratorista_name: user.laboratorista_name || user.full_name,
+    }));
 
-        setFormData(prev => ({
-          ...prev,
-          laboratorista_name: userData.laboratorista_name || userData.full_name,
-        }));
+    const params = new URLSearchParams(location.search);
+    const editId = params.get('editId');
 
-        const params = new URLSearchParams(location.search);
-        const editId = params.get('editId');
-
-        if (editId) {
-          const ensaioToEdit = await base44.entities.EnsaioSondagem.get(editId);
-          const podeEditar = userData.role === 'admin' ||
-            (ensaioToEdit.created_by === userData.email &&
+    if (editId) {
+      base44.entities.EnsaioSondagem.get(editId)
+        .then(ensaioToEdit => {
+          const podeEditar = user.role === 'admin' ||
+            (ensaioToEdit.created_by === user.email &&
               (ensaioToEdit.status === 'rascunho' || ensaioToEdit.approved === false));
-
           if (podeEditar) {
             setEditingEnsaio(ensaioToEdit);
             setFormData(ensaioToEdit);
@@ -62,16 +58,16 @@ export function useEnsaioSondagemData() {
             alert("Você não tem permissão para editar este registro.");
             navigate(createPageUrl('MeusEnsaios'));
           }
-        }
-      } catch (error) {
-        console.error("[EnsaioSondagem] Erro ao carregar dados:", error?.message || error);
-        alert("Erro ao carregar dados iniciais.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, []);
+        })
+        .catch(error => {
+          console.error("[EnsaioSondagem] Erro ao carregar dados:", error?.message || error);
+          alert("Erro ao carregar dados iniciais.");
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [location.search, loadingUser, loadingAux, user?.id, navigate]);
 
   // Atualiza projetos quando obra muda (limpa quando obra é desmarcada)
   useEffect(() => {

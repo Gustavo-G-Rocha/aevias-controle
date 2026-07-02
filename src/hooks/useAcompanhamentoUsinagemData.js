@@ -1,62 +1,55 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
+import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { getInitialFormData } from "@/utils/acompanhamentoUsinagemUtils";
 
 export function useAcompanhamentoUsinagemData() {
-  const [loading, setLoading]         = useState(true);
-  const [user, setUser]               = useState(null);
-  const [obras, setObras]             = useState([]);
-  const [regionais, setRegionais]     = useState([]);
-  const [projects, setProjects]       = useState([]);
-  const [editingId, setEditingId]     = useState(null);
-  const [isEditable, setIsEditable]   = useState(true);
-  const [formData, setFormData]       = useState(getInitialFormData);
+  const [editingId, setEditingId] = useState(null);
+  const [isEditable, setIsEditable] = useState(true);
+  const [formData, setFormData] = useState(getInitialFormData);
+  const [editLoading, setEditLoading] = useState(false);
 
-  const loadInitialData = useCallback(async () => {
-    try {
-      const userData = await base44.auth.me();
-      setUser(userData);
+  const { data: user, isLoading: loadingUser } = useCurrentUser();
+  const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true });
 
-      const [obrasData, regionaisData, projectsData] = await Promise.all([
-        base44.entities.Obra.list(),
-        base44.entities.Regional.list(),
-        base44.entities.Project.list(),
-      ]);
+  const obras = auxData?.obras ?? [];
+  const regionais = auxData?.regionais ?? [];
+  const projects = auxData?.projects ?? [];
 
-      setObras(obrasData);
-      setRegionais(regionaisData);
-      setProjects(projectsData);
+  useEffect(() => {
+    if (loadingUser || loadingAux || !user) return;
 
-      const params = new URLSearchParams(window.location.search);
-      const editId = params.get('editId');
+    const params = new URLSearchParams(window.location.search);
+    const editId = params.get('editId');
 
-      if (editId) {
-        const ensaioData = await base44.entities.AcompanhamentoUsinagem.get(editId);
-        const canEdit = ensaioData.created_by === userData.email &&
-          (ensaioData.status === 'rascunho' || ensaioData.approved === false);
-
-        setIsEditable(canEdit);
-        setEditingId(editId);
-        setFormData({
-          ...ensaioData,
-          agregados: ensaioData.agregados || [],
-          cargas:    ensaioData.cargas    || [],
-        });
-      } else {
-        setFormData(prev => ({
-          ...prev,
-          laboratorista_name: userData.laboratorista_name || userData.full_name || '',
-        }));
-      }
-    } catch (error) {
-      console.error("Erro ao carregar dados:", error);
-      alert("Erro ao carregar dados iniciais");
-    } finally {
-      setLoading(false);
+    if (editId) {
+      setEditLoading(true);
+      base44.entities.AcompanhamentoUsinagem.get(editId)
+        .then(ensaioData => {
+          const canEdit = ensaioData.created_by === user.email &&
+            (ensaioData.status === 'rascunho' || ensaioData.approved === false);
+          setIsEditable(canEdit);
+          setEditingId(editId);
+          setFormData({
+            ...ensaioData,
+            agregados: ensaioData.agregados || [],
+            cargas: ensaioData.cargas || [],
+          });
+        })
+        .catch(error => {
+          console.error("Erro ao carregar dados:", error);
+          alert("Erro ao carregar dados iniciais");
+        })
+        .finally(() => setEditLoading(false));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        laboratorista_name: user.laboratorista_name || user.full_name || '',
+      }));
     }
-  }, []);
+  }, [loadingUser, loadingAux, user?.id]);
 
-  useEffect(() => { loadInitialData(); }, [loadInitialData]);
+  const loading = loadingUser || loadingAux || editLoading;
 
   return {
     loading, user, obras, regionais, projects,

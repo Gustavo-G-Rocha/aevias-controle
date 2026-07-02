@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { createPageUrl } from "@/utils";
+import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 
 export const getInitialFormData = () => ({
   obra_id: "",
@@ -52,13 +53,39 @@ export function useChecklistConcretagem() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [user, setUser] = useState(null);
-  const [obras, setObras] = useState([]);
   const [projects, setProjects] = useState([]);
-  const [allProjects, setAllProjects] = useState([]);
-  const [regionais, setRegionais] = useState([]);
+  const [editLoading, setEditLoading] = useState(false);
+
+  const { data: user, isLoading: loadingUser } = useCurrentUser();
+  const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true });
+
+  const regionais = auxData?.regionais ?? [];
+  const allProjects = auxData?.projects ?? [];
+
+  const obras = useMemo(() => {
+    if (!auxData?.obras || !user) return [];
+    const userAccessLevel = user.access_level || (user.role === "admin" ? "admin" : "user");
+    if (userAccessLevel === "user") {
+      const emailLower = user.email.toLowerCase();
+      const regionaisIds = regionais
+        .filter(r =>
+          (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+          (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+        )
+        .map(r => r.id);
+      if (regionaisIds.length > 0) {
+        const regionaisSet = new Set(regionaisIds);
+        return auxData.obras.filter(o =>
+          regionaisSet.has(o.regional_id) && o.status === "em_andamento" && o.tipo_obra === "supervisao"
+        );
+      }
+      return [];
+    }
+    return auxData.obras.filter(o => o.status === "em_andamento" && o.tipo_obra === "supervisao");
+  }, [auxData?.obras, regionais, user]);
+
+  const loading = loadingUser || loadingAux || editLoading;
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [selectedFileNames, setSelectedFileNames] = useState("Nenhum ficheiro selecionado");
   const [editingChecklist, setEditingChecklist] = useState(null);
@@ -109,71 +136,38 @@ export function useChecklistConcretagem() {
     }
   }, [formData.obra_id]);
 
-  const loadInitialData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [userData, obrasData, projectsData, regionaisData] = await Promise.all([
-        base44.auth.me(),
-        base44.entities.Obra.list(),
-        base44.entities.Project.list(),
-        base44.entities.Regional.list(),
-      ]);
+  useEffect(() => {
+    if (loadingUser || loadingAux || !user) return;
 
-      setUser(userData);
-      setRegionais(regionaisData);
-      setAllProjects(projectsData);
-      setProjects([]);
+    const params = new URLSearchParams(location.search);
+    const editId = params.get("editId");
 
-      const userAccessLevel = userData?.access_level || (userData?.role === "admin" ? "admin" : "user");
-
-      if (userAccessLevel === "user") {
-        const emailLower = userData.email.toLowerCase();
-        const regionaisIds = regionaisData
-          .filter(r =>
-            (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-            (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-          )
-          .map(r => r.id);
-        if (regionaisIds.length > 0) {
-          const regionaisSet = new Set(regionaisIds);
-          setObras(obrasData.filter(o =>
-            regionaisSet.has(o.regional_id) && o.status === "em_andamento" && o.tipo_obra === "supervisao"
-          ));
-        } else {
-          setObras([]);
-        }
-      } else {
-        setObras(obrasData.filter(o => o.status === "em_andamento" && o.tipo_obra === "supervisao"));
-      }
-
-      const params = new URLSearchParams(location.search);
-      const editId = params.get("editId");
-
-      if (editId) {
-        const checklistToEdit = await base44.entities.ChecklistConcretagem.get(editId);
-        if (userAccessLevel === "admin" || (checklistToEdit.created_by === userData.email && (checklistToEdit.status === "rascunho" || checklistToEdit.approved === false))) {
-          setEditingChecklist(checklistToEdit);
-          setFormData(checklistToEdit);
-        } else {
-          alert("Você não tem permissão para editar este registro.");
-          navigate(createPageUrl("MeusEnsaios"));
-        }
-      } else {
-        setFormData(prev => ({
-          ...prev,
-          inspetor_campo: userData.laboratorista_name || userData.full_name,
-          laboratorista_name: userData.laboratorista_name || userData.full_name,
-        }));
-      }
-    } catch (error) {
-      console.error("Erro ao carregar dados:", error);
-      alert("Erro ao carregar dados iniciais.");
-    } finally {
-      setLoading(false);
+    if (editId) {
+      setEditLoading(true);
+      base44.entities.ChecklistConcretagem.get(editId)
+        .then(checklistToEdit => {
+          const userAccessLevel = user.access_level || (user.role === "admin" ? "admin" : "user");
+          if (userAccessLevel === "admin" || (checklistToEdit.created_by === user.email && (checklistToEdit.status === "rascunho" || checklistToEdit.approved === false))) {
+            setEditingChecklist(checklistToEdit);
+            setFormData(checklistToEdit);
+          } else {
+            alert("Você não tem permissão para editar este registro.");
+            navigate(createPageUrl("MeusEnsaios"));
+          }
+        })
+        .catch(error => {
+          console.error("Erro ao carregar dados:", error);
+          alert("Erro ao carregar dados iniciais.");
+        })
+        .finally(() => setEditLoading(false));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        inspetor_campo: user.laboratorista_name || user.full_name,
+        laboratorista_name: user.laboratorista_name || user.full_name,
+      }));
     }
-  }, [location.search, navigate]);
-
-  useEffect(() => { loadInitialData(); }, [loadInitialData]);
+  }, [location.search, loadingUser, loadingAux, user?.id, navigate]);
 
   // --- Handlers de cargas ---
   const checkSlumpConformidade = useCallback((resultado, projectId) => {
