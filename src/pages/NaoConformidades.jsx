@@ -55,12 +55,12 @@ export default function NaoConformidadesPage() {
           <div className="flex items-center gap-3">
             <AlertTriangle className="w-7 h-7 text-red-600" />
             <div>
-              <h1 className="text-3xl font-bold text-[#00233B]">Dashboard de Não Conformidades</h1>
-              <p className="text-[#00233B]/70 text-sm mt-1">Visão geral de todas as obras</p>
+              <h1 className="text-3xl font-bold text-foreground">Dashboard de Não Conformidades</h1>
+              <p className="text-muted-foreground text-sm mt-1">Visão geral de todas as obras</p>
             </div>
           </div>
           {hasActiveFilter && (
-            <Button variant="outline" size="sm" onClick={clearFilters} className="text-[#00233B] border-white/30 hover:bg-white/20 gap-2">
+            <Button variant="outline" size="sm" onClick={clearFilters} className="text-foreground gap-2">
               <X className="w-4 h-4" /> Limpar Filtros
             </Button>
           )}

@@ -12,8 +12,8 @@ export default function GestaoNCHeader({ canCreateNC }) {
       <div className="flex items-center gap-3">
         <AlertTriangle className="w-7 h-7 text-red-600" />
         <div>
-          <h1 className="text-3xl font-bold text-[#00233B]">Gestão de NCs</h1>
-          <p className="text-[#00233B]/70 text-sm mt-1">
+          <h1 className="text-3xl font-bold text-foreground">Gestão de NCs</h1>
+          <p className="text-muted-foreground text-sm mt-1">
             Relatórios de Não Conformidade
           </p>
         </div>

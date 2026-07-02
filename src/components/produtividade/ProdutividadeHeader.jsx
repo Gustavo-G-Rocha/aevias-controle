@@ -32,7 +32,7 @@ export default function ProdutividadeHeader({
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
-          <span className="text-lg font-semibold text-[#00233B] min-w-[200px] text-center capitalize">
+          <span className="text-lg font-semibold text-foreground min-w-[200px] text-center capitalize">
             {getMonthName(currentMonth)}
           </span>
           <Button

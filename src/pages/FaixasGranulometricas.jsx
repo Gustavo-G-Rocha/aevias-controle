@@ -63,7 +63,7 @@ export default function FaixasGranulometricasPage() {
       <div className="flex justify-center items-center h-screen bg-transparent">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#BFCF99]" />
-          <p className="text-[#00233B]/60 mt-2">Carregando faixas granulométricas...</p>
+          <p className="text-muted-foreground mt-2">Carregando faixas granulométricas...</p>
         </div>
       </div>
     );
@@ -74,11 +74,11 @@ export default function FaixasGranulometricasPage() {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-[#00233B] flex items-center gap-3">
-              <Grid className="w-8 h-8 text-[#00233B]"/>
+            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+              <Grid className="w-8 h-8 text-foreground"/>
               Faixas Granulométricas
             </h1>
-            <p className="text-[#00233B]/80 mt-1">Gerencie as especificações de faixas granulométricas.</p>
+            <p className="text-muted-foreground mt-1">Gerencie as especificações de faixas granulométricas.</p>
           </div>
           {canManage && (
             <Dialog open={isFormOpen} onOpenChange={(isOpen) => {
@@ -91,7 +91,7 @@ export default function FaixasGranulometricasPage() {
                   Nova Faixa
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#F2F1EF]/80 backdrop-blur-lg border-white/20 text-[#00233B]">
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>
                     {editingFaixa ? 'Editar Faixa Granulométrica' : 'Nova Faixa Granulométrica'}
@@ -107,7 +107,7 @@ export default function FaixasGranulometricasPage() {
           )}
         </div>
 
-        <Card className="mb-6 bg-white/20 backdrop-blur-lg border border-white/20">
+        <Card className="mb-6 bg-card border-border">
           <CardContent className="p-4">
             <div className="flex gap-4">
               <div className="flex-1 relative">
@@ -116,11 +116,11 @@ export default function FaixasGranulometricasPage() {
                   placeholder="Pesquisar faixas granulométricas..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-transparent border-white/20 placeholder:text-[#00233B]/60 focus:border-[#BFCF99] focus:ring-[#BFCF99] text-[#00233B]"
+                  className="pl-10 focus:border-[#BFCF99] focus:ring-[#BFCF99]"
                 />
               </div>
               <Select value={tipoFilter} onValueChange={setTipoFilter}>
-                <SelectTrigger className="w-48 bg-transparent border-white/20">
+                <SelectTrigger className="w-48">
                   <SelectValue placeholder="Filtrar por tipo" />
                 </SelectTrigger>
                 <SelectContent>
@@ -151,34 +151,34 @@ export default function FaixasGranulometricasPage() {
           </CardContent>
         </Card>
 
-        <div className="bg-white/20 backdrop-blur-lg border border-white/20 rounded-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-white/10">
-            <thead className="bg-black/5">
+        <div className="bg-card border border-border rounded-lg overflow-hidden">
+          <table className="min-w-full divide-y divide-border">
+            <thead className="bg-muted/50">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#00233B]/70 uppercase tracking-wider">Tipo</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#00233B]/70 uppercase tracking-wider">Nome</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#00233B]/70 uppercase tracking-wider">Especificação</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#00233B]/70 uppercase tracking-wider">Órgão</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#00233B]/70 uppercase tracking-wider">Status</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Tipo</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Nome</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Especificação</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Órgão</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
                 {(canManage || !canManage) && <th scope="col" className="relative px-6 py-3"><span className="sr-only">Ações</span></th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/10">
+            <tbody className="divide-y divide-border">
               {filteredFaixas.map((faixa) => (
-                <tr key={faixa.id} className="hover:bg-black/5">
+                <tr key={faixa.id} className="hover:bg-muted/50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <Badge className={tipoProjetoColors[faixa.tipo || 'CAUQ']}>
                       {faixa.tipo || 'CAUQ'}
                     </Badge>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-[#00233B]">{faixa.nome}</div>
+                    <div className="text-sm font-medium text-foreground">{faixa.nome}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-[#00233B]/90">{faixa.especificacao}</div>
+                    <div className="text-sm text-muted-foreground">{faixa.especificacao}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-[#00233B]/90">{faixa.orgao}</div>
+                    <div className="text-sm text-muted-foreground">{faixa.orgao}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <Badge className={
@@ -190,12 +190,12 @@ export default function FaixasGranulometricasPage() {
                     </Badge>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                    <Button variant="ghost" size="sm" onClick={() => setSelectedFaixa(faixa)} className="hover:bg-black/10 text-[#00233B]">
+                    <Button variant="ghost" size="sm" onClick={() => setSelectedFaixa(faixa)} className="text-foreground">
                       <Eye className="w-4 h-4 mr-1 text-[#BFCF99]" /> Ver
                     </Button>
                     {canManage && (
                       <>
-                        <Button variant="ghost" size="sm" onClick={() => handleEdit(faixa)} className="hover:bg-black/10 text-[#00233B]">
+                        <Button variant="ghost" size="sm" onClick={() => handleEdit(faixa)} className="text-foreground">
                           <Edit className="w-4 h-4 mr-1 text-[#BFCF99]" /> Editar
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => handleDelete(faixa.id, loadData)} className="text-red-500 hover:text-red-700 hover:bg-red-500/10">
@@ -211,9 +211,9 @@ export default function FaixasGranulometricasPage() {
 
           {filteredFaixas.length === 0 && (
             <div className="text-center py-12">
-              <FileText className="w-12 h-12 text-[#00233B]/20 mx-auto mb-4" />
-              <h3 className="font-medium text-[#00233B] mb-2">Nenhuma faixa encontrada</h3>
-              <p className="text-sm text-[#00233B]/80">
+              <FileText className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
+              <h3 className="font-medium text-foreground mb-2">Nenhuma faixa encontrada</h3>
+              <p className="text-sm text-muted-foreground">
                 Ajuste sua busca ou adicione uma nova faixa granulométrica.
               </p>
             </div>
@@ -222,9 +222,9 @@ export default function FaixasGranulometricasPage() {
       </div>
       
       <Dialog open={!!selectedFaixa} onOpenChange={() => handleCloseDetails()}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#F2F1EF]/80 backdrop-blur-lg border-white/20">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-[#00233B]">Detalhes da Faixa Granulométrica</DialogTitle>
+            <DialogTitle className="text-foreground">Detalhes da Faixa Granulométrica</DialogTitle>
           </DialogHeader>
           {selectedFaixa && (
             <FaixaDetails faixa={selectedFaixa} />

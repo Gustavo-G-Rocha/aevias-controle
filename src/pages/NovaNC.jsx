@@ -49,8 +49,8 @@ export default function NovaNcPage() {
         <div className="flex items-center gap-3">
           <AlertTriangle className="w-7 h-7 text-red-600" />
           <div>
-            <h1 className="text-3xl font-bold text-[#00233B]">Nova Não Conformidade</h1>
-            <p className="text-[#00233B]/70 text-sm mt-1">Relatório de Não Conformidade (RNC)</p>
+            <h1 className="text-3xl font-bold text-foreground">Nova Não Conformidade</h1>
+            <p className="text-muted-foreground text-sm mt-1">Relatório de Não Conformidade (RNC)</p>
           </div>
         </div>
 
@@ -91,7 +91,7 @@ export default function NovaNcPage() {
           <Button
             variant="outline"
             onClick={() => window.history.back()}
-            className="border-white/20 text-[#00233B]"
+            className="text-foreground"
           >
             Cancelar
           </Button>

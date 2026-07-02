@@ -123,25 +123,25 @@ export default function MigracaoDados() {
     <div className="p-6 space-y-6 bg-transparent min-h-screen">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-            <h1 className="text-3xl font-bold text-[#00233B]">Migração de Dados</h1>
-            <p className="text-[#00233B]/80 mt-1">Ferramentas para migração e manutenção de dados do sistema.</p>
+            <h1 className="text-3xl font-bold text-foreground">Migração de Dados</h1>
+            <p className="text-muted-foreground mt-1">Ferramentas para migração e manutenção de dados do sistema.</p>
         </div>
 
         {/* Remover usuário de todas as regionais */}
-        <Card className="bg-white/20 backdrop-blur-lg border border-white/20">
+        <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-[#00233B] flex items-center gap-2">
+            <CardTitle className="text-foreground flex items-center gap-2">
               <UserX className="w-5 h-5 text-red-500" />
               Remover Usuário de Todas as Regionais
             </CardTitle>
-            <CardDescription className="text-[#00233B]/80">
+            <CardDescription className="text-muted-foreground">
               Informe o email do usuário para removê-lo de todos os campos de alocação em todas as regionais (laboratoristas, gestores, salas técnicas, clientes).
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-3 items-end">
               <div className="flex-1">
-                <Label htmlFor="emailRemover" className="text-[#00233B]">Email do usuário</Label>
+                <Label htmlFor="emailRemover" className="text-foreground">Email do usuário</Label>
                 <Input
                   id="emailRemover"
                   type="email"
@@ -185,10 +185,10 @@ export default function MigracaoDados() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/20 backdrop-blur-lg border border-white/20">
+        <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-[#00233B]">Migração de Peneiras para Projetos</CardTitle>
-            <CardDescription className="text-[#00233B]/80">
+            <CardTitle className="text-foreground">Migração de Peneiras para Projetos</CardTitle>
+            <CardDescription className="text-muted-foreground">
               Esta ação irá ler as Faixas Granulométricas e preencher os campos `faixa_trabalho_min` e `faixa_trabalho_max` em todos os Projetos existentes.
             </CardDescription>
           </CardHeader>
