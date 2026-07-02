@@ -488,7 +488,7 @@
   .dark .bg-orange-50 a[role="button"],
   .dark .bg-green-50 a[role="button"],
   .dark .bg-blue-50 a[role="button"] {
-    color: revert;
+    color: #ffffff;
   }
 
 }
