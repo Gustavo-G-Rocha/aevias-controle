@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 
 export function EquipeSection({ form, onFormChange, user }) {
   return (
-    <Card>
+    <Card className="bg-transparent">
       <CardContent className="pt-4 space-y-4">
         <div className="grid grid-cols-2 gap-6">
           <div className="space-y-3">

@@ -43,7 +43,7 @@ export default function NaoConformidadesPage() {
   const handleUsinaClick = useCallback((d) => setFiltroUsina(p => p === d.name ? null : d.name), [setFiltroUsina]);
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin text-slate-500" /></div>;
+    return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
   }
 
   return (

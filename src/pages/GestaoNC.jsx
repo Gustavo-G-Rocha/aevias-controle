@@ -50,7 +50,7 @@ export default function GestaoNCPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-[#BFCF99]" />
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
   }

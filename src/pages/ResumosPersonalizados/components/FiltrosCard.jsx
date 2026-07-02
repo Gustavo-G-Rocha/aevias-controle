@@ -14,9 +14,9 @@ export default function FiltrosCard({
   onGerarResumo, onExportarCSV,
 }) {
   return (
-    <Card className="bg-white/20 backdrop-blur-lg border border-white/20">
+    <Card>
       <CardHeader>
-        <CardTitle className="text-[#00233B] flex items-center gap-2">
+        <CardTitle className="text-foreground flex items-center gap-2">
           <Filter className="w-5 h-5 text-[#BFCF99]" />
           Filtros
         </CardTitle>
@@ -24,12 +24,12 @@ export default function FiltrosCard({
       <CardContent className="space-y-4">
         {/* Obra */}
         <div>
-          <Label htmlFor="obra" className="text-[#00233B]">Obra *</Label>
+          <Label htmlFor="obra" className="text-foreground">Obra *</Label>
           <select
             id="obra"
             value={obraId}
             onChange={(e) => onObraChange(e.target.value)}
-            className="flex h-10 w-full rounded-md border border-white/20 bg-white/50 px-3 py-2 text-sm text-[#00233B]"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
           >
             <option value="">Selecione uma obra</option>
             {obras.map(obra => {
@@ -45,12 +45,12 @@ export default function FiltrosCard({
 
         {/* Tipo de Ensaio */}
         <div>
-          <Label htmlFor="tipoEnsaio" className="text-[#00233B]">Tipo de Ensaio *</Label>
+          <Label htmlFor="tipoEnsaio" className="text-foreground">Tipo de Ensaio *</Label>
           <select
             id="tipoEnsaio"
             value={tipoEnsaioSelecionado}
             onChange={(e) => onTipoChange(e.target.value)}
-            className="flex h-10 w-full rounded-md border border-white/20 bg-white/50 px-3 py-2 text-sm text-[#00233B]"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
           >
             <option value="">Selecione um tipo de ensaio</option>
             {TIPOS_ENSAIO.map(tipo => (
@@ -62,19 +62,17 @@ export default function FiltrosCard({
         {/* Período */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="dataInicio" className="text-[#00233B]">Data Início</Label>
+            <Label htmlFor="dataInicio" className="text-foreground">Data Início</Label>
             <Input
               id="dataInicio" type="date" value={dataInicio}
               onChange={(e) => onDataInicioChange(e.target.value)}
-              className="bg-white/50 border-white/20 text-[#00233B]"
             />
           </div>
           <div>
-            <Label htmlFor="dataFim" className="text-[#00233B]">Data Fim</Label>
+            <Label htmlFor="dataFim" className="text-foreground">Data Fim</Label>
             <Input
               id="dataFim" type="date" value={dataFim}
               onChange={(e) => onDataFimChange(e.target.value)}
-              className="bg-white/50 border-white/20 text-[#00233B]"
             />
           </div>
         </div>
@@ -82,12 +80,12 @@ export default function FiltrosCard({
         {/* Laboratorista */}
         {laboratoristas.length > 0 && (
           <div>
-            <Label htmlFor="laboratorista" className="text-[#00233B]">Laboratorista</Label>
+            <Label htmlFor="laboratorista" className="text-foreground">Laboratorista</Label>
             <select
               id="laboratorista"
               value={laboratoristaFiltro}
               onChange={(e) => onLaboratoristaChange(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-white/20 bg-white/50 px-3 py-2 text-sm text-[#00233B]"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
             >
               <option value="">Todos</option>
               {laboratoristas.map(lab => (
@@ -101,18 +99,13 @@ export default function FiltrosCard({
           <Button
             onClick={onGerarResumo}
             disabled={loadingData || !obraId || !tipoEnsaioSelecionado}
-            className="bg-[#00233B] text-white hover:bg-[#00233B]/90"
           >
             {loadingData ? (
               <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Carregando...</>
             ) : 'Gerar Resumo'}
           </Button>
           {temDados && (
-            <Button
-              onClick={onExportarCSV}
-              variant="outline"
-              className="border-[#00233B] text-[#00233B] hover:bg-[#00233B]/10"
-            >
+            <Button onClick={onExportarCSV} variant="outline">
               Exportar CSV
             </Button>
           )}

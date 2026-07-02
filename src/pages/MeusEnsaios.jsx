@@ -29,8 +29,8 @@ export default function MeusEnsaios() {
     <div className="p-6 space-y-6 bg-transparent min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#00233B]">Ensaios Realizados</h1>
-          <p className="text-[#00233B]/80 mt-1">{subtitle}</p>
+          <h1 className="text-3xl font-bold text-white">Ensaios Realizados</h1>
+          <p className="text-white/80 mt-1">{subtitle}</p>
         </div>
 
         {/* FAB mobile para laboratoristas */}

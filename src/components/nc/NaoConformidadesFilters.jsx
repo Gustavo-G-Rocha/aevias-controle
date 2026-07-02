@@ -28,9 +28,9 @@ export default function NaoConformidadesFilters({
   return (
     <>
       {/* Dropdowns */}
-      <Card className="bg-white/20 backdrop-blur-lg border border-white/20">
+      <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-[#00233B] text-sm flex items-center gap-2">
+          <CardTitle className="text-foreground text-sm flex items-center gap-2">
             <Filter className="w-4 h-4 text-[#BFCF99]" />
             Filtros
           </CardTitle>
@@ -38,9 +38,9 @@ export default function NaoConformidadesFilters({
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <div>
-              <span className="text-xs text-[#00233B]/70 font-medium mb-1 block flex items-center gap-1"><HardHat className="w-3 h-3" /> Empreiteira</span>
+              <span className="text-xs text-muted-foreground font-medium mb-1 block flex items-center gap-1"><HardHat className="w-3 h-3" /> Empreiteira</span>
               <Select value={filtroEmpreiteira || '_all'} onValueChange={v => setFiltroEmpreiteira(v === '_all' ? null : v)}>
-                <SelectTrigger className="bg-white/50 border-white/30 text-[#00233B] h-9 text-sm">
+                <SelectTrigger className="h-9 text-sm">
                   <SelectValue placeholder="Todas" />
                 </SelectTrigger>
                 <SelectContent>
@@ -50,9 +50,9 @@ export default function NaoConformidadesFilters({
               </Select>
             </div>
             <div>
-              <span className="text-xs text-[#00233B]/70 font-medium mb-1 block flex items-center gap-1"><MapPin className="w-3 h-3" /> Rodovia</span>
+              <span className="text-xs text-muted-foreground font-medium mb-1 block flex items-center gap-1"><MapPin className="w-3 h-3" /> Rodovia</span>
               <Select value={filtroRodovia || '_all'} onValueChange={v => setFiltroRodovia(v === '_all' ? null : v)}>
-                <SelectTrigger className="bg-white/50 border-white/30 text-[#00233B] h-9 text-sm">
+                <SelectTrigger className="h-9 text-sm">
                   <SelectValue placeholder="Todas" />
                 </SelectTrigger>
                 <SelectContent>
@@ -62,9 +62,9 @@ export default function NaoConformidadesFilters({
               </Select>
             </div>
             <div>
-              <span className="text-xs text-[#00233B]/70 font-medium mb-1 block flex items-center gap-1"><Building2 className="w-3 h-3" /> Usina</span>
+              <span className="text-xs text-muted-foreground font-medium mb-1 block flex items-center gap-1"><Building2 className="w-3 h-3" /> Usina</span>
               <Select value={filtroUsina || '_all'} onValueChange={v => setFiltroUsina(v === '_all' ? null : v)}>
-                <SelectTrigger className="bg-white/50 border-white/30 text-[#00233B] h-9 text-sm">
+                <SelectTrigger className="h-9 text-sm">
                   <SelectValue placeholder="Todas" />
                 </SelectTrigger>
                 <SelectContent>
@@ -74,29 +74,29 @@ export default function NaoConformidadesFilters({
               </Select>
             </div>
             <div>
-              <span className="text-xs text-[#00233B]/70 font-medium mb-1 block flex items-center gap-1"><CalendarIcon className="w-3 h-3" /> Data Inicial</span>
+              <span className="text-xs text-muted-foreground font-medium mb-1 block flex items-center gap-1"><CalendarIcon className="w-3 h-3" /> Data Inicial</span>
               <Popover>
                 <PopoverTrigger asChild>
-                  <button type="button" className="w-full h-9 px-3 text-sm bg-white/50 border border-white/30 rounded-md text-[#00233B] text-left flex items-center justify-between hover:bg-white/60 transition-colors">
+                  <button type="button" className="w-full h-9 px-3 text-sm bg-background border border-input rounded-md text-foreground text-left flex items-center justify-between hover:bg-accent transition-colors">
                     {filtroDataInicial ? format(filtroDataInicial, 'dd/MM/yyyy') : 'Selecionar'}
-                    <CalendarIcon className="w-4 h-4 text-[#00233B]/50" />
+                    <CalendarIcon className="w-4 h-4 text-muted-foreground" />
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-white" align="start">
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar mode="single" selected={filtroDataInicial} onSelect={setFiltroDataInicial} />
                 </PopoverContent>
               </Popover>
             </div>
             <div>
-              <span className="text-xs text-[#00233B]/70 font-medium mb-1 block flex items-center gap-1"><CalendarIcon className="w-3 h-3" /> Data Final</span>
+              <span className="text-xs text-muted-foreground font-medium mb-1 block flex items-center gap-1"><CalendarIcon className="w-3 h-3" /> Data Final</span>
               <Popover>
                 <PopoverTrigger asChild>
-                  <button type="button" className="w-full h-9 px-3 text-sm bg-white/50 border border-white/30 rounded-md text-[#00233B] text-left flex items-center justify-between hover:bg-white/60 transition-colors">
+                  <button type="button" className="w-full h-9 px-3 text-sm bg-background border border-input rounded-md text-foreground text-left flex items-center justify-between hover:bg-accent transition-colors">
                     {filtroDataFinal ? format(filtroDataFinal, 'dd/MM/yyyy') : 'Selecionar'}
-                    <CalendarIcon className="w-4 h-4 text-[#00233B]/50" />
+                    <CalendarIcon className="w-4 h-4 text-muted-foreground" />
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-white" align="start">
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar mode="single" selected={filtroDataFinal} onSelect={setFiltroDataFinal} disabled={(date) => filtroDataInicial ? date < filtroDataInicial : false} />
                 </PopoverContent>
               </Popover>
@@ -108,14 +108,14 @@ export default function NaoConformidadesFilters({
       {/* Active filter badges */}
       {hasActiveFilter && (
         <div className="flex flex-wrap gap-2">
-          {filtroStatus && <Badge className="bg-[#BFCF99]/30 text-[#00233B] border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroStatus(null)}>Status: {STATUS_LABELS[filtroStatus]} <X className="w-3 h-3"/></Badge>}
-          {filtroParametro && <Badge className="bg-[#BFCF99]/30 text-[#00233B] border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroParametro(null)}>Parâmetro: {filtroParametro} <X className="w-3 h-3"/></Badge>}
-          {filtroObraId && <Badge className="bg-[#BFCF99]/30 text-[#00233B] border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroObraId(null)}>Obra: {obras.find(o => o.id === filtroObraId)?.name} <X className="w-3 h-3"/></Badge>}
-          {filtroEmpreiteira && <Badge className="bg-[#BFCF99]/30 text-[#00233B] border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroEmpreiteira(null)}>Empreiteira: {filtroEmpreiteira} <X className="w-3 h-3"/></Badge>}
-          {filtroRodovia && <Badge className="bg-[#BFCF99]/30 text-[#00233B] border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroRodovia(null)}>Rodovia: {filtroRodovia} <X className="w-3 h-3"/></Badge>}
-          {filtroUsina && <Badge className="bg-[#BFCF99]/30 text-[#00233B] border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroUsina(null)}>Usina: {filtroUsina} <X className="w-3 h-3"/></Badge>}
-          {filtroDataInicial && <Badge className="bg-[#BFCF99]/30 text-[#00233B] border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroDataInicial(null)}>De: {format(filtroDataInicial, 'dd/MM/yyyy')} <X className="w-3 h-3"/></Badge>}
-          {filtroDataFinal && <Badge className="bg-[#BFCF99]/30 text-[#00233B] border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroDataFinal(null)}>Até: {format(filtroDataFinal, 'dd/MM/yyyy')} <X className="w-3 h-3"/></Badge>}
+          {filtroStatus && <Badge className="bg-[#BFCF99]/30 text-foreground border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroStatus(null)}>Status: {STATUS_LABELS[filtroStatus]} <X className="w-3 h-3"/></Badge>}
+          {filtroParametro && <Badge className="bg-[#BFCF99]/30 text-foreground border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroParametro(null)}>Parâmetro: {filtroParametro} <X className="w-3 h-3"/></Badge>}
+          {filtroObraId && <Badge className="bg-[#BFCF99]/30 text-foreground border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroObraId(null)}>Obra: {obras.find(o => o.id === filtroObraId)?.name} <X className="w-3 h-3"/></Badge>}
+          {filtroEmpreiteira && <Badge className="bg-[#BFCF99]/30 text-foreground border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroEmpreiteira(null)}>Empreiteira: {filtroEmpreiteira} <X className="w-3 h-3"/></Badge>}
+          {filtroRodovia && <Badge className="bg-[#BFCF99]/30 text-foreground border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroRodovia(null)}>Rodovia: {filtroRodovia} <X className="w-3 h-3"/></Badge>}
+          {filtroUsina && <Badge className="bg-[#BFCF99]/30 text-foreground border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroUsina(null)}>Usina: {filtroUsina} <X className="w-3 h-3"/></Badge>}
+          {filtroDataInicial && <Badge className="bg-[#BFCF99]/30 text-foreground border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroDataInicial(null)}>De: {format(filtroDataInicial, 'dd/MM/yyyy')} <X className="w-3 h-3"/></Badge>}
+          {filtroDataFinal && <Badge className="bg-[#BFCF99]/30 text-foreground border border-[#BFCF99]/50 cursor-pointer gap-1" onClick={() => setFiltroDataFinal(null)}>Até: {format(filtroDataFinal, 'dd/MM/yyyy')} <X className="w-3 h-3"/></Badge>}
         </div>
       )}
     </>

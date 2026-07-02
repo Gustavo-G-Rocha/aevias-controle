@@ -19,7 +19,7 @@ export function DadosObraSection({
   loadingChecklists
 }) {
   return (
-    <Card className="bg-card border-border">
+    <Card className="bg-transparent border-border">
       <CardHeader>
         <CardTitle className="text-foreground text-base bg-[#BFCF99]/30 px-3 py-1 rounded">
           DADOS DA OBRA

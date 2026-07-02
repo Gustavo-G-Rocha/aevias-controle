@@ -32,7 +32,7 @@ export default function GestaoNCCard({
   const obraName = getObraName(nc, obras);
 
   return (
-    <Card className="hover:border-primary/30 transition-colors">
+    <Card className="bg-transparent hover:border-primary/30 transition-colors">
       <CardContent className="pt-4 pb-4">
         <div className="flex items-start justify-between gap-4">
           {/* Left Section - NC Details */}

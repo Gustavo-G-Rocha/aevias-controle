@@ -5,9 +5,10 @@ import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, AreaChart, A
 import ChartCard from "./ChartCard";
 import EmptyChart from "./EmptyChart";
 
-const tooltipStyle = { backgroundColor: 'rgba(242,241,239,0.97)', borderRadius: '8px', border: '1px solid rgba(0,35,59,0.15)' };
-const legendFmt = (v) => <span style={{ color: '#00233B', fontSize: 12 }}>{v}</span>;
-const smallLegendFmt = (v) => <span style={{ color: '#00233B', fontSize: 11 }}>{v}</span>;
+const AXIS = 'var(--color-text-muted)';
+const tooltipStyle = { backgroundColor: 'var(--color-surface)', color: 'var(--color-text)', borderRadius: '8px', border: '1px solid var(--color-border)' };
+const legendFmt = (v) => <span style={{ color: 'var(--color-text)', fontSize: 12 }}>{v}</span>;
+const smallLegendFmt = (v) => <span style={{ color: 'var(--color-text)', fontSize: 11 }}>{v}</span>;
 
 const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
   if (percent < 0.04) return null;
@@ -31,12 +32,12 @@ export default function NaoConformidadesCharts({
   return (
     <>
       {/* Timeline */}
-      <Card className="bg-white/20 backdrop-blur-lg border border-white/20">
+      <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-[#00233B] text-base flex items-center gap-2">
+          <CardTitle className="text-foreground text-base flex items-center gap-2">
             <CalendarIcon className="w-4 h-4 text-[#BFCF99]" />
             Evolução Temporal de NCs por Obra
-            <span className="text-xs font-normal text-[#00233B]/50 ml-1">(top 6 obras)</span>
+            <span className="text-xs font-normal text-muted-foreground ml-1">(top 6 obras)</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -51,17 +52,17 @@ export default function NaoConformidadesCharts({
                     </linearGradient>
                   ))}
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,35,59,0.1)" />
-                <XAxis dataKey="date" tick={{ fill: '#00233B', fontSize: 11 }} tickLine={{ stroke: '#00233B' }} interval={hasDateFilter ? 0 : 4} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                <XAxis dataKey="date" tick={{ fill: AXIS, fontSize: 11 }} tickLine={{ stroke: AXIS }} interval={hasDateFilter ? 0 : 4} />
                 <YAxis
                   domain={[0, dadosTemporais.maxValue + 5]}
                   allowDecimals={false}
                   ticks={Array.from({ length: Math.ceil(dadosTemporais.maxValue + 5) + 1 }, (_, i) => i)}
-                  tick={{ fill: '#00233B', fontSize: 11 }}
-                  tickLine={{ stroke: '#00233B' }}
-                  label={{ value: 'Nº de NCs', angle: -90, position: 'insideLeft', style: { fill: '#00233B', fontSize: 12 } }}
+                  tick={{ fill: AXIS, fontSize: 11 }}
+                  tickLine={{ stroke: AXIS }}
+                  label={{ value: 'Nº de NCs', angle: -90, position: 'insideLeft', style: { fill: AXIS, fontSize: 12 } }}
                 />
-                <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: '#00233B', fontWeight: 'bold', marginBottom: 4 }} />
+                <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: 'var(--color-text)', fontWeight: 'bold', marginBottom: 4 }} />
                 <Legend formatter={legendFmt} />
                 {Object.keys(dadosTemporais.data[0] || {}).filter(k => k !== 'date').map((obraNome, i) => (
                   <Area key={obraNome} type="monotone" dataKey={obraNome} stroke="none" fillOpacity={0.7} fill={`url(#color${i})`} />

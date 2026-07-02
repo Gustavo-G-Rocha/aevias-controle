@@ -14,7 +14,7 @@ export default function GestaoNCSummary({ ncs }) {
   return (
     <div className="grid grid-cols-4 gap-4">
       {statusList.map((s) => (
-        <Card key={s}>
+        <Card key={s} className="bg-transparent">
           <CardContent className="pt-4 pb-4">
             <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
               {STATUS_LABELS[s]}

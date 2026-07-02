@@ -15,7 +15,7 @@ export function AnexosSection({
   handleUploadPdfs
 }) {
   return (
-    <Card>
+    <Card className="bg-transparent">
       <CardHeader>
         <CardTitle className="text-foreground text-base bg-[#BFCF99]/30 px-3 py-1 rounded">
           ANEXOS DO GESTOR

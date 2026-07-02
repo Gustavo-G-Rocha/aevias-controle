@@ -13,10 +13,10 @@ export default function ResultadosTable({
   const colunas = Object.keys(dadosConsolidados[0]).filter(k => k !== 'tipo' && k !== 'data' && k !== 'id');
 
   return (
-    <Card className="bg-white/20 backdrop-blur-lg border border-white/20">
+    <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
-          <CardTitle className="text-[#00233B]">
+          <CardTitle className="text-foreground">
             Resultados - {dadosConsolidados.length} registro(s)
           </CardTitle>
           {obraSelecionada && (
@@ -43,15 +43,15 @@ export default function ResultadosTable({
             </thead>
             <tbody>
               {dadosConsolidados.map((linha, idx) => (
-                <tr key={linha.id ?? `linha-${idx}`} className={idx % 2 === 0 ? 'bg-white/50' : 'bg-white/30'}>
-                  <td className="border border-white/20 px-2 py-2 font-medium text-[#00233B]">{linha.tipo}</td>
-                  <td className="border border-white/20 px-2 py-2 text-[#00233B]">{formatValue(linha.data, 'data')}</td>
+                <tr key={linha.id ?? `linha-${idx}`} className={idx % 2 === 0 ? 'bg-muted/40' : 'bg-transparent'}>
+                  <td className="border border-border px-2 py-2 font-medium text-foreground">{linha.tipo}</td>
+                  <td className="border border-border px-2 py-2 text-foreground">{formatValue(linha.data, 'data')}</td>
                   {tipoEnsaioSelecionado === 'ChecklistAplicacao' && (
-                    <td className="border border-white/20 px-2 py-2 text-center">
+                    <td className="border border-border px-2 py-2 text-center">
                       <Button
                         size="sm" variant="outline"
                         onClick={() => onExportarMedicaoGeometrica(linha.id)}
-                        className="h-7 text-xs border-[#00233B]/30 text-[#00233B] hover:bg-[#00233B]/10 gap-1"
+                        className="h-7 text-xs gap-1"
                       >
                         <FileSpreadsheet className="w-3.5 h-3.5 text-green-600" />
                         Excel
@@ -59,7 +59,7 @@ export default function ResultadosTable({
                     </td>
                   )}
                   {colunas.map(key => (
-                    <td key={key} className="border border-white/20 px-2 py-2 text-[#00233B]">{linha[key]}</td>
+                    <td key={key} className="border border-border px-2 py-2 text-foreground">{linha[key]}</td>
                   ))}
                 </tr>
               ))}
@@ -74,12 +74,12 @@ export default function ResultadosTable({
 export function EmptyState({ tipoEnsaioSelecionado, obraId }) {
   if (!tipoEnsaioSelecionado || !obraId) return null;
   return (
-    <Card className="bg-white/20 backdrop-blur-lg border border-white/20">
+    <Card>
       <CardContent className="flex flex-col items-center justify-center py-12">
-        <div className="w-16 h-16 bg-[#00233B]/10 rounded-full flex items-center justify-center mb-4">
-          <X className="w-8 h-8 text-[#00233B]/50" />
+        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+          <X className="w-8 h-8 text-muted-foreground" />
         </div>
-        <p className="text-[#00233B]/80 text-center">
+        <p className="text-muted-foreground text-center">
           Clique em "Gerar Resumo" para visualizar os dados
         </p>
       </CardContent>
