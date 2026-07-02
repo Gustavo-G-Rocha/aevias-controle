@@ -475,4 +475,20 @@
     color: #1e293b;
   }
 
+  /* Botões dentro dessas superfícies claras NÃO herdam o texto escuro:
+     mantêm a cor própria (ex.: texto branco sobre fundo azul/verde). */
+  .dark .bg-slate-50 button,
+  .dark .bg-slate-100 button,
+  .dark .bg-white button,
+  .dark .bg-orange-50 button,
+  .dark .bg-green-50 button,
+  .dark .bg-blue-50 button,
+  .dark .bg-red-50 button,
+  .dark .bg-slate-50 a[role="button"],
+  .dark .bg-orange-50 a[role="button"],
+  .dark .bg-green-50 a[role="button"],
+  .dark .bg-blue-50 a[role="button"] {
+    color: revert;
+  }
+
 }
