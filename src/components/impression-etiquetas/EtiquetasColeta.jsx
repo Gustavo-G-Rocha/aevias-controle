@@ -49,7 +49,7 @@ export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
           .page-container { padding: 4px; max-height: 272mm; overflow: hidden !important; }
           .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
           .print\\:hidden { display: none !important; }
-          header, nav, aside, .no-print, [data-sidebar], [data-sidebar="sidebar"], [data-sidebar="provider"] { display: none !important; }
+          header, nav, aside, .no-print, [data-sidebar], [data-sidebar="sidebar"], [data-sidebar="provider"], [data-side], [data-collapsible] { display: none !important; }
           main { padding-left: 0 !important; margin-left: 0 !important; }
         }
       `}</style>
