@@ -59,12 +59,16 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
     return auxData.obras;
   }, [auxData?.obras, regionais, user, isAdmin]);
 
+  // editId derivado de location.search — estável enquanto o parâmetro não muda,
+  // evita recarregar o registro ao navegar entre edição/criação (P4).
+  const editId = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('editId');
+  }, [location.search]);
+
   // Carregar checklist para edição se editId presente
   useEffect(() => {
     if (loadingUser || loadingAux || !user) return;
-
-    const params = new URLSearchParams(location.search);
-    const editId = params.get('editId');
 
     if (editId) {
       setEditLoading(true);
@@ -115,7 +119,7 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
       setFormData(initialNewFormData);
       setEditingChecklist(null);
     }
-  }, [location.search, loadingUser, loadingAux, user?.id, obras, auxData, entityName, navigate, canEditExtra, regionais]);
+  }, [editId, loadingUser, loadingAux, user?.id, obras, auxData, entityName, navigate, canEditExtra, regionais]);
 
   // Helpers para obra/regional/projetos
   const obraSelecionada = useMemo(() => obras.find(o => o.id === formData.obra_id), [obras, formData.obra_id]);

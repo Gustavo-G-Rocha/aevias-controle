@@ -69,12 +69,16 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
     return availableObras;
   }, [auxData?.obras, regionais, user, filtroTipoObra]);
 
+  // editId derivado de location.search — estável enquanto o parâmetro não muda,
+  // evita recarregar o registro ao navegar entre edição/criação (P4).
+  const editId = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('editId');
+  }, [location.search]);
+
   // Carregar ensaio para edição se editId presente
   useEffect(() => {
     if (loadingUser || loadingAux || !user) return;
-
-    const params = new URLSearchParams(location.search);
-    const editId = params.get('editId');
 
     if (editId) {
       setEditLoading(true);
@@ -113,7 +117,7 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
       setFormData(initialNewFormData);
       setEditingEnsaio(null);
     }
-  }, [location.search, loadingUser, loadingAux, user?.id, obras, entityName, navigate]);
+  }, [editId, loadingUser, loadingAux, user?.id, obras, entityName, navigate]);
 
   const obraSelecionada = useMemo(() => obras.find(o => o.id === formData.obra_id), [obras, formData.obra_id]);
   const regionalSelecionada = useMemo(() => obraSelecionada ? regionais.find(r => r.id === obraSelecionada.regional_id) : null, [obraSelecionada, regionais]);
