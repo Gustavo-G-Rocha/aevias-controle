@@ -7,7 +7,7 @@ const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/pub
 const CELL_STYLES = {
   label: { border: '0.5mm solid #000', height: '22px', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1mm', paddingBottom: '1mm', fontWeight: 'bold', backgroundColor: '#fff' },
   value: { border: '0.5mm solid #000', height: '22px', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1mm', paddingBottom: '1mm', backgroundColor: '#fff' },
-  highlight: { border: '0.5mm solid #000', height: '22px', backgroundColor: '#C4D69B', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1mm', paddingBottom: '1mm' },
+  highlight: { border: '0.5mm solid #000', height: '22px', backgroundColor: '#C4D69B', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1mm', paddingBottom: '1mm' }
 };
 
 export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
@@ -25,15 +25,15 @@ export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
       </div>
 
       <div>
-        {Array.from({ length: numPages }).map((_, pageIdx) => (
-          <div key={pageIdx} className="page-container">
+        {Array.from({ length: numPages }).map((_, pageIdx) =>
+        <div key={pageIdx} className="page-container">
             <div className="grid grid-cols-2 gap-x-2 gap-y-4 print:gap-x-1.5 print:gap-y-3">
-              {getEtiquetasPageColeta(etiquetas, pageIdx).map((etiqueta, idx) => (
-                <EtiquetaColetaItem key={pageIdx * 6 + idx} etiqueta={etiqueta} />
-              ))}
+              {getEtiquetasPageColeta(etiquetas, pageIdx).map((etiqueta, idx) =>
+            <EtiquetaColetaItem key={pageIdx * 6 + idx} etiqueta={etiqueta} />
+            )}
             </div>
           </div>
-        ))}
+        )}
       </div>
 
       <style>{`
@@ -52,8 +52,8 @@ export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
           main { padding-left: 0 !important; margin-left: 0 !important; }
         }
       `}</style>
-    </div>
-  );
+    </div>);
+
 }
 
 function EtiquetaColetaItem({ etiqueta }) {
@@ -61,7 +61,7 @@ function EtiquetaColetaItem({ etiqueta }) {
     <div className="p-3 print:p-3 bg-white" style={{ border: '0.5mm solid #000' }}>
       {/* Header */}
       <div className="grid grid-cols-[90px_1fr_95px] gap-0 mb-1 print:mb-1 pb-1 print:pb-1" style={{ borderBottom: '0.5mm solid #000', alignItems: 'stretch' }}>
-        <div className="flex items-center justify-center px-1" style={{ borderRight: '0.5mm solid #000' }}>
+        <div className="flex items-center justify-center mx-auto" style={{ borderRight: '0.5mm solid #000' }}>
           <picture>
             <source srcSet={LOGO_URL} />
             <img src={LOGO_URL} alt="AfirmaEvias" className="h-6 print:h-5 w-auto object-contain" width="auto" height="24" />
@@ -138,12 +138,12 @@ function EtiquetaColetaItem({ etiqueta }) {
           ENSAIOS SOLICITADOS
         </div>
         <div className="bg-white text-[10px] print:text-[9px] min-h-[14px] print:min-h-[12px] flex items-center gap-1.5" style={{ paddingLeft: '3mm', paddingRight: '3mm', paddingTop: '1mm', paddingBottom: '1mm' }}>
-          {etiqueta.ensaios && etiqueta.ensaios.length > 0 ? (
-            <>
+          {etiqueta.ensaios && etiqueta.ensaios.length > 0 ?
+          <>
               <span className="font-bold text-xs">✓</span>
               <span className="flex-1">{etiqueta.ensaios.join(', ')}</span>
-            </>
-          ) : null}
+            </> :
+          null}
         </div>
       </div>
 
@@ -152,6 +152,6 @@ function EtiquetaColetaItem({ etiqueta }) {
         <div className="font-bold" style={{ height: '26px', display: 'flex', alignItems: 'center', paddingLeft: '4mm', paddingRight: '4mm' }}>RESPONSÁVEL COLETA:</div>
         <div className="font-bold" style={{ height: '26px', display: 'flex', alignItems: 'center', paddingLeft: '4mm', paddingRight: '4mm' }}>DATA:</div>
       </div>
-    </div>
-  );
+    </div>);
+
 }
