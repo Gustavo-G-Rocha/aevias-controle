@@ -76,14 +76,14 @@ function EtiquetaColetaItem({ etiqueta }) {
           <table className="w-full text-[7px] print:text-[6px]" style={{ borderCollapse: 'collapse', borderSpacing: 0 }}>
             <tbody>
               <tr>
-                <td colSpan={2} className="text-center font-semibold" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.2mm 1mm' }}>Identificação do Doc nº</td>
+                <td colSpan={2} className="text-center font-semibold" style={{ border: '0.4mm solid #000', backgroundColor: '#c4d69b', padding: '0.2mm 1mm' }}>Identificação do Doc nº</td>
               </tr>
               <tr>
                 <td colSpan={2} className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.2mm 1mm' }}>FORM 060</td>
               </tr>
               <tr>
-                <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.2mm 1mm', width: '50%' }}>Emissão</td>
-                <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.2mm 1mm', width: '50%' }}>Revisão</td>
+                <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#c4d69b', padding: '0.2mm 1mm', width: '50%' }}>Emissão</td>
+                <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#c4d69b', padding: '0.2mm 1mm', width: '50%' }}>Revisão</td>
               </tr>
               <tr>
                 <td className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.2mm 1mm' }}>20/01/2025</td>
