@@ -63,17 +63,17 @@ describe('impressionEtiquetasUtils', () => {
   });
 
   describe('calcularPaginasColeta', () => {
-    it('calcula 1 página para 4 etiquetas', () => {
-      expect(calcularPaginasColeta(4)).toBe(1);
+    it('calcula 1 página para 6 etiquetas', () => {
+      expect(calcularPaginasColeta(6)).toBe(1);
     });
 
-    it('calcula 2 páginas para 5 etiquetas', () => {
-      expect(calcularPaginasColeta(5)).toBe(2);
+    it('calcula 2 páginas para 7 etiquetas', () => {
+      expect(calcularPaginasColeta(7)).toBe(2);
     });
 
     it('calcula páginas para múltiplos', () => {
-      expect(calcularPaginasColeta(8)).toBe(2);
-      expect(calcularPaginasColeta(9)).toBe(3);
+      expect(calcularPaginasColeta(12)).toBe(2);
+      expect(calcularPaginasColeta(13)).toBe(3);
     });
   });
 
@@ -93,18 +93,18 @@ describe('impressionEtiquetasUtils', () => {
   });
 
   describe('getEtiquetasPageColeta', () => {
-    it('retorna 4 etiquetas da primeira página', () => {
-      const etiquetas = Array(8).fill(null).map((_, i) => ({ id: i }));
+    it('retorna 6 etiquetas da primeira página', () => {
+      const etiquetas = Array(12).fill(null).map((_, i) => ({ id: i }));
       const result = getEtiquetasPageColeta(etiquetas, 0);
-      expect(result).toHaveLength(4);
+      expect(result).toHaveLength(6);
       expect(result[0].id).toBe(0);
     });
 
     it('retorna etiquetas da segunda página', () => {
-      const etiquetas = Array(8).fill(null).map((_, i) => ({ id: i }));
+      const etiquetas = Array(12).fill(null).map((_, i) => ({ id: i }));
       const result = getEtiquetasPageColeta(etiquetas, 1);
-      expect(result).toHaveLength(4);
-      expect(result[0].id).toBe(4);
+      expect(result).toHaveLength(6);
+      expect(result[0].id).toBe(6);
     });
   });
 

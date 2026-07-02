@@ -7,7 +7,7 @@ const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/pub
 const CELL_STYLES = {
   label: { border: '0.5mm solid #000', height: '28px', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1.5mm', paddingBottom: '1.5mm', fontWeight: 'bold', backgroundColor: '#fff' },
   value: { border: '0.5mm solid #000', height: '28px', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1.5mm', paddingBottom: '1.5mm', backgroundColor: '#fff' },
-  highlight: { border: '0.5mm solid #000', height: '28px', backgroundColor: '#f4f4f5', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1.5mm', paddingBottom: '1.5mm' },
+  highlight: { border: '0.5mm solid #000', height: '28px', backgroundColor: '#C4D69B', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1.5mm', paddingBottom: '1.5mm' },
 };
 
 export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
@@ -29,7 +29,7 @@ export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
           <div key={pageIdx} className="page-container">
             <div className="grid grid-cols-2 gap-x-2 gap-y-4 print:gap-x-1.5 print:gap-y-3">
               {getEtiquetasPageColeta(etiquetas, pageIdx).map((etiqueta, idx) => (
-                <EtiquetaColetaItem key={pageIdx * 4 + idx} etiqueta={etiqueta} />
+                <EtiquetaColetaItem key={pageIdx * 6 + idx} etiqueta={etiqueta} />
               ))}
             </div>
           </div>
@@ -59,17 +59,37 @@ function EtiquetaColetaItem({ etiqueta }) {
   return (
     <div className="p-4 print:p-5 bg-white" style={{ border: '0.5mm solid #000' }}>
       {/* Header */}
-      <div className="grid grid-cols-[120px_1fr] gap-0 mb-2 print:mb-2 pb-2 print:pb-1.5" style={{ borderBottom: '0.5mm solid #000', alignItems: 'stretch' }}>
+      <div className="grid grid-cols-[100px_1fr_120px] gap-0 mb-2 print:mb-2 pb-2 print:pb-1.5" style={{ borderBottom: '0.5mm solid #000', alignItems: 'stretch' }}>
         <div className="flex items-center justify-center pr-2" style={{ borderRight: '0.5mm solid #000' }}>
           <picture>
             <source srcSet={LOGO_URL} />
             <img src={LOGO_URL} alt="AfirmaEvias" className="h-9 print:h-8 w-auto object-contain" width="auto" height="36" />
           </picture>
         </div>
-        <div className="flex items-center justify-center px-2">
+        <div className="flex items-center justify-center px-2" style={{ borderRight: '0.5mm solid #000' }}>
           <h2 className="text-sm print:text-xs font-bold text-[#00233B] text-center leading-tight">
             ETIQUETA PARA COLETA DE AMOSTRA SOLO
           </h2>
+        </div>
+        <div className="flex items-stretch">
+          <table className="w-full text-[8px] print:text-[7px]" style={{ borderCollapse: 'collapse', borderSpacing: 0 }}>
+            <tbody>
+              <tr>
+                <td colSpan={2} className="text-center font-semibold" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.5mm 1.5mm' }}>Identificação do Doc nº</td>
+              </tr>
+              <tr>
+                <td colSpan={2} className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.5mm 1.5mm' }}>FORM 060</td>
+              </tr>
+              <tr>
+                <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.5mm 1.5mm', width: '50%' }}>Emissão</td>
+                <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.5mm 1.5mm', width: '50%' }}>Revisão</td>
+              </tr>
+              <tr>
+                <td className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.5mm 1.5mm' }}>20/01/2025</td>
+                <td className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.5mm 1.5mm' }}>01</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -116,17 +136,13 @@ function EtiquetaColetaItem({ etiqueta }) {
         <div className="bg-[#BFCF99] font-bold text-[#00233B] text-xs print:text-[10px] text-center" style={{ borderBottom: '0.5mm solid #000', paddingLeft: '4mm', paddingRight: '4mm', paddingTop: '1.5mm', paddingBottom: '1.5mm' }}>
           ENSAIOS SOLICITADOS
         </div>
-        <div className="bg-white space-y-1 text-xs print:text-[10px] min-h-[60px] print:min-h-[65px]" style={{ paddingLeft: '4mm', paddingRight: '4mm', paddingTop: '3mm', paddingBottom: '3mm' }}>
+        <div className="bg-white text-xs print:text-[10px] min-h-[18px] print:min-h-[16px] flex items-center gap-1.5" style={{ paddingLeft: '4mm', paddingRight: '4mm', paddingTop: '2mm', paddingBottom: '2mm' }}>
           {etiqueta.ensaios && etiqueta.ensaios.length > 0 ? (
-            etiqueta.ensaios.map((ensaio, ensaioIdx) => (
-              <div key={ensaioIdx} className="flex items-start gap-1.5 py-0.5">
-                <span className="font-bold text-sm">✓</span>
-                <span className="flex-1">{ensaio}</span>
-              </div>
-            ))
-          ) : (
-            <div className="h-full"></div>
-          )}
+            <>
+              <span className="font-bold text-sm">✓</span>
+              <span className="flex-1">{etiqueta.ensaios.join(', ')}</span>
+            </>
+          ) : null}
         </div>
       </div>
 

@@ -32,10 +32,10 @@ export function processarArquivoUmidade(data) {
 }
 
 /**
- * Calcula número de páginas para etiquetas de coleta (4 por página)
+ * Calcula número de páginas para etiquetas de coleta (6 por página)
  */
 export function calcularPaginasColeta(totalEtiquetas) {
-  return Math.ceil(totalEtiquetas / 4);
+  return Math.ceil(totalEtiquetas / 6);
 }
 
 /**
@@ -46,10 +46,10 @@ export function calcularPaginasUmidade(totalEtiquetas) {
 }
 
 /**
- * Obtém etiquetas de uma página específica (coleta: 4 por página)
+ * Obtém etiquetas de uma página específica (coleta: 6 por página)
  */
 export function getEtiquetasPageColeta(etiquetas, pageIdx) {
-  return etiquetas.slice(pageIdx * 4, (pageIdx + 1) * 4);
+  return etiquetas.slice(pageIdx * 6, (pageIdx + 1) * 6);
 }
 
 /**
