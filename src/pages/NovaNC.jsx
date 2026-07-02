@@ -49,7 +49,7 @@ export default function NovaNcPage() {
         <div className="flex items-center gap-3">
           <AlertTriangle className="w-7 h-7 text-red-600" />
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Nova Não Conformidade</h1>
+            <h1 className="text-3xl font-bold text-primary">Nova Não Conformidade</h1>
             <p className="text-muted-foreground text-sm mt-1">Relatório de Não Conformidade (RNC)</p>
           </div>
         </div>

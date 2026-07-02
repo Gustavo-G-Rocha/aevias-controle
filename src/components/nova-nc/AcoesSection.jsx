@@ -7,7 +7,7 @@ export function AcoesSection({ form, onFormChange }) {
   return (
     <Card className="bg-transparent">
       <CardHeader>
-        <CardTitle className="text-foreground text-base bg-[#BFCF99]/30 px-3 py-1 rounded">
+        <CardTitle className="text-primary text-base bg-[#BFCF99]/30 px-3 py-1 rounded">
           AÇÕES
         </CardTitle>
       </CardHeader>

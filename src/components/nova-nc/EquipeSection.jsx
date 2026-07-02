@@ -9,7 +9,7 @@ export function EquipeSection({ form, onFormChange, user }) {
       <CardContent className="pt-4 space-y-4">
         <div className="grid grid-cols-2 gap-6">
           <div className="space-y-3">
-            <p className="text-xs font-bold text-foreground uppercase tracking-wider text-center border-b border-border pb-1">
+            <p className="text-xs font-bold text-primary uppercase tracking-wider text-center border-b border-border pb-1">
               Equipe Afirma Evias
             </p>
             <div>
@@ -29,7 +29,7 @@ export function EquipeSection({ form, onFormChange, user }) {
             </div>
           </div>
           <div className="space-y-3">
-            <p className="text-xs font-bold text-foreground uppercase tracking-wider text-center border-b border-border pb-1">
+            <p className="text-xs font-bold text-primary uppercase tracking-wider text-center border-b border-border pb-1">
               ID Executora
             </p>
             <div>
