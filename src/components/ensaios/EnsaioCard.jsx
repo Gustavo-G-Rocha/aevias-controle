@@ -55,16 +55,16 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow duration-200 bg-white/20 backdrop-blur-lg border border-white/20 text-[#00233B]">
+    <Card className="hover:shadow-md transition-shadow duration-200 bg-card border border-border text-card-foreground">
       <CardContent className="p-4">
         <div className="flex flex-col gap-3">
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="font-bold text-[#00233B] text-lg flex items-center gap-2">
-                <TypeIcon className="w-5 h-5 text-[#BFCF99]" /> {name}
+              <h3 className="font-bold  text-lg flex items-center gap-2">
+                <TypeIcon className="w-5 h-5 text-secondary" /> {name}
                 {renderNcBadge()}
               </h3>
-              <p className="text-sm text-[#00233B]/70">{dataFormatted}</p>
+              <p className="text-sm text-muted-foreground">{dataFormatted}</p>
             </div>
             <div className="flex flex-col items-end gap-2">
               <Badge className={`${status.className} gap-1.5`}>
@@ -72,36 +72,36 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
                 {status.text}
               </Badge>
               {status.wasRejected && <Badge className="bg-orange-100/80 text-orange-800 border border-orange-300/50 text-xs">🔄 Editado após reprovação</Badge>}
-              {jaAssinado && <Badge className="bg-[#00233B]/10 text-[#00233B] border border-[#00233B]/30 text-xs">✍️ Assinado por você</Badge>}
+              {jaAssinado && <Badge className="bg-muted/50  border border-border text-xs">✍️ Assinado por você</Badge>}
             </div>
           </div>
 
-          <div className="border-t border-white/20 pt-4 pb-2 space-y-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-[#00233B]/80">
+          <div className="border-t border-border pt-4 pb-2 space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-muted-foreground">
               <div className="flex items-center gap-1.5" title="Obra">
-                <Building className="w-4 h-4 text-[#BFCF99] shrink-0" />
-                <span className="font-medium text-[#00233B]">{obra?.name || 'N/A'}</span>
+                <Building className="w-4 h-4 text-secondary shrink-0" />
+                <span className="font-medium ">{obra?.name || 'N/A'}</span>
                 <span className="text-xs">({obra?.code || 'N/A'})</span>
               </div>
               <div className="flex items-center gap-1.5" title="Laboratorista">
-                <UserIconSmall className="w-4 h-4 text-[#BFCF99] shrink-0" />
+                <UserIconSmall className="w-4 h-4 text-secondary shrink-0" />
                 <span>{laboratorista}</span>
               </div>
               {getRodoviaInfo(ensaio) && (
                 <div className="flex items-center gap-1.5" title="Rodovia">
-                  <MapPin className="w-4 h-4 text-[#BFCF99] shrink-0" />
+                  <MapPin className="w-4 h-4 text-secondary shrink-0" />
                   <span className="font-medium">{getRodoviaInfo(ensaio)}</span>
                 </div>
               )}
               {getTrechoInfo(ensaio) && (
                 <div className="flex items-center gap-1.5" title="Trecho">
-                  <MapPin className="w-4 h-4 text-[#BFCF99] shrink-0" />
+                  <MapPin className="w-4 h-4 text-secondary shrink-0" />
                   <span className="text-xs">Trecho: {getTrechoInfo(ensaio)}</span>
                 </div>
               )}
               {getResponsavelInfo(ensaio) && (
                 <div className="flex items-center gap-1.5" title="Responsável">
-                  <Building className="w-4 h-4 text-[#BFCF99] shrink-0" />
+                  <Building className="w-4 h-4 text-secondary shrink-0" />
                   <span className="font-medium">{getResponsavelInfo(ensaio)}</span>
                 </div>
               )}
@@ -109,53 +109,53 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
 
             {ensaio.sample_id && (
               <div className="text-sm">
-                <span className="font-medium text-[#00233B]">Amostra/ID: </span>
-                <span className="text-[#00233B]/90">{ensaio.sample_id}</span>
+                <span className="font-medium ">Amostra/ID: </span>
+                <span className="text-foreground">{ensaio.sample_id}</span>
               </div>
             )}
 
             {ensaio.client_signature?.signed_by && (
-              <div className="text-sm bg-[#00233B]/5 p-2 rounded border border-[#00233B]/20">
-                <span className="font-medium text-[#00233B]">Assinado por: </span>
-                <span className="text-[#00233B]/80">{ensaio.client_signature.engineer_name}</span>
+              <div className="text-sm bg-muted/50 p-2 rounded border border-border">
+                <span className="font-medium ">Assinado por: </span>
+                <span className="text-muted-foreground">{ensaio.client_signature.engineer_name}</span>
                 {ensaio.client_signature.crea_number && (
-                  <><br /><span className="font-medium text-[#00233B]">CREA: </span><span className="text-[#00233B]/80">{ensaio.client_signature.crea_number}</span></>
+                  <><br /><span className="font-medium ">CREA: </span><span className="text-muted-foreground">{ensaio.client_signature.crea_number}</span></>
                 )}
                 <br />
-                <span className="text-xs text-[#00233B]/70">{new Date(ensaio.client_signature.signed_date).toLocaleString('pt-BR')}</span>
+                <span className="text-xs text-muted-foreground">{new Date(ensaio.client_signature.signed_date).toLocaleString('pt-BR')}</span>
               </div>
             )}
 
             {ensaio.rejection_reason && (
-              <div className="text-sm bg-[#800020]/5 p-2 rounded border border-[#800020]/20">
-                <span className="font-medium text-[#800020]">Motivo da Reprovação: </span>
-                <span className="text-[#800020]/80">{ensaio.rejection_reason}</span>
+              <div className="text-sm bg-red-600/10 p-2 rounded border border-red-600/20">
+                <span className="font-medium text-red-600">Motivo da Reprovação: </span>
+                <span className="text-red-600/80">{ensaio.rejection_reason}</span>
               </div>
             )}
           </div>
 
-          <div className="border-t border-white/20 pt-3 flex items-center gap-2 flex-wrap min-h-[38px]">
+          <div className="border-t border-border pt-3 flex items-center gap-2 flex-wrap min-h-[38px]">
             {podeVerPDF && (
-              <Button asChild variant="outline" size="sm" className="text-[#00233B] hover:bg-black/10 border-white/20">
+              <Button asChild variant="outline" size="sm" >
                 <Link to={reportUrl} target="_blank">
-                  <FileText className="w-4 h-4 mr-1 text-[#BFCF99]" /> Ver PDF
+                  <FileText className="w-4 h-4 mr-1 text-secondary" /> Ver PDF
                 </Link>
               </Button>
             )}
             {podeAssinar && (
-              <Button size="sm" style={{ backgroundColor: '#566E3D' }} className="text-white hover:opacity-90 transition-opacity" onClick={handleAssinar}>
+              <Button size="sm" className="hover:opacity-90" onClick={handleAssinar}>
                 <MessageSquare className="w-4 h-4 mr-1" /> Assinar Registro
               </Button>
             )}
             {podeEditar && (
-              <Button asChild size="sm" className="bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90">
+              <Button asChild size="sm">
                 <Link to={editLink}>
-                  <Edit className="w-4 h-4 mr-1 text-[#BFCF99]" /> Editar
+                  <Edit className="w-4 h-4 mr-1 text-secondary" /> Editar
                 </Link>
               </Button>
             )}
             {ensaio.status === 'finalizado' && ensaio.approved === null && !isCliente && (
-              <p className="text-sm text-[#00233B]/70 italic">Aguardando aprovação do administrador.</p>
+              <p className="text-sm text-muted-foreground italic">Aguardando aprovação do administrador.</p>
             )}
           </div>
         </div>

@@ -76,7 +76,7 @@ const AppLayout = ({ children }) => {
           </main>
         </div>
 
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden backdrop-blur-xl border-white/20" style={{ backgroundColor: 'color-mix(in srgb, var(--color-background) 90%, transparent)', color: 'var(--color-text)' }}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden">
           <DialogHeader>
             <DialogTitle className="text-xl" style={{ color: 'var(--color-text)' }}>Iniciar Novo Registro</DialogTitle>
             <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Selecione o tipo de registro que deseja criar</p>

@@ -11,7 +11,7 @@ const EnsaioButton = ({ ensaio, onSelect }) => (
   <button
     type="button"
     onClick={() => onSelect(ensaio.url)}
-    className="flex items-center gap-3 p-3 bg-background border border-border rounded-lg hover:bg-muted hover:border-primary/40 transition-all duration-200 text-left"
+    className="flex items-center gap-3 p-3 bg-muted/30 border border-border rounded-lg hover:bg-muted hover:border-primary/40 transition-all duration-200 text-left"
   >
     <ensaio.icon className="w-5 h-5 text-primary" />
     <p className="font-medium text-foreground text-sm">{ensaio.title}</p>

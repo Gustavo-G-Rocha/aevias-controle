@@ -48,8 +48,8 @@ export default function MeusEnsaios() {
 
         {loading ? (
           <div className="text-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#00233B]/50" />
-            <p className="text-[#00233B]/80 mt-2">Carregando registros...</p>
+            <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
+            <p className="text-muted-foreground mt-2">Carregando registros...</p>
           </div>
         ) : canApprove ? (
           <AdminInterface

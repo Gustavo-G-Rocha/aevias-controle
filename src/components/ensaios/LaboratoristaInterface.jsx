@@ -27,12 +27,12 @@ const LaboratoristaInterface = React.memo(({ ensaios, obras, user, allUsers }) =
     [ensaios]
   );
 
-  const triggerClass = "data-[state=active]:bg-white/40 data-[state=active]:text-[#00233B] data-[state=active]:border-b-2 data-[state=active]:border-[#BFCF99] text-[#00233B]/80 hover:bg-black/5 flex flex-col items-center gap-0.5 py-2 px-1";
+  const triggerClass = "data-[state=active]:bg-muted data-[state=active]:text-foreground data-[state=active]:border-b-2 data-[state=active]:border-secondary text-muted-foreground hover:bg-muted/50 flex flex-col items-center gap-0.5 py-2 px-1";
 
   const EmptyState = ({ icon: Icon, title, subtitle }) => (
-    <div className="text-center py-12 text-[#00233B]/70">
-      <Icon className="w-16 h-16 text-[#00233B]/30 mx-auto mb-4" />
-      <h3 className="text-lg font-semibold text-[#00233B] mb-2">{title}</h3>
+    <div className="text-center py-12 text-muted-foreground">
+      <Icon className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
+      <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
       <p>{subtitle}</p>
     </div>
   );
@@ -40,7 +40,7 @@ const LaboratoristaInterface = React.memo(({ ensaios, obras, user, allUsers }) =
   return (
     <div className="space-y-4">
       <Tabs defaultValue="emExecucao" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-white/20 backdrop-blur-lg border border-white/20 h-auto">
+        <TabsList className="grid w-full grid-cols-3 bg-muted/30 border border-border h-auto">
           <TabsTrigger value="emExecucao" className={triggerClass}>
             <span className="text-xs leading-tight text-center">Em Execução</span>
             <Badge className="text-xs">{emExecucao.length}</Badge>
