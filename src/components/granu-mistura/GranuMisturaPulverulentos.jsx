@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 
 export default function GranuMisturaPulverulentos({ materiais, isApproved, handlePulvChange }) {
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader><CardTitle className="text-base">4. Determinação de Materiais Pulverulentos</CardTitle></CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
@@ -19,7 +19,7 @@ export default function GranuMisturaPulverulentos({ materiais, isApproved, handl
           </div>
           <div className="space-y-1">
             <Label className="text-xs font-bold">Teor de Pulverulentos — ((Pi−Pf)/Pi)×100 (%)</Label>
-            <Input value={materiais.teor_pct || ""} disabled className="bg-gray-100 text-sm font-bold" />
+            <Input value={materiais.teor_pct || ""} disabled className="bg-muted text-sm font-bold" />
           </div>
         </div>
       </CardContent>

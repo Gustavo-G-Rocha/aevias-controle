@@ -9,7 +9,7 @@ export default function EnsaioTaxaMRAFDimensoes({
   onDimensoesChange
 }) {
   return (
-    <Card className="bg-black/5">
+    <Card className="bg-muted/30">
       <CardHeader>
         <CardTitle className="text-base">Área da Bandeja (global para todos os ensaios)</CardTitle>
       </CardHeader>
@@ -23,7 +23,7 @@ export default function EnsaioTaxaMRAFDimensoes({
               value={dimensoes.lado_1 || ''}
               onChange={e => onDimensoesChange('lado_1', e.target.value ? parseFloat(e.target.value) : null)}
               disabled={!isEditable}
-              className="bg-white"
+              className="bg-background"
             />
           </div>
           <div>
@@ -34,7 +34,7 @@ export default function EnsaioTaxaMRAFDimensoes({
               value={dimensoes.lado_2 || ''}
               onChange={e => onDimensoesChange('lado_2', e.target.value ? parseFloat(e.target.value) : null)}
               disabled={!isEditable}
-              className="bg-white"
+              className="bg-background"
             />
           </div>
           <div>
@@ -42,7 +42,7 @@ export default function EnsaioTaxaMRAFDimensoes({
             <Input
               value={dimensoes.area?.toFixed(4) || ''}
               readOnly
-              className="bg-slate-200"
+              className="bg-muted"
             />
           </div>
         </div>

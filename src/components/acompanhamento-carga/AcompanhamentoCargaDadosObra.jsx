@@ -12,11 +12,11 @@ export default function AcompanhamentoCargaDadosObra({
 }) {
   return (
     <div>
-      <h2 className="text-lg font-bold text-[#00233B] mb-4 border-b pb-2">DADOS DA OBRA</h2>
+      <h2 className="text-lg font-bold text-foreground mb-4 border-b pb-2">DADOS DA OBRA</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <Label>Cliente (Automático)</Label>
-          <Input value={regionalSelecionada?.cliente || ""} disabled className="bg-slate-100" />
+          <Input value={regionalSelecionada?.cliente || ""} disabled className="bg-muted" />
         </div>
 
         <div>
@@ -71,7 +71,7 @@ export default function AcompanhamentoCargaDadosObra({
 
         <div>
           <Label>Laboratorista (Automático)</Label>
-          <Input value={formData.laboratorista_name} disabled className="bg-slate-100" />
+          <Input value={formData.laboratorista_name} disabled className="bg-muted" />
         </div>
 
         <div>
@@ -138,14 +138,14 @@ export default function AcompanhamentoCargaDadosObra({
           <Input
             value={projetoSelecionado?.faixa_granulometrica_id || ""}
             disabled
-            className="bg-slate-100"
+            className="bg-muted"
           />
         </div>
       </div>
 
       {/* Jornada de Trabalho */}
       <div className="mt-6">
-        <h3 className="text-md font-semibold text-[#00233B] mb-3">Jornada de Trabalho</h3>
+        <h3 className="text-md font-semibold text-foreground mb-3">Jornada de Trabalho</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label>Horário de Início</Label>

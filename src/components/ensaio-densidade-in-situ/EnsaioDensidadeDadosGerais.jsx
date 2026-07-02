@@ -52,7 +52,7 @@ export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obra
     <div className="space-y-6">
       {/* Dados da Obra */}
       <div>
-        <h3 className="text-lg font-semibold text-[#00233B] mb-4">Dados da Obra</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-4">Dados da Obra</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <Label htmlFor="obra_id">Obra *</Label>
@@ -62,7 +62,7 @@ export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obra
               onChange={(e) => handleObraChange(e.target.value)}
               disabled={!isEditable}
               required
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
             >
               <option value="">Selecione a obra</option>
               {obras.map(obra => (
@@ -79,14 +79,14 @@ export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obra
                 value={formData.project_id || ''}
                 onChange={(e) => handleProjectChange(e.target.value)}
                 disabled={!isEditable}
-                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
               >
                 <option value="">Selecione o projeto</option>
                 {projetosBGS.map(p => (
                   <option key={p.id} value={p.id}>{p.name}</option>
                 ))}
               </select>
-              <p className="text-xs text-slate-500 mt-1">Preenche automaticamente a densidade seca máxima do Proctor</p>
+              <p className="text-xs text-muted-foreground mt-1">Preenche automaticamente a densidade seca máxima do Proctor</p>
             </div>
           )}
 
@@ -120,7 +120,7 @@ export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obra
               value={formData.rodovia}
               onChange={(e) => setFormData(prev => ({ ...prev, rodovia: e.target.value }))}
               disabled={!isEditable || !formData.obra_id}
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
             >
               <option value="">Selecione a rodovia</option>
               {obras.find(o => o.id === formData.obra_id)?.rodovias?.map((rodovia, idx) => (
@@ -162,7 +162,7 @@ export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obra
               onChange={(e) => setFormData(prev => ({ ...prev, engenheiro_responsavel: e.target.value }))}
               disabled={!isEditable}
               readOnly
-              className="bg-slate-100"
+              className="bg-muted"
             />
           </div>
         </div>
@@ -197,7 +197,7 @@ export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obra
       </div>
 
       {/* Dados da Areia (Calibração) */}
-      <Card className="bg-black/5">
+      <Card className="bg-muted/30">
         <CardHeader>
           <CardTitle className="text-base">Dados da Areia (Calibração)</CardTitle>
         </CardHeader>
@@ -232,7 +232,7 @@ export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obra
       </Card>
 
       {/* Dados do Proctor */}
-      <Card className="bg-black/5">
+      <Card className="bg-muted/30">
         <CardHeader>
           <CardTitle className="text-base">Dados do Proctor</CardTitle>
         </CardHeader>

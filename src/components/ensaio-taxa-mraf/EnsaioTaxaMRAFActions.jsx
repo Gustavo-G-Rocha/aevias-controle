@@ -20,7 +20,7 @@ export default function EnsaioTaxaMRAFActions({
             {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
             Salvar Rascunho
           </Button>
-          <Button onClick={onFinalize} disabled={saving} className="bg-green-600 hover:bg-green-700 text-white">
+          <Button onClick={onFinalize} disabled={saving} >
             <CheckCircle className="w-4 h-4 mr-2" />
             Finalizar Ensaio
           </Button>

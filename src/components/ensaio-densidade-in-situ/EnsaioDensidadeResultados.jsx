@@ -7,7 +7,7 @@ import { Plus, Trash2 } from "lucide-react";
 
 function FuroCard({ furo, index, isEditable, substituicao_retido_3_4, onFuroChange, onRemover, podeRemover }) {
   return (
-    <Card className="mb-4 bg-black/5">
+    <Card className="mb-4 bg-muted/30">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-center">
           <CardTitle className="text-base">Furo {furo.numero}</CardTitle>
@@ -82,25 +82,25 @@ function FuroCard({ furo, index, isEditable, substituicao_retido_3_4, onFuroChan
 
         {/* Resultados Calculados */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t">
-          <div className="p-3 bg-blue-50 rounded">
-            <Label className="text-xs text-blue-800">Densidade Úmida (g/cm³)</Label>
-            <p className="text-lg font-bold text-blue-900">{furo.densidade_umida_furo?.toFixed(3) || '-'}</p>
+          <div className="p-3 bg-muted/50 rounded">
+            <Label className="text-xs text-muted-foreground">Densidade Úmida (g/cm³)</Label>
+            <p className="text-lg font-bold text-foreground">{furo.densidade_umida_furo?.toFixed(3) || '-'}</p>
           </div>
-          <div className="p-3 bg-blue-50 rounded">
-            <Label className="text-xs text-blue-800">Densidade Seca (g/cm³)</Label>
-            <p className="text-lg font-bold text-blue-900">{furo.densidade_seca_solo?.toFixed(3) || '-'}</p>
+          <div className="p-3 bg-muted/50 rounded">
+            <Label className="text-xs text-muted-foreground">Densidade Seca (g/cm³)</Label>
+            <p className="text-lg font-bold text-foreground">{furo.densidade_seca_solo?.toFixed(3) || '-'}</p>
           </div>
-          <div className="p-3 bg-blue-50 rounded">
-            <Label className="text-xs text-blue-800">Umidade (%)</Label>
-            <p className="text-lg font-bold text-blue-900">{furo.umidade?.toFixed(2) || '-'}</p>
+          <div className="p-3 bg-muted/50 rounded">
+            <Label className="text-xs text-muted-foreground">Umidade (%)</Label>
+            <p className="text-lg font-bold text-foreground">{furo.umidade?.toFixed(2) || '-'}</p>
           </div>
-          <div className="p-3 bg-green-50 rounded">
-            <Label className="text-xs text-green-800">Desvio Umidade (%)</Label>
-            <p className="text-lg font-bold text-green-900">{furo.desvio_umidade?.toFixed(2) || '-'}</p>
+          <div className="p-3 bg-muted/50 rounded">
+            <Label className="text-xs text-muted-foreground">Desvio Umidade (%)</Label>
+            <p className="text-lg font-bold text-foreground">{furo.desvio_umidade?.toFixed(2) || '-'}</p>
           </div>
-          <div className="p-3 bg-green-50 rounded">
-            <Label className="text-xs text-green-800">Grau Compactação (%)</Label>
-            <p className="text-lg font-bold text-green-900">{furo.grau_compactacao?.toFixed(2) || '-'}</p>
+          <div className="p-3 bg-muted/50 rounded">
+            <Label className="text-xs text-muted-foreground">Grau Compactação (%)</Label>
+            <p className="text-lg font-bold text-foreground">{furo.grau_compactacao?.toFixed(2) || '-'}</p>
           </div>
         </div>
       </CardContent>
@@ -112,9 +112,9 @@ export default function EnsaioDensidadeResultados({ formData, isEditable, onFuro
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-[#00233B]">Furos (máximo 5)</h3>
+        <h3 className="text-lg font-semibold text-foreground">Furos (máximo 5)</h3>
         {isEditable && (
-          <Button type="button" onClick={onAdicionarFuro} className="bg-[#00233B] text-[#F2F1EF]" disabled={formData.furos.length >= 5}>
+          <Button type="button" onClick={onAdicionarFuro}  disabled={formData.furos.length >= 5}>
             <Plus className="w-4 h-4 mr-2" />Adicionar Furo
           </Button>
         )}

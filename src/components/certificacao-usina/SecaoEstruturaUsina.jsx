@@ -14,7 +14,7 @@ const RadioGroup = ({ options, value, onChange, disabled }) => (
           checked={value === opt}
           onChange={() => onChange(opt)}
           disabled={disabled}
-          className="accent-[#00233B]"
+          className="accent-primary"
         />
         {opt}
       </label>
@@ -24,7 +24,7 @@ const RadioGroup = ({ options, value, onChange, disabled }) => (
 
 const FieldRow = ({ label, children }) => (
   <div className="flex flex-col gap-1">
-    <Label className="text-xs text-slate-600">{label}</Label>
+    <Label className="text-xs text-muted-foreground">{label}</Label>
     {children}
   </div>
 );

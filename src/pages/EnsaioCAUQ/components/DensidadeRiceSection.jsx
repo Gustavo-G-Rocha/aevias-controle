@@ -14,7 +14,7 @@ export default function DensidadeRiceSection({ formData, isEditable, isApproved,
   const canEdit = isEditable && !isApproved;
 
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader>
         <div className="flex justify-between items-start">
           <div>

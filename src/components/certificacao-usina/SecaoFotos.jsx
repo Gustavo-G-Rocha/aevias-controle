@@ -21,8 +21,8 @@ export default function SecaoFotos({
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-base font-semibold text-[#00233B]">Relatório Fotográfico</h3>
-        <p className="text-sm text-slate-500 mt-0.5">Adicione fotos da vistoria para compor o relatório.</p>
+        <h3 className="text-base font-semibold text-foreground">Relatório Fotográfico</h3>
+        <p className="text-sm text-muted-foreground mt-0.5">Adicione fotos da vistoria para compor o relatório.</p>
       </div>
 
       {canEdit && (
@@ -38,10 +38,10 @@ export default function SecaoFotos({
           />
           <Label
             htmlFor="fotos-certificacao"
-            className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm cursor-pointer hover:bg-slate-50 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm cursor-pointer hover:bg-muted ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
           >
-            <span className="truncate text-slate-500">Selecionar fotos</span>
-            <span className="flex-shrink-0 ml-4 px-3 py-1 rounded-md text-sm font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100">
+            <span className="truncate text-muted-foreground">Selecionar fotos</span>
+            <span className="flex-shrink-0 ml-4 px-3 py-1 rounded-md text-sm font-semibold bg-muted text-muted-foreground">
               {loading ? "Enviando..." : "Escolher Ficheiros"}
             </span>
           </Label>
@@ -85,7 +85,7 @@ export default function SecaoFotos({
                 <source srcSet={url} />
                 <img src={url} alt={`Foto ${i + 1}`} className="w-full h-32 object-cover rounded-md border" width="auto" height="128" />
               </picture>
-              <p className="text-xs text-center text-slate-500 mt-1">Foto {i + 1}</p>
+              <p className="text-xs text-center text-muted-foreground mt-1">Foto {i + 1}</p>
               {canEdit && (
                 <Button
                   type="button"

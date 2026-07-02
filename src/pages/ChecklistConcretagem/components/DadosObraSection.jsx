@@ -9,7 +9,7 @@ export default function DadosObraSection({ formData, setFormData, obras, project
   const obraSelecionada = obras.find(o => o.id === formData.obra_id);
 
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader><CardTitle className="text-lg">Dados da Obra</CardTitle></CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

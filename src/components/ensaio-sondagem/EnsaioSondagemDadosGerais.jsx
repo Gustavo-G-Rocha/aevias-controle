@@ -9,9 +9,9 @@ export default function EnsaioSondagemDadosGerais({ formData, setFormData, obras
   return (
     <>
       {/* Método de Ensaio */}
-      <Card className="bg-blue-50 border-2 border-blue-300">
+      <Card className="bg-muted/30 border-2 border-border">
         <CardHeader>
-          <CardTitle className="text-lg text-blue-900">Método de Ensaio</CardTitle>
+          <CardTitle className="text-lg">Método de Ensaio</CardTitle>
         </CardHeader>
         <CardContent>
           <div>
@@ -21,12 +21,12 @@ export default function EnsaioSondagemDadosGerais({ formData, setFormData, obras
               value={formData.metodo_ensaio}
               onChange={e => setFormData({ ...formData, metodo_ensaio: e.target.value })}
               required
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm mt-2"
+              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm mt-2"
             >
               <option value="DNIT 428/2022">DNIT 428/2022 (usa peso saturado e imerso)</option>
               <option value="DNER 117/94">DNER 117/94 (usa apenas peso imerso)</option>
             </select>
-            <p className="text-xs text-slate-600 mt-2">
+            <p className="text-xs text-muted-foreground mt-2">
               {formData.metodo_ensaio === "DNIT 428/2022"
                 ? "Volume = Peso Saturado - Peso Imerso | Densidade = (Peso ao Ar / Volume) × Dens. Água"
                 : "Volume = Peso ao Ar - Peso Imerso | Densidade = Peso ao Ar / Volume"}
@@ -49,7 +49,7 @@ export default function EnsaioSondagemDadosGerais({ formData, setFormData, obras
                 value={formData.obra_id}
                 onChange={e => setFormData({ ...formData, obra_id: e.target.value, project_id: "" })}
                 required
-                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
               >
                 <option value="">Selecione a obra</option>
                 {obras.map(obra => (
@@ -64,7 +64,7 @@ export default function EnsaioSondagemDadosGerais({ formData, setFormData, obras
                 value={formData.project_id}
                 onChange={e => setFormData({ ...formData, project_id: e.target.value })}
                 disabled={!formData.obra_id}
-                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm disabled:opacity-50"
+                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm disabled:opacity-50"
               >
                 <option value="">Selecione o projeto (opcional)</option>
                 {projects.map(p => (
@@ -89,7 +89,7 @@ export default function EnsaioSondagemDadosGerais({ formData, setFormData, obras
                 onChange={e => setFormData({ ...formData, rodovia: e.target.value })}
                 required={isFinalizado}
                 disabled={!formData.obra_id}
-                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
               >
                 <option value="">Selecione a rodovia</option>
                 {obras.find(o => o.id === formData.obra_id)?.rodovias?.map((r, i) => (
@@ -116,7 +116,7 @@ export default function EnsaioSondagemDadosGerais({ formData, setFormData, obras
               <Label htmlFor="servico">Serviço</Label>
               <select id="servico" value={formData.servico}
                 onChange={e => setFormData({ ...formData, servico: e.target.value })}
-                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
               >
                 <option value="">Selecione o serviço</option>
                 <option value="Capa/Reperfilagem">Capa/Reperfilagem (GC: 97-101%)</option>
@@ -127,7 +127,7 @@ export default function EnsaioSondagemDadosGerais({ formData, setFormData, obras
               <Label htmlFor="ensaio_realizado_por">Ensaio realizado por:</Label>
               <select id="ensaio_realizado_por" value={formData.ensaio_realizado_por}
                 onChange={e => setFormData({ ...formData, ensaio_realizado_por: e.target.value })}
-                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
               >
                 <option value="Afirma Evias">Afirma Evias</option>
                 <option value="Empreiteira">Empreiteira</option>

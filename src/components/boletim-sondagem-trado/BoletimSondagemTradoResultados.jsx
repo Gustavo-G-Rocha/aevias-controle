@@ -24,24 +24,24 @@ function TabelaUmidade({ un, isEditable, onFieldChange }) {
     <div className="overflow-x-auto">
       <table className="w-full text-sm border-collapse">
         <thead>
-          <tr className="bg-[#00233B]/10">
-            <th className="border border-[#00233B]/20 px-3 py-2 text-left font-medium text-[#00233B]">Campo</th>
-            <th className="border border-[#00233B]/20 px-3 py-2 text-center font-medium text-[#00233B]">Amostra 1</th>
-            <th className="border border-[#00233B]/20 px-3 py-2 text-center font-medium text-[#00233B]">Amostra 2</th>
+          <tr className="bg-primary/10">
+            <th className="border border-border px-3 py-2 text-left font-medium text-foreground">Campo</th>
+            <th className="border border-border px-3 py-2 text-center font-medium text-foreground">Amostra 1</th>
+            <th className="border border-border px-3 py-2 text-center font-medium text-foreground">Amostra 2</th>
           </tr>
         </thead>
         <tbody>
-          <tr className="bg-white/30">
-            <td className="border border-[#00233B]/20 px-3 py-1.5 font-medium text-[#00233B]/80">Camada ensaiada</td>
-            <td className="border border-[#00233B]/20 px-2 py-1" colSpan={2}>
+          <tr className="bg-muted/20">
+            <td className="border border-border px-3 py-1.5 font-medium text-muted-foreground">Camada ensaiada</td>
+            <td className="border border-border px-2 py-1" colSpan={2}>
               <Input value={un?.camada_ensaiada_1 || ''} onChange={e => onFieldChange('camada_ensaiada_1', e.target.value)} disabled={!isEditable} className="h-8 text-sm" placeholder="Ex.: 0,00 - 0,60m" />
             </td>
           </tr>
           {inputRows.map(({ label, fields, type }, ri) => (
-            <tr key={ri} className={ri % 2 === 0 ? 'bg-white/10' : 'bg-white/30'}>
-              <td className="border border-[#00233B]/20 px-3 py-1.5 font-medium text-[#00233B]/80">{label}</td>
+            <tr key={ri} className={ri % 2 === 0 ? 'bg-muted/10' : 'bg-muted/20'}>
+              <td className="border border-border px-3 py-1.5 font-medium text-muted-foreground">{label}</td>
               {fields.map((f, fi) => (
-                <td key={fi} className="border border-[#00233B]/20 px-2 py-1">
+                <td key={fi} className="border border-border px-2 py-1">
                   {type === 'text'
                     ? <Input value={un?.[f] || ''} onChange={e => onFieldChange(f, e.target.value)} disabled={!isEditable} className="h-8 text-sm" />
                     : <Input type="number" step="0.01" value={un?.[f] ?? ''} onChange={e => onFieldChange(f, e.target.value !== '' ? parseFloat(e.target.value) : null)} disabled={!isEditable} className="h-8 text-sm" />
@@ -51,18 +51,18 @@ function TabelaUmidade({ un, isEditable, onFieldChange }) {
             </tr>
           ))}
           {calcRows.map(({ label, keys }, ri) => (
-            <tr key={`calc-${ri}`} className="bg-[#BFCF99]/10">
-              <td className="border border-[#00233B]/20 px-3 py-1.5 font-medium text-[#00233B]/80 italic">{label}</td>
+            <tr key={`calc-${ri}`} className="bg-secondary/10">
+              <td className="border border-border px-3 py-1.5 font-medium text-muted-foreground italic">{label}</td>
               {keys.map((k, ki) => (
-                <td key={ki} className="border border-[#00233B]/20 px-3 py-1.5 text-center font-semibold text-[#00233B]">
+                <td key={ki} className="border border-border px-3 py-1.5 text-center font-semibold text-foreground">
                   {un?.[k] !== null && un?.[k] !== undefined ? un[k].toFixed(2) : '—'}
                 </td>
               ))}
             </tr>
           ))}
-          <tr className="bg-[#BFCF99]/30">
-            <td className="border border-[#00233B]/20 px-3 py-2 font-bold text-[#00233B]">Umidade (%)</td>
-            <td className="border border-[#00233B]/20 px-3 py-2 text-center font-bold text-[#00233B] text-base" colSpan={2}>
+          <tr className="bg-secondary/20">
+            <td className="border border-border px-3 py-2 font-bold text-foreground">Umidade (%)</td>
+            <td className="border border-border px-3 py-2 text-center font-bold text-foreground text-base" colSpan={2}>
               {umidadeMedia !== null ? `${umidadeMedia.toFixed(2)} %` : '—'}
             </td>
           </tr>
@@ -76,7 +76,7 @@ function TabelaUmidade({ un, isEditable, onFieldChange }) {
 function TabelaDensidade({ densidades, isEditable, handleDensidadeChange, removerDensidade }) {
   const nEnsaios = densidades.length;
   const numInput = (val, onChange, step = "0.01") => (
-    <Input type="number" step={step} value={val ?? ''} onChange={(e) => onChange(e.target.value !== '' ? parseFloat(e.target.value) : null)} disabled={!isEditable} className="h-8 text-xs text-center bg-white/50 min-w-[90px]" />
+    <Input type="number" step={step} value={val ?? ''} onChange={(e) => onChange(e.target.value !== '' ? parseFloat(e.target.value) : null)} disabled={!isEditable} className="h-8 text-xs text-center bg-muted/100 min-w-[90px]" />
   );
   const calc = (val, dec = 2) => val !== null && val !== undefined ? val.toFixed(dec) : '—';
 
@@ -107,14 +107,14 @@ function TabelaDensidade({ densidades, isEditable, handleDensidadeChange, remove
     <div className="overflow-x-auto">
       <table className="w-full text-sm border-collapse">
         <thead>
-          <tr className="bg-[#00233B]/10">
-            <th className="border border-[#00233B]/20 px-3 py-2 text-left font-medium text-[#00233B] min-w-[220px]">Campo</th>
+          <tr className="bg-primary/10">
+            <th className="border border-border px-3 py-2 text-left font-medium text-foreground min-w-[220px]">Campo</th>
             {densidades.map((_, i) => (
-              <th key={i} className="border border-[#00233B]/20 px-3 py-2 text-center font-medium text-[#00233B] min-w-[120px]">
+              <th key={i} className="border border-border px-3 py-2 text-center font-medium text-foreground min-w-[120px]">
                 <div className="flex items-center justify-center gap-2">
                   <span>Ensaio {i + 1}</span>
                   {isEditable && nEnsaios > 1 && (
-                    <button type="button" onClick={() => removerDensidade(i)} className="text-red-400 hover:text-red-600">
+                    <button type="button" onClick={() => removerDensidade(i)} className="text-destructive hover:text-destructive">
                       <Trash2 className="w-3 h-3" />
                     </button>
                   )}
@@ -127,8 +127,8 @@ function TabelaDensidade({ densidades, isEditable, handleDensidadeChange, remove
           {rows.map((row, ri) => {
             if (row.section) {
               return (
-                <tr key={ri} className="bg-[#00233B]/10">
-                  <td colSpan={nEnsaios + 1} className="border border-[#00233B]/20 px-3 py-1 text-xs font-bold text-[#00233B]/60 uppercase tracking-wider">
+                <tr key={ri} className="bg-primary/10">
+                  <td colSpan={nEnsaios + 1} className="border border-border px-3 py-1 text-xs font-bold text-muted-foreground/70 uppercase tracking-wider">
                     {row.label.replace(/—/g, '').trim()}
                   </td>
                 </tr>
@@ -137,14 +137,14 @@ function TabelaDensidade({ densidades, isEditable, handleDensidadeChange, remove
             const isCalc = row.type === 'calc' || row.type === 'result';
             const isResult = row.type === 'result';
             return (
-              <tr key={ri} className={isResult ? 'bg-[#BFCF99]/30' : isCalc ? 'bg-[#BFCF99]/10' : (ri % 2 === 0 ? 'bg-white/20' : 'bg-white/5')}>
-                <td className={`border border-[#00233B]/20 px-3 py-1.5 font-medium text-[#00233B]/80 text-xs ${isCalc ? 'italic' : ''} ${isResult ? 'font-bold text-[#00233B]' : ''}`}>{row.label}</td>
+              <tr key={ri} className={isResult ? 'bg-secondary/20' : isCalc ? 'bg-secondary/10' : (ri % 2 === 0 ? 'bg-muted/20' : 'bg-muted/10')}>
+                <td className={`border border-border px-3 py-1.5 font-medium text-muted-foreground text-xs ${isCalc ? 'italic' : ''} ${isResult ? 'font-bold text-foreground' : ''}`}>{row.label}</td>
                 {densidades.map((d, di) => (
-                  <td key={di} className={`border border-[#00233B]/20 px-2 py-1 text-center ${isCalc ? 'font-semibold text-[#00233B]' : ''}`}>
+                  <td key={di} className={`border border-border px-2 py-1 text-center ${isCalc ? 'font-semibold text-foreground' : ''}`}>
                     {isCalc ? (
-                      <span className={isResult ? 'text-base font-bold text-[#00233B]' : ''}>{calc(d[row.field], row.dec ?? 2)}</span>
+                      <span className={isResult ? 'text-base font-bold text-foreground' : ''}>{calc(d[row.field], row.dec ?? 2)}</span>
                     ) : row.type === 'text' ? (
-                      <Input value={d[row.field] || ''} onChange={e => handleDensidadeChange(di, row.field, e.target.value)} disabled={!isEditable} className="h-8 text-xs bg-white/50 min-w-[90px]" />
+                      <Input value={d[row.field] || ''} onChange={e => handleDensidadeChange(di, row.field, e.target.value)} disabled={!isEditable} className="h-8 text-xs bg-muted/100 min-w-[90px]" />
                     ) : (
                       numInput(d[row.field], v => handleDensidadeChange(di, row.field, v), row.step || "0.01")
                     )}
@@ -168,12 +168,12 @@ export default function BoletimSondagemTradoResultados({
   return (
     <>
       {/* Umidade Natural 1 */}
-      <Card className="bg-black/5 border-[#00233B]/10">
+      <Card className="bg-muted/30 border-border">
         <CardHeader className="pb-3">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-base text-[#00233B]">Umidade Natural 1 — DNER-ME 213/94</CardTitle>
+            <CardTitle className="text-base">Umidade Natural 1 — DNER-ME 213/94</CardTitle>
             {isEditable && !formData.umidade_natural_2 && (
-              <Button type="button" size="sm" variant="outline" className="border-[#00233B]/30 text-[#00233B] hover:bg-[#00233B]/10 text-xs" onClick={adicionarUmidade2}>
+              <Button type="button" size="sm" variant="outline" className=" text-xs" onClick={adicionarUmidade2}>
                 <Plus className="w-3.5 h-3.5 mr-1" /> Adicionar 2ª Umidade
               </Button>
             )}
@@ -186,12 +186,12 @@ export default function BoletimSondagemTradoResultados({
 
       {/* Umidade Natural 2 */}
       {formData.umidade_natural_2 && (
-        <Card className="bg-black/5 border-[#00233B]/10">
+        <Card className="bg-muted/30 border-border">
           <CardHeader className="pb-3">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-base text-[#00233B]">Umidade Natural 2 — DNER-ME 213/94</CardTitle>
+              <CardTitle className="text-base">Umidade Natural 2 — DNER-ME 213/94</CardTitle>
               {isEditable && (
-                <Button type="button" size="sm" variant="outline" className="border-red-300 text-red-600 hover:bg-red-50 text-xs" onClick={removerUmidade2}>
+                <Button type="button" size="sm" variant="outline" className="border-destructive/30 text-destructive hover:bg-destructive/10 text-xs" onClick={removerUmidade2}>
                   <Trash2 className="w-3.5 h-3.5 mr-1" /> Remover
                 </Button>
               )}
@@ -204,10 +204,10 @@ export default function BoletimSondagemTradoResultados({
       )}
 
       {/* Densidade In Situ */}
-      <Card className="bg-black/5 border-[#00233B]/10">
+      <Card className="bg-muted/30 border-border">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <CardTitle className="text-base text-[#00233B]">Massa Específica Aparente In Situ — DNER-ME 092/94</CardTitle>
+            <CardTitle className="text-base">Massa Específica Aparente In Situ — DNER-ME 092/94</CardTitle>
             <div className="flex items-center gap-3">
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
@@ -215,12 +215,12 @@ export default function BoletimSondagemTradoResultados({
                   checked={formData.ensaio_insitu_realizado}
                   onChange={e => setFormData(prev => ({ ...prev, ensaio_insitu_realizado: e.target.checked }))}
                   disabled={!isEditable}
-                  className="w-4 h-4 accent-[#00233B]"
+                  className="w-4 h-4 accent-primary"
                 />
-                <span className="text-sm font-medium text-[#00233B]">Ensaio realizado</span>
+                <span className="text-sm font-medium text-foreground">Ensaio realizado</span>
               </label>
               {isEditable && formData.ensaio_insitu_realizado && (formData.densidades_in_situ || []).length < 3 && (
-                <Button type="button" onClick={adicionarDensidade} size="sm" className="bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90 text-xs">
+                <Button type="button" onClick={adicionarDensidade} size="sm" className=" text-xs">
                   <Plus className="w-3.5 h-3.5 mr-1" /> Adicionar Ensaio
                 </Button>
               )}
@@ -238,7 +238,7 @@ export default function BoletimSondagemTradoResultados({
           </CardContent>
         ) : (
           <CardContent>
-            <p className="text-sm text-[#00233B]/60 italic text-center py-4">Ensaio in situ não realizado neste boletim.</p>
+            <p className="text-sm text-muted-foreground/70 italic text-center py-4">Ensaio in situ não realizado neste boletim.</p>
           </CardContent>
         )}
       </Card>

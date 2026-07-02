@@ -5,7 +5,7 @@ export default function SectionTitle({ children, className = "" }) {
     <tr>
       <td
         colSpan={2}
-        className={`bg-[#00233B] text-white font-semibold text-sm py-2 px-3 ${className}`}
+        className={`bg-muted text-foreground font-semibold text-sm py-2 px-3 ${className}`}
       >
         {children}
       </td>

@@ -12,16 +12,16 @@ export default function AcompanhamentoCargaHeader({ editMode }) {
         <Button
           variant="outline"
           onClick={() => navigate(createPageUrl("MeusEnsaios"))}
-          className="border-white/20"
+
         >
           <ChevronLeft className="w-4 h-4 mr-1" />
           Voltar
         </Button>
         <div>
-          <h1 className="text-3xl font-bold text-[#00233B]">
+          <h1 className="text-3xl font-bold text-foreground">
             {editMode ? "Editar" : "Novo"} Acompanhamento de Aplicação
           </h1>
-          <p className="text-[#00233B]/70">CAUQ - Conservação e Implantação</p>
+          <p className="text-muted-foreground">CAUQ - Conservação e Implantação</p>
         </div>
       </div>
     </div>

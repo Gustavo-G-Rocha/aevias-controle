@@ -10,21 +10,21 @@ export default function EnsaioVigaBenkelmanActions({ saving, onSave }) {
       <Button
         variant="outline"
         onClick={() => navigate(createPageUrl('MeusEnsaios'))}
-        className="border-white/20 text-[#00233B]"
+
       >
         Cancelar
       </Button>
       <Button
         onClick={() => onSave(false)}
         disabled={saving}
-        className="bg-[#00233B] text-white hover:bg-[#00233B]/90"
+
       >
         {saving ? 'Salvando...' : 'Salvar Rascunho'}
       </Button>
       <Button
         onClick={() => onSave(true)}
         disabled={saving}
-        className="bg-[#566E3D] text-white hover:bg-[#566E3D]/90"
+
       >
         {saving ? 'Salvando...' : 'Finalizar'}
       </Button>

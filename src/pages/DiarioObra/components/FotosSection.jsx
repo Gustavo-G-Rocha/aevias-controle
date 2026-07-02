@@ -11,9 +11,9 @@ export default function FotosSection({ formData, handleFileChange, handleRemoveP
         <div>
           <Input id="fotos" type="file" multiple accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
             onChange={handleFileChange} disabled={loadingUpload} className="hidden" />
-          <Label htmlFor="fotos" className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm cursor-pointer hover:bg-slate-50 ${loadingUpload ? "opacity-50 cursor-not-allowed" : ""}`}>
-            <span className="truncate text-slate-500">{selectedFileNames}</span>
-            <span className="flex-shrink-0 ml-4 px-3 py-1 rounded-md text-sm font-semibold bg-blue-50 text-blue-700">
+          <Label htmlFor="fotos" className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm cursor-pointer hover:bg-muted ${loadingUpload ? "opacity-50 cursor-not-allowed" : ""}`}>
+            <span className="truncate text-muted-foreground">{selectedFileNames}</span>
+            <span className="flex-shrink-0 ml-4 px-3 py-1 rounded-md text-sm font-semibold bg-muted text-muted-foreground">
               {loadingUpload ? "Enviando..." : "Escolher Ficheiros"}
             </span>
           </Label>
@@ -21,7 +21,7 @@ export default function FotosSection({ formData, handleFileChange, handleRemoveP
       )}
       {loadingUpload && (
         <div className="space-y-2">
-          <p className="flex items-center gap-2 text-sm text-gray-500"><Loader2 className="w-4 h-4 animate-spin" /> Carregando fotos...</p>
+          <p className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin" /> Carregando fotos...</p>
           {uploadProgress.length > 0 && (
             <div className="text-xs space-y-1 mt-2">
               {uploadProgress.map((p) => (
@@ -32,7 +32,7 @@ export default function FotosSection({ formData, handleFileChange, handleRemoveP
                     {p.status === "success" && <CheckCircle className="w-3 h-3 text-green-500" />}
                     {p.status === "error" && <XCircle className="w-3 h-3 text-red-500" />}
                   </span>
-                  <span className={p.status === "error" ? "text-red-600" : "text-gray-600"}>
+                  <span className={p.status === "error" ? "text-red-600" : "text-muted-foreground"}>
                     {p.fileName} - {p.status === "pending" ? "Aguardando" : p.status === "uploading" ? "Enviando..." : p.status === "success" ? "Sucesso" : `Erro: ${p.error}`}
                   </span>
                 </div>
@@ -56,7 +56,7 @@ export default function FotosSection({ formData, handleFileChange, handleRemoveP
         ))}
       </div>
       {(!formData.fotos || formData.fotos.length === 0) && !loadingUpload && (
-        <p className="text-sm text-gray-500 mt-2">Nenhuma foto adicionada.</p>
+        <p className="text-sm text-muted-foreground mt-2">Nenhuma foto adicionada.</p>
       )}
     </div>
   );

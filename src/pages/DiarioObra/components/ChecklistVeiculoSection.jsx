@@ -50,8 +50,8 @@ export default function ChecklistVeiculoSection({ formData, handleChange, isEdit
   };
 
   return (
-    <Card className="bg-slate-50 text-slate-900">
-      <CardHeader><CardTitle className="text-lg text-slate-900">Checklist de Veículo</CardTitle></CardHeader>
+    <Card className="bg-card text-card-foreground">
+      <CardHeader><CardTitle className="text-lg">Checklist de Veículo</CardTitle></CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label>Preencher Checklist de Veículo?</Label>
@@ -65,7 +65,7 @@ export default function ChecklistVeiculoSection({ formData, handleChange, isEdit
         </div>
 
         {formData.checklist_veiculo_ativo && (
-          <div className="space-y-4 mt-4 p-4 border-2 border-blue-200 rounded-lg bg-white">
+          <div className="space-y-4 mt-4 p-4 border-2 border-border rounded-lg bg-background">
             {/* Dados básicos */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
@@ -129,7 +129,7 @@ export default function ChecklistVeiculoSection({ formData, handleChange, isEdit
 
             {/* Luzes */}
             {LUZES_GRUPOS.map(({ title, groupKey, side, items }) => (
-              <div key={title} className="border rounded p-3 bg-blue-50">
+              <div key={title} className="border rounded p-3 bg-muted/50">
                 <Label className="font-semibold text-sm mb-2 block">{title}</Label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {items.map(({ k, l }) => (

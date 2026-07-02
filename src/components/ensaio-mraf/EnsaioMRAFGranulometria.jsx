@@ -9,13 +9,13 @@ export default function EnsaioMRAFGranulometria({
   onPesoChange,
 }) {
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader>
         <CardTitle className="text-lg">Granulometria *</CardTitle>
         <CardDescription>DNIT 412/2025</CardDescription>
         {pesoInicial > 0 && (
-          <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
-            <p className="text-sm text-blue-800">
+          <div className="mt-2 p-2 bg-primary/10 border border-primary/20 rounded">
+            <p className="text-sm text-primary">
               <strong>Peso Inicial da Amostra (sem ligante):</strong> {pesoInicial} g
             </p>
           </div>

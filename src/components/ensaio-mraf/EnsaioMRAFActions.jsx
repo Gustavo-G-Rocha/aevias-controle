@@ -26,12 +26,12 @@ export default function EnsaioMRAFActions({
             variant="outline"
             onClick={onSaveProgress}
             disabled={saving || !obraId}
-            className="border-[#BFCF99] text-[#00233B] hover:bg-[#BFCF99]/10"
+
           >
             {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Salvar Progresso
           </Button>
-          <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={saving}>
+          <Button type="submit" disabled={saving}>
             {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
             Finalizar Registro
           </Button>

@@ -26,23 +26,23 @@ export default function BoletimSondagemCamadas({
   }));
 
   return (
-    <Card className="bg-black/5 border-[#00233B]/10">
+    <Card className="bg-muted/30 border-border">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-center flex-wrap gap-2">
-          <CardTitle className="text-base text-[#00233B]">Sondagem — Camadas</CardTitle>
+          <CardTitle className="text-base">Sondagem — Camadas</CardTitle>
           {isEditable && (
             <div className="flex gap-2">
               {!temColuna2 && (
-                <Button type="button" onClick={addColuna2} size="sm" variant="outline" className="border-[#00233B]/30 text-[#00233B] hover:bg-[#00233B]/10 text-xs">
+                <Button type="button" onClick={addColuna2} size="sm" variant="outline" className=" text-xs">
                   <Plus className="w-3.5 h-3.5 mr-1" /> 2ª Classificação
                 </Button>
               )}
               {temColuna2 && (
-                <Button type="button" onClick={removeColuna2} size="sm" variant="outline" className="border-red-300 text-red-600 hover:bg-red-50 text-xs">
+                <Button type="button" onClick={removeColuna2} size="sm" variant="outline" className="border-destructive/30 text-destructive hover:bg-destructive/10 text-xs">
                   <Trash2 className="w-3.5 h-3.5 mr-1" /> Remover 2ª Classificação
                 </Button>
               )}
-              <Button type="button" onClick={adicionarCamada} size="sm" className="bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90 text-xs" disabled={formData.camadas.length >= 15}>
+              <Button type="button" onClick={adicionarCamada} size="sm" className=" text-xs" disabled={formData.camadas.length >= 15}>
                 <Plus className="w-4 h-4 mr-1" /> Adicionar Camada
               </Button>
             </div>
@@ -59,7 +59,7 @@ export default function BoletimSondagemCamadas({
                 <Input value={formData.face_classificacao_1 || ''} onChange={e => setFormData(p => ({ ...p, face_classificacao_1: e.target.value }))} disabled={!isEditable} placeholder="Ex.: Pista, Acostamento, etc." className="h-9 text-sm" />
               </div>
             </div>
-            <div className="text-xs font-semibold text-[#00233B]/70 mb-2">Classificação 1</div>
+            <div className="text-xs font-semibold text-muted-foreground mb-2">Classificação 1</div>
             <table className="w-full text-sm border-collapse">
               <colgroup>
                 <col className="w-12" />
@@ -71,53 +71,53 @@ export default function BoletimSondagemCamadas({
                 {isEditable && <col className="w-10" />}
               </colgroup>
               <thead>
-                <tr className="bg-[#00233B]/10">
-                  <th className="border border-[#00233B]/20 px-2 py-2 text-center font-medium">Nº</th>
-                  <th className="border border-[#00233B]/20 px-2 py-2 text-center font-medium" colSpan={2}>PROF. (m)</th>
-                  <th className="border border-[#00233B]/20 px-2 py-2 text-center font-medium">ESP. (m)</th>
-                  <th className="border border-[#00233B]/20 px-2 py-2 text-center font-medium">N.A (m)</th>
-                  <th className="border border-[#00233B]/20 px-2 py-2 text-center font-medium">CLASSIFICAÇÃO</th>
-                  {isEditable && <th className="border border-[#00233B]/20 px-2 py-2"></th>}
+                <tr className="bg-primary/10">
+                  <th className="border border-border px-2 py-2 text-center font-medium">Nº</th>
+                  <th className="border border-border px-2 py-2 text-center font-medium" colSpan={2}>PROF. (m)</th>
+                  <th className="border border-border px-2 py-2 text-center font-medium">ESP. (m)</th>
+                  <th className="border border-border px-2 py-2 text-center font-medium">N.A (m)</th>
+                  <th className="border border-border px-2 py-2 text-center font-medium">CLASSIFICAÇÃO</th>
+                  {isEditable && <th className="border border-border px-2 py-2"></th>}
                 </tr>
-                <tr className="bg-[#00233B]/5">
-                  <th className="border border-[#00233B]/20 px-2 py-1"></th>
-                  <th className="border border-[#00233B]/20 px-2 py-1 text-center text-xs font-medium">DE</th>
-                  <th className="border border-[#00233B]/20 px-2 py-1 text-center text-xs font-medium">ATÉ</th>
-                  <th className="border border-[#00233B]/20 px-2 py-1"></th>
-                  <th className="border border-[#00233B]/20 px-2 py-1"></th>
-                  <th className="border border-[#00233B]/20 px-2 py-1"></th>
-                  {isEditable && <th className="border border-[#00233B]/20 px-2 py-1"></th>}
+                <tr className="bg-muted/30">
+                  <th className="border border-border px-2 py-1"></th>
+                  <th className="border border-border px-2 py-1 text-center text-xs font-medium">DE</th>
+                  <th className="border border-border px-2 py-1 text-center text-xs font-medium">ATÉ</th>
+                  <th className="border border-border px-2 py-1"></th>
+                  <th className="border border-border px-2 py-1"></th>
+                  <th className="border border-border px-2 py-1"></th>
+                  {isEditable && <th className="border border-border px-2 py-1"></th>}
                 </tr>
               </thead>
               <tbody>
                 {formData.camadas.map((camada, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white/30' : 'bg-white/10'}>
-                    <td className="border border-[#00233B]/20 px-2 py-1 text-center font-medium text-[#00233B]/70">{camada.numero}</td>
+                  <tr key={index} className={index % 2 === 0 ? 'bg-muted/20' : 'bg-muted/10'}>
+                    <td className="border border-border px-2 py-1 text-center font-medium text-muted-foreground">{camada.numero}</td>
                     {index === 0 ? (
-                      <td className="border border-[#00233B]/20 px-1 py-1">
-                        <Input type="number" step="0.01" value={camada.prof_de ?? ''} onChange={e => handleCamadaChange(0, 'prof_de', e.target.value !== '' ? parseFloat(e.target.value) : null)} disabled={!isEditable} className="h-8 text-xs text-center bg-white/50" placeholder="0,00" />
+                      <td className="border border-border px-1 py-1">
+                        <Input type="number" step="0.01" value={camada.prof_de ?? ''} onChange={e => handleCamadaChange(0, 'prof_de', e.target.value !== '' ? parseFloat(e.target.value) : null)} disabled={!isEditable} className="h-8 text-xs text-center bg-background" placeholder="0,00" />
                       </td>
                     ) : (
-                      <td className="border border-[#00233B]/20 px-1 py-1 bg-black/10 text-center text-xs font-medium text-[#00233B]/70">
+                      <td className="border border-border px-1 py-1 bg-muted/40 text-center text-xs font-medium text-muted-foreground">
                         {camada.prof_de !== null && camada.prof_de !== undefined ? camada.prof_de.toFixed(2) : '—'}
                       </td>
                     )}
-                    <td className="border border-[#00233B]/20 px-1 py-1">
-                      <Input type="number" step="0.01" value={camada.prof_ate ?? ''} onChange={e => handleCamadaChange(index, 'prof_ate', e.target.value !== '' ? parseFloat(e.target.value) : null)} disabled={!isEditable} className="h-8 text-xs text-center bg-white/50" placeholder="0,00" />
+                    <td className="border border-border px-1 py-1">
+                      <Input type="number" step="0.01" value={camada.prof_ate ?? ''} onChange={e => handleCamadaChange(index, 'prof_ate', e.target.value !== '' ? parseFloat(e.target.value) : null)} disabled={!isEditable} className="h-8 text-xs text-center bg-background" placeholder="0,00" />
                     </td>
-                    <td className="border border-[#00233B]/20 px-1 py-1 bg-black/10 text-center text-xs font-medium text-[#00233B]/70">
+                    <td className="border border-border px-1 py-1 bg-muted/40 text-center text-xs font-medium text-muted-foreground">
                       {camada.espessura !== null && camada.espessura !== undefined ? camada.espessura.toFixed(2) : ''}
                     </td>
-                    <td className="border border-[#00233B]/20 px-1 py-1">
-                      <Input type="number" step="0.01" value={camada.na ?? ''} onChange={e => handleCamadaChange(index, 'na', e.target.value !== '' ? parseFloat(e.target.value) : null)} disabled={!isEditable} className="h-8 text-xs text-center bg-white/50" />
+                    <td className="border border-border px-1 py-1">
+                      <Input type="number" step="0.01" value={camada.na ?? ''} onChange={e => handleCamadaChange(index, 'na', e.target.value !== '' ? parseFloat(e.target.value) : null)} disabled={!isEditable} className="h-8 text-xs text-center bg-background" />
                     </td>
-                    <td className="border border-[#00233B]/20 px-1 py-1">
-                      <Input value={camada.classificacao_1} onChange={e => handleCamadaChange(index, 'classificacao_1', e.target.value)} disabled={!isEditable} className="h-8 text-xs bg-white/50" placeholder="Escrever" />
+                    <td className="border border-border px-1 py-1">
+                      <Input value={camada.classificacao_1} onChange={e => handleCamadaChange(index, 'classificacao_1', e.target.value)} disabled={!isEditable} className="h-8 text-xs bg-background" placeholder="Escrever" />
                     </td>
                     {isEditable && (
-                      <td className="border border-[#00233B]/20 px-1 py-1 text-center">
+                      <td className="border border-border px-1 py-1 text-center">
                         {formData.camadas.length > 1 && (
-                          <button type="button" onClick={() => removerCamada(index)} className="text-red-400 hover:text-red-600">
+                          <button type="button" onClick={() => removerCamada(index)} className="text-destructive hover:text-destructive">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         )}
@@ -137,11 +137,11 @@ export default function BoletimSondagemCamadas({
                   <Label className="text-xs">Face da Sondagem - Classificação 2</Label>
                   <Input value={formData.face_classificacao_2 || ''} onChange={e => setFormData(p => ({ ...p, face_classificacao_2: e.target.value }))} disabled={!isEditable} placeholder="Ex.: Pista, Acostamento, etc." className="h-9 text-sm" />
                 </div>
-                <Button type="button" onClick={adicionarCamada2} size="sm" className="bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90 text-xs h-9" disabled={!isEditable || (formData.camadas_2?.length || 0) >= 15}>
+                <Button type="button" onClick={adicionarCamada2} size="sm" className=" text-xs h-9" disabled={!isEditable || (formData.camadas_2?.length || 0) >= 15}>
                   <Plus className="w-3.5 h-3.5 mr-1" /> Adicionar
                 </Button>
               </div>
-              <div className="text-xs font-semibold text-[#00233B]/70 mb-2">Classificação 2</div>
+              <div className="text-xs font-semibold text-muted-foreground mb-2">Classificação 2</div>
               <table className="w-full text-sm border-collapse">
                 <colgroup>
                   <col className="w-12" />
@@ -153,29 +153,29 @@ export default function BoletimSondagemCamadas({
                   {isEditable && <col className="w-10" />}
                 </colgroup>
                 <thead>
-                  <tr className="bg-[#00233B]/10">
-                    <th className="border border-[#00233B]/20 px-2 py-2 text-center font-medium">Nº</th>
-                    <th className="border border-[#00233B]/20 px-2 py-2 text-center font-medium" colSpan={2}>PROF. (m)</th>
-                    <th className="border border-[#00233B]/20 px-2 py-2 text-center font-medium">ESP. (m)</th>
-                    <th className="border border-[#00233B]/20 px-2 py-2 text-center font-medium">N.A (m)</th>
-                    <th className="border border-[#00233B]/20 px-2 py-2 text-center font-medium">CLASSIFICAÇÃO</th>
-                    {isEditable && <th className="border border-[#00233B]/20 px-2 py-2"></th>}
+                  <tr className="bg-primary/10">
+                    <th className="border border-border px-2 py-2 text-center font-medium">Nº</th>
+                    <th className="border border-border px-2 py-2 text-center font-medium" colSpan={2}>PROF. (m)</th>
+                    <th className="border border-border px-2 py-2 text-center font-medium">ESP. (m)</th>
+                    <th className="border border-border px-2 py-2 text-center font-medium">N.A (m)</th>
+                    <th className="border border-border px-2 py-2 text-center font-medium">CLASSIFICAÇÃO</th>
+                    {isEditable && <th className="border border-border px-2 py-2"></th>}
                   </tr>
-                  <tr className="bg-[#00233B]/5">
-                    <th className="border border-[#00233B]/20 px-2 py-1"></th>
-                    <th className="border border-[#00233B]/20 px-2 py-1 text-center text-xs font-medium">DE</th>
-                    <th className="border border-[#00233B]/20 px-2 py-1 text-center text-xs font-medium">ATÉ</th>
-                    <th className="border border-[#00233B]/20 px-2 py-1"></th>
-                    <th className="border border-[#00233B]/20 px-2 py-1"></th>
-                    <th className="border border-[#00233B]/20 px-2 py-1"></th>
-                    {isEditable && <th className="border border-[#00233B]/20 px-2 py-1"></th>}
+                  <tr className="bg-muted/30">
+                    <th className="border border-border px-2 py-1"></th>
+                    <th className="border border-border px-2 py-1 text-center text-xs font-medium">DE</th>
+                    <th className="border border-border px-2 py-1 text-center text-xs font-medium">ATÉ</th>
+                    <th className="border border-border px-2 py-1"></th>
+                    <th className="border border-border px-2 py-1"></th>
+                    <th className="border border-border px-2 py-1"></th>
+                    {isEditable && <th className="border border-border px-2 py-1"></th>}
                   </tr>
                 </thead>
                 <tbody>
                   {(formData.camadas_2 || []).map((camada, index) => (
-                    <tr key={index} className={index % 2 === 0 ? 'bg-white/30' : 'bg-white/10'}>
-                      <td className="border border-[#00233B]/20 px-2 py-1 text-center font-medium text-[#00233B]/70">{camada.numero}</td>
-                      <td className="border border-[#00233B]/20 px-1 py-1">
+                    <tr key={index} className={index % 2 === 0 ? 'bg-muted/20' : 'bg-muted/10'}>
+                      <td className="border border-border px-2 py-1 text-center font-medium text-muted-foreground">{camada.numero}</td>
+                      <td className="border border-border px-1 py-1">
                         <Input type="number" step="0.01" value={camada.prof_de ?? ''} onChange={e => {
                           const newVal = e.target.value !== '' ? parseFloat(e.target.value) : null;
                           setFormData(prev => {
@@ -186,9 +186,9 @@ export default function BoletimSondagemCamadas({
                             }
                             return { ...prev, camadas_2: c2 };
                           });
-                        }} disabled={!isEditable} className="h-8 text-xs text-center bg-white/50" placeholder="0,00" />
+                        }} disabled={!isEditable} className="h-8 text-xs text-center bg-background" placeholder="0,00" />
                       </td>
-                      <td className="border border-[#00233B]/20 px-1 py-1">
+                      <td className="border border-border px-1 py-1">
                         <Input type="number" step="0.01" value={camada.prof_ate ?? ''} onChange={e => {
                           const newVal = e.target.value !== '' ? parseFloat(e.target.value) : null;
                           setFormData(prev => {
@@ -202,12 +202,12 @@ export default function BoletimSondagemCamadas({
                             }
                             return { ...prev, camadas_2: c2 };
                           });
-                        }} disabled={!isEditable} className="h-8 text-xs text-center bg-white/50" placeholder="0,00" />
+                        }} disabled={!isEditable} className="h-8 text-xs text-center bg-background" placeholder="0,00" />
                       </td>
-                      <td className="border border-[#00233B]/20 px-2 py-1 text-center text-xs font-medium text-[#00233B]/70 bg-black/10">
+                      <td className="border border-border px-2 py-1 text-center text-xs font-medium text-muted-foreground bg-muted/40">
                         {camada.espessura !== null && camada.espessura !== undefined ? camada.espessura.toFixed(2) : ''}
                       </td>
-                      <td className="border border-[#00233B]/20 px-1 py-1">
+                      <td className="border border-border px-1 py-1">
                         <Input type="number" step="0.01" value={camada.na ?? ''} onChange={e => {
                           const newVal = e.target.value !== '' ? parseFloat(e.target.value) : null;
                           setFormData(prev => {
@@ -215,20 +215,20 @@ export default function BoletimSondagemCamadas({
                             c2[index] = { ...c2[index], na: newVal };
                             return { ...prev, camadas_2: c2 };
                           });
-                        }} disabled={!isEditable} className="h-8 text-xs text-center bg-white/50" />
+                        }} disabled={!isEditable} className="h-8 text-xs text-center bg-background" />
                       </td>
-                      <td className="border border-[#00233B]/20 px-1 py-1">
+                      <td className="border border-border px-1 py-1">
                         <Input value={camada.classificacao_2 ?? ''} onChange={e => {
                           setFormData(prev => {
                             const c2 = [...(prev.camadas_2 || [])];
                             c2[index] = { ...c2[index], classificacao_2: e.target.value };
                             return { ...prev, camadas_2: c2 };
                           });
-                        }} disabled={!isEditable} className="h-8 text-xs bg-white/50" placeholder="Escrever" />
+                        }} disabled={!isEditable} className="h-8 text-xs bg-background" placeholder="Escrever" />
                       </td>
                       {isEditable && (
-                        <td className="border border-[#00233B]/20 px-1 py-1 text-center">
-                          <button type="button" onClick={() => removerCamada2(index)} className="text-red-400 hover:text-red-600">
+                        <td className="border border-border px-1 py-1 text-center">
+                          <button type="button" onClick={() => removerCamada2(index)} className="text-destructive hover:text-destructive">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </td>

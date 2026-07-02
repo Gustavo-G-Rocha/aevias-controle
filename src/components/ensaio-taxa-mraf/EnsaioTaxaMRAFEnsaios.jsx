@@ -17,12 +17,12 @@ export default function EnsaioTaxaMRAFEnsaios({
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-[#00233B]">Execução dos Ensaios (máx. 3)</h3>
+        <h3 className="text-lg font-semibold text-foreground">Execução dos Ensaios (máx. 3)</h3>
         {isEditable && (
           <Button
             type="button"
             onClick={onAdicionarEnsaio}
-            className="bg-[#00233B] text-[#F2F1EF]"
+            
             disabled={ensaios.length >= 3}
           >
             <Plus className="w-4 h-4 mr-2" /> Adicionar Bandeja
@@ -31,7 +31,7 @@ export default function EnsaioTaxaMRAFEnsaios({
       </div>
 
       {ensaios.map((ensaio, index) => (
-        <Card key={index} className="mb-4 bg-black/5">
+        <Card key={index} className="mb-4 bg-muted/30">
           <CardHeader className="pb-3">
             <div className="flex justify-between items-center">
               <CardTitle className="text-base">Bandeja {ensaio.numero}</CardTitle>
@@ -41,7 +41,7 @@ export default function EnsaioTaxaMRAFEnsaios({
                   variant="ghost"
                   size="sm"
                   onClick={() => onRemoverEnsaio(index)}
-                  className="text-red-500 hover:text-red-700"
+                  className="text-red-500 hover:text-destructive"
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -58,7 +58,7 @@ export default function EnsaioTaxaMRAFEnsaios({
                   onChange={e => onEnsaioChange(index, 'estaca', e.target.value)}
                   disabled={!isEditable}
                   placeholder="Ex: E-245"
-                  className="bg-white"
+                  className="bg-background"
                 />
               </div>
               <div>
@@ -68,7 +68,7 @@ export default function EnsaioTaxaMRAFEnsaios({
                   onChange={e => onEnsaioChange(index, 'posicao', e.target.value)}
                   disabled={!isEditable}
                   placeholder="Ex: Faixa 1"
-                  className="bg-white"
+                  className="bg-background"
                 />
               </div>
             </div>
@@ -84,7 +84,7 @@ export default function EnsaioTaxaMRAFEnsaios({
                   value={ensaio.peso_bandeja_amostra ?? ''}
                   onChange={e => onEnsaioChange(index, 'peso_bandeja_amostra', e.target.value ? parseFloat(e.target.value) : null)}
                   disabled={!isEditable}
-                  className="bg-white"
+                  className="bg-background"
                 />
               </div>
               <div>
@@ -95,12 +95,12 @@ export default function EnsaioTaxaMRAFEnsaios({
                   value={ensaio.peso_bandeja ?? ''}
                   onChange={e => onEnsaioChange(index, 'peso_bandeja', e.target.value ? parseFloat(e.target.value) : null)}
                   disabled={!isEditable}
-                  className="bg-white"
+                  className="bg-background"
                 />
               </div>
               <div>
-                <Label>Pₐ - Peso da Amostra (g) <span className="text-slate-500 text-xs">(calculado)</span></Label>
-                <Input value={formatarPeso(ensaio.peso_amostra)} readOnly className="bg-slate-200" />
+                <Label>Pₐ - Peso da Amostra (g) <span className="text-muted-foreground text-xs">(calculado)</span></Label>
+                <Input value={formatarPeso(ensaio.peso_amostra)} readOnly className="bg-muted" />
               </div>
             </div>
 
@@ -108,14 +108,14 @@ export default function EnsaioTaxaMRAFEnsaios({
             <h4 className="font-semibold text-sm">Parâmetros de Extração</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label>L - Teor de Ligante (%) <span className="text-slate-500 text-xs">(ensaio extração)</span></Label>
+                <Label>L - Teor de Ligante (%) <span className="text-muted-foreground text-xs">(ensaio extração)</span></Label>
                 <Input
                   type="number"
                   step="0.01"
                   value={ensaio.teor_ligante ?? ''}
                   onChange={e => onEnsaioChange(index, 'teor_ligante', e.target.value ? parseFloat(e.target.value) : null)}
                   disabled={!isEditable}
-                  className="bg-white"
+                  className="bg-background"
                 />
               </div>
               <div>
@@ -126,7 +126,7 @@ export default function EnsaioTaxaMRAFEnsaios({
                   value={ensaio.residuo_emulsao ?? ''}
                   onChange={e => onEnsaioChange(index, 'residuo_emulsao', e.target.value ? parseFloat(e.target.value) : null)}
                   disabled={!isEditable}
-                  className="bg-white"
+                  className="bg-background"
                 />
               </div>
             </div>
@@ -148,22 +148,22 @@ function EnsaioResultados({ ensaio, taxaMinima }) {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t">
-      <div className={`p-3 rounded ${naoConforme ? 'bg-red-200 border border-red-400' : 'bg-blue-200'}`}>
-        <Label className={`text-xs ${naoConforme ? 'text-red-800' : 'text-blue-800'}`}>Tₓ - Taxa MRAF Aplicada (kg/m²)</Label>
-        <p className={`text-lg font-bold ${naoConforme ? 'text-red-900' : 'text-blue-900'}`}>{formatarTaxa(ensaio.taxa_mraf_aplicada)}</p>
-        {naoConforme && <p className="text-xs font-bold text-red-700 mt-1">⚠ NÃO CONFORME (mín: {taxaMinima})</p>}
+      <div className={`p-3 rounded ${naoConforme ? 'bg-destructive/20 border border-destructive/40' : 'bg-muted/50'}`}>
+        <Label className={`text-xs ${naoConforme ? 'text-destructive' : 'text-muted-foreground'}`}>Tₓ - Taxa MRAF Aplicada (kg/m²)</Label>
+        <p className={`text-lg font-bold ${naoConforme ? 'text-destructive' : 'text-foreground'}`}>{formatarTaxa(ensaio.taxa_mraf_aplicada)}</p>
+        {naoConforme && <p className="text-xs font-bold text-destructive mt-1">⚠ NÃO CONFORME (mín: {taxaMinima})</p>}
       </div>
-      <div className="p-3 bg-blue-200 rounded">
-        <Label className="text-xs text-blue-800">T_L - Taxa de Ligante (L/m²)</Label>
-        <p className="text-lg font-bold text-blue-900">{formatarTaxa(ensaio.taxa_ligante)}</p>
+      <div className="p-3 bg-muted/50 rounded">
+        <Label className="text-xs text-muted-foreground">T_L - Taxa de Ligante (L/m²)</Label>
+        <p className="text-lg font-bold text-foreground">{formatarTaxa(ensaio.taxa_ligante)}</p>
       </div>
-      <div className="p-3 bg-green-200 rounded">
-        <Label className="text-xs text-green-800">T_E - Taxa de Emulsão (L/m²)</Label>
-        <p className="text-lg font-bold text-green-900">{formatarTaxa(ensaio.taxa_emulsao)}</p>
+      <div className="p-3 bg-muted/50 rounded">
+        <Label className="text-xs text-muted-foreground">T_E - Taxa de Emulsão (L/m²)</Label>
+        <p className="text-lg font-bold text-foreground">{formatarTaxa(ensaio.taxa_emulsao)}</p>
       </div>
-      <div className="p-3 bg-green-200 rounded">
-        <Label className="text-xs text-green-800">T_A - Taxa de Agregado (kg/m²)</Label>
-        <p className="text-lg font-bold text-green-900">{formatarTaxa(ensaio.taxa_agregado)}</p>
+      <div className="p-3 bg-muted/50 rounded">
+        <Label className="text-xs text-muted-foreground">T_A - Taxa de Agregado (kg/m²)</Label>
+        <p className="text-lg font-bold text-foreground">{formatarTaxa(ensaio.taxa_agregado)}</p>
       </div>
     </div>
   );

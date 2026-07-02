@@ -39,7 +39,7 @@ export default function SecaoLaboratorio({ formData, onNestedChange, disabled })
     const possuiKey = `${key}_possui`;
     const qtdeKey = `${key}_quantidade`;
     return (
-      <tr key={key} className="border-b border-slate-200 hover:bg-slate-50/50">
+      <tr key={key} className="border-b border-slate-200 hover:bg-muted/30/50">
         <td className="py-2 px-3 text-sm text-slate-700">{label}</td>
         <td className="py-2 px-3">
           <div className="flex items-center gap-4">

@@ -16,12 +16,12 @@ export default function RodadasProducaoSection({
   const canEdit = isEditable && !isApproved;
 
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg">Acompanhamento da Produção</CardTitle>
           {canEdit && rodadas.length < 4 && (
-            <Button type="button" onClick={onAdicionarRodada} className="bg-green-600 hover:bg-green-700">
+            <Button type="button" onClick={onAdicionarRodada}>
               <Plus className="w-4 h-4 mr-2" /> Adicionar Rodada
             </Button>
           )}

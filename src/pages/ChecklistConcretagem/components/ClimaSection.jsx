@@ -13,7 +13,7 @@ export default function ClimaSection({ periodos, onChange }) {
   };
 
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader><CardTitle className="text-lg">Condições Climáticas</CardTitle></CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

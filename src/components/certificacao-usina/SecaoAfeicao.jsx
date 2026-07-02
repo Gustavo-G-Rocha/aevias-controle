@@ -7,7 +7,7 @@ import { PENEIRAS_GRANULOMETRIA } from "@/utils/certificacaoUsinaUtils";
 // Célula readonly (calculada)
 function ReadCell({ value }) {
   return (
-    <td className="border border-slate-300 px-2 py-1 text-xs text-center bg-slate-50 text-slate-500">
+    <td className="border border-border px-2 py-1 text-xs text-center bg-muted/30 text-muted-foreground">
       {value != null ? value : ""}
     </td>
   );
@@ -19,24 +19,24 @@ function EnsaioTable({ title, rows, onRowChange, disabled, showPeneira = false }
 
   return (
     <div>
-      <h4 className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1">{title}</h4>
-      <table className="w-full border border-slate-300 text-xs">
+      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">{title}</h4>
+      <table className="w-full border border-border text-xs">
         <thead>
-          <tr className="bg-slate-100">
-            {showPeneira && <th className="border border-slate-300 px-2 py-1">Peneira</th>}
-            <th className="border border-slate-300 px-2 py-1">Projeto</th>
-            <th className="border border-slate-300 px-2 py-1">Obtido</th>
-            <th className="border border-slate-300 px-2 py-1">Erro (%)</th>
+          <tr className="bg-muted">
+            {showPeneira && <th className="border border-border px-2 py-1">Peneira</th>}
+            <th className="border border-border px-2 py-1">Projeto</th>
+            <th className="border border-border px-2 py-1">Obtido</th>
+            <th className="border border-border px-2 py-1">Erro (%)</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row, i) => (
             <tr key={i} className="hover:bg-slate-50">
               {showPeneira && (
-                <td className="border border-slate-300 px-2 py-1 font-medium">{row.peneira}</td>
+                <td className="border border-border px-2 py-1 font-medium">{row.peneira}</td>
               )}
               <ReadCell value={row.projeto} />
-              <td className="border border-slate-300 p-0.5">
+              <td className="border border-border p-0.5">
                 <input
                   type="text"
                   inputMode="decimal"
@@ -57,11 +57,11 @@ function EnsaioTable({ title, rows, onRowChange, disabled, showPeneira = false }
         </tbody>
         {!showPeneira && (
           <tfoot>
-            <tr className="bg-slate-100">
-              <td colSpan={3} className="border border-slate-300 px-2 py-1 text-xs font-semibold text-right text-slate-600">
+            <tr className="bg-muted">
+              <td colSpan={3} className="border border-border px-2 py-1 text-xs font-semibold text-right text-muted-foreground">
                 Desvio Padrão Amostral:
               </td>
-              <td className="border border-slate-300 px-2 py-1 text-xs text-center font-semibold text-slate-700">
+              <td className="border border-border px-2 py-1 text-xs text-center font-semibold text-slate-700">
                 {dpValue != null ? dpValue.toFixed(3) : "—"}
               </td>
             </tr>
@@ -109,7 +109,7 @@ export default function SecaoAfeicao({
 
   return (
     <div className="space-y-4">
-      <h3 className="font-bold text-[#00233B] text-sm bg-slate-100 px-3 py-2 rounded">
+      <h3 className="font-bold text-[#00233B] text-sm bg-muted px-3 py-2 rounded">
         7.2 AFERIÇÃO, REPETIBILIDADE E REPRODUTIBILIDADE
       </h3>
 
@@ -117,18 +117,18 @@ export default function SecaoAfeicao({
         <div className="space-y-2 p-3 border border-slate-200 rounded">
           <h4 className="text-sm font-semibold text-slate-700">Repetibilidade</h4>
           <div className="flex items-center gap-2">
-            <Label className="text-xs text-slate-500 w-36">Desvio padrão obtido:</Label>
+            <Label className="text-xs text-muted-foreground w-36">Desvio padrão obtido:</Label>
             <input
               type="number"
               step="0.0001"
               value={afeicao.repetibilidade_desvio_padrao ?? ""}
               onChange={(e) => onNestedChange("afeicao.repetibilidade_desvio_padrao", e.target.value ? parseFloat(e.target.value) : null)}
               disabled={disabled}
-              className="h-7 text-xs w-24 border border-slate-300 rounded px-2"
+              className="h-7 text-xs w-24 border border-border rounded px-2"
             />
           </div>
           <div className="flex items-center gap-2">
-            <Label className="text-xs text-slate-500 w-36">Satisfatório?</Label>
+            <Label className="text-xs text-muted-foreground w-36">Satisfatório?</Label>
             <ConformeField
               value={afeicao.repetibilidade_satisfatorio}
               onChange={(v) => onNestedChange("afeicao.repetibilidade_satisfatorio", v)}
@@ -141,18 +141,18 @@ export default function SecaoAfeicao({
         <div className="space-y-2 p-3 border border-slate-200 rounded">
           <h4 className="text-sm font-semibold text-slate-700">Reprodutibilidade</h4>
           <div className="flex items-center gap-2">
-            <Label className="text-xs text-slate-500 w-36">Desvio padrão obtido:</Label>
+            <Label className="text-xs text-muted-foreground w-36">Desvio padrão obtido:</Label>
             <input
               type="number"
               step="0.0001"
               value={afeicao.reprodutibilidade_desvio_padrao ?? ""}
               onChange={(e) => onNestedChange("afeicao.reprodutibilidade_desvio_padrao", e.target.value ? parseFloat(e.target.value) : null)}
               disabled={disabled}
-              className="h-7 text-xs w-24 border border-slate-300 rounded px-2"
+              className="h-7 text-xs w-24 border border-border rounded px-2"
             />
           </div>
           <div className="flex items-center gap-2">
-            <Label className="text-xs text-slate-500 w-36">Satisfatório?</Label>
+            <Label className="text-xs text-muted-foreground w-36">Satisfatório?</Label>
             <ConformeField
               value={afeicao.reprodutibilidade_satisfatorio}
               onChange={(v) => onNestedChange("afeicao.reprodutibilidade_satisfatorio", v)}

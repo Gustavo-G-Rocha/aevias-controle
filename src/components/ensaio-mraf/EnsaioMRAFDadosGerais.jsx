@@ -12,7 +12,7 @@ export default function EnsaioMRAFDadosGerais({
   editingEnsaio, regionalSelecionada,
 }) {
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg">Dados da Obra</CardTitle>
       </CardHeader>
@@ -26,7 +26,7 @@ export default function EnsaioMRAFDadosGerais({
               onChange={(e) => handleChange('obra_id', e.target.value)}
               required
               disabled={!isEditable || isApproved || editingEnsaio?.id}
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
             >
               <option value="">Selecione a obra</option>
               {obras.map(obra => {
@@ -47,7 +47,7 @@ export default function EnsaioMRAFDadosGerais({
               value={formData.project_id}
               onChange={(e) => handleProjectChange(e.target.value)}
               disabled={!isEditable || isApproved || !formData.obra_id}
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
             >
               <option value="">Selecione um projeto</option>
               {projetosMRAF.map(proj => (
@@ -110,7 +110,7 @@ export default function EnsaioMRAFDadosGerais({
                 value={formData.rodovia}
                 onChange={(e) => handleChange('rodovia', e.target.value)}
                 disabled={!isEditable || isApproved}
-                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
               >
                 <option value="">Selecione a rodovia</option>
                 {rodoviasDisponiveis.map((rodovia, idx) => (
@@ -190,7 +190,7 @@ export default function EnsaioMRAFDadosGerais({
               value={formData.ensaio_realizado_por}
               onChange={(e) => handleChange('ensaio_realizado_por', e.target.value)}
               disabled={!isEditable || isApproved}
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
             >
               <option value="Afirma Evias">Afirma Evias</option>
               <option value="Empreiteira">Empreiteira</option>

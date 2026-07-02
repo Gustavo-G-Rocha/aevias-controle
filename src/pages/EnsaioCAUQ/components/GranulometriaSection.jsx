@@ -21,12 +21,12 @@ export default function GranulometriaSection({
   const pesoInicial = formData.extracao_ligante?.amostra_sem_ligante || 0;
 
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader>
         <CardTitle className="text-lg">Granulometria *</CardTitle>
         <CardDescription>DNIT 412/2025</CardDescription>
         {pesoInicial > 0 && (
-          <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+          <div className="mt-2 p-2 bg-primary/10 border border-primary/20 rounded text-sm text-primary">
             <strong>Peso Inicial da Amostra (sem ligante):</strong> {pesoInicial} g
           </div>
         )}

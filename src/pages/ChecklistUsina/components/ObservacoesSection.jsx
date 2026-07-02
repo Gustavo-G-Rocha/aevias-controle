@@ -27,7 +27,7 @@ export default function ObservacoesSection({
           onChange={(e) => onObservacoesChange(e.target.value)}
           disabled={!canEdit} rows={3}
           placeholder="Observações sobre o checklist..." maxLength="500" />
-        <p className="text-xs text-right text-slate-500 mt-1">{formData.observacoes?.length || 0} / 500</p>
+        <p className="text-xs text-right text-muted-foreground mt-1">{formData.observacoes?.length || 0} / 500</p>
       </div>
 
       <AcoesCorretivasNC

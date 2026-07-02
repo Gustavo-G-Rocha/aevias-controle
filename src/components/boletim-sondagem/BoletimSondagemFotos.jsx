@@ -10,9 +10,9 @@ export default function BoletimSondagemFotos({ fotos, isEditable, uploadingPhoto
       {isEditable && (
         <div className="mt-2">
           <input id="fotos-upload" type="file" multiple accept="image/*" onChange={onUpload} disabled={uploadingPhoto} className="hidden" />
-          <label htmlFor="fotos-upload" className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-[#00233B]/20 bg-white/30 rounded-md text-sm cursor-pointer hover:bg-white/50 ${uploadingPhoto ? 'opacity-50 cursor-not-allowed' : ''}`}>
-            <span className="text-[#00233B]/60">{uploadingPhoto ? 'Enviando...' : 'Selecionar fotos'}</span>
-            <span className="px-3 py-1 rounded-md text-sm font-semibold bg-[#00233B]/10 text-[#00233B] hover:bg-[#00233B]/20">
+          <label htmlFor="fotos-upload" className={`flex items-center justify-between w-full h-10 px-3 py-2 border border-border bg-muted/20 rounded-md text-sm cursor-pointer hover:bg-white/50 ${uploadingPhoto ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            <span className="text-muted-foreground/70">{uploadingPhoto ? 'Enviando...' : 'Selecionar fotos'}</span>
+            <span className="px-3 py-1 rounded-md text-sm font-semibold bg-muted text-muted-foreground hover:bg-muted/70">
               {uploadingPhoto ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Escolher Ficheiros'}
             </span>
           </label>
@@ -24,7 +24,7 @@ export default function BoletimSondagemFotos({ fotos, isEditable, uploadingPhoto
             <div key={index} className="relative group">
               <picture>
                 <source srcSet={url} />
-                <img src={url} alt={`Foto ${index + 1}`} className="w-full h-32 object-cover rounded-md border border-[#00233B]/20" width="auto" height="128" />
+                <img src={url} alt={`Foto ${index + 1}`} className="w-full h-32 object-cover rounded-md border border-border" width="auto" height="128" />
               </picture>
               {isEditable && (
                 <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => onRemove(index)}>

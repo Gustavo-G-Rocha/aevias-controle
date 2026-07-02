@@ -11,17 +11,17 @@ export default function GranuMisturaActions({ isEditable, isApproved, saving, ha
       <Button type="button" variant="outline" onClick={() => navigate(createPageUrl("MeusEnsaios"))}>Cancelar</Button>
       {isEditable && (
         <>
-          <Button type="button" variant="outline" onClick={e => handleSubmit(e, "rascunho")} disabled={saving} className="border-blue-400 text-blue-600 hover:bg-blue-50">
+          <Button type="button" variant="outline" onClick={e => handleSubmit(e, "rascunho")} disabled={saving}>
             <Save className="mr-2 h-4 w-4" /> Salvar Progresso
           </Button>
-          <Button type="button" onClick={e => handleSubmit(e, "finalizado")} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
+          <Button type="button" onClick={e => handleSubmit(e, "finalizado")} disabled={saving}>
             {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
             Finalizar Registro
           </Button>
         </>
       )}
       {isApproved && (
-        <span className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-md font-medium">
+        <span className="inline-flex items-center gap-2 bg-secondary/20 text-secondary px-4 py-2 rounded-md font-medium">
           <CheckCircle className="w-4 h-4" /> Aprovado
         </span>
       )}

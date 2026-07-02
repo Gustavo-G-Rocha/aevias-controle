@@ -13,7 +13,7 @@ function ViscosidadeRow({ num, ligante, canEdit, onNestedChange, stripedClass })
   const prefix = `viscosidade_${num}`;
   return (
     <tr className={stripedClass}>
-      <td className="border border-slate-300 px-3 py-2">
+      <td className="border border-border px-3 py-2">
         <div className="flex items-center gap-1 flex-wrap">
           <span>Viscosidade Brookfield a</span>
           <Input type="text" value={ligante?.[`${prefix}_temp`] || ''}
@@ -30,21 +30,21 @@ function ViscosidadeRow({ num, ligante, canEdit, onNestedChange, stripedClass })
           <span>rpm]</span>
         </div>
       </td>
-      <td className="border border-slate-300 px-3 py-2 text-center text-xs">cP</td>
-      <td className="border border-slate-300 px-3 py-2">
+      <td className="border border-border px-3 py-2 text-center text-xs">cP</td>
+      <td className="border border-border px-3 py-2">
         <Input type="number" step="0.1" value={ligante?.[`${prefix}_resultado`] || ''}
           onChange={(e) => onNestedChange('controle_ligante', `${prefix}_resultado`, e.target.value ? parseFloat(e.target.value) : null)}
           disabled={!canEdit} className="h-8 text-sm" />
       </td>
-      <td className="border border-slate-300 px-3 py-2">
+      <td className="border border-border px-3 py-2">
         <Input type="text" value={ligante?.[`${prefix}_limite`] || ''}
           onChange={(e) => onNestedChange('controle_ligante', `${prefix}_limite`, e.target.value)}
           disabled={!canEdit} className="h-8 text-sm text-center" />
       </td>
-      <td className="border border-slate-300 px-3 py-2 text-xs text-center">
+      <td className="border border-border px-3 py-2 text-xs text-center">
         {num === 2 ? 'ABNT NBR - 15529' : 'ABNT NBR - 15184'}
       </td>
-      <td className="border border-slate-300 px-3 py-2 text-center">
+      <td className="border border-border px-3 py-2 text-center">
         <input type="checkbox" checked={ligante?.[`${prefix}_conforme`] || false}
           onChange={(e) => onNestedChange('controle_ligante', `${prefix}_conforme`, e.target.checked)}
           disabled={!canEdit} className="w-5 h-5" />
@@ -106,34 +106,34 @@ export default function ControleLiganteSection({ formData, isEditable, isApprove
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-slate-100">
-                    <th className="border border-slate-300 px-3 py-2 text-left font-semibold">Ensaio</th>
-                    <th className="border border-slate-300 px-3 py-2 text-center font-semibold">Unidade</th>
-                    <th className="border border-slate-300 px-3 py-2 text-center font-semibold">Resultado</th>
-                    <th className="border border-slate-300 px-3 py-2 text-center font-semibold">Limite Esp.</th>
-                    <th className="border border-slate-300 px-3 py-2 text-center font-semibold">Especificação</th>
-                    <th className="border border-slate-300 px-3 py-2 text-center font-semibold">Conformidade</th>
+                    <th className="border border-border px-3 py-2 text-left font-semibold">Ensaio</th>
+                    <th className="border border-border px-3 py-2 text-center font-semibold">Unidade</th>
+                    <th className="border border-border px-3 py-2 text-center font-semibold">Resultado</th>
+                    <th className="border border-border px-3 py-2 text-center font-semibold">Limite Esp.</th>
+                    <th className="border border-border px-3 py-2 text-center font-semibold">Especificação</th>
+                    <th className="border border-border px-3 py-2 text-center font-semibold">Conformidade</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <ViscosidadeRow num={1} ligante={ligante} canEdit={canEdit} onNestedChange={onNestedChange} stripedClass="bg-slate-50" />
+                  <ViscosidadeRow num={1} ligante={ligante} canEdit={canEdit} onNestedChange={onNestedChange} stripedClass="bg-muted/30" />
                   <ViscosidadeRow num={2} ligante={ligante} canEdit={canEdit} onNestedChange={onNestedChange} stripedClass="" />
-                  <ViscosidadeRow num={3} ligante={ligante} canEdit={canEdit} onNestedChange={onNestedChange} stripedClass="bg-slate-50" />
+                  <ViscosidadeRow num={3} ligante={ligante} canEdit={canEdit} onNestedChange={onNestedChange} stripedClass="bg-muted/30" />
                   {ENSAIOS_LIGANTE.map((ensaio, idx) => (
-                    <tr key={ensaio.key} className={idx % 2 === 1 ? 'bg-slate-50' : ''}>
-                      <td className="border border-slate-300 px-3 py-2">{ensaio.label}</td>
-                      <td className="border border-slate-300 px-3 py-2 text-center text-xs">{ensaio.unidade}</td>
-                      <td className="border border-slate-300 px-3 py-2">
+                    <tr key={ensaio.key} className={idx % 2 === 1 ? 'bg-muted/30' : ''}>
+                      <td className="border border-border px-3 py-2">{ensaio.label}</td>
+                      <td className="border border-border px-3 py-2 text-center text-xs">{ensaio.unidade}</td>
+                      <td className="border border-border px-3 py-2">
                         <Input type="number" step="0.1" value={ligante?.[`${ensaio.key}_resultado`] || ''}
                           onChange={(e) => onNestedChange('controle_ligante', `${ensaio.key}_resultado`, e.target.value ? parseFloat(e.target.value) : null)}
                           disabled={!canEdit} className="h-8 text-sm" />
                       </td>
-                      <td className="border border-slate-300 px-3 py-2">
+                      <td className="border border-border px-3 py-2">
                         <Input type="text" value={ligante?.[`${ensaio.key}_limite`] || ''}
                           onChange={(e) => onNestedChange('controle_ligante', `${ensaio.key}_limite`, e.target.value)}
                           disabled={!canEdit} className="h-8 text-sm text-center" />
                       </td>
-                      <td className="border border-slate-300 px-3 py-2 text-xs text-center">{ensaio.spec}</td>
-                      <td className="border border-slate-300 px-3 py-2 text-center">
+                      <td className="border border-border px-3 py-2 text-xs text-center">{ensaio.spec}</td>
+                      <td className="border border-border px-3 py-2 text-center">
                         <input type="checkbox" checked={ligante?.[`${ensaio.key}_conforme`] || false}
                           onChange={(e) => onNestedChange('controle_ligante', `${ensaio.key}_conforme`, e.target.checked)}
                           disabled={!canEdit} className="w-5 h-5" />

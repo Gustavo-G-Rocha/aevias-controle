@@ -11,7 +11,7 @@ export default function GranuMisturaDadosObra({
   handleChange,
 }) {
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader><CardTitle className="text-base">Dados da Obra</CardTitle></CardHeader>
       <CardContent>
         <div className="grid grid-cols-3 gap-6">
@@ -19,7 +19,7 @@ export default function GranuMisturaDadosObra({
           <div className="space-y-4">
             <div>
               <Label className="text-xs font-bold">CLIENTE</Label>
-              <Input value={regionalSelecionada?.cliente || ""} disabled className="bg-gray-50 text-xs mt-1" />
+              <Input value={regionalSelecionada?.cliente || ""} disabled className="bg-muted text-xs mt-1" />
             </div>
             <div>
               <Label className="text-xs font-bold">DATA DO ENSAIO *</Label>
@@ -108,7 +108,7 @@ export default function GranuMisturaDadosObra({
             </div>
             <div>
               <Label className="text-xs font-bold">LABORATORISTA</Label>
-              <Input value={formData.laboratorista_name} onChange={e => handleChange("laboratorista_name", e.target.value)} disabled={isApproved} className="text-xs bg-gray-50" placeholder="Nome do laboratorista" />
+              <Input value={formData.laboratorista_name} onChange={e => handleChange("laboratorista_name", e.target.value)} disabled={isApproved} className="text-xs bg-muted" placeholder="Nome do laboratorista" />
             </div>
           </div>
         </div>

@@ -20,12 +20,12 @@ export default function CargasSection({
   };
 
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg">Cargas de Concreto</CardTitle>
           {cargas.length < 10 && (
-            <Button type="button" onClick={adicionarCarga} className="bg-green-600 hover:bg-green-700">
+            <Button type="button" onClick={adicionarCarga}>
               <Plus className="w-4 h-4 mr-2" /> Adicionar Carga
             </Button>
           )}

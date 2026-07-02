@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 
 export default function GranuMisturaUmidade({ umidade, isApproved, handleUmidadeChange }) {
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader><CardTitle className="text-base">1. Determinação de Umidade da Mistura</CardTitle></CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-1">
@@ -18,11 +18,11 @@ export default function GranuMisturaUmidade({ umidade, isApproved, handleUmidade
         </div>
         <div className="space-y-1">
           <Label className="text-xs font-bold">Peso Água — Pω = P₁ − P₂ (g)</Label>
-          <Input value={umidade.peso_agua || ""} disabled className="bg-gray-100 text-sm" />
+          <Input value={umidade.peso_agua || ""} disabled className="bg-muted text-sm" />
         </div>
         <div className="space-y-1">
           <Label className="text-xs font-bold">Umidade — U = (Pω/P₂)×100 (%)</Label>
-          <Input value={umidade.umidade_pct || ""} disabled className="bg-gray-100 text-sm font-bold" />
+          <Input value={umidade.umidade_pct || ""} disabled className="bg-muted text-sm font-bold" />
         </div>
       </CardContent>
     </Card>

@@ -30,7 +30,7 @@ export default function DadosObraSection({
   const rodoviasDisponiveis = obraSelecionada?.rodovias || [];
 
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg">Dados da Obra</CardTitle>
       </CardHeader>
@@ -43,7 +43,7 @@ export default function DadosObraSection({
             <select id="obra_id" value={formData.obra_id}
               onChange={(e) => onObra(e.target.value)}
               required disabled={!canEdit || !!editingEnsaio?.id}
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm">
+              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm">
               <option value="">Selecione a obra</option>
               {obras.map(obra => {
                 const regional = regionais.find(r => r.id === obra.regional_id);
@@ -60,7 +60,7 @@ export default function DadosObraSection({
             <select id="project_id" value={formData.project_id}
               onChange={(e) => onProject(e.target.value)}
               disabled={!canEdit || !formData.obra_id}
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm">
+              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm">
               <option value="">Selecione um projeto</option>
               {projetosCAUQ.map(proj => (
                 <option key={proj.id} value={proj.id}>{proj.name}</option>
@@ -71,10 +71,10 @@ export default function DadosObraSection({
 
         {/* Info regional */}
         {regionalSelecionada && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-sm space-y-0.5">
-            <p className="text-blue-800"><strong>📍 Regional:</strong> {regionalSelecionada.nome}</p>
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-2 text-sm space-y-0.5">
+            <p className="text-primary"><strong>📍 Regional:</strong> {regionalSelecionada.nome}</p>
             {regionalSelecionada.cliente && (
-              <p className="text-blue-800"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>
+              <p className="text-primary"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>
             )}
           </div>
         )}
@@ -107,7 +107,7 @@ export default function DadosObraSection({
               <select id="rodovia" value={formData.rodovia}
                 onChange={(e) => onChange('rodovia', e.target.value)}
                 disabled={!canEdit}
-                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm">
+                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm">
                 <option value="">Selecione a rodovia</option>
                 {rodoviasDisponiveis.map((r, i) => <option key={i} value={r}>{r}</option>)}
               </select>
@@ -138,7 +138,7 @@ export default function DadosObraSection({
               <select id="usina_fornecedora" value={formData.usina_fornecedora}
                 onChange={(e) => onChange('usina_fornecedora', e.target.value)}
                 disabled={!canEdit}
-                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm">
+                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm">
                 <option value="">Selecione a usina</option>
                 {usinasDisponiveis.map((u, i) => <option key={i} value={u}>{u}</option>)}
               </select>
@@ -163,7 +163,7 @@ export default function DadosObraSection({
             <Input id="faixa_especificada" value={formData.faixa_especificada}
               onChange={(e) => onChange('faixa_especificada', e.target.value)}
               disabled={!canEdit} readOnly={!!selectedProject}
-              className={selectedProject ? "bg-slate-100" : ""} />
+              className={selectedProject ? "bg-muted" : ""} />
           </div>
         </div>
 
@@ -174,7 +174,7 @@ export default function DadosObraSection({
             <Input id="tipo_ligante" value={formData.tipo_ligante}
               onChange={(e) => onChange('tipo_ligante', e.target.value)}
               disabled={!canEdit} readOnly={!!selectedProject}
-              className={selectedProject ? "bg-slate-100" : ""} />
+              className={selectedProject ? "bg-muted" : ""} />
           </div>
           <div>
             <Label htmlFor="temperatura_cap">Temperatura CAP (°C)</Label>
@@ -188,7 +188,7 @@ export default function DadosObraSection({
             <select id="ensaio_realizado_por" value={formData.ensaio_realizado_por}
               onChange={(e) => onChange('ensaio_realizado_por', e.target.value)}
               disabled={!canEdit}
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm">
+              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm">
               <option value="Afirma Evias">Afirma Evias</option>
               <option value="Empreiteira">Empreiteira</option>
             </select>

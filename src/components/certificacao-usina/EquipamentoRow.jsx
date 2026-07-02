@@ -3,8 +3,8 @@ import ConformeField from "./ConformeField";
 
 export default function EquipamentoRow({ label, path, value, onChange, disabled }) {
   return (
-    <tr className="border-b border-slate-200 hover:bg-slate-50/50">
-      <td className="py-2 px-3 text-sm text-slate-700">{label}</td>
+    <tr className="border-b border-border hover:bg-muted/30">
+      <td className="py-2 px-3 text-sm text-foreground">{label}</td>
       <td className="py-2 px-3">
         <ConformeField
           value={value}

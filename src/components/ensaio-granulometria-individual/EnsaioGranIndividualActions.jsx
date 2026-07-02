@@ -17,11 +17,11 @@ export default function EnsaioGranIndividualActions({
         <>
           <Button type="button" variant="outline"
             onClick={(e) => onSubmit(e, 'rascunho')}
-            className="border-[#BFCF99] text-[#00233B] hover:bg-[#BFCF99]/10">
+            >
             <Save className="mr-2 h-4 w-4" /> Salvar Progresso
           </Button>
           <Button type="button" onClick={(e) => onSubmit(e, 'finalizado')}
-            className="bg-blue-600 hover:bg-blue-700">
+            >
             <CheckCircle className="mr-2 h-4 w-4" /> Finalizar Registro
           </Button>
         </>

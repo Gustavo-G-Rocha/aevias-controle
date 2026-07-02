@@ -5,7 +5,7 @@ export default function SubSectionTitle({ children }) {
     <tr>
       <td
         colSpan={2}
-        className="bg-slate-200 text-slate-800 font-semibold text-xs py-1.5 px-3 uppercase tracking-wide"
+        className="bg-muted text-foreground font-semibold text-xs py-1.5 px-3 uppercase tracking-wide"
       >
         {children}
       </td>

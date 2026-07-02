@@ -11,11 +11,11 @@ export default function EnsaioVigaBenkelmanHeader({ editId }) {
       <Button
         variant="ghost"
         onClick={() => navigate(createPageUrl('MeusEnsaios'))}
-        className="mb-4 text-[#00233B] hover:bg-black/5"
+        className="mb-4"
       >
         <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
       </Button>
-      <h1 className="text-3xl font-bold text-[#00233B]">
+      <h1 className="text-3xl font-bold text-foreground">
         {editId ? 'Editar Ensaio Viga Benkelman' : 'Novo Ensaio Viga Benkelman'}
       </h1>
     </div>

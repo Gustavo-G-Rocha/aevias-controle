@@ -7,7 +7,7 @@ import { Plus, Trash2 } from "lucide-react";
 
 function CorpoProvaCard({ cp, index, metodo, onUpdate, onRemove }) {
   return (
-    <Card className="border-2 border-slate-200">
+    <Card className="border-2 border-border">
       <CardHeader className="pb-3 flex flex-row items-center justify-between">
         <CardTitle className="text-base">Corpo de Prova #{cp.numero}</CardTitle>
         <Button type="button" variant="destructive" size="sm" onClick={() => onRemove(index)}>
@@ -27,7 +27,7 @@ function CorpoProvaCard({ cp, index, metodo, onUpdate, onRemove }) {
           <div>
             <Label>Lado</Label>
             <select value={cp.lado} onChange={e => onUpdate(index, 'lado', e.target.value)}
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm">
+              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm">
               <option value="direito">Direito</option>
               <option value="esquerdo">Esquerdo</option>
             </select>

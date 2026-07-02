@@ -16,12 +16,12 @@ export default function EnsaioSondagemActions({ saving, uploadingPhotos, obraId,
         variant="outline"
         onClick={onSaveProgress}
         disabled={saving || uploadingPhotos || !obraId}
-        className="border-[#BFCF99] text-[#00233B] hover:bg-[#BFCF99]/10"
+
       >
         {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
         Salvar Progresso
       </Button>
-      <Button type="submit" disabled={saving || uploadingPhotos} className="bg-blue-600 hover:bg-blue-700">
+      <Button type="submit" disabled={saving || uploadingPhotos}>
         {saving
           ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Salvando...</>
           : <><CheckCircle className="mr-2 h-4 w-4" />Finalizar Registro</>

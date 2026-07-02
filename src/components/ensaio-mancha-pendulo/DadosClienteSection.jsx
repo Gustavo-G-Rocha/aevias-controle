@@ -5,8 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const SectionTitle = ({ children }) => (
-  <CardHeader className="bg-slate-50 border-b">
-    <CardTitle className="text-sm font-semibold text-slate-700">{children}</CardTitle>
+  <CardHeader className="bg-muted/50 border-b">
+    <CardTitle className="text-sm font-semibold text-foreground">{children}</CardTitle>
   </CardHeader>
 );
 

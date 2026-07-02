@@ -10,7 +10,7 @@ export default function EnsaioTaxaMRAFDadosGerais({
 }) {
   return (
     <div>
-      <h3 className="text-lg font-semibold text-[#00233B] mb-4">Dados da Obra</h3>
+      <h3 className="text-lg font-semibold text-foreground mb-4">Dados da Obra</h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <Label>Obra *</Label>
@@ -18,7 +18,7 @@ export default function EnsaioTaxaMRAFDadosGerais({
             value={formData.obra_id}
             onChange={e => onFieldChange('obra_id', e.target.value)}
             disabled={!isEditable}
-            className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+            className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           >
             <option value="">Selecione a obra</option>
             {obras.map(o => <option key={o.id} value={o.id}>{o.name} - {o.code}</option>)}
@@ -48,7 +48,7 @@ export default function EnsaioTaxaMRAFDadosGerais({
             value={formData.rodovia}
             onChange={e => onFieldChange('rodovia', e.target.value)}
             disabled={!isEditable}
-            className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+            className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           >
             <option value="">Selecione a rodovia</option>
             {obras.find(o => o.id === formData.obra_id)?.rodovias?.map((r, i) => (
@@ -119,7 +119,7 @@ export default function EnsaioTaxaMRAFDadosGerais({
             value={formData.ensaio_realizado_por}
             onChange={e => onFieldChange('ensaio_realizado_por', e.target.value)}
             disabled={!isEditable}
-            className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+            className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           >
             <option value="">Selecione</option>
             <option value="Afirma Evias">Afirma Evias</option>
@@ -135,12 +135,12 @@ export default function EnsaioTaxaMRAFDadosGerais({
             onChange={e => onFieldChange('taxa_minima_projeto', e.target.value ? parseFloat(e.target.value) : null)}
             disabled={!isEditable}
             placeholder="Ex: 12.0"
-            className="bg-white"
+            className="bg-background"
           />
         </div>
         <div>
           <Label>Laboratorista</Label>
-          <Input value={formData.laboratorista_name} readOnly className="bg-slate-100" />
+          <Input value={formData.laboratorista_name} readOnly className="bg-muted" />
         </div>
       </div>
     </div>

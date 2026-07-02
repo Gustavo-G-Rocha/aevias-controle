@@ -5,9 +5,9 @@ import { Label } from "@/components/ui/label";
 
 export default function BoletimSondagemDadosGerais({ formData, setFormData, obras, regionais, isEditable, editingBoletim, handleObraChange }) {
   return (
-    <Card className="bg-black/5 border-[#00233B]/10">
+    <Card className="bg-muted/30 border-border">
       <CardHeader className="pb-3">
-        <CardTitle className="text-base text-[#00233B]">Dados da Obra</CardTitle>
+        <CardTitle className="text-base">Dados da Obra</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -18,7 +18,7 @@ export default function BoletimSondagemDadosGerais({ formData, setFormData, obra
               onChange={(e) => handleObraChange(e.target.value, obras, regionais)}
               disabled={!isEditable || !!editingBoletim}
               required
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
             >
               <option value="">Selecione a obra</option>
               {obras.map(obra => (
@@ -40,7 +40,7 @@ export default function BoletimSondagemDadosGerais({ formData, setFormData, obra
               value={formData.rodovia}
               onChange={e => setFormData(p => ({ ...p, rodovia: e.target.value }))}
               disabled={!isEditable || !formData.obra_id}
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
             >
               <option value="">Selecione a rodovia</option>
               {(obras.find(o => o.id === formData.obra_id)?.rodovias || []).map((r, i) => (
@@ -66,7 +66,7 @@ export default function BoletimSondagemDadosGerais({ formData, setFormData, obra
           </div>
           <div>
             <Label>Operador</Label>
-            <Input value={formData.operador} readOnly className="h-10 bg-slate-100" />
+            <Input value={formData.operador} readOnly className="h-10 bg-muted" />
           </div>
         </div>
       </CardContent>

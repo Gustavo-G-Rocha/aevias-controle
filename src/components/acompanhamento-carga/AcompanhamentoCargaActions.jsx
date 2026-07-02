@@ -13,7 +13,7 @@ export default function AcompanhamentoCargaActions({ canEdit, saving, handleSubm
       <Button
         onClick={() => handleSubmit(true)}
         disabled={saving}
-        className="bg-[#566E3D] text-white hover:bg-[#566E3D]/90"
+
       >
         {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
         Finalizar

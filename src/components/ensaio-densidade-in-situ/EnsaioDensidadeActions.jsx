@@ -25,7 +25,7 @@ export default function EnsaioDensidadeActions({ formData, setFormData, isEditab
       </div>
 
       <div className="flex justify-end gap-3">
-        <Button type="button" variant="outline" onClick={() => navigate(createPageUrl('MeusEnsaios'))} className="hover:bg-black/10">
+        <Button type="button" variant="outline" onClick={() => navigate(createPageUrl('MeusEnsaios'))} >
           Cancelar
         </Button>
         {isEditable && (
@@ -36,7 +36,7 @@ export default function EnsaioDensidadeActions({ formData, setFormData, isEditab
               label="Salvar Progresso"
               savingLabel="Salvando..."
             />
-            <Button type="submit" disabled={saving} className="bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90">
+            <Button type="submit" disabled={saving} >
               {saving ? (
                 <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Salvando...</>
               ) : (

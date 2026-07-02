@@ -12,7 +12,7 @@ export default function EnsaioGranIndividualDadosGerais({
   const regionalSelecionada = regionais.find(r => r.id === obraSelecionada?.regional_id);
 
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg">Dados da Obra</CardTitle>
       </CardHeader>

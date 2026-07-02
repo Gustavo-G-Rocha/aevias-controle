@@ -22,7 +22,7 @@ export default function CertificacaoUsinaHeader({
   onDataChange,
 }) {
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader className="pb-4"><CardTitle className="text-xl">Dados da Obra</CardTitle></CardHeader>
       <CardContent className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -46,15 +46,15 @@ export default function CertificacaoUsinaHeader({
           <div>
             <Label className="text-base">Data da Vistoria *</Label>
             <Input type="date" value={formData.data_vistoria || ""} onChange={(e) => onDataChange(e.target.value)}
-              required disabled={!isEditable || isApproved} className="bg-white border-slate-200 text-slate-700 h-11 text-base" />
+              required disabled={!isEditable || isApproved} className="bg-background border-border text-foreground h-11 text-base" />
           </div>
         </div>
 
         {regionalSelecionada && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-1 text-sm">
-            <p className="text-blue-800"><strong>📍 Regional:</strong> {regionalSelecionada.nome}</p>
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 space-y-1 text-sm">
+            <p className="text-primary"><strong>📍 Regional:</strong> {regionalSelecionada.nome}</p>
             {regionalSelecionada.cliente && (
-              <p className="text-blue-800"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>
+              <p className="text-primary"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>
             )}
           </div>
         )}

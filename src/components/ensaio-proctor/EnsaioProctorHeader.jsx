@@ -6,8 +6,8 @@ export default function EnsaioProctorHeader({ recordId }) {
   return (
     <div className="flex items-start justify-between">
       <div>
-        <h1 className="text-3xl font-bold text-[#00233B]">Ensaio Proctor</h1>
-        <p className="text-[#00233B]/80 mt-1">ABNT NBR 7182:2016 - Compactação de Solos</p>
+        <h1 className="text-3xl font-bold text-foreground">Ensaio Proctor</h1>
+        <p className="text-muted-foreground mt-1">ABNT NBR 7182:2016 - Compactação de Solos</p>
       </div>
       {recordId && (
         <Button

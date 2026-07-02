@@ -20,13 +20,13 @@ function CorpoProvaCard({ cp, index, isEditable, isApproved, onCorpoProvaChange,
   const canEdit = isEditable && !isApproved;
 
   return (
-    <Card className="relative border-2 border-slate-200">
+    <Card className="relative border-2 border-border">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-center">
           <CardTitle className="text-base">Corpo de Prova {cp.numero}</CardTitle>
           {canEdit && (
             <Button type="button" variant="ghost" size="sm"
-              onClick={() => onRemover(index)} className="text-red-500 hover:text-red-700">
+              onClick={() => onRemover(index)} className="text-destructive hover:text-destructive">
               <Trash2 className="w-4 h-4" />
             </Button>
           )}
@@ -152,7 +152,7 @@ export default function MarshallSection({
   const canEdit = isEditable && !isApproved;
 
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader>
         <div className="flex justify-between items-start">
           <div>

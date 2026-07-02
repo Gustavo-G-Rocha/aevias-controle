@@ -34,10 +34,10 @@ export default function DadosObraSection({ formData, handleChange, obras, region
           </Select>
         </div>
         {regionalSelecionada && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
             <div className="space-y-1 text-sm">
-              <p className="text-blue-800"><strong>📍 Regional:</strong> {regionalSelecionada.nome} - {regionalSelecionada.codigo}</p>
-              {regionalSelecionada.cliente && <p className="text-blue-800"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>}
+              <p className="text-primary"><strong>📍 Regional:</strong> {regionalSelecionada.nome} - {regionalSelecionada.codigo}</p>
+              {regionalSelecionada.cliente && <p className="text-primary"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>}
             </div>
           </div>
         )}
@@ -101,7 +101,7 @@ export default function DadosObraSection({ formData, handleChange, obras, region
                         const isChecked = selected.includes(rodovia);
                         const maxReached = selected.length >= 2 && !isChecked;
                         return (
-                          <label key={rodovia} className={`flex items-center gap-2 px-2 py-1 rounded ${disabled || maxReached ? "opacity-50 pointer-events-none" : "cursor-pointer hover:bg-slate-50"}`}>
+                          <label key={rodovia} className={`flex items-center gap-2 px-2 py-1 rounded ${disabled || maxReached ? "opacity-50 pointer-events-none" : "cursor-pointer hover:bg-muted"}`}>
                             <input type="checkbox" checked={isChecked} disabled={maxReached} onChange={() => {
                               const newSel = isChecked ? selected.filter(r => r !== rodovia) : [...selected, rodovia];
                               handleChange("rodovia", newSel.join(" - "));
@@ -111,10 +111,10 @@ export default function DadosObraSection({ formData, handleChange, obras, region
                         );
                       })}
                     </div>
-                    <p className="text-xs text-gray-400">Máximo 2 rodovias</p>
+                    <p className="text-xs text-muted-foreground">Máximo 2 rodovias</p>
                   </>
-                ) : <div className="border rounded-md p-2 text-sm text-gray-500">Nenhuma rodovia cadastrada</div>}
-                {formData.rodovia && <p className="text-xs text-gray-500">Selecionadas: {formData.rodovia}</p>}
+                ) : <div className="border rounded-md p-2 text-sm text-muted-foreground">Nenhuma rodovia cadastrada</div>}
+                {formData.rodovia && <p className="text-xs text-muted-foreground">Selecionadas: {formData.rodovia}</p>}
               </div>
               <div className="space-y-2">
                 <Label>Trecho *</Label>

@@ -28,7 +28,7 @@ export default function ControleAgregadosSection({
   }, [formData.equivalente_areia_status, onEquivalenteAreiaStatusChange]);
 
   return (
-    <Card className="bg-slate-50">
+    <Card className="bg-muted/30">
       <CardHeader>
         <CardTitle className="text-lg">Controle de Agregados</CardTitle>
       </CardHeader>
@@ -47,7 +47,7 @@ export default function ControleAgregadosSection({
             <tbody>
               {formData.controle_agregados.length > 0 ? formData.controle_agregados.map((agregado, index) => (
                 <tr key={index}>
-                  <td className="border border-slate-300 px-2 py-2 font-medium bg-slate-50">{agregado.nome}</td>
+                  <td className="border border-slate-300 px-2 py-2 font-medium bg-muted/30">{agregado.nome}</td>
                   <td className="border border-slate-300 px-2 py-1 text-center">
                     <input type="checkbox" checked={agregado.estoque_coberto}
                       onChange={(e) => onAgregadoChange(index, 'estoque_coberto', e.target.checked)}
