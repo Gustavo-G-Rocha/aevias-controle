@@ -23,6 +23,10 @@
       "type": "string",
       "description": "Descri\u00e7\u00e3o do trecho"
     },
+    "empreiteira": {
+      "type": "string",
+      "description": "Empreiteira respons\u00e1vel pela execu\u00e7\u00e3o"
+    },
     "camada": {
       "type": "string",
       "description": "Camada"

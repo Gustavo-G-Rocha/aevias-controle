@@ -35,7 +35,8 @@ export const useEnsaioManchaPenduloForm = (formData, setFormData) => {
       obra_id: obraId,
       rodovia: '',
       trecho: '',
-      pista: ''
+      pista: '',
+      empreiteira: ''
     }));
   }, [setFormData]);
 

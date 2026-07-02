@@ -57,6 +57,21 @@ export default function EnsaioVigaBenkelmanDadosGerais({
             </div>
 
             <div>
+              <span className="block text-sm font-medium text-foreground mb-2">Empreiteira</span>
+              <select
+                value={formData.empreiteira || ''}
+                onChange={(e) => onInputChange('empreiteira', e.target.value)}
+                disabled={!formData.obra_id}
+                className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <option value="">Selecionar empreiteira...</option>
+                {(obraAtual?.empreiteiras || []).map((em, idx) => (
+                  <option key={idx} value={em}>{em}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
               <span className="block text-sm font-medium text-foreground mb-2">Material</span>
               <Input value={formData.material} onChange={(e) => onInputChange('material', e.target.value)} placeholder="Digitar" className="bg-background border-border text-foreground" />
             </div>

@@ -161,6 +161,7 @@ export const getInitialFormData = () => ({
   laboratorista_name: '',
   rodovia: '',
   trecho: '',
+  empreiteira: '',
   camada: '',
   pista: '',
   orgao: 'ECO-RODOVIAS',

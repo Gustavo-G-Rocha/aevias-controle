@@ -30,6 +30,7 @@ export const getInitialForm = () => ({
   laboratorista_name: '',
   rodovia: '',
   trecho: '',
+  empreiteira: '',
   material: '',
   procedencia: '',
   camada: '',

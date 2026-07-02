@@ -32,6 +32,10 @@
       "type": "string",
       "description": "Trecho da rodovia"
     },
+    "empreiteira": {
+      "type": "string",
+      "description": "Empreiteira respons\u00e1vel pela execu\u00e7\u00e3o"
+    },
     "material": {
       "type": "string",
       "description": "Material analisado"

@@ -28,6 +28,12 @@ export default function RelatorioVigaBenkelmanDadosObra({ ensaio, obra, regional
           <p className="font-bold text-gray-700">RODOVIA</p>
           <p className="text-gray-900">{ensaio.rodovia || '-'}</p>
         </div>
+        {ensaio.empreiteira && (
+          <div>
+            <p className="font-bold text-gray-700">EMPREITEIRA</p>
+            <p className="text-gray-900">{ensaio.empreiteira}</p>
+          </div>
+        )}
         <div>
           <p className="font-bold text-gray-700">MATERIAL</p>
           <p className="text-gray-900">{ensaio.material || '-'}</p>

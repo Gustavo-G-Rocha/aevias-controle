@@ -35,6 +35,10 @@ describe('getInitialForm', () => {
   it('obra_id começa vazio', () => {
     expect(getInitialForm().obra_id).toBe('');
   });
+
+  it('empreiteira começa vazia', () => {
+    expect(getInitialForm().empreiteira).toBe('');
+  });
 });
 
 // ─── getLevantamentoInicial ───────────────────────────────────────────────────

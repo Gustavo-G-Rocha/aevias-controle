@@ -38,7 +38,7 @@ export function useEnsaioVigaBenkelmanForm(setFormData) {
   }, [setFormData]);
 
   const handleObraChange = useCallback((obraId, obras) => {
-    setFormData(prev => ({ ...prev, obra_id: obraId, rodovia: '' }));
+    setFormData(prev => ({ ...prev, obra_id: obraId, rodovia: '', empreiteira: '' }));
   }, [setFormData]);
 
   const handleLeituraInicialChange = useCallback((value) => {

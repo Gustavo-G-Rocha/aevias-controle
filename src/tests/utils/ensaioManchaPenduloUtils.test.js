@@ -7,10 +7,25 @@ import {
   calcularManchaValores,
   calcularPenduloValores,
   prepareDadosParaSalvar,
-  filterObrasPorAcesso
+  filterObrasPorAcesso,
+  getInitialFormData
 } from '@/utils/ensaioManchaPenduloUtils';
 
 describe('ensaioManchaPenduloUtils', () => {
+  describe('getInitialFormData', () => {
+    it('deve incluir empreiteira vazia no formulário inicial', () => {
+      const form = getInitialFormData();
+      expect(form.empreiteira).toBe('');
+    });
+
+    it('deve incluir campos obrigatórios no formulário inicial', () => {
+      const form = getInitialFormData();
+      expect(form.obra_id).toBe('');
+      expect(form.data_ensaio).toBeDefined();
+      expect(form.status).toBe('rascunho');
+    });
+  });
+
   describe('getLimitesOrgao', () => {
     it('deve retornar limites para DER/PR', () => {
       const limites = getLimitesOrgao('DER/PR');

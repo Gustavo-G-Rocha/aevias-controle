@@ -56,6 +56,20 @@ export default function DadosClienteSection({
           </div>
 
           <div>
+            <Label>Empreiteira</Label>
+            <Select value={formData.empreiteira || ''} onValueChange={(value) => onInputChange('empreiteira', value)} disabled={!formData.obra_id}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione a empreiteira" />
+              </SelectTrigger>
+              <SelectContent>
+                {(obrasDisponiveis?.find(o => o.id === formData.obra_id)?.empreiteiras || []).map((em, idx) => (
+                  <SelectItem key={idx} value={em}>{em}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
             <Label>Camada</Label>
             <Input value={formData.camada} onChange={(e) => onInputChange('camada', e.target.value)} />
           </div>

@@ -108,6 +108,7 @@ export const CAMPOS_POR_TIPO = {
     { key: "laboratorista_name", label: "Laboratorista" },
     { key: "rodovia", label: "Rodovia" },
     { key: "trecho", label: "Trecho" },
+    { key: "empreiteira", label: "Empreiteira" },
     { key: "camada", label: "Camada" },
     { key: "pista", label: "Pista" },
     { key: "orgao", label: "Orgão" },
