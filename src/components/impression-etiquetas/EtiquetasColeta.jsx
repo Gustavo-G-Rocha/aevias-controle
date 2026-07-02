@@ -14,7 +14,7 @@ export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
   const numPages = calcularPaginasColeta(etiquetas.length);
 
   return (
-    <div className="bg-white min-h-screen p-4 print:p-0">
+    <div className="bg-white min-h-screen p-4 print:p-0 print:min-h-0">
       <div className="mb-4 print:hidden flex gap-2 sticky top-0 bg-white z-10 py-2">
         <Button onClick={onPrint}>
           🖨️ Imprimir
