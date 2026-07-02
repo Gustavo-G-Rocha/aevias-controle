@@ -160,7 +160,7 @@ export default function ControleLaboratoristas() {
       <div className="flex items-center justify-center min-h-screen">
         <Card className="max-w-md">
           <CardContent className="pt-6">
-            <p className="text-center text-gray-600">Acesso restrito a administradores.</p>
+            <p className="text-center text-muted-foreground">Acesso restrito a administradores.</p>
           </CardContent>
         </Card>
       </div>
@@ -170,8 +170,8 @@ export default function ControleLaboratoristas() {
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-[#00233B] mb-2">Controle de Laboratoristas</h1>
-        <p className="text-gray-600">Estatísticas de registros por laboratorista</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Controle de Laboratoristas</h1>
+        <p className="text-muted-foreground">Estatísticas de registros por laboratorista</p>
       </div>
 
       <Card className="mb-6">
@@ -216,7 +216,7 @@ export default function ControleLaboratoristas() {
               <Users className="w-5 h-5" />
               Laboratoristas ({laboratoristasFiltrados.length})
             </CardTitle>
-            <Badge variant="secondary" className="bg-[#BFCF99]/20 text-[#00233B]">
+            <Badge variant="secondary" className="bg-[#BFCF99]/20 text-foreground">
               {registros.length} registros totais
             </Badge>
           </div>
@@ -236,7 +236,7 @@ export default function ControleLaboratoristas() {
               <TableBody>
                 {laboratoristasFiltrados.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-gray-500 py-8">
+                    <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                       Nenhum laboratorista encontrado com os filtros selecionados.
                     </TableCell>
                   </TableRow>
