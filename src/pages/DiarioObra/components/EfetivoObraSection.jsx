@@ -24,8 +24,8 @@ export default function EfetivoObraSection({ formData, handleChange, isEditable,
   const disabled = !isEditable || isApproved;
 
   return (
-    <Card className="bg-green-50 border-green-200">
-      <CardHeader><CardTitle className="text-lg">Efetivo de Obra</CardTitle></CardHeader>
+    <Card className="bg-green-50 border-green-200 text-slate-900">
+      <CardHeader><CardTitle className="text-lg text-slate-900">Efetivo de Obra</CardTitle></CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label>Preencher Efetivo de Obra?</Label>

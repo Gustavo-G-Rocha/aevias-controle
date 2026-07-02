@@ -454,4 +454,25 @@
     border-color: var(--color-border) !important;
   }
 
+  /* ─────────────────────────────────────────────────────────────
+     DARK MODE — Cards de formulário com fundo claro FIXO.
+     Vários cards de formulários (Diário de Obra, Checklists, Ensaios)
+     usam superfícies claras fixas (bg-slate-50, bg-white, bg-*-50).
+     No dark, o texto herda a cor clara do tema e fica ilegível sobre
+     esses fundos claros. Aqui definimos a cor de texto BASE (herdável)
+     dessas superfícies como escura, restaurando o contraste AA.
+     Só afeta texto que herda a cor (títulos/labels/parágrafos comuns);
+     elementos com classe de cor própria (text-red-600, botões, etc.)
+     continuam com sua cor intencional.
+     ───────────────────────────────────────────────────────────── */
+  .dark .bg-slate-50,
+  .dark .bg-slate-100,
+  .dark .bg-white,
+  .dark .bg-orange-50,
+  .dark .bg-green-50,
+  .dark .bg-blue-50,
+  .dark .bg-red-50 {
+    color: #1e293b;
+  }
+
 }

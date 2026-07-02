@@ -50,8 +50,8 @@ export default function ChecklistVeiculoSection({ formData, handleChange, isEdit
   };
 
   return (
-    <Card className="bg-slate-50">
-      <CardHeader><CardTitle className="text-lg">Checklist de Veículo</CardTitle></CardHeader>
+    <Card className="bg-slate-50 text-slate-900">
+      <CardHeader><CardTitle className="text-lg text-slate-900">Checklist de Veículo</CardTitle></CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label>Preencher Checklist de Veículo?</Label>
