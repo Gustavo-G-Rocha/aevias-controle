@@ -60,19 +60,19 @@ function EtiquetaColetaItem({ etiqueta }) {
     <div className="p-3 print:p-3 bg-white" style={{ border: '0.5mm solid #000' }}>
       {/* Header */}
       <div className="grid grid-cols-[100px_1fr_120px] gap-0 mb-1 print:mb-1 pb-1 print:pb-1" style={{ borderBottom: '0.5mm solid #000', alignItems: 'stretch' }}>
-        <div className="flex items-center justify-center pr-2" style={{ borderRight: '0.5mm solid #000' }}>
+        <div className="flex items-center justify-center px-1" style={{ borderRight: '0.5mm solid #000' }}>
           <picture>
             <source srcSet={LOGO_URL} />
-            <img src={LOGO_URL} alt="AfirmaEvias" className="h-7 print:h-6 w-auto object-contain" width="auto" height="28" />
+            <img src={LOGO_URL} alt="AfirmaEvias" className="h-6 print:h-5 w-auto object-contain" width="auto" height="24" />
           </picture>
         </div>
-        <div className="flex items-center justify-center px-2" style={{ borderRight: '0.5mm solid #000' }}>
-          <h2 className="text-sm print:text-xs font-bold text-[#00233B] text-center leading-tight">
+        <div className="flex items-center justify-center px-1" style={{ borderRight: '0.5mm solid #000' }}>
+          <h2 className="text-xs print:text-[10px] font-bold text-[#00233B] text-center leading-tight">
             ETIQUETA PARA COLETA DE AMOSTRA SOLO
           </h2>
         </div>
         <div className="flex items-stretch">
-          <table className="w-full text-[8px] print:text-[7px]" style={{ borderCollapse: 'collapse', borderSpacing: 0 }}>
+          <table className="w-full text-[7px] print:text-[6px]" style={{ borderCollapse: 'collapse', borderSpacing: 0 }}>
             <tbody>
               <tr>
                 <td colSpan={2} className="text-center font-semibold" style={{ border: '0.4mm solid #000', backgroundColor: '#f0f0f0', padding: '0.3mm 1.2mm' }}>Identificação do Doc nº</td>
