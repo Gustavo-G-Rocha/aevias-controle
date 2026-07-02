@@ -34,7 +34,7 @@ export const getInitialForm = () => ({
   material: '',
   procedencia: '',
   camada: '',
-  cte_viga: 2,
+  cte_viga: 0.01,
   def_admissivel: '',
   leitura_inicial_global: '',
   faixas: [getFaixaInicial(1)],

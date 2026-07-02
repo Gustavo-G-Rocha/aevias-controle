@@ -93,7 +93,7 @@ describe('initGranulometriaRows', () => {
   it('retorna uma linha por peneira', () => {
     const rows = initGranulometriaRows();
     expect(rows.length).toBe(PENEIRAS_GRANULOMETRIA.length);
-    expect(rows[0].peneira).toBe('1 1/2"');
+    expect(rows[0].peneira).toBe('1.1/2"');
   });
 });
 

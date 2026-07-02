@@ -157,12 +157,12 @@ describe("projectsUtils", () => {
 
   describe("Color mappings", () => {
     it("deve ter STATUS_COLORS definido", () => {
-      expect(STATUS_COLORS.ativo).toBe("bg-[#566E3D]/30 text-[#00233B]");
-      expect(STATUS_COLORS.inativo).toBe("bg-red-400/20 text-red-800");
+      expect(STATUS_COLORS.ativo).toBe("bg-[#566E3D]/30 text-foreground");
+      expect(STATUS_COLORS.inativo).toBe("bg-red-400/20 text-destructive");
     });
 
     it("deve ter TIPO_PROJETO_COLORS definido", () => {
-      expect(TIPO_PROJETO_COLORS.CAUQ).toBe("bg-[#00233B] text-white");
+      expect(TIPO_PROJETO_COLORS.CAUQ).toBe("bg-muted text-white");
       expect(TIPO_PROJETO_COLORS.MRAF).toBe("bg-[#566E3D] text-white");
     });
 

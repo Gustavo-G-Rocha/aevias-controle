@@ -7,8 +7,11 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-// Simula navigator.onLine
+// Simula navigator.onLine (node env não tem navigator por padrão)
 function mockOnLine(value) {
+  if (!globalThis.navigator) {
+    globalThis.navigator = {};
+  }
   Object.defineProperty(globalThis.navigator, 'onLine', {
     writable: true,
     configurable: true,
