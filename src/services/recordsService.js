@@ -42,11 +42,12 @@ export const ALL_RECORD_ENTITIES = [
  * @param {number} limit
  * @returns {Promise<object[]>}
  */
-const RECORD_PAGE_SIZE = 2000;
+const RECORD_PAGE_SIZE = 2000;    // lista completa e loadRecordsByObra
+const DASHBOARD_PAGE_SIZE = 200;  // dashboard — só registros recentes para stats/charts
 
-async function loadEntity(entityType) {
+async function loadEntity(entityType, limit = RECORD_PAGE_SIZE) {
   try {
-    return await base44.entities[entityType].list('-created_date', RECORD_PAGE_SIZE);
+    return await base44.entities[entityType].list('-created_date', limit);
   } catch (e) {
     console.error(`[recordsService] Falha ao carregar ${entityType}:`, e?.message || e);
     return [];
@@ -108,11 +109,11 @@ export function deduplicateRecords(records) {
  */
 const BATCH_SIZE = 5; // máximo de requests simultâneos por lote
 
-async function loadEntitiesInBatches(entityList) {
+async function loadEntitiesInBatches(entityList, limit) {
   const allResults = [];
   for (let i = 0; i < entityList.length; i += BATCH_SIZE) {
     const batch = entityList.slice(i, i + BATCH_SIZE);
-    const settled = await Promise.allSettled(batch.map(type => loadEntity(type)));
+    const settled = await Promise.allSettled(batch.map(type => loadEntity(type, limit)));
     settled.forEach((r, idx) => {
       if (r.status === 'rejected') {
         console.warn(`[recordsService] loadAllRecords: ${batch[idx]} rejeitou:`, r.reason?.message || r.reason);
@@ -125,8 +126,9 @@ async function loadEntitiesInBatches(entityList) {
   return allResults;
 }
 
-export async function loadAllRecords() {
-  const results = await loadEntitiesInBatches(ALL_RECORD_ENTITIES);
+export async function loadAllRecords(mode = 'list') {
+  const limit = mode === 'dashboard' ? DASHBOARD_PAGE_SIZE : RECORD_PAGE_SIZE;
+  const results = await loadEntitiesInBatches(ALL_RECORD_ENTITIES, limit);
   const normalized = normalizeRecords(results, ALL_RECORD_ENTITIES);
   return deduplicateRecords(normalized);
 }

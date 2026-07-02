@@ -30,7 +30,7 @@ export function useDashboardData() {
   const needsRegionais = ['cliente', 'sala_tecnica_afirmaevias', 'gestor_contrato'].includes(userAccessLevel);
 
   const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais });
-  const { data: allRecords = [], isLoading: loadingRecords } = useAllRecords();
+  const { data: allRecords = [], isLoading: loadingRecords } = useAllRecords('dashboard');
 
   const loading = loadingUser || loadingAux || loadingRecords;
 

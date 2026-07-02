@@ -10,7 +10,8 @@ import { loadAllRecords, loadAuxData } from '@/services/recordsService';
 export const QUERY_KEYS = {
   currentUser:   ['currentUser'],
   auxData:       (opts = {}) => ['auxData', opts],
-  allRecords:    ['allRecords'],          // única key — cache compartilhado entre Dashboard e MeusEnsaios
+  allRecords:    ['allRecords'],          // prefix para invalidação (invalida todos os modos)
+  allRecordsFor: (mode) => ['allRecords', mode], // key específica por contexto (dashboard vs list)
   recordsByObra: (obraId) => ['recordsByObra', obraId],
 };
 
@@ -34,10 +35,10 @@ export function useAuxData({ needsRegionais = true, needsUsers = false } = {}) {
 }
 
 // ─── Todos os registros — cache único compartilhado ───────────────────────────
-export function useAllRecords() {
+export function useAllRecords(mode = 'list') {
   return useQuery({
-    queryKey: QUERY_KEYS.allRecords,
-    queryFn: () => loadAllRecords(),
+    queryKey: QUERY_KEYS.allRecordsFor(mode),
+    queryFn: () => loadAllRecords(mode),
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
   });

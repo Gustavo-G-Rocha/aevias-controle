@@ -74,7 +74,7 @@ export function useEnsaiosList() {
   const queryClient = useQueryClient();
   const { data: user, isLoading: loadingUser } = useCurrentUser();
   const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true, needsUsers: true });
-  const { data: allRecords = [], isLoading: loadingRecords } = useAllRecords();
+  const { data: allRecords = [], isLoading: loadingRecords } = useAllRecords('list');
 
   // Invalida o cache de registros para forçar recarregamento após ações (aprovar/excluir)
   const reload = useCallback(() => {
