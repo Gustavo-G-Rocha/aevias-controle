@@ -5,9 +5,9 @@ import { calcularPaginasColeta, getEtiquetasPageColeta } from '@/utils/impressio
 const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68a7599ee3fb9205cfb852ec/47ee9630a_AE-LogoVerPrincipal_1.png';
 
 const CELL_STYLES = {
-  label: { border: '0.5mm solid #000', height: '22px', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1mm', paddingBottom: '1mm', fontWeight: 'bold', backgroundColor: '#fff' },
-  value: { border: '0.5mm solid #000', height: '22px', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1mm', paddingBottom: '1mm', backgroundColor: '#fff' },
-  highlight: { border: '0.5mm solid #000', height: '22px', backgroundColor: '#C4D69B', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1mm', paddingBottom: '1mm' }
+  label: { border: '0.5mm solid #000', height: '20px', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1mm', paddingBottom: '1mm', fontWeight: 'bold', backgroundColor: '#fff' },
+  value: { border: '0.5mm solid #000', height: '20px', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1mm', paddingBottom: '1mm', backgroundColor: '#fff' },
+  highlight: { border: '0.5mm solid #000', height: '20px', backgroundColor: '#C4D69B', paddingLeft: '4mm', paddingRight: '2mm', paddingTop: '1mm', paddingBottom: '1mm' }
 };
 
 export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
@@ -27,7 +27,7 @@ export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
       <div>
         {Array.from({ length: numPages }).map((_, pageIdx) =>
         <div key={pageIdx} className="page-container">
-            <div className="grid grid-cols-2 gap-x-2 gap-y-4 print:gap-x-1.5 print:gap-y-3">
+            <div className="grid grid-cols-2 gap-x-2 gap-y-4 print:gap-x-1.5 print:gap-y-2">
               {getEtiquetasPageColeta(etiquetas, pageIdx).map((etiqueta, idx) =>
             <EtiquetaColetaItem key={pageIdx * 6 + idx} etiqueta={etiqueta} />
             )}
@@ -149,8 +149,8 @@ function EtiquetaColetaItem({ etiqueta }) {
 
       {/* Rodapé */}
       <div className="bg-white text-xs print:text-[10px]" style={{ border: '0.5mm solid #000' }}>
-        <div className="font-bold" style={{ height: '26px', display: 'flex', alignItems: 'center', paddingLeft: '4mm', paddingRight: '4mm' }}>RESPONSÁVEL COLETA:</div>
-        <div className="font-bold" style={{ height: '26px', display: 'flex', alignItems: 'center', paddingLeft: '4mm', paddingRight: '4mm' }}>DATA:</div>
+        <div className="font-bold" style={{ height: '24px', display: 'flex', alignItems: 'center', paddingLeft: '4mm', paddingRight: '4mm' }}>RESPONSÁVEL COLETA:</div>
+        <div className="font-bold" style={{ height: '24px', display: 'flex', alignItems: 'center', paddingLeft: '4mm', paddingRight: '4mm' }}>DATA:</div>
       </div>
     </div>);
 
