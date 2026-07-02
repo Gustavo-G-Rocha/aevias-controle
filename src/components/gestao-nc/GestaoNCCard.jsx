@@ -32,49 +32,49 @@ export default function GestaoNCCard({
   const obraName = getObraName(nc, obras);
 
   return (
-    <Card className="bg-white/20 backdrop-blur-lg border border-white/20 hover:bg-white/30 transition-colors">
+    <Card className="hover:border-primary/30 transition-colors">
       <CardContent className="pt-4 pb-4">
         <div className="flex items-start justify-between gap-4">
           {/* Left Section - NC Details */}
           <div className="flex-1 space-y-1">
             <div className="flex items-center gap-3 flex-wrap">
               {nc.numero_rnc && (
-                <span className="text-sm font-bold text-[#00233B] bg-[#BFCF99]/30 px-2 py-0.5 rounded">
+                <span className="text-sm font-bold text-foreground bg-[#BFCF99]/30 px-2 py-0.5 rounded">
                   {nc.numero_rnc}
                 </span>
               )}
               <Badge className={STATUS_COLORS[nc.status] || "bg-gray-100 text-gray-700"}>
                 {STATUS_LABELS[nc.status] || nc.status}
               </Badge>
-              <span className="text-sm text-[#00233B]/60">
+              <span className="text-sm text-muted-foreground">
                 {formatDatePtBR(nc.data_nc)}
               </span>
             </div>
-            <p className="font-semibold text-[#00233B]">{obraName}</p>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#00233B]/70">
+            <p className="font-semibold text-foreground">{obraName}</p>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
               {nc.rodovia && (
                 <span>
-                  Rodovia: <span className="font-medium text-[#00233B]">{nc.rodovia}</span>
+                  Rodovia: <span className="font-medium text-foreground">{nc.rodovia}</span>
                 </span>
               )}
               {nc.trecho && (
                 <span>
-                  Trecho: <span className="font-medium text-[#00233B]">{nc.trecho}</span>
+                  Trecho: <span className="font-medium text-foreground">{nc.trecho}</span>
                 </span>
               )}
               {nc.executora && (
                 <span>
-                  Executora: <span className="font-medium text-[#00233B]">{nc.executora}</span>
+                  Executora: <span className="font-medium text-foreground">{nc.executora}</span>
                 </span>
               )}
               {nc.relatorio_criador && (
                 <span>
-                  Criado por: <span className="font-medium text-[#00233B]">{nc.relatorio_criador}</span>
+                  Criado por: <span className="font-medium text-foreground">{nc.relatorio_criador}</span>
                 </span>
               )}
             </div>
             {nc.descricao_nc && (
-              <p className="text-sm text-[#00233B]/80 mt-1 line-clamp-2">{nc.descricao_nc}</p>
+              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{nc.descricao_nc}</p>
             )}
           </div>
 
@@ -114,7 +114,7 @@ export default function GestaoNCCard({
                     <select
                       value={nc.status || "aberta"}
                       onChange={(e) => onUpdateStatus(nc.id, e.target.value, false)}
-                      className="h-8 rounded-md border border-white/20 bg-white/50 px-2 text-xs text-[#00233B] cursor-pointer"
+                      className="h-8 rounded-md border border-input bg-background px-2 text-xs text-foreground cursor-pointer"
                     >
                       <option value="aberta">Aberta</option>
                       <option value="em_tratativa">Em Tratativa</option>
@@ -146,7 +146,7 @@ export default function GestaoNCCard({
                     size="sm"
                     variant="outline"
                     onClick={() => navigate(createPageUrl(`EditarNC?id=${nc.id}`))}
-                    className="h-7 text-xs border-white/30 text-[#00233B] hover:bg-white/20"
+                    className="h-7 text-xs text-foreground hover:bg-muted"
                   >
                     Editar NC
                   </Button>
@@ -162,7 +162,7 @@ export default function GestaoNCCard({
                     size="sm"
                     variant="outline"
                     onClick={() => onSolicitarAprovacao(nc)}
-                    className="h-7 text-xs border-white/30 text-[#00233B] hover:bg-white/20"
+                    className="h-7 text-xs text-foreground hover:bg-muted"
                   >
                     Solicitar Aprovação
                   </Button>
@@ -183,7 +183,7 @@ export default function GestaoNCCard({
               size="sm"
               variant="outline"
               onClick={() => window.open(createPageUrl(`RelatorioNC?id=${nc.id}`), "_blank")}
-              className="border-white/20 text-[#00233B] hover:bg-white/20"
+              className="text-foreground hover:bg-muted"
             >
               <Eye className="w-4 h-4 mr-1" />
               Relatório

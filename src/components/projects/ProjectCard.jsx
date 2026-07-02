@@ -25,11 +25,11 @@ export default function ProjectCard({
     "CAUQ";
 
   return (
-    <Card className="bg-white/20 backdrop-blur-lg border border-white/20 text-[#00233B] hover:border-white/40 transition-all">
+    <Card className="hover:border-primary/30 hover:shadow-md transition-all">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start gap-2">
           <div className="flex-1">
-            <CardTitle className="text-lg font-semibold text-[#00233B] line-clamp-1">
+            <CardTitle className="text-lg font-semibold text-foreground line-clamp-1">
               {project.name}
             </CardTitle>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -43,7 +43,7 @@ export default function ProjectCard({
               {regionalNome && (
                 <Badge
                   variant="outline"
-                  className="bg-white/50 text-[#00233B] text-xs"
+                  className="text-xs"
                 >
                   {regionalNome}
                 </Badge>
@@ -62,31 +62,31 @@ export default function ProjectCard({
       <CardContent>
         <div className="space-y-3">
           <div>
-            <p className="text-sm font-medium text-[#00233B]/80">Cliente</p>
-            <p className="text-sm text-[#00233B]">{project.client}</p>
+            <p className="text-sm font-medium text-muted-foreground">Cliente</p>
+            <p className="text-sm text-foreground">{project.client}</p>
           </div>
           {project.tipo_projeto !== "CARTA_TRACO_CONCRETO" && (
             <div>
-              <p className="text-sm font-medium text-[#00233B]/80">
+              <p className="text-sm font-medium text-muted-foreground">
                 Faixa Granulométrica
               </p>
-              <p className="text-sm text-[#00233B]">
+              <p className="text-sm text-foreground">
                 {faixa ? faixa.nome : "Não definida"}
               </p>
             </div>
           )}
           {project.tipo_projeto === "CARTA_TRACO_CONCRETO" && project.fck && (
             <div>
-              <p className="text-sm font-medium text-[#00233B]/80">FCK</p>
-              <p className="text-sm text-[#00233B]">{project.fck} MPa</p>
+              <p className="text-sm font-medium text-muted-foreground">FCK</p>
+              <p className="text-sm text-foreground">{project.fck} MPa</p>
             </div>
           )}
-          <div className="flex justify-end gap-2 pt-3 border-t border-white/20">
+          <div className="flex justify-end gap-2 pt-3 border-t border-border">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onView(project)}
-              className="text-[#00233B] hover:bg-[#566E3D]/10"
+              className="text-foreground hover:bg-[#566E3D]/10"
             >
               <Eye className="w-4 h-4 mr-1 text-[#566E3D]" />
               Ver
@@ -97,7 +97,7 @@ export default function ProjectCard({
                   variant="ghost"
                   size="sm"
                   onClick={() => onEdit(project)}
-                  className="text-[#00233B] hover:bg-amber-500/10"
+                  className="text-foreground hover:bg-amber-500/10"
                 >
                   <Edit className="w-4 h-4 mr-1 text-amber-600" />
                   Editar

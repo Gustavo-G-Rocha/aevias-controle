@@ -20,7 +20,7 @@ export const CopyIdButton = React.memo(({ id }) => {
       type="button"
       onClick={handleCopy}
       title={`Copiar ID: ${id}`}
-      className="inline-flex items-center gap-1 text-[9px] font-mono bg-black/10 hover:bg-[#BFCF99]/40 px-1.5 py-0.5 rounded transition-colors text-[#00233B]/70 hover:text-[#00233B]">
+      className="inline-flex items-center gap-1 text-[9px] font-mono bg-muted hover:bg-[#BFCF99]/40 px-1.5 py-0.5 rounded transition-colors text-muted-foreground hover:text-foreground">
       <span className="truncate max-w-[60px]">{copied ? '✓' : id.slice(0, 8) + '…'}</span>
     </button>
   );
@@ -45,17 +45,17 @@ export const DateRangePicker = React.memo(({ startDate, endDate, onStartChange, 
           {formatDateRange()}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-3 bg-[#F2F1EF]/95 backdrop-blur-lg border-white/20" align="start">
+      <PopoverContent className="w-auto p-3" align="start">
         <div className="space-y-2">
           <div>
-            <Label className="text-xs text-[#00233B]/80">Data Início</Label>
+            <Label className="text-xs text-muted-foreground">Data Início</Label>
             <Input type="date" value={startDate} onChange={(e) => onStartChange(e.target.value)}
-              className="bg-white/50 border-white/20 text-[#00233B] text-xs h-8" />
+              className="text-xs h-8" />
           </div>
           <div>
-            <Label className="text-xs text-[#00233B]/80">Data Fim</Label>
+            <Label className="text-xs text-muted-foreground">Data Fim</Label>
             <Input type="date" value={endDate} onChange={(e) => onEndChange(e.target.value)}
-              className="bg-white/50 border-white/20 text-[#00233B] text-xs h-8" />
+              className="text-xs h-8" />
           </div>
           <Button size="sm" variant="outline" className="w-full h-7 text-xs"
             onClick={() => { onStartChange(''); onEndChange(''); setIsOpen(false); }}>
@@ -77,11 +77,11 @@ export const TextColumnFilter = React.memo(({ value, onChange, placeholder }) =>
           <Filter className={`w-3 h-3 ${value ? 'text-[#BFCF99]' : ''}`} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-64 p-3 bg-[#F2F1EF]/95 backdrop-blur-lg border-white/20" align="start">
+      <PopoverContent className="w-64 p-3" align="start">
         <div className="space-y-2">
-          <Label className="text-xs text-[#00233B]/80">{placeholder}</Label>
+          <Label className="text-xs text-muted-foreground">{placeholder}</Label>
           <Input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
-            className="bg-white/50 border-white/20 text-[#00233B] text-xs h-8" />
+            className="text-xs h-8" />
           <Button size="sm" variant="outline" className="w-full h-7 text-xs"
             onClick={() => { onChange(''); setIsOpen(false); }}>
             Limpar
@@ -108,16 +108,16 @@ export const SelectColumnFilter = React.memo(({ value, onChange, options, placeh
           <Filter className={`w-3 h-3 ${value !== 'all' ? 'text-[#BFCF99]' : ''}`} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-48 p-2 bg-[#F2F1EF]/95 backdrop-blur-lg border-white/20" align="start">
+      <PopoverContent className="w-48 p-2" align="start">
         <div className="space-y-2">
-          <Label className="text-xs text-[#00233B]/80 px-2">{placeholder}</Label>
+          <Label className="text-xs text-muted-foreground px-2">{placeholder}</Label>
           <Input type="text" placeholder="Pesquisar..." value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            className="bg-white/50 border-white/20 text-[#00233B] text-xs h-8" />
+            className="text-xs h-8" />
           <div className="max-h-48 overflow-y-auto space-y-1">
             {filteredOptions.map((option) => (
               <Button key={option.value} variant="ghost" size="sm"
-                className={`w-full justify-start text-xs h-8 ${value === option.value ? 'bg-black/10' : ''}`}
+                className={`w-full justify-start text-xs h-8 ${value === option.value ? 'bg-muted' : ''}`}
                 onClick={() => { onChange(option.value); setIsOpen(false); setSearchText(''); }}>
                 {option.label}
               </Button>

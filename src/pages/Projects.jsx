@@ -85,9 +85,9 @@ export default function Projects() {
 
         {/* Form Dialog */}
         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-lg border-white/20 text-[#00233B]">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-[#00233B]">
+              <DialogTitle className="text-foreground">
                 {editingProject ? "Editar Projeto" : "Novo Projeto"}
               </DialogTitle>
             </DialogHeader>
