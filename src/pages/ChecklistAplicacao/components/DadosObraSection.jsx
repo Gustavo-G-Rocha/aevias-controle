@@ -22,7 +22,7 @@ export default function DadosObraSection({
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-[#00233B] mb-4">Dados da Obra</h3>
+      <h3 className="text-lg font-semibold mb-4">Dados da Obra</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
 
         <div>

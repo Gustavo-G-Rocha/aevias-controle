@@ -20,12 +20,12 @@ export default function ClimaSection({ periodos, isEditable, onChange }) {
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-[#00233B] mb-4">Condições Climáticas</h3>
+      <h3 className="text-lg font-semibold mb-4">Condições Climáticas</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {periodos.map((periodo, index) => (
-          <Card key={periodo.periodo} className="bg-black/5 border-white/20">
+          <Card key={periodo.periodo} className="bg-muted/30 border-border">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-[#00233B]">
+              <CardTitle className="text-sm font-medium">
                 {PERIODO_LABEL[periodo.periodo] || periodo.periodo}
               </CardTitle>
             </CardHeader>

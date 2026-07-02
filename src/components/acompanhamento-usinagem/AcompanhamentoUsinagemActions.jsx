@@ -9,9 +9,9 @@ export default function AcompanhamentoUsinagemActions({
 }) {
   if (!isEditable) {
     return (
-      <Card className="bg-blue-50 border-blue-200">
+      <Card className="bg-muted/50 border-border">
         <CardContent className="pt-6">
-          <p className="text-sm text-blue-800 text-center">
+          <p className="text-sm text-muted-foreground text-center">
             Este registro não pode mais ser editado.{' '}
             {approved ? 'Já foi aprovado.' : 'Entre em contato com o administrador.'}
           </p>
@@ -25,13 +25,11 @@ export default function AcompanhamentoUsinagemActions({
       <Button variant="outline" onClick={() => navigate(createPageUrl("MeusEnsaios"))} disabled={saving}>
         Cancelar
       </Button>
-      <Button onClick={() => onSubmit(false)} disabled={saving}
-        className="bg-gray-600 text-white hover:bg-gray-700">
+      <Button variant="outline" onClick={() => onSubmit(false)} disabled={saving}>
         {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
         Salvar Rascunho
       </Button>
-      <Button onClick={() => onSubmit(true)} disabled={saving}
-        className="bg-[#566E3D] text-white hover:bg-[#566E3D]/90">
+      <Button onClick={() => onSubmit(true)} disabled={saving}>
         {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
         Finalizar e Enviar
       </Button>

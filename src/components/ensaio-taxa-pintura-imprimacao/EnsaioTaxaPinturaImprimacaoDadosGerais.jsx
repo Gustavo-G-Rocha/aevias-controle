@@ -17,7 +17,7 @@ export default function EnsaioTaxaPinturaImprimacaoDadosGerais({
     <div className="space-y-6">
       {/* Dados da Obra */}
       <div>
-        <h3 className="text-lg font-semibold text-[#00233B] mb-4">Dados da Obra</h3>
+        <h3 className="text-lg font-semibold  mb-4">Dados da Obra</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <Label htmlFor="obra_id">Obra *</Label>
@@ -27,7 +27,7 @@ export default function EnsaioTaxaPinturaImprimacaoDadosGerais({
               onChange={(e) => onObraChange(e.target.value)}
               disabled={!isEditable}
               required
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+              className="flex h-10 w-full rounded-md border border-border bg-input px-3 py-2 text-sm"
             >
               <option value="">Selecione a obra</option>
               {obras.map(obra => (
@@ -56,7 +56,7 @@ export default function EnsaioTaxaPinturaImprimacaoDadosGerais({
               onChange={(e) => onFieldChange('tipo_servico', e.target.value)}
               disabled={!isEditable}
               required
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+              className="flex h-10 w-full rounded-md border border-border bg-input px-3 py-2 text-sm"
             >
               <option value="imprimacao">Imprimação</option>
               <option value="ligacao">Ligação</option>
@@ -70,7 +70,7 @@ export default function EnsaioTaxaPinturaImprimacaoDadosGerais({
               value={formData.rodovia}
               onChange={(e) => onFieldChange('rodovia', e.target.value)}
               disabled={!isEditable || !formData.obra_id}
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+              className="flex h-10 w-full rounded-md border border-border bg-input px-3 py-2 text-sm"
             >
               <option value="">Selecione a rodovia</option>
               {rodoviasDaObra.map((rodovia, idx) => (
@@ -119,7 +119,7 @@ export default function EnsaioTaxaPinturaImprimacaoDadosGerais({
               value={formData.ensaio_realizado_por}
               onChange={(e) => onFieldChange('ensaio_realizado_por', e.target.value)}
               disabled={!isEditable}
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+              className="flex h-10 w-full rounded-md border border-border bg-input px-3 py-2 text-sm"
             >
               <option value="Afirma Evias">Afirma Evias</option>
               <option value="Empreiteira">Empreiteira</option>
@@ -134,14 +134,14 @@ export default function EnsaioTaxaPinturaImprimacaoDadosGerais({
               onChange={(e) => onFieldChange('engenheiro_responsavel', e.target.value)}
               disabled={!isEditable}
               readOnly
-              className="bg-slate-100"
+              className="bg-muted"
             />
           </div>
         </div>
       </div>
 
       {/* Dimensões da Bandeja */}
-      <Card className="bg-black/5">
+      <Card className="bg-muted/30">
         <CardHeader>
           <CardTitle className="text-base">Dimensões da Bandeja (aplicadas a todos os ensaios)</CardTitle>
         </CardHeader>
@@ -176,7 +176,7 @@ export default function EnsaioTaxaPinturaImprimacaoDadosGerais({
               <Input
                 value={formData.dimensoes_bandeja.area?.toFixed(4) || ''}
                 disabled
-                className="bg-slate-100"
+                className="bg-muted"
               />
             </div>
           </div>

@@ -19,12 +19,12 @@ export default function EnsaioTaxaPinturaImprimacaoResultados({
       {/* Lista de Ensaios */}
       <div>
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-[#00233B]">Ensaios (máximo 4)</h3>
+          <h3 className="text-lg font-semibold ">Ensaios (máximo 4)</h3>
           {isEditable && (
             <Button
               type="button"
               onClick={onAdicionarEnsaio}
-              className="bg-[#00233B] text-[#F2F1EF]"
+              className=""
               disabled={formData.ensaios.length >= 4}
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -34,7 +34,7 @@ export default function EnsaioTaxaPinturaImprimacaoResultados({
         </div>
 
         {formData.ensaios.map((ensaio, index) => (
-          <Card key={index} className="mb-4 bg-black/5">
+          <Card key={index} className="mb-4 bg-muted/30">
             <CardHeader className="pb-3">
               <div className="flex justify-between items-center">
                 <CardTitle className="text-base">Ensaio {ensaio.numero}</CardTitle>
@@ -116,25 +116,25 @@ export default function EnsaioTaxaPinturaImprimacaoResultados({
 
               {/* Resultados Calculados */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t">
-                <div className="p-3 bg-blue-50 rounded">
-                  <Label className="text-xs text-blue-800">Peso da Emulsão (g)</Label>
-                  <p className="text-lg font-bold text-blue-900">{ensaio.peso_emulsao?.toFixed(2) || '-'}</p>
+                <div className="p-3 bg-muted/50 rounded">
+                  <Label className="text-xs text-muted-foreground">Peso da Emulsão (g)</Label>
+                  <p className="text-lg font-bold text-foreground">{ensaio.peso_emulsao?.toFixed(2) || '-'}</p>
                 </div>
-                <div className="p-3 bg-blue-50 rounded">
-                  <Label className="text-xs text-blue-800">Taxa Aplicada (l/m²)</Label>
-                  <p className="text-lg font-bold text-blue-900">{ensaio.taxa_aplicada?.toFixed(2) || '-'}</p>
+                <div className="p-3 bg-muted/50 rounded">
+                  <Label className="text-xs text-muted-foreground">Taxa Aplicada (l/m²)</Label>
+                  <p className="text-lg font-bold text-foreground">{ensaio.taxa_aplicada?.toFixed(2) || '-'}</p>
                 </div>
-                <div className="p-3 bg-green-50 rounded">
-                  <Label className="text-xs text-green-800">Resíduo (%)</Label>
-                  <p className="text-lg font-bold text-green-900">{ensaio.ensaio_residuo?.residuo?.toFixed(2) || '-'}</p>
+                <div className="p-3 bg-muted/50 rounded">
+                  <Label className="text-xs text-muted-foreground">Resíduo (%)</Label>
+                  <p className="text-lg font-bold text-foreground">{ensaio.ensaio_residuo?.residuo?.toFixed(2) || '-'}</p>
                 </div>
-                <div className="p-3 bg-green-50 rounded">
-                  <Label className="text-xs text-green-800">Taxa Emulsão Aplicada (l/m²)</Label>
-                  <p className="text-lg font-bold text-green-900">{ensaio.taxa_emulsao_aplicada?.toFixed(2) || '-'}</p>
+                <div className="p-3 bg-muted/50 rounded">
+                  <Label className="text-xs text-muted-foreground">Taxa Emulsão Aplicada (l/m²)</Label>
+                  <p className="text-lg font-bold text-foreground">{ensaio.taxa_emulsao_aplicada?.toFixed(2) || '-'}</p>
                 </div>
-                <div className="p-3 bg-green-50 rounded">
-                  <Label className="text-xs text-green-800">Taxa Residual (l/m²)</Label>
-                  <p className="text-lg font-bold text-green-900">{ensaio.taxa_residual?.toFixed(2) || '-'}</p>
+                <div className="p-3 bg-muted/50 rounded">
+                  <Label className="text-xs text-muted-foreground">Taxa Residual (l/m²)</Label>
+                  <p className="text-lg font-bold text-foreground">{ensaio.taxa_residual?.toFixed(2) || '-'}</p>
                 </div>
               </div>
             </CardContent>

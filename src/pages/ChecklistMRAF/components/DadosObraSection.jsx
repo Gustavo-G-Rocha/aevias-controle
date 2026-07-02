@@ -11,7 +11,7 @@ export default function DadosObraSection({
   handleChange, handleObraChange, handleProjectChange,
 }) {
   return (
-    <Card className="bg-slate-50">
+    <Card>
       <CardHeader className="pb-4"><CardTitle className="text-xl">Dados da Obra e Projeto</CardTitle></CardHeader>
       <CardContent className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -67,10 +67,10 @@ export default function DadosObraSection({
         </div>
 
         {regionalSelecionada && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-1 text-sm">
-            <p className="text-blue-800"><strong>📍 Regional:</strong> {regionalSelecionada.nome}</p>
+          <div className="bg-muted/50 border border-border rounded-lg p-3 space-y-1 text-sm">
+            <p className="text-foreground"><strong>📍 Regional:</strong> {regionalSelecionada.nome}</p>
             {regionalSelecionada.cliente && (
-              <p className="text-blue-800"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>
+              <p className="text-foreground"><strong>👤 Cliente:</strong> {regionalSelecionada.cliente}</p>
             )}
           </div>
         )}

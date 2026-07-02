@@ -18,7 +18,7 @@ export default function ControleAplicacaoSection({ controle, isEditable, onNeste
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-[#00233B] mb-4">Controle de Aplicação</h3>
+      <h3 className="text-lg font-semibold mb-4">Controle de Aplicação</h3>
       <div className="space-y-4">
 
         {/* Km/estaca e quantidades */}
@@ -78,7 +78,7 @@ export default function ControleAplicacaoSection({ controle, isEditable, onNeste
         {/* Tabela de ensaios */}
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-slate-300 text-sm min-w-[700px]">
-            <thead className="bg-black/5">
+            <thead className="bg-muted/30">
               <tr>
                 <th className="border border-slate-300 px-2 py-2 text-left">Ensaio</th>
                 <th className="border border-slate-300 px-2 py-2 text-center">Realizado</th>
@@ -144,7 +144,7 @@ export default function ControleAplicacaoSection({ controle, isEditable, onNeste
             onChange={(e) => onNestedChange('controle_aplicacao', 'observacoes', e.target.value)}
             disabled={!canEdit} rows={2} maxLength={500}
             placeholder="Observações sobre o controle de aplicação..." />
-          <p className="text-xs text-right text-[#00233B]/60 mt-1">
+          <p className="text-xs text-right text-muted-foreground mt-1">
             {(controle.observacoes || '').length} / 500 caracteres
           </p>
         </div>

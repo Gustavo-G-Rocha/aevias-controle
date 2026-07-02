@@ -12,7 +12,6 @@ export default function EnsaioTaxaPinturaImprimacaoActions({ saving, isEditable,
         type="button"
         variant="outline"
         onClick={() => navigate(createPageUrl('MeusEnsaios'))}
-        className="hover:bg-black/10"
       >
         Cancelar
       </Button>
@@ -23,7 +22,6 @@ export default function EnsaioTaxaPinturaImprimacaoActions({ saving, isEditable,
             variant="outline"
             disabled={saving}
             onClick={(e) => onSubmit(e, 'rascunho')}
-            className="border-[#BFCF99] text-[#00233B] hover:bg-[#BFCF99]/10"
           >
             {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Clock className="w-4 h-4 mr-2" />}
             Salvar Progresso
@@ -32,7 +30,6 @@ export default function EnsaioTaxaPinturaImprimacaoActions({ saving, isEditable,
             type="button"
             disabled={saving}
             onClick={(e) => onSubmit(e, 'finalizado')}
-            className="bg-[#00233B] text-[#F2F1EF] hover:bg-[#00233B]/90"
           >
             {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
             Finalizar

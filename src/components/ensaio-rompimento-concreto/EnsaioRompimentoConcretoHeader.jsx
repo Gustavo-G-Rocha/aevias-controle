@@ -8,10 +8,10 @@ export default function EnsaioRompimentoConcretoHeader({ editId }) {
   const navigate = useNavigate();
   return (
     <>
-      <Button variant="ghost" onClick={() => navigate(createPageUrl('MeusEnsaios'))} className="mb-6 text-[#00233B] hover:bg-black/5">
+      <Button variant="ghost" onClick={() => navigate(createPageUrl('MeusEnsaios'))} className="mb-6">
         <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
       </Button>
-      <h1 className="text-3xl font-bold text-[#00233B] mb-6">
+      <h1 className="text-3xl font-bold mb-6">
         {editId ? 'Editar Ensaio Rompimento Concreto' : 'Novo Ensaio Rompimento Concreto'}
       </h1>
     </>

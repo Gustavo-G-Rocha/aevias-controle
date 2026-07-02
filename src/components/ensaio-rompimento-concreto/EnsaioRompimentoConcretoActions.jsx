@@ -7,13 +7,13 @@ export default function EnsaioRompimentoConcretoActions({ saving, onSave }) {
   const navigate = useNavigate();
   return (
     <div className="flex gap-4 justify-end">
-      <Button variant="outline" onClick={() => navigate(createPageUrl('MeusEnsaios'))} className="border-white/20 text-[#00233B]">
+      <Button variant="outline" onClick={() => navigate(createPageUrl('MeusEnsaios'))}>
         Cancelar
       </Button>
-      <Button onClick={() => onSave(false)} disabled={saving} className="bg-[#00233B] text-white hover:bg-[#00233B]/90">
+      <Button variant="outline" onClick={() => onSave(false)} disabled={saving}>
         {saving ? 'Salvando...' : 'Salvar Rascunho'}
       </Button>
-      <Button onClick={() => onSave(true)} disabled={saving} className="bg-[#566E3D] text-white hover:bg-[#566E3D]/90">
+      <Button onClick={() => onSave(true)} disabled={saving}>
         {saving ? 'Salvando...' : 'Finalizar'}
       </Button>
     </div>

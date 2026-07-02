@@ -33,7 +33,7 @@ export default function ChecklistMRAFPage() {
   }
 
   return (
-    <div className="p-8 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-transparent min-h-screen">
       <div className="max-w-7xl mx-auto">
         <Card>
           <CardHeader className="pb-6">

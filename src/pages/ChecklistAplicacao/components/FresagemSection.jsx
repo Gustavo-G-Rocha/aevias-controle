@@ -18,13 +18,13 @@ const SWITCHES = [
 export default function FresagemSection({ fresagem, isEditable, onNestedChange }) {
   return (
     <div>
-      <h3 className="text-lg font-semibold text-[#00233B] mb-4">
+      <h3 className="text-lg font-semibold mb-4">
         Acompanhamento da Fresagem e Preparação da Superfície
       </h3>
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {SWITCHES.map(({ field, label }) => (
-            <div key={field} className="flex items-center justify-between p-3 bg-black/5 rounded-lg">
+            <div key={field} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
               <Label className="cursor-pointer">{label}</Label>
               <Switch
                 checked={fresagem[field] || false}
@@ -39,7 +39,7 @@ export default function FresagemSection({ fresagem, isEditable, onNestedChange }
             onChange={(e) => onNestedChange('fresagem_preparacao', 'observacoes', e.target.value)}
             disabled={!isEditable} rows={2} maxLength={500}
             placeholder="Observações sobre a fresagem e preparação..." />
-          <p className="text-xs text-right text-[#00233B]/60 mt-1">
+          <p className="text-xs text-right text-muted-foreground mt-1">
             {(fresagem.observacoes || '').length} / 500 caracteres
           </p>
         </div>

@@ -33,11 +33,11 @@ export default function PinturaLigacaoSection({ pintura, isEditable, onDeepChang
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-[#00233B] mb-4">Acompanhamento da Pintura de Ligação</h3>
+      <h3 className="text-lg font-semibold mb-4">Acompanhamento da Pintura de Ligação</h3>
       <div className="space-y-4">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-slate-300 text-sm min-w-[600px]">
-            <thead className="bg-black/5">
+            <thead className="bg-muted/30">
               <tr>
                 <th className="border border-slate-300 px-2 py-2 text-left">Serviço</th>
                 <th className="border border-slate-300 px-2 py-2 text-center">Realizado</th>
@@ -149,7 +149,7 @@ export default function PinturaLigacaoSection({ pintura, isEditable, onDeepChang
             onChange={(e) => onNestedChange('pintura_ligacao', 'observacoes', e.target.value)}
             disabled={!canEdit} rows={2} maxLength={500}
             placeholder="Observações sobre a pintura de ligação..." />
-          <p className="text-xs text-right text-[#00233B]/60 mt-1">
+          <p className="text-xs text-right text-muted-foreground mt-1">
             {(pintura.observacoes || '').length} / 500 caracteres
           </p>
         </div>

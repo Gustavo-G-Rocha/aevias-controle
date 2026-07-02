@@ -38,7 +38,7 @@ export default function EnsaioRompimentoConcretoPage() {
 
   if (loading) return (
     <div className="p-6 flex justify-center items-center h-screen bg-transparent">
-      <Loader2 className="w-8 h-8 animate-spin text-[#00233B]/50" />
+      <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
     </div>
   );
 

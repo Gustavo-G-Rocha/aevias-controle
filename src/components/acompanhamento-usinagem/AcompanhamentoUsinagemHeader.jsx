@@ -16,10 +16,10 @@ export default function AcompanhamentoUsinagemHeader({ editingId, rejectionReaso
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-[#00233B]">
+            <h1 className="text-3xl font-bold">
               {editingId ? 'Editar' : 'Novo'} Acompanhamento de Usinagem
             </h1>
-            <p className="text-[#00233B]/70">
+            <p className="text-muted-foreground">
               {editingId ? 'Edite os dados do acompanhamento' : 'Preencha os dados do acompanhamento'}
             </p>
           </div>
@@ -27,10 +27,10 @@ export default function AcompanhamentoUsinagemHeader({ editingId, rejectionReaso
       </div>
 
       {rejectionReason && (
-        <Card className="border-red-200 bg-red-50">
+        <Card className="border-red-700 bg-red-600">
           <CardContent className="pt-6">
-            <p className="text-sm font-semibold text-red-800 mb-1">Motivo da Reprovação:</p>
-            <p className="text-sm text-red-700">{rejectionReason}</p>
+            <p className="text-sm font-semibold text-white mb-1">Motivo da Reprovação:</p>
+            <p className="text-sm text-white/90">{rejectionReason}</p>
           </CardContent>
         </Card>
       )}

@@ -31,7 +31,7 @@ export default function ObservacoesSection({
           onChange={(e) => onChange('observacoes_gerais', e.target.value)}
           disabled={!isEditable} rows={3} maxLength={1000}
           placeholder="Observações gerais sobre o checklist..." />
-        <p className="text-xs text-right text-[#00233B]/60 mt-1">
+        <p className="text-xs text-right text-muted-foreground mt-1">
           {(formData.observacoes_gerais || '').length} / 1000 caracteres
         </p>
       </div>
@@ -69,7 +69,7 @@ export default function ObservacoesSection({
                 <picture>
                   <source srcSet={foto} />
                   <img src={foto} alt={`Foto ${index + 1}`}
-                    className="w-full h-32 object-cover rounded-lg border-2 border-white/20"
+                    className="w-full h-32 object-cover rounded-lg border-2 border-border"
                     width="auto" height="128" />
                 </picture>
                 {isEditable && (

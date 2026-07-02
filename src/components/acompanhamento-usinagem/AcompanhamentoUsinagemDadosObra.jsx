@@ -11,9 +11,9 @@ export default function AcompanhamentoUsinagemDadosObra({
   handleObraChange, handleProjectChange,
 }) {
   return (
-    <Card className="bg-white/40 backdrop-blur-lg border-white/20">
+    <Card className="bg-card border border-border">
       <CardHeader>
-        <CardTitle className="text-[#00233B]">Dados da Obra</CardTitle>
+        <CardTitle>Dados da Obra</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -88,7 +88,7 @@ export default function AcompanhamentoUsinagemDadosObra({
             <Label htmlFor="faixa_especificada">Faixa Especificada</Label>
             <Input id="faixa_especificada" value={formData.faixa_especificada}
               onChange={(e) => setFormData(prev => ({ ...prev, faixa_especificada: e.target.value }))}
-              disabled className="bg-gray-100" />
+              disabled className="bg-muted" />
           </div>
         </div>
       </CardContent>
