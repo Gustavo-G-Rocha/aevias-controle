@@ -4,11 +4,12 @@
  */
 
 import { filtrarObrasPorAcessoRegional } from '@/utils/regionalFilter';
+import { todayISO } from "@/utils/formInitialData";
 
 /** Corpo de prova vazio inicial */
 export const getCorpoProvaInicial = (numero) => ({
   numero,
-  data_execucao: new Date().toISOString().split('T')[0],
+  data_execucao: todayISO(),
   estaca: "",
   lado: "direito",
   medidas_espessura: ["", "", "", ""],
@@ -31,7 +32,7 @@ export const getInitialFormData = () => ({
   metodo_ensaio: "DNIT 428/2022",
   obra_id: "",
   project_id: "",
-  data: new Date().toISOString().split('T')[0],
+  data: todayISO(),
   usina_fornecedora: "",
   servico: "",
   rodovia: "",

@@ -3,11 +3,12 @@ import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
 import { useChecklistForm } from "@/hooks/useChecklistForm";
 import { buildDataToSave, validateForm } from "../utils/checklistReciclagemMapper";
+import { todayISO } from "@/utils/formInitialData";
 
 const getInitialFormData = () => ({
   obra_id: "",
   project_id: "",
-  data: new Date().toISOString().split('T')[0],
+  data: todayISO(),
   jornada: { horario_inicio: "", horario_fim: "" },
   rodovia: "",
   empreiteira: "",

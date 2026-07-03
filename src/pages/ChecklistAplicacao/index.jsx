@@ -32,9 +32,10 @@ import FresagemSection from "./components/FresagemSection";
 import PinturaLigacaoSection from "./components/PinturaLigacaoSection";
 import ControleAplicacaoSection from "./components/ControleAplicacaoSection";
 import ObservacoesSection from "./components/ObservacoesSection";
+import { todayISO } from "@/utils/formInitialData";
 
 function getInitialFormData() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayISO();
   return {
     obra_id: "", project_id: "", data: today,
     jornada: { horario_inicio: "", horario_fim: "" },

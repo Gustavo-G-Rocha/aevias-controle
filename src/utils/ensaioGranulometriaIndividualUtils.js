@@ -3,6 +3,7 @@
  * Sem dependências de React ou Base44.
  */
 import { filtrarPeneirasPorFaixa, PENEIRAS_CONFIG } from "@/constants/sieves";
+import { todayISO } from "@/utils/formInitialData";
 
 // ── Estado inicial ────────────────────────────────────────────────────────────
 
@@ -14,7 +15,7 @@ export const getInitialFormData = () => ({
   obra_id: "",
   project_id: "",
   tipo_material: "",
-  data_ensaio: new Date().toISOString().split('T')[0],
+  data_ensaio: todayISO(),
   horario: "",
   rodovia: "",
   pedreira: "",

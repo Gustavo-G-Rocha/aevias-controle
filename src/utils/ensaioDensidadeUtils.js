@@ -5,6 +5,7 @@
  */
 
 import { filtrarObrasPorAcessoRegional } from '@/utils/regionalFilter';
+import { todayISO } from "@/utils/formInitialData";
 
 /**
  * Retorna um furo inicial com todos os campos em branco.
@@ -37,7 +38,7 @@ export function getInitialFormData() {
   return {
     obra_id: "",
     project_id: "",
-    data_ensaio: new Date().toISOString().split('T')[0],
+    data_ensaio: todayISO(),
     horario: "",
     rodovia: "",
     trecho: "",

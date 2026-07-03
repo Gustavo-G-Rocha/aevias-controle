@@ -5,6 +5,7 @@
  */
 
 import { filtrarObrasPorAcessoRegional } from '@/utils/regionalFilter';
+import { todayISO } from "@/utils/formInitialData";
 
 // ── Estruturas iniciais ────────────────────────────────────────────────────────
 
@@ -41,7 +42,7 @@ export const getDensidadeInicial = () => ({
 
 export const getInitialFormData = () => ({
   obra_id: "",
-  data: new Date().toISOString().split('T')[0],
+  data: todayISO(),
   cliente: "",
   pista: "",
   bordo: "",

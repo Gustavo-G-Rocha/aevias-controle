@@ -6,11 +6,12 @@ import { useOfflineDetection } from "@/hooks/useOfflineDetection";
 import { buildDataToSave, validateForm } from "../utils/checklistMRAFMapper";
 import { createQueueItem } from "@/utils/offlineQueue";
 import { addOrUpdateQueueItem } from "@/services/syncService";
+import { todayISO } from "@/utils/formInitialData";
 
 const getInitialFormData = () => ({
   obra_id: "",
   project_id: "",
-  data: new Date().toISOString().split('T')[0],
+  data: todayISO(),
   jornada: { horario_inicio: "", horario_fim: "" },
   laboratorista_name: "",
   empreiteira: "",

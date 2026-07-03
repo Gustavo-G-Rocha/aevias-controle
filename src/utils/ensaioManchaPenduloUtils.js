@@ -3,6 +3,7 @@
  */
 
 import { filtrarObrasPorAcessoRegional } from '@/utils/regionalFilter';
+import { todayISO } from "@/utils/formInitialData";
 
 export const getLimitesOrgao = (orgao) => {
   const limites = {
@@ -158,8 +159,8 @@ export const prepareDadosParaSalvar = (formData) => {
 
 export const getInitialFormData = () => ({
   obra_id: '',
-  data_ensaio: new Date().toISOString().split('T')[0],
-  data_aplicacao: new Date().toISOString().split('T')[0],
+  data_ensaio: todayISO(),
+  data_aplicacao: todayISO(),
   laboratorista_name: '',
   rodovia: '',
   trecho: '',

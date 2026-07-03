@@ -3,12 +3,14 @@
  * Sem dependências de React ou Base44.
  */
 
+import { todayISO } from "@/utils/formInitialData";
+
 // ── Estado inicial ────────────────────────────────────────────────────────────
 
 export const getInitialFormData = () => ({
   obra_id: "",
   project_id: "",
-  data: new Date().toISOString().split('T')[0],
+  data: todayISO(),
   jornada: { horario_inicio: "", horario_fim: "" },
   laboratorista_name: "",
   rodovia: "",

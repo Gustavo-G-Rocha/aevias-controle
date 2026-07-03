@@ -18,11 +18,12 @@ import ControleAgregadosSection from "./components/ControleAgregadosSection";
 import RodadasProducaoSection from "./components/RodadasProducaoSection";
 import ControleLiganteSection from "./components/ControleLiganteSection";
 import ObservacoesSection from "./components/ObservacoesSection";
+import { todayISO } from "@/utils/formInitialData";
 
 const getInitialFormData = () => ({
   obra_id: "",
   project_id: "",
-  data: new Date().toISOString().split('T')[0],
+  data: todayISO(),
   jornada: { horario_inicio: "", horario_fim: "" },
   usina: "",
   projeto_utilizado: "",

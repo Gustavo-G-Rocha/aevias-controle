@@ -31,10 +31,11 @@ import ExtracaoLiganteSection from "./components/ExtracaoLiganteSection";
 import GranulometriaSection from "./components/GranulometriaSection";
 import DensidadeRiceSection from "./components/DensidadeRiceSection";
 import MarshallSection from "./components/MarshallSection";
+import { todayISO } from "@/utils/formInitialData";
 
 const getInitialFormData = () => ({
   obra_id: "", project_id: "",
-  data_ensaio: new Date().toISOString().split('T')[0],
+  data_ensaio: todayISO(),
   horario: "", placa_caminhao: "", local_coleta: "",
   usina_fornecedora: "", pedreira: "", rodovia: "", trecho: "",
   tipo_ligante: "", temperatura_cap: null,

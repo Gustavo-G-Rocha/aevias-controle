@@ -3,6 +3,8 @@
  * Sem dependências de React, SDK ou estado.
  */
 
+import { todayISO } from "@/utils/formInitialData";
+
 export const getCamadaInicial = (numero) => ({
   numero,
   prof_de: numero === 1 ? 0 : null,
@@ -30,7 +32,7 @@ export const getDensidadeInicial = () => ({
 
 export const getInitialFormData = () => ({
   obra_id: "",
-  data: new Date().toISOString().split('T')[0],
+  data: todayISO(),
   cliente: "",
   pista: "",
   bordo: "",
