@@ -4,6 +4,8 @@
  * DNER-ME 213/94 e DNER-ME 092/94
  */
 
+import { filtrarObrasPorAcessoRegional } from '@/utils/regionalFilter';
+
 // ── Estruturas iniciais ────────────────────────────────────────────────────────
 
 export const getCamadaInicial = (numero) => ({
@@ -181,21 +183,9 @@ export function calcularDensidade(d) {
  */
 export function filtrarObrasParaTrado(obrasData, regionaisData, currentUser) {
   const accessLevel = currentUser.access_level || (currentUser.role === 'admin' ? 'admin' : 'user');
-
-  if (accessLevel === 'user') {
-    const emailLower = (currentUser.email || '').toLowerCase();
-    const regionaisIds = regionaisData
-      .filter(r =>
-        (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-        (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-      )
-      .map(r => r.id);
-    if (regionaisIds.length === 0) return [];
-    const regionaisSet = new Set(regionaisIds);
-    return obrasData.filter(
-      o => regionaisSet.has(o.regional_id) && o.status === 'em_andamento' && o.tipo_obra === 'sondagem'
-    );
-  }
-
-  return obrasData.filter(o => o.tipo_obra === 'sondagem');
+  const exigeEmAndamento = accessLevel === 'user';
+  const porAcesso = filtrarObrasPorAcessoRegional(obrasData, regionaisData, currentUser);
+  return porAcesso.filter(
+    o => o.tipo_obra === 'sondagem' && (!exigeEmAndamento || o.status === 'em_andamento')
+  );
 }

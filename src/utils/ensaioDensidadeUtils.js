@@ -4,6 +4,8 @@
  * Método Frasco de Areia - DNIT 458/25
  */
 
+import { filtrarObrasPorAcessoRegional } from '@/utils/regionalFilter';
+
 /**
  * Retorna um furo inicial com todos os campos em branco.
  */
@@ -173,28 +175,10 @@ export function calcularFuroComProctor(
 export function filtrarObrasDisponiveis(obrasData, regionaisData, currentUser) {
   const accessLevel =
     currentUser.access_level || (currentUser.role === 'admin' ? 'admin' : 'user');
-
-  if (accessLevel === 'user') {
-    const emailLower = (currentUser.email || '').toLowerCase();
-    const regionaisIds = regionaisData
-      .filter(r =>
-        (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-        (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-      )
-      .map(r => r.id);
-
-    if (regionaisIds.length === 0) return [];
-    const regionaisSet = new Set(regionaisIds);
-
-    return obrasData.filter(
-      obra =>
-        regionaisSet.has(obra.regional_id) &&
-        obra.status === 'em_andamento' &&
-        (obra.tipo_obra === 'implantacao' || obra.tipo_obra === 'conservacao')
-    );
-  }
-
-  return obrasData.filter(
-    obra => obra.tipo_obra === 'implantacao' || obra.tipo_obra === 'conservacao'
+  const tiposSet = new Set(['implantacao', 'conservacao']);
+  const exigeEmAndamento = accessLevel === 'user';
+  const porAcesso = filtrarObrasPorAcessoRegional(obrasData, regionaisData, currentUser);
+  return porAcesso.filter(
+    obra => tiposSet.has(obra.tipo_obra) && (!exigeEmAndamento || obra.status === 'em_andamento')
   );
 }

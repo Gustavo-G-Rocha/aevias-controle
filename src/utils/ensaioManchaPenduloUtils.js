@@ -2,6 +2,8 @@
  * Funções puras para cálculos e classificações de Ensaio Mancha Pêndulo
  */
 
+import { filtrarObrasPorAcessoRegional } from '@/utils/regionalFilter';
+
 export const getLimitesOrgao = (orgao) => {
   const limites = {
     'DER/PR': { hs_min: 0.6, hs_max: 1.2, vrd_min: 50 },
@@ -175,28 +177,15 @@ export const getInitialFormData = () => ({
 });
 
 export const filterObrasPorAcesso = (obras, user, regionais, isAdmin, userAccessLevel) => {
-  let obrasDisponiveis = obras.filter(o => 
-    o.tipo_obra === 'conservacao' || 
-    o.tipo_obra === 'supervisao' || 
+  const porTipo = obras.filter(o =>
+    o.tipo_obra === 'conservacao' ||
+    o.tipo_obra === 'supervisao' ||
     o.tipo_obra === 'implantacao'
   );
 
   if (!isAdmin && userAccessLevel === 'user') {
-    const emailLower = (user.email || '').toLowerCase();
-    const regionaisIds = regionais
-      .filter(r =>
-        (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-        (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-      )
-      .map(r => r.id);
-
-    if (regionaisIds.length > 0) {
-      const regionaisSet = new Set(regionaisIds);
-      obrasDisponiveis = obrasDisponiveis.filter(obra => regionaisSet.has(obra.regional_id));
-    } else {
-      obrasDisponiveis = [];
-    }
+    return filtrarObrasPorAcessoRegional(porTipo, regionais, user);
   }
 
-  return obrasDisponiveis;
+  return porTipo;
 };

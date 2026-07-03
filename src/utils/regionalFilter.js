@@ -47,6 +47,40 @@ export const filterRegionaisByAccessLevel = (regionais, user) => {
       return laboratoristas.some(email => email.toLowerCase() === user.email.toLowerCase());
     });
   }
-  
+
   return [];
+};
+
+/**
+ * Filtra OBRAS pelo acesso/regional do usuário — núcleo único de permissão.
+ *
+ * Regra validada na correção do bug de permissões:
+ * - Laboratorista (access_level === 'user'): vê apenas obras cuja regional ele
+ *   está vinculado como laboratorista_responsavel OU sala_tecnica_responsavel.
+ *   Se não pertence a nenhuma regional, não vê nenhuma obra.
+ * - Demais níveis (admin, sala_tecnica_afirmaevias, gestor_contrato, cliente):
+ *   veem todas as obras (sem restrição de regional).
+ *
+ * NÃO aplica filtros de tipo_obra/status — esses são específicos de cada ensaio
+ * e devem ser aplicados pelo chamador sobre o resultado.
+ *
+ * @param {Array} obras
+ * @param {Array} regionais
+ * @param {object} user
+ * @returns {Array} obras filtradas por acesso/regional
+ */
+export const filtrarObrasPorAcessoRegional = (obras, regionais, user) => {
+  if (!obras || !regionais || !user) return [];
+  const accessLevel = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
+  if (accessLevel !== 'user') return obras;
+  const emailLower = (user.email || '').toLowerCase();
+  const regionaisIds = regionais
+    .filter(r =>
+      (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+      (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+    )
+    .map(r => r.id);
+  if (regionaisIds.length === 0) return [];
+  const regionaisSet = new Set(regionaisIds);
+  return obras.filter(o => regionaisSet.has(o.regional_id));
 };

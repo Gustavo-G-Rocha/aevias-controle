@@ -3,6 +3,8 @@
  * Sem side effects, sem chamadas de API.
  */
 
+import { filtrarObrasPorAcessoRegional } from '@/utils/regionalFilter';
+
 // ── Constantes ────────────────────────────────────────────────────────────────
 
 export const DIMENSOES_CP = ['5x10', '15x30', '10x20'];
@@ -67,20 +69,9 @@ export function calcularResistenciaFlexaoCp(cp, serie) {
 const TIPOS_OBRA_VALIDOS = ['implantacao', 'conservacao', 'supervisao'];
 
 export function filtrarObras(obras, user, regionais) {
-  const nivel = user?.access_level || (user?.role === 'admin' ? 'admin' : 'user');
-  if (nivel === 'user') {
-    const emailLower = (user?.email || '').toLowerCase();
-    const regionaisIds = regionais
-      .filter(r =>
-        (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-        (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-      )
-      .map(r => r.id);
-    if (regionaisIds.length === 0) return [];
-    const regionaisSet = new Set(regionaisIds);
-    return obras.filter(o => regionaisSet.has(o.regional_id) && TIPOS_OBRA_VALIDOS.includes(o.tipo_obra));
-  }
-  return obras.filter(o => TIPOS_OBRA_VALIDOS.includes(o.tipo_obra));
+  const tiposSet = new Set(TIPOS_OBRA_VALIDOS);
+  const porAcesso = filtrarObrasPorAcessoRegional(obras, regionais, user);
+  return porAcesso.filter(o => tiposSet.has(o.tipo_obra));
 }
 
 // ── Factories de séries ───────────────────────────────────────────────────────

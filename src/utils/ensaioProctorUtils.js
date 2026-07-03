@@ -4,6 +4,8 @@
  * ABNT NBR 7182:2016 — Compactação de Solos
  */
 
+import { filtrarObrasPorAcessoRegional } from '@/utils/regionalFilter';
+
 // ── Estruturas iniciais ────────────────────────────────────────────────────────
 
 export const getUmidadePontoInicial = () => ({
@@ -260,16 +262,7 @@ export function sanitizeFormForSave(form) {
  * Admin/sala técnica/gestor veem todas; laboratorista (role=user) só vê as da sua regional.
  */
 export function filtrarObrasProctor(obrasData, regionaisData, userData) {
-  const isLabUser = !userData.role || userData.role === 'user';
-  if (!isLabUser) return obrasData;
-
-  const regionaisDoLab = regionaisData.filter(r =>
-    (r.laboratoristas_responsaveis || []).some(
-      email => email.toLowerCase() === userData.email.toLowerCase()
-    )
-  );
-  const regionalIds = regionaisDoLab.map(r => r.id);
-  return obrasData.filter(o => regionalIds.includes(o.regional_id));
+  return filtrarObrasPorAcessoRegional(obrasData, regionaisData, userData);
 }
 
 // ── Validação de campos obrigatórios ──────────────────────────────────────────

@@ -4,6 +4,8 @@
  * Referência: DNIT 145/2012 - ES
  */
 
+import { filtrarObrasPorAcessoRegional } from '@/utils/regionalFilter';
+
 // ── Estrutura inicial ─────────────────────────────────────────────────────────
 
 export const getEnsaioInicial = (numero) => ({
@@ -112,23 +114,10 @@ const TIPOS_OBRA_VALIDOS = ['implantacao', 'conservacao', 'supervisao'];
  */
 export function filtrarObrasDisponiveis(obrasData, regionaisData, userData) {
   const accessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
-
-  if (accessLevel === 'user') {
-    const emailLower = (userData?.email || '').toLowerCase();
-    const regionaisIds = regionaisData
-      .filter(r =>
-        (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-        (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-      )
-      .map(r => r.id);
-    if (regionaisIds.length === 0) return [];
-    const regionaisSet = new Set(regionaisIds);
-    return obrasData.filter(o =>
-      regionaisSet.has(o.regional_id) &&
-      o.status === 'em_andamento' &&
-      TIPOS_OBRA_VALIDOS.includes(o.tipo_obra)
-    );
-  }
-
-  return obrasData.filter(o => TIPOS_OBRA_VALIDOS.includes(o.tipo_obra));
+  const tiposSet = new Set(TIPOS_OBRA_VALIDOS);
+  const exigeEmAndamento = accessLevel === 'user';
+  const porAcesso = filtrarObrasPorAcessoRegional(obrasData, regionaisData, userData);
+  return porAcesso.filter(o =>
+    tiposSet.has(o.tipo_obra) && (!exigeEmAndamento || o.status === 'em_andamento')
+  );
 }

@@ -4,6 +4,8 @@
  * DNIT 006/2003-PRO — Avaliação Estrutural com Viga Benkelman
  */
 
+import { filtrarObrasPorAcessoRegional } from '@/utils/regionalFilter';
+
 // ── Estruturas iniciais ────────────────────────────────────────────────────────
 
 export const LADOS_PERMITIDOS = ['bordo_esquerdo', 'eixo', 'bordo_direito'];
@@ -173,17 +175,5 @@ export function serializarFaixas(faixas, def_admissivel) {
  * Admin/sala técnica/gestor veem todas; laboratorista (role=user) só vê da sua regional.
  */
 export function filtrarObrasVigaBenkelman(obrasData, regionaisData, userData) {
-  const userAccessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
-  if (userAccessLevel !== 'user') return obrasData;
-
-  const emailLower = (userData.email || '').toLowerCase();
-  const regionaisIds = regionaisData
-    .filter(r =>
-      (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-      (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-    )
-    .map(r => r.id);
-  if (regionaisIds.length === 0) return [];
-  const regionaisSet = new Set(regionaisIds);
-  return obrasData.filter(o => regionaisSet.has(o.regional_id));
+  return filtrarObrasPorAcessoRegional(obrasData, regionaisData, userData);
 }

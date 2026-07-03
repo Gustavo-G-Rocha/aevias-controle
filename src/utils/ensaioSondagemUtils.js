@@ -3,6 +3,8 @@
  * Sem dependências de React, SDK ou estado.
  */
 
+import { filtrarObrasPorAcessoRegional } from '@/utils/regionalFilter';
+
 /** Corpo de prova vazio inicial */
 export const getCorpoProvaInicial = (numero) => ({
   numero,
@@ -253,24 +255,14 @@ export const validarArquivoFoto = (file) => {
  */
 export const filtrarObrasPorAcesso = (obrasData, regionaisData, userData) => {
   const accessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
-  if (accessLevel === 'user') {
-    const emailLower = (userData.email || '').toLowerCase();
-    const regionaisIds = regionaisData
-      .filter(r =>
-        (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-        (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-      )
-      .map(r => r.id);
-    if (regionaisIds.length === 0) return [];
-    const regionaisSet = new Set(regionaisIds);
-    return obrasData.filter(o =>
-      regionaisSet.has(o.regional_id) &&
-      o.status === 'em_andamento' &&
-      (o.tipo_obra === 'implantacao' || o.tipo_obra === 'supervisao')
-    );
-  }
-  return obrasData.filter(o =>
-    o.tipo_obra === 'implantacao' || o.tipo_obra === 'conservacao' || o.tipo_obra === 'supervisao'
+  const tiposValidos = accessLevel === 'user'
+    ? ['implantacao', 'supervisao']
+    : ['implantacao', 'conservacao', 'supervisao'];
+  const tiposSet = new Set(tiposValidos);
+  const exigeEmAndamento = accessLevel === 'user';
+  const porAcesso = filtrarObrasPorAcessoRegional(obrasData, regionaisData, userData);
+  return porAcesso.filter(o =>
+    tiposSet.has(o.tipo_obra) && (!exigeEmAndamento || o.status === 'em_andamento')
   );
 };
 
