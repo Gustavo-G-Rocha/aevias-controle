@@ -1,25 +1,44 @@
 import { base44 } from '@/api/base44Client';
+import { withServiceCall } from '@/utils/serviceErrorHandler';
 
 export async function listarCertificacoes(limit = 200) {
-  return base44.entities.CertificacaoUsina.list('-created_date', limit);
+  return withServiceCall(
+    () => base44.entities.CertificacaoUsina.list('-created_date', limit),
+    'Falha ao carregar certificações'
+  );
 }
 
 export async function listarCertificacoesPorObra(obraId) {
-  return base44.entities.CertificacaoUsina.filter({ obra_id: obraId }, '-created_date', 200);
+  return withServiceCall(
+    () => base44.entities.CertificacaoUsina.filter({ obra_id: obraId }, '-created_date', 200),
+    'Falha ao carregar certificações da obra'
+  );
 }
 
 export async function obterCertificacaoById(id) {
-  return base44.entities.CertificacaoUsina.get(id);
+  return withServiceCall(
+    () => base44.entities.CertificacaoUsina.get(id),
+    'Falha ao carregar certificação'
+  );
 }
 
 export async function criarCertificacao(data) {
-  return base44.entities.CertificacaoUsina.create(data);
+  return withServiceCall(
+    () => base44.entities.CertificacaoUsina.create(data),
+    'Falha ao criar certificação'
+  );
 }
 
 export async function atualizarCertificacao(id, data) {
-  return base44.entities.CertificacaoUsina.update(id, data);
+  return withServiceCall(
+    () => base44.entities.CertificacaoUsina.update(id, data),
+    'Falha ao atualizar certificação'
+  );
 }
 
 export async function deletarCertificacao(id) {
-  return base44.entities.CertificacaoUsina.delete(id);
+  return withServiceCall(
+    () => base44.entities.CertificacaoUsina.delete(id),
+    'Falha ao excluir certificação'
+  );
 }

@@ -1,32 +1,54 @@
 import { base44 } from '@/api/base44Client';
+import { withServiceCall } from '@/utils/serviceErrorHandler';
 
 /**
  * Service centralizado para operações com Obras
  */
 export async function listarObrasRecentes(limit = 500) {
-  return base44.entities.Obra.list('-created_date', limit);
+  return withServiceCall(
+    () => base44.entities.Obra.list('-created_date', limit),
+    'Falha ao carregar obras'
+  );
 }
 
 export async function listarObrasPorRegional(regionalId) {
-  return base44.entities.Obra.filter({ regional_id: regionalId }, '-created_date', 500);
+  return withServiceCall(
+    () => base44.entities.Obra.filter({ regional_id: regionalId }, '-created_date', 500),
+    'Falha ao carregar obras da regional'
+  );
 }
 
 export async function listarObrasAtivas() {
-  return base44.entities.Obra.filter({ status: 'em_andamento' }, '-created_date', 500);
+  return withServiceCall(
+    () => base44.entities.Obra.filter({ status: 'em_andamento' }, '-created_date', 500),
+    'Falha ao carregar obras ativas'
+  );
 }
 
 export async function obterObraById(id) {
-  return base44.entities.Obra.read(id);
+  return withServiceCall(
+    () => base44.entities.Obra.read(id),
+    'Falha ao carregar obra'
+  );
 }
 
 export async function criarObra(data) {
-  return base44.entities.Obra.create(data);
+  return withServiceCall(
+    () => base44.entities.Obra.create(data),
+    'Falha ao criar obra'
+  );
 }
 
 export async function atualizarObra(id, data) {
-  return base44.entities.Obra.update(id, data);
+  return withServiceCall(
+    () => base44.entities.Obra.update(id, data),
+    'Falha ao atualizar obra'
+  );
 }
 
 export async function deletarObra(id) {
-  return base44.entities.Obra.delete(id);
+  return withServiceCall(
+    () => base44.entities.Obra.delete(id),
+    'Falha ao excluir obra'
+  );
 }

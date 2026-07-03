@@ -1,45 +1,76 @@
 import { base44 } from '@/api/base44Client';
+import { withServiceCall } from '@/utils/serviceErrorHandler';
 
 /**
  * Service centralizado para operações com Solicitações de Transferência
  * (Obra e Regional)
  */
 export async function listarSolicitacoesTransferenciaObra() {
-  return base44.entities.SolicitacaoTransferenciaObra.list();
+  return withServiceCall(
+    () => base44.entities.SolicitacaoTransferenciaObra.list(),
+    'Falha ao carregar solicitações de transferência'
+  );
 }
 
 export async function listarSolicitacoesTransferenciaRegional(sort = '-created_date') {
-  return base44.entities.SolicitacaoTransferenciaRegional.list(sort);
+  return withServiceCall(
+    () => base44.entities.SolicitacaoTransferenciaRegional.list(sort),
+    'Falha ao carregar solicitações de transferência'
+  );
 }
 
 export async function listarSolicitacoesTransferenciaObraPorStatus(status) {
-  return base44.entities.SolicitacaoTransferenciaObra.filter({ status });
+  return withServiceCall(
+    () => base44.entities.SolicitacaoTransferenciaObra.filter({ status }),
+    'Falha ao carregar solicitações de transferência'
+  );
 }
 
 export async function listarSolicitacoesTransferenciaRegionalPorStatus(status) {
-  return base44.entities.SolicitacaoTransferenciaRegional.filter({ status });
+  return withServiceCall(
+    () => base44.entities.SolicitacaoTransferenciaRegional.filter({ status }),
+    'Falha ao carregar solicitações de transferência'
+  );
 }
 
 export async function obterSolicitacaoTransferenciaObraById(id) {
-  return base44.entities.SolicitacaoTransferenciaObra.read(id);
+  return withServiceCall(
+    () => base44.entities.SolicitacaoTransferenciaObra.read(id),
+    'Falha ao carregar solicitação de transferência'
+  );
 }
 
 export async function obterSolicitacaoTransferenciaRegionalById(id) {
-  return base44.entities.SolicitacaoTransferenciaRegional.read(id);
+  return withServiceCall(
+    () => base44.entities.SolicitacaoTransferenciaRegional.read(id),
+    'Falha ao carregar solicitação de transferência'
+  );
 }
 
 export async function criarSolicitacaoTransferenciaObra(data) {
-  return base44.entities.SolicitacaoTransferenciaObra.create(data);
+  return withServiceCall(
+    () => base44.entities.SolicitacaoTransferenciaObra.create(data),
+    'Falha ao criar solicitação de transferência'
+  );
 }
 
 export async function criarSolicitacaoTransferenciaRegional(data) {
-  return base44.entities.SolicitacaoTransferenciaRegional.create(data);
+  return withServiceCall(
+    () => base44.entities.SolicitacaoTransferenciaRegional.create(data),
+    'Falha ao criar solicitação de transferência'
+  );
 }
 
 export async function atualizarSolicitacaoTransferenciaObra(id, data) {
-  return base44.entities.SolicitacaoTransferenciaObra.update(id, data);
+  return withServiceCall(
+    () => base44.entities.SolicitacaoTransferenciaObra.update(id, data),
+    'Falha ao atualizar solicitação de transferência'
+  );
 }
 
 export async function atualizarSolicitacaoTransferenciaRegional(id, data) {
-  return base44.entities.SolicitacaoTransferenciaRegional.update(id, data);
+  return withServiceCall(
+    () => base44.entities.SolicitacaoTransferenciaRegional.update(id, data),
+    'Falha ao atualizar solicitação de transferência'
+  );
 }

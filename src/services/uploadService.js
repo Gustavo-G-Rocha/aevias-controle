@@ -1,4 +1,5 @@
 import { base44 } from '@/api/base44Client';
+import { withServiceCall } from '@/utils/serviceErrorHandler';
 
 /**
  * Service centralizado para upload de arquivos e imagens
@@ -14,7 +15,10 @@ export async function uploadImagem(file) {
     throw new Error('Arquivo excede o tamanho máximo de 10MB');
   }
 
-  return base44.integrations.Core.UploadFile({ file });
+  return withServiceCall(
+    () => base44.integrations.Core.UploadFile({ file }),
+    'Falha ao enviar imagem'
+  );
 }
 
 export async function uploadMultiplasImagens(files) {
@@ -46,5 +50,8 @@ export async function uploadArquivo(file) {
     throw new Error('Arquivo excede o tamanho máximo de 50MB');
   }
 
-  return base44.integrations.Core.UploadFile({ file });
+  return withServiceCall(
+    () => base44.integrations.Core.UploadFile({ file }),
+    'Falha ao enviar arquivo'
+  );
 }

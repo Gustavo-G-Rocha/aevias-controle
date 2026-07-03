@@ -1,4 +1,5 @@
 import { base44 } from '@/api/base44Client';
+import { withServiceCall } from '@/utils/serviceErrorHandler';
 
 /**
  * Service centralizado para operações com Ensaios
@@ -25,57 +26,78 @@ export async function listarEnsaios(entityName, limit = 500) {
   if (!ENSAIO_ENTITIES[entityName]) {
     throw new Error(`Entidade ensaio desconhecida: ${entityName}`);
   }
-  return base44.entities[entityName].list('-created_date', limit);
+  return withServiceCall(
+    () => base44.entities[entityName].list('-created_date', limit),
+    'Falha ao carregar ensaios'
+  );
 }
 
 export async function listarEnsaiosPorObra(entityName, obraId) {
   if (!ENSAIO_ENTITIES[entityName]) {
     throw new Error(`Entidade ensaio desconhecida: ${entityName}`);
   }
-  return base44.entities[entityName].filter({ obra_id: obraId }, '-created_date', 500);
+  return withServiceCall(
+    () => base44.entities[entityName].filter({ obra_id: obraId }, '-created_date', 500),
+    'Falha ao carregar ensaios da obra'
+  );
 }
 
 export async function obterEnsaioById(entityName, id) {
   if (!ENSAIO_ENTITIES[entityName]) {
     throw new Error(`Entidade ensaio desconhecida: ${entityName}`);
   }
-  return base44.entities[entityName].read(id);
+  return withServiceCall(
+    () => base44.entities[entityName].read(id),
+    'Falha ao carregar ensaio'
+  );
 }
 
 export async function criarEnsaio(entityName, data) {
   if (!ENSAIO_ENTITIES[entityName]) {
     throw new Error(`Entidade ensaio desconhecida: ${entityName}`);
   }
-  return base44.entities[entityName].create(data);
+  return withServiceCall(
+    () => base44.entities[entityName].create(data),
+    'Falha ao criar ensaio'
+  );
 }
 
 export async function atualizarEnsaio(entityName, id, data) {
   if (!ENSAIO_ENTITIES[entityName]) {
     throw new Error(`Entidade ensaio desconhecida: ${entityName}`);
   }
-  return base44.entities[entityName].update(id, data);
+  return withServiceCall(
+    () => base44.entities[entityName].update(id, data),
+    'Falha ao atualizar ensaio'
+  );
 }
 
 export async function deletarEnsaio(entityName, id) {
   if (!ENSAIO_ENTITIES[entityName]) {
     throw new Error(`Entidade ensaio desconhecida: ${entityName}`);
   }
-  return base44.entities[entityName].delete(id);
+  return withServiceCall(
+    () => base44.entities[entityName].delete(id),
+    'Falha ao excluir ensaio'
+  );
 }
 
 export async function obterSchemaEnsaio(entityName) {
   if (!ENSAIO_ENTITIES[entityName]) {
     throw new Error(`Entidade ensaio desconhecida: ${entityName}`);
   }
-  return base44.entities[entityName].schema();
+  return withServiceCall(
+    () => base44.entities[entityName].schema(),
+    'Falha ao carregar esquema do ensaio'
+  );
 }
 
 export async function assinarEnsaio(ensaio, user) {
   if (!ensaio?.id) {
     throw new Error('Ensaio inválido');
   }
-  
-  const entityName = Object.keys(ENSAIO_ENTITIES).find(key => 
+
+  const entityName = Object.keys(ENSAIO_ENTITIES).find(key =>
     ENSAIO_ENTITIES[key] === ensaio.constructor?.name || key === ensaio.tipo_ensaio
   ) || detectEntityName(ensaio);
 
@@ -88,7 +110,10 @@ export async function assinarEnsaio(ensaio, user) {
     }
   };
 
-  return base44.entities[entityName].update(ensaio.id, signatureData);
+  return withServiceCall(
+    () => base44.entities[entityName].update(ensaio.id, signatureData),
+    'Falha ao assinar ensaio'
+  );
 }
 
 export async function aprovarEnsaio(ensaio, user) {
@@ -109,7 +134,10 @@ export async function aprovarEnsaio(ensaio, user) {
     }
   };
 
-  return base44.entities[entityName].update(ensaio.id, approvalData);
+  return withServiceCall(
+    () => base44.entities[entityName].update(ensaio.id, approvalData),
+    'Falha ao aprovar ensaio'
+  );
 }
 
 export async function reprovarEnsaio(ensaio, user, rejectionReason) {
@@ -132,7 +160,10 @@ export async function reprovarEnsaio(ensaio, user, rejectionReason) {
     }
   };
 
-  return base44.entities[entityName].update(ensaio.id, rejectionData);
+  return withServiceCall(
+    () => base44.entities[entityName].update(ensaio.id, rejectionData),
+    'Falha ao reprovar ensaio'
+  );
 }
 
 export async function excluirEnsaio(ensaio) {
@@ -141,7 +172,10 @@ export async function excluirEnsaio(ensaio) {
   }
 
   const entityName = detectEntityName(ensaio);
-  return base44.entities[entityName].delete(ensaio.id);
+  return withServiceCall(
+    () => base44.entities[entityName].delete(ensaio.id),
+    'Falha ao excluir ensaio'
+  );
 }
 
 function detectEntityName(ensaio) {

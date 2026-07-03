@@ -1,36 +1,61 @@
 import { base44 } from '@/api/base44Client';
+import { withServiceCall } from '@/utils/serviceErrorHandler';
 
 /**
  * Service centralizado para operações com Projects
  */
 export async function listarProjects() {
-  return base44.entities.Project.list();
+  return withServiceCall(
+    () => base44.entities.Project.list(),
+    'Falha ao carregar projetos'
+  );
 }
 
 export async function listarProjectsPorTipo(tipo) {
-  return base44.entities.Project.filter({ tipo_projeto: tipo });
+  return withServiceCall(
+    () => base44.entities.Project.filter({ tipo_projeto: tipo }),
+    'Falha ao carregar projetos'
+  );
 }
 
 export async function listarProjectsAtivos() {
-  return base44.entities.Project.filter({ status: 'ativo' });
+  return withServiceCall(
+    () => base44.entities.Project.filter({ status: 'ativo' }),
+    'Falha ao carregar projetos ativos'
+  );
 }
 
 export async function obterProjectById(id) {
-  return base44.entities.Project.read(id);
+  return withServiceCall(
+    () => base44.entities.Project.read(id),
+    'Falha ao carregar projeto'
+  );
 }
 
 export async function criarProject(data) {
-  return base44.entities.Project.create(data);
+  return withServiceCall(
+    () => base44.entities.Project.create(data),
+    'Falha ao criar projeto'
+  );
 }
 
 export async function atualizarProject(id, data) {
-  return base44.entities.Project.update(id, data);
+  return withServiceCall(
+    () => base44.entities.Project.update(id, data),
+    'Falha ao atualizar projeto'
+  );
 }
 
 export async function deletarProject(id) {
-  return base44.entities.Project.delete(id);
+  return withServiceCall(
+    () => base44.entities.Project.delete(id),
+    'Falha ao excluir projeto'
+  );
 }
 
 export async function obterSchemaProject() {
-  return base44.entities.Project.schema();
+  return withServiceCall(
+    () => base44.entities.Project.schema(),
+    'Falha ao carregar esquema do projeto'
+  );
 }

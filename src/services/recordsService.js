@@ -3,6 +3,7 @@
 // Paginação inteligente: limites distintos por contexto (dashboard vs lista completa)
 
 import { base44 } from '@/api/base44Client';
+import { withServiceCall } from '@/utils/serviceErrorHandler';
 
 // ─── Mapa canônico de todas as entidades de registro ──────────────────────────
 // Limite único por entidade — cache unificado entre Dashboard e MeusEnsaios
@@ -250,7 +251,10 @@ export async function filtrarRegistros(entityName, filtro, sort = '-created_date
  * @param {object} data
  */
 export async function atualizarRegistro(entityName, id, data) {
-  return base44.entities[entityName].update(id, data);
+  return withServiceCall(
+    () => base44.entities[entityName].update(id, data),
+    'Falha ao atualizar registro'
+  );
 }
 
 /**
@@ -260,7 +264,10 @@ export async function atualizarRegistro(entityName, id, data) {
  * @returns {Promise<object>}
  */
 export async function obterRegistro(entityName, id) {
-  return base44.entities[entityName].read(id);
+  return withServiceCall(
+    () => base44.entities[entityName].read(id),
+    'Falha ao carregar registro'
+  );
 }
 
 /**
@@ -269,7 +276,10 @@ export async function obterRegistro(entityName, id) {
  * @param {string} id
  */
 export async function deletarRegistro(entityName, id) {
-  return base44.entities[entityName].delete(id);
+  return withServiceCall(
+    () => base44.entities[entityName].delete(id),
+    'Falha ao excluir registro'
+  );
 }
 
 /**
@@ -278,5 +288,8 @@ export async function deletarRegistro(entityName, id) {
  * @param {object} data
  */
 export async function criarRegistro(entityName, data) {
-  return base44.entities[entityName].create(data);
+  return withServiceCall(
+    () => base44.entities[entityName].create(data),
+    'Falha ao criar registro'
+  );
 }

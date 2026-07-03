@@ -189,6 +189,22 @@
   ],
   "rls": {
     "read": {},
-    "write": {}
+    "create": {},
+    "update": {
+      "$or": [
+        { "created_by": "{{user.email}}" },
+        { "user_condition": { "role": "admin" } },
+        { "user_condition": { "access_level": "sala_tecnica_afirmaevias" } },
+        { "user_condition": { "access_level": "gestor_contrato" } }
+      ]
+    },
+    "delete": {
+      "$or": [
+        { "created_by": "{{user.email}}" },
+        { "user_condition": { "role": "admin" } },
+        { "user_condition": { "access_level": "sala_tecnica_afirmaevias" } },
+        { "user_condition": { "access_level": "gestor_contrato" } }
+      ]
+    }
   }
 }
