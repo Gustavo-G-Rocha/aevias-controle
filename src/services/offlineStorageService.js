@@ -1,3 +1,5 @@
+import { logger } from '@/utils/logger';
+
 /**
  * offlineStorageService.js
  * Gerencia IndexedDB para armazenamento offline
@@ -26,13 +28,13 @@ async function initDB() {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onerror = () => {
-      console.error('[offlineStorage] Erro ao abrir IndexedDB:', request.error);
+      logger.error('[offlineStorage] Erro ao abrir IndexedDB:', request.error);
       reject(request.error);
     };
 
     request.onsuccess = () => {
       db = request.result;
-      console.log('[offlineStorage] IndexedDB inicializado');
+      logger.log('[offlineStorage] IndexedDB inicializado');
       resolve(db);
     };
 
@@ -46,7 +48,7 @@ async function initDB() {
         store.createIndex('status', 'status', { unique: false });
         store.createIndex('entityType', 'entityType', { unique: false });
         store.createIndex('dataHash', 'dataHash', { unique: false });
-        console.log('[offlineStorage] Store criado:', STORE_QUEUE);
+        logger.log('[offlineStorage] Store criado:', STORE_QUEUE);
       }
     };
   });
@@ -66,12 +68,12 @@ export async function addQueueItem(item) {
     const request = store.add(item);
 
     request.onerror = () => {
-      console.error('[offlineStorage] Erro ao adicionar item:', request.error);
+      logger.error('[offlineStorage] Erro ao adicionar item:', request.error);
       reject(request.error);
     };
 
     request.onsuccess = () => {
-      console.log('[offlineStorage] Item adicionado:', item.id);
+      logger.log('[offlineStorage] Item adicionado:', item.id);
       resolve(item.id);
     };
   });
@@ -118,7 +120,7 @@ export async function updateQueueItem(itemId, updates) {
 
     request.onerror = () => reject(request.error);
     request.onsuccess = () => {
-      console.log('[offlineStorage] Item atualizado:', itemId);
+      logger.log('[offlineStorage] Item atualizado:', itemId);
       resolve();
     };
   });
@@ -139,7 +141,7 @@ export async function removeQueueItem(itemId) {
 
     request.onerror = () => reject(request.error);
     request.onsuccess = () => {
-      console.log('[offlineStorage] Item removido:', itemId);
+      logger.log('[offlineStorage] Item removido:', itemId);
       resolve();
     };
   });
@@ -225,7 +227,7 @@ export async function clearQueue() {
 
     request.onerror = () => reject(request.error);
     request.onsuccess = () => {
-      console.log('[offlineStorage] Fila limpa');
+      logger.log('[offlineStorage] Fila limpa');
       resolve();
     };
   });

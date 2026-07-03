@@ -10,6 +10,7 @@ import {
   removeQueueItem,
   findDuplicateQueueItem,
 } from './offlineStorageService';
+import { logger } from '@/utils/logger';
 
 /**
  * Sincroniza um item da fila com Base44
@@ -19,7 +20,7 @@ import {
  */
 export async function syncQueueItem(item) {
   if (!item || !item.id) {
-    console.error('[syncService] Item inválido:', item);
+    logger.error('[syncService] Item inválido:', item);
     return { success: false, error: 'Item inválido' };
   }
 
@@ -33,11 +34,11 @@ export async function syncQueueItem(item) {
     let result;
     if (operation === 'create') {
       result = await base44.entities[entityType].create(payload);
-      console.log(`[syncService] Created ${entityType}:`, result.id);
+      logger.log(`[syncService] Created ${entityType}:`, result.id);
     } else if (operation === 'update' && entityId) {
       await base44.entities[entityType].update(entityId, payload);
       result = { id: entityId };
-      console.log(`[syncService] Updated ${entityType}:`, entityId);
+      logger.log(`[syncService] Updated ${entityType}:`, entityId);
     } else {
       throw new Error(`Operação desconhecida: ${operation}`);
     }
@@ -51,7 +52,7 @@ export async function syncQueueItem(item) {
 
     return { success: true };
   } catch (error) {
-    console.error(`[syncService] Erro ao sincronizar ${item.id}:`, error?.message);
+    logger.error(`[syncService] Erro ao sincronizar ${item.id}:`, error?.message);
 
     // Incrementar tentativas e marcar como falho se exceder limite
     const newAttempts = item.attempts + 1;
@@ -77,15 +78,15 @@ export async function syncQueueItem(item) {
  * @returns {Promise<{synced: number, failed: number, errors: string[]}>}
  */
 export async function syncPendingItems() {
-  console.log('[syncService] Iniciando sincronização de items pendentes');
+  logger.log('[syncService] Iniciando sincronização de items pendentes');
 
   const pendingItems = await getQueueItemsByStatus('pending');
   if (pendingItems.length === 0) {
-    console.log('[syncService] Nenhum item pendente');
+    logger.log('[syncService] Nenhum item pendente');
     return { synced: 0, failed: 0, errors: [] };
   }
 
-  console.log(`[syncService] ${pendingItems.length} items pendentes para sincronizar`);
+  logger.log(`[syncService] ${pendingItems.length} items pendentes para sincronizar`);
 
   let synced = 0;
   let failed = 0;
@@ -102,7 +103,7 @@ export async function syncPendingItems() {
     }
   }
 
-  console.log(`[syncService] Sincronização concluída: ${synced} sucesso, ${failed} falha`);
+  logger.log(`[syncService] Sincronização concluída: ${synced} sucesso, ${failed} falha`);
 
   return { synced, failed, errors };
 }
@@ -119,7 +120,7 @@ export async function addOrUpdateQueueItem(queueItem) {
   const existing = await findDuplicateQueueItem(entityType, operation, dataHash);
 
   if (existing) {
-    console.log(`[syncService] Encontrado duplicate, atualizando:`, existing.id);
+    logger.log(`[syncService] Encontrado duplicate, atualizando:`, existing.id);
     // Atualizar payload do existente com novo payload
     await updateQueueItem(existing.id, {
       payload: queueItem.payload,
@@ -131,7 +132,7 @@ export async function addOrUpdateQueueItem(queueItem) {
   // Novo item — adicionar normalmente
   const { addQueueItem } = await import('./offlineStorageService');
   const id = await addQueueItem(queueItem);
-  console.log(`[syncService] Novo item adicionado:`, id);
+  logger.log(`[syncService] Novo item adicionado:`, id);
   return id;
 }
 
@@ -141,6 +142,6 @@ export async function addOrUpdateQueueItem(queueItem) {
  * @returns {Promise<void>}
  */
 export async function discardQueueItem(itemId) {
-  console.log('[syncService] Descartando item:', itemId);
+  logger.log('[syncService] Descartando item:', itemId);
   await removeQueueItem(itemId);
 }
