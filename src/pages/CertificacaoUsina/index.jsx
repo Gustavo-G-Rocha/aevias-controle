@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
 import { useChecklistForm } from "@/hooks/useChecklistForm";
 import { useCertificacaoUsinaForm } from "@/hooks/useCertificacaoUsinaForm";

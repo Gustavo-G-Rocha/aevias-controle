@@ -1,5 +1,5 @@
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { PENEIRAS_MAP } from '@/constants/sieves';
 import { formatDate, buildSignatureProps } from '@/utils/relatorioUtils';
 import SignatureFooter from './SignatureFooter';

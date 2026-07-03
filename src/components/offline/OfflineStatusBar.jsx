@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { useOfflineSync } from '@/hooks/useOfflineSync';
-import { AlertCircle, Wifi, WifiOff, Loader } from 'lucide-react';
+import { AlertCircle, WifiOff, Loader } from 'lucide-react';
 
 export default function OfflineStatusBar() {
   const { isOnline, isSyncing, pendingCount, failedCount, lastError } = useOfflineSync();

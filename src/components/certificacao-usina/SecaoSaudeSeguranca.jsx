@@ -1,6 +1,5 @@
 import React from "react";
 import ChecklistRow from "./ChecklistRow";
-import SectionTitle from "./SectionTitle";
 import SubSectionTitle from "./SubSectionTitle";
 
 export default function SecaoSaudeSeguranca({ formData, onNestedChange, disabled }) {
