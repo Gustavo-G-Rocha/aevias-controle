@@ -23,6 +23,9 @@ const { entities } = vi.hoisted(() => {
     'EnsaioProctor', 'EnsaioRompimentoConcreto', 'EnsaioSondagem',
     'EnsaioTaxaMRAF', 'EnsaioTaxaPinturaImprimacao', 'EnsaioVigaBenkelman',
     'AcompanhamentoCarga', 'AcompanhamentoUsinagem',
+    // Entidades de checklist/diário alcançadas pelos fallbacks de detectEntityName
+    'ChecklistUsina', 'ChecklistConcretagem', 'ChecklistTerraplanagem',
+    'ChecklistAplicacao', 'DiarioObra',
   ];
   const entities = {};
   for (const n of names) entities[n] = make();
@@ -139,6 +142,51 @@ describe('ensaiosService — detectEntityName', () => {
   it('detecta AcompanhamentoCarga por cargas', async () => {
     await aprovarEnsaio({ id: 'e5', cargas: [] }, user);
     expect(entities.AcompanhamentoCarga.update).toHaveBeenCalledWith('e5', expect.any(Object));
+  });
+
+  it('detecta EnsaioCAUQ por extracao_ligante', async () => {
+    await aprovarEnsaio({ id: 'e7', extracao_ligante: {} }, user);
+    expect(entities.EnsaioCAUQ.update).toHaveBeenCalledWith('e7', expect.any(Object));
+  });
+
+  it('detecta EnsaioMRAF por teor_ligante_residual', async () => {
+    await aprovarEnsaio({ id: 'e8', teor_ligante_residual: 3 }, user);
+    expect(entities.EnsaioMRAF.update).toHaveBeenCalledWith('e8', expect.any(Object));
+  });
+
+  it('detecta EnsaioGranulometriaIndividual por agregados + tipo_material', async () => {
+    await aprovarEnsaio({ id: 'e9', agregados: [], tipo_material: 'CAUQ' }, user);
+    expect(entities.EnsaioGranulometriaIndividual.update).toHaveBeenCalledWith('e9', expect.any(Object));
+  });
+
+  it('detecta EnsaioVigaBenkelman por levantamentos + cte_viga', async () => {
+    await aprovarEnsaio({ id: 'e10', levantamentos: [], cte_viga: 2.4 }, user);
+    expect(entities.EnsaioVigaBenkelman.update).toHaveBeenCalledWith('e10', expect.any(Object));
+  });
+
+  it('detecta ChecklistUsina por rodadas_producao', async () => {
+    await aprovarEnsaio({ id: 'e11', rodadas_producao: [] }, user);
+    expect(entities.ChecklistUsina.update).toHaveBeenCalledWith('e11', expect.any(Object));
+  });
+
+  it('detecta ChecklistConcretagem por cargas_concreto', async () => {
+    await aprovarEnsaio({ id: 'e12', cargas_concreto: [] }, user);
+    expect(entities.ChecklistConcretagem.update).toHaveBeenCalledWith('e12', expect.any(Object));
+  });
+
+  it('detecta ChecklistTerraplanagem por acompanhamento_execucao + empreiteira', async () => {
+    await aprovarEnsaio({ id: 'e13', acompanhamento_execucao: {}, empreiteira: 'X' }, user);
+    expect(entities.ChecklistTerraplanagem.update).toHaveBeenCalledWith('e13', expect.any(Object));
+  });
+
+  it('detecta ChecklistAplicacao por controle_aplicacao', async () => {
+    await aprovarEnsaio({ id: 'e14', controle_aplicacao: {} }, user);
+    expect(entities.ChecklistAplicacao.update).toHaveBeenCalledWith('e14', expect.any(Object));
+  });
+
+  it('detecta DiarioObra por atividades_realizadas', async () => {
+    await aprovarEnsaio({ id: 'e15', atividades_realizadas: [] }, user);
+    expect(entities.DiarioObra.update).toHaveBeenCalledWith('e15', expect.any(Object));
   });
 
   it('lança erro quando não consegue determinar o tipo', async () => {
