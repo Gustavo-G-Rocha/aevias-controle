@@ -2,7 +2,8 @@
  * Hook de carregamento de dados para RelatorioBoletimSondagemTrado.
  */
 import { useState, useEffect, useCallback } from 'react';
-import { base44 } from '@/api/base44Client';
+import { obterRegistro } from '@/services/recordsService';
+import { carregarObraRegional } from '@/services/relatorioContextService';
 
 export const useRelatorioBoletimSondagemTradoData = () => {
   const [boletim, setBoletim] = useState(null);
@@ -20,19 +21,12 @@ export const useRelatorioBoletimSondagemTradoData = () => {
         return;
       }
 
-      const data = await base44.entities.BoletimSondagemTrado.get(id);
+      const data = await obterRegistro('BoletimSondagemTrado', id);
       setBoletim(data);
 
-      if (data.obra_id) {
-        const obraData = await base44.entities.Obra.get(data.obra_id);
-        setObra(obraData);
-        if (obraData.regional_id) {
-          const regionalData = await base44.entities.Regional.get(
-            obraData.regional_id,
-          );
-          setRegional(regionalData);
-        }
-      }
+      const { obra: obraData, regional: regionalData } = await carregarObraRegional(data.obra_id);
+      setObra(obraData);
+      setRegional(regionalData);
     } catch (err) {
       setError('Erro ao carregar dados do relatório');
     } finally {

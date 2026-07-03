@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { obterRegistro } from "@/services/recordsService";
+import { carregarObraRegional } from "@/services/relatorioContextService";
 
 export const useRelatorioRompimentoConcretoData = () => {
   const [ensaio, setEnsaio] = useState(null);
@@ -18,18 +19,12 @@ export const useRelatorioRompimentoConcretoData = () => {
           return;
         }
 
-        const data = await base44.entities.EnsaioRompimentoConcreto.get(id);
+        const data = await obterRegistro('EnsaioRompimentoConcreto', id);
         setEnsaio(data);
 
-        if (data.obra_id) {
-          const obraData = await base44.entities.Obra.get(data.obra_id);
-          setObra(obraData);
-
-          if (obraData.regional_id) {
-            const reg = await base44.entities.Regional.get(obraData.regional_id);
-            setRegional(reg);
-          }
-        }
+        const { obra: obraData, regional: regionalData } = await carregarObraRegional(data.obra_id);
+        setObra(obraData);
+        setRegional(regionalData);
       } catch (err) {
         setError("Erro ao carregar: " + err.message);
       } finally {

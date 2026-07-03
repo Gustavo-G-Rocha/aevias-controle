@@ -3,7 +3,8 @@
  * Busca ensaio, obra e regional.
  */
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { obterRegistro } from '@/services/recordsService';
+import { carregarObraRegional } from '@/services/relatorioContextService';
 
 export function useRelatorioProctorData() {
   const [ensaio,   setEnsaio]   = useState(null);
@@ -18,22 +19,13 @@ export function useRelatorioProctorData() {
         const id = new URLSearchParams(window.location.search).get('id');
         if (!id) { setError('ID não fornecido'); return; }
 
-        const data = await base44.entities.EnsaioProctor.get(id);
+        const data = await obterRegistro('EnsaioProctor', id);
         if (!data) { setError('Ensaio não encontrado'); return; }
         setEnsaio(data);
 
-        if (data.obra_id) {
-          await base44.entities.Obra.get(data.obra_id)
-            .then(obraData => {
-              setObra(obraData);
-              if (obraData?.regional_id) {
-                return base44.entities.Regional.get(obraData.regional_id)
-                  .then(reg => setRegional(reg))
-                  .catch(e => console.warn('[RelatorioProctor] Regional não carregada:', e));
-              }
-            })
-            .catch(e => console.warn('[RelatorioProctor] Obra não carregada:', e));
-        }
+        const { obra: obraData, regional: regionalData } = await carregarObraRegional(data.obra_id);
+        setObra(obraData);
+        setRegional(regionalData);
       } catch (err) {
         setError('Erro ao carregar: ' + err.message);
       } finally {

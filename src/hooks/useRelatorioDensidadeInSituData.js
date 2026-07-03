@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { obterRegistro } from '@/services/recordsService';
+import { carregarObraRegional } from '@/services/relatorioContextService';
 
 export function useRelatorioDensidadeInSituData() {
   const [ensaio, setEnsaio] = useState(null);
@@ -16,25 +17,12 @@ export function useRelatorioDensidadeInSituData() {
 
         if (!id) throw new Error('ID do ensaio é obrigatório na URL');
 
-        const [ensaioData, obras, regionais] = await Promise.all([
-          base44.entities.EnsaioDensidadeInSitu.get(id),
-          base44.entities.Obra.list(),
-          base44.entities.Regional.list()
-        ]);
-
+        const ensaioData = await obterRegistro('EnsaioDensidadeInSitu', id);
         if (!ensaioData) throw new Error(`Ensaio com ID ${id} não encontrado`);
 
-        let obraData = null;
-        let regionalData = null;
-
-        if (ensaioData.obra_id) {
-          obraData = obras.find(o => o.id === ensaioData.obra_id);
-          if (obraData?.regional_id) {
-            regionalData = regionais.find(r => r.id === obraData.regional_id);
-          }
-        }
-
         setEnsaio(ensaioData);
+
+        const { obra: obraData, regional: regionalData } = await carregarObraRegional(ensaioData.obra_id);
         setObra(obraData);
         setRegional(regionalData);
         setError(null);

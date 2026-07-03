@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { obterRegistro } from "@/services/recordsService";
+import { carregarObraRegional } from "@/services/relatorioContextService";
 
 export const useRelatorioBoletimSondagemData = () => {
   const [boletim, setBoletim] = useState(null);
@@ -15,17 +16,12 @@ export const useRelatorioBoletimSondagemData = () => {
         const id = params.get("id");
         if (!id) { setError("ID não fornecido"); return; }
 
-        const data = await base44.entities.BoletimSondagem.get(id);
+        const data = await obterRegistro('BoletimSondagem', id);
         setBoletim(data);
 
-        if (data.obra_id) {
-          const obraData = await base44.entities.Obra.get(data.obra_id);
-          setObra(obraData);
-          if (obraData.regional_id) {
-            const regionalData = await base44.entities.Regional.get(obraData.regional_id);
-            setRegional(regionalData);
-          }
-        }
+        const { obra: obraData, regional: regionalData } = await carregarObraRegional(data.obra_id);
+        setObra(obraData);
+        setRegional(regionalData);
       } catch (err) {
         console.error(err);
         setError("Erro ao carregar dados do relatório");

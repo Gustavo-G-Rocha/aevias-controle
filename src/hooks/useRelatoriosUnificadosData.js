@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { obterUsuarioAtual } from "@/services/usuariosService";
+import { listarRegistros } from "@/services/recordsService";
+import { listarRegionais } from "@/services/regionaisService";
 import { filterObrasByUserAccess } from "@/utils/relatoriosUnificadosUtils";
 
 export const useRelatoriosUnificadosData = () => {
@@ -11,12 +13,12 @@ export const useRelatoriosUnificadosData = () => {
   const loadInitialData = useCallback(async () => {
     setLoading(true);
     try {
-      const currentUser = await base44.auth.me();
+      const currentUser = await obterUsuarioAtual();
       setUser(currentUser);
 
       const [obrasData, regionaisData] = await Promise.all([
-        base44.entities.Obra.list(),
-        base44.entities.Regional.list(),
+        listarRegistros('Obra'),
+        listarRegionais(),
       ]);
 
       setRegionais(regionaisData);

@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { atualizarUsuario, inviteUser } from "@/services/usuariosService";
+import { atualizarRegional } from "@/services/regionaisService";
 import {
   resolveAccessLevel,
   deriveRoleFromAccessLevel,
@@ -45,27 +46,14 @@ export function useUsersActions({ currentUser, regionais, loadData }) {
           cleanedFields.role = deriveRoleFromAccessLevel(cleanedFields.access_level);
         }
 
-        await base44.entities.User.update(editingUser.id, cleanedFields);
+        await atualizarUsuario(editingUser.id, cleanedFields);
         alert("Usuário atualizado com sucesso!");
       } else {
-        // CRIAÇÃO
-        const newUserData = {
-          laboratorista_name: userData.laboratorista_name,
-          email:              userData.email,
-          company:            userData.company,
-          position:           userData.position,
-          phone:              userData.phone,
-          crea_number:        userData.crea_number,
-          is_active:          userData.is_active,
-          access_level:       userData.access_level,
-          role:               deriveRoleFromAccessLevel(userData.access_level),
-        };
-
-        const finalUserData = Object.fromEntries(
-          Object.entries(newUserData).filter(([, v]) => v !== '' && v !== null && v !== undefined)
+        // CRIAÇÃO via invite (User.create retorna 405 — usuários entram por convite)
+        await inviteUser(
+          userData.email,
+          deriveRoleFromAccessLevel(userData.access_level) === 'admin' ? 'admin' : 'user'
         );
-
-        await base44.entities.User.create(finalUserData);
 
         // Alocar na regional se gestor/sala técnica criando laboratorista
         if (isGestorOrSalaTecnica && userData.access_level === 'user') {
@@ -76,7 +64,7 @@ export function useUsersActions({ currentUser, regionais, loadData }) {
             const laboratoristasAtuais = regionalDoUsuario.laboratoristas_responsaveis || [];
             const novoEmail = userData.email.toLowerCase();
             if (!laboratoristasAtuais.some(e => e.toLowerCase() === novoEmail)) {
-              await base44.entities.Regional.update(regionalDoUsuario.id, {
+              await atualizarRegional(regionalDoUsuario.id, {
                 laboratoristas_responsaveis: [...laboratoristasAtuais, userData.email],
               });
             }

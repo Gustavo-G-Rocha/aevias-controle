@@ -252,3 +252,31 @@ export async function filtrarRegistros(entityName, filtro, sort = '-created_date
 export async function atualizarRegistro(entityName, id, data) {
   return base44.entities[entityName].update(id, data);
 }
+
+/**
+ * Obtém um registro de qualquer entidade por id (camada de serviço genérica).
+ * @param {string} entityName
+ * @param {string} id
+ * @returns {Promise<object>}
+ */
+export async function obterRegistro(entityName, id) {
+  return base44.entities[entityName].read(id);
+}
+
+/**
+ * Exclui um registro de qualquer entidade (camada de serviço genérica).
+ * @param {string} entityName
+ * @param {string} id
+ */
+export async function deletarRegistro(entityName, id) {
+  return base44.entities[entityName].delete(id);
+}
+
+/**
+ * Cria um registro de qualquer entidade (camada de serviço genérica).
+ * @param {string} entityName
+ * @param {object} data
+ */
+export async function criarRegistro(entityName, data) {
+  return base44.entities[entityName].create(data);
+}

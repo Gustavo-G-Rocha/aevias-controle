@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { obterRegistro } from '@/services/recordsService';
+import { carregarObraRegional } from '@/services/relatorioContextService';
 
 export function useRelatorioVigaBenkelmanData() {
   const [searchParams] = useSearchParams();
@@ -21,7 +22,7 @@ export function useRelatorioVigaBenkelmanData() {
           return;
         }
 
-        const data = await base44.entities.EnsaioVigaBenkelman.get(id);
+        const data = await obterRegistro('EnsaioVigaBenkelman', id);
 
         if (!data.levantamentos || !Array.isArray(data.levantamentos)) {
           data.levantamentos = [];
@@ -29,15 +30,9 @@ export function useRelatorioVigaBenkelmanData() {
 
         setEnsaio(data);
 
-        if (data.obra_id) {
-          const obraData = await base44.entities.Obra.get(data.obra_id);
-          setObra(obraData);
-
-          if (obraData.regional_id) {
-            const regionalData = await base44.entities.Regional.get(obraData.regional_id);
-            setRegional(regionalData);
-          }
-        }
+        const { obra: obraData, regional: regionalData } = await carregarObraRegional(data.obra_id);
+        setObra(obraData);
+        setRegional(regionalData);
       } catch (err) {
         console.error('Erro ao carregar ensaio:', err);
         setError('Erro ao carregar ensaio');
