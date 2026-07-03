@@ -66,15 +66,15 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
       </div>
 
       <style>{`
-        .page-container { padding: 0; display: block !important; }
+        .page-container { padding: 14.4mm 6.8mm 16.1mm 7.6mm; display: block !important; box-sizing: border-box; }
         .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
-        @page { size: A4; margin: 14.4mm 6.8mm 16.1mm 7.6mm; }
+        @page { size: A4; margin: 0 !important; }
         @media screen { .page-container { min-height: 100vh; margin-bottom: 20px; border: 1px solid #e5e7eb; } }
         @media print {
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; overflow: visible !important; }
           *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
           html, body, div, section, main { overflow: visible !important; -ms-overflow-style: none !important; scrollbar-width: none !important; }
-          .page-container { padding: 0; overflow: visible !important; }
+          .page-container { overflow: visible !important; }
           .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
           .print\\:hidden { display: none !important; }
           header, nav, aside, .no-print, [data-sidebar], [data-sidebar="sidebar"], [data-sidebar="provider"] { display: none !important; }
