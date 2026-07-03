@@ -19,9 +19,9 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
       <div>
         {Array.from({ length: numPages }).map((_, pageIdx) =>
         <div key={pageIdx} className="page-container">
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', columnGap: '3mm', rowGap: '2mm' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', columnGap: '2.8mm', rowGap: '0mm' }}>
               {getEtiquetasPageUmidade(etiquetas, pageIdx).map((etiqueta, idx) =>
-            <table key={idx} className="text-[8px] print:text-[7px]" style={{ tableLayout: 'fixed', width: '100%', height: '38.1mm', borderCollapse: 'collapse', borderSpacing: 0, border: '0.4mm solid #000' }}>
+            <table key={idx} className="text-[10px] print:text-[9px]" style={{ tableLayout: 'fixed', width: '100%', height: '38.1mm', borderCollapse: 'collapse', borderSpacing: 0, border: '0.4mm solid #000' }}>
                   <tbody>
                     <tr>
                       <td colSpan={2} className="text-center font-semibold" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.3mm 1mm' }}>Identificação do doc. Nº</td>
@@ -39,7 +39,7 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
                     </tr>
                     <tr>
                       <td className="font-bold" style={{ border: '0.4mm solid #000', backgroundColor: '#BFCF99', padding: '0.3mm 1mm' }}>Furo:</td>
-                      <td style={{ border: '0.4mm solid #000', padding: '0.3mm 1mm', backgroundColor: '#BFCF99' }}>{etiqueta.furo}</td>
+                      <td className="font-bold" style={{ border: '0.4mm solid #000', padding: '0.3mm 1mm', backgroundColor: '#BFCF99' }}>{etiqueta.furo}</td>
                     </tr>
                     <tr>
                       <td className="font-bold" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.3mm 1mm' }}>Rodovia:</td>
@@ -66,15 +66,15 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
       </div>
 
       <style>{`
-        .page-container { padding: 8px; display: block !important; }
+        .page-container { padding: 0; display: block !important; }
         .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
-        @page { size: A4; margin: 10mm 12mm; }
+        @page { size: A4; margin: 14.4mm 6.8mm 16.1mm 7.6mm; }
         @media screen { .page-container { min-height: 100vh; margin-bottom: 20px; border: 1px solid #e5e7eb; } }
         @media print {
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; overflow: visible !important; }
           *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
           html, body, div, section, main { overflow: visible !important; -ms-overflow-style: none !important; scrollbar-width: none !important; }
-          .page-container { padding: 4px; overflow: visible !important; }
+          .page-container { padding: 0; overflow: visible !important; }
           .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
           .print\\:hidden { display: none !important; }
           header, nav, aside, .no-print, [data-sidebar], [data-sidebar="sidebar"], [data-sidebar="provider"] { display: none !important; }
