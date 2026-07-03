@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +16,6 @@ import BottomNav from "@/components/layout/BottomNav";
 import CreateEnsaioDialog from "@/components/layout/CreateEnsaioDialog";
 
 const AppLayout = ({ children }) => {
-  const location = useLocation();
   const [isCreateEnsaioOpen, setIsCreateEnsaioOpen] = useState(false);
   const [naoConformidadesOpen, setNaoConformidadesOpen] = useState(false);
   const [minhasObrasOpen, setMinhasObrasOpen] = useState(false);
@@ -56,22 +53,13 @@ const AppLayout = ({ children }) => {
           <main className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
             <MobileHeader user={user} canCreateRecords={canCreateRecords} />
 
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={location.pathname}
-                initial={{ opacity: 0, x: 12 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -12 }}
-                transition={{ duration: 0.15, ease: "easeInOut" }}
-                className="flex-1 flex flex-col"
-              >
-                <PullToRefresh>
-                  <div className="pb-16 lg:pb-0 overflow-x-hidden" style={{ paddingTop: "env(safe-area-inset-top)" }}>
-                    {children}
-                  </div>
-                </PullToRefresh>
-              </motion.div>
-            </AnimatePresence>
+            <div className="flex-1 flex flex-col">
+              <PullToRefresh>
+                <div className="pb-16 lg:pb-0 overflow-x-hidden" style={{ paddingTop: "env(safe-area-inset-top)" }}>
+                  {children}
+                </div>
+              </PullToRefresh>
+            </div>
             <BottomNav />
           </main>
         </div>
