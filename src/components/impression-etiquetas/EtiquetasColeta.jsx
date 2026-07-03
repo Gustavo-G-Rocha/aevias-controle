@@ -19,7 +19,7 @@ export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
         <Button onClick={onPrint}>
           🖨️ Imprimir
         </Button>
-        <Button onClick={onVoltar} variant="outline" className="text-foreground bg-white hover:bg-accent hover:text-accent-foreground">
+        <Button onClick={onVoltar} variant="outline" className="!text-foreground !bg-white hover:!bg-accent hover:!text-accent-foreground">
           ← Voltar
         </Button>
       </div>
