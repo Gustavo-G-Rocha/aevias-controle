@@ -3,7 +3,9 @@
  * Busca checklist, obra, regional, projeto e usuários.
  */
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { obterUsuarioAtual } from '@/services/usuariosService';
+import { obterChecklistById } from '@/services/checklistsService';
+import { carregarContextoRelatorio } from '@/services/relatorioContextService';
 
 export function useRelatorioChecklistData() {
   const [checklist, setChecklist] = useState(null);
@@ -29,8 +31,8 @@ export function useRelatorioChecklistData() {
 
         // Carrega checklist e usuário corrente em paralelo — ambos obrigatórios
         const [checklistData, userData] = await Promise.all([
-          base44.entities.ChecklistUsina.get(id),
-          base44.auth.me().catch(() => null),
+          obterChecklistById('ChecklistUsina', id),
+          obterUsuarioAtual().catch(() => null),
         ]);
 
         if (!checklistData) {
@@ -42,36 +44,12 @@ export function useRelatorioChecklistData() {
         setChecklist(checklistData);
         setUser(userData);
 
-        // Dados relacionados em paralelo — falha isolada não quebra o relatório
-        await Promise.allSettled([
-          // Obra → Regional (sequencial pois regional depende de obra)
-          checklistData.obra_id
-            ? base44.entities.Obra.get(checklistData.obra_id)
-                .then(obraData => {
-                  setObra(obraData);
-                  if (obraData?.regional_id) {
-                    return base44.entities.Regional.get(obraData.regional_id)
-                      .then(reg => setRegional(reg))
-                      .catch(err => console.warn('[RelatorioChecklist] Regional não carregada:', err));
-                  }
-                })
-                .catch(err => console.warn('[RelatorioChecklist] Obra não carregada:', err))
-            : Promise.resolve(),
-
-          // Projeto
-          checklistData.project_id
-            ? base44.entities.Project.get(checklistData.project_id)
-                .then(proj => setProject(proj))
-                .catch(err => console.warn('[RelatorioChecklist] Projeto não carregado:', err))
-            : Promise.resolve(),
-
-          // Criador — buscado no mesmo lote, sem chamada sequencial extra
-          checklistData.created_by
-            ? base44.entities.User.filter({ email: checklistData.created_by })
-                .then(users => { if (users?.length > 0) setCreatorUser(users[0]); })
-                .catch(err => console.warn('[RelatorioChecklist] Criador não carregado:', err))
-            : Promise.resolve(),
-        ]);
+        // Contexto relacionado (obra → regional, project, criador) em paralelo
+        const ctx = await carregarContextoRelatorio(checklistData);
+        setObra(ctx.obra);
+        setRegional(ctx.regional);
+        setProject(ctx.project);
+        setCreatorUser(ctx.creatorUser);
 
         setLoading(false);
       } catch (err) {

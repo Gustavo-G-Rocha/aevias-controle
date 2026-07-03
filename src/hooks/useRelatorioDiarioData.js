@@ -3,7 +3,12 @@
  * Busca diário, obra, usuário, projeto e regional.
  */
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { obterUsuarioAtual } from '@/services/usuariosService';
+import { obterDiarioById } from '@/services/diarioObraService';
+import {
+  carregarContextoRelatorio,
+  carregarProject,
+} from '@/services/relatorioContextService';
 
 export function useRelatorioDiarioData() {
   const [diario, setDiario] = useState(null);
@@ -29,8 +34,8 @@ export function useRelatorioDiarioData() {
 
         // Diário e usuário em paralelo — diário é obrigatório
         const [diarioData, userData] = await Promise.all([
-          base44.entities.DiarioObra.get(id),
-          base44.auth.me().catch(() => null),
+          obterDiarioById(id),
+          obterUsuarioAtual().catch(() => null),
         ]);
 
         if (!diarioData) {
@@ -42,36 +47,15 @@ export function useRelatorioDiarioData() {
         setDiario(diarioData);
         setUser(userData);
 
-        // Dados relacionados em paralelo — falha isolada não quebra o relatório
-        await Promise.allSettled([
-          // Obra → Projeto e Regional (sequencial pois dependem de obra)
-          diarioData.obra_id
-            ? base44.entities.Obra.get(diarioData.obra_id)
-                .then(obraData => {
-                  setObra(obraData);
-                  return Promise.allSettled([
-                    obraData?.project_id
-                      ? base44.entities.Project.get(obraData.project_id)
-                          .then(p => setProject(p))
-                          .catch(err => console.warn('[RelatorioDiario] Projeto não carregado:', err))
-                      : Promise.resolve(),
-                    obraData?.regional_id
-                      ? base44.entities.Regional.get(obraData.regional_id)
-                          .then(r => setRegional(r))
-                          .catch(err => console.warn('[RelatorioDiario] Regional não carregada:', err))
-                      : Promise.resolve(),
-                  ]);
-                })
-                .catch(err => console.warn('[RelatorioDiario] Obra não carregada:', err))
-            : Promise.resolve(),
+        // Contexto: obra→regional, project (pode vir da obra em alguns fluxos), criador
+        const ctx = await carregarContextoRelatorio(diarioData);
+        setObra(ctx.obra);
+        setRegional(ctx.regional);
+        setCreatorUser(ctx.creatorUser);
 
-          // Criador — filtro direto, sem carregar toda a lista
-          diarioData.created_by
-            ? base44.entities.User.filter({ email: diarioData.created_by })
-                .then(users => { if (users?.length > 0) setCreatorUser(users[0]); })
-                .catch(err => console.warn('[RelatorioDiario] Criador não carregado:', err))
-            : Promise.resolve(),
-        ]);
+        // Projeto pode estar no diário (project_id) ou na obra
+        const projectId = diarioData.project_id || ctx.obra?.project_id;
+        setProject(projectId ? await carregarProject(projectId) : null);
 
         setLoading(false);
       } catch (err) {

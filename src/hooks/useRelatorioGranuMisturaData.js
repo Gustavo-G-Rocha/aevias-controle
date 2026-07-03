@@ -2,7 +2,13 @@
  * Hook de carregamento de dados para RelatorioGranuMistura.
  */
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { obterGranuMisturaById } from '@/services/granuMisturaService';
+import {
+  carregarObraRegional,
+  carregarProject,
+  carregarFaixaDoProject,
+} from '@/services/relatorioContextService';
+import { obterFaixaById } from '@/services/faixasService';
 
 export const useRelatorioGranuMisturaData = () => {
   const [record, setRecord] = useState(null);
@@ -23,39 +29,29 @@ export const useRelatorioGranuMisturaData = () => {
           return;
         }
 
-        const rec = await base44.entities.GranuMistura.get(id);
+        const rec = await obterGranuMisturaById(id);
         setRecord(rec);
 
-        // Carrega projeto e faixa granulométrica
+        // Projeto e faixa granulométrica (sequencial pois faixa depende do projeto)
+        let proj = null;
         if (rec.numero_projeto) {
-          const proj = await base44.entities.Project.get(rec.numero_projeto);
+          proj = await carregarProject(rec.numero_projeto);
           setProject(proj);
-          if (proj.faixa_granulometrica_id) {
-            const fxGran = await base44.entities.FaixaGranulometrica.get(
-              proj.faixa_granulometrica_id,
-            );
-            setFaixa(fxGran);
+          if (proj?.faixa_granulometrica_id) {
+            setFaixa(await carregarFaixaDoProject(proj));
           }
         } else if (rec.faixa) {
           try {
-            const fxGran = await base44.entities.FaixaGranulometrica.get(
-              rec.faixa,
-            );
-            setFaixa(fxGran);
+            setFaixa(await obterFaixaById(rec.faixa));
           } catch (e) {
             console.error('Erro ao carregar faixa granulométrica pelo ID', e);
           }
         }
 
-        // Carrega obra e regional
-        if (rec.obra_id) {
-          const obraData = await base44.entities.Obra.get(rec.obra_id);
-          setObra(obraData);
-          if (obraData.regional_id) {
-            const reg = await base44.entities.Regional.get(obraData.regional_id);
-            setRegional(reg);
-          }
-        }
+        // Obra e regional
+        const { obra: obraData, regional: reg } = await carregarObraRegional(rec.obra_id);
+        setObra(obraData);
+        setRegional(reg);
       } catch (err) {
         setError('Erro ao carregar: ' + err.message);
       } finally {

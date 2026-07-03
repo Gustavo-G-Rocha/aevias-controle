@@ -3,7 +3,11 @@
  * Busca dados do RNC e registros vinculados.
  */
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { obterUsuarioAtual, listarUsuarios } from '@/services/usuariosService';
+import { listarObrasRecentes } from '@/services/obrasService';
+import { listarRegionais } from '@/services/regionaisService';
+import { listarProjects } from '@/services/projectsService';
+import { obterRegistroPorEntidade } from '@/services/relatorioContextService';
 import {
   findObra,
   findRegional,
@@ -24,12 +28,12 @@ export const useRelatorioNCData = () => {
 
       const [nc, user, obras, regionais, projects, allUsers] =
         await Promise.all([
-          base44.entities.RelatorioNC.get(id),
-          base44.auth.me(),
-          base44.entities.Obra.list(),
-          base44.entities.Regional.list(),
-          base44.entities.Project.list(),
-          base44.entities.User.list(),
+          obterRegistroPorEntidade('RelatorioNC', id),
+          obterUsuarioAtual(),
+          listarObrasRecentes(),
+          listarRegionais(),
+          listarProjects(),
+          listarUsuarios(),
         ]);
 
       if (!nc) throw new Error('RNC não encontrado');
@@ -43,9 +47,10 @@ export const useRelatorioNCData = () => {
 
       if (nc.checklist_ref_tipo && nc.checklist_ref_id) {
         try {
-          registroVinculado = await base44.entities[
-            nc.checklist_ref_tipo
-          ].get(nc.checklist_ref_id);
+          registroVinculado = await obterRegistroPorEntidade(
+            nc.checklist_ref_tipo,
+            nc.checklist_ref_id,
+          );
           project = findProject(registroVinculado, projects);
           creatorUser = findCreatorUser(registroVinculado, allUsers);
         } catch (e) {
