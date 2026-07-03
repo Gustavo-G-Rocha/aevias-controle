@@ -19,7 +19,7 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
       <div>
         {Array.from({ length: numPages }).map((_, pageIdx) =>
         <div key={pageIdx} className="page-container">
-            <div className="umidade-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 63.5mm)', gridTemplateRows: 'repeat(7, 38.1mm)', columnGap: '2.8mm', rowGap: '0mm' }}>
+            <div className="umidade-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 63.5mm)', gridTemplateRows: 'repeat(7, 38.1mm)', columnGap: '2.15mm', rowGap: '0.08mm' }}>
               {getEtiquetasPageUmidade(etiquetas, pageIdx).map((etiqueta, idx) =>
             <table key={idx} className="umidade-label text-[13px] print:text-[10px] font-bold" style={{ tableLayout: 'fixed', width: '100%', height: '100%', lineHeight: '1', borderCollapse: 'collapse', borderSpacing: 0, border: '0.4mm solid #000' }}>
                   <tbody>
@@ -66,7 +66,7 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
       </div>
 
       <style>{`
-        .page-container { padding: 14.4mm 6.8mm 16.1mm 7.6mm; display: block !important; box-sizing: border-box; }
+        .page-container { padding: 14.4mm 7.6mm 15.4mm 7.6mm; display: block !important; box-sizing: border-box; }
         .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
         @page { size: A4; margin: 0 !important; }
         @media screen { .page-container { min-height: 100vh; margin-bottom: 20px; border: 1px solid #e5e7eb; } .umidade-grid { grid-template-columns: repeat(3, 1fr) !important; grid-template-rows: repeat(7, auto) !important; } }
