@@ -21,41 +21,41 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
         <div key={pageIdx} className="page-container">
             <div className="umidade-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 63.5mm)', gridTemplateRows: 'repeat(7, 38.1mm)', columnGap: '2.8mm', rowGap: '0mm' }}>
               {getEtiquetasPageUmidade(etiquetas, pageIdx).map((etiqueta, idx) =>
-            <table key={idx} className="umidade-label text-[10px] print:text-[9px]" style={{ tableLayout: 'fixed', width: '100%', height: '100%', borderCollapse: 'collapse', borderSpacing: 0, border: '0.4mm solid #000' }}>
+            <table key={idx} className="umidade-label text-[10px] print:text-[9px]" style={{ tableLayout: 'fixed', width: '100%', height: '100%', lineHeight: '1', borderCollapse: 'collapse', borderSpacing: 0, border: '0.4mm solid #000' }}>
                   <tbody>
                     <tr>
-                      <td colSpan={2} className="text-center font-semibold" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.3mm 1mm' }}>Identificação do doc. Nº</td>
+                      <td colSpan={2} className="text-center font-semibold" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.2mm 1mm' }}>Identificação do doc. Nº</td>
                     </tr>
                     <tr>
-                      <td colSpan={2} className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.3mm 1mm' }}>FORM 104 K</td>
+                      <td colSpan={2} className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.2mm 1mm' }}>FORM 104 K</td>
                     </tr>
                     <tr>
-                      <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.3mm 1mm', width: '50%' }}>Emissão</td>
-                      <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.3mm 1mm', width: '50%' }}>Revisão</td>
+                      <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.2mm 1mm', width: '50%' }}>Emissão</td>
+                      <td className="text-center" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.2mm 1mm', width: '50%' }}>Revisão</td>
                     </tr>
                     <tr>
-                      <td className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.3mm 1mm' }}>16/09/2025</td>
-                      <td className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.3mm 1mm' }}>00</td>
+                      <td className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.2mm 1mm' }}>16/09/2025</td>
+                      <td className="text-center font-bold" style={{ border: '0.4mm solid #000', padding: '0.2mm 1mm' }}>00</td>
                     </tr>
                     <tr>
-                      <td className="font-bold" style={{ border: '0.4mm solid #000', backgroundColor: '#BFCF99', padding: '0.3mm 1mm' }}>Furo:</td>
-                      <td className="font-bold" style={{ border: '0.4mm solid #000', padding: '0.3mm 1mm', backgroundColor: '#BFCF99' }}>{etiqueta.furo}</td>
+                      <td className="font-bold" style={{ border: '0.4mm solid #000', backgroundColor: '#BFCF99', padding: '0.2mm 1mm' }}>Furo:</td>
+                      <td className="font-bold" style={{ border: '0.4mm solid #000', padding: '0.2mm 1mm', backgroundColor: '#BFCF99' }}>{etiqueta.furo}</td>
                     </tr>
                     <tr>
-                      <td className="font-bold" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.3mm 1mm' }}>Rodovia:</td>
-                      <td style={{ border: '0.4mm solid #000', padding: '0.3mm 1mm' }}>{etiqueta.rodovia}</td>
+                      <td className="font-bold" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.2mm 1mm' }}>Rodovia:</td>
+                      <td style={{ border: '0.4mm solid #000', padding: '0.2mm 1mm' }}>{etiqueta.rodovia}</td>
                     </tr>
                     <tr>
-                      <td className="font-bold" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.3mm 1mm' }}>Km:</td>
-                      <td style={{ border: '0.4mm solid #000', padding: '0.3mm 1mm' }}>{etiqueta.km}</td>
+                      <td className="font-bold" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.2mm 1mm' }}>Km:</td>
+                      <td style={{ border: '0.4mm solid #000', padding: '0.2mm 1mm' }}>{etiqueta.km}</td>
                     </tr>
                     <tr>
-                      <td className="font-bold" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.3mm 1mm' }}>Pista:</td>
-                      <td style={{ border: '0.4mm solid #000', padding: '0.3mm 1mm' }}>{etiqueta.pista}</td>
+                      <td className="font-bold" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.2mm 1mm' }}>Pista:</td>
+                      <td style={{ border: '0.4mm solid #000', padding: '0.2mm 1mm' }}>{etiqueta.pista}</td>
                     </tr>
                     <tr>
-                      <td className="font-bold" style={{ border: '0.4mm solid #000', backgroundColor: '#BFCF99', padding: '0.3mm 1mm' }}>Tipo:</td>
-                      <td style={{ border: '0.4mm solid #000', padding: '0.3mm 1mm', backgroundColor: '#BFCF99' }}>{etiqueta.tipo_umidade}</td>
+                      <td className="font-bold" style={{ border: '0.4mm solid #000', backgroundColor: '#BFCF99', padding: '0.2mm 1mm' }}>Tipo:</td>
+                      <td style={{ border: '0.4mm solid #000', padding: '0.2mm 1mm', backgroundColor: '#BFCF99' }}>{etiqueta.tipo_umidade}</td>
                     </tr>
                   </tbody>
                 </table>
