@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { base44 } from "@/api/base44Client";
+import { listarUsuarios } from "@/services/usuariosService";
 
 export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obras, regionais, isEditable, handleGlobalDataChange, handleProctorChange, projects = [] }) {
   const handleObraChange = (obraId) => {
@@ -13,7 +13,7 @@ export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obra
     setFormData(prev => ({ ...prev, obra_id: obraId, project_id: '' }));
 
     if (regional?.gestor_contrato_responsavel) {
-      base44.entities.User.list().then(allUsers => {
+      listarUsuarios().then(allUsers => {
         const gestor = allUsers.find(
           u => u.email.toLowerCase() === regional.gestor_contrato_responsavel.toLowerCase()
         );

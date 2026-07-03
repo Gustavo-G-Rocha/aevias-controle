@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { filtrarRegistros } from "@/services/recordsService";
+import { uploadArquivo } from "@/services/uploadService";
 
 export const TIPOS_CHECKLIST = [
   { value: "DiarioObra", label: "Diário de Obra" },
@@ -63,8 +64,8 @@ export function useNovaNCForm(user) {
     if (!obraId || !tipo) return;
     setLoadingChecklists(true);
     try {
-      const data = await base44.entities[tipo].filter({ obra_id: obraId });
-      setChecklists(data.sort((a, b) => new Date(b.data) - new Date(a.data)));
+      const data = await filtrarRegistros(tipo, { obra_id: obraId });
+      setChecklists([...data].sort((a, b) => new Date(b.data) - new Date(a.data)));
     } catch (error) {
       console.error("[useNovaNCForm] Erro ao carregar checklists:", error?.message || error);
       setChecklists([]);
@@ -93,7 +94,7 @@ export function useNovaNCForm(user) {
     setUploadingFotos(true);
     try {
       const urls = await Promise.all(files.map(async (file) => {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        const { file_url } = await uploadArquivo(file);
         return file_url;
       }));
       setFotos(prev => [...prev, ...urls]);
@@ -110,7 +111,7 @@ export function useNovaNCForm(user) {
     setUploadingPdfs(true);
     try {
       const results = await Promise.all(files.map(async (file) => {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        const { file_url } = await uploadArquivo(file);
         return { url: file_url, nome: file.name };
       }));
       setPdfs(prev => [...prev, ...results]);

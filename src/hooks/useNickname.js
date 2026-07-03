@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { filtrarUsuarios, atualizarUsuarioAtual } from '@/services/usuariosService';
 import { QUERY_KEYS } from '@/hooks/useQueryData';
 
 /**
@@ -44,7 +44,7 @@ export function useNickname(user) {
     setError('');
 
     // Verificar unicidade: busca usuários com mesmo nickname
-    const existing = await base44.entities.User.filter({ nickname: trimmed });
+    const existing = await filtrarUsuarios({ nickname: trimmed });
     const takenByAnother = existing.some(u => u.id !== user?.id);
 
     if (takenByAnother) {
@@ -53,7 +53,7 @@ export function useNickname(user) {
       return;
     }
 
-    await base44.auth.updateMe({ nickname: trimmed });
+    await atualizarUsuarioAtual({ nickname: trimmed });
     await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.currentUser });
     setSaving(false);
     setEditing(false);

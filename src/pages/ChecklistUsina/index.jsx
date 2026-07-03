@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { criarChecklist, atualizarChecklist } from "@/services/checklistsService";
 import { uploadMultipleFiles } from "@/utils/imageUpload";
 import { createPageUrl } from "@/utils";
 import { useChecklistForm } from "@/hooks/useChecklistForm";
@@ -153,10 +153,10 @@ export default function ChecklistUsinaPage() {
           updateData.was_rejected = true;
           msg = "Checklist atualizado com sucesso! O registro voltará para análise do administrador.";
         }
-        await base44.entities.ChecklistUsina.update(editingChecklist.id, updateData);
+        await atualizarChecklist('ChecklistUsina', editingChecklist.id, updateData);
         alert(msg);
       } else {
-        await base44.entities.ChecklistUsina.create({ ...dataToSave, laboratorista_name: user?.laboratorista_name || user?.full_name });
+        await criarChecklist('ChecklistUsina', { ...dataToSave, laboratorista_name: user?.laboratorista_name || user?.full_name });
         alert(saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!");
       }
       clearSavedData();

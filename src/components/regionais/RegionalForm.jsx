@@ -8,7 +8,7 @@ import { Check, Loader2 } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { base44 } from "@/api/base44Client";
+import { uploadArquivo } from "@/services/uploadService";
 
 const MultiSelect = ({ options, selected, onSelectedChange, placeholder }) => {
     const [open, setOpen] = useState(false);
@@ -87,7 +87,7 @@ export default function RegionalForm({ regional, users, projects, onSave, onCanc
 
         setUploadingLogo(true);
         try {
-            const { file_url } = await base44.integrations.Core.UploadFile({ file });
+            const { file_url } = await uploadArquivo(file);
             setFormData(prev => ({ ...prev, logo_url: file_url }));
         } catch (error) {
             console.error("Erro ao fazer upload da logo:", error);

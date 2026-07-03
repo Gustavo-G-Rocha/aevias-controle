@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { obterGranuMisturaById } from "@/services/granuMisturaService";
+import { listarFaixas } from "@/services/faixasService";
 import { createPageUrl } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
@@ -24,7 +25,7 @@ export function useGranuMisturaData() {
   // FaixaGranulometrica — cache próprio (não está no useAuxData)
   const { data: faixasDisponiveis } = useQuery({
     queryKey: ['faixasGranulometricas'],
-    queryFn: () => base44.entities.FaixaGranulometrica.list(),
+    queryFn: () => listarFaixas(),
     staleTime: 10 * 60 * 1000,
   });
 
@@ -58,7 +59,7 @@ export function useGranuMisturaData() {
 
     if (editId) {
       setEditLoading(true);
-      base44.entities.GranuMistura.get(editId)
+      obterGranuMisturaById(editId)
         .then(rec => {
           if (user.role === "admin" || (rec.created_by === user.email && (rec.status === "rascunho" || rec.approved === false))) {
             setEditingId(editId);

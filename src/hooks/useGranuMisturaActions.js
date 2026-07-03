@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { criarGranuMistura, atualizarGranuMistura } from "@/services/granuMisturaService";
 import { createPageUrl } from "@/utils";
 import { buildDataToSave } from "@/utils/granuMisturaUtils";
 
@@ -18,9 +18,9 @@ export function useGranuMisturaActions({ formData, editingId, user }) {
     try {
       const dataToSave = buildDataToSave(formData, saveStatus, editingId, user);
       if (editingId) {
-        await base44.entities.GranuMistura.update(editingId, dataToSave);
+        await atualizarGranuMistura(editingId, dataToSave);
       } else {
-        await base44.entities.GranuMistura.create(dataToSave);
+        await criarGranuMistura(dataToSave);
       }
       alert(saveStatus === "rascunho" ? "Progresso salvo!" : "Ensaio finalizado com sucesso!");
       navigate(createPageUrl("MeusEnsaios"));

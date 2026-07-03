@@ -1,6 +1,7 @@
 import React from "react";
 import { FileUp, Sparkles, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { uploadArquivo } from "@/services/uploadService";
 
 export default function ProjectFormUpload({
   formData,
@@ -31,7 +32,7 @@ export default function ProjectFormUpload({
     onExtractionStart();
 
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const { file_url } = await uploadArquivo(file);
       onFileUpload(file_url);
 
       const response = await base44.functions.invoke('extrairDadosProjeto', {
