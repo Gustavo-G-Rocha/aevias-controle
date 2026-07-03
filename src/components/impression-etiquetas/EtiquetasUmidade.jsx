@@ -11,17 +11,17 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
         <Button onClick={onPrint}>
           🖨️ Imprimir
         </Button>
-        <Button onClick={onVoltar} variant="outline" className="text-foreground bg-white hover:bg-accent hover:text-accent-foreground">
+        <Button onClick={onVoltar} variant="outline" className="bg-white hover:bg-accent hover:text-accent-foreground text-[hsl(var(--foreground))]">
           ← Voltar
         </Button>
       </div>
 
       <div>
-        {Array.from({ length: numPages }).map((_, pageIdx) => (
-          <div key={pageIdx} className="page-container">
+        {Array.from({ length: numPages }).map((_, pageIdx) =>
+        <div key={pageIdx} className="page-container">
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', columnGap: '3mm', rowGap: '2mm' }}>
-              {getEtiquetasPageUmidade(etiquetas, pageIdx).map((etiqueta, idx) => (
-                <table key={idx} className="text-[8px] print:text-[7px]" style={{ tableLayout: 'fixed', width: '100%', height: '38.1mm', borderCollapse: 'collapse', borderSpacing: 0, border: '0.4mm solid #000' }}>
+              {getEtiquetasPageUmidade(etiquetas, pageIdx).map((etiqueta, idx) =>
+            <table key={idx} className="text-[8px] print:text-[7px]" style={{ tableLayout: 'fixed', width: '100%', height: '38.1mm', borderCollapse: 'collapse', borderSpacing: 0, border: '0.4mm solid #000' }}>
                   <tbody>
                     <tr>
                       <td colSpan={2} className="text-center font-semibold" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.3mm 1mm' }}>Identificação do doc. Nº</td>
@@ -59,10 +59,10 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
                     </tr>
                   </tbody>
                 </table>
-              ))}
+            )}
             </div>
           </div>
-        ))}
+        )}
       </div>
 
       <style>{`
@@ -81,6 +81,6 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
           main { padding-left: 0 !important; margin-left: 0 !important; }
         }
       `}</style>
-    </div>
-  );
+    </div>);
+
 }
