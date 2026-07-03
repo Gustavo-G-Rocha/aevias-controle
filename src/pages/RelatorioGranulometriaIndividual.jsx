@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useReportMode } from "@/hooks/useReportMode";
 import { useLocation } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { obterEnsaioById } from "@/services/ensaiosService";
+import { obterUsuarioAtual } from "@/services/usuariosService";
+import { obterObraById } from "@/services/obrasService";
+import { obterRegionalById } from "@/services/regionaisService";
+import { obterProjectById } from "@/services/projectsService";
 import RelatorioGranulometriaIndividual from "../components/relatorios/RelatorioGranulometriaIndividual";
 import { Loader2, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,25 +33,25 @@ export default function RelatorioGranulometriaIndividualPage() {
         }
 
         const [ensaioData, currentUser] = await Promise.all([
-          base44.entities.EnsaioGranulometriaIndividual.get(ensaioId),
-          base44.auth.me()
+          obterEnsaioById('EnsaioGranulometriaIndividual', ensaioId),
+          obterUsuarioAtual()
         ]);
 
         setEnsaio(ensaioData);
         setUser(currentUser);
 
         if (ensaioData.obra_id) {
-          const obraData = await base44.entities.Obra.get(ensaioData.obra_id);
+          const obraData = await obterObraById(ensaioData.obra_id);
           setObra(obraData);
 
           if (obraData.regional_id) {
-            const regionalData = await base44.entities.Regional.get(obraData.regional_id);
+            const regionalData = await obterRegionalById(obraData.regional_id);
             setRegional(regionalData);
           }
         }
 
         if (ensaioData.project_id) {
-          const projectData = await base44.entities.Project.get(ensaioData.project_id);
+          const projectData = await obterProjectById(ensaioData.project_id);
           setProject(projectData);
         }
       } catch (error) {

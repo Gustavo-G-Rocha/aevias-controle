@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DatabaseZap, Trash2, UserX, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { listarRegionais, atualizarRegional } from '@/services/regionaisService';
 
 export default function MigracaoDados() {
   const [emailParaRemover, setEmailParaRemover] = useState('');
@@ -26,7 +27,7 @@ export default function MigracaoDados() {
     setResultadoRemocao(null);
 
     try {
-      const regionais = await base44.entities.Regional.list();
+      const regionais = await listarRegionais();
       const regionaisAfetadas = [];
 
       for (const regional of regionais) {
@@ -76,7 +77,7 @@ export default function MigracaoDados() {
         }
 
         if (temAlteracao) {
-          await base44.entities.Regional.update(regional.id, updates);
+          await atualizarRegional(regional.id, updates);
           regionaisAfetadas.push(regional.nome);
         }
       }

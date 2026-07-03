@@ -3,7 +3,10 @@ import { useReportMode } from "@/hooks/useReportMode";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
-import { base44 } from '@/api/base44Client';
+import { obterEnsaioById } from '@/services/ensaiosService';
+import { obterObraById } from '@/services/obrasService';
+import { obterRegionalById } from '@/services/regionaisService';
+import { isAuthenticated } from '@/services/usuariosService';
 import RelatorioTaxaPinturaImprimacaoComponent from '../components/relatorios/RelatorioTaxaPinturaImprimacao';
 
 export default function RelatorioTaxaPinturaImprimacaoPage() {
@@ -22,26 +25,26 @@ export default function RelatorioTaxaPinturaImprimacaoPage() {
 
       if (!id) throw new Error('ID do ensaio é obrigatório na URL');
 
-      const isAuth = await base44.auth.isAuthenticated();
+      const isAuth = await isAuthenticated();
       if (!isAuth) {
         throw new Error('Você precisa estar autenticado para visualizar este relatório');
       }
 
-      const ensaio = await base44.entities.EnsaioTaxaPinturaImprimacao.get(id);
+      const ensaio = await obterEnsaioById('EnsaioTaxaPinturaImprimacao', id);
       if (!ensaio) throw new Error(`Ensaio com ID ${id} não encontrado`);
 
       let obra = null;
       let regional = null;
       if (ensaio.obra_id) {
         try {
-          obra = await base44.entities.Obra.get(ensaio.obra_id);
+          obra = await obterObraById(ensaio.obra_id);
         } catch (err) {
           console.warn("Obra não encontrada:", ensaio.obra_id);
         }
         
         if (obra && obra.regional_id) {
           try {
-            regional = await base44.entities.Regional.get(obra.regional_id);
+            regional = await obterRegionalById(obra.regional_id);
           } catch (err) {
             console.warn("Regional não encontrada:", obra.regional_id);
           }

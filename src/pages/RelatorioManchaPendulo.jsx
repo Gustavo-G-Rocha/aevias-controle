@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useReportMode } from "@/hooks/useReportMode";
 import { useSearchParams } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { obterEnsaioById } from '@/services/ensaiosService';
+import { obterObraById } from '@/services/obrasService';
+import { obterRegionalById } from '@/services/regionaisService';
 import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 import RelatorioManchaPenduloComponent from '@/components/relatorios/RelatorioManchaPendulo';
@@ -21,15 +23,15 @@ export default function RelatorioManchaPenduloPage() {
     if (!id) return;
     const loadData = async () => {
       try {
-        const ensaioData = await base44.entities.EnsaioManchaPendulo.get(id);
+        const ensaioData = await obterEnsaioById('EnsaioManchaPendulo', id);
         setEnsaio(ensaioData);
 
         if (ensaioData.obra_id) {
-          const obraData = await base44.entities.Obra.get(ensaioData.obra_id);
+          const obraData = await obterObraById(ensaioData.obra_id);
           setObra(obraData);
 
           if (obraData.regional_id) {
-            const regionalData = await base44.entities.Regional.get(obraData.regional_id);
+            const regionalData = await obterRegionalById(obraData.regional_id);
             setRegional(regionalData);
           }
         }

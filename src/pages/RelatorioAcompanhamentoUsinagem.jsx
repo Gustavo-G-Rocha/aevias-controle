@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useReportMode } from "@/hooks/useReportMode";
-import { base44 } from "@/api/base44Client";
+import { obterEnsaioById } from "@/services/ensaiosService";
+import { obterObraById } from "@/services/obrasService";
+import { obterRegionalById } from "@/services/regionaisService";
+import { obterProjectById } from "@/services/projectsService";
 import { Loader2, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import RelatorioAcompanhamentoUsinagem from "../components/relatorios/RelatorioAcompanhamentoUsinagem";
@@ -26,21 +29,21 @@ export default function RelatorioAcompanhamentoUsinagemPage() {
           return;
         }
 
-        const ensaioData = await base44.entities.AcompanhamentoUsinagem.get(ensaioId);
+        const ensaioData = await obterEnsaioById('AcompanhamentoUsinagem', ensaioId);
         setEnsaio(ensaioData);
 
         if (ensaioData.obra_id) {
-          const obraData = await base44.entities.Obra.get(ensaioData.obra_id);
+          const obraData = await obterObraById(ensaioData.obra_id);
           setObra(obraData);
 
           if (obraData.regional_id) {
-            const regionalData = await base44.entities.Regional.get(obraData.regional_id);
+            const regionalData = await obterRegionalById(obraData.regional_id);
             setRegional(regionalData);
           }
         }
 
         if (ensaioData.project_id) {
-          const projectData = await base44.entities.Project.get(ensaioData.project_id);
+          const projectData = await obterProjectById(ensaioData.project_id);
           setProject(projectData);
         }
       } catch (error) {

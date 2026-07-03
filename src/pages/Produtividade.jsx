@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo } from "react";
-import { base44 } from "@/api/base44Client";
+import { atualizarRegistro } from "@/services/recordsService";
+import { filtrarProdutividade, atualizarProdutividade, criarProdutividade } from "@/services/produtividadeService";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { useProdutividadeData } from "@/hooks/useProdutividadeData";
@@ -44,7 +45,7 @@ export default function ProdutividadePage() {
       const updateData = tipo === 'empreiteira'
         ? { empreiteira: novoValor }
         : { usina_selecionada: novoValor, usina: novoValor };
-      await base44.entities[entityName].update(editDialog.registro.id, updateData);
+      await atualizarRegistro(entityName, editDialog.registro.id, updateData);
       setEditDialog({ open: false, registro: null });
       await loadData();
     } catch (error) {
@@ -81,14 +82,14 @@ export default function ProdutividadePage() {
     if (Object.keys(cacheDias).length === 0) { alert("Nenhuma alteração para salvar"); return; }
     try {
       for (const [, item] of Object.entries(cacheDias)) {
-        const existente = await base44.entities.ProdutividadeDiaria.filter({
+        const existente = await filtrarProdutividade({
           laboratorista_email: item.laborista,
           data: item.data
         });
         if (existente.length > 0) {
-          await base44.entities.ProdutividadeDiaria.update(existente[0].id, { status: item.status });
+          await atualizarProdutividade(existente[0].id, { status: item.status });
         } else {
-          await base44.entities.ProdutividadeDiaria.create({
+          await criarProdutividade({
             laboratorista_email: item.laborista,
             data: item.data,
             status: item.status

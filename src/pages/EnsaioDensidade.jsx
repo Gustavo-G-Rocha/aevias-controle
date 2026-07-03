@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, AlertTriangle } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { obterUsuarioAtual } from "@/services/usuariosService";
+import { listarObrasRecentes } from "@/services/obrasService";
+import { listarRegionais } from "@/services/regionaisService";
+import { listarProjects } from "@/services/projectsService";
+import { obterEnsaioById, criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -42,16 +46,16 @@ export default function EnsaioDensidadePage() {
     const loadInitialData = async () => {
       setLoading(true);
       try {
-        const currentUser = await base44.auth.me();
+        const currentUser = await obterUsuarioAtual();
         setUser(currentUser);
 
-        let obrasData = await base44.entities.Obra.list();
-        const projectsData = await base44.entities.Project.list();
+        let obrasData = await listarObrasRecentes();
+        const projectsData = await listarProjects();
         
         // Se for laboratorista, filtrar apenas obras em andamento da sua regional
         const currentUserAccessLevel = currentUser.access_level || (currentUser.role === 'admin' ? 'admin' : 'user');
         if (currentUserAccessLevel === 'user') {
-          const regionaisData = await base44.entities.Regional.list();
+          const regionaisData = await listarRegionais();
           const emailLower = currentUser.email.toLowerCase();
           const regionaisIds = regionaisData
             .filter(r =>
@@ -78,7 +82,7 @@ export default function EnsaioDensidadePage() {
         const editId = params.get('editId');
 
         if (editId) {
-          const ensaioToEdit = await base44.entities.EnsaioDensidade.get(editId);
+          const ensaioToEdit = await obterEnsaioById('EnsaioDensidade', editId);
           if (currentUser.role === 'admin' || (ensaioToEdit.created_by === currentUser.email && ensaioToEdit.approved !== true)) {
             setEditingEnsaio(ensaioToEdit);
           } else {
@@ -120,10 +124,10 @@ export default function EnsaioDensidadePage() {
           successMessage = "Ensaio atualizado com sucesso! O registro voltará para análise do administrador.";
         }
         
-        await base44.entities.EnsaioDensidade.update(editingEnsaio.id, updateData);
+        await atualizarEnsaio('EnsaioDensidade', editingEnsaio.id, updateData);
         alert(successMessage);
       } else {
-        await base44.entities.EnsaioDensidade.create({ ...formData, pesos: pesosParsed, laboratorista_name: user?.laboratorista_name || user?.full_name });
+        await criarEnsaio('EnsaioDensidade', { ...formData, pesos: pesosParsed, laboratorista_name: user?.laboratorista_name || user?.full_name });
         alert("Ensaio criado com sucesso!");
       }
       navigate(createPageUrl('MeusEnsaios'));

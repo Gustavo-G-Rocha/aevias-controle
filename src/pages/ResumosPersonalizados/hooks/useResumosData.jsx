@@ -1,5 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { obterUsuarioAtual } from "@/services/usuariosService";
+import { listarObrasRecentes } from "@/services/obrasService";
+import { listarRegionais } from "@/services/regionaisService";
+import { listarProjects } from "@/services/projectsService";
+import { filtrarRegistros } from "@/services/recordsService";
 import { CAMPOS_POR_TIPO, TIPOS_ENSAIO } from "../constants/camposPorTipo";
 import {
   filtrarObrasPorAcesso,
@@ -36,12 +40,12 @@ export function useResumosData() {
     const load = async () => {
       setLoading(true);
       try {
-        const userData = await base44.auth.me();
+        const userData = await obterUsuarioAtual();
         setUser(userData);
         const userAccessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
         const [obrasData, regionaisData] = await Promise.all([
-          base44.entities.Obra.list(),
-          base44.entities.Regional.list(),
+          listarObrasRecentes(),
+          listarRegionais(),
         ]);
         setRegionais(regionaisData);
         const availableObras = filtrarObrasPorAcesso(obrasData, regionaisData, userAccessLevel, userData.email);
@@ -305,7 +309,7 @@ export function useResumosData() {
     try {
       const tipo = tipoEnsaioSelecionado;
       const campos = CAMPOS_POR_TIPO[tipo].map(c => c.key);
-      const ensaios = await base44.entities[tipo].filter({ obra_id: obraId });
+      const ensaios = await filtrarRegistros(tipo, { obra_id: obraId });
 
       // Filtrar por data / laboratorista
       let ensaiosFiltrados = ensaios;
@@ -331,7 +335,7 @@ export function useResumosData() {
       // Carregar projetos se necessário
       let todosOsProjetos = [];
       if (['EnsaioCAUQ', 'EnsaioSondagem', 'ChecklistUsina', 'ChecklistMRAF'].includes(tipo)) {
-        todosOsProjetos = await base44.entities.Project.list();
+        todosOsProjetos = await listarProjects();
       }
 
       const peneirasRelevantes = (tipo === 'EnsaioCAUQ' || tipo === 'EnsaioMRAF')

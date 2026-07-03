@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useReportMode } from "@/hooks/useReportMode";
-import { base44 } from "@/api/base44Client";
+import { obterChecklistById } from "@/services/checklistsService";
+import { listarUsuarios } from "@/services/usuariosService";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import RelatorioChecklistTerraplanagem from "../components/relatorios/RelatorioChecklistTerraplanagem";
@@ -23,12 +24,12 @@ export default function RelatorioChecklistTerraplanamemPage() {
         return;
       }
 
-      const checklist = await base44.entities.ChecklistTerraplanagem.get(checklistId);
+      const checklist = await obterChecklistById('ChecklistTerraplanagem', checklistId);
 
       let creatorUser = null;
       if (checklist.created_by) {
         try {
-          const allUsers = await base44.entities.User.list();
+          const allUsers = await listarUsuarios();
           creatorUser = allUsers.find(u => u.email?.toLowerCase() === checklist.created_by?.toLowerCase()) || null;
         } catch (err) {
           console.warn("Não foi possível buscar dados do criador:", err);

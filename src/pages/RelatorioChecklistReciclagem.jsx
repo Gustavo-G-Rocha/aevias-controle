@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useReportMode } from "@/hooks/useReportMode";
-import { base44 } from "@/api/base44Client";
+import { obterChecklistById } from "@/services/checklistsService";
+import { obterObraById } from "@/services/obrasService";
+import { obterRegionalById } from "@/services/regionaisService";
+import { obterProjectById } from "@/services/projectsService";
+import { filtrarUsuarios } from "@/services/usuariosService";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import RelatorioChecklistReciclagem from "../components/relatorios/RelatorioChecklistReciclagem";
@@ -27,26 +31,26 @@ export default function RelatorioChecklistReciclagemPage() {
         return;
       }
 
-      const checklistData = await base44.entities.ChecklistReciclagem.get(checklistId);
+      const checklistData = await obterChecklistById('ChecklistReciclagem', checklistId);
       setChecklist(checklistData);
 
       if (checklistData.obra_id) {
-        const obraData = await base44.entities.Obra.get(checklistData.obra_id);
+        const obraData = await obterObraById(checklistData.obra_id);
         setObra(obraData);
 
         if (obraData.regional_id) {
-          const regionalData = await base44.entities.Regional.get(obraData.regional_id);
+          const regionalData = await obterRegionalById(obraData.regional_id);
           setRegional(regionalData);
         }
       }
 
       if (checklistData.project_id) {
-        const projectData = await base44.entities.Project.get(checklistData.project_id);
+        const projectData = await obterProjectById(checklistData.project_id);
         setProject(projectData);
       }
 
       if (checklistData.created_by) {
-        const users = await base44.entities.User.filter({ email: checklistData.created_by });
+        const users = await filtrarUsuarios({ email: checklistData.created_by });
         if (users && users.length > 0) setCreatorUser(users[0]);
       }
     } catch (error) {
