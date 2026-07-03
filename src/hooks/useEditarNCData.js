@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { filtrarRegistros } from "@/services/recordsService";
 import { createPageUrl } from "@/utils";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { extractNCIdFromUrl, initializeNCForm } from "@/utils/editarNCUtils";
@@ -27,7 +27,7 @@ export const useEditarNCData = () => {
     }
 
     setNcLoading(true);
-    base44.entities.RelatorioNC.filter({ id: ncId })
+    filtrarRegistros('RelatorioNC', { id: ncId })
       .then(ncData => {
         if (!ncData || ncData.length === 0) {
           alert("NC não encontrada");

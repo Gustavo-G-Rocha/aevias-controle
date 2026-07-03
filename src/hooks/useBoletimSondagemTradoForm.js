@@ -3,7 +3,7 @@
  * Gerencia handlers de camadas, umidade, densidades e fotos.
  */
 import { useState, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { uploadArquivo } from "@/services/uploadService";
 import {
   calcularUmidade,
   calcularDensidade,
@@ -165,7 +165,7 @@ export function useBoletimSondagemTradoForm(setFormData) {
     try {
       const urls = [];
       for (const file of files) {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        const { file_url } = await uploadArquivo(file);
         urls.push(file_url);
       }
       setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...urls] }));

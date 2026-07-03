@@ -3,7 +3,7 @@
  * Gerencia handlers de furos, dados globais, Proctor e fotos.
  */
 import { useState, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { uploadArquivo } from "@/services/uploadService";
 import { calcularFuroComProctor, getFuroInicial } from "@/utils/ensaioDensidadeUtils";
 
 export function useEnsaioDensidadeForm(formData, setFormData) {
@@ -93,7 +93,7 @@ export function useEnsaioDensidadeForm(formData, setFormData) {
     try {
       const uploadedUrls = [];
       for (const file of files) {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        const { file_url } = await uploadArquivo(file);
         uploadedUrls.push(file_url);
       }
       setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...uploadedUrls] }));

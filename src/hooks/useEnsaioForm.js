@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { listarFaixas } from "@/services/faixasService";
+import { obterEnsaioById } from "@/services/ensaiosService";
 import { useQuery } from "@tanstack/react-query";
 import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { createPageUrl } from "@/utils";
@@ -34,7 +35,7 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
   // FaixaGranulometrica — cache próprio (não está no useAuxData)
   const { data: faixas } = useQuery({
     queryKey: ['faixasGranulometricas'],
-    queryFn: () => base44.entities.FaixaGranulometrica.list(),
+    queryFn: () => listarFaixas(),
     staleTime: 10 * 60 * 1000,
   });
 
@@ -82,7 +83,7 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
 
     if (editId) {
       setEditLoading(true);
-      base44.entities[entityName].get(editId)
+      obterEnsaioById(entityName, editId)
         .then(ensaioToEdit => {
           setEditingEnsaio(ensaioToEdit);
           const isCreator = ensaioToEdit.created_by === user.email;

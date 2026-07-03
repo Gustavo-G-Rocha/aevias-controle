@@ -7,7 +7,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { obterEnsaioById } from "@/services/ensaiosService";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import {
   getInitialFormData,
@@ -41,7 +41,7 @@ export function useBoletimSondagemTradoData() {
 
     if (editId) {
       setEditLoading(true);
-      base44.entities.BoletimSondagemTrado.get(editId)
+      obterEnsaioById('BoletimSondagemTrado', editId)
         .then(boletimToEdit => {
           if (
             user.role === 'admin' ||

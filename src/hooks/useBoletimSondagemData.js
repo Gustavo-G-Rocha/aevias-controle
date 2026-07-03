@@ -6,7 +6,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { obterEnsaioById } from "@/services/ensaiosService";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { getInitialFormData, getDensidadeInicial, normalizarDensidades } from "@/utils/boletimSondagemUtils";
 
@@ -50,7 +50,7 @@ export function useBoletimSondagemData() {
 
     if (editId) {
       setEditLoading(true);
-      base44.entities.BoletimSondagem.get(editId)
+      obterEnsaioById('BoletimSondagem', editId)
         .then(boletimToEdit => {
           if (user.role === 'admin' || (boletimToEdit.created_by === user.email && boletimToEdit.approved !== true)) {
             setEditingBoletim(boletimToEdit);

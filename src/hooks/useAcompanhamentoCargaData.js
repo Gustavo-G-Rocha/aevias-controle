@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { base44 } from "@/api/base44Client";
+import { obterEnsaioById } from "@/services/ensaiosService";
 import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import {
@@ -38,7 +38,7 @@ export function useAcompanhamentoCargaData() {
 
     if (editIdParam) {
       setEditLoading(true);
-      base44.entities.AcompanhamentoCarga.get(editIdParam)
+      obterEnsaioById('AcompanhamentoCarga', editIdParam)
         .then(ensaioData => {
           setFormData(ensaioData);
           setEditMode(true);

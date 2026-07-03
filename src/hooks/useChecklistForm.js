@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { listarFaixas } from "@/services/faixasService";
+import { obterChecklistById } from "@/services/checklistsService";
 import { useQuery } from "@tanstack/react-query";
 import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { createPageUrl } from "@/utils";
@@ -29,7 +30,7 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
   // FaixaGranulometrica — cache próprio (não está no useAuxData)
   const { data: faixas } = useQuery({
     queryKey: ['faixasGranulometricas'],
-    queryFn: () => base44.entities.FaixaGranulometrica.list(),
+    queryFn: () => listarFaixas(),
     staleTime: 10 * 60 * 1000,
   });
 
@@ -72,7 +73,7 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
 
     if (editId) {
       setEditLoading(true);
-      base44.entities[entityName].get(editId)
+      obterChecklistById(entityName, editId)
         .then(checklistToEdit => {
           setEditingChecklist(checklistToEdit);
           const isOwnerCheck = checklistToEdit.created_by?.toLowerCase() === user.email?.toLowerCase() || checklistToEdit.created_by_id === user.id;

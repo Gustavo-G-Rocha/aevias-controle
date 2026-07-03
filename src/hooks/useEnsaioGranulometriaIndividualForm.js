@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { base44 } from "@/api/base44Client";
+import { obterFaixaById } from "@/services/faixasService";
 import { filtrarPeneirasPorFaixa, PENEIRAS_CONFIG } from "@/constants/sieves";
 import {
   AGREGADO_VAZIO,
@@ -53,7 +53,7 @@ export function useEnsaioGranulometriaIndividualForm({
       if (proj) {
         if (proj.faixa_granulometrica_id) {
           try {
-            const faixa = await base44.entities.FaixaGranulometrica.get(proj.faixa_granulometrica_id);
+            const faixa = await obterFaixaById(proj.faixa_granulometrica_id);
             setFormData(prev => ({ ...prev, faixa: faixa.nome }));
             setSelectedFaixa(faixa);
           } catch (error) {

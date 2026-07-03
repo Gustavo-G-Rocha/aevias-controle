@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { obterEnsaioById } from "@/services/ensaiosService";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { getInitialFormData } from "@/utils/acompanhamentoUsinagemUtils";
 
@@ -24,7 +24,7 @@ export function useAcompanhamentoUsinagemData() {
 
     if (editId) {
       setEditLoading(true);
-      base44.entities.AcompanhamentoUsinagem.get(editId)
+      obterEnsaioById('AcompanhamentoUsinagem', editId)
         .then(ensaioData => {
           const canEdit = ensaioData.created_by === user.email &&
             (ensaioData.status === 'rascunho' || ensaioData.approved === false);

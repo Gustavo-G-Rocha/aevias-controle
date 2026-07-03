@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { obterFaixaById } from "@/services/faixasService";
 import {
   filtrarProjetosPorObra,
   buildObraFormPatch,
@@ -27,7 +27,7 @@ export function useAcompanhamentoUsinagemFilters({
     const project = filteredProjects.find(p => p.id === projectId);
 
     if (project?.faixa_granulometrica_id) {
-      base44.entities.FaixaGranulometrica.get(project.faixa_granulometrica_id)
+      obterFaixaById(project.faixa_granulometrica_id)
         .then(faixa => {
           if (faixa) setFormData(prev => ({ ...prev, faixa_especificada: faixa.nome || '' }));
         })

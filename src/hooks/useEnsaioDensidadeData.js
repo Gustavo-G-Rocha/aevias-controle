@@ -5,7 +5,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { obterEnsaioById } from "@/services/ensaiosService";
 import { getInitialFormData, filtrarObrasDisponiveis, getFuroInicial } from "@/utils/ensaioDensidadeUtils";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 
@@ -54,7 +54,7 @@ export function useEnsaioDensidadeData() {
 
     // Modo edição: carrega o ensaio específico
     setEditLoading(true);
-    base44.entities.EnsaioDensidadeInSitu.get(editId)
+    obterEnsaioById('EnsaioDensidadeInSitu', editId)
       .then(ensaioToEdit => {
         if (
           user.role === 'admin' ||
