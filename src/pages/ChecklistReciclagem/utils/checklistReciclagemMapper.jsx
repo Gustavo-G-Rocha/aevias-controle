@@ -24,7 +24,7 @@ export const validateForm = (formData, saveStatus) => {
   return null;
 };
 
-export const buildDataToSave = (formData, saveStatus) => ({
+export const buildDataToSave = (formData, saveStatus, user) => ({
   ...formData,
   status: saveStatus,
   fotos: (formData.fotos || []).map(f => (typeof f === 'string' ? f : (f?.url || ''))).filter(Boolean),

@@ -18,7 +18,7 @@ const serializeEnsaio = (ensaio) => ({
   resultados: serializeResultados(ensaio.resultados),
 });
 
-export const buildDataToSave = (formData, saveStatus) => {
+export const buildDataToSave = (formData, saveStatus, user) => {
   const vuQtde = parseInt(formData.ensaios_empreiteira.variacao_umidade_quantidade) || 0;
   const gcQtde = parseInt(formData.ensaios_empreiteira.grau_compactacao_quantidade) || 0;
 
@@ -87,5 +87,3 @@ export const validateForm = (formData, saveStatus) => {
 
   return null;
 };
-
-export const toResultadosArray_ = toResultadosArray;
