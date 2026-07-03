@@ -39,10 +39,10 @@ export function calcularPaginasColeta(totalEtiquetas) {
 }
 
 /**
- * Calcula número de páginas para etiquetas de umidade (32 por página)
+ * Calcula número de páginas para etiquetas de umidade (21 por página - 3 colunas x 7 linhas)
  */
 export function calcularPaginasUmidade(totalEtiquetas) {
-  return Math.ceil(totalEtiquetas / 32);
+  return Math.ceil(totalEtiquetas / 21);
 }
 
 /**
@@ -53,10 +53,10 @@ export function getEtiquetasPageColeta(etiquetas, pageIdx) {
 }
 
 /**
- * Obtém etiquetas de uma página específica (umidade: 32 por página)
+ * Obtém etiquetas de uma página específica (umidade: 21 por página - 3 colunas x 7 linhas)
  */
 export function getEtiquetasPageUmidade(etiquetas, pageIdx) {
-  return etiquetas.slice(pageIdx * 32, (pageIdx + 1) * 32);
+  return etiquetas.slice(pageIdx * 21, (pageIdx + 1) * 21);
 }
 
 /**

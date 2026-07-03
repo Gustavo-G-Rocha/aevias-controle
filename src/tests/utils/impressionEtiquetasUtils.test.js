@@ -78,17 +78,17 @@ describe('impressionEtiquetasUtils', () => {
   });
 
   describe('calcularPaginasUmidade', () => {
-    it('calcula 1 página para 32 etiquetas', () => {
-      expect(calcularPaginasUmidade(32)).toBe(1);
+    it('calcula 1 página para 21 etiquetas', () => {
+      expect(calcularPaginasUmidade(21)).toBe(1);
     });
 
-    it('calcula 2 páginas para 33 etiquetas', () => {
-      expect(calcularPaginasUmidade(33)).toBe(2);
+    it('calcula 2 páginas para 22 etiquetas', () => {
+      expect(calcularPaginasUmidade(22)).toBe(2);
     });
 
     it('calcula páginas para múltiplos', () => {
-      expect(calcularPaginasUmidade(64)).toBe(2);
-      expect(calcularPaginasUmidade(65)).toBe(3);
+      expect(calcularPaginasUmidade(42)).toBe(2);
+      expect(calcularPaginasUmidade(43)).toBe(3);
     });
   });
 
@@ -109,18 +109,18 @@ describe('impressionEtiquetasUtils', () => {
   });
 
   describe('getEtiquetasPageUmidade', () => {
-    it('retorna 32 etiquetas da primeira página', () => {
-      const etiquetas = Array(64).fill(null).map((_, i) => ({ id: i }));
+    it('retorna 21 etiquetas da primeira página', () => {
+      const etiquetas = Array(42).fill(null).map((_, i) => ({ id: i }));
       const result = getEtiquetasPageUmidade(etiquetas, 0);
-      expect(result).toHaveLength(32);
+      expect(result).toHaveLength(21);
       expect(result[0].id).toBe(0);
     });
 
     it('retorna etiquetas da segunda página', () => {
-      const etiquetas = Array(64).fill(null).map((_, i) => ({ id: i }));
+      const etiquetas = Array(42).fill(null).map((_, i) => ({ id: i }));
       const result = getEtiquetasPageUmidade(etiquetas, 1);
-      expect(result).toHaveLength(32);
-      expect(result[0].id).toBe(32);
+      expect(result).toHaveLength(21);
+      expect(result[0].id).toBe(21);
     });
   });
 

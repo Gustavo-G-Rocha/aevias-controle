@@ -19,9 +19,9 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
       <div>
         {Array.from({ length: numPages }).map((_, pageIdx) => (
           <div key={pageIdx} className="page-container">
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-3 gap-x-[3mm] gap-y-[2mm] print:gap-x-[3mm] print:gap-y-[2mm]">
               {getEtiquetasPageUmidade(etiquetas, pageIdx).map((etiqueta, idx) => (
-                <table key={idx} className="w-full text-[8px] print:text-[7px]" style={{ borderCollapse: 'collapse', borderSpacing: 0, border: '0.4mm solid #000' }}>
+                <table key={idx} className="text-[8px] print:text-[7px]" style={{ tableLayout: 'fixed', width: '63.5mm', height: '38.1mm', borderCollapse: 'collapse', borderSpacing: 0, border: '0.4mm solid #000' }}>
                   <tbody>
                     <tr>
                       <td colSpan={2} className="text-center font-semibold" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.3mm 1mm' }}>Identificação do doc. Nº</td>
