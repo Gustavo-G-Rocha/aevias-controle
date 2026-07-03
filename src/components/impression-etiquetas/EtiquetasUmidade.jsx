@@ -19,9 +19,9 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
       <div>
         {Array.from({ length: numPages }).map((_, pageIdx) =>
         <div key={pageIdx} className="page-container">
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', columnGap: '2.8mm', rowGap: '0mm' }}>
+            <div className="umidade-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', columnGap: '2.8mm', rowGap: '0mm' }}>
               {getEtiquetasPageUmidade(etiquetas, pageIdx).map((etiqueta, idx) =>
-            <table key={idx} className="text-[10px] print:text-[9px]" style={{ tableLayout: 'fixed', width: '100%', height: '38.1mm', borderCollapse: 'collapse', borderSpacing: 0, border: '0.4mm solid #000' }}>
+            <table key={idx} className="umidade-label text-[10px] print:text-[9px]" style={{ tableLayout: 'fixed', width: '100%', height: '38.1mm', borderCollapse: 'collapse', borderSpacing: 0, border: '0.4mm solid #000' }}>
                   <tbody>
                     <tr>
                       <td colSpan={2} className="text-center font-semibold" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.3mm 1mm' }}>Identificação do doc. Nº</td>
@@ -74,7 +74,9 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; overflow: visible !important; }
           *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
           html, body, div, section, main { overflow: visible !important; -ms-overflow-style: none !important; scrollbar-width: none !important; }
-          .page-container { overflow: visible !important; }
+          .page-container { height: 297mm !important; overflow: visible !important; }
+          .umidade-grid { grid-template-rows: repeat(7, 1fr) !important; height: 100% !important; }
+          .umidade-label { height: 100% !important; }
           .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
           .print\\:hidden { display: none !important; }
           header, nav, aside, .no-print, [data-sidebar], [data-sidebar="sidebar"], [data-sidebar="provider"] { display: none !important; }
