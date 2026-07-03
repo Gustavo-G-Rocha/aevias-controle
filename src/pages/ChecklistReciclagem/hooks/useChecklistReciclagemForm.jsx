@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
 import { useChecklistForm } from "@/hooks/useChecklistForm";
 import { buildDataToSave, validateForm } from "../utils/checklistReciclagemMapper";
 import { todayISO } from "@/utils/formInitialData";
+import { criarChecklist, atualizarChecklist } from "@/services/checklistsService";
+import { uploadImagem } from "@/services/uploadService";
 
 const getInitialFormData = () => ({
   obra_id: "",
@@ -111,7 +112,7 @@ export function useChecklistReciclagemForm() {
     setSelectedFileNames(files.length === 1 ? files[0].name : `${files.length} ficheiros selecionados`);
     const uploadedUrls = [];
     for (const file of files) {
-      const result = await base44.integrations.Core.UploadFile({ file });
+      const result = await uploadImagem(file);
       uploadedUrls.push(result.file_url);
     }
     setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...uploadedUrls] }));
@@ -140,10 +141,10 @@ export function useChecklistReciclagemForm() {
           updateData.approved_by = null; updateData.approved_date = null; updateData.was_rejected = true;
           msg = "Checklist atualizado com sucesso! O registro voltará para análise do administrador.";
         }
-        await base44.entities.ChecklistReciclagem.update(editingChecklist.id, updateData);
+        await atualizarChecklist('ChecklistReciclagem', editingChecklist.id, updateData);
         alert(msg);
       } else {
-        await base44.entities.ChecklistReciclagem.create(dataToSave);
+        await criarChecklist('ChecklistReciclagem', dataToSave);
         alert(saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!");
       }
       clearSavedData();

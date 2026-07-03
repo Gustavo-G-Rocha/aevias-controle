@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
 import { useChecklistForm } from "@/hooks/useChecklistForm";
 import { useOfflineDetection } from "@/hooks/useOfflineDetection";
@@ -7,6 +6,8 @@ import { buildDataToSave, validateForm } from "../utils/checklistTerrapalagemMap
 import { createQueueItem } from "@/utils/offlineQueue";
 import { addOrUpdateQueueItem } from "@/services/syncService";
 import { todayISO } from "@/utils/formInitialData";
+import { criarChecklist, atualizarChecklist } from "@/services/checklistsService";
+import { uploadImagem } from "@/services/uploadService";
 
 const getInitialFormData = () => ({
   obra_id: "",
@@ -161,7 +162,7 @@ export function useChecklistTerrapalagemForm() {
     try {
       const uploadedUrls = [];
       for (const file of files) {
-        const result = await base44.integrations.Core.UploadFile({ file });
+        const result = await uploadImagem(file);
         uploadedUrls.push(result.file_url);
       }
       setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...uploadedUrls] }));
@@ -213,10 +214,10 @@ export function useChecklistTerrapalagemForm() {
             updateData.was_rejected = true;
             msg = "Checklist atualizado com sucesso! O registro voltará para análise do administrador.";
           }
-          await base44.entities.ChecklistTerraplanagem.update(editingChecklist.id, updateData);
+          await atualizarChecklist('ChecklistTerraplanagem', editingChecklist.id, updateData);
           alert(msg);
         } else {
-          await base44.entities.ChecklistTerraplanagem.create(dataToSave);
+          await criarChecklist('ChecklistTerraplanagem', dataToSave);
           alert(saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!");
         }
         clearSavedData();

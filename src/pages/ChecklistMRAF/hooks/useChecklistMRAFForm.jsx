@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
 import { useChecklistForm } from "@/hooks/useChecklistForm";
 import { useOfflineDetection } from "@/hooks/useOfflineDetection";
@@ -7,6 +6,8 @@ import { buildDataToSave, validateForm } from "../utils/checklistMRAFMapper";
 import { createQueueItem } from "@/utils/offlineQueue";
 import { addOrUpdateQueueItem } from "@/services/syncService";
 import { todayISO } from "@/utils/formInitialData";
+import { criarChecklist, atualizarChecklist } from "@/services/checklistsService";
+import { uploadImagem } from "@/services/uploadService";
 
 const getInitialFormData = () => ({
   obra_id: "",
@@ -144,7 +145,7 @@ export function useChecklistMRAFForm() {
     try {
       const uploadedUrls = [];
       for (const file of files) {
-        const result = await base44.integrations.Core.UploadFile({ file });
+        const result = await uploadImagem(file);
         uploadedUrls.push(result.file_url);
       }
       setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...uploadedUrls] }));
@@ -199,10 +200,10 @@ export function useChecklistMRAFForm() {
             updateData.was_rejected = true;
             msg = "Checklist atualizado com sucesso! O registro voltará para análise do administrador.";
           }
-          await base44.entities.ChecklistMRAF.update(editingChecklist.id, updateData);
+          await atualizarChecklist('ChecklistMRAF', editingChecklist.id, updateData);
           alert(msg);
         } else {
-          await base44.entities.ChecklistMRAF.create(dataToSave);
+          await criarChecklist('ChecklistMRAF', dataToSave);
           alert(saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!");
         }
         clearSavedData();

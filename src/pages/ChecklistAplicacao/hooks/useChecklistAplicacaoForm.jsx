@@ -12,9 +12,9 @@
  * Não importa nem renderiza JSX.
  */
 import { useCallback } from "react";
-import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
 import { uploadMultipleFiles } from "@/utils/imageUpload";
+import { criarChecklist, atualizarChecklist } from "@/services/checklistsService";
 
 export function useChecklistAplicacaoForm({
   formData,
@@ -136,10 +136,10 @@ export function useChecklistAplicacaoForm({
           updateData.was_rejected = true;
           msg = "Checklist atualizado com sucesso! O registro voltará para análise do administrador.";
         }
-        await base44.entities.ChecklistAplicacao.update(editingChecklist.id, updateData);
+        await atualizarChecklist('ChecklistAplicacao', editingChecklist.id, updateData);
         alert(msg);
       } else {
-        await base44.entities.ChecklistAplicacao.create(dataToSave);
+        await criarChecklist('ChecklistAplicacao', dataToSave);
         alert(saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!");
       }
       clearSavedData();
