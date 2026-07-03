@@ -28,6 +28,14 @@ export async function obterSolicitacaoTransferenciaRegionalById(id) {
   return base44.entities.SolicitacaoTransferenciaRegional.read(id);
 }
 
+export async function criarSolicitacaoTransferenciaObra(data) {
+  return base44.entities.SolicitacaoTransferenciaObra.create(data);
+}
+
+export async function criarSolicitacaoTransferenciaRegional(data) {
+  return base44.entities.SolicitacaoTransferenciaRegional.create(data);
+}
+
 export async function atualizarSolicitacaoTransferenciaObra(id, data) {
   return base44.entities.SolicitacaoTransferenciaObra.update(id, data);
 }

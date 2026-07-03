@@ -3,7 +3,11 @@
  * Busca obra, regional, projetos e usuário atual.
  */
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { obterObraById } from '@/services/obrasService';
+import { listarRegionais } from '@/services/regionaisService';
+import { listarProjects } from '@/services/projectsService';
+import { listarFaixas } from '@/services/faixasService';
+import { obterUsuarioAtual } from '@/services/usuariosService';
 
 export function useRelatorioUnificadoData() {
   const [obra, setObra] = useState(null);
@@ -27,7 +31,7 @@ export function useRelatorioUnificadoData() {
         }
 
         // Obra é obrigatória; os demais são independentes — falha isolada não bloqueia
-        const obraData = await base44.entities.Obra.get(obra_id).catch(() => null);
+        const obraData = await obterObraById(obra_id).catch(() => null);
 
         if (!obraData) {
           setError(`Obra com ID ${obra_id} não encontrada`);
@@ -39,10 +43,10 @@ export function useRelatorioUnificadoData() {
 
         // Dados relacionados em paralelo com fallback individual
         const [regionaisResult, projectsResult, faixasResult, userResult] = await Promise.allSettled([
-          base44.entities.Regional.list(),
-          base44.entities.Project.list(),
-          base44.entities.FaixaGranulometrica.list(),
-          base44.auth.me(),
+          listarRegionais(),
+          listarProjects(),
+          listarFaixas(),
+          obterUsuarioAtual(),
         ]);
 
         const regionaisData = regionaisResult.status === 'fulfilled' ? regionaisResult.value : [];

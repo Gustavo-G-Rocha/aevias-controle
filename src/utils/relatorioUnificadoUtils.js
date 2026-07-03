@@ -5,9 +5,6 @@
  */
 import { getEnsaioTypeInfo } from '@/components/ensaios/ensaioMappers';
 
-// Re-exporta getEntityInstance do módulo de dependências
-export { getEntityInstance } from '@/utils/relatorioUnificadoEntityMap';
-
 /**
  * Formata uma data para o padrão pt-BR.
  * @param {string|Date} date - Data a formatar

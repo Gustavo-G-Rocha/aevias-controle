@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
 import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { createPageUrl } from "@/utils";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
+import { obterChecklistById, criarChecklist, atualizarChecklist } from "@/services/checklistsService";
+import { uploadArquivo } from "@/services/uploadService";
 
 export const getInitialFormData = () => ({
   obra_id: "",
@@ -144,7 +145,7 @@ export function useChecklistConcretagem() {
 
     if (editId) {
       setEditLoading(true);
-      base44.entities.ChecklistConcretagem.get(editId)
+      obterChecklistById('ChecklistConcretagem', editId)
         .then(checklistToEdit => {
           const userAccessLevel = user.access_level || (user.role === "admin" ? "admin" : "user");
           if (userAccessLevel === "admin" || (checklistToEdit.created_by === user.email && (checklistToEdit.status === "rascunho" || checklistToEdit.approved === false))) {
@@ -270,7 +271,7 @@ export function useChecklistConcretagem() {
 
     setUploadingPhotos(true);
     setSelectedFileNames(files.length === 1 ? files[0].name : `${files.length} ficheiros selecionados`);
-    const results = await Promise.all(files.map(file => base44.integrations.Core.UploadFile({ file })));
+    const results = await Promise.all(files.map(file => uploadArquivo(file)));
     setFormData(prev => ({ ...prev, fotos: [...prev.fotos, ...results.map(r => r.file_url)] }));
     setUploadingPhotos(false);
     e.target.value = "";
@@ -333,10 +334,10 @@ export function useChecklistConcretagem() {
         if (editingChecklist.approved === false && saveStatus === "finalizado") {
           Object.assign(updateData, { approved: null, rejection_reason: null, approved_by: null, approved_date: null, was_rejected: true });
         }
-        await base44.entities.ChecklistConcretagem.update(editingChecklist.id, updateData);
+        await atualizarChecklist('ChecklistConcretagem', editingChecklist.id, updateData);
         alert(saveStatus === "rascunho" ? "Progresso salvo!" : "Checklist atualizado com sucesso!");
       } else {
-        await base44.entities.ChecklistConcretagem.create(dataToSave);
+        await criarChecklist('ChecklistConcretagem', dataToSave);
         alert(saveStatus === "rascunho" ? "Progresso salvo!" : "Checklist criado com sucesso!");
       }
       clearSavedData();

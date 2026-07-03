@@ -1,10 +1,13 @@
 /**
  * Hook de carregamento de dados iniciais da página de Regionais.
- * Responsabilidades: buscar user, regionais, obras, users, projects; 
+ * Responsabilidades: buscar user, regionais, obras, users, projects;
  * filtrar regionais por nível de acesso; expor loadData para refresh.
  */
 import { useState, useEffect, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { obterUsuarioAtual, listarUsuarios } from "@/services/usuariosService";
+import { listarRegionais } from "@/services/regionaisService";
+import { listarRegistros } from "@/services/recordsService";
+import { listarProjects } from "@/services/projectsService";
 import { getUserAccessLevel, filtrarRegionaisPorAcesso } from "@/utils/regionaisUtils";
 
 export function useRegionaisData() {
@@ -19,15 +22,15 @@ export function useRegionaisData() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const userData = await base44.auth.me();
+      const userData = await obterUsuarioAtual();
       setUser(userData);
 
       const accessLevel = getUserAccessLevel(userData);
 
       const [regionaisData, obrasData, projectsData] = await Promise.all([
-        base44.entities.Regional.list("-created_date", 100),
-        base44.entities.Obra.list(),
-        base44.entities.Project.list(),
+        listarRegionais("-created_date", 100),
+        listarRegistros('Obra', '-created_date', 2000),
+        listarProjects(),
       ]);
 
       setTodasRegionais(regionaisData);
@@ -36,7 +39,7 @@ export function useRegionaisData() {
       let usersData = [];
       if (accessLevel !== 'user') {
         try {
-          usersData = await base44.entities.User.list();
+          usersData = await listarUsuarios();
         } catch (e) {
           console.error('[Regionais] Sem permissão para listar usuários:', e?.message || e);
         }

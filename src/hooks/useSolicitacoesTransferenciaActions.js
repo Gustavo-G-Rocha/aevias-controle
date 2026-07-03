@@ -1,5 +1,9 @@
 import { useCallback } from 'react';
-import { base44 } from '@/api/base44Client';
+import {
+  criarSolicitacaoTransferenciaRegional,
+  atualizarSolicitacaoTransferenciaRegional,
+} from '@/services/solicitacoesService';
+import { atualizarRegional } from '@/services/regionaisService';
 
 export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
   const handleNovaSolicitacao = useCallback(async (formData, regionalAtual) => {
@@ -11,7 +15,7 @@ export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
     const regionalDestino = regionais.find(r => r.id === formData.regional_destino_id);
 
     try {
-      await base44.entities.SolicitacaoTransferenciaRegional.create({
+      await criarSolicitacaoTransferenciaRegional({
         laboratorista_email: user.email,
         laboratorista_name: user.laboratorista_name || user.full_name,
         regional_atual_id: regionalAtual.id,
@@ -37,7 +41,7 @@ export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
 
     try {
       // Atualizar a solicitação
-      await base44.entities.SolicitacaoTransferenciaRegional.update(solicitacao.id, {
+      await atualizarSolicitacaoTransferenciaRegional(solicitacao.id, {
         status: 'aprovada',
         aprovado_por: user.email,
         aprovado_em: new Date().toISOString()
@@ -48,7 +52,7 @@ export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
       if (regionalAtualData) {
         const novosLaboratoristas = (regionalAtualData.laboratoristas_responsaveis || [])
           .filter(email => email.toLowerCase() !== solicitacao.laboratorista_email.toLowerCase());
-        await base44.entities.Regional.update(solicitacao.regional_atual_id, {
+        await atualizarRegional(solicitacao.regional_atual_id, {
           laboratoristas_responsaveis: novosLaboratoristas
         });
       }
@@ -60,7 +64,7 @@ export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
           ...(regionalDestinoData.laboratoristas_responsaveis || []),
           solicitacao.laboratorista_email
         ];
-        await base44.entities.Regional.update(solicitacao.regional_destino_id, {
+        await atualizarRegional(solicitacao.regional_destino_id, {
           laboratoristas_responsaveis: novosLaboratoristas
         });
       }
@@ -77,7 +81,7 @@ export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
 
   const handleReject = useCallback(async (solicitacao, motivoRejeicao) => {
     try {
-      await base44.entities.SolicitacaoTransferenciaRegional.update(solicitacao.id, {
+      await atualizarSolicitacaoTransferenciaRegional(solicitacao.id, {
         status: 'rejeitada',
         aprovado_por: user.email,
         aprovado_em: new Date().toISOString(),

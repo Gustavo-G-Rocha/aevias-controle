@@ -3,7 +3,12 @@
  * Busca ensaio, obra, regional, projeto e faixa granulométrica.
  */
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { obterEnsaioById } from '@/services/ensaiosService';
+import {
+  carregarObraRegional,
+  carregarProject,
+  carregarFaixaDoProject,
+} from '@/services/relatorioContextService';
 
 export function useRelatorioCAUQData() {
   const [ensaio,   setEnsaio]   = useState(null);
@@ -25,38 +30,24 @@ export function useRelatorioCAUQData() {
           return;
         }
 
-        const ensaioData = await base44.entities.EnsaioCAUQ.get(ensaioId);
+        const ensaioData = await obterEnsaioById('EnsaioCAUQ', ensaioId);
         if (!ensaioData) { setError('Ensaio não encontrado'); return; }
         setEnsaio(ensaioData);
 
         // Dados relacionados em paralelo — falha isolada não quebra o relatório
-        await Promise.allSettled([
-          ensaioData.obra_id
-            ? base44.entities.Obra.get(ensaioData.obra_id)
-                .then(obraData => {
-                  setObra(obraData);
-                  if (obraData?.regional_id) {
-                    return base44.entities.Regional.get(obraData.regional_id)
-                      .then(r => setRegional(r))
-                      .catch(e => console.warn('[RelatorioCAUQ] Regional não carregada:', e));
-                  }
-                })
-                .catch(e => console.warn('[RelatorioCAUQ] Obra não carregada:', e))
-            : Promise.resolve(),
-
-          ensaioData.project_id
-            ? base44.entities.Project.get(ensaioData.project_id)
-                .then(projectData => {
-                  setProject(projectData);
-                  if (projectData?.faixa_granulometrica_id) {
-                    return base44.entities.FaixaGranulometrica.get(projectData.faixa_granulometrica_id)
-                      .then(f => setFaixa(f))
-                      .catch(e => console.warn('[RelatorioCAUQ] Faixa não carregada:', e));
-                  }
-                })
-                .catch(e => console.warn('[RelatorioCAUQ] Projeto não carregado:', e))
-            : Promise.resolve(),
+        const [obraRegional, projectData] = await Promise.all([
+          carregarObraRegional(ensaioData.obra_id),
+          carregarProject(ensaioData.project_id),
         ]);
+
+        setObra(obraRegional.obra);
+        setRegional(obraRegional.regional);
+        setProject(projectData);
+
+        if (projectData) {
+          const faixaData = await carregarFaixaDoProject(projectData);
+          setFaixa(faixaData);
+        }
       } catch (err) {
         console.error('[RelatorioCAUQ] Erro ao carregar dados:', err);
         setError('Erro ao carregar dados do relatório');

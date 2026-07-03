@@ -4,7 +4,8 @@
  * Falhas parciais em dados relacionados não quebram o relatório.
  */
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { obterChecklistById } from '@/services/checklistsService';
+import { carregarContextoRelatorio } from '@/services/relatorioContextService';
 
 export function useRelatorioChecklistConcretagemData() {
   const [checklist, setChecklist] = useState(null);
@@ -27,7 +28,7 @@ export function useRelatorioChecklistConcretagemData() {
           return;
         }
 
-        const checklistData = await base44.entities.ChecklistConcretagem.get(id);
+        const checklistData = await obterChecklistById('ChecklistConcretagem', id);
 
         if (!checklistData) {
           setError(`Checklist com ID ${id} não encontrado`);
@@ -37,37 +38,12 @@ export function useRelatorioChecklistConcretagemData() {
 
         setChecklist(checklistData);
 
-        // Busca dados relacionados em paralelo — falha isolada não quebra o relatório
-        await Promise.allSettled([
-          // Criador
-          checklistData.created_by
-            ? base44.entities.User.filter({ email: checklistData.created_by })
-                .then(users => { if (users?.length > 0) setCreatorUser(users[0]); })
-                .catch(err => console.warn('[Concretagem] Criador não carregado:', err))
-            : Promise.resolve(),
-
-          // Obra → Regional (sequencial pois regional depende de obra)
-          checklistData.obra_id
-            ? base44.entities.Obra.get(checklistData.obra_id)
-                .then(obraData => {
-                  setObra(obraData);
-                  if (obraData?.regional_id) {
-                    return base44.entities.Regional.get(obraData.regional_id)
-                      .then(reg => setRegional(reg))
-                      .catch(err => console.warn('[Concretagem] Regional não carregada:', err));
-                  }
-                })
-                .catch(err => console.warn('[Concretagem] Obra não carregada:', err))
-            : Promise.resolve(),
-
-          // Projeto
-          checklistData.project_id
-            ? base44.entities.Project.get(checklistData.project_id)
-                .then(proj => setProject(proj))
-                .catch(err => console.warn('[Concretagem] Projeto não carregado:', err))
-            : Promise.resolve(),
-        ]);
-
+        // Contexto completo (obra, regional, project, creatorUser) em paralelo
+        const ctx = await carregarContextoRelatorio(checklistData);
+        setObra(ctx.obra);
+        setRegional(ctx.regional);
+        setProject(ctx.project);
+        setCreatorUser(ctx.creatorUser);
       } catch (err) {
         console.error('[Concretagem] Erro ao carregar relatório:', err);
         setError(err.message || 'Erro ao carregar o checklist');

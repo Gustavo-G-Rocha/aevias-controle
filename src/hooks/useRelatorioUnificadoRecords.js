@@ -4,7 +4,8 @@
  */
 import { useState, useEffect, useRef } from 'react';
 import { getDataEnsaio } from '@/components/ensaios/ensaioMappers';
-import { getEntityInstance } from '@/utils/relatorioUnificadoEntityMap';
+import { filtrarRegistros } from '@/services/recordsService';
+import { isTipoSuportado } from '@/utils/relatorioUnificadoEntityMap';
 
 export function useRelatorioUnificadoRecords(filters) {
   const [records, setRecords] = useState([]);
@@ -41,25 +42,20 @@ export function useRelatorioUnificadoRecords(filters) {
           return;
         }
 
-        // Busca todos os tipos em paralelo
-        const results = await Promise.allSettled(
-          tiposArray.map(async (tipo) => {
-            const entity = getEntityInstance(tipo);
-            if (!entity) {
-              console.warn(`[RelatorioUnificado] Tipo "${tipo}" não suportado.`);
-              return [];
-            }
-            const raw = await entity
-              .filter({ obra_id: filters.filters.obra_id }, '-created_date', 2000)
-              .catch(err => {
-                console.warn(`[RelatorioUnificado] Falha ao buscar ${tipo}:`, err?.message || err);
-                return [];
-              });
-            return (Array.isArray(raw) ? raw : []).map(r => ({ ...r, entityType: tipo }));
-          })
+        // Busca todos os tipos suportados em paralelo via service centralizado
+        const tiposValidos = tiposArray.filter(isTipoSuportado);
+        tiposArray.forEach(t => {
+          if (!isTipoSuportado(t)) console.warn(`[RelatorioUnificado] Tipo "${t}" não suportado.`);
+        });
+
+        const rawByType = await Promise.all(
+          tiposValidos.map(t =>
+            filtrarRegistros(t, { obra_id: filters.filters.obra_id }, '-created_date', 2000)
+              .then(rows => (Array.isArray(rows) ? rows : []).map(r => ({ ...r, entityType: t })))
+          )
         );
 
-        const allRecords = results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
+        const allRecords = rawByType.flat();
 
         // Filtrar por período
         const inicio = new Date(filters.filters.data_inicio);
