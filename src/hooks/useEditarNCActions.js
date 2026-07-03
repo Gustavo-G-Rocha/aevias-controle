@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { uploadArquivo } from "@/services/uploadService";
+import { atualizarRegistro } from "@/services/recordsService";
 import { createPageUrl } from "@/utils";
 import { validateNCForm, buildNCUpdatePayload } from "@/utils/editarNCUtils";
 
@@ -16,9 +17,7 @@ export const useEditarNCActions = (nc) => {
     try {
       const urls = await Promise.all(
         files.map(async (file) => {
-          const { file_url } = await base44.integrations.Core.UploadFile({
-            file,
-          });
+          const { file_url } = await uploadArquivo(file);
           return file_url;
         })
       );
@@ -34,9 +33,7 @@ export const useEditarNCActions = (nc) => {
     try {
       const results = await Promise.all(
         files.map(async (file) => {
-          const { file_url } = await base44.integrations.Core.UploadFile({
-            file,
-          });
+          const { file_url } = await uploadArquivo(file);
           return { url: file_url, nome: file.name };
         })
       );
@@ -56,7 +53,7 @@ export const useEditarNCActions = (nc) => {
       setSaving(true);
       try {
         const payload = buildNCUpdatePayload(form, fotos, pdfs);
-        await base44.entities.RelatorioNC.update(nc.id, payload);
+        await atualizarRegistro('RelatorioNC', nc.id, payload);
         navigate(createPageUrl("GestaoNC"));
       } catch (error) {
         console.error("[EditarNC] Erro ao salvar NC:", error?.message || error);

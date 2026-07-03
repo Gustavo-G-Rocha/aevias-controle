@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { atualizarRegistro } from "@/services/recordsService";
 
 export const useGestaoNCActions = (setNcs) => {
   const [showApprovalModal, setShowApprovalModal] = useState(false);
@@ -13,7 +13,7 @@ export const useGestaoNCActions = (setNcs) => {
       if (requestApproval) {
         updateData.pendente_aprovacao_cliente = true;
       }
-      await base44.entities.RelatorioNC.update(id, updateData);
+      await atualizarRegistro('RelatorioNC', id, updateData);
       setNcs((prev) =>
         prev.map((n) => (n.id === id ? { ...n, ...updateData } : n))
       );
@@ -34,24 +34,18 @@ export const useGestaoNCActions = (setNcs) => {
             crea_number: user.crea_number || "",
           };
 
-          await base44.entities.RelatorioNC.update(selectedNC.id, {
+          const updateData = {
             pendente_aprovacao_cliente: false,
             cliente_aprovacao: "aprovada",
             cliente_aprovacao_data: new Date().toISOString(),
             cliente_aprovacao_responsavel: user.email,
             client_signature: clientSignature,
-          });
+          };
+          await atualizarRegistro('RelatorioNC', selectedNC.id, updateData);
           setNcs((prev) =>
             prev.map((n) =>
               n.id === selectedNC.id
-                ? {
-                    ...n,
-                    pendente_aprovacao_cliente: false,
-                    cliente_aprovacao: "aprovada",
-                    cliente_aprovacao_data: new Date().toISOString(),
-                    cliente_aprovacao_responsavel: user.email,
-                    client_signature: clientSignature,
-                  }
+                ? { ...n, ...updateData }
                 : n
             )
           );
@@ -60,26 +54,19 @@ export const useGestaoNCActions = (setNcs) => {
             alert("Por favor, informe o motivo da reprovação");
             return;
           }
-          await base44.entities.RelatorioNC.update(selectedNC.id, {
+          const updateData = {
             status: "aberta",
             pendente_aprovacao_cliente: false,
             cliente_aprovacao: "reprovada",
             cliente_aprovacao_data: new Date().toISOString(),
             cliente_aprovacao_responsavel: user.email,
             cliente_reprovacao_motivo: rejectionReason,
-          });
+          };
+          await atualizarRegistro('RelatorioNC', selectedNC.id, updateData);
           setNcs((prev) =>
             prev.map((n) =>
               n.id === selectedNC.id
-                ? {
-                    ...n,
-                    status: "aberta",
-                    pendente_aprovacao_cliente: false,
-                    cliente_aprovacao: "reprovada",
-                    cliente_aprovacao_data: new Date().toISOString(),
-                    cliente_aprovacao_responsavel: user.email,
-                    cliente_reprovacao_motivo: rejectionReason,
-                  }
+                ? { ...n, ...updateData }
                 : n
             )
           );
@@ -98,20 +85,16 @@ export const useGestaoNCActions = (setNcs) => {
   const handleSolicitarAprovacao = useCallback(
     async (nc) => {
       try {
-        await base44.entities.RelatorioNC.update(nc.id, {
+        const updateData = {
           pendente_aprovacao_cliente: true,
           cliente_aprovacao: null,
           cliente_reprovacao_motivo: null,
-        });
+        };
+        await atualizarRegistro('RelatorioNC', nc.id, updateData);
         setNcs((prev) =>
           prev.map((n) =>
             n.id === nc.id
-              ? {
-                  ...n,
-                  pendente_aprovacao_cliente: true,
-                  cliente_aprovacao: null,
-                  cliente_reprovacao_motivo: null,
-                }
+              ? { ...n, ...updateData }
               : n
           )
         );

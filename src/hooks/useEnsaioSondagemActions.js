@@ -3,7 +3,7 @@
  */
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 import { createPageUrl } from "@/utils";
 import { serializarFormData, validarCPsParaFinalizar } from "@/utils/ensaioSondagemUtils";
 
@@ -20,9 +20,9 @@ export function useEnsaioSondagemActions({ formData, editingEnsaio, setEditingEn
     try {
       const dataToSave = serializarFormData(formData, "rascunho");
       if (editingEnsaio) {
-        await base44.entities.EnsaioSondagem.update(editingEnsaio.id, dataToSave);
+        await atualizarEnsaio('EnsaioSondagem', editingEnsaio.id, dataToSave);
       } else {
-        const novo = await base44.entities.EnsaioSondagem.create(dataToSave);
+        const novo = await criarEnsaio('EnsaioSondagem', dataToSave);
         setEditingEnsaio(novo);
       }
       alert("Progresso salvo com sucesso!");
@@ -63,10 +63,10 @@ export function useEnsaioSondagemActions({ formData, editingEnsaio, setEditingEn
           updateData.approved_date = null;
           msg = "Ensaio atualizado com sucesso! O registro voltará para análise do administrador.";
         }
-        await base44.entities.EnsaioSondagem.update(editingEnsaio.id, updateData);
+        await atualizarEnsaio('EnsaioSondagem', editingEnsaio.id, updateData);
         alert(msg);
       } else {
-        await base44.entities.EnsaioSondagem.create(dataToSave);
+        await criarEnsaio('EnsaioSondagem', dataToSave);
         alert("Ensaio de Sondagem criado com sucesso!");
       }
       navigate(createPageUrl("MeusEnsaios"));

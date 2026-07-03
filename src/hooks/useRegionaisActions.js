@@ -3,7 +3,7 @@
  * Recebe loadData para fazer refresh após cada mutação.
  */
 import { useState, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { criarRegional, atualizarRegional, deletarRegional } from "@/services/regionaisService";
 
 export function useRegionaisActions(loadData) {
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -12,9 +12,9 @@ export function useRegionaisActions(loadData) {
   const handleSaveRegional = useCallback(async (regionalData) => {
     try {
       if (editingRegional) {
-        await base44.entities.Regional.update(editingRegional.id, regionalData);
+        await atualizarRegional(editingRegional.id, regionalData);
       } else {
-        await base44.entities.Regional.create(regionalData);
+        await criarRegional(regionalData);
       }
       setIsFormOpen(false);
       setEditingRegional(null);
@@ -33,7 +33,7 @@ export function useRegionaisActions(loadData) {
   const handleDelete = useCallback(async (id) => {
     if (window.confirm("Tem certeza que deseja excluir esta regional?")) {
       try {
-        await base44.entities.Regional.delete(id);
+        await deletarRegional(id);
         loadData();
       } catch (error) {
         console.error("[Regionais] Erro ao excluir regional:", error?.message || error);

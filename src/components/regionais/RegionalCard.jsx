@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Construction as ConstructionIcon, Users as UsersIcon, ChevronDown, ChevronUp, FileText, HardHat, Construction, Wrench, Eye } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { base44 } from "@/api/base44Client";
+import { criarObra, atualizarObra, deletarObra } from "@/services/obrasService";
 import ObraForm from "./ObraForm";
 import {
   STATUS_COLORS_REGIONAL,
@@ -57,10 +57,10 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
         Object.entries(dataToSave).filter(([, v]) => v !== "" && v !== null)
       );
       if (editingObra) {
-        await base44.entities.Obra.update(editingObra.id, cleanedData);
+        await atualizarObra(editingObra.id, cleanedData);
         alert("Obra atualizada com sucesso!");
       } else {
-        await base44.entities.Obra.create(cleanedData);
+        await criarObra(cleanedData);
         alert("Obra criada com sucesso!");
       }
       setIsObraDialogOpen(false);
@@ -75,7 +75,7 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
   const handleDeleteObra = useCallback(async (obraId) => {
     if (window.confirm("Tem certeza que deseja excluir esta obra?")) {
       try {
-        await base44.entities.Obra.delete(obraId);
+        await deletarObra(obraId);
         onObraAdded();
       } catch (error) {
         console.error("[Regionais] Erro ao excluir obra:", error?.message || error);

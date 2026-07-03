@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { obterUsuarioAtual } from "@/services/usuariosService";
+import { listarProjects } from "@/services/projectsService";
+import { listarFaixas } from "@/services/faixasService";
+import { listarRegionais } from "@/services/regionaisService";
 import { filterProjectsByUserAccess } from "@/utils/projectsUtils";
 
 export const useProjectsData = () => {
@@ -14,10 +17,10 @@ export const useProjectsData = () => {
     try {
       const [userData, projectsData, faixasData, regionaisData] =
         await Promise.all([
-          base44.auth.me(),
-          base44.entities.Project.list("-created_date", 500),
-          base44.entities.FaixaGranulometrica.list(),
-          base44.entities.Regional.list(),
+          obterUsuarioAtual(),
+          listarProjects('-created_date', 500),
+          listarFaixas(),
+          listarRegionais(),
         ]);
 
       setUser(userData);

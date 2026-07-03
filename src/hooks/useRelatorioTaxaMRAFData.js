@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { obterEnsaioById } from '@/services/ensaiosService';
+import { carregarObraRegional, carregarCreatorUser } from '@/services/relatorioContextService';
 
 /**
  * Hook para carregar dados de EnsaioTaxaMRAF, Obra, Regional e Criador
@@ -20,27 +21,17 @@ export function useRelatorioTaxaMRAFData(ensaioId) {
 
     const loadData = async () => {
       try {
-        const data = await base44.entities.EnsaioTaxaMRAF.get(ensaioId);
+        const data = await obterEnsaioById('EnsaioTaxaMRAF', ensaioId);
         setEnsaio(data);
 
-        if (data.obra_id) {
-          const obraData = await base44.entities.Obra.get(data.obra_id);
-          setObra(obraData);
-          if (obraData.regional_id) {
-            const regionalData = await base44.entities.Regional.get(obraData.regional_id);
-            setRegional(regionalData);
-          }
-        }
+        const [obraRegional, creator] = await Promise.all([
+          carregarObraRegional(data.obra_id),
+          carregarCreatorUser(data.created_by),
+        ]);
 
-        if (data.created_by) {
-          try {
-            const users = await base44.entities.User.list();
-            const u = users.find(u => u.email === data.created_by);
-            setCreatorUser(u || null);
-          } catch (e) {
-            console.error('Erro ao carregar usuário criador do ensaio', e);
-          }
-        }
+        setObra(obraRegional.obra);
+        setRegional(obraRegional.regional);
+        setCreatorUser(creator);
       } catch (err) {
         console.error('[useRelatorioTaxaMRAFData] Erro ao carregar dados:', err?.message || err);
       } finally {
