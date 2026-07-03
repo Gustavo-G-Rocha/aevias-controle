@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 import { createPageUrl } from "@/utils";
 
 /**
@@ -25,10 +25,10 @@ export function useEnsaioMRAFActions({
         laboratorista_name: user?.laboratorista_name || user?.full_name,
       };
       if (editingEnsaio?.id) {
-        await base44.entities.EnsaioMRAF.update(editingEnsaio.id, dataToSave);
+        await atualizarEnsaio('EnsaioMRAF', editingEnsaio.id, dataToSave);
         alert("Progresso salvo com sucesso!");
       } else {
-        const newEnsaio = await base44.entities.EnsaioMRAF.create(dataToSave);
+        const newEnsaio = await criarEnsaio('EnsaioMRAF', dataToSave);
         setEditingEnsaio(newEnsaio);
         alert("Progresso salvo com sucesso!");
       }
@@ -65,14 +65,14 @@ export function useEnsaioMRAFActions({
           updateData.rejection_reason = null;
           updateData.approved_by = null;
           updateData.approved_date = null;
-          await base44.entities.EnsaioMRAF.update(editingEnsaio.id, updateData);
+          await atualizarEnsaio('EnsaioMRAF', editingEnsaio.id, updateData);
           alert("Ensaio finalizado com sucesso! O registro voltará para análise.");
         } else {
-          await base44.entities.EnsaioMRAF.update(editingEnsaio.id, updateData);
+          await atualizarEnsaio('EnsaioMRAF', editingEnsaio.id, updateData);
           alert("Ensaio finalizado com sucesso!");
         }
       } else {
-        await base44.entities.EnsaioMRAF.create(dataToSave);
+        await criarEnsaio('EnsaioMRAF', dataToSave);
         alert("Ensaio criado e finalizado com sucesso!");
       }
       clearSavedData();

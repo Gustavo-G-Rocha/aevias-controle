@@ -3,7 +3,10 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import SignatureFooter from './SignatureFooter';
 import PrintStyles from './PrintStyles';
 import { buildSignatureProps } from '@/utils/relatorioUtils';
-import { base44 } from "@/api/base44Client";
+import { obterGranuMisturaById } from '@/services/granuMisturaService';
+import { obterObraById } from '@/services/obrasService';
+import { obterProjectById } from '@/services/projectsService';
+import { obterFaixaById } from '@/services/faixasService';
 
 export default function RelatorioGranuMistura({ recordId }) {
   const [record, setRecord] = useState(null);
@@ -15,23 +18,23 @@ export default function RelatorioGranuMistura({ recordId }) {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const rec = await base44.entities.GranuMistura.get(recordId);
+        const rec = await obterGranuMisturaById(recordId);
         setRecord(rec);
 
         if (rec.numero_projeto) {
-          const proj = await base44.entities.Project.get(rec.numero_projeto);
+          const proj = await obterProjectById(rec.numero_projeto);
           setProject(proj);
           if (proj.faixa_granulometrica_id) {
-            const fxGran = await base44.entities.FaixaGranulometrica.get(proj.faixa_granulometrica_id);
+            const fxGran = await obterFaixaById(proj.faixa_granulometrica_id);
             setFaixa(fxGran);
           }
         } else if (rec.faixa) {
-          const fxGran = await base44.entities.FaixaGranulometrica.get(rec.faixa);
+          const fxGran = await obterFaixaById(rec.faixa);
           setFaixa(fxGran);
         }
 
         if (rec.obra_id) {
-          const obraData = await base44.entities.Obra.get(rec.obra_id);
+          const obraData = await obterObraById(rec.obra_id);
           setObra(obraData);
         }
       } catch (err) {

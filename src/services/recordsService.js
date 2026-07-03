@@ -211,6 +211,22 @@ export async function loadRecordsGrouped(entityList, limit = 500) {
 }
 
 /**
+ * Lista registros de uma entidade específica (server-side) com tratamento de erro.
+ * @param {string} entityName
+ * @param {string} sort
+ * @param {number} limit
+ * @returns {Promise<object[]>}
+ */
+export async function listarRegistros(entityName, sort = '-created_date', limit = 500) {
+  try {
+    return await base44.entities[entityName].list(sort, limit);
+  } catch (e) {
+    console.error(`[recordsService] Falha ao listar ${entityName}:`, e?.message || e);
+    return [];
+  }
+}
+
+/**
  * Filtra registros de uma entidade específica (server-side) com tratamento de erro.
  * @param {string} entityName
  * @param {object} filtro

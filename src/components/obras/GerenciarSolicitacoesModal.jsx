@@ -20,7 +20,12 @@ import {
   Loader2,
   AlertCircle
 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { listarUsuarios } from "@/services/usuariosService";
+import { obterRegionalById, atualizarRegional } from "@/services/regionaisService";
+import {
+  listarSolicitacoesTransferenciaRegional,
+  atualizarSolicitacaoTransferenciaRegional,
+} from "@/services/solicitacoesService";
 
 const statusConfig = {
   pendente: { icon: Clock, color: "bg-yellow-100 text-yellow-800", label: "Pendente" },
@@ -43,7 +48,7 @@ const SolicitacaoCard = ({ solicitacao, onAprovar, onRejeitar, user }) => {
     setProcessando(true);
     try {
       // VALIDAÇÃO ADICIONAL: Verificar se o usuário tem o access_level correto
-      const allUsers = await base44.entities.User.list();
+      const allUsers = await listarUsuarios();
       const usuario = allUsers.find(u => u.email.toLowerCase() === solicitacao.laboratorista_email.toLowerCase());
       
       if (usuario && usuario.access_level !== 'user' && usuario.access_level !== 'admin') {
@@ -211,7 +216,7 @@ export default function GerenciarSolicitacoesModal({ isOpen, onClose, user, onUp
   const loadSolicitacoes = async () => {
     setLoading(true);
     try {
-      const todasSolicitacoes = await base44.entities.SolicitacaoTransferenciaRegional.list("-created_date");
+      const todasSolicitacoes = await listarSolicitacoesTransferenciaRegional();
       setSolicitacoes(todasSolicitacoes);
     } catch (error) {
       console.error("Erro ao carregar solicitações:", error);
@@ -233,28 +238,28 @@ export default function GerenciarSolicitacoesModal({ isOpen, onClose, user, onUp
   const handleAprovar = async (solicitacao) => {
     try {
       // 1. Atualizar status da solicitação
-      await base44.entities.SolicitacaoTransferenciaRegional.update(solicitacao.id, {
+      await atualizarSolicitacaoTransferenciaRegional(solicitacao.id, {
         status: "aprovada",
         aprovado_por: user.email,
         aprovado_em: new Date().toISOString()
       });
 
       // 2. Remover laboratorista da regional atual
-      const regionalAtual = await base44.entities.Regional.get(solicitacao.regional_atual_id);
+      const regionalAtual = await obterRegionalById(solicitacao.regional_atual_id);
       const laboratoristasAtuais = regionalAtual.laboratoristas_responsaveis || [];
       const novosLaboratoristasAtual = laboratoristasAtuais.filter(
         email => email.toLowerCase() !== solicitacao.laboratorista_email.toLowerCase()
       );
-      await base44.entities.Regional.update(solicitacao.regional_atual_id, {
+      await atualizarRegional(solicitacao.regional_atual_id, {
         laboratoristas_responsaveis: novosLaboratoristasAtual
       });
 
       // 3. Adicionar laboratorista na regional destino
-      const regionalDestino = await base44.entities.Regional.get(solicitacao.regional_destino_id);
+      const regionalDestino = await obterRegionalById(solicitacao.regional_destino_id);
       const laboratoristasDestino = regionalDestino.laboratoristas_responsaveis || [];
       // Ensure the laboratorista is not duplicated if they somehow already exist
       if (!laboratoristasDestino.some(email => email.toLowerCase() === solicitacao.laboratorista_email.toLowerCase())) {
-        await base44.entities.Regional.update(solicitacao.regional_destino_id, {
+        await atualizarRegional(solicitacao.regional_destino_id, {
           laboratoristas_responsaveis: [...laboratoristasDestino, solicitacao.laboratorista_email]
         });
       }
@@ -270,7 +275,7 @@ export default function GerenciarSolicitacoesModal({ isOpen, onClose, user, onUp
 
   const handleRejeitar = async (solicitacao, motivoRejeicao) => {
     try {
-      await base44.entities.SolicitacaoTransferenciaRegional.update(solicitacao.id, {
+      await atualizarSolicitacaoTransferenciaRegional(solicitacao.id, {
         status: "rejeitada",
         aprovado_por: user.email,
         aprovado_em: new Date().toISOString(),

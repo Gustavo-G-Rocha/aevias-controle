@@ -8,8 +8,8 @@ export async function listarSolicitacoesTransferenciaObra() {
   return base44.entities.SolicitacaoTransferenciaObra.list();
 }
 
-export async function listarSolicitacoesTransferenciaRegional() {
-  return base44.entities.SolicitacaoTransferenciaRegional.list();
+export async function listarSolicitacoesTransferenciaRegional(sort = '-created_date') {
+  return base44.entities.SolicitacaoTransferenciaRegional.list(sort);
 }
 
 export async function listarSolicitacoesTransferenciaObraPorStatus(status) {

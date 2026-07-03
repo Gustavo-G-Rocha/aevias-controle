@@ -1,5 +1,10 @@
 import { useState, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import {
+  criarProject,
+  atualizarProject,
+  deletarProject,
+} from "@/services/projectsService";
+import { atualizarRegional } from "@/services/regionaisService";
 import {
   removeProjectFromRegional,
   addProjectIdToRegional,
@@ -15,7 +20,7 @@ export const useProjectsActions = (regionais, loadData) => {
       try {
         let savedProject;
         if (editingProject) {
-          await base44.entities.Project.update(editingProject.id, projectData);
+          await atualizarProject(editingProject.id, projectData);
           savedProject = { ...editingProject, ...projectData };
 
           if (editingProject.regional_id !== projectData.regional_id) {
@@ -29,7 +34,7 @@ export const useProjectsActions = (regionais, loadData) => {
                   regionalAntiga.project_ids,
                   editingProject.id
                 );
-                await base44.entities.Regional.update(regionalAntiga.id, {
+                await atualizarRegional(regionalAntiga.id, {
                   project_ids: novosProjectIds,
                 });
               }
@@ -45,14 +50,14 @@ export const useProjectsActions = (regionais, loadData) => {
                   regionalNova.project_ids || [],
                   editingProject.id
                 );
-                await base44.entities.Regional.update(regionalNova.id, {
+                await atualizarRegional(regionalNova.id, {
                   project_ids: projectIds,
                 });
               }
             }
           }
         } else {
-          savedProject = await base44.entities.Project.create(projectData);
+          savedProject = await criarProject(projectData);
 
           if (projectData.regional_id) {
             const regional = regionais.find(
@@ -63,7 +68,7 @@ export const useProjectsActions = (regionais, loadData) => {
                 regional.project_ids || [],
                 savedProject.id
               );
-              await base44.entities.Regional.update(regional.id, {
+              await atualizarRegional(regional.id, {
                 project_ids: projectIds,
               });
             }
@@ -89,7 +94,7 @@ export const useProjectsActions = (regionais, loadData) => {
     async (project) => {
       if (window.confirm("Tem certeza que deseja excluir este projeto?")) {
         try {
-          await base44.entities.Project.delete(project.id);
+          await deletarProject(project.id);
           loadData();
         } catch {
           // Error handled silently

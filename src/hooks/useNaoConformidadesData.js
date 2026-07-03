@@ -1,5 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { obterUsuarioAtual } from "@/services/usuariosService";
+import { listarRegionais } from "@/services/regionaisService";
+import {
+  listarRegistros,
+  loadRecordsGrouped,
+} from "@/services/recordsService";
 import {
   TIPOS_CHECKLIST,
   OUTROS_TIPOS_REGISTRO,
@@ -22,12 +27,13 @@ export function useNaoConformidadesData() {
   const loadAll = useCallback(async () => {
     setLoading(true);
     try {
-      const userData = await base44.auth.me();
+      const userData = await obterUsuarioAtual();
       const userAccessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
 
       const [obrasData, regionaisData, rncsData] = await Promise.all([
-        base44.entities.Obra.list(), base44.entities.Regional.list(),
-        base44.entities.RelatorioNC.list("-created_date", 1000)
+        listarRegistros('Obra', '-created_date', 2000),
+        listarRegionais(),
+        listarRegistros('RelatorioNC', '-created_date', 1000),
       ]);
 
       let availableObras = obrasData;
@@ -54,18 +60,16 @@ export function useNaoConformidadesData() {
 
       const allCNCs = [];
 
-      const [checklistResults, diarioData] = await Promise.all([
-        Promise.all(
-          TIPOS_CHECKLIST.map(t =>
-            base44.entities[t.value].list('-created_date', 1000)
-              .catch(() => [])
-              .then(res => res.filter(c => availableIds.has(c.obra_id)).map(c => ({ ...c, _tipo: t.value, _page: t.page })))
-          )
-        ),
-        base44.entities.DiarioObra.list('-created_date', 1000)
-          .catch(() => [])
-          .then(res => res.filter(c => availableIds.has(c.obra_id)))
+      const tiposValues = TIPOS_CHECKLIST.map(t => t.value);
+      const [checklistGroups, diarioData] = await Promise.all([
+        loadRecordsGrouped(tiposValues, 1000),
+        listarRegistros('DiarioObra', '-created_date', 1000),
       ]);
+
+      const checklistResults = TIPOS_CHECKLIST.map((t, i) =>
+        checklistGroups[i].filter(c => availableIds.has(c.obra_id)).map(c => ({ ...c, _tipo: t.value, _page: t.page }))
+      );
+      const diarioFiltrado = diarioData.filter(c => availableIds.has(c.obra_id));
 
       checklistResults.flat().forEach(cl => {
         // NCs automáticas extraídas por lógica de conformidade
@@ -93,7 +97,7 @@ export function useNaoConformidadesData() {
 
       // NCs explícitas do Diário de Obra
       const diarioTipo = { value: 'DiarioObra', page: 'RelatorioDiario' };
-      diarioData.forEach(c => {
+      diarioFiltrado.forEach(c => {
         if (Array.isArray(c.nao_conformidades) && c.nao_conformidades.length > 0) {
           c.nao_conformidades.forEach(nc => {
             allCNCs.push(mapNcExplicitaToCnc(c, nc, diarioTipo));
@@ -102,15 +106,12 @@ export function useNaoConformidadesData() {
       });
 
       // Outros registros não conformes (approved === false ou condicao_conformidade)
-      const outrosResults = await Promise.all(
-        OUTROS_TIPOS_REGISTRO.map(t =>
-          base44.entities[t.value].list('-created_date', 1000)
-            .catch(() => [])
-            .then(res => res
-              .filter(c => availableIds.has(c.obra_id) && isOutroRegistroNaoConforme(c, t.value))
-              .map(c => mapOutroRegistroToCnc(c, t))
-            )
-        )
+      const outrosValues = OUTROS_TIPOS_REGISTRO.map(t => t.value);
+      const outrosGroups = await loadRecordsGrouped(outrosValues, 1000);
+      const outrosResults = OUTROS_TIPOS_REGISTRO.map((t, i) =>
+        outrosGroups[i]
+          .filter(c => availableIds.has(c.obra_id) && isOutroRegistroNaoConforme(c, t.value))
+          .map(c => mapOutroRegistroToCnc(c, t))
       );
 
       outrosResults.flat().forEach(reg => allCNCs.push(reg));
