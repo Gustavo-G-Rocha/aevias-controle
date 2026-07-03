@@ -4,7 +4,12 @@ import { useReportMode } from "@/hooks/useReportMode";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
-import { base44 } from "@/api/base44Client";
+import { obterUsuarioAtual } from '@/services/usuariosService';
+import { listarEnsaios } from '@/services/ensaiosService';
+import { listarObrasRecentes } from '@/services/obrasService';
+import { listarProjects } from '@/services/projectsService';
+import { listarRegionais } from '@/services/regionaisService';
+import { listarFaixas } from '@/services/faixasService';
 import RelatorioDensidade from '../components/relatorios/RelatorioDensidade';
 import RelatorioMRAF from '../components/relatorios/RelatorioMRAF';
 
@@ -24,14 +29,14 @@ export default function RelatorioEnsaio() {
 
       if (!id || !tipo) throw new Error('ID e tipo são obrigatórios na URL');
 
-      const user = await base44.auth.me();
+      const user = await obterUsuarioAtual();
       
       const [ensaiosDensidade, ensaiosMRAF, obras, projects, regionais] = await Promise.all([
-        base44.entities.EnsaioDensidade.list(),
-        base44.entities.EnsaioMRAF.list(),
-        base44.entities.Obra.list(),
-        base44.entities.Project.list(),
-        base44.entities.Regional.list()
+        listarEnsaios('EnsaioDensidade'),
+        listarEnsaios('EnsaioMRAF'),
+        listarObrasRecentes(),
+        listarProjects(),
+        listarRegionais()
       ]);
 
       let record;
@@ -59,7 +64,7 @@ export default function RelatorioEnsaio() {
       if (record.project_id) {
         project = projects.find(p => p.id === record.project_id);
         if (project && project.faixa_granulometrica_id) {
-          const faixas = await base44.entities.FaixaGranulometrica.list();
+          const faixas = await listarFaixas();
           faixaGranulometrica = faixas.find(f => f.id === project.faixa_granulometrica_id);
         }
       }

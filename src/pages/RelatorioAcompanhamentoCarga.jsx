@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useReportMode } from "@/hooks/useReportMode";
 import { Button } from "@/components/ui/button";
 import { Loader2, Printer } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { obterEnsaioById } from '@/services/ensaiosService';
+import { obterObraById } from '@/services/obrasService';
+import { obterRegionalById } from '@/services/regionaisService';
+import { obterProjectById } from '@/services/projectsService';
+import { obterFaixaById } from '@/services/faixasService';
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
 
 import RelatorioAcompanhamentoCarga from "@/components/relatorios/RelatorioAcompanhamentoCarga";
@@ -33,27 +37,27 @@ export default function RelatorioAcompanhamentoCargaPage() {
         return;
       }
 
-      const acompanhamentoData = await base44.entities.AcompanhamentoCarga.get(id);
+      const acompanhamentoData = await obterEnsaioById('AcompanhamentoCarga', id);
       setAcompanhamento(acompanhamentoData);
 
       if (acompanhamentoData.obra_id) {
-        const obraData = await base44.entities.Obra.get(acompanhamentoData.obra_id);
+        const obraData = await obterObraById(acompanhamentoData.obra_id);
         setObra(obraData);
 
         if (obraData.regional_id) {
-          const regionalData = await base44.entities.Regional.get(obraData.regional_id);
+          const regionalData = await obterRegionalById(obraData.regional_id);
           setRegional(regionalData);
         }
       }
 
       if (acompanhamentoData.project_id) {
-        const projetoData = await base44.entities.Project.get(acompanhamentoData.project_id);
+        const projetoData = await obterProjectById(acompanhamentoData.project_id);
         setProjeto(projetoData);
 
         // Buscar faixa granulométrica pelo ID se existir
         if (projetoData.faixa_granulometrica_id) {
           try {
-            const faixaData = await base44.entities.FaixaGranulometrica.get(projetoData.faixa_granulometrica_id);
+            const faixaData = await obterFaixaById(projetoData.faixa_granulometrica_id);
             setFaixaGranulometrica(faixaData);
           } catch (err) {
             console.warn("Faixa granulométrica não encontrada:", err);

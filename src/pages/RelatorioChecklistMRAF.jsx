@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useReportMode } from "@/hooks/useReportMode";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { obterChecklistById } from '@/services/checklistsService';
+import { obterUsuarioAtual } from '@/services/usuariosService';
+import { listarObrasRecentes } from '@/services/obrasService';
+import { listarRegionais } from '@/services/regionaisService';
+import { listarProjects } from '@/services/projectsService';
 import RelatorioChecklistMRAFComponent from '../components/relatorios/RelatorioChecklistMRAF';
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
 
@@ -23,11 +27,11 @@ export default function RelatorioChecklistMRAFPage() {
         if (!id) throw new Error('ID do checklist é obrigatório na URL');
 
         const [checklist, user, obras, regionais, projects] = await Promise.all([
-          base44.entities.ChecklistMRAF.get(id),
-          base44.auth.me(),
-          base44.entities.Obra.list(),
-          base44.entities.Regional.list(),
-          base44.entities.Project.list()
+          obterChecklistById('ChecklistMRAF', id),
+          obterUsuarioAtual(),
+          listarObrasRecentes(),
+          listarRegionais(),
+          listarProjects()
         ]);
 
         if (!checklist) throw new Error(`Checklist com ID ${id} não encontrado`);

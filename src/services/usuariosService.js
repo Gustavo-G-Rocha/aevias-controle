@@ -38,3 +38,12 @@ export async function isAuthenticated() {
 export async function inviteUser(email, role) {
   return base44.users.inviteUser(email, role);
 }
+
+/**
+ * Filtra usuários por critério server-side (ex.: { email: "x@y.com" }).
+ * @param {object} filtro
+ * @returns {Promise<object[]>}
+ */
+export async function filtrarUsuarios(filtro) {
+  return base44.entities.User.filter(filtro);
+}

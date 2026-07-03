@@ -30,3 +30,14 @@ export async function atualizarProdutividade(id, data) {
 export async function deletarProdutividade(id) {
   return base44.entities.ProdutividadeDiaria.delete(id);
 }
+
+/**
+ * Filtra registros de ProdutividadeDiaria por critério server-side.
+ * @param {object} filtro
+ * @param {string} sort
+ * @param {number} limit
+ * @returns {Promise<object[]>}
+ */
+export async function filtrarProdutividade(filtro, sort = '-created_date', limit = 500) {
+  return base44.entities.ProdutividadeDiaria.filter(filtro, sort, limit);
+}

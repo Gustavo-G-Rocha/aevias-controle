@@ -196,3 +196,30 @@ export async function loadRecordsByEntities(entityList, limit = 500) {
   const results = await Promise.all(entityList.map(type => loadEntity(type, limit)));
   return results.flat();
 }
+
+/**
+ * Filtra registros de uma entidade específica (server-side) com tratamento de erro.
+ * @param {string} entityName
+ * @param {object} filtro
+ * @param {string} sort
+ * @param {number} limit
+ * @returns {Promise<object[]>}
+ */
+export async function filtrarRegistros(entityName, filtro, sort = '-created_date', limit = 500) {
+  try {
+    return await base44.entities[entityName].filter(filtro, sort, limit);
+  } catch (e) {
+    console.error(`[recordsService] Falha ao filtrar ${entityName}:`, e?.message || e);
+    return [];
+  }
+}
+
+/**
+ * Atualiza um registro de qualquer entidade (camada de serviço genérica).
+ * @param {string} entityName
+ * @param {string} id
+ * @param {object} data
+ */
+export async function atualizarRegistro(entityName, id, data) {
+  return base44.entities[entityName].update(id, data);
+}
