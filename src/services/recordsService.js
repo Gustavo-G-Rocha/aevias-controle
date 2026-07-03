@@ -198,6 +198,19 @@ export async function loadRecordsByEntities(entityList, limit = 500) {
 }
 
 /**
+ * Carrega registros de um subconjunto específico de entidades em paralelo
+ * e retorna um array de arrays alinhado com a ordem de `entityList`
+ * (cada posição contém os registros da entidade correspondente).
+ * Tolerante a erros: entidades que falham retornam [] sem interromper o lote.
+ * @param {string[]} entityList
+ * @param {number} limit
+ * @returns {Promise<object[][]>}
+ */
+export async function loadRecordsGrouped(entityList, limit = 500) {
+  return loadEntitiesInBatches(entityList, limit);
+}
+
+/**
  * Filtra registros de uma entidade específica (server-side) com tratamento de erro.
  * @param {string} entityName
  * @param {object} filtro

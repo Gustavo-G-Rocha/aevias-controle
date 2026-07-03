@@ -1,5 +1,9 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { base44 } from "@/api/base44Client";
+import { obterUsuarioAtual, listarUsuarios } from "@/services/usuariosService";
+import { listarRegionais } from "@/services/regionaisService";
+import { listarObrasRecentes } from "@/services/obrasService";
+import { listarProdutividade } from "@/services/produtividadeService";
+import { loadRecordsGrouped } from "@/services/recordsService";
 
 const DATE_FIELD = {
   DiarioObra: 'data',
@@ -27,10 +31,6 @@ const DATE_FIELD = {
   BoletimSondagem: 'data',
   BoletimSondagemTrado: 'data',
 };
-
-// Extrai resultado de Promise.allSettled, retornando [] em caso de rejeição
-const settled = (results) =>
-  results.map(r => (r.status === 'fulfilled' ? r.value : []));
 
 export function useProdutividadeData(currentMonth) {
   const [loading, setLoading] = useState(true);
@@ -60,16 +60,16 @@ export function useProdutividadeData(currentMonth) {
 
     setLoading(true);
     try {
-      const currentUser = await base44.auth.me();
+      const currentUser = await obterUsuarioAtual();
       setUser(currentUser);
 
       const userAccessLevel = currentUser?.access_level || (currentUser?.role === 'admin' ? 'admin' : 'user');
       const isAdmin = userAccessLevel === 'admin';
 
       const [regionais, allUsers, obras] = await Promise.all([
-        base44.entities.Regional.list(),
-        base44.entities.User.list(),
-        base44.entities.Obra.list()
+        listarRegionais(),
+        listarUsuarios(),
+        listarObrasRecentes()
       ]);
 
       let obrasVisiveisIds;
@@ -98,38 +98,20 @@ export function useProdutividadeData(currentMonth) {
       setUsinas(usinasArr);
 
       if (force || !entityCacheRef.current) {
-        const lote1 = settled(await Promise.allSettled([
-          base44.entities.DiarioObra.list("-created_date", 500),
-          base44.entities.ChecklistUsina.list("-created_date", 500),
-          base44.entities.ChecklistAplicacao.list("-created_date", 500),
-          base44.entities.ChecklistMRAF.list("-created_date", 500),
-          base44.entities.ChecklistConcretagem.list("-created_date", 500),
-          base44.entities.ChecklistTerraplanagem.list("-created_date", 500),
-          base44.entities.ChecklistReciclagem.list("-created_date", 500),
-          base44.entities.EnsaioCAUQ.list("-created_date", 500),
-        ]));
+        const lote1 = await loadRecordsGrouped([
+          'DiarioObra', 'ChecklistUsina', 'ChecklistAplicacao', 'ChecklistMRAF',
+          'ChecklistConcretagem', 'ChecklistTerraplanagem', 'ChecklistReciclagem', 'EnsaioCAUQ',
+        ], 500);
 
-        const lote2 = settled(await Promise.allSettled([
-          base44.entities.EnsaioDensidade.list("-created_date", 500),
-          base44.entities.EnsaioDensidadeInSitu.list("-created_date", 500),
-          base44.entities.EnsaioSondagem.list("-created_date", 500),
-          base44.entities.EnsaioTaxaPinturaImprimacao.list("-created_date", 500),
-          base44.entities.AcompanhamentoCarga.list("-created_date", 500),
-          base44.entities.EnsaioMRAF.list("-created_date", 500),
-          base44.entities.EnsaioManchaPendulo.list("-created_date", 500),
-          base44.entities.EnsaioVigaBenkelman.list("-created_date", 500),
-        ]));
+        const lote2 = await loadRecordsGrouped([
+          'EnsaioDensidade', 'EnsaioDensidadeInSitu', 'EnsaioSondagem', 'EnsaioTaxaPinturaImprimacao',
+          'AcompanhamentoCarga', 'EnsaioMRAF', 'EnsaioManchaPendulo', 'EnsaioVigaBenkelman',
+        ], 500);
 
-        const lote3 = settled(await Promise.allSettled([
-          base44.entities.EnsaioTaxaMRAF.list("-created_date", 500),
-          base44.entities.AcompanhamentoUsinagem.list("-created_date", 500),
-          base44.entities.EnsaioGranulometriaIndividual.list("-created_date", 500),
-          base44.entities.GranuMistura.list("-created_date", 500),
-          base44.entities.EnsaioProctor.list("-created_date", 500),
-          base44.entities.EnsaioRompimentoConcreto.list("-created_date", 500),
-          base44.entities.BoletimSondagem.list("-created_date", 500),
-          base44.entities.BoletimSondagemTrado.list("-created_date", 500),
-        ]));
+        const lote3 = await loadRecordsGrouped([
+          'EnsaioTaxaMRAF', 'AcompanhamentoUsinagem', 'EnsaioGranulometriaIndividual', 'GranuMistura',
+          'EnsaioProctor', 'EnsaioRompimentoConcreto', 'BoletimSondagem', 'BoletimSondagemTrado',
+        ], 500);
 
         entityCacheRef.current = {
           diarios: lote1[0], checklistsUsina: lote1[1], checklistsAplicacao: lote1[2],
@@ -146,10 +128,7 @@ export function useProdutividadeData(currentMonth) {
 
       const ec = entityCacheRef.current;
 
-      const [produtividadeDiariaResult] = settled(await Promise.allSettled([
-        base44.entities.ProdutividadeDiaria.list(),
-      ]));
-      const produtividadeDiaria = produtividadeDiariaResult;
+      const produtividadeDiaria = await listarProdutividade();
 
       const startDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
       const todayLocal = new Date();
