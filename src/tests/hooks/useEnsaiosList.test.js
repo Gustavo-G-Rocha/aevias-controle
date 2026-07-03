@@ -9,7 +9,13 @@
  * As funções são puras (recebem todos os dados por parâmetro), então testamos
  * diretamente sem renderHook (ambiente 'node' sem DOM/RTL).
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+// O hook importa useQueryData -> base44Client -> app-params, que referencia `window`
+// em ambiente node. As funções puras testadas não usam o base44, então um stub
+// evita o carregamento do client real (mesmo padrão dos testes de service).
+vi.mock('@/api/base44Client', () => ({ base44: { entities: {} } }));
+
 import { filtrarPorAcesso, sortByEnsaioDate } from '@/hooks/useEnsaiosList';
 
 const regionais = [
