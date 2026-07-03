@@ -129,6 +129,20 @@ Os testes de services devem validar:
 
 Validar comunicação entre módulos do sistema.
 
+## Fluxos Críticos de Negócio
+
+Os fluxos críticos de negócio (aprovação de ensaio, assinatura do cliente e
+geração de relatório) possuem cobertura determinística em
+`tests/integration/criticalFlows.test.js`, exercitando os serviços e utilitários
+ponta-a-ponta contra um store em memória.
+
+> **E2E em navegador (Playwright/Cypress):** adiado. Browser-E2E exige binários
+> de navegador, um servidor da aplicação em execução e um backend descartável
+> autenticado — pré-requisitos não disponíveis no ambiente atual de build/CI.
+> A cobertura de fluxo roda no gate `test:run` e captura regressões nas regras
+> críticas; quando houver ambiente CI com navegador + backend de teste, os
+> mesmos três fluxos devem ser espelhados em specs Playwright.
+
 ---
 
 ## Responsabilidades
