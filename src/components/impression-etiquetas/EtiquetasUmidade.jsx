@@ -39,7 +39,7 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
                     </tr>
                     <tr>
                       <td className="font-bold" style={{ border: '0.4mm solid #000', backgroundColor: '#BFCF99', padding: '0.3mm 1mm' }}>Furo:</td>
-                      <td style={{ border: '0.4mm solid #000', padding: '0.3mm 1mm' }}>{etiqueta.furo}</td>
+                      <td style={{ border: '0.4mm solid #000', padding: '0.3mm 1mm', backgroundColor: '#BFCF99' }}>{etiqueta.furo}</td>
                     </tr>
                     <tr>
                       <td className="font-bold" style={{ border: '0.4mm solid #000', backgroundColor: '#ccc', padding: '0.3mm 1mm' }}>Rodovia:</td>
@@ -55,7 +55,7 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
                     </tr>
                     <tr>
                       <td className="font-bold" style={{ border: '0.4mm solid #000', backgroundColor: '#BFCF99', padding: '0.3mm 1mm' }}>Tipo:</td>
-                      <td style={{ border: '0.4mm solid #000', padding: '0.3mm 1mm' }}>{etiqueta.tipo_umidade}</td>
+                      <td style={{ border: '0.4mm solid #000', padding: '0.3mm 1mm', backgroundColor: '#BFCF99' }}>{etiqueta.tipo_umidade}</td>
                     </tr>
                   </tbody>
                 </table>
