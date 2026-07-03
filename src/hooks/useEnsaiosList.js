@@ -7,7 +7,7 @@ import { getUserAccessLevel } from '@/utils/accessControl';
 import { useCurrentUser, useAuxData, useAllRecords, QUERY_KEYS } from '@/hooks/useQueryData';
 import { getDataEnsaio } from '@/components/ensaios/ensaioMappers';
 
-function sortByEnsaioDate(records) {
+export function sortByEnsaioDate(records) {
   return [...records].sort((a, b) => {
     const dateA = new Date(getDataEnsaio(a));
     const dateB = new Date(getDataEnsaio(b));
@@ -21,7 +21,7 @@ function sortByEnsaioDate(records) {
   });
 }
 
-function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccessLevel, obrasData, regionaisData) {
+export function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccessLevel, obrasData, regionaisData) {
   if (currentUserAccessLevel === 'admin') return combinedEnsaios;
 
   if (currentUserAccessLevel === 'sala_tecnica_afirmaevias') {
