@@ -79,6 +79,7 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
           .print\\:hidden { display: none !important; }
           header, nav, aside, .no-print, [data-sidebar], [data-sidebar="sidebar"], [data-sidebar="provider"], [data-side] { display: none !important; }
           main { padding: 0 !important; margin: 0 !important; }
+          main .pb-16 { padding: 0 !important; }
           .min-h-screen { background: #FFFFFF !important; }
         }
       `}</style>
