@@ -33,8 +33,15 @@ describe('EtiquetasUmidade - contrato de impressão', () => {
     expect(src).toContain('bg-white');
   });
 
-  it('usa grade de 3 colunas (1fr cada) preenchendo a área útil', () => {
-    expect(src).toContain("gridTemplateColumns: 'repeat(3, 1fr)'");
+  it('usa grade de 3 colunas x 7 linhas com tamanho exato de etiqueta (63,5mm x 38,1mm)', () => {
+    expect(src).toContain("gridTemplateColumns: 'repeat(3, 63.5mm)'");
+    expect(src).toContain("gridTemplateRows: 'repeat(7, 38.1mm)'");
+  });
+
+  it('trava a página em A4 exato (210x297mm) com overflow hidden para evitar vazar para a 2ª folha', () => {
+    expect(src).toContain('width: 210mm !important');
+    expect(src).toContain('height: 297mm !important');
+    expect(src).toContain('overflow: hidden !important');
   });
 
   it('respeita gaps e margens exatas da folha A4', () => {
@@ -55,9 +62,9 @@ describe('EtiquetasUmidade - contrato de impressão', () => {
     expect(src).toContain('font-bold');
   });
 
-  it('cada etiqueta ocupa 100% da célula (30% da folha) com altura 38,1mm', () => {
+  it('cada etiqueta ocupa 100% da célula exata', () => {
     expect(src).toContain("width: '100%'");
-    expect(src).toContain("height: '38.1mm'");
+    expect(src).toContain("height: '100%'");
   });
 
   it('respeita 21 etiquetas por página (3x7) via getEtiquetasPageUmidade', () => {
