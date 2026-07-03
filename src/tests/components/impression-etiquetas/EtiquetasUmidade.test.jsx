@@ -33,13 +33,14 @@ describe('EtiquetasUmidade - contrato de impressão', () => {
     expect(src).toContain('bg-white');
   });
 
-  it('usa grade de 3 colunas com 30% de largura cada', () => {
-    expect(src).toContain("gridTemplateColumns: 'repeat(3, 30%)'");
+  it('usa grade de 3 colunas (1fr cada) preenchendo a área útil', () => {
+    expect(src).toContain("gridTemplateColumns: 'repeat(3, 1fr)'");
   });
 
-  it('deixa gap entre etiquetas (não coladas) e gap da lateral', () => {
-    expect(src).toContain("columnGap: '5%'");
-    expect(src).toContain("rowGap: '4mm'");
+  it('deixa gap pequeno entre etiquetas e gap grande na lateral da folha', () => {
+    expect(src).toContain("columnGap: '3mm'");
+    expect(src).toContain("rowGap: '2mm'");
+    expect(src).toContain('margin: 10mm 12mm');
   });
 
   it('cada etiqueta ocupa 100% da célula (30% da folha) com altura 38,1mm', () => {

@@ -19,7 +19,7 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
       <div>
         {Array.from({ length: numPages }).map((_, pageIdx) => (
           <div key={pageIdx} className="page-container">
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 30%)', columnGap: '5%', rowGap: '4mm' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', columnGap: '3mm', rowGap: '2mm' }}>
               {getEtiquetasPageUmidade(etiquetas, pageIdx).map((etiqueta, idx) => (
                 <table key={idx} className="text-[8px] print:text-[7px]" style={{ tableLayout: 'fixed', width: '100%', height: '38.1mm', borderCollapse: 'collapse', borderSpacing: 0, border: '0.4mm solid #000' }}>
                   <tbody>
@@ -68,7 +68,7 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
       <style>{`
         .page-container { padding: 8px; display: block !important; }
         .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
-        @page { size: A4; margin: 8mm 6mm; }
+        @page { size: A4; margin: 10mm 12mm; }
         @media screen { .page-container { min-height: 100vh; margin-bottom: 20px; border: 1px solid #e5e7eb; } }
         @media print {
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; overflow: visible !important; }
