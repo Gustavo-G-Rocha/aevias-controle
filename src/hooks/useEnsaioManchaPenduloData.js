@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { base44 } from '@/api/base44Client';
+import { obterEnsaioById } from '@/services/ensaiosService';
 import { useCurrentUser, useAuxData } from '@/hooks/useQueryData';
 import { getInitialFormData, filterObrasPorAcesso } from '@/utils/ensaioManchaPenduloUtils';
 
@@ -25,7 +25,7 @@ export const useEnsaioManchaPenduloData = (editId, isEditMode) => {
     if (loadingUser || loadingAux || !user) return;
 
     if (isEditMode) {
-      base44.entities.EnsaioManchaPendulo.get(editId)
+      obterEnsaioById('EnsaioManchaPendulo', editId)
         .then(ensaio => setFormData(ensaio))
         .catch(error => console.error('Erro ao carregar dados:', error))
         .finally(() => setLoading(false));

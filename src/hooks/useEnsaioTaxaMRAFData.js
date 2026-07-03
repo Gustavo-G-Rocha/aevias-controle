@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { obterEnsaioById } from "@/services/ensaiosService";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { getEnsaioInicial } from "@/utils/ensaioTaxaMRAFUtils";
 
@@ -55,7 +55,7 @@ export const useEnsaioTaxaMRAFData = () => {
 
     if (editId) {
       setEditLoading(true);
-      base44.entities.EnsaioTaxaMRAF.get(editId)
+      obterEnsaioById('EnsaioTaxaMRAF', editId)
         .then(existing => setEditingEnsaio(existing))
         .catch(err => {
           console.error('Erro ao carregar dados:', err);

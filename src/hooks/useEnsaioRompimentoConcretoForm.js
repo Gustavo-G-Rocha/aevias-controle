@@ -2,7 +2,7 @@
  * Hook de mutações do formulário EnsaioRompimentoConcreto.
  */
 import { useCallback, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { obterRegionalById } from '@/services/regionaisService';
 import {
   calcularAreaCP,
   calcularResistencia,
@@ -36,7 +36,7 @@ export function useEnsaioRompimentoConcretoForm({ formData, setFormData, series,
     let clienteNome = '';
     if (obra?.regional_id) {
       try {
-        const reg = await base44.entities.Regional.get(obra.regional_id);
+        const reg = await obterRegionalById(obra.regional_id);
         clienteNome = reg?.cliente || '';
       } catch (e) {
         console.error('Erro ao carregar cliente da regional', e);

@@ -1,4 +1,4 @@
-import { base44 } from '@/api/base44Client';
+import { uploadArquivo } from '@/services/uploadService';
 import { MAX_UPLOAD_WIDTH, UPLOAD_QUALITY } from '@/constants/imageConfig';
 
 /**
@@ -69,7 +69,7 @@ export async function compressImage(file, maxWidth = MAX_UPLOAD_WIDTH, quality =
  */
 export async function compressAndUpload(file) {
   const compressed = await compressImage(file);
-  const result = await base44.integrations.Core.UploadFile({ file: compressed });
+  const result = await uploadArquivo(compressed);
   return result.file_url;
 }
 

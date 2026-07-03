@@ -5,7 +5,7 @@
  */
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { obterEnsaioById } from '@/services/ensaiosService';
 import { useCurrentUser, useAuxData } from '@/hooks/useQueryData';
 import { getInitialForm, filtrarObrasVigaBenkelman, reconstruirFaixas } from '@/utils/ensaioVigaBenkelmanUtils';
 
@@ -28,7 +28,7 @@ export function useEnsaioVigaBenkelmanData() {
     if (loadingUser || loadingAux || !user) return;
 
     if (editId) {
-      base44.entities.EnsaioVigaBenkelman.get(editId)
+      obterEnsaioById('EnsaioVigaBenkelman', editId)
         .then(ensaio => {
           const faixasReconstruidas = reconstruirFaixas(
             ensaio.levantamentos,

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { obterFaixaById } from "@/services/faixasService";
 import {
   calcUmidade,
   calcEquivalenteMedicao,
@@ -47,7 +47,7 @@ export function useGranuMisturaForm({ formData, setFormData, obras, regionais, p
       const proj = projects.find(p => p.id === formData.numero_projeto);
       setSelectedProject(proj || null);
       if (proj?.faixa_granulometrica_id) {
-        base44.entities.FaixaGranulometrica.get(proj.faixa_granulometrica_id)
+        obterFaixaById(proj.faixa_granulometrica_id)
           .then(f => {
             setFaixaGran(f);
             setFormData(prev => ({ ...prev, peneiras: syncPeneirasComFaixa(f, prev.peneiras) }));

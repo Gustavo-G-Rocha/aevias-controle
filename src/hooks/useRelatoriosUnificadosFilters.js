@@ -1,11 +1,11 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { base44 } from "@/api/base44Client";
 import {
   extractLaboratoristas,
   filterRecordsByDateRange,
 } from "@/utils/relatoriosUnificadosUtils";
 import { resolveUserIdentity } from "@/utils/userIdentityResolver";
 import { loadRecordsByObra } from "@/services/recordsService";
+import { obterObraById } from "@/services/obrasService";
 
 export const useRelatoriosUnificadosFilters = () => {
   const [obraSelecionada, setObraSelecionada] = useState("");
@@ -26,7 +26,7 @@ export const useRelatoriosUnificadosFilters = () => {
 
   const loadFiltrosObra = useCallback(async (obraId) => {
     try {
-      const obraData = await base44.entities.Obra.get(obraId);
+      const obraData = await obterObraById(obraId);
       setRodoviasDisponiveis(obraData?.rodovias || []);
       setEmpreiteirasDisponiveis(obraData?.empreiteiras || []);
       setUsinasDisponiveis(obraData?.usinas || []);

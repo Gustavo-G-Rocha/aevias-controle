@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { criarRegistro } from "@/services/recordsService";
 import { createPageUrl } from "@/utils";
 
 export function useNovaNCActions(user) {
@@ -16,7 +16,7 @@ export function useNovaNCActions(user) {
     setSaving(true);
     try {
       const managerName = user?.laboratorista_name || user?.full_name || "";
-      await base44.entities.RelatorioNC.create({
+      await criarRegistro('RelatorioNC', {
         ...form,
         obra_id: obraId,
         obra_nome: obras.find(o => o.id === obraId)?.name || "",

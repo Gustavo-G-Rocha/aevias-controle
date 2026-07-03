@@ -3,7 +3,7 @@
  * Gerencia handlers de dimensões e ensaios individuais.
  */
 import { useCallback } from 'react';
-import { base44 } from '@/api/base44Client';
+import { listarUsuarios } from '@/services/usuariosService';
 import {
   calcularAreaBandeja,
   calcularEnsaio,
@@ -63,7 +63,7 @@ export function useEnsaioTaxaPinturaImprimacaoForm(setFormData) {
     const obra     = obras.find(o => o.id === obraId);
     const regional = obra ? regionais.find(r => r.id === obra.regional_id) : null;
     if (regional?.gestor_contrato_responsavel) {
-      base44.entities.User.list().then(allUsers => {
+      listarUsuarios().then(allUsers => {
         const gestor = allUsers.find(u =>
           u.email.toLowerCase() === regional.gestor_contrato_responsavel.toLowerCase()
         );

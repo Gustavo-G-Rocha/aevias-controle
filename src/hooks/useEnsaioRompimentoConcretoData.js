@@ -4,7 +4,7 @@
  */
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { obterEnsaioById } from '@/services/ensaiosService';
 import { useCurrentUser, useAuxData } from '@/hooks/useQueryData';
 import {
   FORM_INITIAL,
@@ -40,7 +40,7 @@ export function useEnsaioRompimentoConcretoData() {
     if (loadingUser || loadingAux || !user) return;
 
     if (editId) {
-      base44.entities.EnsaioRompimentoConcreto.get(editId)
+      obterEnsaioById('EnsaioRompimentoConcreto', editId)
         .then(ensaio => {
           setFormData({ ...ensaio, compressao_axial: ensaio.compressao_axial || [], tracao_flexao: ensaio.tracao_flexao || [] });
         })

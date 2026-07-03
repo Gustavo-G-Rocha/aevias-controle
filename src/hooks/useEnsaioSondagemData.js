@@ -5,7 +5,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { obterEnsaioById } from "@/services/ensaiosService";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import {
   getInitialFormData,
@@ -46,7 +46,7 @@ export function useEnsaioSondagemData() {
     const editId = params.get('editId');
 
     if (editId) {
-      base44.entities.EnsaioSondagem.get(editId)
+      obterEnsaioById('EnsaioSondagem', editId)
         .then(ensaioToEdit => {
           const podeEditar = user.role === 'admin' ||
             (ensaioToEdit.created_by === user.email &&

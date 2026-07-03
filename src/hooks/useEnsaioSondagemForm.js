@@ -2,7 +2,7 @@
  * Hook com todos os handlers de mutação do formulário do Ensaio de Sondagem.
  */
 import { useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { uploadArquivo } from "@/services/uploadService";
 import {
   getCorpoProvaInicial,
   recalcularCP,
@@ -62,7 +62,7 @@ export function useEnsaioSondagemForm(formData, setFormData) {
     setUploadingPhotos(true);
     setSelectedFileNames(files.length === 1 ? files[0].name : `${files.length} ficheiros selecionados`);
     try {
-      const results = await Promise.all(files.map(file => base44.integrations.Core.UploadFile({ file })));
+      const results = await Promise.all(files.map(file => uploadArquivo(file)));
       setFormData(prev => ({ ...prev, fotos: [...prev.fotos, ...results.map(r => r.file_url)] }));
     } catch (error) {
       console.error("[EnsaioSondagem] Erro ao fazer upload das fotos:", error?.message || error);
