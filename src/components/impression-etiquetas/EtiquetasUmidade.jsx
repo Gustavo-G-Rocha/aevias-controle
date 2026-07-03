@@ -77,8 +77,9 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
           .page-container { width: 210mm !important; height: 297mm !important; overflow: hidden !important; }
           .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
           .print\\:hidden { display: none !important; }
-          header, nav, aside, .no-print, [data-sidebar], [data-sidebar="sidebar"], [data-sidebar="provider"] { display: none !important; }
-          main { padding-left: 0 !important; margin-left: 0 !important; }
+          header, nav, aside, .no-print, [data-sidebar], [data-sidebar="sidebar"], [data-sidebar="provider"], [data-side] { display: none !important; }
+          main { padding: 0 !important; margin: 0 !important; }
+          .min-h-screen { background: #FFFFFF !important; }
         }
       `}</style>
     </div>);
