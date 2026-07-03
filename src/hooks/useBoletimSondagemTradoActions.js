@@ -5,7 +5,7 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 
 export function useBoletimSondagemTradoActions(formData, user, editingBoletim) {
   const [saving, setSaving] = useState(false);
@@ -31,10 +31,10 @@ export function useBoletimSondagemTradoActions(formData, user, editingBoletim) {
           updateData.approved_by = null;
           updateData.approved_date = null;
         }
-        await base44.entities.BoletimSondagemTrado.update(editingBoletim.id, updateData);
+        await atualizarEnsaio('BoletimSondagemTrado', editingBoletim.id, updateData);
         alert("Boletim atualizado com sucesso!");
       } else {
-        await base44.entities.BoletimSondagemTrado.create(dataToSave);
+        await criarEnsaio('BoletimSondagemTrado', dataToSave);
         alert("Boletim criado com sucesso!");
       }
       navigate(createPageUrl('MeusEnsaios'));

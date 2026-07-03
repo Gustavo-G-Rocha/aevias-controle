@@ -1,4 +1,4 @@
-import { base44 } from "@/api/base44Client";
+import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 import { createPageUrl } from "@/utils";
 import { sanitizeAgregados, sanitizeEquivalenteAreia } from "@/utils/dataSanitization";
 import { validateGranulometriaIndividual } from "@/utils/ensaioValidation";
@@ -36,10 +36,10 @@ export function useEnsaioGranulometriaIndividualActions({
           successMessage = "Ensaio atualizado! Voltará para análise.";
         }
 
-        await base44.entities.EnsaioGranulometriaIndividual.update(editingEnsaio.id, updateData);
+        await atualizarEnsaio('EnsaioGranulometriaIndividual', editingEnsaio.id, updateData);
         alert(successMessage);
       } else {
-        await base44.entities.EnsaioGranulometriaIndividual.create({
+        await criarEnsaio('EnsaioGranulometriaIndividual', {
           ...dataToSave,
           laboratorista_name: user.laboratorista_name || user.full_name,
         });

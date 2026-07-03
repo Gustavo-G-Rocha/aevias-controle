@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 
 /**
  * Hook para ações de salvar, finalizar e navegar
@@ -37,9 +37,9 @@ export const useEnsaioTaxaMRAFActions = () => {
       }
 
       if (editingEnsaio) {
-        await base44.entities.EnsaioTaxaMRAF.update(editingEnsaio.id, dataToSave);
+        await atualizarEnsaio('EnsaioTaxaMRAF', editingEnsaio.id, dataToSave);
       } else {
-        await base44.entities.EnsaioTaxaMRAF.create(dataToSave);
+        await criarEnsaio('EnsaioTaxaMRAF', dataToSave);
       }
 
       navigate(createPageUrl('MeusEnsaios'));

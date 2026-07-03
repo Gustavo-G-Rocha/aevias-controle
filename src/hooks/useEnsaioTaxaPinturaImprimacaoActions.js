@@ -4,7 +4,7 @@
  */
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { criarEnsaio, atualizarEnsaio } from '@/services/ensaiosService';
 import { createPageUrl } from '@/utils';
 
 export function useEnsaioTaxaPinturaImprimacaoActions(formData, editingEnsaio, user) {
@@ -37,10 +37,10 @@ export function useEnsaioTaxaPinturaImprimacaoActions(formData, editingEnsaio, u
           updateData.approved_date    = null;
           successMessage = 'Ensaio atualizado com sucesso! O registro voltará para análise do administrador.';
         }
-        await base44.entities.EnsaioTaxaPinturaImprimacao.update(editingEnsaio.id, updateData);
+        await atualizarEnsaio('EnsaioTaxaPinturaImprimacao', editingEnsaio.id, updateData);
         alert(successMessage);
       } else {
-        await base44.entities.EnsaioTaxaPinturaImprimacao.create(dataToSave);
+        await criarEnsaio('EnsaioTaxaPinturaImprimacao', dataToSave);
         alert('Ensaio criado com sucesso!');
       }
       navigate(createPageUrl('MeusEnsaios'));

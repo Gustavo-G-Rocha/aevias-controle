@@ -3,7 +3,8 @@
  * Gerencia handlers de obra, umidade, densidade e energia.
  */
 import { useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { obterRegionalById } from "@/services/regionaisService";
+import { obterProjectById } from "@/services/projectsService";
 import { recalcDensidades, calcularTeorUmidade, GOLPES_POR_ENERGIA } from "@/utils/ensaioProctorUtils";
 
 export function useEnsaioProctorForm(setForm, setProjetos) {
@@ -13,13 +14,13 @@ export function useEnsaioProctorForm(setForm, setProjetos) {
     let clienteAuto = "";
     if (obra?.regional_id) {
       try {
-        const regional = await base44.entities.Regional.get(obra.regional_id);
+        const regional = await obterRegionalById(obra.regional_id);
         clienteAuto = regional?.cliente || "";
       } catch {}
     }
     setForm(prev => ({ ...prev, obra_id: id, project_id: "", cliente: clienteAuto }));
     if (id && obra?.project_ids?.length > 0) {
-      const projs = await Promise.all(obra.project_ids.map(pid => base44.entities.Project.get(pid)));
+      const projs = await Promise.all(obra.project_ids.map(pid => obterProjectById(pid)));
       setProjetos(projs);
     }
   }, [setForm, setProjetos]);

@@ -5,7 +5,8 @@
  */
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { obterEnsaioById } from '@/services/ensaiosService';
+import { listarUsuarios } from '@/services/usuariosService';
 import { createPageUrl } from '@/utils';
 import { useCurrentUser, useAuxData } from '@/hooks/useQueryData';
 import {
@@ -40,7 +41,7 @@ export function useEnsaioTaxaPinturaImprimacaoData() {
 
     if (editId) {
       setEditLoading(true);
-      base44.entities.EnsaioTaxaPinturaImprimacao.get(editId)
+      obterEnsaioById('EnsaioTaxaPinturaImprimacao', editId)
         .then(ensaioToEdit => {
           if (user.role === 'admin' || (ensaioToEdit.created_by === user.email && ensaioToEdit.approved !== true)) {
             setEditingEnsaio(ensaioToEdit);
@@ -68,7 +69,7 @@ export function useEnsaioTaxaPinturaImprimacaoData() {
       let gestorName = '';
       if (regional?.gestor_contrato_responsavel) {
         try {
-          base44.entities.User.list().then(allUsers => {
+          listarUsuarios().then(allUsers => {
             const gestor = allUsers.find(u =>
               u.email.toLowerCase() === regional.gestor_contrato_responsavel.toLowerCase()
             );

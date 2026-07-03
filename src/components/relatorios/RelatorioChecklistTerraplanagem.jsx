@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { carregarObraRegional } from "@/services/relatorioContextService";
 import SignatureFooter from './SignatureFooter';
 import { compressImages } from '@/utils/reportImageCompression';
 
@@ -35,12 +35,9 @@ export default function RelatorioChecklistTerraplanagem({ checklist, creatorUser
   const loadRelatedData = async () => {
     try {
       if (checklist.obra_id) {
-        const obraData = await base44.entities.Obra.get(checklist.obra_id);
+        const { obra: obraData, regional: regionalData } = await carregarObraRegional(checklist.obra_id);
         setObra(obraData);
-        if (obraData.regional_id) {
-          const regionalData = await base44.entities.Regional.get(obraData.regional_id);
-          setRegional(regionalData);
-        }
+        setRegional(regionalData);
       }
     } catch (error) {
       console.error("Erro ao carregar dados relacionados:", error);

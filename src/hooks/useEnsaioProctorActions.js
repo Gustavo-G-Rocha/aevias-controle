@@ -4,7 +4,7 @@
  */
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 import { sanitizeFormForSave, getEmptyRequiredFields } from "@/utils/ensaioProctorUtils";
 
 export function useEnsaioProctorActions(form, recordId) {
@@ -22,10 +22,10 @@ export function useEnsaioProctorActions(form, recordId) {
     try {
       const data = { ...sanitizeFormForSave(form), status };
       if (recordId) {
-        await base44.entities.EnsaioProctor.update(recordId, data);
+        await atualizarEnsaio('EnsaioProctor', recordId, data);
         alert("Ensaio atualizado com sucesso!");
       } else {
-        await base44.entities.EnsaioProctor.create(data);
+        await criarEnsaio('EnsaioProctor', data);
         alert("Ensaio criado com sucesso!");
         navigate("/MeusEnsaios");
       }

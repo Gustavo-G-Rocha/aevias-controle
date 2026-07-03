@@ -5,7 +5,8 @@
  */
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { obterEnsaioById } from "@/services/ensaiosService";
+import { obterProjectById } from "@/services/projectsService";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { getInitialForm, filtrarObrasProctor } from "@/utils/ensaioProctorUtils";
 import { defaultLimites } from "@/components/ensaios/EnsaioLimites";
@@ -34,11 +35,11 @@ export function useEnsaioProctorData() {
     setForm(prev => ({ ...prev, laboratorista_name: user.laboratorista_name || user.full_name }));
 
     if (recordId) {
-      base44.entities.EnsaioProctor.get(recordId)
+      obterEnsaioById('EnsaioProctor', recordId)
         .then(recordData => {
           setForm(recordData);
           if (recordData.project_id) {
-            return base44.entities.Project.get(recordData.project_id).then(projectData => {
+            return obterProjectById(recordData.project_id).then(projectData => {
               setProjetos([projectData]);
             });
           }

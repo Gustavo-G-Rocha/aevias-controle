@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { criarEnsaio, atualizarEnsaio } from '@/services/ensaiosService';
 import { createPageUrl } from '@/utils';
 import { prepareDadosParaSalvar } from '@/utils/ensaioManchaPenduloUtils';
 
@@ -41,9 +41,9 @@ export const useEnsaioManchaPenduloActions = (isEditMode, editId, formData) => {
           updateData.approved_date = null;
           updateData.was_rejected = true;
         }
-        await base44.entities.EnsaioManchaPendulo.update(editId, updateData);
+        await atualizarEnsaio('EnsaioManchaPendulo', editId, updateData);
       } else {
-        await base44.entities.EnsaioManchaPendulo.create(dataToSave);
+        await criarEnsaio('EnsaioManchaPendulo', dataToSave);
       }
 
       navigate(createPageUrl('MeusEnsaios'));

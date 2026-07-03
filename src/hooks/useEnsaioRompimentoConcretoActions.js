@@ -3,7 +3,7 @@
  */
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { criarEnsaio, atualizarEnsaio } from '@/services/ensaiosService';
 import { createPageUrl } from '@/utils';
 
 export function useEnsaioRompimentoConcretoActions(formData, editId) {
@@ -16,10 +16,10 @@ export function useEnsaioRompimentoConcretoActions(formData, editId) {
     try {
       const dataToSave = { ...formData, status: asFinal ? 'finalizado' : 'rascunho' };
       if (editId) {
-        await base44.entities.EnsaioRompimentoConcreto.update(editId, dataToSave);
+        await atualizarEnsaio('EnsaioRompimentoConcreto', editId, dataToSave);
         alert('Ensaio atualizado com sucesso!');
       } else {
-        await base44.entities.EnsaioRompimentoConcreto.create(dataToSave);
+        await criarEnsaio('EnsaioRompimentoConcreto', dataToSave);
         alert('Ensaio criado com sucesso!');
       }
       navigate(createPageUrl('MeusEnsaios'));

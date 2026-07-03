@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 import { createPageUrl } from "@/utils";
 import {
   filtrarProjetosDisponiveis,
@@ -62,9 +62,9 @@ export function useAcompanhamentoCargaActions({
       const dataToSave = buildDataToSave(formData, finalizar);
 
       if (editMode) {
-        await base44.entities.AcompanhamentoCarga.update(editId, dataToSave);
+        await atualizarEnsaio('AcompanhamentoCarga', editId, dataToSave);
       } else {
-        await base44.entities.AcompanhamentoCarga.create(dataToSave);
+        await criarEnsaio('AcompanhamentoCarga', dataToSave);
       }
 
       clearSavedData();

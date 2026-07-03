@@ -5,7 +5,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 import { toast } from "sonner";
 
 export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
@@ -51,9 +51,9 @@ export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
           successMessage = "Ensaio atualizado com sucesso! O registro voltará para análise do administrador.";
         }
 
-        await base44.entities.EnsaioDensidadeInSitu.update(ee.id, updateData);
+        await atualizarEnsaio('EnsaioDensidadeInSitu', ee.id, updateData);
       } else {
-        await base44.entities.EnsaioDensidadeInSitu.create(dataToSave);
+        await criarEnsaio('EnsaioDensidadeInSitu', dataToSave);
       }
 
       if (saveStatus === "rascunho") {

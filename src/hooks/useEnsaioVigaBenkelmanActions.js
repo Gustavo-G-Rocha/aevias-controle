@@ -4,7 +4,7 @@
  */
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { criarEnsaio, atualizarEnsaio } from '@/services/ensaiosService';
 import { serializarFaixas } from '@/utils/ensaioVigaBenkelmanUtils';
 import { createPageUrl } from '@/utils';
 
@@ -47,10 +47,10 @@ export function useEnsaioVigaBenkelmanActions(formData, editId) {
       };
 
       if (editId) {
-        await base44.entities.EnsaioVigaBenkelman.update(editId, dataToSave);
+        await atualizarEnsaio('EnsaioVigaBenkelman', editId, dataToSave);
         alert('Ensaio atualizado com sucesso!');
       } else {
-        await base44.entities.EnsaioVigaBenkelman.create(dataToSave);
+        await criarEnsaio('EnsaioVigaBenkelman', dataToSave);
         alert('Ensaio criado com sucesso!');
       }
 

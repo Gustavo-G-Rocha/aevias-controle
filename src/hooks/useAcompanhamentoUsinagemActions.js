@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 import { createPageUrl } from "@/utils";
 import {
   AGREGADO_VAZIO,
@@ -60,10 +60,10 @@ export function useAcompanhamentoUsinagemActions({ formData, setFormData, editin
       const dataToSave = buildDataToSave(formData, finalizar, editingId);
 
       if (editingId) {
-        await base44.entities.AcompanhamentoUsinagem.update(editingId, dataToSave);
+        await atualizarEnsaio('AcompanhamentoUsinagem', editingId, dataToSave);
         alert(finalizar ? 'Acompanhamento finalizado e enviado para aprovação!' : 'Acompanhamento salvo como rascunho!');
       } else {
-        await base44.entities.AcompanhamentoUsinagem.create(dataToSave);
+        await criarEnsaio('AcompanhamentoUsinagem', dataToSave);
         alert(finalizar ? 'Acompanhamento criado e enviado para aprovação!' : 'Acompanhamento salvo como rascunho!');
       }
 
