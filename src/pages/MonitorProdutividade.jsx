@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Users } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { obterUsuarioAtual } from "@/services/usuariosService";
+import { loadAuxData, loadRecordsByEntities } from "@/services/recordsService";
+
+const MONITOR_ENTITIES = [
+  'DiarioObra', 'EnsaioCAUQ', 'EnsaioDensidade', 'EnsaioDensidadeInSitu',
+  'EnsaioTaxaPinturaImprimacao', 'ChecklistUsina', 'ChecklistAplicacao', 'ChecklistMRAF',
+  'ChecklistConcretagem', 'ChecklistTerraplanagem', 'EnsaioSondagem',
+];
 
 export default function MonitorProdutividade() {
   const [loading, setLoading] = useState(true);
@@ -13,7 +20,7 @@ export default function MonitorProdutividade() {
     const loadData = async () => {
       setLoading(true);
     try {
-      const user = await base44.auth.me();
+      const user = await obterUsuarioAtual();
       setCurrentUser(user);
 
       // Verificar se é admin
@@ -22,53 +29,11 @@ export default function MonitorProdutividade() {
         return;
       }
 
-      // Carregar dados
-      const [todosUsuarios, regionaisData, obrasData] = await Promise.all([
-        base44.entities.User.list(),
-        base44.entities.Regional.list(),
-        base44.entities.Obra.list(),
+      // Carregar dados auxiliares e registros em paralelo via service layer
+      const [{ obras: obrasData, regionais: regionaisData, users: todosUsuarios }, todosRegistros] = await Promise.all([
+        loadAuxData({ needsRegionais: true, needsUsers: true }),
+        loadRecordsByEntities(MONITOR_ENTITIES, 500),
       ]);
-
-      // Carregar todos os registros
-      const [
-        diariosData,
-        ensaiosCAUQData,
-        densidadeData,
-        densidadeInSituData,
-        taxaPinturaData,
-        checklistsData,
-        checklistsAplicacaoData,
-        checklistsMRAFData,
-        checklistsConcretagemData,
-        checklistsTerraplanamemData,
-        sondagemData
-      ] = await Promise.all([
-        base44.entities.DiarioObra.list("-created_date", 500),
-        base44.entities.EnsaioCAUQ.list("-created_date", 500),
-        base44.entities.EnsaioDensidade.list("-created_date", 500),
-        base44.entities.EnsaioDensidadeInSitu.list("-created_date", 500),
-        base44.entities.EnsaioTaxaPinturaImprimacao.list("-created_date", 500),
-        base44.entities.ChecklistUsina.list("-created_date", 500),
-        base44.entities.ChecklistAplicacao.list("-created_date", 500),
-        base44.entities.ChecklistMRAF.list("-created_date", 500),
-        base44.entities.ChecklistConcretagem.list("-created_date", 500),
-        base44.entities.ChecklistTerraplanagem.list("-created_date", 500),
-        base44.entities.EnsaioSondagem.list("-created_date", 500)
-      ]);
-
-      const todosRegistros = [
-        ...diariosData,
-        ...ensaiosCAUQData,
-        ...densidadeData,
-        ...densidadeInSituData,
-        ...taxaPinturaData,
-        ...checklistsData,
-        ...checklistsAplicacaoData,
-        ...checklistsMRAFData,
-        ...checklistsConcretagemData,
-        ...checklistsTerraplanamemData,
-        ...sondagemData
-      ];
 
       // Identificar gestores de contrato
       const gestores = todosUsuarios.filter(u => 

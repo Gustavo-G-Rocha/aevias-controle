@@ -182,3 +182,17 @@ export async function loadAuxData({ needsRegionais = true, needsUsers = false } 
     users:     usersResult.status    === 'fulfilled' ? usersResult.value    : [],
   };
 }
+
+/**
+ * Carrega registros de um subconjunto específico de entidades em paralelo
+ * e retorna um array plano (concatenado, sem normalização nem deduplicação).
+ * Preserva o comportamento de páginas que agregam contagens sobre múltiplas
+ * entidades sem precisar do entityType/dedup de loadAllRecords.
+ * @param {string[]} entityList
+ * @param {number} limit
+ * @returns {Promise<object[]>}
+ */
+export async function loadRecordsByEntities(entityList, limit = 500) {
+  const results = await Promise.all(entityList.map(type => loadEntity(type, limit)));
+  return results.flat();
+}

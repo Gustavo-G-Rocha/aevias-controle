@@ -1,5 +1,7 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { base44 } from '@/api/base44Client';
+import { obterUsuarioAtual } from '@/services/usuariosService';
+import { listarObrasRecentes } from '@/services/obrasService';
+import { loadRecordsByEntities } from '@/services/recordsService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,6 +9,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Users, CheckCircle2, XCircle, TrendingDown } from 'lucide-react';
+
+const CONTROLE_LAB_ENTITIES = [
+  'DiarioObra', 'ChecklistUsina', 'ChecklistAplicacao', 'ChecklistMRAF',
+  'ChecklistConcretagem', 'ChecklistTerraplanagem', 'ChecklistReciclagem', 'EnsaioCAUQ',
+  'EnsaioMRAF', 'EnsaioDensidade', 'EnsaioDensidadeInSitu', 'EnsaioSondagem',
+  'EnsaioTaxaPinturaImprimacao', 'EnsaioGranulometriaIndividual', 'EnsaioManchaPendulo',
+  'EnsaioVigaBenkelman', 'AcompanhamentoUsinagem', 'AcompanhamentoCarga', 'EnsaioProctor',
+  'EnsaioRompimentoConcreto', 'EnsaioTaxaMRAF', 'GranuMistura', 'BoletimSondagem', 'BoletimSondagemTrado',
+];
 
 export default function ControleLaboratoristas() {
   const [user, setUser] = useState(null);
@@ -19,78 +30,26 @@ export default function ControleLaboratoristas() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const userData = await base44.auth.me();
+      const userData = await obterUsuarioAtual();
       setUser(userData);
 
       if (userData?.role !== 'admin') {
         return;
       }
 
-      const obrasData = await base44.entities.Obra.list();
+      const [obrasData, todosRegistros] = await Promise.all([
+        listarObrasRecentes(),
+        loadRecordsByEntities(CONTROLE_LAB_ENTITIES, 500),
+      ]);
+
       setObras(obrasData);
-
-      const s = (results) => results.map(r => r.status === 'fulfilled' ? r.value : []);
-
-      const [
-        diariosObra, checklistsUsina, checklistsAplicacao, checklistsMRAF,
-        checklistsConcretagem, checklistsTerraplanagem, checklistsReciclagem, ensaiosCAUQ
-      ] = s(await Promise.allSettled([
-        base44.entities.DiarioObra.list("-created_date", 500),
-        base44.entities.ChecklistUsina.list("-created_date", 500),
-        base44.entities.ChecklistAplicacao.list("-created_date", 500),
-        base44.entities.ChecklistMRAF.list("-created_date", 500),
-        base44.entities.ChecklistConcretagem.list("-created_date", 500),
-        base44.entities.ChecklistTerraplanagem.list("-created_date", 500),
-        base44.entities.ChecklistReciclagem.list("-created_date", 500),
-        base44.entities.EnsaioCAUQ.list("-created_date", 500),
-      ]));
-
-      const [
-        ensaiosMRAF, ensaiosDensidade, ensaiosDensidadeInSitu, ensaiosSondagem,
-        ensaiosTaxaPintura, ensaiosGranIndividual, ensaiosManchaPendulo, ensaiosVigaBenkelman
-      ] = s(await Promise.allSettled([
-        base44.entities.EnsaioMRAF.list("-created_date", 500),
-        base44.entities.EnsaioDensidade.list("-created_date", 500),
-        base44.entities.EnsaioDensidadeInSitu.list("-created_date", 500),
-        base44.entities.EnsaioSondagem.list("-created_date", 500),
-        base44.entities.EnsaioTaxaPinturaImprimacao.list("-created_date", 500),
-        base44.entities.EnsaioGranulometriaIndividual.list("-created_date", 500),
-        base44.entities.EnsaioManchaPendulo.list("-created_date", 500),
-        base44.entities.EnsaioVigaBenkelman.list("-created_date", 500),
-      ]));
-
-      const [
-        acompanhamentosUsinagem, acompanhamentosCarga, ensaiosProctor,
-        ensaiosRompimento, ensaiosTaxaMRAF, granuMisturas,
-        boletinsSondagem, boletinsSondagemTrado
-      ] = s(await Promise.allSettled([
-        base44.entities.AcompanhamentoUsinagem.list("-created_date", 500),
-        base44.entities.AcompanhamentoCarga.list("-created_date", 500),
-        base44.entities.EnsaioProctor.list("-created_date", 500),
-        base44.entities.EnsaioRompimentoConcreto.list("-created_date", 500),
-        base44.entities.EnsaioTaxaMRAF.list("-created_date", 500),
-        base44.entities.GranuMistura.list("-created_date", 500),
-        base44.entities.BoletimSondagem.list("-created_date", 500),
-        base44.entities.BoletimSondagemTrado.list("-created_date", 500),
-      ]));
-
-      const todosRegistros = [
-        ...diariosObra, ...checklistsUsina, ...checklistsAplicacao, ...checklistsMRAF,
-        ...checklistsConcretagem, ...checklistsTerraplanagem, ...checklistsReciclagem,
-        ...ensaiosCAUQ, ...ensaiosMRAF, ...ensaiosDensidade, ...ensaiosDensidadeInSitu,
-        ...ensaiosSondagem, ...ensaiosTaxaPintura, ...ensaiosGranIndividual,
-        ...ensaiosManchaPendulo, ...ensaiosVigaBenkelman, ...acompanhamentosUsinagem,
-        ...acompanhamentosCarga, ...ensaiosProctor, ...ensaiosRompimento,
-        ...ensaiosTaxaMRAF, ...granuMisturas, ...boletinsSondagem, ...boletinsSondagemTrado
-      ];
-
       setRegistros(todosRegistros);
     } catch (error) {
       console.error('[ControleLaboratoristas] Erro ao carregar dados:', error?.message || error);
     } finally {
       setLoading(false);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     loadData();
