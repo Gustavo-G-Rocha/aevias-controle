@@ -53,9 +53,10 @@ describe('EtiquetasUmidade - contrato de impressão', () => {
     expect(src).toContain('margin: 0 !important');
   });
 
-  it('usa fonte aumentada nas etiquetas', () => {
-    expect(src).toContain('text-[10px]');
-    expect(src).toContain('print:text-[9px]');
+  it('usa fonte aumentada e em negrito nas etiquetas', () => {
+    expect(src).toContain('text-[13px]');
+    expect(src).toContain('print:text-[10px]');
+    expect(src).toContain('font-bold');
   });
 
   it('deixa o valor do Furo (ponto) em negrito', () => {
