@@ -66,7 +66,7 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
       </div>
 
       <style>{`
-        .page-container { padding: 14.4mm 6.95mm 15.4mm 6.95mm; display: block !important; box-sizing: border-box; }
+        .page-container { padding: 15mm 7mm 15mm 7mm; display: block !important; box-sizing: border-box; }
         .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
         @page { size: A4; margin: 0 !important; }
         @media screen { .page-container { min-height: 100vh; margin-bottom: 20px; border: 1px solid #e5e7eb; } .umidade-grid { grid-template-columns: repeat(3, 1fr) !important; grid-template-rows: repeat(7, auto) !important; } }
