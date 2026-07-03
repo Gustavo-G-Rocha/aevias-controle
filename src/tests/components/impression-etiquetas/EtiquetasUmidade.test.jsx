@@ -45,10 +45,10 @@ describe('EtiquetasUmidade - contrato de impressão', () => {
   });
 
   it('respeita gaps e margens exatas da folha A4', () => {
-    expect(src).toContain("columnGap: '2.15mm'");
+    expect(src).toContain("columnGap: '2.8mm'");
     expect(src).toContain("rowGap: '0.08mm'");
     // Margens do documento aplicadas como padding do container (robusto ao navegador)
-    expect(src).toContain('padding: 14.4mm 7.6mm 15.4mm 7.6mm');
+    expect(src).toContain('padding: 14.4mm 6.95mm 15.4mm 6.95mm');
     // @page zerado para não somar com a margem do navegador
     expect(src).toContain('margin: 0 !important');
   });
