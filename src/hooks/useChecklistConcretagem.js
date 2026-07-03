@@ -5,6 +5,7 @@ import { createPageUrl } from "@/utils";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { obterChecklistById, criarChecklist, atualizarChecklist } from "@/services/checklistsService";
 import { uploadArquivo } from "@/services/uploadService";
+import { toast } from "@/components/ui/use-toast";
 
 export const getInitialFormData = () => ({
   obra_id: "",
@@ -152,13 +153,13 @@ export function useChecklistConcretagem() {
             setEditingChecklist(checklistToEdit);
             setFormData(checklistToEdit);
           } else {
-            alert("Você não tem permissão para editar este registro.");
+            toast({ title: "Você não tem permissão para editar este registro.", variant: "destructive" });
             navigate(createPageUrl("MeusEnsaios"));
           }
         })
         .catch(error => {
           console.error("Erro ao carregar dados:", error);
-          alert("Erro ao carregar dados iniciais.");
+          toast({ title: "Erro ao carregar dados iniciais.", variant: "destructive" });
         })
         .finally(() => setEditLoading(false));
     } else {
@@ -265,8 +266,8 @@ export function useChecklistConcretagem() {
 
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
     for (const file of files) {
-      if (!allowedTypes.includes(file.type)) { alert(`Tipo não suportado: ${file.type}`); e.target.value = ""; return; }
-      if (file.size > 50 * 1024 * 1024) { alert(`Arquivo muito grande: ${(file.size / 1024 / 1024).toFixed(2)}MB`); e.target.value = ""; return; }
+      if (!allowedTypes.includes(file.type)) { toast({ title: `Tipo não suportado: ${file.type}`, variant: "destructive" }); e.target.value = ""; return; }
+      if (file.size > 50 * 1024 * 1024) { toast({ title: `Arquivo muito grande: ${(file.size / 1024 / 1024).toFixed(2)}MB`, variant: "destructive" }); e.target.value = ""; return; }
     }
 
     setUploadingPhotos(true);
@@ -286,7 +287,7 @@ export function useChecklistConcretagem() {
     e.preventDefault();
     setSaving(true);
 
-    if (!formData.obra_id) { alert("Por favor, selecione uma obra."); setSaving(false); return; }
+    if (!formData.obra_id) { toast({ title: "Por favor, selecione uma obra.", variant: "destructive" }); setSaving(false); return; }
 
     if (saveStatus === "finalizado") {
       const requiredFields = [
@@ -302,11 +303,11 @@ export function useChecklistConcretagem() {
         [formData.acoes_corretivas_realizado === true && !formData.acoes_corretivas_descricao?.trim(), "descreva as ações corretivas"],
       ];
       for (const [cond, msg] of requiredFields) {
-        if (cond) { alert(`Por favor, ${msg}.`); setSaving(false); return; }
+        if (cond) { toast({ title: `Por favor, ${msg}.`, variant: "destructive" }); setSaving(false); return; }
       }
       for (const c of formData.cargas_concreto) {
         if (c.moldado_fiscalizacao && (!c.corpos_prova || c.corpos_prova.length === 0)) {
-          alert(`Configure ao menos 1 corpo de prova para a Carga ${c.numero_carga}.`);
+          toast({ title: `Configure ao menos 1 corpo de prova para a Carga ${c.numero_carga}.`, variant: "destructive" });
           setSaving(false); return;
         }
       }
@@ -335,16 +336,16 @@ export function useChecklistConcretagem() {
           Object.assign(updateData, { approved: null, rejection_reason: null, approved_by: null, approved_date: null, was_rejected: true });
         }
         await atualizarChecklist('ChecklistConcretagem', editingChecklist.id, updateData);
-        alert(saveStatus === "rascunho" ? "Progresso salvo!" : "Checklist atualizado com sucesso!");
+        toast({ title: saveStatus === "rascunho" ? "Progresso salvo!" : "Checklist atualizado com sucesso!" });
       } else {
         await criarChecklist('ChecklistConcretagem', dataToSave);
-        alert(saveStatus === "rascunho" ? "Progresso salvo!" : "Checklist criado com sucesso!");
+        toast({ title: saveStatus === "rascunho" ? "Progresso salvo!" : "Checklist criado com sucesso!" });
       }
       clearSavedData();
       navigate(createPageUrl("MeusEnsaios"));
     } catch (error) {
       console.error("Erro ao salvar checklist:", error);
-      alert(`Erro ao salvar: ${error.message}`);
+      toast({ title: `Erro ao salvar: ${error.message}`, variant: "destructive" });
     } finally {
       setSaving(false);
     }

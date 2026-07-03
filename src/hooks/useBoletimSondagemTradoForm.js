@@ -10,6 +10,7 @@ import {
   getDensidadeInicial,
   getUmidadeNatural2Inicial,
 } from "@/utils/boletimSondagemTradoUtils";
+import { toast } from "@/components/ui/use-toast";
 
 export function useBoletimSondagemTradoForm(setFormData) {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
@@ -171,7 +172,7 @@ export function useBoletimSondagemTradoForm(setFormData) {
       setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...urls] }));
       e.target.value = '';
     } catch (error) {
-      alert("Erro ao fazer upload da foto.");
+      toast({ title: "Erro ao fazer upload da foto.", variant: "destructive" });
     } finally {
       setUploadingPhoto(false);
     }

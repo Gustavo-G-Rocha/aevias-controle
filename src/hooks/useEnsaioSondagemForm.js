@@ -8,11 +8,12 @@ import {
   recalcularCP,
   validarArquivoFoto,
 } from "@/utils/ensaioSondagemUtils";
+import { toast } from "@/components/ui/use-toast";
 
 export function useEnsaioSondagemForm(formData, setFormData) {
   const addCorpoProva = useCallback(() => {
     if (formData.corpos_prova.length >= 10) {
-      alert("Máximo de 10 corpos de prova permitido.");
+      toast({ title: "Máximo de 10 corpos de prova permitido.", variant: "destructive" });
       return;
     }
     setFormData(prev => ({
@@ -55,7 +56,7 @@ export function useEnsaioSondagemForm(formData, setFormData) {
     try {
       files.forEach(f => validarArquivoFoto(f));
     } catch (error) {
-      alert(error.message);
+      toast({ title: error.message, variant: "destructive" });
       e.target.value = '';
       return;
     }
@@ -66,7 +67,7 @@ export function useEnsaioSondagemForm(formData, setFormData) {
       setFormData(prev => ({ ...prev, fotos: [...prev.fotos, ...results.map(r => r.file_url)] }));
     } catch (error) {
       console.error("[EnsaioSondagem] Erro ao fazer upload das fotos:", error?.message || error);
-      alert("Erro ao fazer upload das fotos.");
+      toast({ title: "Erro ao fazer upload das fotos.", variant: "destructive" });
     } finally {
       setUploadingPhotos(false);
       e.target.value = '';

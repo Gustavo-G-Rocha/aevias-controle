@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { createPageUrl } from "@/utils";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
+import { toast } from "@/components/ui/use-toast";
 
 /**
  * Hook reutilizável para formulários de ensaios individuais
@@ -100,13 +101,13 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
                 : new Date().toISOString().split('T')[0],
             });
           } else {
-            alert("Você não tem permissão para editar este registro.");
+            toast({ title: "Você não tem permissão para editar este registro.", variant: "destructive" });
             navigate(createPageUrl('MeusEnsaios'));
           }
         })
         .catch(error => {
           console.error(`[${entityName}] Erro ao carregar:`, error?.message);
-          alert("Erro ao carregar os dados.");
+          toast({ title: "Erro ao carregar os dados.", variant: "destructive" });
           navigate(createPageUrl('MeusEnsaios'));
         })
         .finally(() => setEditLoading(false));

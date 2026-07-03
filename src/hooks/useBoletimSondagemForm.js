@@ -12,6 +12,7 @@ import {
   recalcularCamadas,
   removerCamadaDoArray,
 } from "@/utils/boletimSondagemUtils";
+import { toast } from "@/components/ui/use-toast";
 
 export function useBoletimSondagemForm(setFormData) {
   const handleObraChange = useCallback((obraId, obras, regionais) => {
@@ -111,7 +112,7 @@ export function useBoletimSondagemForm(setFormData) {
       setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...urls] }));
       e.target.value = '';
     } catch {
-      alert("Erro ao fazer upload da foto.");
+      toast({ title: "Erro ao fazer upload da foto.", variant: "destructive" });
     } finally {
       setUploadingPhoto(false);
     }

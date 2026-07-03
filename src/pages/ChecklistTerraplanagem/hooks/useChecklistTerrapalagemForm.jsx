@@ -8,6 +8,7 @@ import { addOrUpdateQueueItem } from "@/services/syncService";
 import { todayISO } from "@/utils/formInitialData";
 import { criarChecklist, atualizarChecklist } from "@/services/checklistsService";
 import { uploadImagem } from "@/services/uploadService";
+import { toast } from "@/components/ui/use-toast";
 
 const getInitialFormData = () => ({
   obra_id: "",
@@ -152,8 +153,8 @@ export function useChecklistTerrapalagemForm() {
 
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     for (const file of files) {
-      if (!allowedTypes.includes(file.type)) { alert(`Tipo de arquivo não suportado: ${file.type}`); e.target.value = ''; return; }
-      if (file.size > 10 * 1024 * 1024) { alert(`Arquivo muito grande: ${(file.size / 1024 / 1024).toFixed(2)}MB`); e.target.value = ''; return; }
+      if (!allowedTypes.includes(file.type)) { toast({ title: `Tipo de arquivo não suportado: ${file.type}`, variant: "destructive" }); e.target.value = ''; return; }
+      if (file.size > 10 * 1024 * 1024) { toast({ title: `Arquivo muito grande: ${(file.size / 1024 / 1024).toFixed(2)}MB`, variant: "destructive" }); e.target.value = ''; return; }
     }
 
     setUploadingPhotos(true);
@@ -168,7 +169,7 @@ export function useChecklistTerrapalagemForm() {
       setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...uploadedUrls] }));
     } catch (error) {
       console.error("Erro ao fazer upload das fotos:", error);
-      alert("Erro ao fazer upload das fotos.");
+      toast({ title: "Erro ao fazer upload das fotos.", variant: "destructive" });
     } finally {
       setUploadingPhotos(false);
       e.target.value = '';
@@ -195,7 +196,7 @@ export function useChecklistTerrapalagemForm() {
   const handleSubmit = async (e, saveStatus = 'finalizado') => {
     e.preventDefault();
     const error = validateForm(formData, saveStatus);
-    if (error) { alert(error); return; }
+    if (error) { toast({ title: error, variant: "destructive" }); return; }
 
     setSaving(true);
     try {
@@ -215,10 +216,10 @@ export function useChecklistTerrapalagemForm() {
             msg = "Checklist atualizado com sucesso! O registro voltará para análise do administrador.";
           }
           await atualizarChecklist('ChecklistTerraplanagem', editingChecklist.id, updateData);
-          alert(msg);
+          toast({ title: msg });
         } else {
           await criarChecklist('ChecklistTerraplanagem', dataToSave);
-          alert(saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!");
+          toast({ title: saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!" });
         }
         clearSavedData();
         navigate(createPageUrl("MeusEnsaios"));
@@ -233,13 +234,13 @@ export function useChecklistTerrapalagemForm() {
         });
 
         await addOrUpdateQueueItem(queueItem);
-        alert(`Registro salvo localmente. Será sincronizado quando a conexão voltar.${editingChecklist?.id ? '' : ''}`);
+        toast({ title: `Registro salvo localmente. Será sincronizado quando a conexão voltar.${editingChecklist?.id ? '' : ''}` });
         clearSavedData();
         navigate(createPageUrl("MeusEnsaios"));
       }
     } catch (error) {
       console.error("Erro ao salvar checklist:", error);
-      alert(`Erro ao salvar checklist: ${error.message}`);
+      toast({ title: `Erro ao salvar checklist: ${error.message}`, variant: "destructive" });
     } finally {
       setSaving(false);
     }

@@ -4,6 +4,7 @@
  */
 import { useState, useCallback } from 'react';
 import { calcularLado, getFaixaInicial, LADOS_PERMITIDOS } from '@/utils/ensaioVigaBenkelmanUtils';
+import { toast } from '@/components/ui/use-toast';
 
 export function useEnsaioVigaBenkelmanForm(setFormData) {
   const [activeFaixaTab, setActiveFaixaTab] = useState('1');
@@ -73,7 +74,7 @@ export function useEnsaioVigaBenkelmanForm(setFormData) {
   const addFaixa = useCallback(() => {
     setFormData(prev => {
       if (prev.faixas.length >= 4) {
-        alert('Limite máximo de 4 faixas atingido.');
+        toast({ title: 'Limite máximo de 4 faixas atingido.', variant: 'destructive' });
         return prev;
       }
       const newId = prev.nextFaixaId;

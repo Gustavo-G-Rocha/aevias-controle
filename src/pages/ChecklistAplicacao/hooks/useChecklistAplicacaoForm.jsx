@@ -15,6 +15,7 @@ import { useCallback } from "react";
 import { createPageUrl } from "@/utils";
 import { uploadMultipleFiles } from "@/utils/imageUpload";
 import { criarChecklist, atualizarChecklist } from "@/services/checklistsService";
+import { toast } from "@/components/ui/use-toast";
 
 export function useChecklistAplicacaoForm({
   formData,
@@ -90,7 +91,7 @@ export function useChecklistAplicacaoForm({
       setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...urls] }));
     }
     if (errors.length > 0) {
-      alert(`${urls.length} de ${files.length} fotos enviadas.\n\nErros:\n` + errors.map(err => `• ${err.fileName}: ${err.error}`).join('\n'));
+      toast({ title: `${urls.length} de ${files.length} fotos enviadas.\n\nErros:\n` + errors.map(err => `• ${err.fileName}: ${err.error}`).join('\n'), variant: "destructive" });
     }
     setUploadingPhoto(false);
     e.target.value = '';
@@ -107,11 +108,11 @@ export function useChecklistAplicacaoForm({
     if (saveStatus === 'finalizado') {
       const required = ['obra_id', 'project_id', 'data', 'rodovia', 'trecho', 'empreiteira', 'usina', 'ligante', 'pedreira', 'ensaio_realizado_por'];
       if (required.some(f => !formData[f])) {
-        alert("Preencha todos os campos obrigatórios (Obra, Projeto Vinculado, Data, Rodovia, Trecho, Empreiteira, Usina, Ligante, Pedreira, Ensaio realizado por).");
+        toast({ title: "Preencha todos os campos obrigatórios (Obra, Projeto Vinculado, Data, Rodovia, Trecho, Empreiteira, Usina, Ligante, Pedreira, Ensaio realizado por).", variant: "destructive" });
         return;
       }
     } else {
-      if (!formData.obra_id) { alert("Por favor, selecione uma obra."); return; }
+      if (!formData.obra_id) { toast({ title: "Por favor, selecione uma obra.", variant: "destructive" }); return; }
     }
 
     setSaving(true);
@@ -137,16 +138,16 @@ export function useChecklistAplicacaoForm({
           msg = "Checklist atualizado com sucesso! O registro voltará para análise do administrador.";
         }
         await atualizarChecklist('ChecklistAplicacao', editingChecklist.id, updateData);
-        alert(msg);
+        toast({ title: msg });
       } else {
         await criarChecklist('ChecklistAplicacao', dataToSave);
-        alert(saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!");
+        toast({ title: saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!" });
       }
       clearSavedData();
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
       console.error("[ChecklistAplicacao] Erro ao salvar checklist:", error?.message || error);
-      alert("Erro ao salvar checklist.");
+      toast({ title: "Erro ao salvar checklist.", variant: "destructive" });
     } finally {
       setSaving(false);
     }

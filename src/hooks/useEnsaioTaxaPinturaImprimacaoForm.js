@@ -9,6 +9,7 @@ import {
   calcularEnsaio,
   getEnsaioInicial,
 } from '@/utils/ensaioTaxaPinturaImprimacaoUtils';
+import { toast } from '@/components/ui/use-toast';
 
 export function useEnsaioTaxaPinturaImprimacaoForm(setFormData) {
 
@@ -43,7 +44,7 @@ export function useEnsaioTaxaPinturaImprimacaoForm(setFormData) {
   const adicionarEnsaio = useCallback(() => {
     setFormData(prev => {
       if (prev.ensaios.length >= 4) {
-        alert('Máximo de 4 ensaios permitidos.');
+        toast({ title: 'Máximo de 4 ensaios permitidos.', variant: 'destructive' });
         return prev;
       }
       return { ...prev, ensaios: [...prev.ensaios, getEnsaioInicial(prev.ensaios.length + 1)] };

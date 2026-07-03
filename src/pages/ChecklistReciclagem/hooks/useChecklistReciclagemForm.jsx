@@ -5,6 +5,7 @@ import { buildDataToSave, validateForm } from "../utils/checklistReciclagemMappe
 import { todayISO } from "@/utils/formInitialData";
 import { criarChecklist, atualizarChecklist } from "@/services/checklistsService";
 import { uploadImagem } from "@/services/uploadService";
+import { toast } from "@/components/ui/use-toast";
 
 const getInitialFormData = () => ({
   obra_id: "",
@@ -104,8 +105,8 @@ export function useChecklistReciclagemForm() {
 
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     for (const file of files) {
-      if (!allowedTypes.includes(file.type)) { alert(`Tipo não suportado: ${file.type}`); e.target.value = ''; return; }
-      if (file.size > 10 * 1024 * 1024) { alert(`Arquivo muito grande: ${(file.size / 1024 / 1024).toFixed(2)}MB`); e.target.value = ''; return; }
+      if (!allowedTypes.includes(file.type)) { toast({ title: `Tipo não suportado: ${file.type}`, variant: "destructive" }); e.target.value = ''; return; }
+      if (file.size > 10 * 1024 * 1024) { toast({ title: `Arquivo muito grande: ${(file.size / 1024 / 1024).toFixed(2)}MB`, variant: "destructive" }); e.target.value = ''; return; }
     }
 
     setUploadingPhotos(true);
@@ -127,7 +128,7 @@ export function useChecklistReciclagemForm() {
   const handleSubmit = async (e, saveStatus = 'finalizado') => {
     e.preventDefault();
     const error = validateForm(formData, saveStatus);
-    if (error) { alert(error); return; }
+    if (error) { toast({ title: error, variant: "destructive" }); return; }
 
     setSaving(true);
     try {
@@ -142,15 +143,15 @@ export function useChecklistReciclagemForm() {
           msg = "Checklist atualizado com sucesso! O registro voltará para análise do administrador.";
         }
         await atualizarChecklist('ChecklistReciclagem', editingChecklist.id, updateData);
-        alert(msg);
+        toast({ title: msg });
       } else {
         await criarChecklist('ChecklistReciclagem', dataToSave);
-        alert(saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!");
+        toast({ title: saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!" });
       }
       clearSavedData();
       navigate(createPageUrl("MeusEnsaios"));
     } catch (error) {
-      alert(`Erro ao salvar checklist: ${error.message}`);
+      toast({ title: `Erro ao salvar checklist: ${error.message}`, variant: "destructive" });
     } finally {
       setSaving(false);
     }

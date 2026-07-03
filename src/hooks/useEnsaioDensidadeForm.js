@@ -5,6 +5,7 @@
 import { useState, useCallback } from "react";
 import { uploadArquivo } from "@/services/uploadService";
 import { calcularFuroComProctor, getFuroInicial } from "@/utils/ensaioDensidadeUtils";
+import { toast } from "@/components/ui/use-toast";
 
 export function useEnsaioDensidadeForm(formData, setFormData) {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
@@ -64,7 +65,7 @@ export function useEnsaioDensidadeForm(formData, setFormData) {
   const adicionarFuro = useCallback(() => {
     setFormData(prev => {
       if (prev.furos.length >= 5) {
-        alert("Máximo de 5 furos permitidos.");
+        toast({ title: "Máximo de 5 furos permitidos.", variant: "destructive" });
         return prev;
       }
       return { ...prev, furos: [...prev.furos, getFuroInicial(prev.furos.length + 1)] };
@@ -100,7 +101,7 @@ export function useEnsaioDensidadeForm(formData, setFormData) {
       e.target.value = '';
     } catch (error) {
       console.error("Erro ao fazer upload da foto:", error);
-      alert("Erro ao fazer upload da foto.");
+      toast({ title: "Erro ao fazer upload da foto.", variant: "destructive" });
     } finally {
       setUploadingPhoto(false);
     }
