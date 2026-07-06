@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useCallback } from "react";
 import { useReportMode } from "@/hooks/useReportMode";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
 import { obterUsuarioAtual } from '@/services/usuariosService';
 import { listarEnsaios } from '@/services/ensaiosService';
@@ -89,7 +89,14 @@ export default function RelatorioEnsaio() {
   };
 
   if (state.loading) {
-    return <div className="p-8 text-center">Carregando relatório...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin mx-auto text-blue-600" />
+          <p className="mt-4 text-slate-700">Carregando relatório...</p>
+        </div>
+      </div>
+    );
   }
 
   if (state.error) {
