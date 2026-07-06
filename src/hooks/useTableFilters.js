@@ -2,6 +2,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { getDataEnsaio } from '@/components/ensaios/ensaioMappers';
 import { getLocalInfo, getLaboratoristaInfo, getEmpireiteiraInfo } from '@/components/ensaios/utils';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
 export function useTableFilters(ensaios, obras, projects, allUsers, applyCustomFilters = null) {
   const [nomeFilter, setNomeFilter] = useState('');
@@ -9,6 +10,13 @@ export function useTableFilters(ensaios, obras, projects, allUsers, applyCustomF
   const [projetoFilter, setProjetoFilter] = useState('');
   const [localFilter, setLocalFilter] = useState('');
   const [empreiteiraFilter, setEmpreiteiraFilter] = useState('');
+
+  // Debounce dos filtros de texto para evitar recálculo a cada tecla
+  const nomeFilterDebounced = useDebouncedValue(nomeFilter, 250);
+  const obraFilterDebounced = useDebouncedValue(obraFilter, 250);
+  const projetoFilterDebounced = useDebouncedValue(projetoFilter, 250);
+  const localFilterDebounced = useDebouncedValue(localFilter, 250);
+  const empreiteiraFilterDebounced = useDebouncedValue(empreiteiraFilter, 250);
   const [dataInicioFilter, setDataInicioFilter] = useState('');
   const [dataFimFilter, setDataFimFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -28,21 +36,21 @@ export function useTableFilters(ensaios, obras, projects, allUsers, applyCustomF
   const filteredEnsaios = useMemo(() => {
     let filtered = ensaios;
     
-    if (nomeFilter) filtered = filtered.filter((e) => getLaboratoristaInfo(e, allUsers).toLowerCase().includes(nomeFilter.toLowerCase()));
-    if (obraFilter) filtered = filtered.filter((e) => {
+    if (nomeFilterDebounced) filtered = filtered.filter((e) => getLaboratoristaInfo(e, allUsers).toLowerCase().includes(nomeFilterDebounced.toLowerCase()));
+    if (obraFilterDebounced) filtered = filtered.filter((e) => {
       const o = obrasMap.get(e.obra_id);
-      return o?.name?.toLowerCase().includes(obraFilter.toLowerCase()) || o?.code?.toLowerCase().includes(obraFilter.toLowerCase());
+      return o?.name?.toLowerCase().includes(obraFilterDebounced.toLowerCase()) || o?.code?.toLowerCase().includes(obraFilterDebounced.toLowerCase());
     });
-    if (projetoFilter) filtered = filtered.filter((e) => {
+    if (projetoFilterDebounced) filtered = filtered.filter((e) => {
       if (!e.project_id) return false;
       const p = projectsMap.get(e.project_id);
-      return p?.name?.toLowerCase().includes(projetoFilter.toLowerCase());
+      return p?.name?.toLowerCase().includes(projetoFilterDebounced.toLowerCase());
     });
-    if (localFilter) filtered = filtered.filter((e) => {
+    if (localFilterDebounced) filtered = filtered.filter((e) => {
       const li = getLocalInfo(e);
-      return li.tipo?.toLowerCase().includes(localFilter.toLowerCase()) || li.detalhes?.toLowerCase().includes(localFilter.toLowerCase());
+      return li.tipo?.toLowerCase().includes(localFilterDebounced.toLowerCase()) || li.detalhes?.toLowerCase().includes(localFilterDebounced.toLowerCase());
     });
-    if (empreiteiraFilter) filtered = filtered.filter((e) => getEmpireiteiraInfo(e)?.toLowerCase().includes(empreiteiraFilter.toLowerCase()) ?? false);
+    if (empreiteiraFilterDebounced) filtered = filtered.filter((e) => getEmpireiteiraInfo(e)?.toLowerCase().includes(empreiteiraFilterDebounced.toLowerCase()) ?? false);
     
     if (dataInicioFilter) {
       const d = new Date(dataInicioFilter);
@@ -81,7 +89,7 @@ export function useTableFilters(ensaios, obras, projects, allUsers, applyCustomF
     }
     
     return filtered;
-  }, [ensaios, nomeFilter, obraFilter, projetoFilter, localFilter, empreiteiraFilter, dataInicioFilter, dataFimFilter, typeFilter, obrasMap, projectsMap, sortOrder, allUsers, applyCustomFilters]);
+  }, [ensaios, nomeFilterDebounced, obraFilterDebounced, projetoFilterDebounced, localFilterDebounced, empreiteiraFilterDebounced, dataInicioFilter, dataFimFilter, typeFilter, obrasMap, projectsMap, sortOrder, allUsers, applyCustomFilters]);
 
   const clearFilters = useCallback(() => {
     setNomeFilter('');
