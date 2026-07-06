@@ -16,7 +16,7 @@ export default function RecordsByObraChart({ data, activeObraId, onSliceClick })
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4" style={{ maxHeight: '100%', overflowY: 'auto', '@media (max-width: 1024px)': { maxHeight: '400px', overflowY: 'auto' } }} className="space-y-4 sm:max-h-96 sm:overflow-y-auto">
+        <div className="space-y-4 sm:max-h-96 sm:overflow-y-auto" style={{ maxHeight: '100%', overflowY: 'auto' }}>
           {data.map((entry, index) => {
             const isActive = !activeObraId || entry.obraId === activeObraId;
             const barWidth = (entry.value / maxValue) * 100;
