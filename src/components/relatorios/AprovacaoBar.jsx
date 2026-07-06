@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { base44 } from "@/api/base44Client";
+import { obterRegistro, atualizarRegistro } from "@/services/recordsService";
 import { toast } from "@/components/ui/use-toast";
 
 // Props:
@@ -33,7 +34,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
     if (!entityName || !recordId) return;
     const loadRecord = async () => {
       try {
-        const data = await base44.entities[entityName].get(recordId);
+        const data = await obterRegistro(entityName, recordId);
         setRecord(data);
       } catch (err) {
         console.error('AprovacaoBar: erro ao carregar registro', err);
@@ -63,7 +64,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
         position: user.position || 'Responsável',
         crea_number: user.crea_number || ''
       };
-      await base44.entities[entityName].update(recordId, {
+      await atualizarRegistro(entityName, recordId, {
         approved: true,
         approved_by: user.email,
         approved_date: new Date().toISOString(),
@@ -87,7 +88,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
     }
     setSaving(true);
     try {
-      await base44.entities[entityName].update(recordId, {
+      await atualizarRegistro(entityName, recordId, {
         approved: false,
         approved_by: user.email,
         approved_date: new Date().toISOString(),
