@@ -1,53 +1,12 @@
-import React, { useMemo } from "react";
+import React from "react";
 import {
-  ComposedChart, Scatter, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import {
-  fmtN, calcUmidade, calcLLRow, fitLogLine, calcIG, classificarHRB,
+  fmtN, calcularLimites,
 } from "@/utils/relatorioLimitesUtils";
 import LimitesHeader from "@/components/relatorio-limites/LimitesHeader";
 import LimitesInfoFields from "@/components/relatorio-limites/LimitesInfoFields";
 import LimitesResumo from "@/components/relatorio-limites/LimitesResumo";
 import LimitesAssinaturas from "@/components/relatorio-limites/LimitesAssinaturas";
-
-const PENEIRAS_GROSSAS = [
-  { label: '3"', mm: 76.2 }, { label: '2"', mm: 50.8 }, { label: '1"', mm: 25.4 },
-  { label: '3/8"', mm: 9.52 }, { label: '4°', mm: 4.76 }, { label: '10°', mm: 2.0 },
-];
-const PENEIRAS_FINAS = [{ label: '40', mm: 0.42 }, { label: '200', mm: 0.075 }];
-
-/* ─── Gráfico LL ─── */
-function LLChart({ llPoints, llFit, llYAxisDomain }) {
-  if (llPoints.length < 2) return (
-    <div className="text-[7px] text-gray-400 flex items-center justify-center h-full">Insuficiente</div>
-  );
-  const xs = llPoints.map(p => p.x);
-  const minX = Math.max(1, Math.min(...xs) - 2), maxX = Math.max(...xs) + 2;
-  const curveData = [
-    { x: minX, y: parseFloat((llFit.a * minX + llFit.b).toFixed(2)) },
-    { x: maxX, y: parseFloat((llFit.a * maxX + llFit.b).toFixed(2)) },
-  ];
-  return (
-    <ResponsiveContainer width="100%" height="100%">
-      <ComposedChart margin={{ top: 6, right: 6, left: 6, bottom: 16 }}>
-        <CartesianGrid strokeDasharray="2 2" stroke="#ccc" />
-        <XAxis dataKey="x" type="number"
-          label={{ value: 'Nº Golpes', position: 'insideBottom', offset: -10, fontSize: 7 }}
-          tick={{ fontSize: 7 }} />
-        <YAxis dataKey="y" type="number" domain={llYAxisDomain}
-          label={{ value: '% Água', angle: -90, position: 'insideLeft', offset: 10, fontSize: 7 }}
-          tick={{ fontSize: 7 }} width={36} tickCount={6} />
-        <Tooltip formatter={(v) => `${Number(v).toFixed(2)}%`} />
-        <Line data={curveData} dataKey="y" type="monotone" stroke="#1e3a5f" strokeWidth={1.5} dot={false} isAnimationActive={false} />
-        <Line data={[{ x: 25, y: 0 }, { x: 25, y: llFit.ll }]} dataKey="y" type="monotone" stroke="red" strokeDasharray="3 2" strokeWidth={1} dot={false} name="LL ref" />
-        <Line data={[{ x: 0, y: llFit.ll }, { x: 25, y: llFit.ll }]} dataKey="y" type="monotone" stroke="red" strokeDasharray="3 2" strokeWidth={1} dot={false} isAnimationActive={false}
-          label={{ value: `LL=${llFit.ll}%`, fill: 'red', fontSize: 7, position: 'top' }} />
-        <Scatter data={llPoints} dataKey="y" fill="#6b8f3e" stroke="#1e3a5f" r={4} isAnimationActive={false} />
-      </ComposedChart>
-    </ResponsiveContainer>
-  );
-}
+import LLChart from "@/components/relatorio-limites/LLChart";
 
 /* ─── Tabela genérica com colunas dinâmicas (LL / LP) ─── */
 const FIELD_ROWS = [
@@ -65,102 +24,15 @@ const tdCalc = "border border-slate-400 px-1 py-0.5 text-center text-[8px] bg-gr
 export default function RelatorioLimites({ limites, ensaio, obra, regional }) {
   const lim = limites || {};
 
-  /* Umidade higroscópica */
-  const higroT1 = calcUmidade(lim.higro_solo_umido_capsula_1, lim.higro_solo_seco_capsula_1, lim.higro_peso_capsula_1);
-  const higroT2 = calcUmidade(lim.higro_solo_umido_capsula_2, lim.higro_solo_seco_capsula_2, lim.higro_peso_capsula_2);
-  const higroMedia = useMemo(() => {
-    const valid = [higroT1, higroT2].filter(v => v != null);
-    return valid.length > 0 ? parseFloat((valid.reduce((s, v) => s + v, 0) / valid.length).toFixed(2)) : null;
-  }, [higroT1, higroT2]);
-
-  /* Peneiramento grosso */
-  const penGrossas = lim.peneiras_grossas || PENEIRAS_GROSSAS.map(p => ({ ...p, retido: "" }));
-  const retidosGrossos = penGrossas.map(p => parseFloat(p.retido) || 0);
-  const totalSeca = parseFloat(lim.amostra_total_seca) || null;
-  const granGrossaCalc = useMemo(() => {
-    if (!totalSeca || totalSeca <= 0) return [];
-    let acum = totalSeca;
-    return retidosGrossos.map(ret => {
-      const passando = parseFloat((acum - ret).toFixed(3));
-      const pct = parseFloat((passando / totalSeca * 100).toFixed(1));
-      acum = passando;
-      return { retido: ret, passando, passPct: pct };
-    });
-  }, [retidosGrossos, totalSeca]);
-
-  /* SP10 */
-  const soloSecoRetido10 = useMemo(() => {
-    const t = retidosGrossos.reduce((s, r) => s + r, 0);
-    return t > 0 ? parseFloat(t.toFixed(3)) : null;
-  }, [retidosGrossos]);
-
-  const soloUmPassando10 = useMemo(() => {
-    const ut = parseFloat(lim.amostra_total_umida);
-    if (isNaN(ut) || !retidosGrossos.length) return null;
-    const r = parseFloat((ut - retidosGrossos.reduce((s, x) => s + x, 0)).toFixed(3));
-    return r > 0 ? r : null;
-  }, [lim.amostra_total_umida, retidosGrossos]);
-
-  const sp10 = useMemo(() => {
-    if (soloUmPassando10 == null || higroMedia == null) return null;
-    return parseFloat((soloUmPassando10 / (higroMedia / 100 + 1)).toFixed(3));
-  }, [soloUmPassando10, higroMedia]);
-
-  const amostraTotalSecaCalc = useMemo(() => {
-    if (soloSecoRetido10 == null || sp10 == null) return null;
-    return parseFloat((soloSecoRetido10 + sp10).toFixed(3));
-  }, [soloSecoRetido10, sp10]);
-
-  /* Peneiramento fino */
-  const penFinas = lim.peneiras_finas || PENEIRAS_FINAS.map(p => ({ ...p, retido: "" }));
-  const amostParcSeca = parseFloat(lim.amostra_parcial_seca) || null;
-  const granFinaCalc = useMemo(() => {
-    if (!amostParcSeca || amostParcSeca <= 0) return [];
-    let acum = amostParcSeca;
-    return penFinas.map(pen => {
-      const ret = parseFloat(pen.retido) || 0;
-      const passando = parseFloat((acum - ret).toFixed(3));
-      const pct = parseFloat((passando / amostParcSeca * 100).toFixed(1));
-      acum = passando;
-      return { retido: ret, passando, passPct: pct };
-    });
-  }, [penFinas, amostParcSeca]);
-
-  /* LL */
-  const llRows = lim.ll_rows || [];
-  const llCalc = useMemo(() => llRows.map(calcLLRow), [llRows]);
-  const llPoints = useMemo(() =>
-    llRows.map((r, i) => ({ x: parseFloat(r.num_golpes), y: llCalc[i].teor }))
-      .filter(p => p.x > 0 && p.y != null),
-    [llRows, llCalc]);
-  const llYAxisDomain = useMemo(() => {
-    if (llPoints.length === 0) return ['auto', 'auto'];
-    const yValues = llPoints.map(p => p.y).filter(y => y != null);
-    return [parseFloat((Math.min(...yValues) - 5).toFixed(2)), parseFloat((Math.max(...yValues) + 5).toFixed(2))];
-  }, [llPoints]);
-  const llFit = useMemo(() => fitLogLine(llPoints), [llPoints]);
-
-  /* LP */
-  const lpRows = lim.lp_rows || [];
-  const lpTeors = useMemo(() => lpRows.map(r => calcUmidade(r.solo_umido_capsula, r.solo_seco_capsula, r.peso_capsula)), [lpRows]);
-  const lpMedia = useMemo(() => {
-    const valid = lpTeors.filter(v => v != null);
-    return valid.length > 0 ? parseFloat((valid.reduce((s, v) => s + v, 0) / valid.length).toFixed(1)) : null;
-  }, [lpTeors]);
-
-  /* IP, IG, HRB */
-  const IP = llFit?.ll != null && lpMedia != null ? parseFloat((llFit.ll - lpMedia).toFixed(1)) : null;
-  const pct200 = useMemo(() => {
-    if (!granFinaCalc.length || !totalSeca || sp10 == null || !amostParcSeca) return null;
-    const passando200 = granFinaCalc[granFinaCalc.length - 1]?.passando || 0;
-    return parseFloat(((passando200 / amostParcSeca) * (sp10 / totalSeca) * 100).toFixed(1));
-  }, [granFinaCalc, totalSeca, sp10, amostParcSeca]);
-  const pct10 = granGrossaCalc[5]?.passando != null && totalSeca
-    ? parseFloat((granGrossaCalc[5].passando / totalSeca * 100).toFixed(1)) : null;
-  const pct40 = granFinaCalc[0]?.passando != null && totalSeca && sp10 && amostParcSeca
-    ? parseFloat(((granFinaCalc[0].passando / amostParcSeca) * (sp10 / totalSeca) * 100).toFixed(1)) : null;
-  const igCalc = calcIG(pct200, llFit?.ll, IP);
-  const hrb = classificarHRB(pct10, pct40, pct200, llFit?.ll ?? null, IP, igCalc);
+  const {
+    higroT1, higroT2, higroMedia,
+    penGrossas, granGrossaCalc, totalSeca,
+    soloSecoRetido10, soloUmPassando10, sp10, amostraTotalSecaCalc,
+    penFinas, granFinaCalc, amostParcSeca,
+    llRows, llCalc, llPoints, llYAxisDomain, llFit,
+    lpRows, lpTeors, lpMedia,
+    IP, pct200, pct10, pct40, igCalc, hrb,
+  } = calcularLimites(lim);
 
   if (!limites) return null;
 

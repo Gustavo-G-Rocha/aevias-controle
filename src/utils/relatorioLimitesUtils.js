@@ -77,6 +77,129 @@ export function classificarHRB(F10, F40, F200, ll, ip, ig) {
   return "-";
 }
 
+export const PENEIRAS_GROSSAS = [
+  { label: '3"', mm: 76.2 }, { label: '2"', mm: 50.8 }, { label: '1"', mm: 25.4 },
+  { label: '3/8"', mm: 9.52 }, { label: '4°', mm: 4.76 }, { label: '10°', mm: 2.0 },
+];
+export const PENEIRAS_FINAS = [{ label: '40', mm: 0.42 }, { label: '200', mm: 0.075 }];
+
+/**
+ * Calcula todos os valores derivados do relatório de Limites de Consistência.
+ * Função pura — sem dependências React.
+ * @param {Object} lim - Dados brutos do ensaio
+ * @returns {Object} Todos os valores calculados
+ */
+export function calcularLimites(lim) {
+  const d = lim || {};
+
+  /* Umidade higroscópica */
+  const higroT1 = calcUmidade(d.higro_solo_umido_capsula_1, d.higro_solo_seco_capsula_1, d.higro_peso_capsula_1);
+  const higroT2 = calcUmidade(d.higro_solo_umido_capsula_2, d.higro_solo_seco_capsula_2, d.higro_peso_capsula_2);
+  const validHigro = [higroT1, higroT2].filter(v => v != null);
+  const higroMedia = validHigro.length > 0 ? parseFloat((validHigro.reduce((s, v) => s + v, 0) / validHigro.length).toFixed(2)) : null;
+
+  /* Peneiramento grosso */
+  const penGrossas = d.peneiras_grossas || PENEIRAS_GROSSAS.map(p => ({ ...p, retido: "" }));
+  const retidosGrossos = penGrossas.map(p => parseFloat(p.retido) || 0);
+  const totalSeca = parseFloat(d.amostra_total_seca) || null;
+
+  let granGrossaCalc = [];
+  if (totalSeca && totalSeca > 0) {
+    let acum = totalSeca;
+    granGrossaCalc = retidosGrossos.map(ret => {
+      const passando = parseFloat((acum - ret).toFixed(3));
+      const pct = parseFloat((passando / totalSeca * 100).toFixed(1));
+      acum = passando;
+      return { retido: ret, passando, passPct: pct };
+    });
+  }
+
+  /* SP10 */
+  const soloSecoRetido10 = (() => {
+    const t = retidosGrossos.reduce((s, r) => s + r, 0);
+    return t > 0 ? parseFloat(t.toFixed(3)) : null;
+  })();
+
+  const soloUmPassando10 = (() => {
+    const ut = parseFloat(d.amostra_total_umida);
+    if (isNaN(ut) || !retidosGrossos.length) return null;
+    const r = parseFloat((ut - retidosGrossos.reduce((s, x) => s + x, 0)).toFixed(3));
+    return r > 0 ? r : null;
+  })();
+
+  const sp10 = (soloUmPassando10 != null && higroMedia != null)
+    ? parseFloat((soloUmPassando10 / (higroMedia / 100 + 1)).toFixed(3))
+    : null;
+
+  const amostraTotalSecaCalc = (soloSecoRetido10 != null && sp10 != null)
+    ? parseFloat((soloSecoRetido10 + sp10).toFixed(3))
+    : null;
+
+  /* Peneiramento fino */
+  const penFinas = d.peneiras_finas || PENEIRAS_FINAS.map(p => ({ ...p, retido: "" }));
+  const amostParcSeca = parseFloat(d.amostra_parcial_seca) || null;
+
+  let granFinaCalc = [];
+  if (amostParcSeca && amostParcSeca > 0) {
+    let acum = amostParcSeca;
+    granFinaCalc = penFinas.map(pen => {
+      const ret = parseFloat(pen.retido) || 0;
+      const passando = parseFloat((acum - ret).toFixed(3));
+      const pct = parseFloat((passando / amostParcSeca * 100).toFixed(1));
+      acum = passando;
+      return { retido: ret, passando, passPct: pct };
+    });
+  }
+
+  /* LL */
+  const llRows = d.ll_rows || [];
+  const llCalc = llRows.map(calcLLRow);
+  const llPoints = llRows.map((r, i) => ({ x: parseFloat(r.num_golpes), y: llCalc[i].teor }))
+    .filter(p => p.x > 0 && p.y != null);
+
+  let llYAxisDomain = ['auto', 'auto'];
+  if (llPoints.length > 0) {
+    const yValues = llPoints.map(p => p.y).filter(y => y != null);
+    llYAxisDomain = [parseFloat((Math.min(...yValues) - 5).toFixed(2)), parseFloat((Math.max(...yValues) + 5).toFixed(2))];
+  }
+
+  const llFit = fitLogLine(llPoints);
+
+  /* LP */
+  const lpRows = d.lp_rows || [];
+  const lpTeors = lpRows.map(r => calcUmidade(r.solo_umido_capsula, r.solo_seco_capsula, r.peso_capsula));
+  const validLp = lpTeors.filter(v => v != null);
+  const lpMedia = validLp.length > 0 ? parseFloat((validLp.reduce((s, v) => s + v, 0) / validLp.length).toFixed(1)) : null;
+
+  /* IP, IG, HRB */
+  const IP = llFit?.ll != null && lpMedia != null ? parseFloat((llFit.ll - lpMedia).toFixed(1)) : null;
+
+  let pct200 = null;
+  if (granFinaCalc.length && totalSeca && sp10 != null && amostParcSeca) {
+    const passando200 = granFinaCalc[granFinaCalc.length - 1]?.passando || 0;
+    pct200 = parseFloat(((passando200 / amostParcSeca) * (sp10 / totalSeca) * 100).toFixed(1));
+  }
+
+  const pct10 = granGrossaCalc[5]?.passando != null && totalSeca
+    ? parseFloat((granGrossaCalc[5].passando / totalSeca * 100).toFixed(1)) : null;
+
+  const pct40 = granFinaCalc[0]?.passando != null && totalSeca && sp10 && amostParcSeca
+    ? parseFloat(((granFinaCalc[0].passando / amostParcSeca) * (sp10 / totalSeca) * 100).toFixed(1)) : null;
+
+  const igCalc = calcIG(pct200, llFit?.ll, IP);
+  const hrb = classificarHRB(pct10, pct40, pct200, llFit?.ll ?? null, IP, igCalc);
+
+  return {
+    higroT1, higroT2, higroMedia,
+    penGrossas, granGrossaCalc, totalSeca, retidosGrossos,
+    soloSecoRetido10, soloUmPassando10, sp10, amostraTotalSecaCalc,
+    penFinas, granFinaCalc, amostParcSeca,
+    llRows, llCalc, llPoints, llYAxisDomain, llFit,
+    lpRows, lpTeors, lpMedia,
+    IP, pct200, pct10, pct40, igCalc, hrb,
+  };
+}
+
 /** Formata data ISO (YYYY-MM-DD) para pt-BR. */
 export const fmtDate = (d) =>
   d ? new Date(d + (d.length === 10 ? 'T00:00:00' : '')).toLocaleDateString('pt-BR') : '-';
