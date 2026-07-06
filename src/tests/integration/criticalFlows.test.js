@@ -56,7 +56,7 @@ const { store, makeEntityApi, ENTITY_NAMES } = vi.hoisted(() => {
         store[name][id] = updated;
         return updated;
       }),
-      read: vi.fn(async (id) => {
+      get: vi.fn(async (id) => {
         const r = store[name][id];
         if (!r) throw new Error(`${name} não encontrado: ${id}`);
         return r;

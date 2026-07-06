@@ -27,7 +27,7 @@ export async function listarObrasAtivas() {
 
 export async function obterObraById(id) {
   return withServiceCall(
-    () => base44.entities.Obra.read(id),
+    () => base44.entities.Obra.get(id),
     'Falha ao carregar obra'
   );
 }

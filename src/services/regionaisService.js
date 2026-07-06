@@ -20,7 +20,7 @@ export async function listarRegionaisAtivas() {
 
 export async function obterRegionalById(id) {
   return withServiceCall(
-    () => base44.entities.Regional.read(id),
+    () => base44.entities.Regional.get(id),
     'Falha ao carregar regional'
   );
 }

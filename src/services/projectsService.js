@@ -27,7 +27,7 @@ export async function listarProjectsAtivos() {
 
 export async function obterProjectById(id) {
   return withServiceCall(
-    () => base44.entities.Project.read(id),
+    () => base44.entities.Project.get(id),
     'Falha ao carregar projeto'
   );
 }

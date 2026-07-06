@@ -13,7 +13,7 @@ const { entities } = vi.hoisted(() => {
     filter: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
-    read: vi.fn(),
+    get: vi.fn(),
     delete: vi.fn(),
     schema: vi.fn(),
   });
@@ -64,7 +64,7 @@ beforeEach(() => {
     entities[n].filter.mockResolvedValue([]);
     entities[n].create.mockResolvedValue({ id: 'new' });
     entities[n].update.mockResolvedValue({ ok: true });
-    entities[n].read.mockResolvedValue({ id: 'r' });
+    entities[n].get.mockResolvedValue({ id: 'r' });
     entities[n].delete.mockResolvedValue({ ok: true });
     entities[n].schema.mockResolvedValue({});
   }
@@ -91,9 +91,9 @@ describe('ensaiosService — CRUD e validação de entidade', () => {
     expect(entities.EnsaioMRAF.filter).toHaveBeenCalledWith({ obra_id: 'O1' }, '-created_date', 500);
   });
 
-  it('obterEnsaioById delega read', async () => {
+  it('obterEnsaioById delega get', async () => {
     await obterEnsaioById('EnsaioCAUQ', 'e1');
-    expect(entities.EnsaioCAUQ.read).toHaveBeenCalledWith('e1');
+    expect(entities.EnsaioCAUQ.get).toHaveBeenCalledWith('e1');
   });
 
   it('criarEnsaio delega create', async () => {

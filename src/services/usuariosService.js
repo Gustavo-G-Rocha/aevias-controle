@@ -20,7 +20,7 @@ export async function listarUsuarios() {
 
 export async function obterUsuarioById(id) {
   return withServiceCall(
-    () => base44.entities.User.read(id),
+    () => base44.entities.User.get(id),
     'Falha ao carregar usuário'
   );
 }

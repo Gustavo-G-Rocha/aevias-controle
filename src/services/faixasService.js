@@ -27,7 +27,7 @@ export async function listarFaixasAtivas() {
 
 export async function obterFaixaById(id) {
   return withServiceCall(
-    () => base44.entities.FaixaGranulometrica.read(id),
+    () => base44.entities.FaixaGranulometrica.get(id),
     'Falha ao carregar faixa granulométrica'
   );
 }

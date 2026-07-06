@@ -20,7 +20,7 @@ export async function listarDiariosPorObra(obraId) {
 
 export async function obterDiarioById(id) {
   return withServiceCall(
-    () => base44.entities.DiarioObra.read(id),
+    () => base44.entities.DiarioObra.get(id),
     'Falha ao carregar diário'
   );
 }

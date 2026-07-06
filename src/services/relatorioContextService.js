@@ -98,5 +98,5 @@ export async function carregarContextoRelatorio(record) {
  * Usado por hooks de relatório para entidades sem service dedicado.
  */
 export async function obterRegistroPorEntidade(entityName, id) {
-  return base44.entities[entityName].read(id);
+  return base44.entities[entityName].get(id);
 }

@@ -27,7 +27,7 @@ export async function listarProdutividadePorLaboratorista(laboratoristaName) {
 
 export async function obterProdutividadeById(id) {
   return withServiceCall(
-    () => base44.entities.ProdutividadeDiaria.read(id),
+    () => base44.entities.ProdutividadeDiaria.get(id),
     'Falha ao carregar produtividade'
   );
 }

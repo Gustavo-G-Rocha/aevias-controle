@@ -39,7 +39,7 @@ export async function obterChecklistById(entityName, id) {
     throw new Error(`Entidade checklist desconhecida: ${entityName}`);
   }
   return withServiceCall(
-    () => base44.entities[entityName].read(id),
+    () => base44.entities[entityName].get(id),
     'Falha ao carregar checklist'
   );
 }

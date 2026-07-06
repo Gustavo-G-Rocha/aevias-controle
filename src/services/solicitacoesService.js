@@ -35,14 +35,14 @@ export async function listarSolicitacoesTransferenciaRegionalPorStatus(status) {
 
 export async function obterSolicitacaoTransferenciaObraById(id) {
   return withServiceCall(
-    () => base44.entities.SolicitacaoTransferenciaObra.read(id),
+    () => base44.entities.SolicitacaoTransferenciaObra.get(id),
     'Falha ao carregar solicitação de transferência'
   );
 }
 
 export async function obterSolicitacaoTransferenciaRegionalById(id) {
   return withServiceCall(
-    () => base44.entities.SolicitacaoTransferenciaRegional.read(id),
+    () => base44.entities.SolicitacaoTransferenciaRegional.get(id),
     'Falha ao carregar solicitação de transferência'
   );
 }

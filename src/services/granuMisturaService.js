@@ -20,7 +20,7 @@ export async function listarGranuMisturaPorObra(obraId) {
 
 export async function obterGranuMisturaById(id) {
   return withServiceCall(
-    () => base44.entities.GranuMistura.read(id),
+    () => base44.entities.GranuMistura.get(id),
     'Falha ao carregar ensaio de granulometria'
   );
 }

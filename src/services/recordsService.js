@@ -266,7 +266,7 @@ export async function atualizarRegistro(entityName, id, data) {
  */
 export async function obterRegistro(entityName, id) {
   return withServiceCall(
-    () => base44.entities[entityName].read(id),
+    () => base44.entities[entityName].get(id),
     'Falha ao carregar registro'
   );
 }

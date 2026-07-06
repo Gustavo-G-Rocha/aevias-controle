@@ -13,7 +13,7 @@ const { entities } = vi.hoisted(() => {
     filter: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
-    read: vi.fn(),
+    get: vi.fn(),
     delete: vi.fn(),
     schema: vi.fn(),
   });
@@ -60,7 +60,7 @@ beforeEach(() => {
     entities[n].filter.mockResolvedValue([]);
     entities[n].create.mockResolvedValue({ id: 'created' });
     entities[n].update.mockResolvedValue({ ok: true });
-    entities[n].read.mockResolvedValue({ id: 'read' });
+    entities[n].get.mockResolvedValue({ id: 'read' });
     entities[n].delete.mockResolvedValue({ ok: true });
     entities[n].schema.mockResolvedValue({});
   }
@@ -216,9 +216,9 @@ describe('recordsService — subconjuntos e CRUD genérico', () => {
     expect(entities.DiarioObra.update).toHaveBeenCalledWith('id1', { x: 1 });
   });
 
-  it('obterRegistro delega read', async () => {
+  it('obterRegistro delega get', async () => {
     await obterRegistro('DiarioObra', 'id1');
-    expect(entities.DiarioObra.read).toHaveBeenCalledWith('id1');
+    expect(entities.DiarioObra.get).toHaveBeenCalledWith('id1');
   });
 
   it('deletarRegistro delega delete', async () => {
