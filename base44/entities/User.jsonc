@@ -4,23 +4,23 @@
   "properties": {
     "nickname": {
       "type": "string",
-      "description": "Apelido do usu\u00e1rio (exibido no Dashboard)"
+      "description": "Apelido do usuário (exibido no Dashboard)"
     },
     "company": {
       "type": "string",
-      "description": "Empresa do usu\u00e1rio"
+      "description": "Empresa do usuário"
     },
     "phone": {
       "type": "string",
-      "description": "Telefone do usu\u00e1rio"
+      "description": "Telefone do usuário"
     },
     "position": {
       "type": "string",
-      "description": "Cargo do usu\u00e1rio"
+      "description": "Cargo do usuário"
     },
     "crea_number": {
       "type": "string",
-      "description": "N\u00famero do CREA"
+      "description": "Número do CREA"
     },
     "laboratorista_name": {
       "type": "string",
@@ -29,7 +29,7 @@
     "is_active": {
       "type": "boolean",
       "default": true,
-      "description": "Se o usu\u00e1rio est\u00e1 ativo"
+      "description": "Se o usuário está ativo"
     },
     "access_level": {
       "type": "string",
@@ -41,12 +41,12 @@
         "cliente"
       ],
       "default": "user",
-      "description": "N\u00edvel de acesso funcional do usu\u00e1rio"
+      "description": "Nível de acesso funcional do usuário"
     },
     "last_login": {
       "type": "string",
       "format": "date-time",
-      "description": "Data e hora do \u00faltimo login do usu\u00e1rio"
+      "description": "Data e hora do último login do usuário"
     }
   },
   "required": [

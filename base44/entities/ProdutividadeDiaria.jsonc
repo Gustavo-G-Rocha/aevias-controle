@@ -24,5 +24,74 @@
     "laboratorista_email",
     "data",
     "status"
-  ]
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "gestor_contrato"
+          }
+        },
+        {
+          "data.laboratorista_email": "{{user.email}}"
+        }
+      ]
+    },
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "data.laboratorista_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "gestor_contrato"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.laboratorista_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "gestor_contrato"
+          }
+        }
+      ]
+    }
+  }
 }

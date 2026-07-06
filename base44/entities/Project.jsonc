@@ -184,7 +184,7 @@
     },
     "relacao_filer_betume": {
       "type": "number",
-      "description": "Rela\u00e7\u00e3o F\u00edler/Betume de projeto (%)"
+      "description": "Relação Fíler/Betume de projeto (%)"
     },
     "volume_vazios": {
       "type": "object",
@@ -287,7 +287,7 @@
     },
     "umidade_otima": {
       "type": "number",
-      "description": "Umidade \u00f3tima (%) - BGS e Camadas Granulares"
+      "description": "Umidade ótima (%) - BGS e Camadas Granulares"
     },
     "densidade_otima": {
       "type": "number"
@@ -297,7 +297,7 @@
     },
     "densidade_seca_max": {
       "type": "number",
-      "description": "Densidade seca m\u00e1xima (g/cm\u00b3) - apenas BGS"
+      "description": "Densidade seca máxima (g/cm³) - apenas BGS"
     },
     "faixa_trabalho_bgs": {
       "type": "object",

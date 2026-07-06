@@ -21,7 +21,7 @@
     },
     "trecho": {
       "type": "string",
-      "description": "Descri\u00e7\u00e3o do trecho"
+      "description": "Descrição do trecho"
     },
     "pedreira": {
       "type": "string",
@@ -29,11 +29,11 @@
     },
     "numero_projeto": {
       "type": "string",
-      "description": "N\u00famero do projeto"
+      "description": "Número do projeto"
     },
     "faixa_especificada": {
       "type": "string",
-      "description": "Faixa granulom\u00e9trica especificada"
+      "description": "Faixa granulométrica especificada"
     },
     "rodovia": {
       "type": "string",
@@ -52,7 +52,7 @@
         "number",
         "null"
       ],
-      "description": "Temperatura do ligante (CAP) em \u00b0C"
+      "description": "Temperatura do ligante (CAP) em °C"
     },
     "agregados": {
       "type": "array",
@@ -69,7 +69,7 @@
               "number",
               "null"
             ],
-            "description": "Composi\u00e7\u00e3o em %"
+            "description": "Composição em %"
           },
           "umidade": {
             "type": [
@@ -83,14 +83,14 @@
               "number",
               "null"
             ],
-            "description": "Temperatura T1 em \u00b0C"
+            "description": "Temperatura T1 em °C"
           },
           "temperatura_t2": {
             "type": [
               "number",
               "null"
             ],
-            "description": "Temperatura T2 em \u00b0C"
+            "description": "Temperatura T2 em °C"
           }
         }
       }
@@ -119,14 +119,14 @@
               "number",
               "null"
             ],
-            "description": "Temperatura em \u00b0C"
+            "description": "Temperatura em °C"
           },
           "temperatura_2": {
             "type": [
               "number",
               "null"
             ],
-            "description": "Temperatura em \u00b0C"
+            "description": "Temperatura em °C"
           },
           "observacao": {
             "type": "string"
@@ -136,7 +136,7 @@
     },
     "observacoes_gerais": {
       "type": "string",
-      "description": "Observa\u00e7\u00f5es gerais"
+      "description": "Observações gerais"
     },
     "status": {
       "type": "string",
@@ -153,11 +153,11 @@
         "null"
       ],
       "default": null,
-      "description": "Status de aprova\u00e7\u00e3o"
+      "description": "Status de aprovação"
     },
     "approved_by": {
       "type": "string",
-      "description": "Email do usu\u00e1rio que aprovou/reprovou"
+      "description": "Email do usuário que aprovou/reprovou"
     },
     "approved_date": {
       "type": "string",
@@ -208,22 +208,76 @@
     "data"
   ],
   "rls": {
-    "read": {},
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "gestor_contrato"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "cliente"
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    },
     "create": {},
     "update": {
       "$or": [
-        { "created_by": "{{user.email}}" },
-        { "user_condition": { "role": "admin" } },
-        { "user_condition": { "access_level": "sala_tecnica_afirmaevias" } },
-        { "user_condition": { "access_level": "gestor_contrato" } }
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "gestor_contrato"
+          }
+        }
       ]
     },
     "delete": {
       "$or": [
-        { "created_by": "{{user.email}}" },
-        { "user_condition": { "role": "admin" } },
-        { "user_condition": { "access_level": "sala_tecnica_afirmaevias" } },
-        { "user_condition": { "access_level": "gestor_contrato" } }
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "gestor_contrato"
+          }
+        }
       ]
     }
   }

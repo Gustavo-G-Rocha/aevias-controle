@@ -130,7 +130,7 @@
     },
     "densidades_in_situ": {
       "type": "array",
-      "description": "Array de ensaios de massa espec\u00edfica aparente in situ - DNER-ME 092/94",
+      "description": "Array de ensaios de massa específica aparente in situ - DNER-ME 092/94",
       "items": {
         "type": "object",
         "properties": {
@@ -223,22 +223,76 @@
     "data"
   ],
   "rls": {
-    "read": {},
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "gestor_contrato"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "cliente"
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    },
     "create": {},
     "update": {
       "$or": [
-        { "created_by": "{{user.email}}" },
-        { "user_condition": { "role": "admin" } },
-        { "user_condition": { "access_level": "sala_tecnica_afirmaevias" } },
-        { "user_condition": { "access_level": "gestor_contrato" } }
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "gestor_contrato"
+          }
+        }
       ]
     },
     "delete": {
       "$or": [
-        { "created_by": "{{user.email}}" },
-        { "user_condition": { "role": "admin" } },
-        { "user_condition": { "access_level": "sala_tecnica_afirmaevias" } },
-        { "user_condition": { "access_level": "gestor_contrato" } }
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "gestor_contrato"
+          }
+        }
       ]
     }
   }

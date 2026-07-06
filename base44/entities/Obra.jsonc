@@ -8,7 +8,7 @@
     },
     "code": {
       "type": "string",
-      "description": "C\u00f3digo da obra/contrato"
+      "description": "Código da obra/contrato"
     },
     "regional_id": {
       "type": "string",
@@ -23,7 +23,7 @@
         "sondagem",
         "levantamentos"
       ],
-      "description": "Tipo de obra: Supervis\u00e3o, Implanta\u00e7\u00e3o, Conserva\u00e7\u00e3o, Sondagem ou Levantamentos"
+      "description": "Tipo de obra: Supervisão, Implantação, Conservação, Sondagem ou Levantamentos"
     },
     "status": {
       "type": "string",
@@ -41,7 +41,7 @@
       "items": {
         "type": "string"
       },
-      "description": "Nomes das empreiteiras do contrato - apenas para obras de Supervis\u00e3o"
+      "description": "Nomes das empreiteiras do contrato - apenas para obras de Supervisão"
     },
     "clientes": {
       "type": "array",

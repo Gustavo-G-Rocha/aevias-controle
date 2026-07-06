@@ -17,7 +17,7 @@
     },
     "horario": {
       "type": "string",
-      "description": "Hor\u00e1rio do ensaio"
+      "description": "Horário do ensaio"
     },
     "laboratorista_name": {
       "type": "string",
@@ -25,7 +25,7 @@
     },
     "placa_caminhao": {
       "type": "string",
-      "description": "Placa do caminh\u00e3o"
+      "description": "Placa do caminhão"
     },
     "local_coleta": {
       "type": "string",
@@ -45,19 +45,19 @@
     },
     "trecho": {
       "type": "string",
-      "description": "Descri\u00e7\u00e3o do trecho"
+      "description": "Descrição do trecho"
     },
     "tipo_ligante": {
       "type": "string",
-      "description": "Tipo de ligante asf\u00e1ltico"
+      "description": "Tipo de ligante asfáltico"
     },
     "temperatura_cap": {
       "type": "number",
-      "description": "Temperatura do CAP (\u00b0C)"
+      "description": "Temperatura do CAP (°C)"
     },
     "faixa_especificada": {
       "type": "string",
-      "description": "Faixa granulom\u00e9trica especificada"
+      "description": "Faixa granulométrica especificada"
     },
     "ensaio_realizado_por": {
       "type": "string",
@@ -75,7 +75,7 @@
     },
     "extracao_ligante": {
       "type": "object",
-      "description": "Dados da extra\u00e7\u00e3o de ligante (Rotarex)",
+      "description": "Dados da extração de ligante (Rotarex)",
       "properties": {
         "peso_amostra": {
           "type": "number"
@@ -356,7 +356,33 @@
   ],
   "rls": {
     "create": {},
-    "read": {},
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "gestor_contrato"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "cliente"
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    },
     "update": {
       "$or": [
         {

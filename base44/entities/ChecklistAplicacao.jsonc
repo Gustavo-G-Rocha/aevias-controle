@@ -155,7 +155,7 @@
     },
     "nao_conformidades": {
       "type": "array",
-      "description": "Lista de n\u00e3o conformidades identificadas",
+      "description": "Lista de não conformidades identificadas",
       "items": {
         "type": "object",
         "properties": {
@@ -272,22 +272,76 @@
     "obra_id"
   ],
   "rls": {
-    "read": {},
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "gestor_contrato"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "cliente"
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    },
     "create": {},
     "update": {
       "$or": [
-        { "created_by": "{{user.email}}" },
-        { "user_condition": { "role": "admin" } },
-        { "user_condition": { "access_level": "sala_tecnica_afirmaevias" } },
-        { "user_condition": { "access_level": "gestor_contrato" } }
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "gestor_contrato"
+          }
+        }
       ]
     },
     "delete": {
       "$or": [
-        { "created_by": "{{user.email}}" },
-        { "user_condition": { "role": "admin" } },
-        { "user_condition": { "access_level": "sala_tecnica_afirmaevias" } },
-        { "user_condition": { "access_level": "gestor_contrato" } }
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "gestor_contrato"
+          }
+        }
       ]
     }
   }
