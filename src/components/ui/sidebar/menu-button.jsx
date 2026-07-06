@@ -62,8 +62,6 @@ const SidebarMenuButton = React.forwardRef(function SidebarMenuButton(allProps, 
     className={cn(sidebarMenuButtonVariants({ variant: variantVal, size: sizeVal }), className)}
     {...props} />;
 
-
-
   if (!tooltip) return button;
 
   const tooltipProps = typeof tooltip === "string" ? { children: tooltip } : tooltip;
