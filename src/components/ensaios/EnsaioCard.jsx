@@ -3,7 +3,7 @@ import React, { useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, Edit, MessageSquare, MapPin, User as UserIconSmall, Building } from "lucide-react";
+import { FileText, Edit, MessageSquare, MapPin, User as UserIconSmall, Building, RotateCcw, PenLine } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components/ensaios/ensaioMappers";
@@ -72,8 +72,8 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
                 <status.icon className="w-3 h-3" />
                 {status.text}
               </Badge>
-              {status.wasRejected && <Badge className="bg-orange-100/80 text-orange-800 border border-border/50 text-xs">🔄 Editado após reprovação</Badge>}
-              {jaAssinado && <Badge className="bg-muted/50  border border-border text-xs">✍️ Assinado por você</Badge>}
+              {status.wasRejected && <Badge className="bg-orange-100/80 text-orange-800 border border-border/50 text-xs gap-1"><RotateCcw className="w-3 h-3" /> Editado após reprovação</Badge>}
+              {jaAssinado && <Badge className="bg-muted/50 border border-border text-xs gap-1"><PenLine className="w-3 h-3" /> Assinado por você</Badge>}
             </div>
           </div>
 

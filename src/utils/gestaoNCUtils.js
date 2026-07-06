@@ -1,3 +1,5 @@
+import { AlertCircle, Clock, CheckCircle, Ban } from "lucide-react";
+
 /**
  * Cores para badges de status
  */
@@ -16,6 +18,16 @@ export const STATUS_LABELS = {
   em_tratativa: "Em Tratativa",
   encerrada: "Finalizada",
   cancelada: "Cancelada",
+};
+
+/**
+ * Ícones para badges de status (acessibilidade — não usar cor como único indicador)
+ */
+export const STATUS_ICONS = {
+  aberta: AlertCircle,
+  em_tratativa: Clock,
+  encerrada: CheckCircle,
+  cancelada: Ban,
 };
 
 /**

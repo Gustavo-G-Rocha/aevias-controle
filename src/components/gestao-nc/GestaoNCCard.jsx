@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, CheckCircle, XCircle } from "lucide-react";
+import { Eye, CheckCircle, XCircle, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,7 @@ import { createPageUrl } from "@/utils";
 import {
   STATUS_COLORS,
   STATUS_LABELS,
+  STATUS_ICONS,
   isUserGestor,
   isUserAdmin,
   isUserCliente,
@@ -30,6 +31,7 @@ export default function GestaoNCCard({
   const isCliente = isUserCliente(user);
   const canChangeStatus = canUserChangeStatus(user);
   const obraName = getObraName(nc, obras);
+  const StatusIcon = STATUS_ICONS[nc.status];
 
   return (
     <Card className="bg-transparent hover:border-primary/30 transition-colors">
@@ -43,7 +45,8 @@ export default function GestaoNCCard({
                   {nc.numero_rnc}
                 </span>
               )}
-              <Badge className={STATUS_COLORS[nc.status] || "bg-gray-100 text-gray-700"}>
+              <Badge className={`${STATUS_COLORS[nc.status] || "bg-gray-100 text-gray-700"} gap-1`}>
+                {StatusIcon && <StatusIcon className="w-3 h-3" />}
                 {STATUS_LABELS[nc.status] || nc.status}
               </Badge>
               <span className="text-sm text-muted-foreground">
@@ -83,7 +86,8 @@ export default function GestaoNCCard({
             {/* Pending Client Approval */}
             {nc.pendente_aprovacao_cliente ? (
               <div className="flex flex-col gap-2">
-                <Badge className="bg-orange-100 text-orange-700 text-center">
+                <Badge className="bg-orange-100 text-orange-700 text-center gap-1">
+                  <Clock className="w-3 h-3" />
                   Aguardando Aprovação do Cliente
                 </Badge>
                 {isCliente && (
@@ -121,24 +125,28 @@ export default function GestaoNCCard({
                       <option value="encerrada">Finalizada</option>
                       <option value="cancelada">Cancelada</option>
                     </select>
-                    <Badge className="bg-green-100 text-green-700 text-center text-xs">
-                      ✓ Aprovada pelo Cliente
+                    <Badge className="bg-green-100 text-green-700 text-center text-xs gap-1">
+                      <CheckCircle className="w-3 h-3" />
+                      Aprovada pelo Cliente
                     </Badge>
                   </>
                 ) : (
                   <>
-                    <Badge className={STATUS_COLORS[nc.status] || "bg-gray-100 text-gray-700"}>
+                    <Badge className={`${STATUS_COLORS[nc.status] || "bg-gray-100 text-gray-700"} gap-1`}>
+                      {StatusIcon && <StatusIcon className="w-3 h-3" />}
                       {STATUS_LABELS[nc.status] || nc.status}
                     </Badge>
-                    <Badge className="bg-green-100 text-green-700 text-center text-xs">
-                      ✓ Aprovada pelo Cliente
+                    <Badge className="bg-green-100 text-green-700 text-center text-xs gap-1">
+                      <CheckCircle className="w-3 h-3" />
+                      Aprovada pelo Cliente
                     </Badge>
                   </>
                 )}
               </div>
             ) : nc.cliente_aprovacao === "reprovada" ? (
               <div className="flex flex-col gap-1">
-                <Badge className="bg-red-100 text-destructive text-center">
+                <Badge className="bg-red-100 text-destructive text-center gap-1">
+                  <XCircle className="w-3 h-3" />
                   Reprovada - Editar e Reenviar
                 </Badge>
                 {(isGestor || isAdmin) && (
@@ -154,7 +162,8 @@ export default function GestaoNCCard({
               </div>
             ) : (
               <div className="flex flex-col gap-1">
-                <Badge className={STATUS_COLORS[nc.status] || "bg-gray-100 text-gray-700"}>
+                <Badge className={`${STATUS_COLORS[nc.status] || "bg-gray-100 text-gray-700"} gap-1`}>
+                  {StatusIcon && <StatusIcon className="w-3 h-3" />}
                   {STATUS_LABELS[nc.status] || nc.status}
                 </Badge>
                 {(isGestor || isAdmin) && (
