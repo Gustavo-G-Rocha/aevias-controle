@@ -225,7 +225,7 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
                           <Button variant="ghost" size="icon" onClick={() => { setEditingObra(obra); setIsObraDialogOpen(true); }} className="h-8 w-8" style={{ color: 'var(--color-text)' }}>
                             <Edit className="w-4 h-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDeleteObra(obra.id)} className="text-[#800020] hover:text-[#800020] hover:bg-[#800020]/10 h-8 w-8">
+                          <Button variant="ghost" size="icon" onClick={() => handleDeleteObra(obra.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8">
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
@@ -256,7 +256,7 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
                   <Edit className="w-4 h-4 mr-1" style={{ color: 'var(--color-secondary)' }} />Editar
                 </Button>
                 {isAdmin && (
-                  <Button variant="ghost" size="sm" onClick={() => onDelete(regional.id)} className="text-[#800020] hover:text-[#800020] hover:bg-[#800020]/10">
+                  <Button variant="ghost" size="sm" onClick={() => onDelete(regional.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10">
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 )}

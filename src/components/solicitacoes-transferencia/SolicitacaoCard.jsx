@@ -66,7 +66,7 @@ export const SolicitacaoCard = React.memo(({ solicitacao, onApprove, onReject, c
             <div>
               <p className="text-xs font-medium text-foreground/70 mb-1">Regional Atual</p>
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-[#800020]" />
+                <MapPin className="w-4 h-4 text-destructive" />
                 <span className="font-medium text-foreground">{regionalAtual?.nome || solicitacao.regional_atual_nome}</span>
               </div>
             </div>
@@ -89,7 +89,7 @@ export const SolicitacaoCard = React.memo(({ solicitacao, onApprove, onReject, c
           </div>
 
           {solicitacao.status === 'aprovada' && solicitacao.aprovado_em && (
-            <div className="bg-[#566E3D]/10 border border-[#566E3D]/30 rounded p-2">
+            <div className="bg-green-100 border border-green-300 rounded p-2">
               <p className="text-sm text-foreground">
                 <CheckCircle className="w-4 h-4 inline mr-1" />
                 Aprovada por {solicitacao.aprovado_por} em {format(new Date(solicitacao.aprovado_em), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
@@ -98,13 +98,13 @@ export const SolicitacaoCard = React.memo(({ solicitacao, onApprove, onReject, c
           )}
 
           {solicitacao.status === 'rejeitada' && (
-            <div className="bg-[#800020]/10 border border-[#800020]/30 rounded p-2">
-              <p className="text-sm font-medium text-[#800020] mb-1">
+            <div className="bg-red-100 border border-red-300 rounded p-2">
+              <p className="text-sm font-medium text-destructive mb-1">
                 <XCircle className="w-4 h-4 inline mr-1" />
                 Rejeitada em {format(new Date(solicitacao.aprovado_em), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
               </p>
               {solicitacao.motivo_rejeicao && (
-                <p className="text-sm text-[#800020]">Motivo: {solicitacao.motivo_rejeicao}</p>
+                <p className="text-sm text-destructive">Motivo: {solicitacao.motivo_rejeicao}</p>
               )}
             </div>
           )}

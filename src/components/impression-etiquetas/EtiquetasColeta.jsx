@@ -69,7 +69,7 @@ function EtiquetaColetaItem({ etiqueta }) {
           </picture>
         </div>
         <div className="flex items-center justify-center px-1" style={{ borderRight: '0.5mm solid #000' }}>
-          <h2 className="text-xs print:text-[10px] font-bold text-[#00233B] text-center leading-tight">
+          <h2 className="text-xs print:text-[10px] font-bold text-[var(--color-primary)] text-center leading-tight">
             ETIQUETA PARA COLETA DE AMOSTRA SOLO
           </h2>
         </div>
@@ -135,7 +135,7 @@ function EtiquetaColetaItem({ etiqueta }) {
 
       {/* Ensaios Solicitados */}
       <div className="mb-1 print:mb-1" style={{ border: '0.5mm solid #000' }}>
-        <div className="bg-[#BFCF99] font-bold text-[#00233B] text-[10px] print:text-[9px] text-center" style={{ borderBottom: '0.5mm solid #000', paddingLeft: '3mm', paddingRight: '3mm', paddingTop: '1mm', paddingBottom: '1mm' }}>
+        <div className="bg-[var(--color-secondary)] font-bold text-[var(--color-primary)] text-[10px] print:text-[9px] text-center" style={{ borderBottom: '0.5mm solid #000', paddingLeft: '3mm', paddingRight: '3mm', paddingTop: '1mm', paddingBottom: '1mm' }}>
           ENSAIOS SOLICITADOS
         </div>
         <div className="bg-white text-[10px] print:text-[9px] min-h-[14px] print:min-h-[12px] flex items-center gap-1.5" style={{ paddingLeft: '3mm', paddingRight: '3mm', paddingTop: '1mm', paddingBottom: '1mm' }}>

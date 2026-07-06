@@ -192,13 +192,13 @@ export const getStatusInfo = (ensaio) => {
     return { text: "Assinado", icon: CheckCircle, className: "bg-muted/10 text-foreground border border-border/30 hover:bg-muted/20 hover:border-border/40 transition-colors" };
   }
   if (ensaio.approved === true) {
-    return { text: "Aprovado", icon: CheckCircle, className: "bg-[#566E3D]/10 text-secondary border border-[#566E3D]/30 hover:bg-[#566E3D]/20 hover:border-[#566E3D]/40 transition-colors" };
+    return { text: "Aprovado", icon: CheckCircle, className: "bg-green-100 text-green-700 border border-green-300/50 hover:bg-green-200 hover:border-green-400/50 transition-colors" };
   }
   if (ensaio.approved === false) {
-    return { text: "Reprovado", icon: XCircle, className: "bg-[#800020]/10 text-[#800020] border border-[#800020]/30 hover:bg-[#800020]/20 hover:border-[#800020]/40 transition-colors" };
+    return { text: "Reprovado", icon: XCircle, className: "bg-red-100 text-destructive border border-red-300/50 hover:bg-red-200 hover:border-red-400/50 transition-colors" };
   }
   if (ensaio.was_rejected === true) {
     return { text: "Pendente", icon: Clock, className: "bg-orange-100/80 text-orange-800 border border-border/50 hover:bg-orange-200/80 hover:border-orange-400/50 transition-colors", wasRejected: true };
   }
-  return { text: "Pendente", icon: Clock, className: "bg-[#FBBF24]/10 text-[#854d0e] border border-[#FBBF24]/30 hover:bg-[#FBBF24]/20 hover:border-[#FBBF24]/40 transition-colors" };
+  return { text: "Pendente", icon: Clock, className: "bg-yellow-100 text-yellow-700 border border-yellow-300/50 hover:bg-yellow-200 hover:border-yellow-400/50 transition-colors" };
 };
