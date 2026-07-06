@@ -75,6 +75,18 @@ vi.mock('@/api/base44Client', () => {
   return { base44: { entities } };
 });
 
+vi.mock('@/functions/validarESalvarRegistro', () => ({
+  validarESalvarRegistro: vi.fn(async ({ entityName, data, operation, recordId }) => {
+    const { base44 } = await import('@/api/base44Client');
+    if (operation === 'create') {
+      const result = await base44.entities[entityName].create(data);
+      return { data: { success: true, data: result } };
+    }
+    const result = await base44.entities[entityName].update(recordId, data);
+    return { data: { success: true, data: result } };
+  }),
+}));
+
 beforeEach(() => {
   for (const n of ENTITY_NAMES) store[n] = {};
   vi.clearAllMocks();

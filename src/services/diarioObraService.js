@@ -1,5 +1,7 @@
 import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
+import { logger } from '@/utils/logger';
+import { validarESalvarRegistro } from '@/functions/validarESalvarRegistro';
 
 /**
  * Service centralizado para operações com Diário de Obra
@@ -26,17 +28,27 @@ export async function obterDiarioById(id) {
 }
 
 export async function criarDiario(data) {
-  return withServiceCall(
-    () => base44.entities.DiarioObra.create(data),
-    'Falha ao criar diário'
-  );
+  try {
+    const response = await validarESalvarRegistro({ entityName: 'DiarioObra', data, operation: 'create' });
+    return response.data.data;
+  } catch (error) {
+    const validationMessage = error?.response?.data?.error;
+    if (validationMessage) throw new Error(validationMessage);
+    logger.error('[Service] Falha ao criar diário', error);
+    throw new Error('Falha ao criar diário');
+  }
 }
 
 export async function atualizarDiario(id, data) {
-  return withServiceCall(
-    () => base44.entities.DiarioObra.update(id, data),
-    'Falha ao atualizar diário'
-  );
+  try {
+    const response = await validarESalvarRegistro({ entityName: 'DiarioObra', data, operation: 'update', recordId: id });
+    return response.data.data;
+  } catch (error) {
+    const validationMessage = error?.response?.data?.error;
+    if (validationMessage) throw new Error(validationMessage);
+    logger.error('[Service] Falha ao atualizar diário', error);
+    throw new Error('Falha ao atualizar diário');
+  }
 }
 
 export async function deletarDiario(id) {

@@ -1,5 +1,7 @@
 import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
+import { logger } from '@/utils/logger';
+import { validarESalvarRegistro } from '@/functions/validarESalvarRegistro';
 
 /**
  * Service centralizado para operações com Ensaios
@@ -20,6 +22,8 @@ const ENSAIO_ENTITIES = {
   'EnsaioVigaBenkelman': 'EnsaioVigaBenkelman',
   'AcompanhamentoCarga': 'AcompanhamentoCarga',
   'AcompanhamentoUsinagem': 'AcompanhamentoUsinagem',
+  'BoletimSondagem': 'BoletimSondagem',
+  'BoletimSondagemTrado': 'BoletimSondagemTrado',
 };
 
 export async function listarEnsaios(entityName, limit = 500) {
@@ -56,20 +60,30 @@ export async function criarEnsaio(entityName, data) {
   if (!ENSAIO_ENTITIES[entityName]) {
     throw new Error(`Entidade ensaio desconhecida: ${entityName}`);
   }
-  return withServiceCall(
-    () => base44.entities[entityName].create(data),
-    'Falha ao criar ensaio'
-  );
+  try {
+    const response = await validarESalvarRegistro({ entityName, data, operation: 'create' });
+    return response.data.data;
+  } catch (error) {
+    const validationMessage = error?.response?.data?.error;
+    if (validationMessage) throw new Error(validationMessage);
+    logger.error('[Service] Falha ao criar ensaio', error);
+    throw new Error('Falha ao criar ensaio');
+  }
 }
 
 export async function atualizarEnsaio(entityName, id, data) {
   if (!ENSAIO_ENTITIES[entityName]) {
     throw new Error(`Entidade ensaio desconhecida: ${entityName}`);
   }
-  return withServiceCall(
-    () => base44.entities[entityName].update(id, data),
-    'Falha ao atualizar ensaio'
-  );
+  try {
+    const response = await validarESalvarRegistro({ entityName, data, operation: 'update', recordId: id });
+    return response.data.data;
+  } catch (error) {
+    const validationMessage = error?.response?.data?.error;
+    if (validationMessage) throw new Error(validationMessage);
+    logger.error('[Service] Falha ao atualizar ensaio', error);
+    throw new Error('Falha ao atualizar ensaio');
+  }
 }
 
 export async function deletarEnsaio(entityName, id) {

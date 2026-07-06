@@ -1,5 +1,7 @@
 import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
+import { logger } from '@/utils/logger';
+import { validarESalvarRegistro } from '@/functions/validarESalvarRegistro';
 
 /**
  * Service centralizado para operações com Checklists
@@ -48,20 +50,30 @@ export async function criarChecklist(entityName, data) {
   if (!CHECKLIST_ENTITIES[entityName]) {
     throw new Error(`Entidade checklist desconhecida: ${entityName}`);
   }
-  return withServiceCall(
-    () => base44.entities[entityName].create(data),
-    'Falha ao criar checklist'
-  );
+  try {
+    const response = await validarESalvarRegistro({ entityName, data, operation: 'create' });
+    return response.data.data;
+  } catch (error) {
+    const validationMessage = error?.response?.data?.error;
+    if (validationMessage) throw new Error(validationMessage);
+    logger.error('[Service] Falha ao criar checklist', error);
+    throw new Error('Falha ao criar checklist');
+  }
 }
 
 export async function atualizarChecklist(entityName, id, data) {
   if (!CHECKLIST_ENTITIES[entityName]) {
     throw new Error(`Entidade checklist desconhecida: ${entityName}`);
   }
-  return withServiceCall(
-    () => base44.entities[entityName].update(id, data),
-    'Falha ao atualizar checklist'
-  );
+  try {
+    const response = await validarESalvarRegistro({ entityName, data, operation: 'update', recordId: id });
+    return response.data.data;
+  } catch (error) {
+    const validationMessage = error?.response?.data?.error;
+    if (validationMessage) throw new Error(validationMessage);
+    logger.error('[Service] Falha ao atualizar checklist', error);
+    throw new Error('Falha ao atualizar checklist');
+  }
 }
 
 export async function deletarChecklist(entityName, id) {
