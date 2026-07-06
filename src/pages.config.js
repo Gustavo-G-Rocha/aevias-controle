@@ -188,42 +188,6 @@ export const PAGES = {
     "Settings": Settings,
 }
 
-/**
- * Páginas que usam o escopo de relatório (report-scope) em vez do layout
- * padrão com sidebar/header/bottom-nav. Manter explicitamente: se uma página
- * de relatório for renomeada, adicionar o novo nome aqui para preservar o
- * escape de layout. Não usar prefixo de string — a associação é explícita.
- */
-export const REPORT_PAGES = new Set([
-    "RelatorioCertificacaoUsina",
-    "RelatorioAcompanhamentoCarga",
-    "RelatorioAcompanhamentoUsinagem",
-    "RelatorioCAUQ",
-    "RelatorioChecklist",
-    "RelatorioChecklistAplicacao",
-    "RelatorioChecklistConcretagem",
-    "RelatorioChecklistMRAF",
-    "RelatorioChecklistPage",
-    "RelatorioChecklistReciclagem",
-    "RelatorioChecklistTerraplanagem",
-    "RelatorioDensidadeInSitu",
-    "RelatorioDiario",
-    "RelatorioEnsaio",
-    "RelatorioGranulometriaIndividual",
-    "RelatorioManchaPendulo",
-    "RelatorioNC",
-    "RelatorioSondagem",
-    "RelatorioTaxaMRAF",
-    "RelatorioTaxaPinturaImprimacao",
-    "RelatorioVigaBenkelman",
-    "RelatorioBoletimSondagem",
-    "RelatorioBoletimSondagemTrado",
-    "RelatorioProctor",
-    "RelatorioRompimentoConcreto",
-    "RelatorioGranuMistura",
-    "RelatorioUnificado",
-]);
-
 export const pagesConfig = {
     mainPage: "Dashboard",
     Pages: PAGES,
