@@ -1,5 +1,6 @@
 // Interface de tabela para usuários cliente
 import React, { useState, useCallback, useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
@@ -11,6 +12,7 @@ import { assinarEnsaio } from "@/services/ensaiosService";
 import { toast } from "@/components/ui/use-toast";
 
 const ClienteInterface = React.memo(({ ensaios, obras, projects, user, allUsers }) => {
+  const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState('all');
 
   // O(1) lookup — evita obras.find() / projects.find() dentro de loops
@@ -47,11 +49,11 @@ const ClienteInterface = React.memo(({ ensaios, obras, projects, user, allUsers 
     try {
       await assinarEnsaio(ensaio, user);
       toast({ title: 'Registro assinado com sucesso!' });
-      window.location.reload();
+      await queryClient.invalidateQueries();
     } catch (error) {
       toast({ title: `Erro ao assinar: ${error?.message || 'Erro desconhecido'}.`, variant: "destructive" });
     }
-  }, [user]);
+  }, [user, queryClient]);
 
   const statusOptions = [
     { value: 'all', label: 'Todos os status' },

@@ -1,5 +1,6 @@
 // Card de ensaio para a interface de laboratorista
 import React, { useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { assinarEnsaio } from "@/services/ensaiosService";
 import { toast } from "@/components/ui/use-toast";
 
 const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
+  const queryClient = useQueryClient();
   const status = getStatusInfo(ensaio);
   const { name, icon: TypeIcon } = getEnsaioTypeInfo(ensaio);
   const reportUrl = getReportLink(ensaio);
@@ -34,11 +36,11 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
     try {
       await assinarEnsaio(ensaio, user);
       toast({ title: 'Registro assinado com sucesso!' });
-      window.location.reload();
+      await queryClient.invalidateQueries();
     } catch (error) {
       toast({ title: `Erro ao assinar registro: ${error?.message || 'Erro desconhecido'}.`, variant: "destructive" });
     }
-  }, [user, ensaio]);
+  }, [user, ensaio, queryClient]);
 
   const renderNcBadge = () => {
     const naoConformidades = getNaoConformidades(ensaio);
