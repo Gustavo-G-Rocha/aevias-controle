@@ -303,6 +303,15 @@
     @apply border-border outline-ring/50;
   }
 
+  /* ── Foco visível global para acessibilidade por teclado ──
+     Outline consistente usando o token --ring do design system.
+     Elementos com focus-visible:outline-none (ex.: botões) mantêm
+     seu próprio ring e não são afetados (utility > base). */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
   /* Hide scrollbars on mobile */
   @media (max-width: 1023px) {
     * {
