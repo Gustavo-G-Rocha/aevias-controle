@@ -44,7 +44,7 @@ export const ALL_RECORD_ENTITIES = [
  * @param {number} limit
  * @returns {Promise<object[]>}
  */
-const RECORD_PAGE_SIZE = 2000;    // lista completa e loadRecordsByObra
+const RECORD_PAGE_SIZE = 500;     // lista completa e loadRecordsByObra — reduz volume em memória
 const DASHBOARD_PAGE_SIZE = 200;  // dashboard — só registros recentes para stats/charts
 
 async function loadEntity(entityType, limit = RECORD_PAGE_SIZE) {
