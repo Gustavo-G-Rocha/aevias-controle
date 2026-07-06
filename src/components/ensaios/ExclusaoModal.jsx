@@ -9,6 +9,7 @@ import {
   DialogTitle,
   DialogFooter
 } from "@/components/ui/dialog";
+import { toast } from "@/components/ui/use-toast";
 
 export const ExclusaoModal = React.memo(({ ensaio, isOpen, onClose, onDelete }) => {
   const [confirmacao, setConfirmacao] = useState('');
@@ -16,7 +17,7 @@ export const ExclusaoModal = React.memo(({ ensaio, isOpen, onClose, onDelete }) 
 
   const handleDelete = useCallback(async () => {
     if (confirmacao !== textoConfirmacao) {
-      alert(`Por favor, digite "${textoConfirmacao}" para confirmar a exclusão.`);
+      toast({ title: `Por favor, digite "${textoConfirmacao}" para confirmar a exclusão.`, variant: "destructive" });
       return;
     }
 

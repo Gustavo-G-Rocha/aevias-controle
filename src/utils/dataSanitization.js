@@ -4,6 +4,35 @@
  * e números são corretamente parseados
  */
 
+/**
+ * Sanitiza uma string removendo tags HTML e protocolos perigosos.
+ * Defense-in-depth contra XSS — aplicado em texto livre antes de persistir.
+ */
+export const sanitizeText = (value) => {
+  if (typeof value !== 'string' || !value) return value;
+  return value
+    .replace(/<[^>]*>/g, '')       // remove tags HTML
+    .replace(/javascript:/gi, ''); // remove protocolo javascript:
+};
+
+/**
+ * Percorre recursivamente um objeto/array sanitizando todas as strings.
+ * Não modifica o objeto original.
+ */
+export const sanitizeTextFields = (data) => {
+  if (data === null || data === undefined) return data;
+  if (typeof data === 'string') return sanitizeText(data);
+  if (Array.isArray(data)) return data.map(sanitizeTextFields);
+  if (typeof data === 'object') {
+    const result = {};
+    for (const [key, value] of Object.entries(data)) {
+      result[key] = sanitizeTextFields(value);
+    }
+    return result;
+  }
+  return data;
+};
+
 export const sanitizeNumber = (value) => {
   if (value === '' || value === null || value === undefined) return null;
   const num = parseFloat(value);

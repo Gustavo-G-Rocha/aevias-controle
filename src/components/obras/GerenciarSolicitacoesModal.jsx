@@ -26,6 +26,7 @@ import {
   listarSolicitacoesTransferenciaRegional,
   atualizarSolicitacaoTransferenciaRegional,
 } from "@/services/solicitacoesService";
+import { toast } from "@/components/ui/use-toast";
 
 const statusConfig = {
   pendente: { icon: Clock, color: "bg-yellow-100 text-yellow-800", label: "Pendente" },
@@ -52,7 +53,7 @@ const SolicitacaoCard = ({ solicitacao, onAprovar, onRejeitar, user }) => {
       const usuario = allUsers.find(u => u.email.toLowerCase() === solicitacao.laboratorista_email.toLowerCase());
       
       if (usuario && usuario.access_level !== 'user' && usuario.access_level !== 'admin') {
-        alert(`❌ Erro: O usuário ${solicitacao.laboratorista_email} não é um laboratorista (access_level: ${usuario.access_level}). Não pode ser transferido como laboratorista.`);
+        toast({ title: `❌ Erro: O usuário ${solicitacao.laboratorista_email} não é um laboratorista (access_level: ${usuario.access_level}). Não pode ser transferido como laboratorista.`, variant: "destructive" });
         setProcessando(false);
         return;
       }
@@ -65,7 +66,7 @@ const SolicitacaoCard = ({ solicitacao, onAprovar, onRejeitar, user }) => {
 
   const handleRejeitar = async () => {
     if (!motivoRejeicao.trim()) {
-      alert("Por favor, informe o motivo da rejeição.");
+      toast({ title: "Por favor, informe o motivo da rejeição.", variant: "destructive" });
       return;
     }
 
@@ -264,12 +265,12 @@ export default function GerenciarSolicitacoesModal({ isOpen, onClose, user, onUp
         });
       }
 
-      alert(`Transferência aprovada! ${solicitacao.laboratorista_name} foi movido para ${solicitacao.regional_destino_nome}.`);
+      toast({ title: `Transferência aprovada! ${solicitacao.laboratorista_name} foi movido para ${solicitacao.regional_destino_nome}.` });
       await loadSolicitacoes();
       onUpdate();
     } catch (error) {
       console.error("Erro ao aprovar solicitação:", error);
-      alert("Erro ao aprovar solicitação. Tente novamente.");
+      toast({ title: "Erro ao aprovar solicitação. Tente novamente.", variant: "destructive" });
     }
   };
 
@@ -282,11 +283,11 @@ export default function GerenciarSolicitacoesModal({ isOpen, onClose, user, onUp
         motivo_rejeicao: motivoRejeicao
       });
 
-      alert("Solicitação rejeitada.");
+      toast({ title: "Solicitação rejeitada." });
       await loadSolicitacoes();
     } catch (error) {
       console.error("Erro ao rejeitar solicitação:", error);
-      alert("Erro ao rejeitar solicitação. Tente novamente.");
+      toast({ title: "Erro ao rejeitar solicitação. Tente novamente.", variant: "destructive" });
     }
   };
 

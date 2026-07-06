@@ -10,6 +10,7 @@ import RelatorioGranulometriaIndividual from "../components/relatorios/Relatorio
 import { Loader2, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import { toast } from "@/components/ui/use-toast";
 
 export default function RelatorioGranulometriaIndividualPage() {
   useReportMode();
@@ -28,7 +29,7 @@ export default function RelatorioGranulometriaIndividualPage() {
         const ensaioId = params.get("id");
 
         if (!ensaioId) {
-          alert("ID do ensaio não fornecido.");
+          toast({ title: "ID do ensaio não fornecido.", variant: "destructive" });
           return;
         }
 
@@ -56,7 +57,7 @@ export default function RelatorioGranulometriaIndividualPage() {
         }
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
-        alert("Erro ao carregar o relatório.");
+        toast({ title: "Erro ao carregar o relatório.", variant: "destructive" });
       } finally {
         setLoading(false);
       }

@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertTriangle } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 export default function SolicitarTransferenciaModal({ 
   isOpen, 
@@ -31,7 +32,7 @@ export default function SolicitarTransferenciaModal({
     e.preventDefault();
     
     if (!formData.regional_destino_id || !formData.motivo) {
-      alert("Por favor, preencha todos os campos.");
+      toast({ title: "Por favor, preencha todos os campos.", variant: "destructive" });
       return;
     }
 

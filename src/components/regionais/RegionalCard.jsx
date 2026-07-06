@@ -18,6 +18,7 @@ import {
   filtrarObrasPorStatus,
   getProjetosNaRegional,
 } from "@/utils/regionaisUtils";
+import { toast } from "@/components/ui/use-toast";
 
 const tipoObraIcons = {
   supervisao: <HardHat className="w-3 h-3 text-blue-600" />,
@@ -58,17 +59,17 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
       );
       if (editingObra) {
         await atualizarObra(editingObra.id, cleanedData);
-        alert("Obra atualizada com sucesso!");
+        toast({ title: "Obra atualizada com sucesso!" });
       } else {
         await criarObra(cleanedData);
-        alert("Obra criada com sucesso!");
+        toast({ title: "Obra criada com sucesso!" });
       }
       setIsObraDialogOpen(false);
       setEditingObra(null);
       onObraAdded();
     } catch (error) {
       console.error("[Regionais] Erro ao salvar obra:", error?.message || error);
-      alert(`Erro ao salvar obra: ${error.message}`);
+      toast({ title: `Erro ao salvar obra: ${error.message}`, variant: "destructive" });
     }
   }, [editingObra, regional.id, onObraAdded]);
 
@@ -79,7 +80,7 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
         onObraAdded();
       } catch (error) {
         console.error("[Regionais] Erro ao excluir obra:", error?.message || error);
-        alert("Erro ao excluir obra.");
+        toast({ title: "Erro ao excluir obra.", variant: "destructive" });
       }
     }
   }, [onObraAdded]);

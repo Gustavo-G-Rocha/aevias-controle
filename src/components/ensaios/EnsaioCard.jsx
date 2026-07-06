@@ -9,6 +9,7 @@ import { createPageUrl } from "@/utils";
 import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components/ensaios/ensaioMappers";
 import { getLaboratoristaInfo, getResponsavelInfo, getRodoviaInfo, getTrechoInfo, getNaoConformidades, getStatusInfo } from "@/components/ensaios/utils";
 import { assinarEnsaio } from "@/services/ensaiosService";
+import { toast } from "@/components/ui/use-toast";
 
 const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
   const status = getStatusInfo(ensaio);
@@ -32,10 +33,10 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
     if (!window.confirm(`Confirma a assinatura digital do registro "${ensaio.sample_id || ensaio.id}"?`)) return;
     try {
       await assinarEnsaio(ensaio, user);
-      alert('Registro assinado com sucesso!');
+      toast({ title: 'Registro assinado com sucesso!' });
       window.location.reload();
     } catch (error) {
-      alert(`Erro ao assinar registro: ${error?.message || 'Erro desconhecido'}.`);
+      toast({ title: `Erro ao assinar registro: ${error?.message || 'Erro desconhecido'}.`, variant: "destructive" });
     }
   }, [user, ensaio]);
 

@@ -9,13 +9,14 @@ import {
   DialogTitle,
   DialogFooter
 } from "@/components/ui/dialog";
+import { toast } from "@/components/ui/use-toast";
 
 export const ReprovacaoModal = React.memo(({ ensaio, isOpen, onClose, onReprove }) => {
   const [motivo, setMotivo] = useState('');
 
   const handleReprove = useCallback(async () => {
     if (!motivo.trim()) {
-      alert('Por favor, informe o motivo da reprovação.');
+      toast({ title: 'Por favor, informe o motivo da reprovação.', variant: "destructive" });
       return;
     }
 

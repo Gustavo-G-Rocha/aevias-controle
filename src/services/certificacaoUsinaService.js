@@ -1,5 +1,6 @@
 import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
+import { sanitizeTextFields } from '@/utils/dataSanitization';
 
 export async function listarCertificacoes(limit = 200) {
   return withServiceCall(
@@ -24,14 +25,14 @@ export async function obterCertificacaoById(id) {
 
 export async function criarCertificacao(data) {
   return withServiceCall(
-    () => base44.entities.CertificacaoUsina.create(data),
+    () => base44.entities.CertificacaoUsina.create(sanitizeTextFields(data)),
     'Falha ao criar certificação'
   );
 }
 
 export async function atualizarCertificacao(id, data) {
   return withServiceCall(
-    () => base44.entities.CertificacaoUsina.update(id, data),
+    () => base44.entities.CertificacaoUsina.update(id, sanitizeTextFields(data)),
     'Falha ao atualizar certificação'
   );
 }

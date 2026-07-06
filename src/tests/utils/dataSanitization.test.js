@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sanitizeNumber, sanitizeNestedNumbers, sanitizeAgregados, sanitizeEquivalenteAreia } from '@/utils/dataSanitization';
+import { sanitizeNumber, sanitizeNestedNumbers, sanitizeAgregados, sanitizeEquivalenteAreia, sanitizeText, sanitizeTextFields } from '@/utils/dataSanitization';
 
 describe('sanitizeNumber', () => {
   it('retorna null para string vazia', () => {
@@ -120,5 +120,82 @@ describe('sanitizeEquivalenteAreia', () => {
     const result = sanitizeEquivalenteAreia({ medicoes: [], media: '80' });
     expect(result.medicoes).toEqual([]);
     expect(result.media).toBe(80);
+  });
+});
+
+describe('sanitizeText', () => {
+  it('remove tags HTML de uma string', () => {
+    expect(sanitizeText('<script>alert("xss")</script>')).toBe('alert("xss")');
+  });
+
+  it('remove protocolo javascript:', () => {
+    expect(sanitizeText('javascript:alert(1)')).toBe('alert(1)');
+  });
+
+  it('preserva texto plano sem HTML', () => {
+    expect(sanitizeText('Observação normal do diário')).toBe('Observação normal do diário');
+  });
+
+  it('remove tags HTML misturadas com texto', () => {
+    expect(sanitizeText('Texto <b>com</b> <img src=x> tags')).toBe('Texto com  tags');
+  });
+
+  it('retorna valor original para não-string', () => {
+    expect(sanitizeText(42)).toBe(42);
+    expect(sanitizeText(null)).toBeNull();
+    expect(sanitizeText(undefined)).toBeUndefined();
+  });
+
+  it('retorna string vazia sem modificação', () => {
+    expect(sanitizeText('')).toBe('');
+  });
+});
+
+describe('sanitizeTextFields', () => {
+  it('sanitiza strings em um objeto plano', () => {
+    const input = {
+      observacoes: '<script>evil()</script>Texto limpo',
+      descricao: 'Normal',
+      numero: 42,
+    };
+    const result = sanitizeTextFields(input);
+    expect(result.observacoes).toBe('evil()Texto limpo');
+    expect(result.descricao).toBe('Normal');
+    expect(result.numero).toBe(42);
+  });
+
+  it('sanitiza recursivamente objetos aninhados', () => {
+    const input = {
+      nivel1: {
+        observacoes: '<iframe src="evil"></iframe>Dados',
+      },
+    };
+    const result = sanitizeTextFields(input);
+    expect(result.nivel1.observacoes).toBe('Dados');
+  });
+
+  it('sanitiza arrays de objetos', () => {
+    const input = [
+      { descricao: '<b>Item 1</b>' },
+      { descricao: 'Item 2' },
+    ];
+    const result = sanitizeTextFields(input);
+    expect(result[0].descricao).toBe('Item 1');
+    expect(result[1].descricao).toBe('Item 2');
+  });
+
+  it('não modifica o objeto original', () => {
+    const input = { texto: '<script>x</script>' };
+    sanitizeTextFields(input);
+    expect(input.texto).toBe('<script>x</script>');
+  });
+
+  it('trata null e undefined', () => {
+    expect(sanitizeTextFields(null)).toBeNull();
+    expect(sanitizeTextFields(undefined)).toBeUndefined();
+  });
+
+  it('trata string direta', () => {
+    expect(sanitizeTextFields('<script>x</script>')).toBe('x');
   });
 });

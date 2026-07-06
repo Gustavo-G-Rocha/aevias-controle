@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Trash2, Save } from "lucide-react";
 import { DialogFooter } from "@/components/ui/dialog";
 import { PENEIRAS_ASTM, getInitialFaixaData, validatePeneiras } from "@/utils/faixasGranulometricasUtils";
+import { toast } from "@/components/ui/use-toast";
 
 const FaixaForm = React.memo(({ faixa: editingFaixa, onSave, onCancel }) => {
   const [faixa, setFaixa] = useState(() => editingFaixa || getInitialFaixaData());
@@ -46,7 +47,7 @@ const FaixaForm = React.memo(({ faixa: editingFaixa, onSave, onCancel }) => {
     const peneirasValidas = validatePeneiras(faixa.peneiras);
 
     if (peneirasValidas.length === 0) {
-      alert('Adicione pelo menos uma peneira com Peneira ASTM, Mínimo e Máximo preenchidos.');
+      toast({ title: 'Adicione pelo menos uma peneira com Peneira ASTM, Mínimo e Máximo preenchidos.' });
       return;
     }
 

@@ -5,6 +5,7 @@ import { useResumosData } from "./hooks/useResumosData";
 import FiltrosCard from "./components/FiltrosCard";
 import ResultadosTable, { EmptyState } from "./components/ResultadosTable";
 import { normalizarTexto } from "./utils/resumosUtils";
+import { toast } from "@/components/ui/use-toast";
 
 export default function ResumosPersonalizadosPage() {
   const {
@@ -18,7 +19,7 @@ export default function ResumosPersonalizadosPage() {
   const obraSelecionada = useMemo(() => obras.find(o => o.id === obraId), [obras, obraId]);
 
   const exportarParaCSV = () => {
-    if (dadosConsolidados.length === 0) { alert("Nenhum dado para exportar."); return; }
+    if (dadosConsolidados.length === 0) { toast({ title: "Nenhum dado para exportar.", variant: "destructive" }); return; }
     const headers = Object.keys(dadosConsolidados[0]);
     const csvContent = [
       headers.map(h => normalizarTexto(h)).join(';'),
@@ -36,7 +37,7 @@ export default function ResumosPersonalizadosPage() {
     if (!ensaio) return;
     const med = ensaio.medicoes_geometricas;
     const medicoes = med?.medicoes || [];
-    if (medicoes.length === 0) { alert('Este checklist não possui medições geométricas.'); return; }
+    if (medicoes.length === 0) { toast({ title: 'Este checklist não possui medições geométricas.', variant: "destructive" }); return; }
     const wsData = [
       ['Subtrecho', med.subtrecho || '-'],
       ['Serviço', med.servico || '-'],

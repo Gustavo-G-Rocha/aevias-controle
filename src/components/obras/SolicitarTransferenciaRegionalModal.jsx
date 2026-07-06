@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowRightLeft, MapPin } from "lucide-react";
 import { criarSolicitacaoTransferenciaRegional } from "@/services/solicitacoesService";
+import { toast } from "@/components/ui/use-toast";
 
 export default function SolicitarTransferenciaRegionalModal({ 
   isOpen, 
@@ -28,12 +29,12 @@ export default function SolicitarTransferenciaRegionalModal({
     e.preventDefault();
     
     if (!regionalDestinoId || !motivo.trim()) {
-      alert("Por favor, selecione a regional de destino e informe o motivo.");
+      toast({ title: "Por favor, selecione a regional de destino e informe o motivo.", variant: "destructive" });
       return;
     }
 
     if (regionalDestinoId === regionalAtual.id) {
-      alert("A regional de destino não pode ser a mesma da atual.");
+      toast({ title: "A regional de destino não pode ser a mesma da atual.", variant: "destructive" });
       return;
     }
 
@@ -52,13 +53,13 @@ export default function SolicitarTransferenciaRegionalModal({
         status: "pendente"
       });
 
-      alert("Solicitação enviada com sucesso! Aguarde a aprovação do gestor ou sala técnica.");
+      toast({ title: "Solicitação enviada com sucesso! Aguarde a aprovação do gestor ou sala técnica." });
       setRegionalDestinoId("");
       setMotivo("");
       onSuccess();
     } catch (error) {
       console.error("Erro ao criar solicitação:", error);
-      alert("Erro ao enviar solicitação. Tente novamente.");
+      toast({ title: "Erro ao enviar solicitação. Tente novamente.", variant: "destructive" });
     } finally {
       setLoading(false);
     }

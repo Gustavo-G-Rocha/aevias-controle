@@ -8,6 +8,7 @@ import { useTableFilters } from "@/hooks/useTableFilters";
 import TableRowCliente from "@/components/ensaios/TableRowCliente";
 import EnsaiosTableHeader from "@/components/ensaios/EnsaiosTableHeader";
 import { assinarEnsaio } from "@/services/ensaiosService";
+import { toast } from "@/components/ui/use-toast";
 
 const ClienteInterface = React.memo(({ ensaios, obras, projects, user, allUsers }) => {
   const [statusFilter, setStatusFilter] = useState('all');
@@ -45,10 +46,10 @@ const ClienteInterface = React.memo(({ ensaios, obras, projects, user, allUsers 
     if (!window.confirm(`Confirma a assinatura digital do registro "${ensaio.sample_id || ensaio.id}"?`)) return;
     try {
       await assinarEnsaio(ensaio, user);
-      alert('Registro assinado com sucesso!');
+      toast({ title: 'Registro assinado com sucesso!' });
       window.location.reload();
     } catch (error) {
-      alert(`Erro ao assinar: ${error?.message || 'Erro desconhecido'}.`);
+      toast({ title: `Erro ao assinar: ${error?.message || 'Erro desconhecido'}.`, variant: "destructive" });
     }
   }, [user]);
 

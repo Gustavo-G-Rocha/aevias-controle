@@ -7,6 +7,7 @@ import { useProdutividadeData } from "@/hooks/useProdutividadeData";
 import ProdutividadeHeader from "@/components/produtividade/ProdutividadeHeader";
 import ProdutividadeTable from "@/components/produtividade/ProdutividadeTable";
 import { EditRegistroDialog, MarcaDiaDialog } from "@/components/produtividade/ProdutividadeModals";
+import { toast } from "@/components/ui/use-toast";
 
 export default function ProdutividadePage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -50,7 +51,7 @@ export default function ProdutividadePage() {
       await loadData();
     } catch (error) {
       console.error("[Produtividade] Erro ao salvar:", error?.message || error);
-      alert("Erro ao salvar");
+      toast({ title: "Erro ao salvar", variant: "destructive" });
     }
   }, [editDialog.registro, loadData]);
 
@@ -79,7 +80,7 @@ export default function ProdutividadePage() {
   }, [currentMonth]);
 
   const handleSaveCache = async () => {
-    if (Object.keys(cacheDias).length === 0) { alert("Nenhuma alteração para salvar"); return; }
+    if (Object.keys(cacheDias).length === 0) { toast({ title: "Nenhuma alteração para salvar" }); return; }
     try {
       for (const [, item] of Object.entries(cacheDias)) {
         const existente = await filtrarProdutividade({
@@ -97,10 +98,10 @@ export default function ProdutividadePage() {
         }
       }
       setCacheDias({});
-      alert("Dados salvos com sucesso!");
+      toast({ title: "Dados salvos com sucesso!" });
     } catch (error) {
       console.error("[Produtividade] Erro ao salvar marcadores:", error?.message || error);
-      alert("Erro ao salvar dados");
+      toast({ title: "Erro ao salvar dados", variant: "destructive" });
     }
   };
 

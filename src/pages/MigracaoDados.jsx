@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { DatabaseZap, Trash2, UserX, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { listarRegionais, atualizarRegional } from '@/services/regionaisService';
+import { toast } from "@/components/ui/use-toast";
 
 export default function MigracaoDados() {
   const [emailParaRemover, setEmailParaRemover] = useState('');
@@ -15,7 +16,7 @@ export default function MigracaoDados() {
   const handleRemoverUsuarioRegionais = async () => {
     const emailBusca = emailParaRemover.trim().toLowerCase();
     if (!emailBusca) {
-      alert("Por favor, informe o email do usuário.");
+      toast({ title: "Por favor, informe o email do usuário.", variant: "destructive" });
       return;
     }
 
@@ -100,10 +101,10 @@ export default function MigracaoDados() {
     if (window.confirm("Você tem certeza que deseja executar a migração das peneiras para os projetos? Esta ação não pode ser desfeita.")) {
       try {
         const { data } = await base44.functions.invoke('migrarPeneirasProjects');
-        alert(`Migração concluída! Detalhes: ${JSON.stringify(data)}`);
+        toast({ title: `Migração concluída! Detalhes: ${JSON.stringify(data)}` });
       } catch (error) {
         console.error("Erro na migração:", error);
-        alert(`Erro ao executar a migração: ${error.message}`);
+        toast({ title: `Erro ao executar a migração: ${error.message}`, variant: "destructive" });
       }
     }
   };
@@ -112,10 +113,10 @@ export default function MigracaoDados() {
     if (window.confirm("ATENÇÃO: Você tem certeza que deseja LIMPAR TODOS os dados de peneiras dos projetos? Esta ação é IRREVERSÍVEL.")) {
       try {
         const { data } = await base44.functions.invoke('limparTodasPeneirasProjects');
-        alert(`Limpeza concluída! Detalhes: ${JSON.stringify(data)}`);
+        toast({ title: `Limpeza concluída! Detalhes: ${JSON.stringify(data)}` });
       } catch (error) {
         console.error("Erro na limpeza:", error);
-        alert(`Erro ao executar a limpeza: ${error.message}`);
+        toast({ title: `Erro ao executar a limpeza: ${error.message}`, variant: "destructive" });
       }
     }
   };

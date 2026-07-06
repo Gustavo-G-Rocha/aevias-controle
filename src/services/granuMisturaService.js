@@ -1,5 +1,6 @@
 import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
+import { sanitizeTextFields } from '@/utils/dataSanitization';
 
 /**
  * Service centralizado para operações com GranuMistura
@@ -27,14 +28,14 @@ export async function obterGranuMisturaById(id) {
 
 export async function criarGranuMistura(data) {
   return withServiceCall(
-    () => base44.entities.GranuMistura.create(data),
+    () => base44.entities.GranuMistura.create(sanitizeTextFields(data)),
     'Falha ao criar ensaio de granulometria'
   );
 }
 
 export async function atualizarGranuMistura(id, data) {
   return withServiceCall(
-    () => base44.entities.GranuMistura.update(id, data),
+    () => base44.entities.GranuMistura.update(id, sanitizeTextFields(data)),
     'Falha ao atualizar ensaio de granulometria'
   );
 }

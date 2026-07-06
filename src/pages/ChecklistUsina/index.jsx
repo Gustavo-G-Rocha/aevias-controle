@@ -19,6 +19,7 @@ import RodadasProducaoSection from "./components/RodadasProducaoSection";
 import ControleLiganteSection from "./components/ControleLiganteSection";
 import ObservacoesSection from "./components/ObservacoesSection";
 import { getInitialFormData } from "@/utils/checklistUsinaFormInitial";
+import { toast } from "@/components/ui/use-toast";
 
 export default function ChecklistUsinaPage() {
   const {
@@ -49,7 +50,7 @@ export default function ChecklistUsinaPage() {
     });
 
     if (urls.length > 0) setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...urls] }));
-    if (errors.length > 0) alert(`${urls.length} de ${files.length} fotos enviadas.\n\nErros:\n` + errors.map(err => `• ${err.fileName}: ${err.error}`).join('\n'));
+    if (errors.length > 0) toast({ title: `${urls.length} de ${files.length} fotos enviadas.\n\nErros:\n` + errors.map(err => `• ${err.fileName}: ${err.error}`).join('\n'), variant: "destructive" });
 
     setLoadingUpload(false);
     setUploadProgress([]);
@@ -73,7 +74,7 @@ export default function ChecklistUsinaPage() {
   const handleSubmit = useCallback(async (e, saveStatus = 'finalizado') => {
     e.preventDefault();
     const validation = validateChecklistForm(formData, saveStatus);
-    if (!validation.valid) { alert(validation.message); return; }
+    if (!validation.valid) { toast({ title: validation.message }); return; }
 
     const dataToSave = {
       ...formData,
@@ -94,16 +95,16 @@ export default function ChecklistUsinaPage() {
           msg = "Checklist atualizado com sucesso! O registro voltará para análise do administrador.";
         }
         await atualizarChecklist('ChecklistUsina', editingChecklist.id, updateData);
-        alert(msg);
+        toast({ title: msg });
       } else {
         await criarChecklist('ChecklistUsina', { ...dataToSave, laboratorista_name: user?.laboratorista_name || user?.full_name });
-        alert(saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!");
+        toast({ title: saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!" });
       }
       clearSavedData();
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
       console.error("[ChecklistUsina] Erro ao salvar:", error?.message || error);
-      alert("Erro ao salvar checklist.");
+      toast({ title: "Erro ao salvar checklist.", variant: "destructive" });
     }
   }, [formData, editingChecklist, user, clearSavedData, navigate]);
 

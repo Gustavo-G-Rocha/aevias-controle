@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DialogFooter } from "@/components/ui/dialog";
 import { getRegionaisDisponiveis, validateNovasolicitacao } from "@/utils/solicitacoesTransferenciaUtils";
+import { toast } from "@/components/ui/use-toast";
 
 export const NovaSolicitacaoDialog = React.memo(({ isOpen, onClose, onSubmit, regionais, regionalAtual }) => {
   const [formData, setFormData] = useState({
@@ -17,7 +18,7 @@ export const NovaSolicitacaoDialog = React.memo(({ isOpen, onClose, onSubmit, re
     
     const validation = validateNovasolicitacao(formData);
     if (!validation.valid) {
-      alert(validation.message);
+      toast({ title: validation.message });
       return;
     }
 

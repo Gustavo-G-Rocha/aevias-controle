@@ -9,6 +9,7 @@ import { listarProjects } from "@/services/projectsService";
 import { obterEnsaioById, criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { toast } from "@/components/ui/use-toast";
 
 const EnsaioForm = ({ ensaio, obras, projects, onSave, onCancel }) => {
     const [formData, setFormData] = useState(ensaio || {});
@@ -86,7 +87,7 @@ export default function EnsaioDensidadePage() {
           if (currentUser.role === 'admin' || (ensaioToEdit.created_by === currentUser.email && ensaioToEdit.approved !== true)) {
             setEditingEnsaio(ensaioToEdit);
           } else {
-            alert("Você não tem permissão para editar este registro.");
+            toast({ title: "Você não tem permissão para editar este registro.", variant: "destructive" });
             navigate(createPageUrl('MeusEnsaios'));
           }
         }
@@ -125,15 +126,15 @@ export default function EnsaioDensidadePage() {
         }
         
         await atualizarEnsaio('EnsaioDensidade', editingEnsaio.id, updateData);
-        alert(successMessage);
+        toast({ title: successMessage });
       } else {
         await criarEnsaio('EnsaioDensidade', { ...formData, pesos: pesosParsed, laboratorista_name: user?.laboratorista_name || user?.full_name });
-        alert("Ensaio criado com sucesso!");
+        toast({ title: "Ensaio criado com sucesso!" });
       }
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
       console.error("Erro ao salvar ensaio:", error);
-      alert("Erro ao salvar ensaio.");
+      toast({ title: "Erro ao salvar ensaio.", variant: "destructive" });
     }
   };
   

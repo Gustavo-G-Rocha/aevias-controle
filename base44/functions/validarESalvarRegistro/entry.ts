@@ -142,12 +142,32 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Sanitização de texto — remove tags HTML de todos os campos string (defense-in-depth contra XSS)
+    const sanitizeText = (val: unknown): unknown => {
+      if (typeof val !== 'string' || !val) return val;
+      return val.replace(/<[^>]*>/g, '').replace(/javascript:/gi, '');
+    };
+    const sanitizeTextFields = (obj: unknown): unknown => {
+      if (obj === null || obj === undefined) return obj;
+      if (typeof obj === 'string') return sanitizeText(obj);
+      if (Array.isArray(obj)) return obj.map(sanitizeTextFields);
+      if (typeof obj === 'object') {
+        const result: Record<string, unknown> = {};
+        for (const [key, value] of Object.entries(obj)) {
+          result[key] = sanitizeTextFields(value);
+        }
+        return result;
+      }
+      return obj;
+    };
+    const sanitizedData = sanitizeTextFields(data);
+
     // Persistir (user-scoped — respeita RLS da entidade)
     let result;
     if (operation === 'create') {
-      result = await base44.entities[entityName].create(data);
+      result = await base44.entities[entityName].create(sanitizedData);
     } else {
-      result = await base44.entities[entityName].update(recordId, data);
+      result = await base44.entities[entityName].update(recordId, sanitizedData);
     }
 
     return Response.json({ success: true, data: result });

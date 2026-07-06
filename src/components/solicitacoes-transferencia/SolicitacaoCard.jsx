@@ -9,6 +9,7 @@ import { CheckCircle, XCircle, Clock, MapPin, User as UserIcon } from "lucide-re
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { getStatusInfo, ACTION_COLORS, validateMotivoRejeicao } from "@/utils/solicitacoesTransferenciaUtils";
+import { toast } from "@/components/ui/use-toast";
 
 const STATUS_ICONS = {
   CheckCircle,
@@ -35,7 +36,7 @@ export const SolicitacaoCard = React.memo(({ solicitacao, onApprove, onReject, c
   const handleReject = useCallback(() => {
     const validation = validateMotivoRejeicao(motivoRejeicao);
     if (!validation.valid) {
-      alert(validation.message);
+      toast({ title: validation.message });
       return;
     }
     onReject(solicitacao, motivoRejeicao);

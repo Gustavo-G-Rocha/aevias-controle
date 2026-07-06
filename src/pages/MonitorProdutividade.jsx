@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Users } from "lucide-react";
 import { obterUsuarioAtual } from "@/services/usuariosService";
 import { loadAuxData, loadRecordsByEntities } from "@/services/recordsService";
+import { toast } from "@/components/ui/use-toast";
 
 const MONITOR_ENTITIES = [
   'DiarioObra', 'EnsaioCAUQ', 'EnsaioDensidade', 'EnsaioDensidadeInSitu',
@@ -25,7 +26,7 @@ export default function MonitorProdutividade() {
 
       // Verificar se é admin
       if (user.role !== 'admin' && user.access_level !== 'admin') {
-        alert('Acesso negado. Esta página é exclusiva para administradores.');
+        toast({ title: 'Acesso negado. Esta página é exclusiva para administradores.', variant: "destructive" });
         return;
       }
 
@@ -88,7 +89,7 @@ export default function MonitorProdutividade() {
       setGestoresData(gestoresComMetricas);
     } catch (error) {
       console.error("[MonitorProdutividade] Erro ao carregar dados:", error?.message || error);
-      alert('Erro ao carregar dados do monitor.');
+      toast({ title: 'Erro ao carregar dados do monitor.', variant: "destructive" });
     } finally {
       setLoading(false);
     }

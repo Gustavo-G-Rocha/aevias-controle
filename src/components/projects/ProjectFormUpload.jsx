@@ -2,6 +2,7 @@ import React from "react";
 import { FileUp, Sparkles, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { uploadArquivo } from "@/services/uploadService";
+import { toast } from "@/components/ui/use-toast";
 
 export default function ProjectFormUpload({
   formData,
@@ -44,7 +45,7 @@ export default function ProjectFormUpload({
 
       if (response.success && response.dados) {
         onFormDataUpdate(response.dados);
-        alert('✅ Dados extraídos com sucesso! Revise os campos antes de salvar.');
+        toast({ title: '✅ Dados extraídos com sucesso! Revise os campos antes de salvar.' });
       } else {
         throw new Error('Falha ao extrair dados do arquivo');
       }

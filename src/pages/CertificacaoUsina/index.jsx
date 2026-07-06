@@ -25,6 +25,7 @@ import SecaoEstruturaUsina from "@/components/certificacao-usina/SecaoEstruturaU
 import SecaoResultado from "@/components/certificacao-usina/SecaoResultado";
 import SecaoFotos from "@/components/certificacao-usina/SecaoFotos";
 import { getInitialFormData } from "@/utils/certificacaoUsinaFormInitial";
+import { toast } from "@/components/ui/use-toast";
 
 
 
@@ -80,7 +81,7 @@ export default function CertificacaoUsinaPage() {
       setUploadProgress(prev => prev.map(p => p.id === i ? { ...p, status, error: err || null } : p));
     });
     if (urls.length > 0) setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...urls] }));
-    if (errors.length > 0) alert(`${urls.length} de ${files.length} fotos enviadas.\n\nErros:\n` + errors.map(e => `• ${e.fileName}: ${e.error}`).join("\n"));
+    if (errors.length > 0) toast({ title: `${urls.length} de ${files.length} fotos enviadas.\n\nErros:\n` + errors.map(e => `• ${e.fileName}: ${e.error}`).join("\n"), variant: "destructive" });
     setLoadingUpload(false);
     setUploadProgress([]);
     e.target.value = "";
@@ -158,7 +159,7 @@ export default function CertificacaoUsinaPage() {
   const handleSubmit = useCallback(async (e, saveStatus = "finalizado") => {
     e.preventDefault();
     const validation = validarCertificacao(formData, saveStatus);
-    if (!validation.valid) { alert(validation.message); return; }
+    if (!validation.valid) { toast({ title: validation.message }); return; }
 
     const dataToSave = { ...formData, status: saveStatus };
 
@@ -175,10 +176,10 @@ export default function CertificacaoUsinaPage() {
         msg = "Certificação atualizada! O registro voltará para análise.";
       }
       await atualizarCertificacao(editing, updateData);
-      alert(msg);
+      toast({ title: msg });
     } else {
       await criarCertificacao({ ...dataToSave, laboratorista_name: user?.laboratorista_name || user?.full_name });
-      alert(saveStatus === "rascunho" ? "Progresso salvo!" : "Certificação criada com sucesso!");
+      toast({ title: saveStatus === "rascunho" ? "Progresso salvo!" : "Certificação criada com sucesso!" });
     }
     clearSavedData();
     navigate(createPageUrl("MeusEnsaios"));

@@ -15,6 +15,7 @@ import {
   processarSubfieldControleCauq,
   enriquecerManchaPendulo,
 } from "../utils/resumosUtils";
+import { toast } from "@/components/ui/use-toast";
 
 export function useResumosData() {
   const [user, setUser] = useState(null);
@@ -301,7 +302,7 @@ export function useResumosData() {
   // ── Carregar dados ─────────────────────────────────────────────────────────
   const carregarDados = useCallback(async () => {
     if (!obraId || !tipoEnsaioSelecionado) {
-      alert("Selecione uma obra e um tipo de ensaio.");
+      toast({ title: "Selecione uma obra e um tipo de ensaio.", variant: "destructive" });
       return;
     }
 
@@ -352,7 +353,7 @@ export function useResumosData() {
       setRawEnsaios(ensaiosFiltrados);
     } catch (error) {
       console.error("[ResumosPersonalizados] Erro ao carregar ensaios:", error?.message || error);
-      alert("Erro ao carregar dados dos ensaios: " + (error?.message || error));
+      toast({ title: "Erro ao carregar dados dos ensaios: " + (error?.message || error), variant: "destructive" });
     } finally {
       setLoadingData(false);
     }

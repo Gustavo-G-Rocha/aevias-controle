@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DialogFooter } from "@/components/ui/dialog";
 import { Users as UsersIcon } from "lucide-react";
 import { resolveAccessLevel, validateEmailDomain, sanitizeUserFormData } from "@/utils/usersUtils";
+import { toast } from "@/components/ui/use-toast";
 
 const UserForm = React.memo(({ user: editingUser, onSave, onCancel, currentUser, regionais }) => {
   const [formData, setFormData] = useState(
@@ -34,7 +35,7 @@ const UserForm = React.memo(({ user: editingUser, onSave, onCancel, currentUser,
 
     if (!editingUser && formData.email) {
       const error = validateEmailDomain(formData.email, formData.access_level);
-      if (error) { alert(error); return; }
+      if (error) { toast({ title: error, variant: "destructive" }); return; }
     }
 
     onSave(sanitizeUserFormData(formData));

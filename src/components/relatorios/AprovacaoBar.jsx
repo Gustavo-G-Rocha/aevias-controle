@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { base44 } from "@/api/base44Client";
+import { toast } from "@/components/ui/use-toast";
 
 // Props:
 //   entityName: string (e.g. "ChecklistConcretagem")
@@ -70,10 +71,10 @@ export default function AprovacaoBar({ entityName, recordId }) {
         rejection_reason: null
       });
       setRecord(prev => ({ ...prev, approved: true, approver_details: approverDetails }));
-      alert('Registro aprovado com sucesso!');
+      toast({ title: 'Registro aprovado com sucesso!' });
     } catch (err) {
       console.error('[AprovacaoBar] Erro ao aprovar registro:', err?.message || err);
-      alert('Erro ao aprovar registro.');
+      toast({ title: 'Erro ao aprovar registro.', variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -81,7 +82,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
 
   const handleReject = async () => {
     if (!rejectionReason.trim()) {
-      alert('Informe o motivo da reprovação.');
+      toast({ title: 'Informe o motivo da reprovação.', variant: "destructive" });
       return;
     }
     setSaving(true);
@@ -95,10 +96,10 @@ export default function AprovacaoBar({ entityName, recordId }) {
       setRecord(prev => ({ ...prev, approved: false, rejection_reason: rejectionReason }));
       setShowRejectModal(false);
       setRejectionReason('');
-      alert('Registro reprovado.');
+      toast({ title: 'Registro reprovado.' });
     } catch (err) {
       console.error('[AprovacaoBar] Erro ao reprovar registro:', err?.message || err);
-      alert('Erro ao reprovar registro.');
+      toast({ title: 'Erro ao reprovar registro.', variant: "destructive" });
     } finally {
       setSaving(false);
     }
