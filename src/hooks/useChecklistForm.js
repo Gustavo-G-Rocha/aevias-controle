@@ -6,6 +6,7 @@ import { createPageUrl } from "@/utils";
 import { useFormDataLoader } from "@/hooks/useFormDataLoader";
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
+import { validateChecklistForm } from '@/utils/formValidationSchemas';
 
 /**
  * Hook reutilizável para formulários de checklist.
@@ -121,6 +122,8 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
   );
   const isEditable = userCanEdit;
 
+  const validateForm = (saveStatus = 'rascunho') => validateChecklistForm(formData, saveStatus);
+
   return {
     obras,
     regionais,
@@ -138,6 +141,7 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
     isApproved,
     userCanEdit,
     isEditable,
+    validateForm,
     extraCanEdit,
     clearSavedData,
     navigate,

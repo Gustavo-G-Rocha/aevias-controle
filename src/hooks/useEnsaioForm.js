@@ -6,6 +6,7 @@ import { createPageUrl } from "@/utils";
 import { useFormDataLoader } from "@/hooks/useFormDataLoader";
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
+import { validateEnsaioForm } from '@/utils/formValidationSchemas';
 
 /**
  * Hook reutilizável para formulários de ensaios individuais
@@ -84,6 +85,8 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
   const userCanEdit = user?.role === 'admin' || (formData.created_by === user?.email && (formData.status === 'rascunho' || formData.status === 'finalizado' || formData.approved === false));
   const isEditable = !editingEnsaio?.id || userCanEdit;
 
+  const validateForm = (saveStatus = 'rascunho') => validateEnsaioForm(formData, saveStatus);
+
   return {
     obras,
     regionais,
@@ -100,6 +103,7 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
     projetosDisponiveis,
     isApproved,
     isEditable,
+    validateForm,
     clearSavedData,
     navigate,
   };

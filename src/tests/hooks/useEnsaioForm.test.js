@@ -78,7 +78,7 @@ describe('useEnsaioForm — contrato', () => {
       'obras', 'regionais', 'projects', 'faixas', 'user',
       'editingEnsaio', 'loading', 'formData', 'obraSelecionada',
       'regionalSelecionada', 'projetosDisponiveis', 'isApproved',
-      'isEditable', 'clearSavedData', 'navigate',
+      'isEditable', 'validateForm', 'clearSavedData', 'navigate',
     ]) {
       expect(returnBlock).toContain(k);
     }

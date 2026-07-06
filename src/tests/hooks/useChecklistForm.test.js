@@ -85,7 +85,7 @@ describe('useChecklistForm — contrato', () => {
       'obras', 'regionais', 'projects', 'faixas', 'user', 'allUsers',
       'editingChecklist', 'loading', 'formData', 'obraSelecionada',
       'regionalSelecionada', 'projetosDisponiveis', 'isApproved',
-      'userCanEdit', 'isEditable', 'extraCanEdit', 'clearSavedData', 'navigate',
+      'userCanEdit', 'isEditable', 'validateForm', 'extraCanEdit', 'clearSavedData', 'navigate',
     ]) {
       expect(returnBlock).toContain(k);
     }
