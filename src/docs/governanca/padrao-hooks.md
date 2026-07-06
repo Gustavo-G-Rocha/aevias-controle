@@ -203,6 +203,22 @@ Quando hooks crescerem excessivamente:
 
 ---
 
+# Hooks Base Compartilhados
+
+Quando múltiplos hooks de formulário compartilham lógica comum de carregamento de dados (usuário, obras, regionais, projetos), essa lógica deve ser extraída para um hook base reutilizável.
+
+Exemplo atual:
+
+```txt id="jlwm7b"
+useFormDataLoader  (hook base)
+├── useEnsaioForm  (delega carregamento ao base)
+└── useChecklistForm (delega carregamento ao base)
+```
+
+O hook base encapsula o carregamento compartilhado, enquanto os hooks derivados mantêm suas particularidades (formatação de datas, permissões, validações específicas).
+
+---
+
 # Objetivo Arquitetural Final
 
 A arquitetura baseada em hooks busca transformar pages em:

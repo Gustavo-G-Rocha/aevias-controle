@@ -80,10 +80,20 @@ Exemplos identificados:
 
 ```txt id="jlwm1k"
 ensaiosService.js
+checklistsService.js
 dashboardService.js
-usuariosService.js
+diarioObraService.js
+faixasService.js
+granuMisturaService.js
+obrasService.js
+produtividadeService.js
 projectsService.js
 recordsService.js
+regionaisService.js
+relatorioContextService.js
+solicitacoesService.js
+usuariosService.js
+certificacaoUsinaService.js
 ```
 
 ---

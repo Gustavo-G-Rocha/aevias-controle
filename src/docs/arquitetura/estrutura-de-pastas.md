@@ -13,13 +13,13 @@ src/
 ├── api/
 ├── components/
 ├── constants/
-├── contexts/
+├── docs/
 ├── hooks/
+├── lib/
 ├── pages/
 ├── services/
 ├── tests/
-├── utils/
-└── validations/
+└── utils/
 
 base44/
 ├── entities/
@@ -115,14 +115,21 @@ Responsabilidades:
 
 Services identificados:
 
+* certificacaoUsinaService.js
 * checklistsService.js
 * dashboardService.js
+* diarioObraService.js
 * ensaiosService.js
+* faixasService.js
+* granuMisturaService.js
 * obrasService.js
 * offlineStorageService.js
+* produtividadeService.js
 * projectsService.js
 * recordsService.js
 * regionaisService.js
+* relatorioContextService.js
+* solicitacoesService.js
 * syncService.js
 * uploadService.js
 * usuariosService.js
@@ -156,15 +163,17 @@ Exemplos:
 
 ---
 
-# src/contexts
+# src/lib
 
-Responsável pelo gerenciamento global de estado utilizando Context API.
+Responsável por infraestrutura transversal da aplicação.
 
-Responsabilidades esperadas:
+Responsabilidades:
 
-* Sessão do usuário
-* Configurações globais
-* Estado compartilhado
+* Sessão do usuário (AuthContext)
+* Cliente Base44 inicializado
+* Query client (React Query)
+* Configurações de layout
+* Roteamento auxiliar
 
 ---
 
@@ -186,11 +195,11 @@ Objetivos:
 
 ---
 
-# src/validations
+# Validações
 
-Responsável pelas validações centralizadas.
+As validações centralizadas residem em `src/utils/` (ex: checklistValidation.js, ensaioValidation.js).
 
-Possíveis responsabilidades:
+Responsabilidades:
 
 * Schema validation
 * Regras de formulário

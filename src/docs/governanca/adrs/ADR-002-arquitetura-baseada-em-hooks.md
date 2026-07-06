@@ -167,6 +167,12 @@ Sempre que pages crescerem excessivamente, a lógica deve preferencialmente ser 
 
 ---
 
+# Evolução: Hooks Base Compartilhados
+
+Quando múltiplos hooks de formulário compartilham lógica comum de carregamento de dados (usuário, obras, regionais, projetos), essa lógica foi extraída para um hook base reutilizável (`useFormDataLoader`). Os hooks derivados (`useEnsaioForm`, `useChecklistForm`) delegam ao base o carregamento compartilhado, mantendo suas particularidades.
+
+---
+
 # Motivação Principal
 
 A decisão foi tomada visando:
