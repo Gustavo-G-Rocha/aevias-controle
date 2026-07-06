@@ -17,7 +17,7 @@ import {
   getObraName,
 } from "@/utils/gestaoNCUtils";
 
-export default function GestaoNCCard({
+const GestaoNCCard = React.memo(function GestaoNCCard({
   nc,
   obras,
   user,
@@ -202,4 +202,7 @@ export default function GestaoNCCard({
       </CardContent>
     </Card>
   );
-}
+});
+
+GestaoNCCard.displayName = 'GestaoNCCard';
+export default GestaoNCCard;
