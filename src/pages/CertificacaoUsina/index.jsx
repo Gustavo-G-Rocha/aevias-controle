@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { useChecklistForm } from "@/hooks/useChecklistForm";
 import { useCertificacaoUsinaForm } from "@/hooks/useCertificacaoUsinaForm";
-import { validarCertificacao, VALIDADORES_PAGINA } from "@/utils/certificacaoUsinaUtils";
+import { validarCertificacao } from "@/utils/certificacaoUsinaUtils";
 import { canGestorPreencherResultado, laboratoristaDeveOcultarResultado } from "@/utils/certificacaoUsinaAccess";
 import { criarCertificacao, atualizarCertificacao } from "@/services/certificacaoUsinaService";
 import { uploadMultipleFiles } from "@/utils/imageUpload";
@@ -26,18 +26,11 @@ import SecaoResultado from "@/components/certificacao-usina/SecaoResultado";
 import SecaoFotos from "@/components/certificacao-usina/SecaoFotos";
 import { getInitialFormData } from "@/utils/certificacaoUsinaFormInitial";
 import { toast } from "@/components/ui/use-toast";
-
-
-
-// Cada página referencia sua seção (key) e o validador correspondente pelo índice-base.
-const ALL_PAGES = [
-  { key: "identificacao", num: "1-4", label: "Identificação e\nAspectos Legais", validatorIndex: 0 },
-  { key: "saude",         num: "5",   label: "Saúde e\nSegurança",              validatorIndex: 1 },
-  { key: "meio_ambiente", num: "6",   label: "Meio\nAmbiente",                   validatorIndex: 2 },
-  { key: "laboratorio",   num: "7",   label: "Laboratório\ne Estrutura",         validatorIndex: 3 },
-  { key: "resultado",     num: "8",   label: "Resultado",                        validatorIndex: 4 },
-  { key: "fotos",         num: "📷",  label: "Relatório\nFotográfico",           validatorIndex: null },
-];
+import {
+  ALL_PAGES,
+  isPageComplete as checkPageComplete,
+  getCamposVaziosByPage,
+} from "./certificacaoUsinaPages";
 
 export default function CertificacaoUsinaPage() {
   const [currentPage, setCurrentPage] = useState(0);
@@ -93,56 +86,12 @@ export default function CertificacaoUsinaPage() {
 
   const [camposVazios, setCamposVazios] = useState([]);
 
-  const isPageComplete = (pageIndex) => {
-    const validatorIndex = PAGES[pageIndex]?.validatorIndex;
-    if (validatorIndex == null) return true;
-    return VALIDADORES_PAGINA[validatorIndex]?.(formData) ?? true;
-  };
-
-  /** Retorna lista de labels dos campos obrigatórios vazios na página atual */
-  const getCamposVaziosPagina0 = () => {
-    const labels = {
-      razao_social: "Razão Social",
-      localizacao: "Localização",
-      interessado: "Interessado",
-      responsavel_tecnico: "Responsável Técnico",
-      data_vistoria: "Data da Vistoria",
-      avaliador: "Avaliador",
-      cnpj: "CNPJ",
-      classe_usina: "Classe de Usina",
-      tipo_dosagem: "Tipo de Dosagem",
-      tipo_secagem: "Tipo de Secagem",
-    };
-    const aspectoLabels = {
-      autorizacao_ambiental: "Autorização Ambiental",
-      licenca_previa: "Licença Prévia",
-      licenca_instalacao: "Licença de Instalação",
-      licenca_operacao: "Licença de Operação",
-    };
-    const al = formData.aspectos_legais || {};
-    return [
-      ...Object.entries(labels).filter(([k]) => !formData[k]).map(([, l]) => l),
-      ...Object.entries(aspectoLabels).filter(([k]) => !al[k]).map(([, l]) => l),
-    ];
-  };
-
-  const getCamposVaziosByPage = (page) => {
-    const pageKey = PAGES[page]?.key;
-    if (pageKey === "identificacao") return getCamposVaziosPagina0();
-    // Demais páginas: checklist — indicar seção incompleta
-    const nomes = {
-      saude: "Saúde e Segurança",
-      meio_ambiente: "Meio Ambiente",
-      laboratorio: "Laboratório e Estrutura",
-      resultado: "Resultado",
-    };
-    return [`Seção "${nomes[pageKey] || ""}" incompleta — preencha todos os campos`];
-  };
+  const isPageComplete = (pageIndex) => checkPageComplete(PAGES, pageIndex, formData);
 
   const goToPage = (page) => {
     // Ao avançar, mostrar campos vazios da página atual
     if (page > currentPage && !isPageComplete(currentPage)) {
-      setCamposVazios(getCamposVaziosByPage(currentPage));
+      setCamposVazios(getCamposVaziosByPage(PAGES, currentPage, formData));
       return;
     }
     // Ao navegar por tab, só permite se as anteriores estiverem completas
