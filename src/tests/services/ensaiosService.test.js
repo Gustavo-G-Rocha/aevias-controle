@@ -167,6 +167,11 @@ describe('ensaiosService — detectEntityName', () => {
     expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'EnsaioMRAF' }));
   });
 
+  it('usa entityName como fonte secundária quando entityType ausente', async () => {
+    await aprovarEnsaio({ id: 'e16', entityName: 'EnsaioDensidadeInSitu' }, user);
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'EnsaioDensidadeInSitu' }));
+  });
+
   it('detecta EnsaioCAUQ por corpos_prova_marshall', async () => {
     await aprovarEnsaio({ id: 'e2', corpos_prova_marshall: [] }, user);
     expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'EnsaioCAUQ' }));
