@@ -1,11 +1,9 @@
-import { useState, useEffect, useMemo } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { listarFaixas } from "@/services/faixasService";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { obterEnsaioById } from "@/services/ensaiosService";
-import { useQuery } from "@tanstack/react-query";
 import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { createPageUrl } from "@/utils";
-import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
+import { useFormDataLoader } from "@/hooks/useFormDataLoader";
 import { toast } from "@/components/ui/use-toast";
 
 /**
@@ -15,72 +13,31 @@ import { toast } from "@/components/ui/use-toast";
  * Diferenças em relação ao useChecklistForm:
  * - Usa `data_ensaio` em vez de `data` para normalização de datas
  * - Retorna `editingEnsaio` em vez de `editingChecklist`
- * - Usa base44.entities para carregar entidade (não dynamic import)
+ * - Usa `obterEnsaioById` (não `obterChecklistById`)
  * - filtroTipoObra opcional para filtrar obras por tipo
+ * - Usa `useAccessLevel: true` no useFormDataLoader (access_level 'user' = laboratorista)
  *
- * Usa React Query (cache compartilhado via useAuxData) para evitar chamadas redundantes.
+ * Lógica de carregamento de dados (user, obras, regionais, projetos, faixas,
+ * filtragem por acesso, editId, valores derivados) delegada a useFormDataLoader.
  */
 export function useEnsaioForm(getInitialFormData, entityName, storageName, { filtroTipoObra } = {}) {
   const [editingEnsaio, setEditingEnsaio] = useState(null);
   const [editLoading, setEditLoading] = useState(false);
   const [formData, setFormData] = useState(getInitialFormData);
 
-  const location = useLocation();
   const navigate = useNavigate();
 
   const { clearSavedData } = useFormPersistence(storageName, formData, setFormData, !!editingEnsaio);
 
-  const { data: user, isLoading: loadingUser } = useCurrentUser();
-  const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true });
-
-  // FaixaGranulometrica — cache próprio (não está no useAuxData)
-  const { data: faixas } = useQuery({
-    queryKey: ['faixasGranulometricas'],
-    queryFn: () => listarFaixas(),
-    staleTime: 10 * 60 * 1000,
-  });
-
-  const regionais = auxData?.regionais ?? [];
-  const projects = auxData?.projects ?? [];
-
-  const obras = useMemo(() => {
-    if (!auxData?.obras || !user) return [];
-    const currentUserAccessLevel = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
-    let availableObras = auxData.obras;
-    if (currentUserAccessLevel === 'user') {
-      const emailLower = user.email.toLowerCase();
-      const regionaisIds = regionais
-        .filter(r =>
-          (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-          (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-        )
-        .map(r => r.id);
-      if (regionaisIds.length > 0) {
-        const regionaisSet = new Set(regionaisIds);
-        availableObras = auxData.obras.filter(obra =>
-          regionaisSet.has(obra.regional_id) &&
-          obra.status === 'em_andamento' &&
-          (filtroTipoObra ? filtroTipoObra.includes(obra.tipo_obra) : true)
-        );
-      } else {
-        availableObras = [];
-      }
-    } else if (filtroTipoObra) {
-      availableObras = auxData.obras.filter(obra => filtroTipoObra.includes(obra.tipo_obra));
-    }
-    return availableObras;
-  }, [auxData?.obras, regionais, user, filtroTipoObra]);
-
-  // editId derivado de location.search — estável enquanto o parâmetro não muda,
-  // evita recarregar o registro ao navegar entre edição/criação (P4).
-  const editId = useMemo(() => {
-    const params = new URLSearchParams(location.search);
-    return params.get('editId');
-  }, [location.search]);
+  const {
+    user, obras, regionais, projects, faixas, editId,
+    loading: dataLoading,
+    obraSelecionada, regionalSelecionada, projetosDisponiveis,
+  } = useFormDataLoader({ formData, filtroTipoObra, useAccessLevel: true });
 
   // Carregar ensaio para edição se editId presente
   useEffect(() => {
-    if (loadingUser || loadingAux || !user) return;
+    if (dataLoading || !user) return;
 
     if (editId) {
       setEditLoading(true);
@@ -119,19 +76,9 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
       setFormData(initialNewFormData);
       setEditingEnsaio(null);
     }
-  }, [editId, loadingUser, loadingAux, user?.id, obras, entityName, navigate]);
+  }, [editId, dataLoading, user?.id, obras, entityName, navigate]);
 
-  const obraSelecionada = useMemo(() => obras.find(o => o.id === formData.obra_id), [obras, formData.obra_id]);
-  const regionalSelecionada = useMemo(() => obraSelecionada ? regionais.find(r => r.id === obraSelecionada.regional_id) : null, [obraSelecionada, regionais]);
-  const projetosDisponiveis = useMemo(() => {
-    if (!regionalSelecionada || !projects) return [];
-    return projects.filter(p =>
-      (regionalSelecionada.project_ids || []).includes(p.id) &&
-      p.status === 'ativo'
-    );
-  }, [regionalSelecionada, projects]);
-
-  const loading = loadingUser || loadingAux || editLoading;
+  const loading = dataLoading || editLoading;
   const isApproved = formData.approved === true;
   const userCanEdit = user?.role === 'admin' || (formData.created_by === user?.email && (formData.status === 'rascunho' || formData.status === 'finalizado' || formData.approved === false));
   const isEditable = !editingEnsaio?.id || userCanEdit;
@@ -140,7 +87,7 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
     obras,
     regionais,
     projects,
-    faixas: faixas ?? [],
+    faixas,
     user,
     editingEnsaio,
     setEditingEnsaio,

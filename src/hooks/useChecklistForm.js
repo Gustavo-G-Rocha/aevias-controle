@@ -1,17 +1,25 @@
 import { useState, useEffect, useMemo } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { listarFaixas } from "@/services/faixasService";
+import { useNavigate } from "react-router-dom";
 import { obterChecklistById } from "@/services/checklistsService";
-import { useQuery } from "@tanstack/react-query";
 import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { createPageUrl } from "@/utils";
-import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
+import { useFormDataLoader } from "@/hooks/useFormDataLoader";
 import { toast } from "@/components/ui/use-toast";
 
 /**
- * Hook reutilizável para formulários de checklist
- * Gerencia carregamento de dados, persistência, edição e permissões.
- * Usa React Query (cache compartilhado via useAuxData) para evitar chamadas redundantes.
+ * Hook reutilizável para formulários de checklist.
+ * Gerencia carregamento de registro para edição, persistência e permissões.
+ *
+ * Diferenças em relação ao useEnsaioForm:
+ * - Usa `data` em vez de `data_ensaio` para normalização de datas
+ * - Retorna `editingChecklist` em vez de `editingEnsaio`
+ * - Usa `obterChecklistById` (não `obterEnsaioById`)
+ * - Suporta `canEditExtra` (predicado para perfis autorizados editarem)
+ * - Faz deep-merge de campos objeto ao carregar edição
+ * - Expõe `allUsers` (admin vê todos; demais veem apenas o próprio)
+ *
+ * Lógica de carregamento de dados (user, obras, regionais, projetos, faixas,
+ * filtragem por acesso, editId, valores derivados) delegada a useFormDataLoader.
  */
 export function useChecklistForm(getInitialFormData, entityName, storageName, canEditExtra = null) {
   const [editingChecklist, setEditingChecklist] = useState(null);
@@ -19,58 +27,22 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
   const [editLoading, setEditLoading] = useState(false);
   const [formData, setFormData] = useState(getInitialFormData());
 
-  const location = useLocation();
   const navigate = useNavigate();
 
   const { clearSavedData } = useFormPersistence(storageName, formData, setFormData, !!editingChecklist);
 
-  const { data: user, isLoading: loadingUser } = useCurrentUser();
+  const {
+    user, auxData, obras, regionais, projects, faixas, editId,
+    loading: dataLoading,
+    obraSelecionada, regionalSelecionada, projetosDisponiveis,
+  } = useFormDataLoader({ formData, needsUsers: true, useAccessLevel: false });
+
   const isAdmin = user?.role === 'admin';
-  const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true, needsUsers: true });
-
-  // FaixaGranulometrica — cache próprio (não está no useAuxData)
-  const { data: faixas } = useQuery({
-    queryKey: ['faixasGranulometricas'],
-    queryFn: () => listarFaixas(),
-    staleTime: 10 * 60 * 1000,
-  });
-
-  const regionais = auxData?.regionais ?? [];
-  const projects = auxData?.projects ?? [];
   const allUsers = isAdmin ? (auxData?.users ?? []) : (user ? [user] : []);
-
-  const obras = useMemo(() => {
-    if (!auxData?.obras || !user) return [];
-    if (!isAdmin) {
-      const emailLower = user.email.toLowerCase();
-      const regionaisIds = regionais
-        .filter(r =>
-          (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-          (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-        )
-        .map(r => r.id);
-      if (regionaisIds.length > 0) {
-        const regionaisSet = new Set(regionaisIds);
-        return auxData.obras.filter(obra =>
-          regionaisSet.has(obra.regional_id) &&
-          obra.status === 'em_andamento'
-        );
-      }
-      return [];
-    }
-    return auxData.obras;
-  }, [auxData?.obras, regionais, user, isAdmin]);
-
-  // editId derivado de location.search — estável enquanto o parâmetro não muda,
-  // evita recarregar o registro ao navegar entre edição/criação (P4).
-  const editId = useMemo(() => {
-    const params = new URLSearchParams(location.search);
-    return params.get('editId');
-  }, [location.search]);
 
   // Carregar checklist para edição se editId presente
   useEffect(() => {
-    if (loadingUser || loadingAux || !user) return;
+    if (dataLoading || !user) return;
 
     if (editId) {
       setEditLoading(true);
@@ -121,22 +93,10 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
       setFormData(initialNewFormData);
       setEditingChecklist(null);
     }
-  }, [editId, loadingUser, loadingAux, user?.id, obras, auxData, entityName, navigate, canEditExtra, regionais]);
-
-  // Helpers para obra/regional/projetos
-  const obraSelecionada = useMemo(() => obras.find(o => o.id === formData.obra_id), [obras, formData.obra_id]);
-  const regionalSelecionada = useMemo(() => obraSelecionada ? regionais.find(r => r.id === obraSelecionada.regional_id) : null, [obraSelecionada, regionais]);
-  const projetosDisponiveis = useMemo(() => {
-    if (!regionalSelecionada || !projects) return [];
-    const regionalProjectIds = regionalSelecionada.project_ids || [];
-    return projects.filter(p =>
-      regionalProjectIds.includes(p.id) &&
-      p.status === 'ativo'
-    );
-  }, [regionalSelecionada, projects]);
+  }, [editId, dataLoading, user?.id, obras, auxData, entityName, navigate, canEditExtra, regionais]);
 
   // Permissões — calculadas apenas quando user já foi carregado
-  const loading = loadingUser || loadingAux || editLoading;
+  const loading = dataLoading || editLoading;
   const isApproved = formData.approved === true && formData.status !== 'rascunho';
 
   const extraCanEdit = useMemo(() => {
@@ -164,7 +124,7 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
     obras,
     regionais,
     projects,
-    faixas: faixas ?? [],
+    faixas,
     user,
     allUsers,
     editingChecklist,

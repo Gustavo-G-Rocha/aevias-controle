@@ -3,9 +3,14 @@
  *
  * Teste de contrato (source-based) para useChecklistForm — hook reutilizável
  * de formulários de checklist. Complementa useChecklistFormExtraEdit.test.js
- * (que foca no canEditExtra) cobrindo o contrato geral: filtragem de obras,
+ * (que foca no canEditExtra) cobrindo o contrato geral: delegação ao hook base,
  * permissões, deep-merge de campos e formato de retorno.
  * Ambiente 'node' sem DOM/RTL — validação via leitura do source.
+ *
+ * Após AR4: a lógica comum de carregamento de dados (user, obras, regionais,
+ * projetos, faixas, filtragem por acesso, editId, valores derivados) foi
+ * extraída para useFormDataLoader. Este teste verifica a delegação e mantém
+ * as asserções específicas que permanecem no useChecklistForm.
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
@@ -14,6 +19,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const src = readFileSync(resolve(__dirname, '../../hooks/useChecklistForm.js'), 'utf-8');
+const loaderSrc = readFileSync(resolve(__dirname, '../../hooks/useFormDataLoader.js'), 'utf-8');
 
 const returnBlock = (() => {
   const blocks = [...src.matchAll(/return\s*{([\s\S]*?)};/g)];
@@ -27,18 +33,21 @@ describe('useChecklistForm — contrato', () => {
     );
   });
 
+  it('delega carregamento de dados ao useFormDataLoader sem useAccessLevel', () => {
+    expect(src).toContain('useFormDataLoader');
+    expect(src).toContain('needsUsers: true');
+    expect(src).toContain('useAccessLevel: false');
+  });
+
   it('allUsers: admin recebe todos; demais perfis recebem apenas o próprio usuário', () => {
     expect(src).toContain("const allUsers = isAdmin ? (auxData?.users ?? []) : (user ? [user] : [])");
   });
 
-  it('obras: não-admin filtra por regionais responsáveis e status em_andamento', () => {
-    expect(src).toContain('if (!isAdmin)');
-    expect(src).toContain("obra.status === 'em_andamento'");
-    expect(src).toContain('regionaisSet.has(obra.regional_id)');
-  });
-
-  it('obras: admin recebe todas as obras', () => {
-    expect(src).toContain('return auxData.obras;');
+  it('filtragem de obras por acesso está no hook base (useFormDataLoader)', () => {
+    expect(loaderSrc).toContain("user.role !== 'admin'");
+    expect(loaderSrc).toContain("obra.status === 'em_andamento'");
+    expect(loaderSrc).toContain('regionaisSet.has(obra.regional_id)');
+    expect(loaderSrc).toContain('return auxData.obras;');
   });
 
   it('faz deep-merge de campos objeto ao editar (preserva chaves adicionadas depois)', () => {

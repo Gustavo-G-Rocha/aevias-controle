@@ -3,8 +3,12 @@
  *
  * Teste de contrato (source-based) para useEnsaioForm — hook reutilizável
  * de formulários de ensaio. O ambiente de testes é 'node' (sem DOM/RTL),
- * portanto validamos o contrato lendo o source do hook, seguindo o padrão
- * estabelecido por useChecklistFormExtraEdit.test.js.
+ * portanto validamos o contrato lendo o source do hook.
+ *
+ * Após AR4: a lógica comum de carregamento de dados (user, obras, regionais,
+ * projetos, faixas, filtragem por acesso, editId, valores derivados) foi
+ * extraída para useFormDataLoader. Este teste verifica a delegação e mantém
+ * as asserções específicas que permanecem no useEnsaioForm.
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
@@ -13,6 +17,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const src = readFileSync(resolve(__dirname, '../../hooks/useEnsaioForm.js'), 'utf-8');
+const loaderSrc = readFileSync(resolve(__dirname, '../../hooks/useFormDataLoader.js'), 'utf-8');
 
 const returnBlock = (() => {
   const blocks = [...src.matchAll(/return\s*{([\s\S]*?)};/g)];
@@ -26,12 +31,25 @@ describe('useEnsaioForm — contrato', () => {
     );
   });
 
-  it('normaliza data_ensaio ao carregar para edição', () => {
-    expect(src).toContain('data_ensaio: ensaioToEdit.data_ensaio');
+  it('delega carregamento de dados ao useFormDataLoader com useAccessLevel', () => {
+    expect(src).toContain('useFormDataLoader');
+    expect(src).toContain('useAccessLevel: true');
+    expect(src).toContain('filtroTipoObra');
   });
 
-  it('deriva editId da query string de forma estável', () => {
-    expect(src).toContain("params.get('editId')");
+  it('filtragem de obras por acesso está no hook base (useFormDataLoader)', () => {
+    expect(loaderSrc).toContain("obra.status === 'em_andamento'");
+    expect(loaderSrc).toContain('laboratoristas_responsaveis');
+    expect(loaderSrc).toContain('salas_tecnicas_responsaveis');
+    expect(loaderSrc).toContain('filtroTipoObra.includes(obra.tipo_obra)');
+  });
+
+  it('editId é derivado no hook base', () => {
+    expect(loaderSrc).toContain("params.get('editId')");
+  });
+
+  it('normaliza data_ensaio ao carregar para edição', () => {
+    expect(src).toContain('data_ensaio: ensaioToEdit.data_ensaio');
   });
 
   it('carrega ensaio via obterEnsaioById', () => {
@@ -48,17 +66,6 @@ describe('useEnsaioForm — contrato', () => {
     expect(src).toContain(
       "ensaioToEdit.status === 'rascunho' || ensaioToEdit.status === 'finalizado' || ensaioToEdit.approved === false"
     );
-  });
-
-  it('filtra obras para access_level user por regional responsável e em_andamento', () => {
-    expect(src).toContain("currentUserAccessLevel === 'user'");
-    expect(src).toContain('laboratoristas_responsaveis');
-    expect(src).toContain('salas_tecnicas_responsaveis');
-    expect(src).toContain("obra.status === 'em_andamento'");
-  });
-
-  it('aplica filtroTipoObra quando fornecido', () => {
-    expect(src).toContain('filtroTipoObra.includes(obra.tipo_obra)');
   });
 
   it('trata erro de carregamento com toast + navigate', () => {
