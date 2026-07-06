@@ -351,6 +351,10 @@
     button, .btn {
       font-size: 0.8rem !important;
     }
+    /* WCAG 2.1 AA — área de toque mínima de 44px em mobile */
+    button, .btn, [role="button"] {
+      min-height: 44px !important;
+    }
   }
 
   /* Mobile form pages — full width, no side padding */
