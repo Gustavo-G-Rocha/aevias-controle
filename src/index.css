@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo:wght@400;500;600;700;800&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
 @media print {
   @page {
     margin: 10mm;
@@ -130,6 +132,11 @@
   --font-size-xl:   1.25rem;
   --font-size-2xl:  1.5rem;
   --font-size-3xl:  1.875rem;
+
+  /* ── Famílias tipográficas da marca ── */
+  --font-heading: 'Exo', system-ui, sans-serif;
+  --font-body:    'Poppins', system-ui, sans-serif;
+  --font-display: 'Exo', system-ui, sans-serif;
 
   /* ── Transições ── */
   --transition-fast:   150ms ease;
@@ -440,6 +447,7 @@
 
   body {
     @apply text-foreground;
+    font-family: var(--font-body);
     background-color: var(--color-background);
     overscroll-behavior-y: none;
     overflow-x: hidden;
@@ -448,6 +456,11 @@
     padding-bottom: env(safe-area-inset-bottom);
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
+  }
+
+  /* ── Aplicação da tipografia da marca em títulos ── */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
   }
 
   #root {
