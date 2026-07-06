@@ -5,6 +5,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
+import { logger } from '@/utils/logger';
 
 /**
  * Gera hash SHA-256 simples do payload para deduplicação
@@ -22,7 +23,7 @@ export function generatePayloadHash(payload) {
     // Fallback: usar crypto do Node (não deve chegar aqui em produção)
     return crypto.createHash('sha256').update(jsonStr).digest('hex').substring(0, 32);
   } catch (e) {
-    console.error('[offlineQueue] Erro ao gerar hash:', e);
+    logger.error('[offlineQueue] Erro ao gerar hash:', e);
     return `hash-${Date.now()}`;
   }
 }

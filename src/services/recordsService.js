@@ -4,6 +4,7 @@
 
 import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
+import { logger } from '@/utils/logger';
 
 // ─── Mapa canônico de todas as entidades de registro ──────────────────────────
 // Limite único por entidade — cache unificado entre Dashboard e MeusEnsaios
@@ -50,7 +51,7 @@ async function loadEntity(entityType, limit = RECORD_PAGE_SIZE) {
   try {
     return await base44.entities[entityType].list('-created_date', limit);
   } catch (e) {
-    console.error(`[recordsService] Falha ao carregar ${entityType}:`, e?.message || e);
+    logger.error(`[recordsService] Falha ao carregar ${entityType}:`, e?.message || e);
     return [];
   }
 }
@@ -117,7 +118,7 @@ async function loadEntitiesInBatches(entityList, limit) {
     const settled = await Promise.allSettled(batch.map(type => loadEntity(type, limit)));
     settled.forEach((r, idx) => {
       if (r.status === 'rejected') {
-        console.warn(`[recordsService] loadAllRecords: ${batch[idx]} rejeitou:`, r.reason?.message || r.reason);
+        logger.warn(`[recordsService] loadAllRecords: ${batch[idx]} rejeitou:`, r.reason?.message || r.reason);
         allResults.push([]);
       } else {
         allResults.push(r.value);
@@ -148,7 +149,7 @@ export async function loadRecordsByObra(obraId) {
   );
   const results = settled.map((r, i) => {
     if (r.status === 'rejected') {
-      console.warn(`[recordsService] loadRecordsByObra: ${ALL_RECORD_ENTITIES[i]} rejeitou:`, r.reason?.message || r.reason);
+      logger.warn(`[recordsService] loadRecordsByObra: ${ALL_RECORD_ENTITIES[i]} rejeitou:`, r.reason?.message || r.reason);
       return [];
     }
     return r.value;
@@ -171,10 +172,10 @@ export async function loadAuxData({ needsRegionais = true, needsUsers = false } 
   
   const [obrasResult, projectsResult, regionaisResult, usersResult] = results;
   
-  if (obrasResult.status    === 'rejected') console.warn('[recordsService] loadAuxData: Obra falhou:',     obrasResult.reason?.message);
-  if (projectsResult.status === 'rejected') console.warn('[recordsService] loadAuxData: Project falhou:', projectsResult.reason?.message);
-  if (regionaisResult.status === 'rejected') console.warn('[recordsService] loadAuxData: Regional falhou:', regionaisResult.reason?.message);
-  if (usersResult.status    === 'rejected') console.warn('[recordsService] loadAuxData: User falhou:',     usersResult.reason?.message);
+  if (obrasResult.status    === 'rejected') logger.warn('[recordsService] loadAuxData: Obra falhou:',     obrasResult.reason?.message);
+  if (projectsResult.status === 'rejected') logger.warn('[recordsService] loadAuxData: Project falhou:', projectsResult.reason?.message);
+  if (regionaisResult.status === 'rejected') logger.warn('[recordsService] loadAuxData: Regional falhou:', regionaisResult.reason?.message);
+  if (usersResult.status    === 'rejected') logger.warn('[recordsService] loadAuxData: User falhou:',     usersResult.reason?.message);
   
   return {
     obras:     obrasResult.status    === 'fulfilled' ? obrasResult.value    : [],
@@ -222,7 +223,7 @@ export async function listarRegistros(entityName, sort = '-created_date', limit 
   try {
     return await base44.entities[entityName].list(sort, limit);
   } catch (e) {
-    console.error(`[recordsService] Falha ao listar ${entityName}:`, e?.message || e);
+    logger.error(`[recordsService] Falha ao listar ${entityName}:`, e?.message || e);
     return [];
   }
 }
@@ -239,7 +240,7 @@ export async function filtrarRegistros(entityName, filtro, sort = '-created_date
   try {
     return await base44.entities[entityName].filter(filtro, sort, limit);
   } catch (e) {
-    console.error(`[recordsService] Falha ao filtrar ${entityName}:`, e?.message || e);
+    logger.error(`[recordsService] Falha ao filtrar ${entityName}:`, e?.message || e);
     return [];
   }
 }

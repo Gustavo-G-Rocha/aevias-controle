@@ -4,6 +4,7 @@ import { obterRegionalById } from './regionaisService';
 import { obterProjectById } from './projectsService';
 import { obterFaixaById } from './faixasService';
 import { filtrarUsuarios } from './usuariosService';
+import { logger } from '@/utils/logger';
 
 /**
  * Carrega o par obra → regional a partir do obra_id de um registro.
@@ -19,12 +20,12 @@ export async function carregarObraRegional(obraId) {
       try {
         regional = await obterRegionalById(obra.regional_id);
       } catch (err) {
-        console.warn('[RelatorioContext] Regional não carregada:', err);
+        logger.warn('[RelatorioContext] Regional não carregada:', err);
       }
     }
     return { obra, regional };
   } catch (err) {
-    console.warn('[RelatorioContext] Obra não carregada:', err);
+    logger.warn('[RelatorioContext] Obra não carregada:', err);
     return { obra: null, regional: null };
   }
 }
@@ -37,7 +38,7 @@ export async function carregarProject(projectId) {
   try {
     return await obterProjectById(projectId);
   } catch (err) {
-    console.warn('[RelatorioContext] Projeto não carregado:', err);
+    logger.warn('[RelatorioContext] Projeto não carregado:', err);
     return null;
   }
 }
@@ -50,7 +51,7 @@ export async function carregarFaixaDoProject(project) {
   try {
     return await obterFaixaById(project.faixa_granulometrica_id);
   } catch (err) {
-    console.warn('[RelatorioContext] Faixa granulométrica não carregada:', err);
+    logger.warn('[RelatorioContext] Faixa granulométrica não carregada:', err);
     return null;
   }
 }
@@ -64,7 +65,7 @@ export async function carregarCreatorUser(email) {
     const users = await filtrarUsuarios({ email });
     return users?.length > 0 ? users[0] : null;
   } catch (err) {
-    console.warn('[RelatorioContext] Criador não carregado:', err);
+    logger.warn('[RelatorioContext] Criador não carregado:', err);
     return null;
   }
 }
