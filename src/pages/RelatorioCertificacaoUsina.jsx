@@ -44,10 +44,10 @@ export default function RelatorioCertificacaoUsina() {
     if (!rows?.length) return null;
     return (
       <div style={{ marginBottom: "10px" }}>
-        <div style={{ fontSize: "10px", fontWeight: 600, color: "#00233B", borderBottom: "1px solid #BFCF99", paddingBottom: "2px", marginBottom: "4px" }}>{title}</div>
+        <div style={{ fontSize: "10px", fontWeight: 600, color: 'var(--color-primary)', borderBottom: '1px solid var(--color-secondary)', paddingBottom: "2px", marginBottom: "4px" }}>{title}</div>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "10px" }}>
           <thead>
-            <tr style={{ backgroundColor: "#f1f5f9" }}>
+            <tr style={{ backgroundColor: 'var(--color-surface-muted)' }}>
               {hasPeneira && <th style={td}>Peneira</th>}
               <th style={td}>Projeto</th>
               <th style={td}>Obtido</th>
@@ -77,16 +77,16 @@ export default function RelatorioCertificacaoUsina() {
     maxWidth: "210mm",
     margin: "0 auto",
     padding: "10mm 15mm",
-    backgroundColor: "#fff",
+    backgroundColor: 'var(--color-surface)',
     boxSizing: "border-box",
     fontFamily: "Arial, sans-serif",
   };
 
   return (
-    <div style={{ backgroundColor: "#e2e8f0", minHeight: "100vh", padding: "24px 0" }}>
+    <div style={{ backgroundColor: 'var(--color-surface-muted)', minHeight: "100vh", padding: "24px 0" }}>
       {/* Toolbar */}
       <div className="print:hidden flex justify-center mb-4">
-        <Button onClick={() => window.print()} className="gap-2 bg-[#00233B] hover:bg-[#00304F] text-white">
+        <Button onClick={() => window.print()} className="gap-2 text-white" style={{ backgroundColor: 'var(--color-primary)' }}>
           <Printer className="w-4 h-4" /> Imprimir / Salvar PDF
         </Button>
       </div>
@@ -110,7 +110,7 @@ export default function RelatorioCertificacaoUsina() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "6px" }}>
           <div>
             <SecTitle breakBefore={false}>2 - CLASSE PRETENDIDA</SecTitle>
-            <div style={{ padding: "6px 8px", border: "1px solid #cbd5e1", fontSize: "13px", fontWeight: 700, color: "#00233B" }}>{val(data.classe_usina)}</div>
+            <div style={{ padding: "6px 8px", border: '1px solid var(--color-border-strong)', fontSize: "13px", fontWeight: 700, color: 'var(--color-primary)' }}>{val(data.classe_usina)}</div>
           </div>
           <div>
             <SecTitle breakBefore={false}>3 - TIPO DE USINA</SecTitle>
@@ -163,13 +163,13 @@ export default function RelatorioCertificacaoUsina() {
         {/* ── 7.2 AFERIÇÃO ────────────────────────────────────────────────── */}
         <SecTitle breakBefore>7.2 AFERIÇÃO, REPETIBILIDADE E REPRODUTIBILIDADE</SecTitle>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "10px" }}>
-          <div style={{ border: "1px solid #cbd5e1", borderRadius: "4px", padding: "8px", fontSize: "11px" }}>
-            <div style={{ fontWeight: 600, marginBottom: "4px", color: "#00233B" }}>Repetibilidade</div>
+          <div style={{ border: '1px solid var(--color-border-strong)', borderRadius: "4px", padding: "8px", fontSize: "11px" }}>
+            <div style={{ fontWeight: 600, marginBottom: "4px", color: 'var(--color-primary)' }}>Repetibilidade</div>
             <div>Desvio padrão: <strong>{val(afeicao.repetibilidade_desvio_padrao)}</strong></div>
             <div>Satisfatório: <strong>{val(afeicao.repetibilidade_satisfatorio)}</strong></div>
           </div>
-          <div style={{ border: "1px solid #cbd5e1", borderRadius: "4px", padding: "8px", fontSize: "11px" }}>
-            <div style={{ fontWeight: 600, marginBottom: "4px", color: "#00233B" }}>Reprodutibilidade</div>
+          <div style={{ border: '1px solid var(--color-border-strong)', borderRadius: "4px", padding: "8px", fontSize: "11px" }}>
+            <div style={{ fontWeight: 600, marginBottom: "4px", color: 'var(--color-primary)' }}>Reprodutibilidade</div>
             <div>Desvio padrão: <strong>{val(afeicao.reprodutibilidade_desvio_padrao)}</strong></div>
             <div>Satisfatório: <strong>{val(afeicao.reprodutibilidade_satisfatorio)}</strong></div>
           </div>
@@ -191,38 +191,38 @@ export default function RelatorioCertificacaoUsina() {
           <ConformeRow label="Baias separadoras" value={ef.baias_separadoras} />
           <ConformeRow label="Identificação pilhas" value={ef.identificacao_pilhas} />
           <tr style={{ breakInside: "avoid" }}>
-            <td style={{ ...td, width: "72%", color: "#475569" }}>Piso</td>
+            <td style={{ ...td, width: "72%", color: 'var(--color-text-muted)' }}>Piso</td>
             <td style={{ ...td, width: "28%", fontWeight: 600, textAlign: "center" }}>{val(ef.piso_tipo)}{ef.piso_outro ? ` — ${ef.piso_outro}` : ""}</td>
           </tr>
           {Array.isArray(ef.coberturas_po_pedra) && ef.coberturas_po_pedra.length > 0
             ? ef.coberturas_po_pedra.map((cob, i) => (
                 <tr key={i} style={{ breakInside: "avoid" }}>
-                  <td style={{ ...td, color: "#475569" }}>Cobertura do pó de pedra – Silo {i + 1}</td>
+                  <td style={{ ...td, color: 'var(--color-text-muted)' }}>Cobertura do pó de pedra – Silo {i + 1}</td>
                   <td style={{ ...td, fontWeight: 600, textAlign: "center" }}>{val(cob)}</td>
                 </tr>
               ))
             : (
                 <tr style={{ breakInside: "avoid" }}>
-                  <td style={{ ...td, color: "#475569" }}>Cobertura do pó de pedra</td>
+                  <td style={{ ...td, color: 'var(--color-text-muted)' }}>Cobertura do pó de pedra</td>
                   <td style={{ ...td, fontWeight: 600, textAlign: "center" }}>{val(ef.cobertura_po_pedra)}</td>
                 </tr>
               )
           }
           <tr style={{ breakInside: "avoid" }}>
-            <td style={{ ...td, color: "#475569" }}>Quantidade de silos</td>
+            <td style={{ ...td, color: 'var(--color-text-muted)' }}>Quantidade de silos</td>
             <td style={{ ...td, fontWeight: 600, textAlign: "center" }}>{val(ef.quantidade_silos)}</td>
           </tr>
           <tr style={{ breakInside: "avoid" }}>
-            <td style={{ ...td, color: "#475569" }}>Tamanho relação concha</td>
+            <td style={{ ...td, color: 'var(--color-text-muted)' }}>Tamanho relação concha</td>
             <td style={{ ...td, fontWeight: 600, textAlign: "center" }}>{val(ef.tamanho_relacao_concha)}</td>
           </tr>
           <tr style={{ breakInside: "avoid" }}>
-            <td style={{ ...td, color: "#475569" }}>Altura divisória baias</td>
+            <td style={{ ...td, color: 'var(--color-text-muted)' }}>Altura divisória baias</td>
             <td style={{ ...td, fontWeight: 600, textAlign: "center" }}>{val(ef.altura_divisoria_baias)}</td>
           </tr>
           <ConformeRow label="Sistema de vibração" value={ef.sistema_vibracao} />
           <tr style={{ breakInside: "avoid" }}>
-            <td style={{ ...td, color: "#475569" }}>Tanque – controle de temperatura</td>
+            <td style={{ ...td, color: 'var(--color-text-muted)' }}>Tanque – controle de temperatura</td>
             <td style={{ ...td, fontWeight: 600, textAlign: "center" }}>{val(ef.tanque_controle_temperatura)}</td>
           </tr>
           <ConformeRow label="Termômetros internos" value={ef.termometros_internos} />
@@ -230,7 +230,7 @@ export default function RelatorioCertificacaoUsina() {
           <ConformeRow label="Agitadores" value={ef.agitadores} />
           {ef.agitadores === "Sim" && (
             <tr style={{ breakInside: "avoid" }}>
-              <td style={{ ...td, color: "#475569" }}>Tipo de agitador</td>
+              <td style={{ ...td, color: 'var(--color-text-muted)' }}>Tipo de agitador</td>
               <td style={{ ...td, fontWeight: 600, textAlign: "center" }}>{val(ef.agitadores_tipo)}</td>
             </tr>
           )}
@@ -247,11 +247,11 @@ export default function RelatorioCertificacaoUsina() {
   <InfoRow label="Retido nº8 (%)" value={ua.material_retido_n8} label2="Temp. final massa (°C)" value2={ua.temperatura_final_massa} />
   
   <tr style={{ breakInside: "avoid" }}>
-    <td style={{ ...td, color: "#475569", width: "20%" }}>Fonte elétrica</td>
+    <td style={{ ...td, color: 'var(--color-text-muted)', width: "20%" }}>Fonte elétrica</td>
     <td style={{ ...td, fontWeight: 600 }} colSpan={3}>{val(ua.fonte_eletrica)}{ua.observacoes_fonte ? ` — ${ua.observacoes_fonte}` : ""}</td>
   </tr>
   <tr style={{ breakInside: "avoid" }}>
-    <td style={{ ...td, color: "#475569", width: "20%" }}>Combustível</td>
+    <td style={{ ...td, color: 'var(--color-text-muted)', width: "20%" }}>Combustível</td>
     <td style={{ ...td, fontWeight: 600 }} colSpan={3}>{val(ua.tipo_combustivel)}</td>
   </tr>
   
@@ -271,9 +271,9 @@ export default function RelatorioCertificacaoUsina() {
     { label: "Usina utiliza RAP?", val: ua.utiliza_rap },
   ].map((item, idx) => (
     <tr key={idx} style={{ breakInside: "avoid" }}>
-      <td style={{ ...td, color: "#475569", width: "50%"}}>{item.label}</td>
+      <td style={{ ...td, color: 'var(--color-text-muted)', width: "50%"}}>{item.label}</td>
       <td style={{ ...td, fontWeight: 700, textAlign: "center" }} colSpan={3}>
-        <span style={{ color: item.val === "Sim" || item.val === true ? "#15803d" : "#b91c1c" }}>
+        <span style={{ color: item.val === "Sim" || item.val === true ? 'var(--color-success)' : 'var(--color-danger)' }}>
           {item.val ? "Sim" : "Não"}
         </span>
       </td>
@@ -282,23 +282,23 @@ export default function RelatorioCertificacaoUsina() {
   {ua.utiliza_rap === "Sim" && (
     <>
       <tr style={{ breakInside: "avoid" }}>
-        <td style={{ ...td, color: "#475569", width: "50%"}}>Possui silo específico para RAP?</td>
+        <td style={{ ...td, color: 'var(--color-text-muted)', width: "50%"}}>Possui silo específico para RAP?</td>
         <td style={{ ...td, fontWeight: 700, textAlign: "center" }} colSpan={3}>
-          <span style={{ color: ua.silo_especifico_rap === "Sim" ? "#15803d" : "#b91c1c" }}>
+          <span style={{ color: ua.silo_especifico_rap === "Sim" ? 'var(--color-success)' : 'var(--color-danger)' }}>
             {ua.silo_especifico_rap || "Não"}
           </span>
         </td>
       </tr>
       <tr style={{ breakInside: "avoid" }}>
-        <td style={{ ...td, color: "#475569", width: "50%"}}>Possui sistema automatizado de dosagem de RAP?</td>
+        <td style={{ ...td, color: 'var(--color-text-muted)', width: "50%"}}>Possui sistema automatizado de dosagem de RAP?</td>
         <td style={{ ...td, fontWeight: 700, textAlign: "center" }} colSpan={3}>
-          <span style={{ color: ua.sistema_dosagem_rap === "Sim" ? "#15803d" : "#b91c1c" }}>
+          <span style={{ color: ua.sistema_dosagem_rap === "Sim" ? 'var(--color-success)' : 'var(--color-danger)' }}>
             {ua.sistema_dosagem_rap || "Não"}
           </span>
         </td>
       </tr>
       <tr style={{ breakInside: "avoid" }}>
-        <td style={{ ...td, color: "#475569", width: "50%"}}>Qual % utilizado de RAP?</td>
+        <td style={{ ...td, color: 'var(--color-text-muted)', width: "50%"}}>Qual % utilizado de RAP?</td>
         <td style={{ ...td, fontWeight: 700, textAlign: "center" }} colSpan={3}>
           {ua.percentual_rap ? `${ua.percentual_rap}%` : "-"}
         </td>
@@ -311,15 +311,15 @@ export default function RelatorioCertificacaoUsina() {
         <SecTitle>8 - RESULTADO</SecTitle>
 
         {(data.observacoes_resultado || data.observacoes_gerais) && (
-          <div style={{ fontSize: "11px", marginBottom: "10px", padding: "6px 8px", border: "1px solid #e2e8f0", borderRadius: "4px" }}>
+          <div style={{ fontSize: "11px", marginBottom: "10px", padding: "6px 8px", border: '1px solid var(--color-border)', borderRadius: "4px" }}>
             {data.observacoes_resultado && <p><span style={{ fontWeight: 600 }}>Observações resultado:</span> {data.observacoes_resultado}</p>}
             {data.observacoes_gerais && <p style={{ marginTop: "4px" }}><span style={{ fontWeight: 600 }}>Observações gerais:</span> {data.observacoes_gerais}</p>}
           </div>
         )}
 
-        <div style={{ textAlign: "center", padding: "24px 16px", border: "2px solid #00233B", borderRadius: "6px", marginTop: "8px" }}>
-          <div style={{ fontSize: "12px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>Classe atendida:</div>
-          <div style={{ fontSize: "28px", fontWeight: 700, color: "#00233B" }}>{val(data.resultado_classe)}</div>
+        <div style={{ textAlign: "center", padding: "24px 16px", border: '2px solid var(--color-primary)', borderRadius: "6px", marginTop: "8px" }}>
+          <div style={{ fontSize: "12px", fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: "6px" }}>Classe atendida:</div>
+          <div style={{ fontSize: "28px", fontWeight: 700, color: 'var(--color-primary)' }}>{val(data.resultado_classe)}</div>
         </div>
       </div>
 

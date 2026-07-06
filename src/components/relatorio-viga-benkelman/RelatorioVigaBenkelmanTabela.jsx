@@ -29,7 +29,7 @@ export default function RelatorioVigaBenkelmanTabela({ faixa, ensaio }) {
 
   return (
     <div className="mb-0 overflow-x-auto print:break-inside-avoid">
-      <div className="bg-slate-200 px-1.5 py-0 font-bold text-center text-[8px] border" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px' }}>
+      <div className="bg-slate-200 px-1.5 py-0 font-bold text-center text-[8px] border" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px' }}>
         LEVANTAMENTO DEFLECTOMÉTRICO POR VIGA BENKELMAN
       </div>
       <table className="w-full border-collapse text-[7px]" style={{ borderWidth: '0.05px', tableLayout: 'fixed' }}>
@@ -40,24 +40,24 @@ export default function RelatorioVigaBenkelmanTabela({ faixa, ensaio }) {
         </colgroup>
         <thead>
           <tr className="bg-slate-100">
-            <th rowSpan="2" className="px-1 py-0.5 text-center font-semibold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>Estaca / km</th>
-            <th colSpan="4" className="px-1 py-0.5 text-center font-semibold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>BORDO ESQUERDO</th>
-            <th colSpan="4" className="px-1 py-0.5 text-center font-semibold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>EIXO</th>
-            <th colSpan="4" className="px-1 py-0.5 text-center font-semibold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>BORDO DIREITO</th>
+            <th rowSpan="2" className="px-1 py-0.5 text-center font-semibold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>Estaca / km</th>
+            <th colSpan="4" className="px-1 py-0.5 text-center font-semibold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>BORDO ESQUERDO</th>
+            <th colSpan="4" className="px-1 py-0.5 text-center font-semibold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>EIXO</th>
+            <th colSpan="4" className="px-1 py-0.5 text-center font-semibold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>BORDO DIREITO</th>
           </tr>
           <tr className="bg-slate-100">
-            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>Leitura Inicial (A)</th>
-            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>Leitura Final (B)</th>
-            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>Diferença (C = A - B)</th>
-            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>Deflexão (x10⁻²mm)</th>
-            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>Leitura Inicial (A)</th>
-            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>Leitura Final (B)</th>
-            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>Diferença (C = A - B)</th>
-            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>Deflexão (x10⁻²mm)</th>
-            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>Leitura Inicial (A)</th>
-            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>Leitura Final (B)</th>
-            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>Diferença (C = A - B)</th>
-            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>Deflexão (x10⁻²mm)</th>
+            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>Leitura Inicial (A)</th>
+            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>Leitura Final (B)</th>
+            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>Diferença (C = A - B)</th>
+            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>Deflexão (x10⁻²mm)</th>
+            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>Leitura Inicial (A)</th>
+            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>Leitura Final (B)</th>
+            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>Diferença (C = A - B)</th>
+            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>Deflexão (x10⁻²mm)</th>
+            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>Leitura Inicial (A)</th>
+            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>Leitura Final (B)</th>
+            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>Diferença (C = A - B)</th>
+            <th className="px-1 py-0.5 font-semibold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>Deflexão (x10⁻²mm)</th>
           </tr>
         </thead>
         <tbody>
@@ -75,21 +75,21 @@ export default function RelatorioVigaBenkelmanTabela({ faixa, ensaio }) {
 
             return (
               <tr key={`lev-${idx}`} className={bgColor} style={{ height: '22px' }}>
-                <td className="px-0.5 py-0 font-semibold text-center" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>
+                <td className="px-0.5 py-0 font-semibold text-center" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>
                   {lev?.estaca_km || ''}
                 </td>
-                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temBE && lev.bordo_esquerdo.leitura_inicial !== 0 ? lev.bordo_esquerdo.leitura_inicial.toFixed(0) : ''}</td>
-                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temBE ? lev.bordo_esquerdo.leitura_final.toFixed(0) : ''}</td>
-                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temBE && lev.bordo_esquerdo.diferenca !== 0 ? lev.bordo_esquerdo.diferenca.toFixed(0) : ''}</td>
-                <td className={`px-0.5 py-0 text-center font-semibold ${beExcede ? 'text-red-600' : ''}`} style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temBE && lev.bordo_esquerdo.deflexao !== 0 ? lev.bordo_esquerdo.deflexao.toFixed(0) : ''}</td>
-                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temEixo && lev.eixo.leitura_inicial !== 0 ? lev.eixo.leitura_inicial.toFixed(0) : ''}</td>
-                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temEixo ? lev.eixo.leitura_final.toFixed(0) : ''}</td>
-                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temEixo && lev.eixo.diferenca !== 0 ? lev.eixo.diferenca.toFixed(0) : ''}</td>
-                <td className={`px-0.5 py-0 text-center font-semibold ${eixoExcede ? 'text-red-600' : ''}`} style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temEixo && lev.eixo.deflexao !== 0 ? lev.eixo.deflexao.toFixed(0) : ''}</td>
-                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temBD && lev.bordo_direito.leitura_inicial !== 0 ? lev.bordo_direito.leitura_inicial.toFixed(0) : ''}</td>
-                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temBD ? lev.bordo_direito.leitura_final.toFixed(0) : ''}</td>
-                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temBD && lev.bordo_direito.diferenca !== 0 ? lev.bordo_direito.diferenca.toFixed(0) : ''}</td>
-                <td className={`px-0.5 py-0 text-center font-semibold ${bdExcede ? 'text-red-600' : ''}`} style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temBD && lev.bordo_direito.deflexao !== 0 ? lev.bordo_direito.deflexao.toFixed(0) : ''}</td>
+                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temBE && lev.bordo_esquerdo.leitura_inicial !== 0 ? lev.bordo_esquerdo.leitura_inicial.toFixed(0) : ''}</td>
+                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temBE ? lev.bordo_esquerdo.leitura_final.toFixed(0) : ''}</td>
+                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temBE && lev.bordo_esquerdo.diferenca !== 0 ? lev.bordo_esquerdo.diferenca.toFixed(0) : ''}</td>
+                <td className={`px-0.5 py-0 text-center font-semibold ${beExcede ? 'text-red-600' : ''}`} style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temBE && lev.bordo_esquerdo.deflexao !== 0 ? lev.bordo_esquerdo.deflexao.toFixed(0) : ''}</td>
+                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temEixo && lev.eixo.leitura_inicial !== 0 ? lev.eixo.leitura_inicial.toFixed(0) : ''}</td>
+                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temEixo ? lev.eixo.leitura_final.toFixed(0) : ''}</td>
+                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temEixo && lev.eixo.diferenca !== 0 ? lev.eixo.diferenca.toFixed(0) : ''}</td>
+                <td className={`px-0.5 py-0 text-center font-semibold ${eixoExcede ? 'text-red-600' : ''}`} style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temEixo && lev.eixo.deflexao !== 0 ? lev.eixo.deflexao.toFixed(0) : ''}</td>
+                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temBD && lev.bordo_direito.leitura_inicial !== 0 ? lev.bordo_direito.leitura_inicial.toFixed(0) : ''}</td>
+                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temBD ? lev.bordo_direito.leitura_final.toFixed(0) : ''}</td>
+                <td className="px-0.5 py-0 text-center" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temBD && lev.bordo_direito.diferenca !== 0 ? lev.bordo_direito.diferenca.toFixed(0) : ''}</td>
+                <td className={`px-0.5 py-0 text-center font-semibold ${bdExcede ? 'text-red-600' : ''}`} style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{temBD && lev.bordo_direito.deflexao !== 0 ? lev.bordo_direito.deflexao.toFixed(0) : ''}</td>
               </tr>
             );
           })}
@@ -105,29 +105,29 @@ export default function RelatorioVigaBenkelmanTabela({ faixa, ensaio }) {
         </colgroup>
         <tbody>
           <tr className="bg-white">
-            <td rowSpan="3" className="px-0.5 py-0.5 text-center font-semibold align-middle" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>CONTROLE<br/>ESTATÍSTICO</td>
-            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>QT. LEITURAS:</td>
-            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.bordoEsquerdo.qt}</td>
-            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>QT. LEITURAS:</td>
-            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.eixo.qt}</td>
-            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>QT. LEITURAS:</td>
-            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.bordoDireito.qt}</td>
+            <td rowSpan="3" className="px-0.5 py-0.5 text-center font-semibold align-middle" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>CONTROLE<br/>ESTATÍSTICO</td>
+            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>QT. LEITURAS:</td>
+            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.bordoEsquerdo.qt}</td>
+            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>QT. LEITURAS:</td>
+            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.eixo.qt}</td>
+            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>QT. LEITURAS:</td>
+            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.bordoDireito.qt}</td>
           </tr>
           <tr className="bg-white">
-            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>MÉDIA:</td>
-            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.bordoEsquerdo.media.toFixed(0)}</td>
-            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>MÉDIA:</td>
-            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.eixo.media.toFixed(0)}</td>
-            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>MÉDIA:</td>
-            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.bordoDireito.media.toFixed(0)}</td>
+            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>MÉDIA:</td>
+            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.bordoEsquerdo.media.toFixed(0)}</td>
+            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>MÉDIA:</td>
+            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.eixo.media.toFixed(0)}</td>
+            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>MÉDIA:</td>
+            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.bordoDireito.media.toFixed(0)}</td>
           </tr>
           <tr className="bg-white">
-            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>DESV. PAD.:</td>
-            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.bordoEsquerdo.desvPad.toFixed(0)}</td>
-            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>DESV. PAD.:</td>
-            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.eixo.desvPad.toFixed(0)}</td>
-            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>DESV. PAD.:</td>
-            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'rgb(148, 163, 184)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.bordoDireito.desvPad.toFixed(0)}</td>
+            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>DESV. PAD.:</td>
+            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.bordoEsquerdo.desvPad.toFixed(0)}</td>
+            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>DESV. PAD.:</td>
+            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.eixo.desvPad.toFixed(0)}</td>
+            <td colSpan="3" className="px-0.5 py-0.5 text-left font-semibold text-[6px]" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>DESV. PAD.:</td>
+            <td className="px-0.5 py-0.5 text-center font-bold" style={{ borderColor: 'var(--color-border-strong)', borderWidth: '0.05px', borderStyle: 'solid' }}>{stats.bordoDireito.desvPad.toFixed(0)}</td>
           </tr>
         </tbody>
       </table>

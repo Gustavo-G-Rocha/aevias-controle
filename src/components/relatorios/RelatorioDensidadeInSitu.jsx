@@ -143,157 +143,157 @@ export default function RelatorioDensidadeInSitu({ ensaio, obra, regional }) {
         <table className="w-full border-collapse text-[9px]">
           <tbody>
             <tr>
-              <td className="border px-1 py-1 font-semibold" style={{ borderColor: 'rgb(148, 163, 184)' }}>ESTACA</td>
+              <td className="border px-1 py-1 font-semibold" style={{ borderColor: 'var(--color-border-strong)' }}>ESTACA</td>
               {furos.map((furo, i) => (
-                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'rgb(148, 163, 184)' }}>{furo.estaca || ''}</td>
+                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'var(--color-border-strong)' }}>{furo.estaca || ''}</td>
               ))}
             </tr>
             <tr>
-              <td className="border px-1 py-1 font-semibold" style={{ borderColor: 'rgb(148, 163, 184)' }}>PISTA</td>
+              <td className="border px-1 py-1 font-semibold" style={{ borderColor: 'var(--color-border-strong)' }}>PISTA</td>
               {furos.map((furo, i) => (
-                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'rgb(148, 163, 184)' }}>{furo.pista || ''}</td>
+                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'var(--color-border-strong)' }}>{furo.pista || ''}</td>
               ))}
             </tr>
 
             <tr>
-              <td colSpan={furos.length + 1} className="border px-1 py-1 font-semibold text-center text-[9px]" style={{ backgroundColor: 'hsl(214.29deg 31.82% 91.37%)', borderColor: 'rgb(148, 163, 184)' }}>
+              <td colSpan={furos.length + 1} className="border px-1 py-1 font-semibold text-center text-[9px]" style={{ backgroundColor: 'var(--color-surface-muted)', borderColor: 'var(--color-border-strong)' }}>
                 ENSAIO DE DENSIDADE "IN SITU" - DNIT 458/25
               </td>
             </tr>
 
             <tr>
-              <td className="border px-1 py-1" style={{ borderColor: 'rgb(148, 163, 184)' }}>PESO AREIA NO FUNIL (g)</td>
+              <td className="border px-1 py-1" style={{ borderColor: 'var(--color-border-strong)' }}>PESO AREIA NO FUNIL (g)</td>
               {furos.map((furo, i) => (
-                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'rgb(148, 163, 184)' }}>
+                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'var(--color-border-strong)' }}>
                   {ensaio.peso_areia_funil !== null && ensaio.peso_areia_funil !== undefined ? ensaio.peso_areia_funil.toFixed(1) : ''}
                 </td>
               ))}
             </tr>
             <tr>
-              <td className="border px-1 py-1" style={{ borderColor: 'rgb(148, 163, 184)' }}>DENSIDADE DA AREIA (g/cm³)</td>
+              <td className="border px-1 py-1" style={{ borderColor: 'var(--color-border-strong)' }}>DENSIDADE DA AREIA (g/cm³)</td>
               {furos.map((furo, i) => (
-                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'rgb(148, 163, 184)' }}>
+                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'var(--color-border-strong)' }}>
                   {ensaio.densidade_areia !== null && ensaio.densidade_areia !== undefined ? ensaio.densidade_areia.toFixed(3) : ''}
                 </td>
               ))}
             </tr>
             {ensaio.substituicao_retido_3_4 && (
               <tr>
-                <td className="border px-1 py-1" style={{ borderColor: 'rgb(148, 163, 184)' }}>DENSIDADE REAL RETIDA 3/4" (g/cm³)</td>
+                <td className="border px-1 py-1" style={{ borderColor: 'var(--color-border-strong)' }}>DENSIDADE REAL RETIDA 3/4" (g/cm³)</td>
                 {furos.map((furo, i) => (
-                  <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'rgb(148, 163, 184)' }}>{ensaio.densidade_real_retida_3_4 || ''}</td>
+                  <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'var(--color-border-strong)' }}>{ensaio.densidade_real_retida_3_4 || ''}</td>
                 ))}
               </tr>
             )}
             <tr>
-              <td className="border px-1 py-1" style={{ borderColor: 'rgb(148, 163, 184)' }}>PROFUNDIDADE DO FURO (cm)</td>
+              <td className="border px-1 py-1" style={{ borderColor: 'var(--color-border-strong)' }}>PROFUNDIDADE DO FURO (cm)</td>
               {furos.map((furo, i) => (
-                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'rgb(148, 163, 184)' }}>{furo.profundidade_furo || ''}</td>
+                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'var(--color-border-strong)' }}>{furo.profundidade_furo || ''}</td>
               ))}
             </tr>
             <tr>
-              <td className="border px-1 py-1" style={{ borderColor: 'rgb(148, 163, 184)' }}>PESO AREIA+GARRAFA, ANTES (g)</td>
+              <td className="border px-1 py-1" style={{ borderColor: 'var(--color-border-strong)' }}>PESO AREIA+GARRAFA, ANTES (g)</td>
               {furos.map((furo, i) => (
-                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'rgb(148, 163, 184)' }}>{furo.peso_areia_garrafa_antes || ''}</td>
+                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'var(--color-border-strong)' }}>{furo.peso_areia_garrafa_antes || ''}</td>
               ))}
             </tr>
             <tr>
-              <td className="border px-1 py-1" style={{ borderColor: 'rgb(148, 163, 184)' }}>PESO AREIA+GARRAFA, APÓS (g)</td>
+              <td className="border px-1 py-1" style={{ borderColor: 'var(--color-border-strong)' }}>PESO AREIA+GARRAFA, APÓS (g)</td>
               {furos.map((furo, i) => (
-                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'rgb(148, 163, 184)' }}>{furo.peso_areia_garrafa_apos || ''}</td>
+                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'var(--color-border-strong)' }}>{furo.peso_areia_garrafa_apos || ''}</td>
               ))}
             </tr>
             <tr>
-              <td className="border px-1 py-1" style={{ borderColor: 'rgb(148, 163, 184)' }}>PESO MATERIAL ÚMIDO NO FURO (g)</td>
+              <td className="border px-1 py-1" style={{ borderColor: 'var(--color-border-strong)' }}>PESO MATERIAL ÚMIDO NO FURO (g)</td>
               {furos.map((furo, i) => (
-                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'rgb(148, 163, 184)' }}>{furo.peso_material_umido_furo || ''}</td>
+                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'var(--color-border-strong)' }}>{furo.peso_material_umido_furo || ''}</td>
               ))}
             </tr>
             {ensaio.substituicao_retido_3_4 && (
               <tr>
-                <td className="border px-1 py-1" style={{ borderColor: 'rgb(148, 163, 184)' }}>PESO SOLO RETIDO 3/4" ÚMIDO (g)</td>
+                <td className="border px-1 py-1" style={{ borderColor: 'var(--color-border-strong)' }}>PESO SOLO RETIDO 3/4" ÚMIDO (g)</td>
                 {furos.map((furo, i) => (
-                  <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'rgb(148, 163, 184)' }}>{furo.peso_solo_retido_3_4_umido || ''}</td>
+                  <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'var(--color-border-strong)' }}>{furo.peso_solo_retido_3_4_umido || ''}</td>
                 ))}
               </tr>
             )}
             <tr>
-              <td className="border px-1 py-1 font-bold" style={{ borderColor: 'rgb(148, 163, 184)' }}>DENSIDADE ÚMIDA DO FURO (g/cm³)</td>
+              <td className="border px-1 py-1 font-bold" style={{ borderColor: 'var(--color-border-strong)' }}>DENSIDADE ÚMIDA DO FURO (g/cm³)</td>
               {furos.map((furo, i) => (
-                <td key={i} className="border px-1 py-1 text-center font-bold" style={{ borderColor: 'rgb(148, 163, 184)' }}>{furo.densidade_umida_furo?.toFixed(3) || ''}</td>
+                <td key={i} className="border px-1 py-1 text-center font-bold" style={{ borderColor: 'var(--color-border-strong)' }}>{furo.densidade_umida_furo?.toFixed(3) || ''}</td>
               ))}
             </tr>
             <tr>
-              <td className="border px-1 py-1 font-bold" style={{ borderColor: 'rgb(148, 163, 184)' }}>DENSIDADE SECA DO SOLO (g/cm³)</td>
+              <td className="border px-1 py-1 font-bold" style={{ borderColor: 'var(--color-border-strong)' }}>DENSIDADE SECA DO SOLO (g/cm³)</td>
               {furos.map((furo, i) => (
-                <td key={i} className="border px-1 py-1 text-center font-bold" style={{ borderColor: 'rgb(148, 163, 184)' }}>{furo.densidade_seca_solo?.toFixed(3) || ''}</td>
+                <td key={i} className="border px-1 py-1 text-center font-bold" style={{ borderColor: 'var(--color-border-strong)' }}>{furo.densidade_seca_solo?.toFixed(3) || ''}</td>
               ))}
             </tr>
 
             <tr>
-              <td colSpan={furos.length + 1} className="border px-1 py-1 font-semibold text-center text-[9px]" style={{ backgroundColor: 'hsl(214.29deg 31.82% 91.37%)', borderColor: 'rgb(148, 163, 184)' }}>
+              <td colSpan={furos.length + 1} className="border px-1 py-1 font-semibold text-center text-[9px]" style={{ backgroundColor: 'var(--color-surface-muted)', borderColor: 'var(--color-border-strong)' }}>
                 DADOS DO PROCTOR
               </td>
             </tr>
             <tr>
-              <td className="border px-1 py-1" style={{ borderColor: 'rgb(148, 163, 184)' }}>DENS. SECA MÁX. (g/cm³)</td>
+              <td className="border px-1 py-1" style={{ borderColor: 'var(--color-border-strong)' }}>DENS. SECA MÁX. (g/cm³)</td>
               {furos.map((_, i) => (
-                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'rgb(148, 163, 184)' }}>{ensaio.dados_proctor?.densidade_seca_max?.toFixed(3) || ''}</td>
+                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'var(--color-border-strong)' }}>{ensaio.dados_proctor?.densidade_seca_max?.toFixed(3) || ''}</td>
               ))}
             </tr>
             <tr>
-              <td className="border px-1 py-1" style={{ borderColor: 'rgb(148, 163, 184)' }}>UMIDADE ÓTIMA (%)</td>
+              <td className="border px-1 py-1" style={{ borderColor: 'var(--color-border-strong)' }}>UMIDADE ÓTIMA (%)</td>
               {furos.map((_, i) => (
-                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'rgb(148, 163, 184)' }}>{ensaio.dados_proctor?.umidade_otima || ''}</td>
+                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'var(--color-border-strong)' }}>{ensaio.dados_proctor?.umidade_otima || ''}</td>
               ))}
             </tr>
 
             <tr>
-              <td colSpan={furos.length + 1} className="border px-1 py-1 font-semibold text-center text-[9px]" style={{ backgroundColor: 'hsl(214.29deg 31.82% 91.37%)', borderColor: 'rgb(148, 163, 184)' }}>
+              <td colSpan={furos.length + 1} className="border px-1 py-1 font-semibold text-center text-[9px]" style={{ backgroundColor: 'var(--color-surface-muted)', borderColor: 'var(--color-border-strong)' }}>
                 RESULTADOS
               </td>
             </tr>
 
             <tr>
-              <td className="border px-1 py-1 font-bold" style={{ borderColor: 'rgb(148, 163, 184)' }}>DESVIO DE UMIDADE (%)</td>
+              <td className="border px-1 py-1 font-bold" style={{ borderColor: 'var(--color-border-strong)' }}>DESVIO DE UMIDADE (%)</td>
               {furos.map((furo, i) => (
-                <td key={i} className="border px-1 py-1 text-center font-bold" style={{ borderColor: 'rgb(148, 163, 184)' }}>{furo.desvio_umidade?.toFixed(2) || ''}</td>
+                <td key={i} className="border px-1 py-1 text-center font-bold" style={{ borderColor: 'var(--color-border-strong)' }}>{furo.desvio_umidade?.toFixed(2) || ''}</td>
               ))}
             </tr>
             <tr>
-              <td className="border px-1 py-1 font-bold" style={{ borderColor: 'rgb(148, 163, 184)' }}>GRAU DE COMPACTAÇÃO (%)</td>
+              <td className="border px-1 py-1 font-bold" style={{ borderColor: 'var(--color-border-strong)' }}>GRAU DE COMPACTAÇÃO (%)</td>
               {furos.map((furo, i) => (
-                <td key={i} className="border px-1 py-1 text-center font-bold" style={{ borderColor: 'rgb(148, 163, 184)' }}>{furo.grau_compactacao?.toFixed(2) || ''}</td>
+                <td key={i} className="border px-1 py-1 text-center font-bold" style={{ borderColor: 'var(--color-border-strong)' }}>{furo.grau_compactacao?.toFixed(2) || ''}</td>
               ))}
             </tr>
 
             <tr>
-              <td colSpan={furos.length + 1} className="border px-1 py-1 font-semibold text-center text-[9px]" style={{ backgroundColor: 'hsl(214.29deg 31.82% 91.37%)', borderColor: 'rgb(148, 163, 184)' }}>
+              <td colSpan={furos.length + 1} className="border px-1 py-1 font-semibold text-center text-[9px]" style={{ backgroundColor: 'var(--color-surface-muted)', borderColor: 'var(--color-border-strong)' }}>
                 ENSAIO DE UMIDADE "IN SITU" (hₐ) - NBR 16097/2012
               </td>
             </tr>
             <tr>
-              <td className="border px-1 py-1" style={{ borderColor: 'rgb(148, 163, 184)' }}>TARA DA FRIGIDEIRA (g)</td>
+              <td className="border px-1 py-1" style={{ borderColor: 'var(--color-border-strong)' }}>TARA DA FRIGIDEIRA (g)</td>
               {furos.map((furo, i) => (
-                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'rgb(148, 163, 184)' }}>{furo.tara_frigideira || ''}</td>
+                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'var(--color-border-strong)' }}>{furo.tara_frigideira || ''}</td>
               ))}
             </tr>
             <tr>
-              <td className="border px-1 py-1" style={{ borderColor: 'rgb(148, 163, 184)' }}>MATERIAL ÚMIDO+FRIGIDEIRA (g)</td>
+              <td className="border px-1 py-1" style={{ borderColor: 'var(--color-border-strong)' }}>MATERIAL ÚMIDO+FRIGIDEIRA (g)</td>
               {furos.map((furo, i) => (
-                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'rgb(148, 163, 184)' }}>{furo.material_umido_frigideira || ''}</td>
+                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'var(--color-border-strong)' }}>{furo.material_umido_frigideira || ''}</td>
               ))}
             </tr>
             <tr>
-              <td className="border px-1 py-1" style={{ borderColor: 'rgb(148, 163, 184)' }}>MATERIAL SECO+FRIGIDEIRA (g)</td>
+              <td className="border px-1 py-1" style={{ borderColor: 'var(--color-border-strong)' }}>MATERIAL SECO+FRIGIDEIRA (g)</td>
               {furos.map((furo, i) => (
-                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'rgb(148, 163, 184)' }}>{furo.material_seco_frigideira || ''}</td>
+                <td key={i} className="border px-1 py-1 text-center" style={{ borderColor: 'var(--color-border-strong)' }}>{furo.material_seco_frigideira || ''}</td>
               ))}
             </tr>
             <tr>
-              <td className="border px-1 py-1 font-bold" style={{ borderColor: 'rgb(148, 163, 184)' }}>UMIDADE (%)</td>
+              <td className="border px-1 py-1 font-bold" style={{ borderColor: 'var(--color-border-strong)' }}>UMIDADE (%)</td>
               {furos.map((furo, i) => (
-                <td key={i} className="border px-1 py-1 text-center font-bold" style={{ borderColor: 'rgb(148, 163, 184)' }}>{furo.umidade?.toFixed(2) || ''}</td>
+                <td key={i} className="border px-1 py-1 text-center font-bold" style={{ borderColor: 'var(--color-border-strong)' }}>{furo.umidade?.toFixed(2) || ''}</td>
               ))}
             </tr>
           </tbody>
