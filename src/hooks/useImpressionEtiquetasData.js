@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { processarArquivoColeta, processarArquivoUmidade } from '@/utils/impressionEtiquetasUtils';
+import { logger } from '@/utils/logger';
 
 export function useImpressionEtiquetasData() {
   const [etiquetas, setEtiquetas] = useState([]);
@@ -30,7 +31,7 @@ export function useImpressionEtiquetasData() {
           setErro('');
         } catch (err) {
           setErro('Erro ao processar arquivo. Verifique o formato.');
-          console.error(err);
+          logger.error(err);
         } finally {
           setLoading(false);
         }
@@ -44,7 +45,7 @@ export function useImpressionEtiquetasData() {
       reader.readAsBinaryString(file);
     } catch (error) {
       setErro('Erro ao processar arquivo. Verifique o formato.');
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };

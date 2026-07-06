@@ -8,6 +8,7 @@ import { createPageUrl } from "@/utils";
 import { serializarFormData, validarCPsParaFinalizar } from "@/utils/ensaioSondagemUtils";
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 export function useEnsaioSondagemActions({ formData, editingEnsaio, setEditingEnsaio }) {
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export function useEnsaioSondagemActions({ formData, editingEnsaio, setEditingEn
       }
       toast({ title: "Progresso salvo com sucesso!" });
     } catch (error) {
-      console.error("[EnsaioSondagem] Erro ao salvar progresso:", error?.message || error);
+      logger.error("[EnsaioSondagem] Erro ao salvar progresso:", error?.message || error);
       toast({ title: "Erro ao salvar progresso.", variant: "destructive" });
     } finally {
       setSaving(false);
@@ -72,7 +73,7 @@ export function useEnsaioSondagemActions({ formData, editingEnsaio, setEditingEn
       }
       navigate(createPageUrl("MeusEnsaios"));
     } catch (error) {
-      console.error("[EnsaioSondagem] Erro ao salvar ensaio:", error?.message || error);
+      logger.error("[EnsaioSondagem] Erro ao salvar ensaio:", error?.message || error);
       toast({ title: `Erro ao salvar ensaio: ${error.message}`, variant: "destructive" });
     } finally {
       setSaving(false);

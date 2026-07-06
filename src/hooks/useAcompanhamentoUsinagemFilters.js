@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { obterFaixaById } from "@/services/faixasService";
+import { logger } from '@/utils/logger';
 import {
   filtrarProjetosPorObra,
   buildObraFormPatch,
@@ -31,7 +32,7 @@ export function useAcompanhamentoUsinagemFilters({
         .then(faixa => {
           if (faixa) setFormData(prev => ({ ...prev, faixa_especificada: faixa.nome || '' }));
         })
-        .catch(err => console.error("Erro ao buscar faixa:", err));
+        .catch(err => logger.error("Erro ao buscar faixa:", err));
     }
 
     setFormData(prev => ({ ...prev, project_id: projectId, ...buildProjectFormPatch(project) }));

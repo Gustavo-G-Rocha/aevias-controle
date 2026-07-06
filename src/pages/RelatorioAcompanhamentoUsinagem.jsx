@@ -8,6 +8,7 @@ import { Loader2, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import RelatorioAcompanhamentoUsinagem from "../components/relatorios/RelatorioAcompanhamentoUsinagem";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import { logger } from '@/utils/logger';
 
 export default function RelatorioAcompanhamentoUsinagemPage() {
   useReportMode();
@@ -47,7 +48,7 @@ export default function RelatorioAcompanhamentoUsinagemPage() {
           setProject(projectData);
         }
       } catch (error) {
-        console.error("Erro ao carregar dados:", error);
+        logger.error("Erro ao carregar dados:", error);
         setError("Erro ao carregar dados do relatório");
       } finally {
         setLoading(false);

@@ -20,6 +20,7 @@ import ControleLiganteSection from "./components/ControleLiganteSection";
 import ObservacoesSection from "./components/ObservacoesSection";
 import { getInitialFormData } from "@/utils/checklistUsinaFormInitial";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export default function ChecklistUsinaPage() {
   const {
@@ -103,7 +104,7 @@ export default function ChecklistUsinaPage() {
       clearSavedData();
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
-      console.error("[ChecklistUsina] Erro ao salvar:", error?.message || error);
+      logger.error("[ChecklistUsina] Erro ao salvar:", error?.message || error);
       toast({ title: "Erro ao salvar checklist.", variant: "destructive" });
     }
   }, [formData, editingChecklist, user, clearSavedData, navigate]);

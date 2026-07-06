@@ -5,6 +5,7 @@ import { createPageUrl } from '@/utils';
 import { prepareDadosParaSalvar } from '@/utils/ensaioManchaPenduloUtils';
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 export const useEnsaioManchaPenduloActions = (isEditMode, editId, formData) => {
   const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
@@ -49,7 +50,7 @@ export const useEnsaioManchaPenduloActions = (isEditMode, editId, formData) => {
 
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
-      console.error('Erro ao salvar:', error);
+      logger.error('Erro ao salvar:', error);
       toast({ title: 'Erro ao salvar o ensaio.', variant: "destructive" });
     } finally {
       setSaving(false);

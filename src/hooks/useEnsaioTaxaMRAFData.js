@@ -4,6 +4,7 @@ import { createPageUrl } from "@/utils";
 import { obterEnsaioById } from "@/services/ensaiosService";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { getEnsaioInicial } from "@/utils/ensaioTaxaMRAFUtils";
+import { logger } from '@/utils/logger';
 
 /**
  * Hook para carregamento e gerenciamento de dados iniciais
@@ -58,7 +59,7 @@ export const useEnsaioTaxaMRAFData = () => {
       obterEnsaioById('EnsaioTaxaMRAF', editId)
         .then(existing => setEditingEnsaio(existing))
         .catch(err => {
-          console.error('Erro ao carregar dados:', err);
+          logger.error('Erro ao carregar dados:', err);
           setError(err.message);
           navigate(createPageUrl('MeusEnsaios'));
         })

@@ -5,6 +5,7 @@ import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { createPageUrl } from "@/utils";
 import { useFormDataLoader } from "@/hooks/useFormDataLoader";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 /**
  * Hook reutilizável para formulários de ensaios individuais
@@ -63,7 +64,7 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
           }
         })
         .catch(error => {
-          console.error(`[${entityName}] Erro ao carregar:`, error?.message);
+          logger.error(`[${entityName}] Erro ao carregar:`, error?.message);
           toast({ title: "Erro ao carregar os dados.", variant: "destructive" });
           navigate(createPageUrl('MeusEnsaios'));
         })

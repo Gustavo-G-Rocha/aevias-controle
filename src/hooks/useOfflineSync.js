@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useOfflineDetection } from './useOfflineDetection';
 import { syncPendingItems, syncQueueItem } from '@/services/syncService';
 import { getQueueItemsByStatus, countQueueItemsByStatus } from '@/services/offlineStorageService';
+import { logger } from '@/utils/logger';
 
 /**
  * Hook que sincroniza items pendentes automaticamente quando online
@@ -28,7 +29,7 @@ export function useOfflineSync() {
       setPendingCount(pending);
       setFailedCount(failed);
     } catch (e) {
-      console.error('[useOfflineSync] Erro ao atualizar contadores:', e);
+      logger.error('[useOfflineSync] Erro ao atualizar contadores:', e);
     }
   }, []);
 
@@ -36,7 +37,7 @@ export function useOfflineSync() {
   const performSync = useCallback(async () => {
     if (!isOnline || isSyncing) return;
 
-    console.log('[useOfflineSync] Iniciando sincronização');
+    logger.log('[useOfflineSync] Iniciando sincronização');
     setIsSyncing(true);
     setLastError(null);
 
@@ -45,19 +46,19 @@ export function useOfflineSync() {
       setLastSyncTime(new Date());
       
       if (result.synced > 0) {
-        console.log(`[useOfflineSync] ${result.synced} items sincronizados`);
+        logger.log(`[useOfflineSync] ${result.synced} items sincronizados`);
       }
       
       if (result.failed > 0) {
         const errorMsg = `${result.failed} items falharam: ${result.errors.join('; ')}`;
-        console.warn('[useOfflineSync]', errorMsg);
+        logger.warn('[useOfflineSync]', errorMsg);
         setLastError(errorMsg);
       }
 
       // Atualizar contadores
       await refreshCounts();
     } catch (e) {
-      console.error('[useOfflineSync] Erro durante sincronização:', e);
+      logger.error('[useOfflineSync] Erro durante sincronização:', e);
       setLastError(e?.message || String(e));
     } finally {
       setIsSyncing(false);

@@ -3,6 +3,7 @@
  */
 import { useCallback, useEffect } from 'react';
 import { obterRegionalById } from '@/services/regionaisService';
+import { logger } from '@/utils/logger';
 import {
   calcularAreaCP,
   calcularResistencia,
@@ -39,7 +40,7 @@ export function useEnsaioRompimentoConcretoForm({ formData, setFormData, series,
         const reg = await obterRegionalById(obra.regional_id);
         clienteNome = reg?.cliente || '';
       } catch (e) {
-        console.error('Erro ao carregar cliente da regional', e);
+        logger.error('Erro ao carregar cliente da regional', e);
       }
     }
     setFormData(prev => ({

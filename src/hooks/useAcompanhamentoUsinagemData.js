@@ -4,6 +4,7 @@ import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { getInitialFormData } from "@/utils/acompanhamentoUsinagemUtils";
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 export function useAcompanhamentoUsinagemData() {
   const [editingId, setEditingId] = useState(null);
   const [isEditable, setIsEditable] = useState(true);
@@ -38,7 +39,7 @@ export function useAcompanhamentoUsinagemData() {
           });
         })
         .catch(error => {
-          console.error("Erro ao carregar dados:", error);
+          logger.error("Erro ao carregar dados:", error);
           toast({ title: "Erro ao carregar dados iniciais", variant: "destructive" });
         })
         .finally(() => setEditLoading(false));

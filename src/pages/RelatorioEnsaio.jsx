@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
 import { obterUsuarioAtual } from '@/services/usuariosService';
-import { listarEnsaios } from '@/services/ensaiosService';
+import { obterEnsaioById } from '@/services/ensaiosService';
 import { listarObrasRecentes } from '@/services/obrasService';
 import { listarProjects } from '@/services/projectsService';
 import { listarRegionais } from '@/services/regionaisService';
 import { listarFaixas } from '@/services/faixasService';
 import RelatorioDensidade from '../components/relatorios/RelatorioDensidade';
 import RelatorioMRAF from '../components/relatorios/RelatorioMRAF';
+import { logger } from '@/utils/logger';
 
 export default function RelatorioEnsaio() {
   useReportMode();
@@ -31,21 +32,20 @@ export default function RelatorioEnsaio() {
 
       const user = await obterUsuarioAtual();
       
-      const [ensaiosDensidade, ensaiosMRAF, obras, projects, regionais] = await Promise.all([
-        listarEnsaios('EnsaioDensidade'),
-        listarEnsaios('EnsaioMRAF'),
+      const entityMap = { densidade: 'EnsaioDensidade', mraf: 'EnsaioMRAF' };
+      const entityName = entityMap[tipo];
+      if (!entityName) throw new Error(`Tipo de relatório inválido: ${tipo}`);
+
+      const [record, obras, projects, regionais] = await Promise.all([
+        obterEnsaioById(entityName, id),
         listarObrasRecentes(),
         listarProjects(),
         listarRegionais()
       ]);
 
-      let record;
-      if (tipo === 'densidade') record = ensaiosDensidade.find(r => r.id === id);
-      if (tipo === 'mraf') record = ensaiosMRAF.find(r => r.id === id);
-
       // Note: 'diario' type is now handled by a separate dedicated page/component.
-      // If 'tipo' is 'diario' here, 'record' will remain undefined, and the
-      // subsequent check will correctly report it as not found (or invalid type for this page).
+      // If 'tipo' is 'diario' here, 'entityName' will be undefined and the check
+      // above will correctly report it as an invalid type for this page.
 
       if (!record) throw new Error(`Registro ${tipo} com ID ${id} não encontrado`);
 
@@ -75,7 +75,7 @@ export default function RelatorioEnsaio() {
         data: { tipo, record, obra, project, user, regional, faixaGranulometrica }
       });
     } catch (error) {
-      console.error('Erro ao carregar relatório:', error);
+      logger.error('Erro ao carregar relatório:', error);
       setState({ loading: false, error: error.message, data: null });
     }
   }, []);

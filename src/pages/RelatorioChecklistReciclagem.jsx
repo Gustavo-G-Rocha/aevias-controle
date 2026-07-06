@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import RelatorioChecklistReciclagem from "../components/relatorios/RelatorioChecklistReciclagem";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import { logger } from '@/utils/logger';
 
 export default function RelatorioChecklistReciclagemPage() {
   useReportMode();
@@ -54,7 +55,7 @@ export default function RelatorioChecklistReciclagemPage() {
         if (users && users.length > 0) setCreatorUser(users[0]);
       }
     } catch (error) {
-      console.error("Erro ao carregar dados:", error);
+      logger.error("Erro ao carregar dados:", error);
       setError("Erro ao carregar dados do relatório");
     } finally {
       setLoading(false);

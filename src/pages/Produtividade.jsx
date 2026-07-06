@@ -8,6 +8,7 @@ import ProdutividadeHeader from "@/components/produtividade/ProdutividadeHeader"
 import ProdutividadeTable from "@/components/produtividade/ProdutividadeTable";
 import { EditRegistroDialog, MarcaDiaDialog } from "@/components/produtividade/ProdutividadeModals";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export default function ProdutividadePage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -50,7 +51,7 @@ export default function ProdutividadePage() {
       setEditDialog({ open: false, registro: null });
       await loadData();
     } catch (error) {
-      console.error("[Produtividade] Erro ao salvar:", error?.message || error);
+      logger.error("[Produtividade] Erro ao salvar:", error?.message || error);
       toast({ title: "Erro ao salvar", variant: "destructive" });
     }
   }, [editDialog.registro, loadData]);
@@ -100,7 +101,7 @@ export default function ProdutividadePage() {
       setCacheDias({});
       toast({ title: "Dados salvos com sucesso!" });
     } catch (error) {
-      console.error("[Produtividade] Erro ao salvar marcadores:", error?.message || error);
+      logger.error("[Produtividade] Erro ao salvar marcadores:", error?.message || error);
       toast({ title: "Erro ao salvar dados", variant: "destructive" });
     }
   };

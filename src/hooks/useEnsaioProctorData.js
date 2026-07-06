@@ -10,6 +10,7 @@ import { obterProjectById } from "@/services/projectsService";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { getInitialForm, filtrarObrasProctor } from "@/utils/ensaioProctorUtils";
 import { defaultLimites } from "@/components/ensaios/EnsaioLimites";
+import { logger } from '@/utils/logger';
 
 export function useEnsaioProctorData() {
   const [searchParams] = useSearchParams();
@@ -44,7 +45,7 @@ export function useEnsaioProctorData() {
             });
           }
         })
-        .catch(err => console.error("Erro ao carregar dados:", err))
+        .catch(err => logger.error("Erro ao carregar dados:", err))
         .finally(() => setLoading(false));
     } else {
       setLoading(false);

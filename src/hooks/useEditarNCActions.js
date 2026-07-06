@@ -6,6 +6,7 @@ import { createPageUrl } from "@/utils";
 import { validateNCForm, buildNCUpdatePayload } from "@/utils/editarNCUtils";
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 export const useEditarNCActions = (nc) => {
   const navigate = useNavigate();
   const [uploadingFotos, setUploadingFotos] = useState(false);
@@ -57,7 +58,7 @@ export const useEditarNCActions = (nc) => {
         await atualizarRegistro('RelatorioNC', nc.id, payload);
         navigate(createPageUrl("GestaoNC"));
       } catch (error) {
-        console.error("[EditarNC] Erro ao salvar NC:", error?.message || error);
+        logger.error("[EditarNC] Erro ao salvar NC:", error?.message || error);
         toast({ title: "Erro ao salvar a NC. Tente novamente.", variant: "destructive" });
       } finally {
         setSaving(false);

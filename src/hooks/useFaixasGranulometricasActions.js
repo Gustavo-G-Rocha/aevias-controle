@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { criarFaixa, atualizarFaixa, deletarFaixa } from '@/services/faixasService';
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 export function useFaixasGranulometricasActions(onSuccess) {
   const handleSaveFaixa = useCallback(async (faixaData, editingFaixa) => {
     try {
@@ -12,7 +13,7 @@ export function useFaixasGranulometricasActions(onSuccess) {
       }
       onSuccess();
     } catch (error) {
-      console.error("Erro ao salvar faixa:", error);
+      logger.error("Erro ao salvar faixa:", error);
       toast({ title: 'Erro ao salvar faixa. Verifique os dados e tente novamente.', variant: "destructive" });
       throw error;
     }
@@ -24,7 +25,7 @@ export function useFaixasGranulometricasActions(onSuccess) {
         await deletarFaixa(id);
         onDeleteSuccess();
       } catch (error) {
-        console.error("Erro ao excluir faixa:", error);
+        logger.error("Erro ao excluir faixa:", error);
         toast({ title: 'Erro ao excluir faixa. Tente novamente mais tarde.', variant: "destructive" });
         throw error;
       }

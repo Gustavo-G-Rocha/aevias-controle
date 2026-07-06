@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { logger } from '@/utils/logger';
 
 /**
  * Hook para persistir dados do formulário em sessionStorage
@@ -31,7 +32,7 @@ export function useFormPersistence(formKey, formData, setFormData, isEditing = f
           hasRestoredRef.current = true;
         }
       } catch (error) {
-        console.error('[useFormPersistence] Erro ao recuperar dados do formulário:', error?.message || error);
+        logger.error('[useFormPersistence] Erro ao recuperar dados do formulário:', error?.message || error);
       }
       isInitialMount.current = false;
     }
@@ -46,7 +47,7 @@ export function useFormPersistence(formKey, formData, setFormData, isEditing = f
       try {
         sessionStorage.setItem(storageKey, JSON.stringify(formData));
       } catch (error) {
-        console.error('[useFormPersistence] Erro ao persistir formulário:', error?.message || error);
+        logger.error('[useFormPersistence] Erro ao persistir formulário:', error?.message || error);
       }
     }, 1000); // Aumentado para 1s para reduzir frequência de writes
 
@@ -58,7 +59,7 @@ export function useFormPersistence(formKey, formData, setFormData, isEditing = f
     try {
       sessionStorage.removeItem(storageKey);
     } catch (error) {
-      console.error('[useFormPersistence] Erro ao limpar dados do formulário:', error?.message || error);
+      logger.error('[useFormPersistence] Erro ao limpar dados do formulário:', error?.message || error);
     }
   };
 

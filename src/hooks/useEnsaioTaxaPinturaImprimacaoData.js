@@ -15,6 +15,7 @@ import {
   filtrarObrasDisponiveis,
 } from '@/utils/ensaioTaxaPinturaImprimacaoUtils';
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export function useEnsaioTaxaPinturaImprimacaoData() {
   const location = useLocation();
@@ -59,7 +60,7 @@ export function useEnsaioTaxaPinturaImprimacaoData() {
           }
         })
         .catch(err => {
-          console.error('Erro ao carregar dados:', err);
+          logger.error('Erro ao carregar dados:', err);
           toast({ title: 'Erro ao carregar dados.', variant: "destructive" });
           navigate(createPageUrl('MeusEnsaios'));
         })

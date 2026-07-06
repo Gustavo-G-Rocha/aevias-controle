@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { base44 } from "@/api/base44Client";
 import { obterRegistro, atualizarRegistro } from "@/services/recordsService";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 // Props:
 //   entityName: string (e.g. "ChecklistConcretagem")
@@ -24,7 +25,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
         const userData = await base44.auth.me();
         setUser(userData);
       } catch (err) {
-        console.error('AprovacaoBar: erro ao carregar usuário', err);
+        logger.error('AprovacaoBar: erro ao carregar usuário', err);
       }
     };
     loadUser();
@@ -37,7 +38,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
         const data = await obterRegistro(entityName, recordId);
         setRecord(data);
       } catch (err) {
-        console.error('AprovacaoBar: erro ao carregar registro', err);
+        logger.error('AprovacaoBar: erro ao carregar registro', err);
       }
     };
     loadRecord();
@@ -74,7 +75,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
       setRecord(prev => ({ ...prev, approved: true, approver_details: approverDetails }));
       toast({ title: 'Registro aprovado com sucesso!' });
     } catch (err) {
-      console.error('[AprovacaoBar] Erro ao aprovar registro:', err?.message || err);
+      logger.error('[AprovacaoBar] Erro ao aprovar registro:', err?.message || err);
       toast({ title: 'Erro ao aprovar registro.', variant: "destructive" });
     } finally {
       setSaving(false);
@@ -99,7 +100,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
       setRejectionReason('');
       toast({ title: 'Registro reprovado.' });
     } catch (err) {
-      console.error('[AprovacaoBar] Erro ao reprovar registro:', err?.message || err);
+      logger.error('[AprovacaoBar] Erro ao reprovar registro:', err?.message || err);
       toast({ title: 'Erro ao reprovar registro.', variant: "destructive" });
     } finally {
       setSaving(false);

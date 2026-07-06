@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { obterEnsaioById } from '@/services/ensaiosService';
 import { carregarObraRegional, carregarCreatorUser } from '@/services/relatorioContextService';
+import { logger } from '@/utils/logger';
 
 /**
  * Hook para carregar dados de EnsaioTaxaMRAF, Obra, Regional e Criador
@@ -33,7 +34,7 @@ export function useRelatorioTaxaMRAFData(ensaioId) {
         setRegional(obraRegional.regional);
         setCreatorUser(creator);
       } catch (err) {
-        console.error('[useRelatorioTaxaMRAFData] Erro ao carregar dados:', err?.message || err);
+        logger.error('[useRelatorioTaxaMRAFData] Erro ao carregar dados:', err?.message || err);
       } finally {
         setLoading(false);
       }

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { obterEnsaioById } from '@/services/ensaiosService';
 import { useCurrentUser, useAuxData } from '@/hooks/useQueryData';
 import { getInitialFormData, filterObrasPorAcesso } from '@/utils/ensaioManchaPenduloUtils';
+import { logger } from '@/utils/logger';
 
 export const useEnsaioManchaPenduloData = (editId, isEditMode) => {
   const [loading, setLoading] = useState(true);
@@ -27,7 +28,7 @@ export const useEnsaioManchaPenduloData = (editId, isEditMode) => {
     if (isEditMode) {
       obterEnsaioById('EnsaioManchaPendulo', editId)
         .then(ensaio => setFormData(ensaio))
-        .catch(error => console.error('Erro ao carregar dados:', error))
+        .catch(error => logger.error('Erro ao carregar dados:', error))
         .finally(() => setLoading(false));
     } else {
       setFormData(prev => ({

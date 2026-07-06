@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { obterRegistro } from "@/services/recordsService";
 import { carregarObraRegional } from "@/services/relatorioContextService";
+import { logger } from '@/utils/logger';
 
 export const useRelatorioBoletimSondagemData = () => {
   const [boletim, setBoletim] = useState(null);
@@ -23,7 +24,7 @@ export const useRelatorioBoletimSondagemData = () => {
         setObra(obraData);
         setRegional(regionalData);
       } catch (err) {
-        console.error(err);
+        logger.error(err);
         setError("Erro ao carregar dados do relatório");
       } finally {
         setLoading(false);

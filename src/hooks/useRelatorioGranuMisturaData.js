@@ -9,6 +9,7 @@ import {
   carregarFaixaDoProject,
 } from '@/services/relatorioContextService';
 import { obterFaixaById } from '@/services/faixasService';
+import { logger } from '@/utils/logger';
 
 export const useRelatorioGranuMisturaData = () => {
   const [record, setRecord] = useState(null);
@@ -44,7 +45,7 @@ export const useRelatorioGranuMisturaData = () => {
           try {
             setFaixa(await obterFaixaById(rec.faixa));
           } catch (e) {
-            console.error('Erro ao carregar faixa granulométrica pelo ID', e);
+            logger.error('Erro ao carregar faixa granulométrica pelo ID', e);
           }
         }
 

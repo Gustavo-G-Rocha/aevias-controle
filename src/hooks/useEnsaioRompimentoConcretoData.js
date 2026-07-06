@@ -6,6 +6,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { obterEnsaioById } from '@/services/ensaiosService';
 import { useCurrentUser, useAuxData } from '@/hooks/useQueryData';
+import { logger } from '@/utils/logger';
 import {
   FORM_INITIAL,
   filtrarObras,
@@ -44,7 +45,7 @@ export function useEnsaioRompimentoConcretoData() {
         .then(ensaio => {
           setFormData({ ...ensaio, compressao_axial: ensaio.compressao_axial || [], tracao_flexao: ensaio.tracao_flexao || [] });
         })
-        .catch(error => console.error('Erro ao carregar dados:', error))
+        .catch(error => logger.error('Erro ao carregar dados:', error))
         .finally(() => setLoading(false));
     } else {
       setFormData(prev => ({ ...prev, laboratorista_name: user.laboratorista_name || user.full_name }));

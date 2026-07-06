@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { getDataEnsaio } from '@/components/ensaios/ensaioMappers';
 import { filtrarRegistros } from '@/services/recordsService';
 import { isTipoSuportado } from '@/utils/relatorioUnificadoEntityMap';
+import { logger } from '@/utils/logger';
 
 export function useRelatorioUnificadoRecords(filters) {
   const [records, setRecords] = useState([]);
@@ -45,7 +46,7 @@ export function useRelatorioUnificadoRecords(filters) {
         // Busca todos os tipos suportados em paralelo via service centralizado
         const tiposValidos = tiposArray.filter(isTipoSuportado);
         tiposArray.forEach(t => {
-          if (!isTipoSuportado(t)) console.warn(`[RelatorioUnificado] Tipo "${t}" não suportado.`);
+          if (!isTipoSuportado(t)) logger.warn(`[RelatorioUnificado] Tipo "${t}" não suportado.`);
         });
 
         const rawByType = await Promise.all(
@@ -101,7 +102,7 @@ export function useRelatorioUnificadoRecords(filters) {
         setRecords(filtered);
         setError(null);
       } catch (err) {
-        console.error('Erro ao carregar registros:', err);
+        logger.error('Erro ao carregar registros:', err);
         setError('Erro ao carregar os dados.');
       } finally {
         setLoading(false);

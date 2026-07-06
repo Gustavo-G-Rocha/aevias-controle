@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { obterUsuarioAtual, logout as encerrarSessao } from "@/services/usuariosService";
 import { listarObrasRecentes } from "@/services/obrasService";
 import { listarRegionais } from "@/services/regionaisService";
+import { logger } from '@/utils/logger';
 import {
   listarSolicitacoesTransferenciaObra,
   listarSolicitacoesTransferenciaRegional,
@@ -80,7 +81,7 @@ export function useLayoutData() {
         setPendingTransfers(pendentes);
       }
     } catch (error) {
-      console.error("Erro ao carregar usuário e obras:", error);
+      logger.error("Erro ao carregar usuário e obras:", error);
       setUser(null);
       setObrasDoUsuario([]);
     } finally {

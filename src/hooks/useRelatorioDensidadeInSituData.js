@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { obterRegistro } from '@/services/recordsService';
 import { carregarObraRegional } from '@/services/relatorioContextService';
+import { logger } from '@/utils/logger';
 
 export function useRelatorioDensidadeInSituData() {
   const [ensaio, setEnsaio] = useState(null);
@@ -27,7 +28,7 @@ export function useRelatorioDensidadeInSituData() {
         setRegional(regionalData);
         setError(null);
       } catch (err) {
-        console.error('Erro ao carregar relatório:', err);
+        logger.error('Erro ao carregar relatório:', err);
         setError(err.message);
       } finally {
         setLoading(false);

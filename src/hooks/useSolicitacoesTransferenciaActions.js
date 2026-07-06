@@ -6,6 +6,7 @@ import {
 import { atualizarRegional } from '@/services/regionaisService';
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
   const handleNovaSolicitacao = useCallback(async (formData, regionalAtual) => {
     if (!user || !regionalAtual) {
@@ -31,7 +32,7 @@ export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
       loadData();
       return true;
     } catch (error) {
-      console.error("Erro ao criar solicitação:", error);
+      logger.error("Erro ao criar solicitação:", error);
       toast({ title: 'Erro ao enviar solicitação.', variant: "destructive" });
       return false;
     }
@@ -74,7 +75,7 @@ export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
       loadData();
       return true;
     } catch (error) {
-      console.error("Erro ao aprovar solicitação:", error);
+      logger.error("Erro ao aprovar solicitação:", error);
       toast({ title: 'Erro ao aprovar solicitação.', variant: "destructive" });
       return false;
     }
@@ -93,7 +94,7 @@ export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
       loadData();
       return true;
     } catch (error) {
-      console.error("Erro ao rejeitar solicitação:", error);
+      logger.error("Erro ao rejeitar solicitação:", error);
       toast({ title: 'Erro ao rejeitar solicitação.', variant: "destructive" });
       return false;
     }

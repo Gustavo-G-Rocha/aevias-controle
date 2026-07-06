@@ -8,6 +8,7 @@ import { useSearchParams } from 'react-router-dom';
 import { obterEnsaioById } from '@/services/ensaiosService';
 import { useCurrentUser, useAuxData } from '@/hooks/useQueryData';
 import { getInitialForm, filtrarObrasVigaBenkelman, reconstruirFaixas } from '@/utils/ensaioVigaBenkelmanUtils';
+import { logger } from '@/utils/logger';
 
 export function useEnsaioVigaBenkelmanData() {
   const [searchParams] = useSearchParams();
@@ -41,7 +42,7 @@ export function useEnsaioVigaBenkelmanData() {
             nextFaixaId: faixasReconstruidas.length + 1,
           });
         })
-        .catch(err => console.error('Erro ao carregar dados:', err))
+        .catch(err => logger.error('Erro ao carregar dados:', err))
         .finally(() => setLoading(false));
     } else {
       setFormData(prev => ({

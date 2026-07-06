@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { obterUsuarioAtual } from '@/services/usuariosService';
 import { obterDiarioById } from '@/services/diarioObraService';
+import { logger } from '@/utils/logger';
 import {
   carregarContextoRelatorio,
   carregarProject,
@@ -59,7 +60,7 @@ export function useRelatorioDiarioData() {
 
         setLoading(false);
       } catch (err) {
-        console.error('[RelatorioDiario] Erro ao carregar relatório:', err);
+        logger.error('[RelatorioDiario] Erro ao carregar relatório:', err);
         setError('Erro ao carregar o diário');
         setLoading(false);
       }

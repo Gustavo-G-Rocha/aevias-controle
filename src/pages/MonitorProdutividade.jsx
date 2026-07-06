@@ -5,6 +5,7 @@ import { Loader2, Users } from "lucide-react";
 import { obterUsuarioAtual } from "@/services/usuariosService";
 import { loadAuxData, loadRecordsByEntities } from "@/services/recordsService";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 const MONITOR_ENTITIES = [
   'DiarioObra', 'EnsaioCAUQ', 'EnsaioDensidade', 'EnsaioDensidadeInSitu',
@@ -88,7 +89,7 @@ export default function MonitorProdutividade() {
 
       setGestoresData(gestoresComMetricas);
     } catch (error) {
-      console.error("[MonitorProdutividade] Erro ao carregar dados:", error?.message || error);
+      logger.error("[MonitorProdutividade] Erro ao carregar dados:", error?.message || error);
       toast({ title: 'Erro ao carregar dados do monitor.', variant: "destructive" });
     } finally {
       setLoading(false);

@@ -6,6 +6,7 @@ import {
 import { resolveUserIdentity } from "@/utils/userIdentityResolver";
 import { loadRecordsByObra } from "@/services/recordsService";
 import { obterObraById } from "@/services/obrasService";
+import { logger } from '@/utils/logger';
 
 export const useRelatoriosUnificadosFilters = () => {
   const [obraSelecionada, setObraSelecionada] = useState("");
@@ -31,7 +32,7 @@ export const useRelatoriosUnificadosFilters = () => {
       setEmpreiteirasDisponiveis(obraData?.empreiteiras || []);
       setUsinasDisponiveis(obraData?.usinas || []);
     } catch (err) {
-      console.warn('[RelatoriosUnificados] Filtros da obra não carregados:', err?.message || err);
+      logger.warn('[RelatoriosUnificados] Filtros da obra não carregados:', err?.message || err);
       setRodoviasDisponiveis([]);
       setEmpreiteirasDisponiveis([]);
       setUsinasDisponiveis([]);
@@ -47,7 +48,7 @@ export const useRelatoriosUnificadosFilters = () => {
       setLaboratoristasDisponiveis(labs);
       setLaboratoristasChecked(labs);
     } catch (err) {
-      console.error(
+      logger.error(
         "[RelatoriosUnificados] Erro ao carregar laboratoristas:",
         err?.message || err
       );

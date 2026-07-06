@@ -4,6 +4,7 @@ import { createPageUrl } from "@/utils";
 import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 /**
  * Hook para ações de salvar, finalizar e navegar
  */
@@ -45,7 +46,7 @@ export const useEnsaioTaxaMRAFActions = () => {
 
       navigate(createPageUrl('MeusEnsaios'));
     } catch (err) {
-      console.error('Erro ao salvar:', err);
+      logger.error('Erro ao salvar:', err);
       toast({ title: "Erro ao salvar ensaio.", variant: "destructive" });
     } finally {
       setSaving(false);

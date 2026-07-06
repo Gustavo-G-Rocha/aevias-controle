@@ -8,6 +8,7 @@ import {
   buildDataToSave,
 } from "@/utils/acompanhamentoUsinagemUtils";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export function useAcompanhamentoUsinagemActions({ formData, setFormData, editingId }) {
   const navigate  = useNavigate();
@@ -70,7 +71,7 @@ export function useAcompanhamentoUsinagemActions({ formData, setFormData, editin
 
       navigate(createPageUrl("MeusEnsaios"));
     } catch (error) {
-      console.error("Erro ao salvar:", error);
+      logger.error("Erro ao salvar:", error);
       toast({ title: "Erro ao salvar acompanhamento", variant: "destructive" });
     } finally {
       setSaving(false);

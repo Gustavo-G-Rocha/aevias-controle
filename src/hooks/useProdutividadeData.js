@@ -4,6 +4,7 @@ import { listarRegionais } from "@/services/regionaisService";
 import { listarObrasRecentes } from "@/services/obrasService";
 import { listarProdutividade } from "@/services/produtividadeService";
 import { loadRecordsGrouped } from "@/services/recordsService";
+import { logger } from '@/utils/logger';
 
 const DATE_FIELD = {
   DiarioObra: 'data',
@@ -232,7 +233,7 @@ export function useProdutividadeData(currentMonth) {
       marcadoresDiaRef.current = marcadoresDia;
 
     } catch (error) {
-      console.error("[Produtividade] Erro ao carregar dados:", error?.message || error);
+      logger.error("[Produtividade] Erro ao carregar dados:", error?.message || error);
     } finally {
       setLoading(false);
     }

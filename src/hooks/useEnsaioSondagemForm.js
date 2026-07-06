@@ -9,6 +9,7 @@ import {
   validarArquivoFoto,
 } from "@/utils/ensaioSondagemUtils";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export function useEnsaioSondagemForm(formData, setFormData) {
   const addCorpoProva = useCallback(() => {
@@ -66,7 +67,7 @@ export function useEnsaioSondagemForm(formData, setFormData) {
       const results = await Promise.all(files.map(file => uploadArquivo(file)));
       setFormData(prev => ({ ...prev, fotos: [...prev.fotos, ...results.map(r => r.file_url)] }));
     } catch (error) {
-      console.error("[EnsaioSondagem] Erro ao fazer upload das fotos:", error?.message || error);
+      logger.error("[EnsaioSondagem] Erro ao fazer upload das fotos:", error?.message || error);
       toast({ title: "Erro ao fazer upload das fotos.", variant: "destructive" });
     } finally {
       setUploadingPhotos(false);

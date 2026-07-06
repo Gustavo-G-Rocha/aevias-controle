@@ -9,6 +9,7 @@ import { listarRegionais } from '@/services/regionaisService';
 import { listarProjects } from '@/services/projectsService';
 import RelatorioChecklistMRAFComponent from '../components/relatorios/RelatorioChecklistMRAF';
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import { logger } from '@/utils/logger';
 
 export default function RelatorioChecklistMRAFPage() {
   useReportMode();
@@ -57,7 +58,7 @@ export default function RelatorioChecklistMRAFPage() {
           data: { checklist, obra, regional, project, user }
         });
       } catch (error) {
-        console.error('Erro ao carregar relatório do checklist:', error);
+        logger.error('Erro ao carregar relatório do checklist:', error);
         setState({ loading: false, error: error.message, data: null });
       }
     };

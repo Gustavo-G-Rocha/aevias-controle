@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import RelatorioChecklistTerraplanagem from "../components/relatorios/RelatorioChecklistTerraplanagem";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import { logger } from '@/utils/logger';
 
 export default function RelatorioChecklistTerraplanamemPage() {
   useReportMode();
@@ -32,13 +33,13 @@ export default function RelatorioChecklistTerraplanamemPage() {
           const allUsers = await listarUsuarios();
           creatorUser = allUsers.find(u => u.email?.toLowerCase() === checklist.created_by?.toLowerCase()) || null;
         } catch (err) {
-          console.warn("Não foi possível buscar dados do criador:", err);
+          logger.warn("Não foi possível buscar dados do criador:", err);
         }
       }
 
       setReportData({ checklist, creatorUser });
     } catch (error) {
-      console.error("Erro ao carregar dados do relatório:", error);
+      logger.error("Erro ao carregar dados do relatório:", error);
       setError("Erro ao carregar dados do relatório");
     } finally {
       setLoading(false);

@@ -3,6 +3,7 @@ import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 import { createPageUrl } from "@/utils";
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 /**
  * Gerencia as ações de salvar/finalizar do EnsaioMRAF.
  */
@@ -35,7 +36,7 @@ export function useEnsaioMRAFActions({
       }
       clearSavedData();
     } catch (error) {
-      console.error("Erro ao salvar progresso:", error);
+      logger.error("Erro ao salvar progresso:", error);
       toast({ title: "Erro ao salvar progresso.", variant: "destructive" });
     } finally {
       setSaving(false);
@@ -79,7 +80,7 @@ export function useEnsaioMRAFActions({
       clearSavedData();
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
-      console.error("Erro ao finalizar ensaio:", error);
+      logger.error("Erro ao finalizar ensaio:", error);
       toast({ title: "Erro ao finalizar ensaio.", variant: "destructive" });
     } finally {
       setSaving(false);

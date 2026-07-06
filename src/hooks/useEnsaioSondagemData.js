@@ -13,6 +13,7 @@ import {
   filtrarProjetosPorObra,
 } from "@/utils/ensaioSondagemUtils";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export function useEnsaioSondagemData() {
   const [loading, setLoading] = useState(true);
@@ -61,7 +62,7 @@ export function useEnsaioSondagemData() {
           }
         })
         .catch(error => {
-          console.error("[EnsaioSondagem] Erro ao carregar dados:", error?.message || error);
+          logger.error("[EnsaioSondagem] Erro ao carregar dados:", error?.message || error);
           toast({ title: "Erro ao carregar dados iniciais.", variant: "destructive" });
         })
         .finally(() => setLoading(false));

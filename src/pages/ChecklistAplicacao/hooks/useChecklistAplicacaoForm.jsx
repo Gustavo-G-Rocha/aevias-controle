@@ -16,6 +16,7 @@ import { createPageUrl } from "@/utils";
 import { uploadMultipleFiles } from "@/utils/imageUpload";
 import { criarChecklist, atualizarChecklist } from "@/services/checklistsService";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export function useChecklistAplicacaoForm({
   formData,
@@ -146,7 +147,7 @@ export function useChecklistAplicacaoForm({
       clearSavedData();
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
-      console.error("[ChecklistAplicacao] Erro ao salvar checklist:", error?.message || error);
+      logger.error("[ChecklistAplicacao] Erro ao salvar checklist:", error?.message || error);
       toast({ title: "Erro ao salvar checklist.", variant: "destructive" });
     } finally {
       setSaving(false);

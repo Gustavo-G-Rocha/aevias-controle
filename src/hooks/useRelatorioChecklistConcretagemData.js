@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { obterChecklistById } from '@/services/checklistsService';
 import { carregarContextoRelatorio } from '@/services/relatorioContextService';
+import { logger } from '@/utils/logger';
 
 export function useRelatorioChecklistConcretagemData() {
   const [checklist, setChecklist] = useState(null);
@@ -45,7 +46,7 @@ export function useRelatorioChecklistConcretagemData() {
         setProject(ctx.project);
         setCreatorUser(ctx.creatorUser);
       } catch (err) {
-        console.error('[Concretagem] Erro ao carregar relatório:', err);
+        logger.error('[Concretagem] Erro ao carregar relatório:', err);
         setError(err.message || 'Erro ao carregar o checklist');
       } finally {
         setLoading(false);

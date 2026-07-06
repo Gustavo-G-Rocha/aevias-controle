@@ -8,6 +8,7 @@ import { obterObraById } from '@/services/obrasService';
 import { obterRegionalById } from '@/services/regionaisService';
 import { isAuthenticated } from '@/services/usuariosService';
 import RelatorioTaxaPinturaImprimacaoComponent from '../components/relatorios/RelatorioTaxaPinturaImprimacao';
+import { logger } from '@/utils/logger';
 
 export default function RelatorioTaxaPinturaImprimacaoPage() {
   const [state, setState] = useState({
@@ -39,14 +40,14 @@ export default function RelatorioTaxaPinturaImprimacaoPage() {
         try {
           obra = await obterObraById(ensaio.obra_id);
         } catch (err) {
-          console.warn("Obra não encontrada:", ensaio.obra_id);
+          logger.warn("Obra não encontrada:", ensaio.obra_id);
         }
         
         if (obra && obra.regional_id) {
           try {
             regional = await obterRegionalById(obra.regional_id);
           } catch (err) {
-            console.warn("Regional não encontrada:", obra.regional_id);
+            logger.warn("Regional não encontrada:", obra.regional_id);
           }
         }
       }
@@ -57,7 +58,7 @@ export default function RelatorioTaxaPinturaImprimacaoPage() {
         data: { ensaio, obra, regional }
       });
     } catch (error) {
-      console.error('Erro ao carregar relatório:', error);
+      logger.error('Erro ao carregar relatório:', error);
       setState({ loading: false, error: error.message, data: null });
     }
   };

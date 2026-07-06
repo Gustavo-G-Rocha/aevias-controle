@@ -8,6 +8,7 @@ import {
   getEmailsPermitidosPorRegional,
 } from "@/utils/usersUtils";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export function useUsersData() {
   const [users, setUsers]             = useState([]);
@@ -37,7 +38,7 @@ export function useUsersData() {
 
       setUsers(allUsers);
     } catch (error) {
-      console.error("Erro ao carregar dados:", error);
+      logger.error("Erro ao carregar dados:", error);
       toast({ title: "Não foi possível carregar a lista de usuários. Por favor, contate o administrador.", variant: "destructive" });
     } finally {
       setLoading(false);

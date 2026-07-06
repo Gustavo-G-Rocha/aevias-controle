@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { obterUsuarioAtual } from "@/services/usuariosService";
 import { listarRegionais } from "@/services/regionaisService";
 import { listarRegistros } from "@/services/recordsService";
+import { logger } from '@/utils/logger';
 
 export const useGestaoNCData = () => {
   const [user, setUser] = useState(null);
@@ -26,7 +27,7 @@ export const useGestaoNCData = () => {
       setObras(obrasData);
       setNcs(ncsData);
     } catch (error) {
-      console.error("[GestaoNC] Erro ao carregar dados:", error?.message || error);
+      logger.error("[GestaoNC] Erro ao carregar dados:", error?.message || error);
     } finally {
       setLoading(false);
     }

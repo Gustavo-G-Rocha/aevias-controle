@@ -19,6 +19,7 @@ import {
   getProjetosNaRegional,
 } from "@/utils/regionaisUtils";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 const tipoObraIcons = {
   supervisao: <HardHat className="w-3 h-3 text-blue-600" />,
@@ -68,7 +69,7 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
       setEditingObra(null);
       onObraAdded();
     } catch (error) {
-      console.error("[Regionais] Erro ao salvar obra:", error?.message || error);
+      logger.error("[Regionais] Erro ao salvar obra:", error?.message || error);
       toast({ title: `Erro ao salvar obra: ${error.message}`, variant: "destructive" });
     }
   }, [editingObra, regional.id, onObraAdded]);
@@ -79,7 +80,7 @@ const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onD
         await deletarObra(obraId);
         onObraAdded();
       } catch (error) {
-        console.error("[Regionais] Erro ao excluir obra:", error?.message || error);
+        logger.error("[Regionais] Erro ao excluir obra:", error?.message || error);
         toast({ title: "Erro ao excluir obra.", variant: "destructive" });
       }
     }

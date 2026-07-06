@@ -25,24 +25,55 @@ const ENSAIO_ENTITIES = {
   'BoletimSondagemTrado': 'BoletimSondagemTrado',
 };
 
-export async function listarEnsaios(entityName, limit = 500) {
+const DEFAULT_PAGE_SIZE = 100;
+
+/**
+ * Lista ensaios com paginação real (offset-based via skip).
+ * @param {string} entityName
+ * @param {{ page?: number, pageSize?: number }} opts
+ * @returns {Promise<{ data: object[], page: number, pageSize: number, hasMore: boolean }>}
+ */
+export async function listarEnsaios(entityName, { page = 1, pageSize = DEFAULT_PAGE_SIZE } = {}) {
   if (!ENSAIO_ENTITIES[entityName]) {
     throw new Error(`Entidade ensaio desconhecida: ${entityName}`);
   }
-  return withServiceCall(
-    () => base44.entities[entityName].list('-created_date', limit),
+  const skip = (page - 1) * pageSize;
+  const data = await withServiceCall(
+    () => base44.entities[entityName].list('-created_date', pageSize + 1, skip),
     'Falha ao carregar ensaios'
   );
+  const hasMore = data.length > pageSize;
+  return {
+    data: hasMore ? data.slice(0, pageSize) : data,
+    page,
+    pageSize,
+    hasMore,
+  };
 }
 
-export async function listarEnsaiosPorObra(entityName, obraId) {
+/**
+ * Lista ensaios de uma obra com paginação real (offset-based via skip).
+ * @param {string} entityName
+ * @param {string} obraId
+ * @param {{ page?: number, pageSize?: number }} opts
+ * @returns {Promise<{ data: object[], page: number, pageSize: number, hasMore: boolean }>}
+ */
+export async function listarEnsaiosPorObra(entityName, obraId, { page = 1, pageSize = DEFAULT_PAGE_SIZE } = {}) {
   if (!ENSAIO_ENTITIES[entityName]) {
     throw new Error(`Entidade ensaio desconhecida: ${entityName}`);
   }
-  return withServiceCall(
-    () => base44.entities[entityName].filter({ obra_id: obraId }, '-created_date', 500),
+  const skip = (page - 1) * pageSize;
+  const data = await withServiceCall(
+    () => base44.entities[entityName].filter({ obra_id: obraId }, '-created_date', pageSize + 1, skip),
     'Falha ao carregar ensaios da obra'
   );
+  const hasMore = data.length > pageSize;
+  return {
+    data: hasMore ? data.slice(0, pageSize) : data,
+    page,
+    pageSize,
+    hasMore,
+  };
 }
 
 export async function obterEnsaioById(entityName, id) {

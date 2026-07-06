@@ -10,6 +10,7 @@ import { obterEnsaioById, criarEnsaio, atualizarEnsaio } from "@/services/ensaio
 import { useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 const EnsaioForm = ({ ensaio, obras, projects, onSave, onCancel }) => {
     const [formData, setFormData] = useState(ensaio || {});
@@ -92,7 +93,7 @@ export default function EnsaioDensidadePage() {
           }
         }
       } catch (error) {
-        console.error("Erro ao carregar dados:", error);
+        logger.error("Erro ao carregar dados:", error);
         navigate(createPageUrl('MeusEnsaios'));
       } finally {
         setLoading(false);
@@ -133,7 +134,7 @@ export default function EnsaioDensidadePage() {
       }
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
-      console.error("Erro ao salvar ensaio:", error);
+      logger.error("Erro ao salvar ensaio:", error);
       toast({ title: "Erro ao salvar ensaio.", variant: "destructive" });
     }
   };

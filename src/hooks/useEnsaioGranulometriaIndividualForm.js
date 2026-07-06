@@ -14,6 +14,7 @@ import {
   buildAgregadosDoProjeto,
 } from "@/utils/ensaioGranulometriaIndividualUtils";
 import { PENEIRAS_CONFIG as PC } from "@/constants/sieves";
+import { logger } from '@/utils/logger';
 
 const PENEIRAS_PERMITIDAS = PC.map(p => p.key);
 
@@ -57,7 +58,7 @@ export function useEnsaioGranulometriaIndividualForm({
             setFormData(prev => ({ ...prev, faixa: faixa.nome }));
             setSelectedFaixa(faixa);
           } catch (error) {
-            console.error("Erro ao carregar faixa:", error);
+            logger.error("Erro ao carregar faixa:", error);
             setSelectedFaixa(null);
           }
         } else {

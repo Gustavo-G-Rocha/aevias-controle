@@ -6,6 +6,7 @@ import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { extractNCIdFromUrl, initializeNCForm } from "@/utils/editarNCUtils";
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 export const useEditarNCData = () => {
   const navigate = useNavigate();
   const [nc, setNc] = useState(null);
@@ -38,7 +39,7 @@ export const useEditarNCData = () => {
         setNc(ncData[0]);
       })
       .catch(error => {
-        console.error("[EditarNC] Erro ao carregar dados:", error?.message || error);
+        logger.error("[EditarNC] Erro ao carregar dados:", error?.message || error);
         toast({ title: "Erro ao carregar a NC. Tente novamente.", variant: "destructive" });
         navigate(createPageUrl("GestaoNC"));
       })

@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { atualizarRegistro } from "@/services/recordsService";
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 export const useGestaoNCActions = (setNcs) => {
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [selectedNC, setSelectedNC] = useState(null);
@@ -76,7 +77,7 @@ export const useGestaoNCActions = (setNcs) => {
         setSelectedNC(null);
         setRejectionReason("");
       } catch (error) {
-        console.error("Erro ao processar aprovação:", error);
+        logger.error("Erro ao processar aprovação:", error);
         toast({ title: "Erro ao processar aprovação", variant: "destructive" });
       }
     },
@@ -100,7 +101,7 @@ export const useGestaoNCActions = (setNcs) => {
           )
         );
       } catch (error) {
-        console.error("Erro ao solicitar aprovação:", error);
+        logger.error("Erro ao solicitar aprovação:", error);
         toast({ title: "Erro ao solicitar aprovação do cliente", variant: "destructive" });
       }
     },

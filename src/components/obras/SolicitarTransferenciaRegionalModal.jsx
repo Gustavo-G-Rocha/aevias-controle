@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowRightLeft, MapPin } from "lucide-react";
 import { criarSolicitacaoTransferenciaRegional } from "@/services/solicitacoesService";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export default function SolicitarTransferenciaRegionalModal({ 
   isOpen, 
@@ -58,7 +59,7 @@ export default function SolicitarTransferenciaRegionalModal({
       setMotivo("");
       onSuccess();
     } catch (error) {
-      console.error("Erro ao criar solicitação:", error);
+      logger.error("Erro ao criar solicitação:", error);
       toast({ title: "Erro ao enviar solicitação. Tente novamente.", variant: "destructive" });
     } finally {
       setLoading(false);

@@ -7,6 +7,7 @@ import {
   getRegionaisDoUsuario,
 } from "@/utils/usersUtils";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export function useUsersActions({ currentUser, regionais, loadData }) {
   const [isFormOpen,   setIsFormOpen]   = useState(false);
@@ -83,7 +84,7 @@ export function useUsersActions({ currentUser, regionais, loadData }) {
       setEditingUser(null);
       await loadData();
     } catch (error) {
-      console.error("Erro ao salvar usuário:", error);
+      logger.error("Erro ao salvar usuário:", error);
       const mensagemErro =
         error.response?.data?.detail  ||
         error.response?.data?.message ||

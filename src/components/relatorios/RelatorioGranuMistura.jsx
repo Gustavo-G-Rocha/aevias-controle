@@ -7,6 +7,7 @@ import { obterGranuMisturaById } from '@/services/granuMisturaService';
 import { obterObraById } from '@/services/obrasService';
 import { obterProjectById } from '@/services/projectsService';
 import { obterFaixaById } from '@/services/faixasService';
+import { logger } from '@/utils/logger';
 
 export default function RelatorioGranuMistura({ recordId }) {
   const [record, setRecord] = useState(null);
@@ -38,7 +39,7 @@ export default function RelatorioGranuMistura({ recordId }) {
           setObra(obraData);
         }
       } catch (err) {
-        console.error(err);
+        logger.error(err);
       } finally {
         setLoading(false);
       }

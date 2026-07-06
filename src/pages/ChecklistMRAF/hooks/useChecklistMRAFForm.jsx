@@ -9,6 +9,7 @@ import { todayISO } from "@/utils/formInitialData";
 import { criarChecklist, atualizarChecklist } from "@/services/checklistsService";
 import { uploadImagem } from "@/services/uploadService";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 const getInitialFormData = () => ({
   obra_id: "",
@@ -151,7 +152,7 @@ export function useChecklistMRAFForm() {
       }
       setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...uploadedUrls] }));
     } catch (error) {
-      console.error("Erro ao fazer upload das fotos:", error);
+      logger.error("Erro ao fazer upload das fotos:", error);
       toast({ title: "Erro ao fazer upload das fotos.", variant: "destructive" });
     } finally {
       setUploadingPhotos(false);
@@ -225,7 +226,7 @@ export function useChecklistMRAFForm() {
         navigate(createPageUrl("MeusEnsaios"));
       }
     } catch (error) {
-      console.error("Erro ao salvar checklist:", error);
+      logger.error("Erro ao salvar checklist:", error);
       toast({ title: `Erro ao salvar checklist: ${error.message}`, variant: "destructive" });
     } finally {
       setSaving(false);

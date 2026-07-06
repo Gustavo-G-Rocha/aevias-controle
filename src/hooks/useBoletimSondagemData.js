@@ -11,6 +11,7 @@ import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { getInitialFormData, getDensidadeInicial, normalizarDensidades } from "@/utils/boletimSondagemUtils";
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 export function useBoletimSondagemData() {
   const [formData, setFormData] = useState(getInitialFormData());
   const [editingBoletim, setEditingBoletim] = useState(null);
@@ -72,7 +73,7 @@ export function useBoletimSondagemData() {
           }
         })
         .catch(err => {
-          console.error("Erro ao carregar dados:", err);
+          logger.error("Erro ao carregar dados:", err);
           toast({ title: "Erro ao carregar dados.", variant: "destructive" });
           navigate(createPageUrl('MeusEnsaios'));
         })

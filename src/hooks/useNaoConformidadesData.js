@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { obterUsuarioAtual } from "@/services/usuariosService";
 import { listarRegionais } from "@/services/regionaisService";
+import { logger } from '@/utils/logger';
 import {
   listarRegistros,
   loadRecordsGrouped,
@@ -117,7 +118,7 @@ export function useNaoConformidadesData() {
       outrosResults.flat().forEach(reg => allCNCs.push(reg));
       setChecklistNCs(allCNCs);
     } catch (error) {
-      console.error("[NaoConformidades] Erro ao carregar dados:", error?.message || error);
+      logger.error("[NaoConformidades] Erro ao carregar dados:", error?.message || error);
     } finally {
       setLoading(false);
     }

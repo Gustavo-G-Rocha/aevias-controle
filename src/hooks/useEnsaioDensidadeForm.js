@@ -6,6 +6,7 @@ import { useState, useCallback } from "react";
 import { uploadArquivo } from "@/services/uploadService";
 import { calcularFuroComProctor, getFuroInicial } from "@/utils/ensaioDensidadeUtils";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export function useEnsaioDensidadeForm(formData, setFormData) {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
@@ -100,7 +101,7 @@ export function useEnsaioDensidadeForm(formData, setFormData) {
       setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...uploadedUrls] }));
       e.target.value = '';
     } catch (error) {
-      console.error("Erro ao fazer upload da foto:", error);
+      logger.error("Erro ao fazer upload da foto:", error);
       toast({ title: "Erro ao fazer upload da foto.", variant: "destructive" });
     } finally {
       setUploadingPhoto(false);

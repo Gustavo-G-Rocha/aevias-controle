@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
   const [saving, setSaving] = useState(false);
@@ -63,7 +64,7 @@ export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
       }
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
-      console.error("Erro ao salvar ensaio:", error);
+      logger.error("Erro ao salvar ensaio:", error);
       toast({ title: `Erro ao salvar ensaio: ${error.message || 'Erro desconhecido'}`, variant: "destructive" });
     } finally {
       setSaving(false);

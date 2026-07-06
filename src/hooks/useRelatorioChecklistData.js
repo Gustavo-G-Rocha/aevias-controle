@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { obterUsuarioAtual } from '@/services/usuariosService';
 import { obterChecklistById } from '@/services/checklistsService';
 import { carregarContextoRelatorio } from '@/services/relatorioContextService';
+import { logger } from '@/utils/logger';
 
 export function useRelatorioChecklistData() {
   const [checklist, setChecklist] = useState(null);
@@ -53,7 +54,7 @@ export function useRelatorioChecklistData() {
 
         setLoading(false);
       } catch (err) {
-        console.error('[RelatorioChecklist] Erro ao carregar relatório:', err);
+        logger.error('[RelatorioChecklist] Erro ao carregar relatório:', err);
         setError(err.message || 'Erro ao carregar o checklist');
         setLoading(false);
       }

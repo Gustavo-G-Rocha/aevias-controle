@@ -7,6 +7,7 @@ import { criarEnsaio, atualizarEnsaio } from '@/services/ensaiosService';
 import { createPageUrl } from '@/utils';
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 export function useEnsaioRompimentoConcretoActions(formData, editId) {
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ export function useEnsaioRompimentoConcretoActions(formData, editId) {
       }
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
-      console.error('Erro ao salvar:', error);
+      logger.error('Erro ao salvar:', error);
       toast({ title: 'Erro ao salvar ensaio', variant: "destructive" });
     } finally {
       setSaving(false);

@@ -18,6 +18,7 @@ import { createPageUrl } from "@/utils";
 import { validateEnsaioCAUQ, validateEnsaioRascunho } from "@/utils/ensaioValidation";
 import { getFatorCorrecaoEstabilidade, novoCorpoProva } from "@/utils/ensaioCAUQCalculations";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 // Reexporta para preservar a API pública do hook (outros módulos importam novoCorpoProva daqui).
 export { novoCorpoProva };
@@ -229,7 +230,7 @@ export function useEnsaioCAUQForm({
       }
       clearSavedData();
     } catch (error) {
-      console.error("[EnsaioCAUQ] Erro ao salvar progresso:", error?.message || error);
+      logger.error("[EnsaioCAUQ] Erro ao salvar progresso:", error?.message || error);
       toast({ title: "Erro ao salvar progresso.", variant: "destructive" });
     } finally {
       setSaving(false);
@@ -270,7 +271,7 @@ export function useEnsaioCAUQForm({
       clearSavedData();
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
-      console.error("[EnsaioCAUQ] Erro ao finalizar ensaio:", error?.message || error);
+      logger.error("[EnsaioCAUQ] Erro ao finalizar ensaio:", error?.message || error);
       toast({ title: "Erro ao finalizar ensaio.", variant: "destructive" });
     } finally {
       setSaving(false);

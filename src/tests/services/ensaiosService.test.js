@@ -87,20 +87,43 @@ describe('ensaiosService — CRUD e validação de entidade', () => {
     await expect(listarEnsaios('Foo')).rejects.toThrow('desconhecida');
   });
 
-  it('listarEnsaios delega list com ordenação e limite padrão', async () => {
-    entities.EnsaioCAUQ.list.mockResolvedValueOnce([{ id: 'e1' }]);
-    expect(await listarEnsaios('EnsaioCAUQ')).toEqual([{ id: 'e1' }]);
-    expect(entities.EnsaioCAUQ.list).toHaveBeenCalledWith('-created_date', 500);
+  it('listarEnsaios retorna página 1 com pageSize padrão', async () => {
+    entities.EnsaioCAUQ.list.mockResolvedValueOnce([{ id: 'e1' }, { id: 'e2' }]);
+    const result = await listarEnsaios('EnsaioCAUQ');
+    expect(result.data).toEqual([{ id: 'e1' }, { id: 'e2' }]);
+    expect(result.page).toBe(1);
+    expect(result.pageSize).toBe(100);
+    expect(result.hasMore).toBe(false);
+    expect(entities.EnsaioCAUQ.list).toHaveBeenCalledWith('-created_date', 101, 0);
   });
 
-  it('listarEnsaios aceita limite custom', async () => {
-    await listarEnsaios('EnsaioCAUQ', 10);
-    expect(entities.EnsaioCAUQ.list).toHaveBeenCalledWith('-created_date', 10);
+  it('listarEnsaios aceita page e pageSize custom', async () => {
+    entities.EnsaioCAUQ.list.mockResolvedValueOnce([]);
+    await listarEnsaios('EnsaioCAUQ', { page: 3, pageSize: 10 });
+    expect(entities.EnsaioCAUQ.list).toHaveBeenCalledWith('-created_date', 11, 20);
   });
 
-  it('listarEnsaiosPorObra delega filter com obra_id', async () => {
-    await listarEnsaiosPorObra('EnsaioMRAF', 'O1');
-    expect(entities.EnsaioMRAF.filter).toHaveBeenCalledWith({ obra_id: 'O1' }, '-created_date', 500);
+  it('listarEnsaios sinaliza hasMore quando há mais registros', async () => {
+    const records = Array.from({ length: 101 }, (_, i) => ({ id: `e${i}` }));
+    entities.EnsaioCAUQ.list.mockResolvedValueOnce(records);
+    const result = await listarEnsaios('EnsaioCAUQ', { pageSize: 50 });
+    expect(result.data).toHaveLength(50);
+    expect(result.hasMore).toBe(true);
+  });
+
+  it('listarEnsaiosPorObra delega filter com obra_id e paginação', async () => {
+    entities.EnsaioMRAF.filter.mockResolvedValueOnce([{ id: 'e1' }]);
+    const result = await listarEnsaiosPorObra('EnsaioMRAF', 'O1');
+    expect(result.data).toEqual([{ id: 'e1' }]);
+    expect(result.page).toBe(1);
+    expect(result.pageSize).toBe(100);
+    expect(entities.EnsaioMRAF.filter).toHaveBeenCalledWith({ obra_id: 'O1' }, '-created_date', 101, 0);
+  });
+
+  it('listarEnsaiosPorObra aceita page e pageSize custom', async () => {
+    entities.EnsaioMRAF.filter.mockResolvedValueOnce([]);
+    await listarEnsaiosPorObra('EnsaioMRAF', 'O1', { page: 2, pageSize: 20 });
+    expect(entities.EnsaioMRAF.filter).toHaveBeenCalledWith({ obra_id: 'O1' }, '-created_date', 21, 20);
   });
 
   it('obterEnsaioById delega get', async () => {

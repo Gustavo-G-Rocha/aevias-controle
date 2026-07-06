@@ -15,6 +15,7 @@ import {
   filtrarObrasParaTrado,
 } from "@/utils/boletimSondagemTradoUtils";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export function useBoletimSondagemTradoData() {
   const [formData, setFormData] = useState(getInitialFormData());
@@ -72,7 +73,7 @@ export function useBoletimSondagemTradoData() {
           }
         })
         .catch(err => {
-          console.error("Erro ao carregar dados:", err);
+          logger.error("Erro ao carregar dados:", err);
           toast({ title: "Erro ao carregar dados.", variant: "destructive" });
           navigate(createPageUrl('MeusEnsaios'));
         })

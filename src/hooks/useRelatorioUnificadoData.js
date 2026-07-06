@@ -8,6 +8,7 @@ import { listarRegionais } from '@/services/regionaisService';
 import { listarProjects } from '@/services/projectsService';
 import { listarFaixas } from '@/services/faixasService';
 import { obterUsuarioAtual } from '@/services/usuariosService';
+import { logger } from '@/utils/logger';
 
 export function useRelatorioUnificadoData() {
   const [obra, setObra] = useState(null);
@@ -55,13 +56,13 @@ export function useRelatorioUnificadoData() {
         const currentUser   = userResult.status       === 'fulfilled' ? userResult.value       : null;
 
         if (regionaisResult.status === 'rejected')
-          console.warn('[RelatorioUnificado] Regionais não carregadas:', regionaisResult.reason);
+          logger.warn('[RelatorioUnificado] Regionais não carregadas:', regionaisResult.reason);
         if (projectsResult.status === 'rejected')
-          console.warn('[RelatorioUnificado] Projetos não carregados:', projectsResult.reason);
+          logger.warn('[RelatorioUnificado] Projetos não carregados:', projectsResult.reason);
         if (faixasResult.status === 'rejected')
-          console.warn('[RelatorioUnificado] Faixas granulométricas não carregadas:', faixasResult.reason);
+          logger.warn('[RelatorioUnificado] Faixas granulométricas não carregadas:', faixasResult.reason);
         if (userResult.status === 'rejected')
-          console.warn('[RelatorioUnificado] Usuário não carregado:', userResult.reason);
+          logger.warn('[RelatorioUnificado] Usuário não carregado:', userResult.reason);
 
         setUser(currentUser);
         setProjects(projectsData);
@@ -70,7 +71,7 @@ export function useRelatorioUnificadoData() {
 
         setLoading(false);
       } catch (err) {
-        console.error('[RelatorioUnificado] Erro ao carregar dados:', err);
+        logger.error('[RelatorioUnificado] Erro ao carregar dados:', err);
         setError(err.message || 'Erro ao carregar dados');
         setLoading(false);
       }

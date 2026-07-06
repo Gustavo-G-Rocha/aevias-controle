@@ -11,6 +11,7 @@ import { Loader2, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export default function RelatorioGranulometriaIndividualPage() {
   useReportMode();
@@ -56,7 +57,7 @@ export default function RelatorioGranulometriaIndividualPage() {
           setProject(projectData);
         }
       } catch (error) {
-        console.error("Erro ao carregar dados:", error);
+        logger.error("Erro ao carregar dados:", error);
         toast({ title: "Erro ao carregar o relatório.", variant: "destructive" });
       } finally {
         setLoading(false);

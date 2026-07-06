@@ -7,6 +7,7 @@ import { listarObrasRecentes } from '@/services/obrasService';
 import { listarRegionais } from '@/services/regionaisService';
 import { listarProjects } from '@/services/projectsService';
 import RelatorioChecklistComponent from '../components/relatorios/RelatorioChecklist';
+import { logger } from '@/utils/logger';
 
 export default function RelatorioChecklistPage() {
   const [state, setState] = useState({
@@ -53,7 +54,7 @@ export default function RelatorioChecklistPage() {
           data: { checklist, obra, regional, project, user }
         });
       } catch (error) {
-        console.error('Erro ao carregar relatório do checklist:', error);
+        logger.error('Erro ao carregar relatório do checklist:', error);
         setState({ loading: false, error: error.message, data: null });
       }
     };

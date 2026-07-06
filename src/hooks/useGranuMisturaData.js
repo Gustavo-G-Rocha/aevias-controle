@@ -11,6 +11,7 @@ import {
   getInitialPeneiras,
 } from "@/utils/granuMisturaUtils";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export function useGranuMisturaData() {
   const location = useLocation();
@@ -71,7 +72,7 @@ export function useGranuMisturaData() {
           }
         })
         .catch(err => {
-          console.error(err);
+          logger.error(err);
           toast({ title: "Erro ao carregar dados.", variant: "destructive" });
         })
         .finally(() => setEditLoading(false));

@@ -7,6 +7,7 @@ import { createPageUrl } from "@/utils";
 import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 export function useBoletimSondagemActions({ formData, user, editingBoletim }) {
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ export function useBoletimSondagemActions({ formData, user, editingBoletim }) {
       }
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
-      console.error("Erro ao salvar boletim:", error);
+      logger.error("Erro ao salvar boletim:", error);
       toast({ title: "Erro ao salvar boletim: " + error.message, variant: "destructive" });
     } finally {
       setSaving(false);

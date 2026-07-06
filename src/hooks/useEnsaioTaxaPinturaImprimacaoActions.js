@@ -8,6 +8,7 @@ import { criarEnsaio, atualizarEnsaio } from '@/services/ensaiosService';
 import { createPageUrl } from '@/utils';
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 export function useEnsaioTaxaPinturaImprimacaoActions(formData, editingEnsaio, user) {
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ export function useEnsaioTaxaPinturaImprimacaoActions(formData, editingEnsaio, u
       }
       navigate(createPageUrl('MeusEnsaios'));
     } catch (err) {
-      console.error('Erro ao salvar ensaio:', err);
+      logger.error('Erro ao salvar ensaio:', err);
       toast({ title: `Erro ao salvar ensaio: ${err.message || 'Erro desconhecido'}.`, variant: "destructive" });
     } finally {
       setSaving(false);

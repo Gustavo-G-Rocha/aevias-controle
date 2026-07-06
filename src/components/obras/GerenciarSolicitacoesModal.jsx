@@ -27,6 +27,7 @@ import {
   atualizarSolicitacaoTransferenciaRegional,
 } from "@/services/solicitacoesService";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 const statusConfig = {
   pendente: { icon: Clock, color: "bg-yellow-100 text-yellow-800", label: "Pendente" },
@@ -220,7 +221,7 @@ export default function GerenciarSolicitacoesModal({ isOpen, onClose, user, onUp
       const todasSolicitacoes = await listarSolicitacoesTransferenciaRegional();
       setSolicitacoes(todasSolicitacoes);
     } catch (error) {
-      console.error("Erro ao carregar solicitações:", error);
+      logger.error("Erro ao carregar solicitações:", error);
     } finally {
       setLoading(false);
     }
@@ -269,7 +270,7 @@ export default function GerenciarSolicitacoesModal({ isOpen, onClose, user, onUp
       await loadSolicitacoes();
       onUpdate();
     } catch (error) {
-      console.error("Erro ao aprovar solicitação:", error);
+      logger.error("Erro ao aprovar solicitação:", error);
       toast({ title: "Erro ao aprovar solicitação. Tente novamente.", variant: "destructive" });
     }
   };
@@ -286,7 +287,7 @@ export default function GerenciarSolicitacoesModal({ isOpen, onClose, user, onUp
       toast({ title: "Solicitação rejeitada." });
       await loadSolicitacoes();
     } catch (error) {
-      console.error("Erro ao rejeitar solicitação:", error);
+      logger.error("Erro ao rejeitar solicitação:", error);
       toast({ title: "Erro ao rejeitar solicitação. Tente novamente.", variant: "destructive" });
     }
   };

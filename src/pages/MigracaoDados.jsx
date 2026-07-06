@@ -7,6 +7,7 @@ import { DatabaseZap, Trash2, UserX, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { listarRegionais, atualizarRegional } from '@/services/regionaisService';
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export default function MigracaoDados() {
   const [emailParaRemover, setEmailParaRemover] = useState('');
@@ -90,7 +91,7 @@ export default function MigracaoDados() {
       });
       setEmailParaRemover('');
     } catch (error) {
-      console.error("Erro ao remover usuário das regionais:", error);
+      logger.error("Erro ao remover usuário das regionais:", error);
       setResultadoRemocao({ success: false, error: error.message });
     } finally {
       setRemovendoUsuario(false);
@@ -103,7 +104,7 @@ export default function MigracaoDados() {
         const { data } = await base44.functions.invoke('migrarPeneirasProjects');
         toast({ title: `Migração concluída! Detalhes: ${JSON.stringify(data)}` });
       } catch (error) {
-        console.error("Erro na migração:", error);
+        logger.error("Erro na migração:", error);
         toast({ title: `Erro ao executar a migração: ${error.message}`, variant: "destructive" });
       }
     }
@@ -115,7 +116,7 @@ export default function MigracaoDados() {
         const { data } = await base44.functions.invoke('limparTodasPeneirasProjects');
         toast({ title: `Limpeza concluída! Detalhes: ${JSON.stringify(data)}` });
       } catch (error) {
-        console.error("Erro na limpeza:", error);
+        logger.error("Erro na limpeza:", error);
         toast({ title: `Erro ao executar a limpeza: ${error.message}`, variant: "destructive" });
       }
     }

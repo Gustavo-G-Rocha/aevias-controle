@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { logger } from '@/utils/logger';
 
 /**
  * Hook que monitora conexão online/offline
@@ -18,12 +19,12 @@ export function useOfflineDetection() {
 
   useEffect(() => {
     const handleOnline = () => {
-      console.log('[useOfflineDetection] Online');
+      logger.log('[useOfflineDetection] Online');
       setIsOnline(true);
     };
 
     const handleOffline = () => {
-      console.log('[useOfflineDetection] Offline');
+      logger.log('[useOfflineDetection] Offline');
       setIsOnline(false);
     };
 

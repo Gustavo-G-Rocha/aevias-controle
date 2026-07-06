@@ -4,6 +4,7 @@
  */
 import { useState, useEffect } from 'react';
 import { obterEnsaioById } from '@/services/ensaiosService';
+import { logger } from '@/utils/logger';
 import {
   carregarObraRegional,
   carregarProject,
@@ -49,7 +50,7 @@ export function useRelatorioCAUQData() {
           setFaixa(faixaData);
         }
       } catch (err) {
-        console.error('[RelatorioCAUQ] Erro ao carregar dados:', err);
+        logger.error('[RelatorioCAUQ] Erro ao carregar dados:', err);
         setError('Erro ao carregar dados do relatório');
       } finally {
         setLoading(false);

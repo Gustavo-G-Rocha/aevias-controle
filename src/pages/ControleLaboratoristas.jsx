@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Users, CheckCircle2, XCircle, TrendingDown } from 'lucide-react';
 import { CONTROLE_LAB_ENTITIES, calcularEstatisticasLaboratoristas } from '@/utils/controleLaboratoristasUtils';
+import { logger } from '@/utils/logger';
 
 export default function ControleLaboratoristas() {
   const [user, setUser] = useState(null);
@@ -37,7 +38,7 @@ export default function ControleLaboratoristas() {
       setObras(obrasData);
       setRegistros(todosRegistros);
     } catch (error) {
-      console.error('[ControleLaboratoristas] Erro ao carregar dados:', error?.message || error);
+      logger.error('[ControleLaboratoristas] Erro ao carregar dados:', error?.message || error);
     } finally {
       setLoading(false);
     }

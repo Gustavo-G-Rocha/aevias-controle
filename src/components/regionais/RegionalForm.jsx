@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Badge } from "@/components/ui/badge";
 import { uploadArquivo } from "@/services/uploadService";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 const MultiSelect = ({ options, selected, onSelectedChange, placeholder }) => {
     const [open, setOpen] = useState(false);
@@ -91,7 +92,7 @@ export default function RegionalForm({ regional, users, projects, onSave, onCanc
             const { file_url } = await uploadArquivo(file);
             setFormData(prev => ({ ...prev, logo_url: file_url }));
         } catch (error) {
-            console.error("Erro ao fazer upload da logo:", error);
+            logger.error("Erro ao fazer upload da logo:", error);
             toast({ title: "Erro ao fazer upload da logo. Tente novamente.", variant: "destructive" });
         } finally {
             setUploadingLogo(false);

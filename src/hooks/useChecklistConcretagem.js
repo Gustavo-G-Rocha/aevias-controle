@@ -6,6 +6,7 @@ import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { obterChecklistById, criarChecklist, atualizarChecklist } from "@/services/checklistsService";
 import { uploadArquivo } from "@/services/uploadService";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export const getInitialFormData = () => ({
   obra_id: "",
@@ -158,7 +159,7 @@ export function useChecklistConcretagem() {
           }
         })
         .catch(error => {
-          console.error("Erro ao carregar dados:", error);
+          logger.error("Erro ao carregar dados:", error);
           toast({ title: "Erro ao carregar dados iniciais.", variant: "destructive" });
         })
         .finally(() => setEditLoading(false));
@@ -344,7 +345,7 @@ export function useChecklistConcretagem() {
       clearSavedData();
       navigate(createPageUrl("MeusEnsaios"));
     } catch (error) {
-      console.error("Erro ao salvar checklist:", error);
+      logger.error("Erro ao salvar checklist:", error);
       toast({ title: `Erro ao salvar: ${error.message}`, variant: "destructive" });
     } finally {
       setSaving(false);

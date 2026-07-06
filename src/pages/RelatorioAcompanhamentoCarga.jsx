@@ -10,6 +10,7 @@ import { obterFaixaById } from '@/services/faixasService';
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
 
 import RelatorioAcompanhamentoCarga from "@/components/relatorios/RelatorioAcompanhamentoCarga";
+import { logger } from '@/utils/logger';
 
 export default function RelatorioAcompanhamentoCargaPage() {
   useReportMode();
@@ -60,12 +61,12 @@ export default function RelatorioAcompanhamentoCargaPage() {
             const faixaData = await obterFaixaById(projetoData.faixa_granulometrica_id);
             setFaixaGranulometrica(faixaData);
           } catch (err) {
-            console.warn("Faixa granulométrica não encontrada:", err);
+            logger.warn("Faixa granulométrica não encontrada:", err);
           }
         }
       }
     } catch (err) {
-      console.error("Erro ao carregar dados:", err);
+      logger.error("Erro ao carregar dados:", err);
       setError("Erro ao carregar dados do acompanhamento");
     } finally {
       setLoading(false);

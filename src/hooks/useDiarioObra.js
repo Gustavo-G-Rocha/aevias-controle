@@ -6,6 +6,7 @@ import { createPageUrl } from "@/utils";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 export const getInitialFormData = () => ({
   obra_id: "",
   data: new Date().toISOString().split("T")[0],
@@ -181,7 +182,7 @@ export function useDiarioObra() {
       }
       navigate(createPageUrl("MeusEnsaios"));
     } catch (error) {
-      console.error("[DiarioObra] Erro:", error?.message || error);
+      logger.error("[DiarioObra] Erro:", error?.message || error);
       toast({ title: "Ocorreu um erro ao salvar o diário.", variant: "destructive" });
     }
   }, [formData, editingDiarioOriginal, obras, user, navigate]);
@@ -214,7 +215,7 @@ export function useDiarioObra() {
           }
         })
         .catch(error => {
-          console.error("[DiarioObra] Erro ao carregar:", error?.message || error);
+          logger.error("[DiarioObra] Erro ao carregar:", error?.message || error);
           toast({ title: "Não foi possível carregar os dados.", variant: "destructive" });
           navigate(createPageUrl("MeusEnsaios"));
         })

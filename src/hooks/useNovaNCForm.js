@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { filtrarRegistros } from "@/services/recordsService";
 import { uploadArquivo } from "@/services/uploadService";
+import { logger } from '@/utils/logger';
 
 export const TIPOS_CHECKLIST = [
   { value: "DiarioObra", label: "Diário de Obra" },
@@ -67,7 +68,7 @@ export function useNovaNCForm(user) {
       const data = await filtrarRegistros(tipo, { obra_id: obraId });
       setChecklists([...data].sort((a, b) => new Date(b.data) - new Date(a.data)));
     } catch (error) {
-      console.error("[useNovaNCForm] Erro ao carregar checklists:", error?.message || error);
+      logger.error("[useNovaNCForm] Erro ao carregar checklists:", error?.message || error);
       setChecklists([]);
     } finally {
       setLoadingChecklists(false);
@@ -99,7 +100,7 @@ export function useNovaNCForm(user) {
       }));
       setFotos(prev => [...prev, ...urls]);
     } catch (error) {
-      console.error("[useNovaNCForm] Erro ao fazer upload de fotos:", error?.message || error);
+      logger.error("[useNovaNCForm] Erro ao fazer upload de fotos:", error?.message || error);
     } finally {
       setUploadingFotos(false);
     }
@@ -116,7 +117,7 @@ export function useNovaNCForm(user) {
       }));
       setPdfs(prev => [...prev, ...results]);
     } catch (error) {
-      console.error("[useNovaNCForm] Erro ao fazer upload de PDFs:", error?.message || error);
+      logger.error("[useNovaNCForm] Erro ao fazer upload de PDFs:", error?.message || error);
     } finally {
       setUploadingPdfs(false);
     }

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 import RelatorioManchaPenduloComponent from '@/components/relatorios/RelatorioManchaPendulo';
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import { logger } from '@/utils/logger';
 
 export default function RelatorioManchaPenduloPage() {
   useReportMode();
@@ -36,7 +37,7 @@ export default function RelatorioManchaPenduloPage() {
           }
         }
       } catch (error) {
-        console.error('Erro ao carregar dados:', error);
+        logger.error('Erro ao carregar dados:', error);
       } finally {
         setLoading(false);
       }

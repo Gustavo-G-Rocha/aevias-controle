@@ -6,6 +6,7 @@ import { useState, useCallback } from "react";
 import { criarRegional, atualizarRegional, deletarRegional } from "@/services/regionaisService";
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 export function useRegionaisActions(loadData) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingRegional, setEditingRegional] = useState(null);
@@ -21,7 +22,7 @@ export function useRegionaisActions(loadData) {
       setEditingRegional(null);
       loadData();
     } catch (error) {
-      console.error("[Regionais] Erro ao salvar regional:", error?.message || error);
+      logger.error("[Regionais] Erro ao salvar regional:", error?.message || error);
       toast({ title: "Erro ao salvar regional.", variant: "destructive" });
     }
   }, [editingRegional, loadData]);
@@ -37,7 +38,7 @@ export function useRegionaisActions(loadData) {
         await deletarRegional(id);
         loadData();
       } catch (error) {
-        console.error("[Regionais] Erro ao excluir regional:", error?.message || error);
+        logger.error("[Regionais] Erro ao excluir regional:", error?.message || error);
         toast({ title: "Erro ao excluir regional.", variant: "destructive" });
       }
     }

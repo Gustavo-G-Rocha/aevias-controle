@@ -8,6 +8,7 @@ import { listarObrasRecentes } from '@/services/obrasService';
 import { listarRegionais } from '@/services/regionaisService';
 import { listarProjects } from '@/services/projectsService';
 import { obterRegistroPorEntidade } from '@/services/relatorioContextService';
+import { logger } from '@/utils/logger';
 import {
   findObra,
   findRegional,
@@ -54,7 +55,7 @@ export const useRelatorioNCData = () => {
           project = findProject(registroVinculado, projects);
           creatorUser = findCreatorUser(registroVinculado, allUsers);
         } catch (e) {
-          console.warn('Registro vinculado não encontrado:', e);
+          logger.warn('Registro vinculado não encontrado:', e);
         }
       }
 

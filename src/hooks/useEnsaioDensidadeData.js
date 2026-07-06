@@ -10,6 +10,7 @@ import { getInitialFormData, filtrarObrasDisponiveis, getFuroInicial } from "@/u
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 export function useEnsaioDensidadeData() {
   const [formData, setFormData] = useState(getInitialFormData());
   const [editingEnsaio, setEditingEnsaio] = useState(null);
@@ -79,7 +80,7 @@ export function useEnsaioDensidadeData() {
         }
       })
       .catch(err => {
-        console.error("Erro ao carregar ensaio:", err);
+        logger.error("Erro ao carregar ensaio:", err);
         toast({ title: "Erro ao carregar ensaio para edição.", variant: "destructive" });
         navigate(createPageUrl('MeusEnsaios'));
       })

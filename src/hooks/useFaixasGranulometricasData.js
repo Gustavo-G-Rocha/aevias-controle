@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { obterUsuarioAtual } from '@/services/usuariosService';
 import { listarFaixas } from '@/services/faixasService';
+import { logger } from '@/utils/logger';
 
 export function useFaixasGranulometricasData() {
   const [faixas, setFaixas] = useState([]);
@@ -21,7 +22,7 @@ export function useFaixasGranulometricasData() {
       setUser(userData);
       setFaixas(faixasData);
     } catch (error) {
-      console.error("Erro ao carregar dados:", error);
+      logger.error("Erro ao carregar dados:", error);
     } finally {
       setLoading(false);
     }

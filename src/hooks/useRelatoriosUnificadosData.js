@@ -3,6 +3,7 @@ import { obterUsuarioAtual } from "@/services/usuariosService";
 import { listarRegistros } from "@/services/recordsService";
 import { listarRegionais } from "@/services/regionaisService";
 import { filterObrasByUserAccess } from "@/utils/relatoriosUnificadosUtils";
+import { logger } from '@/utils/logger';
 
 export const useRelatoriosUnificadosData = () => {
   const [loading, setLoading] = useState(true);
@@ -35,7 +36,7 @@ export const useRelatoriosUnificadosData = () => {
 
       setObras(availableObras);
     } catch (err) {
-      console.error(
+      logger.error(
         "[RelatoriosUnificados] Erro ao carregar dados iniciais:",
         err?.message || err
       );

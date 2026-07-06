@@ -9,6 +9,7 @@ import { listarRegionais } from "@/services/regionaisService";
 import { listarRegistros } from "@/services/recordsService";
 import { listarProjects } from "@/services/projectsService";
 import { getUserAccessLevel, filtrarRegionaisPorAcesso } from "@/utils/regionaisUtils";
+import { logger } from '@/utils/logger';
 
 export function useRegionaisData() {
   const [regionais, setRegionais] = useState([]);
@@ -41,7 +42,7 @@ export function useRegionaisData() {
         try {
           usersData = await listarUsuarios();
         } catch (e) {
-          console.error('[Regionais] Sem permissão para listar usuários:', e?.message || e);
+          logger.error('[Regionais] Sem permissão para listar usuários:', e?.message || e);
         }
       }
 
@@ -50,7 +51,7 @@ export function useRegionaisData() {
       setUsers(usersData);
       setProjects(projectsData);
     } catch (error) {
-      console.error("[Regionais] Erro ao carregar dados:", error?.message || error);
+      logger.error("[Regionais] Erro ao carregar dados:", error?.message || error);
     } finally {
       setLoading(false);
     }

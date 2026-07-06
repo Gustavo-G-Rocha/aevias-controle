@@ -12,6 +12,7 @@ import {
   MAX_CARGAS,
 } from "@/utils/acompanhamentoCargaUtils";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export function useAcompanhamentoCargaActions({
   formData, setFormData,
@@ -72,7 +73,7 @@ export function useAcompanhamentoCargaActions({
       toast({ title: finalizar ? "Acompanhamento finalizado com sucesso!" : "Progresso salvo!" });
       navigate(createPageUrl("MeusEnsaios"));
     } catch (error) {
-      console.error("Erro ao salvar:", error);
+      logger.error("Erro ao salvar:", error);
       toast({ title: "Erro ao salvar acompanhamento.", variant: "destructive" });
     } finally {
       setSaving(false);

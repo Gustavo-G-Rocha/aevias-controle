@@ -16,6 +16,7 @@ import {
   enriquecerManchaPendulo,
 } from "../utils/resumosUtils";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export function useResumosData() {
   const [user, setUser] = useState(null);
@@ -53,7 +54,7 @@ export function useResumosData() {
         setObras(availableObras);
         if (availableObras.length === 1) setObraId(availableObras[0].id);
       } catch (error) {
-        console.error("[ResumosPersonalizados] Erro ao carregar dados iniciais:", error?.message || error);
+        logger.error("[ResumosPersonalizados] Erro ao carregar dados iniciais:", error?.message || error);
       } finally {
         setLoading(false);
       }
@@ -352,7 +353,7 @@ export function useResumosData() {
       setDadosConsolidados(resultados);
       setRawEnsaios(ensaiosFiltrados);
     } catch (error) {
-      console.error("[ResumosPersonalizados] Erro ao carregar ensaios:", error?.message || error);
+      logger.error("[ResumosPersonalizados] Erro ao carregar ensaios:", error?.message || error);
       toast({ title: "Erro ao carregar dados dos ensaios: " + (error?.message || error), variant: "destructive" });
     } finally {
       setLoadingData(false);

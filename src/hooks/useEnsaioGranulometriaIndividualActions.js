@@ -4,6 +4,7 @@ import { sanitizeAgregados, sanitizeEquivalenteAreia } from "@/utils/dataSanitiz
 import { validateGranulometriaIndividual } from "@/utils/ensaioValidation";
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 export function useEnsaioGranulometriaIndividualActions({
   formData, user, editingEnsaio, navigate,
 }) {
@@ -48,7 +49,7 @@ export function useEnsaioGranulometriaIndividualActions({
       }
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
-      console.error("Erro ao salvar:", error);
+      logger.error("Erro ao salvar:", error);
       toast({ title: "Erro ao salvar o ensaio.", variant: "destructive" });
     }
   };

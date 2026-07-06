@@ -15,13 +15,14 @@ const formatDateBrasilia = (dateString) => {
 };
 
 import SignatureFooter from './SignatureFooter';
+import { logger } from '@/utils/logger';
 
 export default function RelatorioDensidadeInSitu({ ensaio, obra, regional }) {
   const furos = ensaio.furos || [];
   
-  console.log('📊 DEBUG Relatório - densidade_areia:', ensaio.densidade_areia);
-  console.log('📊 DEBUG Relatório - peso_areia_funil:', ensaio.peso_areia_funil);
-  console.log('📊 DEBUG Relatório - ensaio completo:', ensaio);
+  logger.log('📊 DEBUG Relatório - densidade_areia:', ensaio.densidade_areia);
+  logger.log('📊 DEBUG Relatório - peso_areia_funil:', ensaio.peso_areia_funil);
+  logger.log('📊 DEBUG Relatório - ensaio completo:', ensaio);
 
   const ReportHeader = () => (
     <header className="grid grid-cols-3 items-center border-b-2 border-slate-900 pb-1 mb-2">

@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { aprovarEnsaio, reprovarEnsaio, excluirEnsaio } from "@/services/ensaiosService";
 
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 /**
  * Hook que encapsula as ações de aprovação, reprovação e exclusão de ensaios.
  * Fornece manipuladores de erro padronizados e confirmações.
@@ -14,7 +15,7 @@ export function useEnsaiosActions(user, obras, onSuccess) {
       toast({ title: 'Registro aprovado com sucesso!' });
       onSuccess?.();
     } catch (error) {
-      console.error('[useEnsaiosActions] Erro ao aprovar ensaio:', error?.message || error);
+      logger.error('[useEnsaiosActions] Erro ao aprovar ensaio:', error?.message || error);
       toast({ title: 'Erro ao aprovar ensaio. Tente novamente.', variant: "destructive" });
     }
   }, [user, obras, onSuccess]);
@@ -25,7 +26,7 @@ export function useEnsaiosActions(user, obras, onSuccess) {
       toast({ title: 'Registro reprovado com sucesso!' });
       onSuccess?.();
     } catch (error) {
-      console.error('[useEnsaiosActions] Erro ao reprovar registro:', error?.message || error);
+      logger.error('[useEnsaiosActions] Erro ao reprovar registro:', error?.message || error);
       toast({ title: 'Erro ao reprovar registro. Tente novamente.', variant: "destructive" });
     }
   }, [user, onSuccess]);
@@ -36,7 +37,7 @@ export function useEnsaiosActions(user, obras, onSuccess) {
       toast({ title: 'Registro excluído com sucesso!' });
       onSuccess?.();
     } catch (error) {
-      console.error('[useEnsaiosActions] Erro ao excluir registro:', error?.message || error);
+      logger.error('[useEnsaiosActions] Erro ao excluir registro:', error?.message || error);
       toast({ title: 'Erro ao excluir registro. Tente novamente.', variant: "destructive" });
     }
   }, [onSuccess]);

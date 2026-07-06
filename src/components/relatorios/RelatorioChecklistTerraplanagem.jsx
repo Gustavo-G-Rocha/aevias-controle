@@ -13,6 +13,7 @@ import PhotoPages from '@/components/relatorio-checklist-terraplanagem/PhotoPage
 import ActionsPage from '@/components/relatorio-checklist-terraplanagem/ActionsPage';
 
 import { temAcoesCorretivas, buildFooterProps } from '@/utils/relatorioChecklistTerraplanagemUtils';
+import { logger } from '@/utils/logger';
 
 export default function RelatorioChecklistTerraplanagem({ checklist, creatorUser, obra: obraProp, regional: regionalProp }) {
   const [obra, setObra] = useState(obraProp || null);
@@ -40,7 +41,7 @@ export default function RelatorioChecklistTerraplanagem({ checklist, creatorUser
         setRegional(regionalData);
       }
     } catch (error) {
-      console.error("Erro ao carregar dados relacionados:", error);
+      logger.error("Erro ao carregar dados relacionados:", error);
     }
   };
 

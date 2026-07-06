@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertTriangle } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { logger } from '@/utils/logger';
 
 export default function SolicitarTransferenciaModal({ 
   isOpen, 
@@ -41,7 +42,7 @@ export default function SolicitarTransferenciaModal({
       await onSubmit(formData);
       setFormData({ regional_destino_id: "", motivo: "" });
     } catch (error) {
-      console.error("Erro ao enviar solicitação:", error);
+      logger.error("Erro ao enviar solicitação:", error);
     } finally {
       setSubmitting(false);
     }

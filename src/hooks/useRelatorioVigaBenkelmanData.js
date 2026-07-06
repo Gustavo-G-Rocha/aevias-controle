@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { obterRegistro } from '@/services/recordsService';
 import { carregarObraRegional } from '@/services/relatorioContextService';
+import { logger } from '@/utils/logger';
 
 export function useRelatorioVigaBenkelmanData() {
   const [searchParams] = useSearchParams();
@@ -34,7 +35,7 @@ export function useRelatorioVigaBenkelmanData() {
         setObra(obraData);
         setRegional(regionalData);
       } catch (err) {
-        console.error('Erro ao carregar ensaio:', err);
+        logger.error('Erro ao carregar ensaio:', err);
         setError('Erro ao carregar ensaio');
       } finally {
         setLoading(false);

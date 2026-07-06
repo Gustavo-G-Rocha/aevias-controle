@@ -4,6 +4,7 @@ import { obterObraById } from "@/services/obrasService";
 import { obterRegionalById } from "@/services/regionaisService";
 import { obterProjectById } from "@/services/projectsService";
 import { obterFaixaById } from "@/services/faixasService";
+import { logger } from '@/utils/logger';
 
 /**
  * Hook para carregar dados do relatório de sondagem
@@ -51,7 +52,7 @@ export function useRelatorioSondagemData() {
         setProject(projectToSet);
       }
     } catch (error) {
-      console.error("[RelatorioSondagem] Erro ao carregar dados:", error?.message || error);
+      logger.error("[RelatorioSondagem] Erro ao carregar dados:", error?.message || error);
       setError("Erro ao carregar dados do relatório");
     } finally {
       setLoading(false);
