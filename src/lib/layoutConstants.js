@@ -21,36 +21,6 @@ export const ACCESS_LEVELS = {
   USER: 'user',
 };
 
-export const REPORT_PAGES = new Set([
-  "RelatorioEnsaio",
-  "RelatorioDiario",
-  "RelatorioChecklist",
-  "RelatorioChecklistAplicacao",
-  "RelatorioChecklistMRAF",
-  "RelatorioChecklistConcretagem",
-  "RelatorioChecklistTerraplanagem",
-  "RelatorioChecklistReciclagem",
-  "RelatorioSondagem",
-  "RelatorioDensidadeInSitu",
-  "RelatorioTaxaPinturaImprimacao",
-  "RelatorioConsolidado",
-  "RelatorioCAUQ",
-  "RelatorioGranulometriaIndividual",
-  "RelatorioAcompanhamentoUsinagem",
-  "RelatorioAcompanhamentoCarga",
-  "RelatorioManchaPendulo",
-  "RelatorioVigaBenkelman",
-  "RelatorioTaxaMRAF",
-  "RelatorioNC",
-  "RelatorioBoletimSondagem",
-  "RelatorioBoletimSondagemTrado",
-  "RelatorioProctor",
-  "RelatorioRompimentoConcreto",
-  "RelatorioGranuMistura",
-  "RelatorioUnificado",
-  "RelatorioCertificacaoUsina",
-]);
-
 /** Returns the tab zone key for a given pathname, or null */
 export function getTabZone(pathname) {
   for (const [zone, prefixes] of Object.entries(TAB_ZONES)) {

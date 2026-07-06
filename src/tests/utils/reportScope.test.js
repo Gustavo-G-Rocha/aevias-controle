@@ -16,7 +16,7 @@ const cssSrc = readFileSync(resolve(__dirname, '../../index.css'), 'utf-8');
 
 describe('Exceção de relatórios (report-scope)', () => {
   it('Layout envolve páginas de relatório com a classe report-scope', () => {
-    expect(layoutSrc).toContain('REPORT_PAGES.has(currentPageName)');
+    expect(layoutSrc).toContain("currentPageName?.startsWith('Relatorio')");
     expect(layoutSrc).toContain('className="report-scope"');
   });
 

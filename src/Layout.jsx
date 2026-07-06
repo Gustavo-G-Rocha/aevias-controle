@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import PullToRefresh from "@/components/PullToRefresh";
-import { REPORT_PAGES, ACCESS_LEVELS, getUserAccessLevel } from "@/lib/layoutConstants";
+import { ACCESS_LEVELS, getUserAccessLevel } from "@/lib/layoutConstants";
 
 import { useLayoutData } from "@/components/layout/useLayoutData";
 import AppSidebar from "@/components/layout/AppSidebar";
@@ -81,7 +81,7 @@ const AppLayout = ({ children }) => {
 };
 
 export default function Layout({ children, currentPageName }) {
-  if (REPORT_PAGES.has(currentPageName)) {
+  if (currentPageName?.startsWith('Relatorio')) {
     return <div className="report-scope">{children}</div>;
   }
   return <AppLayout>{children}</AppLayout>;
