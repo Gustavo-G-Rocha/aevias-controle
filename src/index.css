@@ -138,6 +138,19 @@
 
   /* ── Superfície de relatório (fundo fixo claro, ignora tema escuro) ── */
   --color-report-surface: #FFFFFF;
+
+  /* ── Tokens para remapeamento de dark mode ──
+     Valores usados pelas regras .dark que remapeiam cores Tailwind
+     fixas (bg-white, text-slate-500, border-slate-200, etc.) para
+     garantir contraste. Centralizados como tokens para que mudanças
+     de paleta se propaguem automaticamente. Mesmo valor em ambos os
+     temas pois aplicam-se a superfícies com fundo fixo. */
+  --color-dm-text-on-dark:        #94A3B8;  /* text-slate/gray-500~800 sobre fundo escuro */
+  --color-dm-border-on-dark:      #33587A;  /* border-slate/gray-200~300 sobre fundo escuro */
+  --color-dm-text-on-light:       #1e293b;  /* texto base sobre superfície clara forçada */
+  --color-dm-text-muted-light:    #475569;  /* text-slate/gray-500~700 descendente em sup. clara */
+  --color-dm-text-strong-light:   #334155;  /* text-slate/gray-500~700 no mesmo elemento claro */
+  --color-dm-border-on-light:    #CBD5E1;  /* border-slate/gray-200~300 em superfície clara */
 }
 
 /* ============================================
@@ -481,7 +494,7 @@
   .dark .bg-green-50,
   .dark .bg-blue-50,
   .dark .bg-red-50 {
-    color: #1e293b;
+    color: var(--color-dm-text-on-light);
   }
 
   /* Botões dentro dessas superfícies claras NÃO herdam o texto escuro:
@@ -519,7 +532,7 @@
   .dark .text-gray-600,
   .dark .text-gray-700,
   .dark .text-gray-800 {
-    color: #94A3B8;
+    color: var(--color-dm-text-on-dark);
   }
 
   /* Remapear bordas cinza-claras → borda escura visível (em fundo escuro) */
@@ -527,7 +540,7 @@
   .dark .border-slate-200,
   .dark .border-gray-300,
   .dark .border-gray-200 {
-    border-color: #33587A;
+    border-color: var(--color-dm-border-on-dark);
   }
 
   /* Restaurar texto escuro dentro de superfícies claras (descendentes) */
@@ -539,7 +552,7 @@
   .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100, .bg-orange-50, .bg-green-50, .bg-blue-50, .bg-red-50) .text-gray-600,
   .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100, .bg-orange-50, .bg-green-50, .bg-blue-50, .bg-red-50) .text-gray-700,
   .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100, .bg-orange-50, .bg-green-50, .bg-blue-50, .bg-red-50) .text-gray-800 {
-    color: #475569;
+    color: var(--color-dm-text-muted-light);
   }
 
   /* Restaurar texto escuro no mesmo elemento (ex.: input bg-white text-slate-700) */
@@ -551,7 +564,7 @@
   .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).text-gray-600,
   .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).text-gray-700,
   .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).text-gray-800 {
-    color: #334155;
+    color: var(--color-dm-text-strong-light);
   }
 
   /* Restaurar bordas claras dentro de superfícies claras (descendentes) */
@@ -559,7 +572,7 @@
   .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100) .border-slate-200,
   .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100) .border-gray-300,
   .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100) .border-gray-200 {
-    border-color: #CBD5E1;
+    border-color: var(--color-dm-border-on-light);
   }
 
   /* Restaurar bordas claras no mesmo elemento (ex.: input bg-white border-slate-200) */
@@ -567,7 +580,7 @@
   .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).border-slate-200,
   .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).border-gray-300,
   .dark :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100).border-gray-200 {
-    border-color: #CBD5E1;
+    border-color: var(--color-dm-border-on-light);
   }
 
 }
