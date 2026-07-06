@@ -66,7 +66,7 @@ const { store, makeEntityApi, ENTITY_NAMES } = vi.hoisted(() => {
 
   const ENTITY_NAMES = [
     'EnsaioCAUQ', 'EnsaioMRAF', 'EnsaioDensidade', 'EnsaioDensidadeInSitu',
-    'EnsaioGranulometriaIndividual', 'EnsaioGranMistura', 'EnsaioManchaPendulo',
+    'EnsaioGranulometriaIndividual', 'GranuMistura', 'EnsaioManchaPendulo',
     'EnsaioProctor', 'EnsaioRompimentoConcreto', 'EnsaioSondagem',
     'EnsaioTaxaMRAF', 'EnsaioTaxaPinturaImprimacao', 'EnsaioVigaBenkelman',
     'AcompanhamentoCarga', 'AcompanhamentoUsinagem',

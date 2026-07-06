@@ -26,7 +26,6 @@ const ALLOWED_ENTITIES = [
   'EnsaioDensidade',
   'EnsaioDensidadeInSitu',
   'EnsaioGranulometriaIndividual',
-  'EnsaioGranMistura',
   'EnsaioManchaPendulo',
   'EnsaioProctor',
   'EnsaioRompimentoConcreto',

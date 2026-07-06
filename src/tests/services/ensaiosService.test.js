@@ -19,7 +19,7 @@ const { entities } = vi.hoisted(() => {
   });
   const names = [
     'EnsaioCAUQ', 'EnsaioMRAF', 'EnsaioDensidade', 'EnsaioDensidadeInSitu',
-    'EnsaioGranulometriaIndividual', 'EnsaioGranMistura', 'EnsaioManchaPendulo',
+    'EnsaioGranulometriaIndividual', 'GranuMistura', 'EnsaioManchaPendulo',
     'EnsaioProctor', 'EnsaioRompimentoConcreto', 'EnsaioSondagem',
     'EnsaioTaxaMRAF', 'EnsaioTaxaPinturaImprimacao', 'EnsaioVigaBenkelman',
     'AcompanhamentoCarga', 'AcompanhamentoUsinagem',
@@ -141,9 +141,9 @@ describe('ensaiosService — detectEntityName', () => {
     expect(entities.EnsaioCAUQ.update).toHaveBeenCalledWith('e2', expect.any(Object));
   });
 
-  it('detecta EnsaioGranMistura por peneiras', async () => {
+  it('detecta GranuMistura por peneiras', async () => {
     await aprovarEnsaio({ id: 'e3', peneiras: [] }, user);
-    expect(entities.EnsaioGranMistura.update).toHaveBeenCalledWith('e3', expect.any(Object));
+    expect(entities.GranuMistura.update).toHaveBeenCalledWith('e3', expect.any(Object));
   });
 
   it('detecta EnsaioDensidade por pesos', async () => {

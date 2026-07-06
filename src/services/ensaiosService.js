@@ -12,7 +12,6 @@ const ENSAIO_ENTITIES = {
   'EnsaioDensidade': 'EnsaioDensidade',
   'EnsaioDensidadeInSitu': 'EnsaioDensidadeInSitu',
   'EnsaioGranulometriaIndividual': 'EnsaioGranulometriaIndividual',
-  'EnsaioGranMistura': 'EnsaioGranMistura',
   'EnsaioManchaPendulo': 'EnsaioManchaPendulo',
   'EnsaioProctor': 'EnsaioProctor',
   'EnsaioRompimentoConcreto': 'EnsaioRompimentoConcreto',
@@ -202,7 +201,7 @@ function detectEntityName(ensaio) {
   if (ensaio.teor_ligante_residual !== undefined) return 'EnsaioMRAF';
   if (ensaio.pesos !== undefined) return 'EnsaioDensidade';
   if (ensaio.agregados !== undefined && ensaio.tipo_material !== undefined) return 'EnsaioGranulometriaIndividual';
-  if (ensaio.peneiras !== undefined) return 'EnsaioGranMistura';
+  if (ensaio.peneiras !== undefined) return 'GranuMistura';
   if (ensaio.levantamentos !== undefined && ensaio.cte_viga !== undefined) return 'EnsaioVigaBenkelman';
   if (ensaio.cargas !== undefined) return 'AcompanhamentoCarga';
   if (ensaio.rodadas_producao !== undefined) return 'ChecklistUsina';
