@@ -1,51 +1,33 @@
 /**
- * pages.config.js - Page routing configuration
- * 
- * This file is AUTO-GENERATED. Do not add imports or modify PAGES manually.
- * Pages are auto-registered when you create files in the ./pages/ folder.
- * 
- * THE ONLY EDITABLE VALUE: mainPage
- * This controls which page is the landing page (shown when users visit the app).
- * 
- * Example file structure:
- * 
- *   import HomePage from './pages/HomePage';
- *   import Dashboard from './pages/Dashboard';
- *   import Settings from './pages/Settings';
- *   
- *   export const PAGES = {
- *       "HomePage": HomePage,
- *       "Dashboard": Dashboard,
- *       "Settings": Settings,
- *   }
- *   
- *   export const pagesConfig = {
- *       mainPage: "HomePage",
- *       Pages: PAGES,
- *   };
- * 
- * Example with Layout (wraps all pages):
+ * pages.config.js — Page routing configuration
  *
- *   import Home from './pages/Home';
- *   import Settings from './pages/Settings';
- *   import __Layout from './Layout.jsx';
+ * ⚠️  This file is NOT auto-generated. It is manually maintained.
+ *     New pages are NOT auto-registered — you MUST follow the checklist
+ *     below, otherwise the page will be unreachable (no build error).
  *
- *   export const PAGES = {
- *       "Home": Home,
- *       "Settings": Settings,
- *   }
+ * ── How to add a new page ──────────────────────────────────────────────
  *
- *   export const pagesConfig = {
- *       mainPage: "Home",
- *       Pages: PAGES,
- *       Layout: __Layout,
- *   };
+ * 1. Create the page component in src/pages/ (e.g. src/pages/MyPage.jsx).
  *
- * To change the main page from HomePage to Dashboard, use find_replace:
- *   Old: mainPage: "HomePage",
- *   New: mainPage: "Dashboard",
+ * 2. Add a lazy import here (alphabetical order by convention):
+ *        const MyPage = lazy(() => import('./pages/MyPage'));
  *
- * The mainPage value must match a key in the PAGES object exactly.
+ * 3. Add an entry to the PAGES object (key = route path segment):
+ *        "MyPage": MyPage,
+ *
+ * 4. If the page is a report (uses report-scope layout, no sidebar),
+ *    add its key to the REPORT_PAGES set below.
+ *
+ * 5. App.jsx reads pagesConfig.Pages and generates a <Route> for each
+ *    key automatically — no need to edit App.jsx for standard pages.
+ *    Routes outside this loop (if any) must be added manually in App.jsx.
+ *
+ * 6. To set the landing page, change mainPage below to the desired key.
+ *
+ * ── mainPage ───────────────────────────────────────────────────────────
+ * Controls which page is shown when users visit "/".
+ * The value must match a key in PAGES exactly.
+ * ────────────────────────────────────────────────────────────────────────
  *
  * ── Code Splitting ──────────────────────────────────────────────────────
  * Pages are lazy-loaded via React.lazy() so each route becomes a separate
