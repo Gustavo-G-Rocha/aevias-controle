@@ -21,7 +21,7 @@ describe("relatoriosUnificadosUtils", () => {
       expect(result).toEqual(obras);
     });
 
-    it("deve filtrar obras para gestor_contrato", () => {
+    it("deve retornar todas as obras para gestor_contrato (regra canônica)", () => {
       const obras = [
         { id: "1", regional_id: "r1" },
         { id: "2", regional_id: "r2" },
@@ -32,7 +32,7 @@ describe("relatoriosUnificadosUtils", () => {
           gestores_contrato_responsaveis: ["user@test.com"],
         },
       ];
-      const user = { email: "user@test.com" };
+      const user = { email: "user@test.com", access_level: "gestor_contrato" };
 
       const result = filterObrasByUserAccess(
         obras,
@@ -40,8 +40,8 @@ describe("relatoriosUnificadosUtils", () => {
         user,
         "gestor_contrato"
       );
-      expect(result).toHaveLength(1);
-      expect(result[0].id).toBe("1");
+      // gestor_contrato vê todas as obras (regra centralizada em regionalFilter.js)
+      expect(result).toHaveLength(2);
     });
   });
 

@@ -1,33 +1,20 @@
 import { getDataEnsaio } from "@/components/ensaios/ensaioMappers";
 
 /**
- * Filter obras by user access level
+ * Filter obras by user access level.
+ * Delega à função canônica `filtrarObrasPorAcessoRegional` em regionalFilter.js
+ * para garantir regra de acesso única e consistente em todo o app.
+ * O parâmetro `userAccessLevel` é mantido por compatibilidade de assinatura.
  */
+import { filtrarObrasPorAcessoRegional } from "@/utils/regionalFilter";
+
 export const filterObrasByUserAccess = (
   obras,
   regionais,
   user,
   userAccessLevel
 ) => {
-  if (userAccessLevel === "gestor_contrato" || userAccessLevel === "sala_tecnica_afirmaevias") {
-    const regionaisDoUsuario = regionais.filter(
-      (r) =>
-        r.gestor_contrato_responsavel?.toLowerCase() ===
-          user.email?.toLowerCase() ||
-        (r.gestores_contrato_responsaveis || []).some(
-          (e) => e.toLowerCase() === user.email?.toLowerCase()
-        ) ||
-        (r.salas_tecnicas_responsaveis || []).some(
-          (e) => e.toLowerCase() === user.email?.toLowerCase()
-        )
-    );
-    const regionaisIds = regionaisDoUsuario.map((r) => r.id);
-    const obrasVinculadas = obras.filter((o) =>
-      regionaisIds.includes(o.regional_id)
-    );
-    return obrasVinculadas.length > 0 ? obrasVinculadas : obras;
-  }
-  return obras;
+  return filtrarObrasPorAcessoRegional(obras, regionais, user);
 };
 
 /**
