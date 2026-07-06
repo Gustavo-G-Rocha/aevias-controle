@@ -5,7 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { base44 } from "@/api/base44Client";
-import { obterRegistro, atualizarRegistro } from "@/services/recordsService";
+import { obterRegistro } from "@/services/recordsService";
+import { gerenciarAprovacao } from "@/functions/gerenciarAprovacao";
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
 
@@ -60,23 +61,17 @@ export default function AprovacaoBar({ entityName, recordId }) {
   const handleApprove = async () => {
     setSaving(true);
     try {
-      const approverDetails = {
-        name: user.laboratorista_name || user.full_name,
-        position: user.position || 'Responsável',
-        crea_number: user.crea_number || ''
-      };
-      await atualizarRegistro(entityName, recordId, {
-        approved: true,
-        approved_by: user.email,
-        approved_date: new Date().toISOString(),
-        approver_details: approverDetails,
-        rejection_reason: null
+      const response = await gerenciarAprovacao({
+        action: 'approve',
+        entityName,
+        recordId,
       });
-      setRecord(prev => ({ ...prev, approved: true, approver_details: approverDetails }));
+      const updated = response.data.data;
+      setRecord(prev => ({ ...prev, approved: true, approver_details: updated.approver_details }));
       toast({ title: 'Registro aprovado com sucesso!' });
     } catch (err) {
       logger.error('[AprovacaoBar] Erro ao aprovar registro:', err?.message || err);
-      toast({ title: 'Erro ao aprovar registro.', variant: "destructive" });
+      toast({ title: err?.response?.data?.error || 'Erro ao aprovar registro.', variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -89,11 +84,11 @@ export default function AprovacaoBar({ entityName, recordId }) {
     }
     setSaving(true);
     try {
-      await atualizarRegistro(entityName, recordId, {
-        approved: false,
-        approved_by: user.email,
-        approved_date: new Date().toISOString(),
-        rejection_reason: rejectionReason
+      await gerenciarAprovacao({
+        action: 'reject',
+        entityName,
+        recordId,
+        rejectionReason,
       });
       setRecord(prev => ({ ...prev, approved: false, rejection_reason: rejectionReason }));
       setShowRejectModal(false);
@@ -101,7 +96,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
       toast({ title: 'Registro reprovado.' });
     } catch (err) {
       logger.error('[AprovacaoBar] Erro ao reprovar registro:', err?.message || err);
-      toast({ title: 'Erro ao reprovar registro.', variant: "destructive" });
+      toast({ title: err?.response?.data?.error || 'Erro ao reprovar registro.', variant: "destructive" });
     } finally {
       setSaving(false);
     }

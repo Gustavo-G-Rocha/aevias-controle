@@ -46,6 +46,14 @@ vi.mock('@/functions/validarESalvarRegistro', () => ({
   }),
 }));
 
+const { gerenciarAprovacao } = vi.hoisted(() => ({
+  gerenciarAprovacao: vi.fn(async (payload) => {
+    return { data: { success: true, data: { id: payload.recordId, ...payload } } };
+  }),
+}));
+
+vi.mock('@/functions/gerenciarAprovacao', () => ({ gerenciarAprovacao }));
+
 import {
   listarEnsaios,
   listarEnsaiosPorObra,
@@ -71,6 +79,7 @@ const user = {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  gerenciarAprovacao.mockResolvedValue({ data: { success: true, data: { ok: true } } });
   for (const n of Object.keys(entities)) {
     entities[n].list.mockResolvedValue([]);
     entities[n].filter.mockResolvedValue([]);
@@ -155,73 +164,72 @@ describe('ensaiosService — CRUD e validação de entidade', () => {
 describe('ensaiosService — detectEntityName', () => {
   it('usa entityType quando presente', async () => {
     await aprovarEnsaio({ id: 'e1', entityType: 'EnsaioMRAF' }, user);
-    expect(entities.EnsaioMRAF.update).toHaveBeenCalledWith('e1', expect.any(Object));
-    expect(entities.EnsaioCAUQ.update).not.toHaveBeenCalled();
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'EnsaioMRAF' }));
   });
 
   it('detecta EnsaioCAUQ por corpos_prova_marshall', async () => {
     await aprovarEnsaio({ id: 'e2', corpos_prova_marshall: [] }, user);
-    expect(entities.EnsaioCAUQ.update).toHaveBeenCalledWith('e2', expect.any(Object));
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'EnsaioCAUQ' }));
   });
 
   it('detecta GranuMistura por peneiras', async () => {
     await aprovarEnsaio({ id: 'e3', peneiras: [] }, user);
-    expect(entities.GranuMistura.update).toHaveBeenCalledWith('e3', expect.any(Object));
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'GranuMistura' }));
   });
 
   it('detecta EnsaioDensidade por pesos', async () => {
     await aprovarEnsaio({ id: 'e4', pesos: {} }, user);
-    expect(entities.EnsaioDensidade.update).toHaveBeenCalledWith('e4', expect.any(Object));
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'EnsaioDensidade' }));
   });
 
   it('detecta AcompanhamentoCarga por cargas', async () => {
     await aprovarEnsaio({ id: 'e5', cargas: [] }, user);
-    expect(entities.AcompanhamentoCarga.update).toHaveBeenCalledWith('e5', expect.any(Object));
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'AcompanhamentoCarga' }));
   });
 
   it('detecta EnsaioCAUQ por extracao_ligante', async () => {
     await aprovarEnsaio({ id: 'e7', extracao_ligante: {} }, user);
-    expect(entities.EnsaioCAUQ.update).toHaveBeenCalledWith('e7', expect.any(Object));
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'EnsaioCAUQ' }));
   });
 
   it('detecta EnsaioMRAF por teor_ligante_residual', async () => {
     await aprovarEnsaio({ id: 'e8', teor_ligante_residual: 3 }, user);
-    expect(entities.EnsaioMRAF.update).toHaveBeenCalledWith('e8', expect.any(Object));
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'EnsaioMRAF' }));
   });
 
   it('detecta EnsaioGranulometriaIndividual por agregados + tipo_material', async () => {
     await aprovarEnsaio({ id: 'e9', agregados: [], tipo_material: 'CAUQ' }, user);
-    expect(entities.EnsaioGranulometriaIndividual.update).toHaveBeenCalledWith('e9', expect.any(Object));
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'EnsaioGranulometriaIndividual' }));
   });
 
   it('detecta EnsaioVigaBenkelman por levantamentos + cte_viga', async () => {
     await aprovarEnsaio({ id: 'e10', levantamentos: [], cte_viga: 2.4 }, user);
-    expect(entities.EnsaioVigaBenkelman.update).toHaveBeenCalledWith('e10', expect.any(Object));
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'EnsaioVigaBenkelman' }));
   });
 
   it('detecta ChecklistUsina por rodadas_producao', async () => {
     await aprovarEnsaio({ id: 'e11', rodadas_producao: [] }, user);
-    expect(entities.ChecklistUsina.update).toHaveBeenCalledWith('e11', expect.any(Object));
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'ChecklistUsina' }));
   });
 
   it('detecta ChecklistConcretagem por cargas_concreto', async () => {
     await aprovarEnsaio({ id: 'e12', cargas_concreto: [] }, user);
-    expect(entities.ChecklistConcretagem.update).toHaveBeenCalledWith('e12', expect.any(Object));
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'ChecklistConcretagem' }));
   });
 
   it('detecta ChecklistTerraplanagem por acompanhamento_execucao + empreiteira', async () => {
     await aprovarEnsaio({ id: 'e13', acompanhamento_execucao: {}, empreiteira: 'X' }, user);
-    expect(entities.ChecklistTerraplanagem.update).toHaveBeenCalledWith('e13', expect.any(Object));
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'ChecklistTerraplanagem' }));
   });
 
   it('detecta ChecklistAplicacao por controle_aplicacao', async () => {
     await aprovarEnsaio({ id: 'e14', controle_aplicacao: {} }, user);
-    expect(entities.ChecklistAplicacao.update).toHaveBeenCalledWith('e14', expect.any(Object));
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'ChecklistAplicacao' }));
   });
 
   it('detecta DiarioObra por atividades_realizadas', async () => {
     await aprovarEnsaio({ id: 'e15', atividades_realizadas: [] }, user);
-    expect(entities.DiarioObra.update).toHaveBeenCalledWith('e15', expect.any(Object));
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'DiarioObra' }));
   });
 
   it('lança erro quando não consegue determinar o tipo', async () => {
@@ -230,47 +238,32 @@ describe('ensaiosService — detectEntityName', () => {
 });
 
 describe('ensaiosService — assinar/aprovar/reprovar/excluir', () => {
-  it('aprovarEnsaio envia payload de aprovação completo', async () => {
+  it('aprovarEnsaio delega para gerenciarAprovacao com action approve', async () => {
     await aprovarEnsaio({ id: 'e1', entityType: 'EnsaioCAUQ' }, user);
-    expect(entities.EnsaioCAUQ.update).toHaveBeenCalledWith(
-      'e1',
-      expect.objectContaining({
-        approved: true,
-        approved_by: user.email,
-        approver_details: expect.objectContaining({
-          name: 'Lab Nome',
-          position: user.access_level,
-          crea_number: '12345',
-        }),
-      })
-    );
+    expect(gerenciarAprovacao).toHaveBeenCalledWith({
+      action: 'approve',
+      entityName: 'EnsaioCAUQ',
+      recordId: 'e1',
+    });
   });
 
-  it('reprovarEnsaio envia payload com motivo e was_rejected', async () => {
+  it('reprovarEnsaio delega para gerenciarAprovacao com action reject e motivo', async () => {
     await reprovarEnsaio({ id: 'e1', entityType: 'EnsaioCAUQ' }, user, 'fora da tolerância');
-    expect(entities.EnsaioCAUQ.update).toHaveBeenCalledWith(
-      'e1',
-      expect.objectContaining({
-        approved: false,
-        rejection_reason: 'fora da tolerância',
-        was_rejected: true,
-        approved_by: user.email,
-      })
-    );
+    expect(gerenciarAprovacao).toHaveBeenCalledWith({
+      action: 'reject',
+      entityName: 'EnsaioCAUQ',
+      recordId: 'e1',
+      rejectionReason: 'fora da tolerância',
+    });
   });
 
-  it('assinarEnsaio envia client_signature com dados do usuário', async () => {
+  it('assinarEnsaio delega para gerenciarAprovacao com action sign', async () => {
     await assinarEnsaio({ id: 'e1', entityType: 'EnsaioCAUQ' }, user);
-    expect(entities.EnsaioCAUQ.update).toHaveBeenCalledWith(
-      'e1',
-      expect.objectContaining({
-        client_signature: expect.objectContaining({
-          signed_by: user.email,
-          engineer_name: 'Lab Nome',
-          crea_number: '12345',
-        }),
-      })
-    );
+    expect(gerenciarAprovacao).toHaveBeenCalledWith({
+      action: 'sign',
+      entityName: 'EnsaioCAUQ',
+      recordId: 'e1',
+    });
   });
 
   it('excluirEnsaio deleta via entidade detectada', async () => {

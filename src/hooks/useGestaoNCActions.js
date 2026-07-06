@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { atualizarRegistro } from "@/services/recordsService";
+import { gerenciarAprovacao } from "@/functions/gerenciarAprovacao";
 
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
@@ -11,13 +11,16 @@ export const useGestaoNCActions = (setNcs) => {
 
   const updateNCStatus = useCallback(
     async (id, status, requestApproval = false) => {
-      const updateData = { status };
-      if (requestApproval) {
-        updateData.pendente_aprovacao_cliente = true;
-      }
-      await atualizarRegistro('RelatorioNC', id, updateData);
+      const response = await gerenciarAprovacao({
+        action: 'update_nc_status',
+        entityName: 'RelatorioNC',
+        recordId: id,
+        ncStatus: status,
+        requestApproval,
+      });
+      const updated = response.data.data;
       setNcs((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, ...updateData } : n))
+        prev.map((n) => (n.id === id ? { ...n, ...updated } : n))
       );
     },
     [setNcs]
@@ -29,25 +32,16 @@ export const useGestaoNCActions = (setNcs) => {
 
       try {
         if (approve) {
-          const clientSignature = {
-            signed_by: user.email,
-            signed_date: new Date().toISOString(),
-            engineer_name: user.full_name || user.email,
-            crea_number: user.crea_number || "",
-          };
-
-          const updateData = {
-            pendente_aprovacao_cliente: false,
-            cliente_aprovacao: "aprovada",
-            cliente_aprovacao_data: new Date().toISOString(),
-            cliente_aprovacao_responsavel: user.email,
-            client_signature: clientSignature,
-          };
-          await atualizarRegistro('RelatorioNC', selectedNC.id, updateData);
+          const response = await gerenciarAprovacao({
+            action: 'approve_nc',
+            entityName: 'RelatorioNC',
+            recordId: selectedNC.id,
+          });
+          const updated = response.data.data;
           setNcs((prev) =>
             prev.map((n) =>
               n.id === selectedNC.id
-                ? { ...n, ...updateData }
+                ? { ...n, ...updated }
                 : n
             )
           );
@@ -56,19 +50,17 @@ export const useGestaoNCActions = (setNcs) => {
             toast({ title: "Por favor, informe o motivo da reprovação", variant: "destructive" });
             return;
           }
-          const updateData = {
-            status: "aberta",
-            pendente_aprovacao_cliente: false,
-            cliente_aprovacao: "reprovada",
-            cliente_aprovacao_data: new Date().toISOString(),
-            cliente_aprovacao_responsavel: user.email,
-            cliente_reprovacao_motivo: rejectionReason,
-          };
-          await atualizarRegistro('RelatorioNC', selectedNC.id, updateData);
+          const response = await gerenciarAprovacao({
+            action: 'reject_nc',
+            entityName: 'RelatorioNC',
+            recordId: selectedNC.id,
+            rejectionReason,
+          });
+          const updated = response.data.data;
           setNcs((prev) =>
             prev.map((n) =>
               n.id === selectedNC.id
-                ? { ...n, ...updateData }
+                ? { ...n, ...updated }
                 : n
             )
           );
@@ -87,22 +79,22 @@ export const useGestaoNCActions = (setNcs) => {
   const handleSolicitarAprovacao = useCallback(
     async (nc) => {
       try {
-        const updateData = {
-          pendente_aprovacao_cliente: true,
-          cliente_aprovacao: null,
-          cliente_reprovacao_motivo: null,
-        };
-        await atualizarRegistro('RelatorioNC', nc.id, updateData);
+        const response = await gerenciarAprovacao({
+          action: 'solicitar_aprovacao_nc',
+          entityName: 'RelatorioNC',
+          recordId: nc.id,
+        });
+        const updated = response.data.data;
         setNcs((prev) =>
           prev.map((n) =>
             n.id === nc.id
-              ? { ...n, ...updateData }
+              ? { ...n, ...updated }
               : n
           )
         );
       } catch (error) {
         logger.error("Erro ao solicitar aprovação:", error);
-        toast({ title: "Erro ao solicitar aprovação do cliente", variant: "destructive" });
+        toast({ title: error?.response?.data?.error || "Erro ao solicitar aprovação do cliente", variant: "destructive" });
       }
     },
     [setNcs]

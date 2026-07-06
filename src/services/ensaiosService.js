@@ -2,6 +2,7 @@ import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
 import { logger } from '@/utils/logger';
 import { validarESalvarRegistro } from '@/functions/validarESalvarRegistro';
+import { gerenciarAprovacao } from '@/functions/gerenciarAprovacao';
 
 /**
  * Service centralizado para operações com Ensaios
@@ -141,23 +142,14 @@ export async function assinarEnsaio(ensaio, user) {
     throw new Error('Ensaio inválido');
   }
 
-  const entityName = Object.keys(ENSAIO_ENTITIES).find(key =>
-    ENSAIO_ENTITIES[key] === ensaio.constructor?.name || key === ensaio.tipo_ensaio
-  ) || detectEntityName(ensaio);
+  const entityName = detectEntityName(ensaio);
 
-  const signatureData = {
-    client_signature: {
-      signed_by: user.email,
-      signed_date: new Date().toISOString(),
-      engineer_name: user.full_name || user.laboratorista_name,
-      crea_number: user.crea_number || ''
-    }
-  };
-
-  return withServiceCall(
-    () => base44.entities[entityName].update(ensaio.id, signatureData),
-    'Falha ao assinar ensaio'
-  );
+  const response = await gerenciarAprovacao({
+    action: 'sign',
+    entityName,
+    recordId: ensaio.id,
+  });
+  return response.data.data;
 }
 
 export async function aprovarEnsaio(ensaio, user) {
@@ -167,21 +159,12 @@ export async function aprovarEnsaio(ensaio, user) {
 
   const entityName = detectEntityName(ensaio);
 
-  const approvalData = {
-    approved: true,
-    approved_by: user.email,
-    approved_date: new Date().toISOString(),
-    approver_details: {
-      name: user.full_name || user.laboratorista_name,
-      position: user.access_level || user.role,
-      crea_number: user.crea_number || ''
-    }
-  };
-
-  return withServiceCall(
-    () => base44.entities[entityName].update(ensaio.id, approvalData),
-    'Falha ao aprovar ensaio'
-  );
+  const response = await gerenciarAprovacao({
+    action: 'approve',
+    entityName,
+    recordId: ensaio.id,
+  });
+  return response.data.data;
 }
 
 export async function reprovarEnsaio(ensaio, user, rejectionReason) {
@@ -191,23 +174,13 @@ export async function reprovarEnsaio(ensaio, user, rejectionReason) {
 
   const entityName = detectEntityName(ensaio);
 
-  const rejectionData = {
-    approved: false,
-    approved_by: user.email,
-    approved_date: new Date().toISOString(),
-    rejection_reason: rejectionReason,
-    was_rejected: true,
-    approver_details: {
-      name: user.full_name || user.laboratorista_name,
-      position: user.access_level || user.role,
-      crea_number: user.crea_number || ''
-    }
-  };
-
-  return withServiceCall(
-    () => base44.entities[entityName].update(ensaio.id, rejectionData),
-    'Falha ao reprovar ensaio'
-  );
+  const response = await gerenciarAprovacao({
+    action: 'reject',
+    entityName,
+    recordId: ensaio.id,
+    rejectionReason,
+  });
+  return response.data.data;
 }
 
 export async function excluirEnsaio(ensaio) {
