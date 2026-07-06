@@ -14,6 +14,7 @@ import AppSidebar from "@/components/layout/AppSidebar";
 import MobileHeader from "@/components/layout/MobileHeader";
 import BottomNav from "@/components/layout/BottomNav";
 import CreateEnsaioDialog from "@/components/layout/CreateEnsaioDialog";
+import { REPORT_PAGES } from "@/pages.config";
 
 const AppLayout = ({ children }) => {
   const [isCreateEnsaioOpen, setIsCreateEnsaioOpen] = useState(false);
@@ -81,7 +82,7 @@ const AppLayout = ({ children }) => {
 };
 
 export default function Layout({ children, currentPageName }) {
-  if (currentPageName?.startsWith('Relatorio')) {
+  if (currentPageName && REPORT_PAGES.has(currentPageName)) {
     return <div className="report-scope">{children}</div>;
   }
   return <AppLayout>{children}</AppLayout>;
