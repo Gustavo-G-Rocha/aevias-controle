@@ -1,8 +1,10 @@
 import React, { useRef, useState, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 const THRESHOLD = 80;
 
 export default function PullToRefresh({ children }) {
+  const queryClient = useQueryClient();
   const [pullDistance, setPullDistance] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const startYRef = useRef(null);
@@ -35,13 +37,14 @@ export default function PullToRefresh({ children }) {
     if (pullDistance >= THRESHOLD && !isInputFocused()) {
       setRefreshing(true);
       setPullDistance(THRESHOLD);
-      await new Promise((r) => setTimeout(r, 800));
-      window.location.reload();
+      await queryClient.invalidateQueries();
+      setRefreshing(false);
+      setPullDistance(0);
     } else {
       setPullDistance(0);
     }
     startYRef.current = null;
-  }, [pullDistance, isInputFocused]);
+  }, [pullDistance, isInputFocused, queryClient]);
 
   const progress = Math.min(pullDistance / THRESHOLD, 1);
   const showIndicator = pullDistance > 5;
