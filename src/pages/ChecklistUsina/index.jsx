@@ -5,7 +5,7 @@ import { criarChecklist, atualizarChecklist } from "@/services/checklistsService
 import { uploadMultipleFiles } from "@/utils/imageUpload";
 import { createPageUrl } from "@/utils";
 import { useChecklistForm } from "@/hooks/useChecklistForm";
-import { validateChecklistForm } from "@/utils/checklistValidation";
+import { validateChecklistUsinaForm } from "@/utils/checklistValidation";
 import MedicaoUsina from "@/components/checklists/MedicaoUsina";
 import ChecklistUsinaHeader from "@/components/checklists/ChecklistUsinaHeader";
 import ChecklistFooter from "@/components/checklists/ChecklistFooter";
@@ -74,7 +74,7 @@ export default function ChecklistUsinaPage() {
   // ── submit ───────────────────────────────────────────────────────────────────
   const handleSubmit = useCallback(async (e, saveStatus = 'finalizado') => {
     e.preventDefault();
-    const validation = validateChecklistForm(formData, saveStatus);
+    const validation = validateChecklistUsinaForm(formData, saveStatus);
     if (!validation.valid) { toast({ title: validation.message }); return; }
 
     const dataToSave = {

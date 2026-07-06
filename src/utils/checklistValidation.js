@@ -2,7 +2,7 @@
  * Funções de validação para formulários de checklist
  */
 
-export function validateChecklistForm(formData, saveStatus) {
+export function validateChecklistUsinaForm(formData, saveStatus) {
   if (saveStatus === 'finalizado') {
     const requiredFields = {
       obra_id: "Obra",
