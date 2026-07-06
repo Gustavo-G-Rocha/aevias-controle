@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import * as XLSX from "xlsx";
 import { Loader2 } from "lucide-react";
 import { useResumosData } from "./hooks/useResumosData";
 import FiltrosCard from "./components/FiltrosCard";
@@ -32,7 +31,7 @@ export default function ResumosPersonalizadosPage() {
     link.click();
   };
 
-  const exportarMedicaoGeometrica = (linhaId) => {
+  const exportarMedicaoGeometrica = async (linhaId) => {
     const ensaio = rawEnsaios.find(e => e.id === linhaId || linhaId?.startsWith(e.id));
     if (!ensaio) return;
     const med = ensaio.medicoes_geometricas;
@@ -49,6 +48,7 @@ export default function ResumosPersonalizadosPage() {
         m.quantidade ?? '-', m.temperatura ?? '-', m.observacoes || '-'
       ])
     ];
+    const XLSX = await import("xlsx");
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Medição Geométrica');

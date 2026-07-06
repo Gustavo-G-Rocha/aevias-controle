@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { useReportMode } from '@/hooks/useReportMode';
 import { Loader2 } from 'lucide-react';
-import PdfRenderer from '@/components/relatorios/PdfRenderer';
+const PdfRenderer = lazy(() => import('@/components/relatorios/PdfRenderer'));
 import { useRelatorioNCData } from '@/hooks/useRelatorioNCData';
 import { useRelatorioNCActions } from '@/hooks/useRelatorioNCActions';
 import NCReport from '@/components/relatorio-nc/NCReport';
@@ -62,7 +62,13 @@ export default function RelatorioNCPage() {
 
         {data.nc.pdfs?.map((pdf, i) => (
           <div key={i} className="break-before-page bg-white">
-            <PdfRenderer url={pdf.url} />
+            <Suspense fallback={
+              <div className="flex justify-center items-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+              </div>
+            }>
+              <PdfRenderer url={pdf.url} />
+            </Suspense>
           </div>
         ))}
       </div>
