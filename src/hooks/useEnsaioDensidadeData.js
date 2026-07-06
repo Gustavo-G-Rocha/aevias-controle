@@ -2,7 +2,7 @@
  * Hook de carregamento inicial para EnsaioDensidadeInSitu.
  * Usa React Query (cache compartilhado) para evitar 429 Too Many Requests.
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { obterEnsaioById } from "@/services/ensaiosService";
@@ -23,9 +23,12 @@ export function useEnsaioDensidadeData() {
   const { data: user, isLoading: loadingUser } = useCurrentUser();
   const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true, needsUsers: false });
 
-  const obras = auxData ? filtrarObrasDisponiveis(auxData.obras, auxData.regionais, user) : [];
-  const projects = auxData?.projects ?? [];
-  const regionais = auxData?.regionais ?? [];
+  const obras = useMemo(
+    () => auxData ? filtrarObrasDisponiveis(auxData.obras, auxData.regionais, user) : [],
+    [auxData, user]
+  );
+  const projects = useMemo(() => auxData?.projects ?? [], [auxData?.projects]);
+  const regionais = useMemo(() => auxData?.regionais ?? [], [auxData?.regionais]);
 
   // Carrega o ensaio para edição (editId na query string)
   useEffect(() => {

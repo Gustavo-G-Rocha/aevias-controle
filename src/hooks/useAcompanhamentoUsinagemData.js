@@ -14,9 +14,9 @@ export function useAcompanhamentoUsinagemData() {
   const { data: user, isLoading: loadingUser } = useCurrentUser();
   const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true });
 
-  const obras = auxData?.obras ?? [];
-  const regionais = auxData?.regionais ?? [];
-  const projects = auxData?.projects ?? [];
+  const obras = useMemo(() => auxData?.obras ?? [], [auxData?.obras]);
+  const regionais = useMemo(() => auxData?.regionais ?? [], [auxData?.regionais]);
+  const projects = useMemo(() => auxData?.projects ?? [], [auxData?.projects]);
 
   useEffect(() => {
     if (loadingUser || loadingAux || !user) return;

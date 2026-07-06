@@ -58,13 +58,13 @@ export function useEnsaioRompimentoConcretoData() {
     if (formData.compressao_axial?.length > 0 && series.length === 0) {
       setSeries(compressaoAxialToSeries(formData.compressao_axial));
     }
-  }, [formData.compressao_axial.length]);
+  }, [formData.compressao_axial.length, series.length]);
 
   useEffect(() => {
     if (formData.tracao_flexao?.length > 0 && seriesFlexao.length === 0) {
       setSeriesFlexao(tracaoFlexaoToSeries(formData.tracao_flexao));
     }
-  }, [formData.tracao_flexao.length]);
+  }, [formData.tracao_flexao.length, seriesFlexao.length]);
 
   return {
     editId, loading,

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { obterEnsaioById } from "@/services/ensaiosService";
 import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
@@ -24,13 +24,17 @@ export function useAcompanhamentoCargaData() {
     'acompanhamento_carga_form', formData, setFormData, editMode
   );
 
-  const regionais = auxData?.regionais ?? [];
-  const projects = auxData?.projects ?? [];
-
   const obras = useMemo(() => {
     if (!auxData?.obras) return [];
     return filtrarObras(auxData.obras);
   }, [auxData?.obras]);
+
+  const regionais = useMemo(() => auxData?.regionais ?? [], [auxData?.regionais]);
+  const projects = useMemo(() => auxData?.projects ?? [], [auxData?.projects]);
+
+  // Refs para acessar valores atualizados dentro do .then() sem re-disparar o effect
+  const auxRef = useRef({ obras, regionais, projects });
+  auxRef.current = { obras, regionais, projects };
 
   useEffect(() => {
     if (loadingUser || loadingAux || !user) return;
@@ -45,8 +49,9 @@ export function useAcompanhamentoCargaData() {
           setFormData(ensaioData);
           setEditMode(true);
           setEditId(editIdParam);
+          const { obras: curObras, regionais: curReg, projects: curProj } = auxRef.current;
           const projFiltered = filtrarProjetosDisponiveis(
-            ensaioData.obra_id, obras, regionais, projects
+            ensaioData.obra_id, curObras, curReg, curProj
           );
           setAvailableProjects(projFiltered);
         })
@@ -61,7 +66,7 @@ export function useAcompanhamentoCargaData() {
         laboratorista_name: user.laboratorista_name || user.full_name || "",
       });
     }
-  }, [loadingUser, loadingAux, user?.id, obras, regionais, projects]);
+  }, [loadingUser, loadingAux, user?.id]);
 
   const loading = loadingUser || loadingAux || editLoading;
 

@@ -3,7 +3,7 @@
  * Responsabilidades: buscar user, obras, regionais, e boletim a editar.
  * Usa React Query (cache compartilhado via useAuxData) para evitar chamadas redundantes.
  */
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { obterEnsaioById } from "@/services/ensaiosService";
@@ -23,7 +23,7 @@ export function useBoletimSondagemData() {
   const { data: user, isLoading: loadingUser } = useCurrentUser();
   const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true });
 
-  const regionais = auxData?.regionais ?? [];
+  const regionais = useMemo(() => auxData?.regionais ?? [], [auxData?.regionais]);
 
   const obras = useMemo(() => {
     if (!auxData?.obras || !user) return [];
@@ -43,6 +43,10 @@ export function useBoletimSondagemData() {
     }
     return auxData.obras.filter(o => o.tipo_obra === 'sondagem');
   }, [auxData?.obras, regionais, user]);
+
+  // Ref para acessar valores atualizados dentro do callback sem re-disparar o effect
+  const auxRef = useRef({ obras, regionais });
+  auxRef.current = { obras, regionais };
 
   useEffect(() => {
     if (loadingUser || loadingAux || !user) return;
@@ -79,21 +83,22 @@ export function useBoletimSondagemData() {
         })
         .finally(() => setEditLoading(false));
     } else {
+      const { obras: curObras, regionais: curReg } = auxRef.current;
       setFormData(prev => {
         const novo = {
           ...prev,
           operador: user.laboratorista_name || user.full_name,
-          obra_id: obras.length > 0 ? obras[0].id : "",
+          obra_id: curObras.length > 0 ? curObras[0].id : "",
         };
-        if (obras.length > 0) {
-          const obra = obras[0];
-          const regional = regionais.find(r => r.id === obra.regional_id);
+        if (curObras.length > 0) {
+          const obra = curObras[0];
+          const regional = curReg.find(r => r.id === obra.regional_id);
           if (regional?.cliente) novo.cliente = regional.cliente;
         }
         return novo;
       });
     }
-  }, [location.search, loadingUser, loadingAux, user?.id, obras, regionais, navigate]);
+  }, [location.search, loadingUser, loadingAux, user?.id, navigate]);
 
   const loading = loadingUser || loadingAux || editLoading;
 
