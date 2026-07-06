@@ -67,7 +67,7 @@ export default function AcoesCorretivasNC({
                 disabled={disabled}
                 rows={3}
                 placeholder="Descreva as ações corretivas..."
-                maxLength="500"
+                maxLength={500}
               />
               <p className="text-xs text-right text-muted-foreground mt-1">
                 {acoesDescricao?.length || 0} / 500
