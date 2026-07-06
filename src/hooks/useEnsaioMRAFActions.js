@@ -2,6 +2,7 @@ import { useState } from "react";
 import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 import { createPageUrl } from "@/utils";
 
+import { toast } from "@/components/ui/use-toast";
 /**
  * Gerencia as ações de salvar/finalizar do EnsaioMRAF.
  */
@@ -14,7 +15,7 @@ export function useEnsaioMRAFActions({
 
   const handleSaveProgress = async () => {
     if (!formData.obra_id) {
-      alert("Por favor, selecione uma obra para salvar o progresso.");
+      toast({ title: "Por favor, selecione uma obra para salvar o progresso.", variant: "destructive" });
       return;
     }
     setSaving(true);
@@ -26,16 +27,16 @@ export function useEnsaioMRAFActions({
       };
       if (editingEnsaio?.id) {
         await atualizarEnsaio('EnsaioMRAF', editingEnsaio.id, dataToSave);
-        alert("Progresso salvo com sucesso!");
+        toast({ title: "Progresso salvo com sucesso!" });
       } else {
         const newEnsaio = await criarEnsaio('EnsaioMRAF', dataToSave);
         setEditingEnsaio(newEnsaio);
-        alert("Progresso salvo com sucesso!");
+        toast({ title: "Progresso salvo com sucesso!" });
       }
       clearSavedData();
     } catch (error) {
       console.error("Erro ao salvar progresso:", error);
-      alert("Erro ao salvar progresso.");
+      toast({ title: "Erro ao salvar progresso.", variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -44,11 +45,11 @@ export function useEnsaioMRAFActions({
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.obra_id) {
-      alert("Por favor, selecione uma obra.");
+      toast({ title: "Por favor, selecione uma obra.", variant: "destructive" });
       return;
     }
     if (!formData.data_ensaio) {
-      alert("Por favor, informe a data do ensaio.");
+      toast({ title: "Por favor, informe a data do ensaio.", variant: "destructive" });
       return;
     }
     setSaving(true);
@@ -66,20 +67,20 @@ export function useEnsaioMRAFActions({
           updateData.approved_by = null;
           updateData.approved_date = null;
           await atualizarEnsaio('EnsaioMRAF', editingEnsaio.id, updateData);
-          alert("Ensaio finalizado com sucesso! O registro voltará para análise.");
+          toast({ title: "Ensaio finalizado com sucesso! O registro voltará para análise." });
         } else {
           await atualizarEnsaio('EnsaioMRAF', editingEnsaio.id, updateData);
-          alert("Ensaio finalizado com sucesso!");
+          toast({ title: "Ensaio finalizado com sucesso!" });
         }
       } else {
         await criarEnsaio('EnsaioMRAF', dataToSave);
-        alert("Ensaio criado e finalizado com sucesso!");
+        toast({ title: "Ensaio criado e finalizado com sucesso!" });
       }
       clearSavedData();
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
       console.error("Erro ao finalizar ensaio:", error);
-      alert("Erro ao finalizar ensaio.");
+      toast({ title: "Erro ao finalizar ensaio.", variant: "destructive" });
     } finally {
       setSaving(false);
     }

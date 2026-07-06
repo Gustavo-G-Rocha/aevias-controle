@@ -3,6 +3,7 @@ import { obterEnsaioById } from "@/services/ensaiosService";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { getInitialFormData } from "@/utils/acompanhamentoUsinagemUtils";
 
+import { toast } from "@/components/ui/use-toast";
 export function useAcompanhamentoUsinagemData() {
   const [editingId, setEditingId] = useState(null);
   const [isEditable, setIsEditable] = useState(true);
@@ -38,7 +39,7 @@ export function useAcompanhamentoUsinagemData() {
         })
         .catch(error => {
           console.error("Erro ao carregar dados:", error);
-          alert("Erro ao carregar dados iniciais");
+          toast({ title: "Erro ao carregar dados iniciais", variant: "destructive" });
         })
         .finally(() => setEditLoading(false));
     } else {

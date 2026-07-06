@@ -10,6 +10,7 @@ import { obterEnsaioById } from "@/services/ensaiosService";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { getInitialFormData, getDensidadeInicial, normalizarDensidades } from "@/utils/boletimSondagemUtils";
 
+import { toast } from "@/components/ui/use-toast";
 export function useBoletimSondagemData() {
   const [formData, setFormData] = useState(getInitialFormData());
   const [editingBoletim, setEditingBoletim] = useState(null);
@@ -66,13 +67,13 @@ export function useBoletimSondagemData() {
               fotos: Array.isArray(boletimToEdit.fotos) ? boletimToEdit.fotos : [],
             });
           } else {
-            alert("Você não tem permissão para editar este registro.");
+            toast({ title: "Você não tem permissão para editar este registro.", variant: "destructive" });
             navigate(createPageUrl('MeusEnsaios'));
           }
         })
         .catch(err => {
           console.error("Erro ao carregar dados:", err);
-          alert("Erro ao carregar dados.");
+          toast({ title: "Erro ao carregar dados.", variant: "destructive" });
           navigate(createPageUrl('MeusEnsaios'));
         })
         .finally(() => setEditLoading(false));

@@ -18,9 +18,14 @@ vi.mock('@/utils', () => ({
 }));
 
 // Mock com vi.hoisted para evitar problema de hoisting
-const { mockCreate, mockUpdate } = vi.hoisted(() => ({
+const { mockCreate, mockUpdate, mockToast } = vi.hoisted(() => ({
   mockCreate: vi.fn(),
   mockUpdate: vi.fn(),
+  mockToast: vi.fn(),
+}));
+
+vi.mock('@/components/ui/use-toast', () => ({
+  toast: mockToast,
 }));
 
 vi.mock('@/api/base44Client', () => ({
@@ -35,6 +40,7 @@ vi.mock('@/api/base44Client', () => ({
 }));
 
 import { base44 } from '@/api/base44Client';
+import { toast } from '@/components/ui/use-toast';
 
 // Replica a lógica core do hook sem React
 async function invokeHandleSubmit({ formData, user, editingEnsaio, saveStatus = 'finalizado' }) {
@@ -42,7 +48,7 @@ async function invokeHandleSubmit({ formData, user, editingEnsaio, saveStatus = 
   e.preventDefault();
 
   if (!formData.obra_id || !formData.data_ensaio) {
-    alert('Preencha todos os campos obrigatórios (Obra, Data).');
+    toast({ title: 'Preencha todos os campos obrigatórios (Obra, Data).', variant: "destructive" });
     return { navigated: false, alerted: true };
   }
 
@@ -131,16 +137,14 @@ describe('useEnsaioDensidadeActions - lógica de submit', () => {
   });
 
   it('deve bloquear submit quando obra_id estiver ausente', async () => {
-    globalThis.alert = vi.fn();
+    mockToast.mockClear();
     const invalidFormData = { ...mockFormData, obra_id: null };
 
     const { alerted } = await invokeHandleSubmit({ formData: invalidFormData, user: mockUser, editingEnsaio: null, saveStatus: 'finalizado' });
 
     expect(alerted).toBe(true);
-    expect(globalThis.alert).toHaveBeenCalledWith(expect.stringContaining('campos obrigatórios'));
+    expect(mockToast).toHaveBeenCalledWith(expect.objectContaining({ title: expect.stringContaining('campos obrigatórios') }));
     expect(base44.entities.EnsaioDensidadeInSitu.create).not.toHaveBeenCalled();
-
-    delete globalThis.alert;
   });
 
   it('deve limpar campos de aprovação ao re-submeter reprovado', async () => {

@@ -6,7 +6,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 
 export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
   const [saving, setSaving] = useState(false);
@@ -27,7 +27,7 @@ export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
     const ee = editingEnsaioRef.current;
 
     if (!fd.obra_id || !fd.data_ensaio) {
-      alert("Preencha todos os campos obrigatórios (Obra, Data).");
+      toast({ title: "Preencha todos os campos obrigatórios (Obra, Data).", variant: "destructive" });
       return;
     }
 
@@ -57,14 +57,14 @@ export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
       }
 
       if (saveStatus === "rascunho") {
-        toast.success("Progresso salvo! O ensaio está em execução.");
+        toast({ title: "Progresso salvo! O ensaio está em execução." });
       } else {
-        toast.success("Ensaio finalizado com sucesso!");
+        toast({ title: "Ensaio finalizado com sucesso!" });
       }
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
       console.error("Erro ao salvar ensaio:", error);
-      alert(`Erro ao salvar ensaio: ${error.message || 'Erro desconhecido'}`);
+      toast({ title: `Erro ao salvar ensaio: ${error.message || 'Erro desconhecido'}`, variant: "destructive" });
     } finally {
       setSaving(false);
     }

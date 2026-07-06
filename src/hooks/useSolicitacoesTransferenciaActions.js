@@ -5,10 +5,11 @@ import {
 } from '@/services/solicitacoesService';
 import { atualizarRegional } from '@/services/regionaisService';
 
+import { toast } from "@/components/ui/use-toast";
 export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
   const handleNovaSolicitacao = useCallback(async (formData, regionalAtual) => {
     if (!user || !regionalAtual) {
-      alert('Você precisa estar alocado em uma regional para solicitar transferência.');
+      toast({ title: 'Você precisa estar alocado em uma regional para solicitar transferência.' });
       return;
     }
 
@@ -26,12 +27,12 @@ export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
         status: 'pendente'
       });
 
-      alert('Solicitação enviada com sucesso!');
+      toast({ title: 'Solicitação enviada com sucesso!' });
       loadData();
       return true;
     } catch (error) {
       console.error("Erro ao criar solicitação:", error);
-      alert('Erro ao enviar solicitação.');
+      toast({ title: 'Erro ao enviar solicitação.', variant: "destructive" });
       return false;
     }
   }, [user, regionais, loadData]);
@@ -69,12 +70,12 @@ export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
         });
       }
 
-      alert('Solicitação aprovada com sucesso! O laboratorista foi transferido de regional.');
+      toast({ title: 'Solicitação aprovada com sucesso! O laboratorista foi transferido de regional.' });
       loadData();
       return true;
     } catch (error) {
       console.error("Erro ao aprovar solicitação:", error);
-      alert('Erro ao aprovar solicitação.');
+      toast({ title: 'Erro ao aprovar solicitação.', variant: "destructive" });
       return false;
     }
   }, [user, regionais, loadData]);
@@ -88,12 +89,12 @@ export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
         motivo_rejeicao: motivoRejeicao
       });
 
-      alert('Solicitação rejeitada.');
+      toast({ title: 'Solicitação rejeitada.' });
       loadData();
       return true;
     } catch (error) {
       console.error("Erro ao rejeitar solicitação:", error);
-      alert('Erro ao rejeitar solicitação.');
+      toast({ title: 'Erro ao rejeitar solicitação.', variant: "destructive" });
       return false;
     }
   }, [user, loadData]);

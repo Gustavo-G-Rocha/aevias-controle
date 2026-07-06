@@ -4,6 +4,7 @@ import { criarGranuMistura, atualizarGranuMistura } from "@/services/granuMistur
 import { createPageUrl } from "@/utils";
 import { buildDataToSave } from "@/utils/granuMisturaUtils";
 
+import { toast } from "@/components/ui/use-toast";
 export function useGranuMisturaActions({ formData, editingId, user }) {
   const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
@@ -11,7 +12,7 @@ export function useGranuMisturaActions({ formData, editingId, user }) {
   const handleSubmit = async (e, saveStatus = "finalizado") => {
     e?.preventDefault();
     if (saveStatus === "finalizado" && !formData.obra_id) {
-      alert("Selecione uma obra.");
+      toast({ title: "Selecione uma obra.", variant: "destructive" });
       return;
     }
     setSaving(true);
@@ -22,11 +23,11 @@ export function useGranuMisturaActions({ formData, editingId, user }) {
       } else {
         await criarGranuMistura(dataToSave);
       }
-      alert(saveStatus === "rascunho" ? "Progresso salvo!" : "Ensaio finalizado com sucesso!");
+      toast({ title: saveStatus === "rascunho" ? "Progresso salvo!" : "Ensaio finalizado com sucesso!" });
       navigate(createPageUrl("MeusEnsaios"));
     } catch (err) {
       console.error(err);
-      alert("Erro ao salvar.");
+      toast({ title: "Erro ao salvar.", variant: "destructive" });
     } finally {
       setSaving(false);
     }

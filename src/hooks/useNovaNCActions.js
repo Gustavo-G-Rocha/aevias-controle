@@ -3,13 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { criarRegistro } from "@/services/recordsService";
 import { createPageUrl } from "@/utils";
 
+import { toast } from "@/components/ui/use-toast";
 export function useNovaNCActions(user) {
   const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
 
   const handleSave = async ({ obraId, obras, tipoChecklist, checklistId, form, fotos, pdfs }) => {
     if (!obraId || !form.descricao_nc || !form.data_nc) {
-      alert("Preencha os campos obrigatórios: Obra, Data da NC e Descrição.");
+      toast({ title: "Preencha os campos obrigatórios: Obra, Data da NC e Descrição.", variant: "destructive" });
       return;
     }
 
@@ -37,7 +38,7 @@ export function useNovaNCActions(user) {
       navigate(createPageUrl("GestaoNC"));
     } catch (error) {
       console.error("[useNovaNCActions] Erro ao salvar NC:", error?.message || error);
-      alert("Erro ao salvar a NC. Tente novamente.");
+      toast({ title: "Erro ao salvar a NC. Tente novamente.", variant: "destructive" });
     } finally {
       setSaving(false);
     }

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 
+import { toast } from "@/components/ui/use-toast";
 /**
  * Hook para ações de salvar, finalizar e navegar
  */
@@ -15,7 +16,7 @@ export const useEnsaioTaxaMRAFActions = () => {
    */
   const handleSubmit = useCallback(async (formData, user, editingEnsaio, finalizar = false) => {
     if (!formData.obra_id || !formData.data_ensaio) {
-      alert("Preencha Obra e Data.");
+      toast({ title: "Preencha Obra e Data.", variant: "destructive" });
       return;
     }
 
@@ -45,7 +46,7 @@ export const useEnsaioTaxaMRAFActions = () => {
       navigate(createPageUrl('MeusEnsaios'));
     } catch (err) {
       console.error('Erro ao salvar:', err);
-      alert("Erro ao salvar ensaio.");
+      toast({ title: "Erro ao salvar ensaio.", variant: "destructive" });
     } finally {
       setSaving(false);
     }

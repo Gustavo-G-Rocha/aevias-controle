@@ -8,13 +8,14 @@ import { criarEnsaio, atualizarEnsaio } from '@/services/ensaiosService';
 import { serializarFaixas } from '@/utils/ensaioVigaBenkelmanUtils';
 import { createPageUrl } from '@/utils';
 
+import { toast } from "@/components/ui/use-toast";
 export function useEnsaioVigaBenkelmanActions(formData, editId) {
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
 
   const handleSave = useCallback(async (asFinal = false) => {
     if (!formData.obra_id) {
-      alert('Selecione uma obra');
+      toast({ title: 'Selecione uma obra', variant: "destructive" });
       return;
     }
 
@@ -48,16 +49,16 @@ export function useEnsaioVigaBenkelmanActions(formData, editId) {
 
       if (editId) {
         await atualizarEnsaio('EnsaioVigaBenkelman', editId, dataToSave);
-        alert('Ensaio atualizado com sucesso!');
+        toast({ title: 'Ensaio atualizado com sucesso!' });
       } else {
         await criarEnsaio('EnsaioVigaBenkelman', dataToSave);
-        alert('Ensaio criado com sucesso!');
+        toast({ title: 'Ensaio criado com sucesso!' });
       }
 
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
       console.error('Erro ao salvar:', error);
-      alert('Erro ao salvar ensaio');
+      toast({ title: 'Erro ao salvar ensaio', variant: "destructive" });
     } finally {
       setSaving(false);
     }

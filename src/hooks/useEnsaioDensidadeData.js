@@ -9,6 +9,7 @@ import { obterEnsaioById } from "@/services/ensaiosService";
 import { getInitialFormData, filtrarObrasDisponiveis, getFuroInicial } from "@/utils/ensaioDensidadeUtils";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 
+import { toast } from "@/components/ui/use-toast";
 export function useEnsaioDensidadeData() {
   const [formData, setFormData] = useState(getInitialFormData());
   const [editingEnsaio, setEditingEnsaio] = useState(null);
@@ -73,13 +74,13 @@ export function useEnsaioDensidadeData() {
             fotos: Array.isArray(ensaioToEdit.fotos) ? ensaioToEdit.fotos : [],
           });
         } else {
-          alert("Você não tem permissão para editar este registro.");
+          toast({ title: "Você não tem permissão para editar este registro.", variant: "destructive" });
           navigate(createPageUrl('MeusEnsaios'));
         }
       })
       .catch(err => {
         console.error("Erro ao carregar ensaio:", err);
-        alert("Erro ao carregar ensaio para edição.");
+        toast({ title: "Erro ao carregar ensaio para edição.", variant: "destructive" });
         navigate(createPageUrl('MeusEnsaios'));
       })
       .finally(() => setEditLoading(false));

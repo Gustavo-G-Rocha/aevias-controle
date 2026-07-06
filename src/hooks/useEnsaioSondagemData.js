@@ -12,6 +12,7 @@ import {
   filtrarObrasPorAcesso,
   filtrarProjetosPorObra,
 } from "@/utils/ensaioSondagemUtils";
+import { toast } from "@/components/ui/use-toast";
 
 export function useEnsaioSondagemData() {
   const [loading, setLoading] = useState(true);
@@ -55,13 +56,13 @@ export function useEnsaioSondagemData() {
             setEditingEnsaio(ensaioToEdit);
             setFormData(ensaioToEdit);
           } else {
-            alert("Você não tem permissão para editar este registro.");
+            toast({ title: "Você não tem permissão para editar este registro.", variant: "destructive" });
             navigate(createPageUrl('MeusEnsaios'));
           }
         })
         .catch(error => {
           console.error("[EnsaioSondagem] Erro ao carregar dados:", error?.message || error);
-          alert("Erro ao carregar dados iniciais.");
+          toast({ title: "Erro ao carregar dados iniciais.", variant: "destructive" });
         })
         .finally(() => setLoading(false));
     } else {

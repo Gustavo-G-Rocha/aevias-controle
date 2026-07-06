@@ -14,6 +14,7 @@ import {
   getEnsaioInicial,
   filtrarObrasDisponiveis,
 } from '@/utils/ensaioTaxaPinturaImprimacaoUtils';
+import { toast } from "@/components/ui/use-toast";
 
 export function useEnsaioTaxaPinturaImprimacaoData() {
   const location = useLocation();
@@ -53,13 +54,13 @@ export function useEnsaioTaxaPinturaImprimacaoData() {
               ensaios: ensaioToEdit.ensaios?.length > 0 ? ensaioToEdit.ensaios : [getEnsaioInicial(1)],
             });
           } else {
-            alert('Você não tem permissão para editar este registro.');
+            toast({ title: 'Você não tem permissão para editar este registro.', variant: "destructive" });
             navigate(createPageUrl('MeusEnsaios'));
           }
         })
         .catch(err => {
           console.error('Erro ao carregar dados:', err);
-          alert('Erro ao carregar dados.');
+          toast({ title: 'Erro ao carregar dados.', variant: "destructive" });
           navigate(createPageUrl('MeusEnsaios'));
         })
         .finally(() => setEditLoading(false));

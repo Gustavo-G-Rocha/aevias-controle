@@ -4,6 +4,7 @@ import { listarRegistros } from '@/services/recordsService';
 import { listarRegionais } from '@/services/regionaisService';
 import { filterSolicitacoesByUserAccess } from '@/utils/solicitacoesTransferenciaUtils';
 
+import { toast } from "@/components/ui/use-toast";
 export function useSolicitacoesTransferenciaData() {
   const [solicitacoes, setSolicitacoes] = useState([]);
   const [regionais, setRegionais] = useState([]);
@@ -32,7 +33,7 @@ export function useSolicitacoesTransferenciaData() {
       setSolicitacoes(filtradas);
     } catch (error) {
       console.error("[SolicitacoesTransferencia] Erro ao carregar dados:", error?.message || error);
-      alert("Erro ao carregar solicitações.");
+      toast({ title: "Erro ao carregar solicitações.", variant: "destructive" });
     } finally {
       setLoading(false);
     }

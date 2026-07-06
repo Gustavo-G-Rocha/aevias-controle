@@ -5,6 +5,7 @@ import { createPageUrl } from "@/utils";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { extractNCIdFromUrl, initializeNCForm } from "@/utils/editarNCUtils";
 
+import { toast } from "@/components/ui/use-toast";
 export const useEditarNCData = () => {
   const navigate = useNavigate();
   const [nc, setNc] = useState(null);
@@ -21,7 +22,7 @@ export const useEditarNCData = () => {
 
     const ncId = extractNCIdFromUrl();
     if (!ncId) {
-      alert("ID da NC não encontrado");
+      toast({ title: "ID da NC não encontrado", variant: "destructive" });
       navigate(createPageUrl("GestaoNC"));
       return;
     }
@@ -30,7 +31,7 @@ export const useEditarNCData = () => {
     filtrarRegistros('RelatorioNC', { id: ncId })
       .then(ncData => {
         if (!ncData || ncData.length === 0) {
-          alert("NC não encontrada");
+          toast({ title: "NC não encontrada", variant: "destructive" });
           navigate(createPageUrl("GestaoNC"));
           return;
         }
@@ -38,7 +39,7 @@ export const useEditarNCData = () => {
       })
       .catch(error => {
         console.error("[EditarNC] Erro ao carregar dados:", error?.message || error);
-        alert("Erro ao carregar a NC. Tente novamente.");
+        toast({ title: "Erro ao carregar a NC. Tente novamente.", variant: "destructive" });
         navigate(createPageUrl("GestaoNC"));
       })
       .finally(() => setNcLoading(false));

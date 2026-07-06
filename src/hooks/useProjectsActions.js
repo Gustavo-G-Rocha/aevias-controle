@@ -9,6 +9,7 @@ import {
   removeProjectFromRegional,
   addProjectIdToRegional,
 } from "@/utils/projectsUtils";
+import { toast } from "@/components/ui/use-toast";
 
 export const useProjectsActions = (regionais, loadData) => {
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -79,7 +80,7 @@ export const useProjectsActions = (regionais, loadData) => {
         setEditingProject(null);
         loadData();
       } catch (error) {
-        alert(`Erro ao salvar: ${error.message || "Erro desconhecido"}`);
+        toast({ title: `Erro ao salvar: ${error.message || "Erro desconhecido"}`, variant: "destructive" });
       }
     },
     [editingProject, loadData, regionais]

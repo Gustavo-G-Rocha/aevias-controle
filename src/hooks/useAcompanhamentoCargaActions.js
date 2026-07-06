@@ -11,6 +11,7 @@ import {
   buildDataToSave,
   MAX_CARGAS,
 } from "@/utils/acompanhamentoCargaUtils";
+import { toast } from "@/components/ui/use-toast";
 
 export function useAcompanhamentoCargaActions({
   formData, setFormData,
@@ -39,7 +40,7 @@ export function useAcompanhamentoCargaActions({
   const handleAddCarga = () => {
     const novas = addCarga(formData.cargas);
     if (novas === null) {
-      alert(`Limite máximo de ${MAX_CARGAS} cargas atingido.`);
+      toast({ title: `Limite máximo de ${MAX_CARGAS} cargas atingido.`, variant: "destructive" });
       return;
     }
     setFormData(prev => ({ ...prev, cargas: novas }));
@@ -55,7 +56,7 @@ export function useAcompanhamentoCargaActions({
 
   const handleSubmit = async (finalizar = false) => {
     const error = validateFormData(formData, finalizar);
-    if (error) { alert(error); return; }
+    if (error) { toast({ title: error, variant: "destructive" }); return; }
 
     setSaving(true);
     try {
@@ -68,11 +69,11 @@ export function useAcompanhamentoCargaActions({
       }
 
       clearSavedData();
-      alert(finalizar ? "Acompanhamento finalizado com sucesso!" : "Progresso salvo!");
+      toast({ title: finalizar ? "Acompanhamento finalizado com sucesso!" : "Progresso salvo!" });
       navigate(createPageUrl("MeusEnsaios"));
     } catch (error) {
       console.error("Erro ao salvar:", error);
-      alert("Erro ao salvar acompanhamento.");
+      toast({ title: "Erro ao salvar acompanhamento.", variant: "destructive" });
     } finally {
       setSaving(false);
     }

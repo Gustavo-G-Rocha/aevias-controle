@@ -5,6 +5,7 @@ import { atualizarRegistro } from "@/services/recordsService";
 import { createPageUrl } from "@/utils";
 import { validateNCForm, buildNCUpdatePayload } from "@/utils/editarNCUtils";
 
+import { toast } from "@/components/ui/use-toast";
 export const useEditarNCActions = (nc) => {
   const navigate = useNavigate();
   const [uploadingFotos, setUploadingFotos] = useState(false);
@@ -46,7 +47,7 @@ export const useEditarNCActions = (nc) => {
   const handleSave = useCallback(
     async (form, fotos, pdfs) => {
       if (!validateNCForm(form)) {
-        alert("Preencha os campos obrigatórios: Data da NC e Descrição.");
+        toast({ title: "Preencha os campos obrigatórios: Data da NC e Descrição.", variant: "destructive" });
         return;
       }
 
@@ -57,7 +58,7 @@ export const useEditarNCActions = (nc) => {
         navigate(createPageUrl("GestaoNC"));
       } catch (error) {
         console.error("[EditarNC] Erro ao salvar NC:", error?.message || error);
-        alert("Erro ao salvar a NC. Tente novamente.");
+        toast({ title: "Erro ao salvar a NC. Tente novamente.", variant: "destructive" });
       } finally {
         setSaving(false);
       }

@@ -6,6 +6,7 @@ import {
   deriveRoleFromAccessLevel,
   getRegionaisDoUsuario,
 } from "@/utils/usersUtils";
+import { toast } from "@/components/ui/use-toast";
 
 export function useUsersActions({ currentUser, regionais, loadData }) {
   const [isFormOpen,   setIsFormOpen]   = useState(false);
@@ -47,7 +48,7 @@ export function useUsersActions({ currentUser, regionais, loadData }) {
         }
 
         await atualizarUsuario(editingUser.id, cleanedFields);
-        alert("Usuário atualizado com sucesso!");
+        toast({ title: "Usuário atualizado com sucesso!" });
       } else {
         // CRIAÇÃO via invite (User.create retorna 405 — usuários entram por convite)
         await inviteUser(
@@ -75,7 +76,7 @@ export function useUsersActions({ currentUser, regionais, loadData }) {
           ? "Usuário cadastrado com sucesso! O laboratorista foi automaticamente alocado na sua regional. Um convite foi enviado por email."
           : "Usuário cadastrado com sucesso! Um convite foi enviado por email.";
 
-        alert(successMessage);
+        toast({ title: successMessage });
       }
 
       setIsFormOpen(false);
@@ -88,7 +89,7 @@ export function useUsersActions({ currentUser, regionais, loadData }) {
         error.response?.data?.message ||
         error.message                  ||
         "Erro desconhecido ao salvar usuário";
-      alert(`Erro ao salvar usuário: ${mensagemErro}`);
+      toast({ title: `Erro ao salvar usuário: ${mensagemErro}`, variant: "destructive" });
     }
   }, [editingUser, currentUser, regionais, loadData]);
 

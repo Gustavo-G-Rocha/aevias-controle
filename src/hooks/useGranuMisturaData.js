@@ -10,6 +10,7 @@ import {
   getInitialForm,
   getInitialPeneiras,
 } from "@/utils/granuMisturaUtils";
+import { toast } from "@/components/ui/use-toast";
 
 export function useGranuMisturaData() {
   const location = useLocation();
@@ -65,13 +66,13 @@ export function useGranuMisturaData() {
             setEditingId(editId);
             setFormData({ ...getInitialForm(), ...rec, peneiras: rec.peneiras || getInitialPeneiras() });
           } else {
-            alert("Sem permissão para editar.");
+            toast({ title: "Sem permissão para editar.", variant: "destructive" });
             navigate(createPageUrl("MeusEnsaios"));
           }
         })
         .catch(err => {
           console.error(err);
-          alert("Erro ao carregar dados.");
+          toast({ title: "Erro ao carregar dados.", variant: "destructive" });
         })
         .finally(() => setEditLoading(false));
     } else {

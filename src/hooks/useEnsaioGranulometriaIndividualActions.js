@@ -3,6 +3,7 @@ import { createPageUrl } from "@/utils";
 import { sanitizeAgregados, sanitizeEquivalenteAreia } from "@/utils/dataSanitization";
 import { validateGranulometriaIndividual } from "@/utils/ensaioValidation";
 
+import { toast } from "@/components/ui/use-toast";
 export function useEnsaioGranulometriaIndividualActions({
   formData, user, editingEnsaio, navigate,
 }) {
@@ -11,7 +12,7 @@ export function useEnsaioGranulometriaIndividualActions({
 
     const validation = validateGranulometriaIndividual(formData, saveStatus);
     if (!validation.valid) {
-      alert(validation.message);
+      toast({ title: validation.message });
       return;
     }
 
@@ -37,18 +38,18 @@ export function useEnsaioGranulometriaIndividualActions({
         }
 
         await atualizarEnsaio('EnsaioGranulometriaIndividual', editingEnsaio.id, updateData);
-        alert(successMessage);
+        toast({ title: successMessage });
       } else {
         await criarEnsaio('EnsaioGranulometriaIndividual', {
           ...dataToSave,
           laboratorista_name: user.laboratorista_name || user.full_name,
         });
-        alert(saveStatus === 'rascunho' ? "Progresso salvo!" : "Ensaio criado!");
+        toast({ title: saveStatus === 'rascunho' ? "Progresso salvo!" : "Ensaio criado!" });
       }
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
       console.error("Erro ao salvar:", error);
-      alert("Erro ao salvar o ensaio.");
+      toast({ title: "Erro ao salvar o ensaio.", variant: "destructive" });
     }
   };
 

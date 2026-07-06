@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { criarEnsaio, atualizarEnsaio } from '@/services/ensaiosService';
 import { createPageUrl } from '@/utils';
 
+import { toast } from "@/components/ui/use-toast";
 export function useEnsaioTaxaPinturaImprimacaoActions(formData, editingEnsaio, user) {
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ export function useEnsaioTaxaPinturaImprimacaoActions(formData, editingEnsaio, u
     e.preventDefault();
 
     if (!formData.obra_id || !formData.data_ensaio) {
-      alert('Preencha todos os campos obrigatórios (Obra, Data).');
+      toast({ title: 'Preencha todos os campos obrigatórios (Obra, Data).', variant: "destructive" });
       return;
     }
 
@@ -38,15 +39,15 @@ export function useEnsaioTaxaPinturaImprimacaoActions(formData, editingEnsaio, u
           successMessage = 'Ensaio atualizado com sucesso! O registro voltará para análise do administrador.';
         }
         await atualizarEnsaio('EnsaioTaxaPinturaImprimacao', editingEnsaio.id, updateData);
-        alert(successMessage);
+        toast({ title: successMessage });
       } else {
         await criarEnsaio('EnsaioTaxaPinturaImprimacao', dataToSave);
-        alert('Ensaio criado com sucesso!');
+        toast({ title: 'Ensaio criado com sucesso!' });
       }
       navigate(createPageUrl('MeusEnsaios'));
     } catch (err) {
       console.error('Erro ao salvar ensaio:', err);
-      alert(`Erro ao salvar ensaio: ${err.message || 'Erro desconhecido'}.`);
+      toast({ title: `Erro ao salvar ensaio: ${err.message || 'Erro desconhecido'}.`, variant: "destructive" });
     } finally {
       setSaving(false);
     }

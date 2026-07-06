@@ -5,6 +5,7 @@ import { uploadMultipleFiles } from "@/utils/imageUpload";
 import { createPageUrl } from "@/utils";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 
+import { toast } from "@/components/ui/use-toast";
 export const getInitialFormData = () => ({
   obra_id: "",
   data: new Date().toISOString().split("T")[0],
@@ -120,7 +121,7 @@ export function useDiarioObra() {
     });
 
     if (urls.length > 0) setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...urls] }));
-    if (errors.length > 0) alert(`${urls.length} de ${files.length} fotos enviadas.\n\nErros:\n` + errors.map(e => `• ${e.fileName}: ${e.error}`).join("\n"));
+    if (errors.length > 0) toast({ title: `${urls.length} de ${files.length} fotos enviadas.\n\nErros:\n` + errors.map(e => `• ${e.fileName}: ${e.error}`).join("\n"), variant: "destructive" });
 
     setLoadingUpload(false);
     setUploadProgress([]);
@@ -134,28 +135,28 @@ export function useDiarioObra() {
   const handleSubmit = useCallback(async (e, saveStatus = "finalizado") => {
     e.preventDefault();
 
-    if (!formData.obra_id) { alert("Por favor, selecione uma obra."); return; }
+    if (!formData.obra_id) { toast({ title: "Por favor, selecione uma obra.", variant: "destructive" }); return; }
 
     if (saveStatus === "finalizado") {
       if (!formData.data || !formData.jornada?.horario_inicio || !formData.jornada?.horario_fim) {
-        alert("Preencha todos os campos de data e horários."); return;
+        toast({ title: "Preencha todos os campos de data e horários.", variant: "destructive" }); return;
       }
       const obraAtual = obras.find(o => o.id === formData.obra_id);
       if (formData.tipo_local !== "escritorio" && obraAtual?.tipo_obra === "supervisao" && !formData.empreiteira) {
-        alert("Selecione uma empreiteira."); return;
+        toast({ title: "Selecione uma empreiteira.", variant: "destructive" }); return;
       }
       if (formData.tipo_local === "campo" && (!formData.rodovia || !formData.trecho)) {
-        alert("Preencha rodovia e trecho."); return;
+        toast({ title: "Preencha rodovia e trecho.", variant: "destructive" }); return;
       }
       if (formData.tipo_local === "usina" && !formData.usina_selecionada) {
-        alert("Selecione uma usina."); return;
+        toast({ title: "Selecione uma usina.", variant: "destructive" }); return;
       }
-      if (!formData.atividades_realizadas) { alert("Preencha as atividades realizadas."); return; }
+      if (!formData.atividades_realizadas) { toast({ title: "Preencha as atividades realizadas.", variant: "destructive" }); return; }
       if (formData.tipo_local !== "escritorio" && formData.acoes_corretivas_realizado === null) {
-        alert("Indique se foram realizadas ações corretivas."); return;
+        toast({ title: "Indique se foram realizadas ações corretivas.", variant: "destructive" }); return;
       }
       if (formData.tipo_local !== "escritorio" && formData.acoes_corretivas_realizado === true && !formData.acoes_corretivas_descricao?.trim()) {
-        alert("Descreva as ações corretivas realizadas."); return;
+        toast({ title: "Descreva as ações corretivas realizadas.", variant: "destructive" }); return;
       }
     }
 
@@ -173,15 +174,15 @@ export function useDiarioObra() {
           Object.assign(updateData, { approved: null, rejection_reason: null, approved_by: null, approved_date: null, was_rejected: true });
         }
         await atualizarDiario(editingDiarioOriginal.id, updateData);
-        alert(saveStatus === "rascunho" ? "Progresso salvo!" : "Diário atualizado com sucesso!");
+        toast({ title: saveStatus === "rascunho" ? "Progresso salvo!" : "Diário atualizado com sucesso!" });
       } else {
         await criarDiario({ ...dataToSave, created_by: user.email, laboratorista_name: user.laboratorista_name || user.full_name });
-        alert(saveStatus === "rascunho" ? "Progresso salvo!" : "Diário criado com sucesso!");
+        toast({ title: saveStatus === "rascunho" ? "Progresso salvo!" : "Diário criado com sucesso!" });
       }
       navigate(createPageUrl("MeusEnsaios"));
     } catch (error) {
       console.error("[DiarioObra] Erro:", error?.message || error);
-      alert("Ocorreu um erro ao salvar o diário.");
+      toast({ title: "Ocorreu um erro ao salvar o diário.", variant: "destructive" });
     }
   }, [formData, editingDiarioOriginal, obras, user, navigate]);
 
@@ -208,13 +209,13 @@ export function useDiarioObra() {
               temperatura: diarioToEdit.temperatura ?? "",
             });
           } else {
-            alert("Você não tem permissão para editar este registro.");
+            toast({ title: "Você não tem permissão para editar este registro.", variant: "destructive" });
             navigate(createPageUrl("MeusEnsaios"));
           }
         })
         .catch(error => {
           console.error("[DiarioObra] Erro ao carregar:", error?.message || error);
-          alert("Não foi possível carregar os dados.");
+          toast({ title: "Não foi possível carregar os dados.", variant: "destructive" });
           navigate(createPageUrl("MeusEnsaios"));
         })
         .finally(() => setEditLoading(false));

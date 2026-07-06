@@ -7,6 +7,7 @@ import {
   CARGA_VAZIA,
   buildDataToSave,
 } from "@/utils/acompanhamentoUsinagemUtils";
+import { toast } from "@/components/ui/use-toast";
 
 export function useAcompanhamentoUsinagemActions({ formData, setFormData, editingId }) {
   const navigate  = useNavigate();
@@ -51,7 +52,7 @@ export function useAcompanhamentoUsinagemActions({ formData, setFormData, editin
 
   const handleSubmit = async (finalizar = false) => {
     if (!formData.obra_id || !formData.data) {
-      alert("Por favor, preencha os campos obrigatórios: Obra e Data");
+      toast({ title: "Por favor, preencha os campos obrigatórios: Obra e Data", variant: "destructive" });
       return;
     }
 
@@ -61,16 +62,16 @@ export function useAcompanhamentoUsinagemActions({ formData, setFormData, editin
 
       if (editingId) {
         await atualizarEnsaio('AcompanhamentoUsinagem', editingId, dataToSave);
-        alert(finalizar ? 'Acompanhamento finalizado e enviado para aprovação!' : 'Acompanhamento salvo como rascunho!');
+        toast({ title: finalizar ? 'Acompanhamento finalizado e enviado para aprovação!' : 'Acompanhamento salvo como rascunho!' });
       } else {
         await criarEnsaio('AcompanhamentoUsinagem', dataToSave);
-        alert(finalizar ? 'Acompanhamento criado e enviado para aprovação!' : 'Acompanhamento salvo como rascunho!');
+        toast({ title: finalizar ? 'Acompanhamento criado e enviado para aprovação!' : 'Acompanhamento salvo como rascunho!' });
       }
 
       navigate(createPageUrl("MeusEnsaios"));
     } catch (error) {
       console.error("Erro ao salvar:", error);
-      alert("Erro ao salvar acompanhamento");
+      toast({ title: "Erro ao salvar acompanhamento", variant: "destructive" });
     } finally {
       setSaving(false);
     }

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 import { sanitizeFormForSave, getEmptyRequiredFields } from "@/utils/ensaioProctorUtils";
 
+import { toast } from "@/components/ui/use-toast";
 export function useEnsaioProctorActions(form, recordId) {
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ export function useEnsaioProctorActions(form, recordId) {
   const handleSave = useCallback(async (status) => {
     const emptyFields = getEmptyRequiredFields(form);
     if (emptyFields.length > 0) {
-      alert(`Preencha os campos obrigatórios:\n${emptyFields.map(f => f.label).join(', ')}`);
+      toast({ title: `Preencha os campos obrigatórios:\n${emptyFields.map(f => f.label).join(', ')}`, variant: "destructive" });
       return;
     }
 
@@ -23,14 +24,14 @@ export function useEnsaioProctorActions(form, recordId) {
       const data = { ...sanitizeFormForSave(form), status };
       if (recordId) {
         await atualizarEnsaio('EnsaioProctor', recordId, data);
-        alert("Ensaio atualizado com sucesso!");
+        toast({ title: "Ensaio atualizado com sucesso!" });
       } else {
         await criarEnsaio('EnsaioProctor', data);
-        alert("Ensaio criado com sucesso!");
+        toast({ title: "Ensaio criado com sucesso!" });
         navigate("/MeusEnsaios");
       }
     } catch (err) {
-      alert("Erro ao salvar ensaio: " + err.message);
+      toast({ title: "Erro ao salvar ensaio: " + err.message, variant: "destructive" });
     } finally {
       setSaving(false);
     }

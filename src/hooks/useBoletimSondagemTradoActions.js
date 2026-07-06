@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 
+import { toast } from "@/components/ui/use-toast";
 export function useBoletimSondagemTradoActions(formData, user, editingBoletim) {
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ export function useBoletimSondagemTradoActions(formData, user, editingBoletim) {
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     if (!formData.obra_id || !formData.data) {
-      alert("Preencha todos os campos obrigatórios (Obra, Data).");
+      toast({ title: "Preencha todos os campos obrigatórios (Obra, Data).", variant: "destructive" });
       return;
     }
     setSaving(true);
@@ -32,15 +33,15 @@ export function useBoletimSondagemTradoActions(formData, user, editingBoletim) {
           updateData.approved_date = null;
         }
         await atualizarEnsaio('BoletimSondagemTrado', editingBoletim.id, updateData);
-        alert("Boletim atualizado com sucesso!");
+        toast({ title: "Boletim atualizado com sucesso!" });
       } else {
         await criarEnsaio('BoletimSondagemTrado', dataToSave);
-        alert("Boletim criado com sucesso!");
+        toast({ title: "Boletim criado com sucesso!" });
       }
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
       console.error("Erro ao salvar boletim:", error);
-      alert("Erro ao salvar boletim: " + error.message);
+      toast({ title: "Erro ao salvar boletim: " + error.message, variant: "destructive" });
     } finally {
       setSaving(false);
     }

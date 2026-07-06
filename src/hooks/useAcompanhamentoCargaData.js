@@ -7,6 +7,7 @@ import {
   filtrarObras,
   filtrarProjetosDisponiveis,
 } from "@/utils/acompanhamentoCargaUtils";
+import { toast } from "@/components/ui/use-toast";
 
 export function useAcompanhamentoCargaData() {
   const [formData, setFormData] = useState(getInitialFormData());
@@ -50,7 +51,7 @@ export function useAcompanhamentoCargaData() {
         })
         .catch(error => {
           console.error("Erro ao carregar dados:", error);
-          alert("Erro ao carregar dados iniciais.");
+          toast({ title: "Erro ao carregar dados iniciais.", variant: "destructive" });
         })
         .finally(() => setEditLoading(false));
     } else {
