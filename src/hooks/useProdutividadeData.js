@@ -99,20 +99,20 @@ export function useProdutividadeData(currentMonth) {
       setUsinas(usinasArr);
 
       if (force || !entityCacheRef.current) {
-        const lote1 = await loadRecordsGrouped([
-          'DiarioObra', 'ChecklistUsina', 'ChecklistAplicacao', 'ChecklistMRAF',
-          'ChecklistConcretagem', 'ChecklistTerraplanagem', 'ChecklistReciclagem', 'EnsaioCAUQ',
-        ], 500);
-
-        const lote2 = await loadRecordsGrouped([
-          'EnsaioDensidade', 'EnsaioDensidadeInSitu', 'EnsaioSondagem', 'EnsaioTaxaPinturaImprimacao',
-          'AcompanhamentoCarga', 'EnsaioMRAF', 'EnsaioManchaPendulo', 'EnsaioVigaBenkelman',
-        ], 500);
-
-        const lote3 = await loadRecordsGrouped([
-          'EnsaioTaxaMRAF', 'AcompanhamentoUsinagem', 'EnsaioGranulometriaIndividual', 'GranuMistura',
-          'EnsaioProctor', 'EnsaioRompimentoConcreto', 'BoletimSondagem', 'BoletimSondagemTrado',
-        ], 500);
+        const [lote1, lote2, lote3] = await Promise.all([
+          loadRecordsGrouped([
+            'DiarioObra', 'ChecklistUsina', 'ChecklistAplicacao', 'ChecklistMRAF',
+            'ChecklistConcretagem', 'ChecklistTerraplanagem', 'ChecklistReciclagem', 'EnsaioCAUQ',
+          ], 500),
+          loadRecordsGrouped([
+            'EnsaioDensidade', 'EnsaioDensidadeInSitu', 'EnsaioSondagem', 'EnsaioTaxaPinturaImprimacao',
+            'AcompanhamentoCarga', 'EnsaioMRAF', 'EnsaioManchaPendulo', 'EnsaioVigaBenkelman',
+          ], 500),
+          loadRecordsGrouped([
+            'EnsaioTaxaMRAF', 'AcompanhamentoUsinagem', 'EnsaioGranulometriaIndividual', 'GranuMistura',
+            'EnsaioProctor', 'EnsaioRompimentoConcreto', 'BoletimSondagem', 'BoletimSondagemTrado',
+          ], 500),
+        ]);
 
         entityCacheRef.current = {
           diarios: lote1[0], checklistsUsina: lote1[1], checklistsAplicacao: lote1[2],
