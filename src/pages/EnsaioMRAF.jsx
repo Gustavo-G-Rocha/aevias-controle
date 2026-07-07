@@ -24,7 +24,7 @@ export default function EnsaioMRAFPage() {
   } = useEnsaioForm(getInitialFormData, 'EnsaioMRAF', 'ensaio_mraf');
 
   const {
-    handleChange, handleNestedChange, handleProjectChange,
+    handleChange, handleNestedChange, handleExtracaoLiganteChange, handleProjectChange,
     selectedProject, peneirasDoProjecto,
     projetosMRAF, rodoviasDisponiveis,
   } = useEnsaioMRAFForm({
@@ -79,7 +79,7 @@ export default function EnsaioMRAFPage() {
                 isEditable={isEditable}
                 isApproved={isApproved}
                 isFinalizado={formData.status === 'finalizado'}
-                onChange={(field, value) => handleNestedChange('extracao_ligante', field, value)}
+                onChange={handleExtracaoLiganteChange}
               />
 
               <EnsaioMRAFGranulometria

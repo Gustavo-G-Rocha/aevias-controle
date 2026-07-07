@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { PENEIRAS_CONFIG, filtrarPeneirasPorFaixa } from "@/constants/sieves";
 import {
   calcExtracaoLigante,
@@ -25,24 +25,20 @@ export function useEnsaioMRAFForm({
     }));
   }, [setFormData]);
 
-  // ── cálculo automático extração de ligante ────────────────────────────────
-  useEffect(() => {
-    const ext = formData.extracao_ligante;
-    const patches = calcExtracaoLigante(ext);
-    if (Object.keys(patches).length === 0) return;
-    setFormData(prev => ({
-      ...prev,
-      extracao_ligante: { ...prev.extracao_ligante, ...patches },
-    }));
-  }, [
-    formData.extracao_ligante.amostra_umida,
-    formData.extracao_ligante.amostra_seca,
-    formData.extracao_ligante.amostra_com_ligante,
-    formData.extracao_ligante.amostra_sem_ligante,
-    formData.extracao_ligante.fator_correcao,
-    formData.extracao_ligante.teor_ligante,
-    formData.extracao_ligante.residuo_emulsao,
-  ]);
+  // ── cálculo de extração de ligante inline no onChange ──────────────────────
+  // Evita o ciclo effect → setFormData → re-render → effect a cada digitação.
+  // O cálculo é feito no momento do onChange, atualizando campo + derivados em
+  // uma única chamada de setFormData.
+  const handleExtracaoLiganteChange = useCallback((field, value) => {
+    setFormData(prev => {
+      const updatedExt = { ...prev.extracao_ligante, [field]: value };
+      const patches = calcExtracaoLigante(updatedExt);
+      return {
+        ...prev,
+        extracao_ligante: { ...updatedExt, ...patches },
+      };
+    });
+  }, [setFormData]);
 
   // ── seleção de projeto ────────────────────────────────────────────────────
   const handleProjectChange = useCallback((projectId) => {
@@ -84,6 +80,7 @@ export function useEnsaioMRAFForm({
   return {
     handleChange,
     handleNestedChange,
+    handleExtracaoLiganteChange,
     handleProjectChange,
     selectedProject,
     peneirasDoProjecto,
