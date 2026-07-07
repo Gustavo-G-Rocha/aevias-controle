@@ -4,7 +4,7 @@
  */
 import { useMemo, useState, useCallback } from 'react';
 import { subMonths } from 'date-fns';
-import { getUserAccessLevel, filterRegionaisByUser, isCliente, isEngenheiroCliente } from '@/utils/accessControl';
+import { getUserAccessLevel, filterRegionaisByUser, getAccessibleObraIds, isCliente, isEngenheiroCliente } from '@/utils/accessControl';
 import {
   calcularStats,
   calcularGraficoMensal,
@@ -48,15 +48,13 @@ export function useDashboardData() {
     if (userAccessLevel === 'user') {
       filteredEnsaios = filteredEnsaios.filter(e => e.created_by === user.email);
     } else if (needsRegionais) {
+      const obrasIds = getAccessibleObraIds(auxData.obras, auxData.regionais ?? [], user);
+      filteredObras = auxData.obras.filter(o => obrasIds.has(o.id));
+
       const regionaisDoUsuario = filterRegionaisByUser(auxData.regionais ?? [], user);
-      const regionaisIds = new Set(regionaisDoUsuario.map(r => r.id));
-
-      filteredObras = auxData.obras.filter(o => regionaisIds.has(o.regional_id));
-
       const projectIdsPermitidos = new Set(regionaisDoUsuario.flatMap(r => r.project_ids || []));
       filteredProjects = auxData.projects.filter(p => projectIdsPermitidos.has(p.id));
 
-      const obrasIds = new Set(filteredObras.map(o => o.id));
       filteredEnsaios = isClienteUser
         ? filteredEnsaios.filter(e => obrasIds.has(e.obra_id) && (e.approved === true || e.client_signature?.signed_by))
         : filteredEnsaios.filter(e => obrasIds.has(e.obra_id));

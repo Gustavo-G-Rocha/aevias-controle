@@ -3,7 +3,7 @@
 
 import { useMemo, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { getUserAccessLevel } from '@/utils/accessControl';
+import { getUserAccessLevel, getAccessibleObraIds } from '@/utils/accessControl';
 import { useCurrentUser, useAuxData, useAllRecords, QUERY_KEYS } from '@/hooks/useQueryData';
 import { getDataEnsaio } from '@/components/ensaios/ensaioMappers';
 
@@ -24,40 +24,11 @@ export function sortByEnsaioDate(records) {
 export function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccessLevel, obrasData, regionaisData) {
   if (currentUserAccessLevel === 'admin') return combinedEnsaios;
 
-  if (currentUserAccessLevel === 'sala_tecnica_afirmaevias') {
-    const regionaisDoUsuario = regionaisData.filter(r =>
-      (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === currentUser.email.toLowerCase())
-    );
-    const obrasIds = new Set(
-      obrasData.filter(o => regionaisDoUsuario.some(r => r.id === o.regional_id)).map(o => o.id)
-    );
-    return combinedEnsaios.filter(e => obrasIds.has(e.obra_id));
-  }
-
-  if (currentUserAccessLevel === 'gestor_contrato') {
-    const regionaisDoUsuario = regionaisData.filter(r => {
-      const gestores = r.gestores_contrato_responsaveis || [];
-      return (
-        r.gestor_contrato_responsavel?.toLowerCase() === currentUser.email.toLowerCase() ||
-        gestores.some(e => e.toLowerCase() === currentUser.email.toLowerCase())
-      );
-    });
-    const obrasIds = new Set(
-      obrasData.filter(o => regionaisDoUsuario.some(r => r.id === o.regional_id)).map(o => o.id)
-    );
-    return combinedEnsaios.filter(e => obrasIds.has(e.obra_id));
-  }
-
-  if (currentUserAccessLevel === 'cliente') {
-    const regionaisDoUsuario = regionaisData.filter(r =>
-      (r.clientes_responsaveis || []).some(e => e.toLowerCase() === currentUser.email.toLowerCase())
-    );
-    const obrasIds = new Set(
-      obrasData.filter(o => regionaisDoUsuario.some(r => r.id === o.regional_id)).map(o => o.id)
-    );
-    return combinedEnsaios.filter(
-      e => obrasIds.has(e.obra_id) && (e.approved === true || e.client_signature?.signed_by)
-    );
+  if (['cliente', 'sala_tecnica_afirmaevias', 'gestor_contrato'].includes(currentUserAccessLevel)) {
+    const obrasIds = getAccessibleObraIds(obrasData, regionaisData, currentUser);
+    return currentUserAccessLevel === 'cliente'
+      ? combinedEnsaios.filter(e => obrasIds.has(e.obra_id) && (e.approved === true || e.client_signature?.signed_by))
+      : combinedEnsaios.filter(e => obrasIds.has(e.obra_id));
   }
 
   // Laboratorista: próprios registros

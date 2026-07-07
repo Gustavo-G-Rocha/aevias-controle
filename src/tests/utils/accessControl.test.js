@@ -10,6 +10,7 @@ import {
   canSeeFilters,
   canSeeObraChart,
   filterRegionaisByUser,
+  getAccessibleObraIds,
 } from '@/utils/accessControl';
 
 const makeUser = (overrides = {}) => ({
@@ -166,5 +167,72 @@ describe('filterRegionaisByUser', () => {
     const user = makeUser({ email: 'gestor@test.com', access_level: 'gestor_contrato' });
     const result = filterRegionaisByUser(regionais, user);
     expect(result.some(r => r.id === 'r1')).toBe(true);
+  });
+});
+
+describe('getAccessibleObraIds', () => {
+  const obras = [
+    { id: 'o1', regional_id: 'r1' },
+    { id: 'o2', regional_id: 'r2' },
+    { id: 'o3', regional_id: 'r9' },
+  ];
+  const regionais = [
+    {
+      id: 'r1',
+      status: 'ativa',
+      clientes_responsaveis: ['cliente@test.com'],
+      salas_tecnicas_responsaveis: ['sala@test.com'],
+      gestores_contrato_responsaveis: ['gestor@test.com'],
+    },
+    {
+      id: 'r2',
+      status: 'inativa',
+      clientes_responsaveis: ['cliente@test.com'],
+    },
+  ];
+
+  it('admin — retorna todas as obras', () => {
+    const ids = getAccessibleObraIds(obras, regionais, makeUser({ role: 'admin' }));
+    expect(ids.size).toBe(3);
+    expect(ids.has('o1')).toBe(true);
+    expect(ids.has('o2')).toBe(true);
+    expect(ids.has('o3')).toBe(true);
+  });
+
+  it('laboratorista — retorna todas as obras (filtragem é por registro)', () => {
+    const ids = getAccessibleObraIds(obras, regionais, makeUser({ email: 'lab@test.com' }));
+    expect(ids.size).toBe(3);
+  });
+
+  it('cliente — retorna apenas obras de regionais ativas vinculadas', () => {
+    const user = makeUser({ email: 'cliente@test.com', access_level: 'cliente' });
+    const ids = getAccessibleObraIds(obras, regionais, user);
+    expect(ids.size).toBe(1);
+    expect(ids.has('o1')).toBe(true);
+    expect(ids.has('o2')).toBe(false);
+  });
+
+  it('sala_tecnica — retorna apenas obras de regionais vinculadas', () => {
+    const user = makeUser({ email: 'sala@test.com', access_level: 'sala_tecnica_afirmaevias' });
+    const ids = getAccessibleObraIds(obras, regionais, user);
+    expect(ids.size).toBe(1);
+    expect(ids.has('o1')).toBe(true);
+  });
+
+  it('gestor_contrato — retorna apenas obras de regionais vinculadas', () => {
+    const user = makeUser({ email: 'gestor@test.com', access_level: 'gestor_contrato' });
+    const ids = getAccessibleObraIds(obras, regionais, user);
+    expect(ids.size).toBe(1);
+    expect(ids.has('o1')).toBe(true);
+  });
+
+  it('retorna Set vazio quando obras é nulo', () => {
+    const ids = getAccessibleObraIds(null, regionais, makeUser({ role: 'admin' }));
+    expect(ids.size).toBe(0);
+  });
+
+  it('retorna Set vazio quando user é nulo', () => {
+    const ids = getAccessibleObraIds(obras, regionais, null);
+    expect(ids.size).toBe(0);
   });
 });

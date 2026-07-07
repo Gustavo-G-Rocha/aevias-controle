@@ -63,3 +63,32 @@ export function filterRegionaisByUser(regionais, user) {
     return false;
   });
 }
+
+/**
+ * Retorna o conjunto de IDs de obras acessíveis ao usuário,
+ * baseado nas regionais às quais ele pertence.
+ *
+ * Núcleo único de permissão de obra — substitui a lógica duplicada
+ * em useEnsaiosList, useDashboardData e useNaoConformidadesData.
+ *
+ * - admin: todas as obras
+ * - user (laboratorista): todas as obras (filtragem de registros é por created_by)
+ * - cliente/sala_tecnica_afirmaevias/gestor_contrato: obras das regionais vinculadas
+ *
+ * @param {Array} obras
+ * @param {Array} regionais
+ * @param {object} user
+ * @returns {Set<string>} Set de obra IDs acessíveis
+ */
+export function getAccessibleObraIds(obras, regionais, user) {
+  if (!obras || !user) return new Set();
+  const level = getUserAccessLevel(user);
+
+  if (level === 'admin' || level === 'user') {
+    return new Set(obras.map(o => o.id));
+  }
+
+  const regionaisDoUsuario = filterRegionaisByUser(regionais ?? [], user);
+  const regionaisIds = new Set(regionaisDoUsuario.map(r => r.id));
+  return new Set(obras.filter(o => regionaisIds.has(o.regional_id)).map(o => o.id));
+}

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useCurrentUser } from "@/hooks/useQueryData";
+import { getAccessibleObraIds } from "@/utils/accessControl";
 import {
   listarRegistros,
   loadRecordsGrouped,
@@ -33,7 +34,6 @@ export function useNaoConformidadesData() {
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const userData = user;
-      const userAccessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
 
       const tiposValues = TIPOS_CHECKLIST.map(t => t.value);
       const outrosValues = OUTROS_TIPOS_REGISTRO.map(t => t.value);
@@ -49,25 +49,8 @@ export function useNaoConformidadesData() {
       ]);
 
       // Calcula availableObras e availableIds para filtrar os resultados
-      let availableObras = obrasData;
-      if (userAccessLevel === 'cliente') {
-        const regs = regionaisData.filter(r => (r.clientes_responsaveis || []).some(e => e.toLowerCase() === userData.email.toLowerCase()));
-        const ids = new Set(regs.flatMap(r => obrasData.filter(o => o.regional_id === r.id).map(o => o.id)));
-        availableObras = obrasData.filter(o => ids.has(o.id));
-      } else if (userAccessLevel === 'sala_tecnica_afirmaevias') {
-        const regs = regionaisData.filter(r => (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === userData.email.toLowerCase()));
-        const ids = new Set(regs.flatMap(r => obrasData.filter(o => o.regional_id === r.id).map(o => o.id)));
-        availableObras = obrasData.filter(o => ids.has(o.id));
-      } else if (userAccessLevel === 'gestor_contrato') {
-        const regs = regionaisData.filter(r =>
-          r.gestor_contrato_responsavel?.toLowerCase() === userData.email.toLowerCase() ||
-          (r.gestores_contrato_responsaveis || []).some(e => e.toLowerCase() === userData.email.toLowerCase())
-        );
-        const ids = new Set(regs.flatMap(r => obrasData.filter(o => o.regional_id === r.id).map(o => o.id)));
-        availableObras = obrasData.filter(o => ids.has(o.id));
-      }
-
-      const availableIds = new Set(availableObras.map(o => o.id));
+      const availableIds = getAccessibleObraIds(obrasData, regionaisData, userData);
+      const availableObras = obrasData.filter(o => availableIds.has(o.id));
       const filteredRncs = rncsData.filter(r => availableIds.has(r.obra_id));
 
       const allCNCs = [];
