@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { aprovarEnsaio, reprovarEnsaio, excluirEnsaio } from "@/services/ensaiosService";
+// Re-exportado para garantir que o chunk lazy seja recompilado pelo Vite HMR
 
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
