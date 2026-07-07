@@ -7,7 +7,7 @@ import { getEntityLabel, getEntityColor, PIE_COLORS } from './entityConfig';
 
 // ─── calcularStats ────────────────────────────────────────────────────────────
 // Single-pass: conta approved/pending/rejected/assinados em uma única iteração.
-export function calcularStats(ensaios, obras, projects, isClienteUser, isEngenheiroUser, allEnsaios = ensaios) {
+export function calcularStats(ensaios, obras, projects, isClienteUser, isEngenheiroUser) {
   // Acumular tudo em uma passagem
   let approved = 0, pending = 0, rejected = 0, assinados = 0, aguardando = 0;
   for (const e of ensaios) {
@@ -26,7 +26,7 @@ export function calcularStats(ensaios, obras, projects, isClienteUser, isEngenhe
     return {
       obras: obras.length,
       projects: projects.length,
-      ensaios: allEnsaios.length,
+      ensaios: ensaios.length,
       approved,
       pending: 0,
       rejected: 0,
@@ -38,7 +38,7 @@ export function calcularStats(ensaios, obras, projects, isClienteUser, isEngenhe
   return {
     obras: obras.length,
     projects: projects.length,
-    ensaios: allEnsaios.length,
+    ensaios: ensaios.length,
     approved,
     pending,
     rejected,

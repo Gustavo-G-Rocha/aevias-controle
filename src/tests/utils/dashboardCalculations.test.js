@@ -63,6 +63,26 @@ describe('calcularStats', () => {
     const stats = calcularStats(ensaios, [], [], true, true);
     expect(stats.aguardando_assinatura).toBe(1);
   });
+
+  it('stats.ensaios reflete o tamanho do array recebido', () => {
+    const ensaios = [
+      mkEnsaio({ approved: true }),
+      mkEnsaio({ approved: null }),
+      mkEnsaio({ approved: false }),
+      mkEnsaio({ approved: true }),
+    ];
+    const stats = calcularStats(ensaios, [], [], false, false);
+    expect(stats.ensaios).toBe(4);
+  });
+
+  it('stats.ensaios para cliente reflete o tamanho do array recebido', () => {
+    const ensaios = [
+      mkEnsaio({ approved: true, client_signature: { signed_by: 'x@x.com' } }),
+      mkEnsaio({ approved: true, client_signature: null }),
+    ];
+    const stats = calcularStats(ensaios, [], [], true, true);
+    expect(stats.ensaios).toBe(2);
+  });
 });
 
 // ─── calcularGraficoStatus ────────────────────────────────────────────────────
