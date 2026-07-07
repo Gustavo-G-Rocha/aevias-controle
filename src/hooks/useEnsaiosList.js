@@ -74,7 +74,7 @@ export function useEnsaiosList() {
   const queryClient = useQueryClient();
   const { data: user, isLoading: loadingUser } = useCurrentUser();
   const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true, needsUsers: true });
-  const { data: allRecords = [], isLoading: loadingRecords } = useAllRecords('list');
+  const { data: allRecords, isLoading: loadingRecords } = useAllRecords('list');
 
   // Invalida o cache de registros para forçar recarregamento após ações (aprovar/excluir)
   const reload = useCallback(() => {
@@ -83,34 +83,34 @@ export function useEnsaiosList() {
 
   const loading = loadingUser || loadingAux || loadingRecords;
 
-  const { ensaios, obras, projects, allUsers, regionais } = useMemo(() => {
-    if (!user || !auxData) {
-      return {
-        ensaios: [],
-        obras: auxData?.obras ?? [],
-        projects: auxData?.projects ?? [],
-        allUsers: auxData?.users ?? [],
-        regionais: auxData?.regionais ?? [],
-      };
-    }
+  // Campos específicos que filtrarPorAcesso consome — referências estáveis do React Query
+  const obras = auxData?.obras;
+  const regionais = auxData?.regionais;
+  const currentUserAccessLevel = user ? getUserAccessLevel(user) : null;
 
-    const currentUserAccessLevel = getUserAccessLevel(user);
+  // Memoização com dependências reais: só recalcula a cascata regionais→obras→ensaios
+  // quando user, accessLevel, allRecords, obras ou regionais mudam de referência.
+  const ensaios = useMemo(() => {
+    if (!user || !obras || !allRecords) return [];
+
     const filtered = filtrarPorAcesso(
       allRecords,
       user,
       currentUserAccessLevel,
-      auxData.obras,
-      auxData.regionais ?? []
+      obras,
+      regionais ?? []
     );
+    return sortByEnsaioDate(filtered);
+  }, [user, currentUserAccessLevel, allRecords, obras, regionais]);
 
-    return {
-      ensaios: sortByEnsaioDate(filtered),
-      obras: auxData.obras,
-      projects: auxData.projects,
-      allUsers: auxData.users ?? [],
-      regionais: auxData.regionais ?? [],
-    };
-  }, [user, auxData, allRecords]);
-
-  return { ensaios, obras, projects, allUsers, regionais, user, loading, reload };
+  return {
+    ensaios,
+    obras: obras ?? [],
+    projects: auxData?.projects ?? [],
+    allUsers: auxData?.users ?? [],
+    regionais: regionais ?? [],
+    user,
+    loading,
+    reload,
+  };
 }
