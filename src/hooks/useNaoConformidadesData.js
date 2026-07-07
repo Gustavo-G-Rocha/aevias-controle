@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useCurrentUser } from "@/hooks/useQueryData";
-import { getAccessibleObraIds } from "@/utils/accessControl";
+import { getAccessibleObraIds, getUserAccessLevel } from "@/utils/accessControl";
 import {
   listarRegistros,
-  loadRecordsGrouped,
+  filtrarRegistros,
 } from "@/services/recordsService";
 import { listarRegionais } from "@/services/regionaisService";
 import { logger } from '@/utils/logger';
@@ -34,23 +34,45 @@ export function useNaoConformidadesData() {
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const userData = user;
+      const level = getUserAccessLevel(userData);
+      const isFullAccess = level === 'admin' || level === 'user';
 
+      // Phase 1: fetch obras + regionais to compute accessible obra IDs
+      const [obrasData, regionaisData] = await Promise.all([
+        listarRegistros('Obra', '-created_date', 2000),
+        listarRegionais(),
+      ]);
+
+      const availableIds = getAccessibleObraIds(obrasData, regionaisData, userData);
+      const availableObras = obrasData.filter(o => availableIds.has(o.id));
+
+      // Restricted user with no accessible obras — skip record fetching
+      if (!isFullAccess && availableIds.size === 0) {
+        return { obras: [], rncs: [], checklistNCs: [] };
+      }
+
+      // Server-side obra_id filter for restricted users (cliente/sala_tecnica/gestor_contrato)
+      const obraFilter = isFullAccess ? {} : { obra_id: { $in: [...availableIds] } };
+
+      // Phase 2: fetch NC records with server-side filtering
+      // - checklists/diario/rncs: filter by obra_id for restricted users
+      // - outros: also filter by NC condition (approved=false or condicao_conformidade='NÃO CONFORME')
       const tiposValues = TIPOS_CHECKLIST.map(t => t.value);
       const outrosValues = OUTROS_TIPOS_REGISTRO.map(t => t.value);
 
-      // Dispara TODOS os fetchs em paralelo — nenhum depende de outro.
-      const [obrasData, regionaisData, rncsData, checklistGroups, diarioData, outrosGroups] = await Promise.all([
-        listarRegistros('Obra', '-created_date', 2000),
-        listarRegionais(),
-        listarRegistros('RelatorioNC', '-created_date', 1000),
-        loadRecordsGrouped(tiposValues, 1000),
-        listarRegistros('DiarioObra', '-created_date', 1000),
-        loadRecordsGrouped(outrosValues, 1000),
+      const [rncsData, checklistGroups, diarioData, outrosGroups] = await Promise.all([
+        filtrarRegistros('RelatorioNC', obraFilter, '-created_date', 1000),
+        Promise.all(tiposValues.map(t => filtrarRegistros(t, obraFilter, '-created_date', 1000))),
+        filtrarRegistros('DiarioObra', obraFilter, '-created_date', 1000),
+        Promise.all(outrosValues.map(t => {
+          const isCondicaoNC = t === 'EnsaioManchaPendulo' || t === 'EnsaioVigaBenkelman';
+          const ncFilter = isCondicaoNC
+            ? { ...obraFilter, condicao_conformidade: 'NÃO CONFORME' }
+            : { ...obraFilter, approved: false };
+          return filtrarRegistros(t, ncFilter, '-created_date', 1000);
+        })),
       ]);
 
-      // Calcula availableObras e availableIds para filtrar os resultados
-      const availableIds = getAccessibleObraIds(obrasData, regionaisData, userData);
-      const availableObras = obrasData.filter(o => availableIds.has(o.id));
       const filteredRncs = rncsData.filter(r => availableIds.has(r.obra_id));
 
       const allCNCs = [];
