@@ -1,5 +1,5 @@
 // Interface de visualização para laboratoristas (cards por status)
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { FileText, CheckCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,7 +11,7 @@ import EnsaioCard from "./EnsaioCard";
 // pelo AdminInterface (useTableFilters + Pagination).
 const ITEMS_PER_PAGE = 12;
 
-const LaboratoristaInterface = React.memo(({ ensaios, obras, user, allUsers }) => {
+const LaboratoristaInterface = React.memo(({ ensaios, obras, user, allUsers, onFiltersActiveChange }) => {
   const [activeTab, setActiveTab] = useState('emExecucao');
   const [currentPage, setCurrentPage] = useState(1);
 

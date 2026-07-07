@@ -1,15 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { Loader2, Plus } from "lucide-react";
 import { useEnsaiosList } from "@/hooks/useEnsaiosList";
 import { useEnsaiosActions } from "@/hooks/useEnsaiosActions";
 import { isAdmin, isCliente as isClienteUser, isGestorContrato, isSalaTecnica } from "@/utils/accessControl";
+import { MAX_PAGES, MAX_PAGES_FILTERED } from "@/services/recordsService";
 import AdminInterface from "@/components/ensaios/AdminInterface";
 import ClienteInterface from "@/components/ensaios/ClienteInterface";
 import LaboratoristaInterface from "@/components/ensaios/LaboratoristaInterface";
 import { DialogTrigger } from "@/components/ui/dialog";
 
 export default function MeusEnsaios() {
-  const { ensaios, obras, projects, allUsers, regionais, user, loading, reload } = useEnsaiosList();
+  const [filtersActive, setFiltersActive] = useState(false);
+  const maxPages = filtersActive ? MAX_PAGES_FILTERED : MAX_PAGES;
+  const { ensaios, obras, projects, allUsers, regionais, user, loading, reload } = useEnsaiosList(maxPages);
   const { handleApprove, handleReject, handleDelete } = useEnsaiosActions(user, obras, reload);
 
   const _isAdmin = isAdmin(user);
@@ -64,6 +67,7 @@ export default function MeusEnsaios() {
             canCreate={canCreate}
             allUsers={allUsers}
             regionais={regionais}
+            onFiltersActiveChange={setFiltersActive}
           />
         ) : _isCliente ? (
           <ClienteInterface
@@ -72,6 +76,7 @@ export default function MeusEnsaios() {
             projects={projects}
             user={user}
             allUsers={allUsers}
+            onFiltersActiveChange={setFiltersActive}
           />
         ) : (
           <LaboratoristaInterface
@@ -79,6 +84,7 @@ export default function MeusEnsaios() {
             obras={obras}
             user={user}
             allUsers={allUsers}
+            onFiltersActiveChange={setFiltersActive}
           />
         )}
       </div>

@@ -49,9 +49,10 @@ export const ALL_RECORD_ENTITIES = [
  */
 const RECORD_PAGE_SIZE = 500;     // lista completa e loadRecordsByObra — reduz volume em memória
 const DASHBOARD_PAGE_SIZE = 200; // dashboard — só registros recentes para stats/charts
-const MAX_PAGES = 10;             // safety: 10 × 500 = 5000 registros por entidade
+export const MAX_PAGES = 10;             // safety padrão: 10 × 500 = 5000 registros por entidade
+export const MAX_PAGES_FILTERED = 100;  // com filtro ativo: 100 × 500 = 50000 registros por entidade
 
-async function loadEntity(entityType, limit = RECORD_PAGE_SIZE, paginate = false) {
+async function loadEntity(entityType, limit = RECORD_PAGE_SIZE, paginate = false, maxPages = MAX_PAGES) {
   try {
     if (!paginate) {
       return await base44.entities[entityType].list('-created_date', limit);
@@ -63,7 +64,7 @@ async function loadEntity(entityType, limit = RECORD_PAGE_SIZE, paginate = false
     const allRecords = [];
     let cursor = null;
 
-    for (let page = 0; page < MAX_PAGES; page++) {
+    for (let page = 0; page < maxPages; page++) {
       let batch;
       if (cursor) {
         batch = await base44.entities[entityType].filter(
@@ -130,11 +131,11 @@ export function deduplicateRecords(records) {
  */
 const BATCH_SIZE = 5; // máximo de requests simultâneos por lote
 
-async function loadEntitiesInBatches(entityList, limit, paginate = false) {
+async function loadEntitiesInBatches(entityList, limit, paginate = false, maxPages = MAX_PAGES) {
   const allResults = [];
   for (let i = 0; i < entityList.length; i += BATCH_SIZE) {
     const batch = entityList.slice(i, i + BATCH_SIZE);
-    const settled = await Promise.allSettled(batch.map(type => loadEntity(type, limit, paginate)));
+    const settled = await Promise.allSettled(batch.map(type => loadEntity(type, limit, paginate, maxPages)));
     settled.forEach((r, idx) => {
       if (r.status === 'rejected') {
         logger.warn(`[recordsService] loadAllRecords: ${batch[idx]} rejeitou:`, r.reason?.message || r.reason);
@@ -147,10 +148,10 @@ async function loadEntitiesInBatches(entityList, limit, paginate = false) {
   return allResults;
 }
 
-export async function loadAllRecords(mode = 'list') {
+export async function loadAllRecords(mode = 'list', maxPages = MAX_PAGES) {
   const limit = mode === 'dashboard' ? DASHBOARD_PAGE_SIZE : RECORD_PAGE_SIZE;
   const paginate = mode === 'list';
-  const results = await loadEntitiesInBatches(ALL_RECORD_ENTITIES, limit, paginate);
+  const results = await loadEntitiesInBatches(ALL_RECORD_ENTITIES, limit, paginate, maxPages);
   const normalized = normalizeRecords(results, ALL_RECORD_ENTITIES);
   return deduplicateRecords(normalized);
 }
