@@ -57,6 +57,14 @@ function canApprove(user) {
   return APPROVER_LEVELS.includes(level) || user.role === 'admin';
 }
 
+// Permissão de exclusão: criador do registro OU approver-level
+// (espelha a RLS de delete das entidades)
+function canDelete(user, record) {
+  const level = getUserAccessLevel(user);
+  if (APPROVER_LEVELS.includes(level) || user.role === 'admin') return true;
+  return record?.created_by === user.email;
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -207,6 +215,24 @@ Deno.serve(async (req) => {
       if (requestApproval) {
         updateData.pendente_aprovacao_cliente = true;
       }
+    } else if (action === 'delete') {
+      // Busca o registro para verificar autoria (asServiceRole bypassa RLS)
+      const record = await base44.asServiceRole.entities[entityName].get(recordId);
+      if (!record) {
+        return Response.json(
+          { error: 'Registro não encontrado' },
+          { status: 404 }
+        );
+      }
+      // Permissão: criador OU approver-level
+      if (!canDelete(user, record)) {
+        return Response.json(
+          { error: 'Sem permissão para excluir este registro' },
+          { status: 403 }
+        );
+      }
+      await base44.asServiceRole.entities[entityName].delete(recordId);
+      return Response.json({ success: true, data: { id: recordId, deleted: true } });
     } else {
       return Response.json(
         { error: 'Ação inválida' },

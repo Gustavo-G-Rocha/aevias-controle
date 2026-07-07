@@ -121,10 +121,12 @@ export async function deletarEnsaio(entityName, id) {
   if (!ENSAIO_ENTITIES[entityName]) {
     throw new Error(`Entidade ensaio desconhecida: ${entityName}`);
   }
-  return withServiceCall(
-    () => base44.entities[entityName].delete(id),
-    'Falha ao excluir ensaio'
-  );
+  const response = await gerenciarAprovacao({
+    action: 'delete',
+    entityName,
+    recordId: id,
+  });
+  return response.data.data;
 }
 
 export async function obterSchemaEnsaio(entityName) {
@@ -189,10 +191,12 @@ export async function excluirEnsaio(ensaio) {
   }
 
   const entityName = detectEntityName(ensaio);
-  return withServiceCall(
-    () => base44.entities[entityName].delete(ensaio.id),
-    'Falha ao excluir ensaio'
-  );
+  const response = await gerenciarAprovacao({
+    action: 'delete',
+    entityName,
+    recordId: ensaio.id,
+  });
+  return response.data.data;
 }
 
 function detectEntityName(ensaio) {
