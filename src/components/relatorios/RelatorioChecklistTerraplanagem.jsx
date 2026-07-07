@@ -26,11 +26,22 @@ export default function RelatorioChecklistTerraplanagem({ checklist, creatorUser
   }, [checklist, obraProp]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    let cancelled = false;
     (async () => {
-      const compressed = await compressImages(checklist?.fotos || []);
-      setCompressedPhotos(compressed);
-      setIsCompressing(false);
+      try {
+        const compressed = await compressImages(checklist?.fotos || []);
+        if (!cancelled) {
+          setCompressedPhotos(compressed.length ? compressed : (checklist?.fotos || []));
+        }
+      } catch {
+        if (!cancelled) {
+          setCompressedPhotos(checklist?.fotos || []);
+        }
+      } finally {
+        if (!cancelled) setIsCompressing(false);
+      }
     })();
+    return () => { cancelled = true; };
   }, [checklist?.fotos]);
 
   const loadRelatedData = async () => {

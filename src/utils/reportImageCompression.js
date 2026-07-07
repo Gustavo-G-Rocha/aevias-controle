@@ -4,6 +4,12 @@
  */
 
 /**
+ * Extrai a URL de string ou objeto { url, legenda }.
+ */
+const toUrl = (foto) =>
+  typeof foto === 'string' ? foto : foto?.url || '';
+
+/**
  * Comprime uma única imagem usando Canvas.
  * @param {string} photoUrl - URL da imagem original
  * @param {object} opts
@@ -11,6 +17,7 @@
  * @param {number} opts.maxHeight - altura máxima (default 600)
  * @param {number} opts.quality   - qualidade JPEG 0–1 (default 0.5)
  * @param {boolean} opts.whiteBg  - preencher fundo branco (default false)
+ * @param {number} opts.timeout   - tempo máximo de carregamento em ms (default 10000)
  * @returns {Promise<string>} dataURL comprimida, ou photoUrl original em caso de falha
  */
 export async function compressImage(photoUrl, opts = {}) {
@@ -19,6 +26,7 @@ export async function compressImage(photoUrl, opts = {}) {
     maxHeight = 600,
     quality = 0.5,
     whiteBg = false,
+    timeout = 10000,
   } = opts;
 
   try {
@@ -26,8 +34,9 @@ export async function compressImage(photoUrl, opts = {}) {
     img.crossOrigin = 'anonymous';
 
     await new Promise((resolve, reject) => {
-      img.onload = resolve;
-      img.onerror = reject;
+      const timer = setTimeout(() => reject(new Error('timeout')), timeout);
+      img.onload = () => { clearTimeout(timer); resolve(); };
+      img.onerror = () => { clearTimeout(timer); reject(new Error('load error')); };
       img.src = photoUrl;
     });
 
@@ -59,23 +68,31 @@ export async function compressImage(photoUrl, opts = {}) {
 }
 
 /**
- * Comprime um array de URLs de imagem de forma SEQUENCIAL (uma por vez).
+ * Comprime um array de fotos de forma SEQUENCIAL (uma por vez).
+ *
+ * Aceita tanto strings (URLs) quanto objetos { url, legenda }.
+ * Preserva a legenda original: retorna o mesmo formato de entrada,
+ * substituindo apenas a URL pela dataURL comprimida.
  *
  * O carregamento sequencial evita picos de rede/memória e travamento da UI
- * ao gerar relatórios com muitas imagens (o carregamento paralelo anterior
- * disparava todas as requisições simultaneamente). A ordem final é preservada
- * e o resultado de cada imagem é idêntico ao da compressão individual.
+ * ao gerar relatórios com muitas imagens. A ordem final é preservada.
  *
- * @param {string[]} urls - Array de URLs
+ * @param {(string|{url:string,legenda?:string})[]} fotos - Array de fotos
  * @param {object} opts   - Mesmas opções de compressImage
- * @returns {Promise<string[]>} Array de dataURLs comprimidas, na ordem original
+ * @returns {Promise<(string|{url:string,legenda?:string})[]>} Array no mesmo formato
  */
-export async function compressImages(urls, opts = {}) {
-  const valid = (urls || []).filter(u => u && u.trim() !== '');
+export async function compressImages(fotos, opts = {}) {
+  const valid = (fotos || []).filter(f => f && toUrl(f).trim() !== '');
   const results = [];
-  for (const url of valid) {
+  for (const foto of valid) {
+    const url = toUrl(foto);
     // eslint-disable-next-line no-await-in-loop
-    results.push(await compressImage(url, opts));
+    const compressed = await compressImage(url, opts);
+    if (typeof foto === 'string') {
+      results.push(compressed);
+    } else {
+      results.push({ ...foto, url: compressed });
+    }
   }
   return results;
 }
