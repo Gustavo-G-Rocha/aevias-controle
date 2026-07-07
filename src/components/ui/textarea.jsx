@@ -1,5 +1,5 @@
 import * as React from "react"
-
+// Re-validated for Vite HMR cache invalidation
 import { cn } from "@/lib/utils"
 
 const Textarea = React.forwardRef(({ className, ...props }, ref) => {
