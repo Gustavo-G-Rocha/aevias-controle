@@ -74,14 +74,17 @@ export function useEnsaiosList(maxPages) {
   const queryClient = useQueryClient();
   const { data: user, isLoading: loadingUser } = useCurrentUser();
   const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true, needsUsers: true });
-  const { data: allRecords, isLoading: loadingRecords } = useAllRecords('list', maxPages);
+  const { data: allRecords, isFetching: fetchingRecords } = useAllRecords('list', maxPages);
 
   // Invalida o cache de registros para forçar recarregamento após ações (aprovar/excluir)
   const reload = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords });
   }, [queryClient]);
 
-  const loading = loadingUser || loadingAux || loadingRecords;
+  // isFetching (não isLoading) garante que o loading apareça também durante
+  // o refetch quando maxPages muda (filtro ativo → limite expandido), evitando
+  // que a tabela mostre dados incompletos sem indicador de carregamento.
+  const loading = loadingUser || loadingAux || fetchingRecords;
 
   // Campos específicos que filtrarPorAcesso consome — referências estáveis do React Query
   const obras = auxData?.obras;

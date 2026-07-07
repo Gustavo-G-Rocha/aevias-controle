@@ -52,7 +52,14 @@ export default function MeusEnsaios() {
         {loading ? (
           <div className="text-center py-12">
             <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
-            <p className="text-muted-foreground mt-2">Carregando registros...</p>
+            <p className="text-muted-foreground mt-2">
+              {filtersActive ? "Buscando todos os registros no período filtrado..." : "Carregando registros..."}
+            </p>
+            {filtersActive && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Isso pode levar alguns segundos para garantir que nenhum registro seja omitido.
+              </p>
+            )}
           </div>
         ) : canApprove ? (
           <AdminInterface
