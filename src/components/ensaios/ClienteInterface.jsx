@@ -1,5 +1,5 @@
 // Interface de tabela para usuários cliente
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import EnsaiosTableHeader from "@/components/ensaios/EnsaiosTableHeader";
 import { assinarEnsaio } from "@/services/ensaiosService";
 import { toast } from "@/components/ui/use-toast";
 
-const ClienteInterface = React.memo(({ ensaios, obras, projects, user, allUsers, onFiltersActiveChange }) => {
+const ClienteInterface = React.memo(({ ensaios, obras, projects, user, allUsers }) => {
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState('all');
 
@@ -43,11 +43,6 @@ const ClienteInterface = React.memo(({ ensaios, obras, projects, user, allUsers,
     toggleSortOrder,
     clearFilters,
   } = useTableFilters(ensaios, obras, projects, allUsers, applyCustomFilters);
-
-  // Reporta filtro ativo para o pai permitir carregar mais registros (limite dinâmico)
-  useEffect(() => {
-    onFiltersActiveChange?.(isAnyFilterActive || statusFilter !== 'all');
-  }, [isAnyFilterActive, statusFilter, onFiltersActiveChange]);
 
   const handleAssinar = useCallback(async (ensaio) => {
     if (!window.confirm(`Confirma a assinatura digital do registro "${ensaio.sample_id || ensaio.id}"?`)) return;

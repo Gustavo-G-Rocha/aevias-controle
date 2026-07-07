@@ -64,8 +64,6 @@ beforeEach(() => {
   vi.clearAllMocks();
   for (const n of ALL_RECORD_ENTITIES) {
     entities[n].list.mockResolvedValue(generateRecords(RECORDS_PER_ENTITY, n));
-    // filter retorna [] por padrão — pára a paginação após a 1ª página
-    entities[n].filter.mockResolvedValue([]);
   }
 });
 

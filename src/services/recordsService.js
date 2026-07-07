@@ -49,8 +49,7 @@ export const ALL_RECORD_ENTITIES = [
  */
 const RECORD_PAGE_SIZE = 500;     // lista completa e loadRecordsByObra — reduz volume em memória
 const DASHBOARD_PAGE_SIZE = 200; // dashboard — só registros recentes para stats/charts
-export const MAX_PAGES = 10;             // safety padrão: 10 × 500 = 5000 registros por entidade
-export const MAX_PAGES_FILTERED = 100;  // com filtro ativo: 100 × 500 = 50000 registros por entidade
+export const MAX_PAGES = 10;             // 10 × 500 = 5000 registros por entidade (limite da API)
 
 async function loadEntity(entityType, limit = RECORD_PAGE_SIZE, paginate = false, maxPages = MAX_PAGES) {
   try {
@@ -58,33 +57,10 @@ async function loadEntity(entityType, limit = RECORD_PAGE_SIZE, paginate = false
       return await base44.entities[entityType].list('-created_date', limit);
     }
 
-    // Paginação por cursor: busca lotes de `limit` registros ordenados por
-    // created_date desc. Se o lote tem exatamente `limit` registros, há mais.
-    // Usa o created_date do último registro como cursor ($lt) para a próxima página.
-    const allRecords = [];
-    let cursor = null;
-
-    for (let page = 0; page < maxPages; page++) {
-      let batch;
-      if (cursor) {
-        batch = await base44.entities[entityType].filter(
-          { created_date: { $lt: cursor } },
-          '-created_date',
-          limit
-        );
-      } else {
-        batch = await base44.entities[entityType].list('-created_date', limit);
-      }
-
-      allRecords.push(...batch);
-
-      if (batch.length < limit) break;
-      if (batch.length === 0) break;
-
-      cursor = batch[batch.length - 1].created_date;
-    }
-
-    return allRecords;
+    // Uma única chamada list com limite alto — mais rápida e confiável que
+    // paginação por cursor (filter com $lt em created_date não funciona).
+    const totalLimit = limit * maxPages;
+    return await base44.entities[entityType].list('-created_date', totalLimit);
   } catch (e) {
     logger.error(`[recordsService] Falha ao carregar ${entityType}:`, e?.message || e);
     return [];
@@ -165,34 +141,11 @@ export async function loadAllRecords(mode = 'list', maxPages = MAX_PAGES) {
  */
 async function loadEntityByObra(entityType, obraId) {
   try {
-    const allRecords = [];
-    let cursor = null;
-
-    for (let page = 0; page < MAX_PAGES; page++) {
-      let batch;
-      if (cursor) {
-        batch = await base44.entities[entityType].filter(
-          { obra_id: obraId, created_date: { $lt: cursor } },
-          '-created_date',
-          RECORD_PAGE_SIZE
-        );
-      } else {
-        batch = await base44.entities[entityType].filter(
-          { obra_id: obraId },
-          '-created_date',
-          RECORD_PAGE_SIZE
-        );
-      }
-
-      allRecords.push(...batch);
-
-      if (batch.length < RECORD_PAGE_SIZE) break;
-      if (batch.length === 0) break;
-
-      cursor = batch[batch.length - 1].created_date;
-    }
-
-    return allRecords;
+    return await base44.entities[entityType].filter(
+      { obra_id: obraId },
+      '-created_date',
+      RECORD_PAGE_SIZE * MAX_PAGES
+    );
   } catch (e) {
     logger.error(`[recordsService] Falha ao carregar ${entityType} por obra:`, e?.message || e);
     return [];

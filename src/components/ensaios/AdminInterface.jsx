@@ -1,5 +1,5 @@
 // Interface de tabela para admin/gestor/sala técnica
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, PlusCircle, FlaskConical, Gauge, ClipboardList } from "lucide-react";
@@ -13,7 +13,7 @@ import { useTableFilters } from "@/hooks/useTableFilters";
 import TableRowAdmin from "@/components/ensaios/TableRowAdmin";
 import EnsaiosTableHeader from "@/components/ensaios/EnsaiosTableHeader";
 
-const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReject, onDelete, user, canApprove, canCreate, allUsers, regionais = [], onFiltersActiveChange }) => {
+const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReject, onDelete, user, canApprove, canCreate, allUsers, regionais = [] }) => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [reprovingEnsaio, setReprovingEnsaio] = useState(null);
   const [deletingEnsaio, setDeletingEnsaio] = useState(null);
@@ -48,11 +48,6 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
     toggleSortOrder,
     clearFilters,
   } = useTableFilters(ensaios, obras, projects, allUsers, applyCustomFilters);
-
-  // Reporta filtro ativo para o pai permitir carregar mais registros (limite dinâmico)
-  useEffect(() => {
-    onFiltersActiveChange?.(isAnyFilterActive || statusFilter !== 'all');
-  }, [isAnyFilterActive, statusFilter, onFiltersActiveChange]);
 
   const handleReject = useCallback(async (ensaio, motivo) => {
     await onReject(ensaio, motivo);

@@ -110,10 +110,10 @@ describe('recordsService — loadAllRecords', () => {
     }
   });
 
-  it('modo list (padrão) usa limite 500 por entidade', async () => {
+  it('modo list (padrão) usa limite 5000 por entidade (paginação em chamada única)', async () => {
     await loadAllRecords();
     for (const n of ALL_RECORD_ENTITIES) {
-      expect(entities[n].list).toHaveBeenCalledWith('-created_date', 500);
+      expect(entities[n].list).toHaveBeenCalledWith('-created_date', 5000);
     }
   });
 
@@ -138,10 +138,10 @@ describe('recordsService — loadAllRecords', () => {
 });
 
 describe('recordsService — loadRecordsByObra', () => {
-  it('filtra server-side por obra_id com limite 500 e normaliza', async () => {
+  it('filtra server-side por obra_id com limite 5000 e normaliza', async () => {
     entities.DiarioObra.filter.mockResolvedValueOnce([{ id: 'd1', obra_id: 'O1' }]);
     const out = await loadRecordsByObra('O1');
-    expect(entities.DiarioObra.filter).toHaveBeenCalledWith({ obra_id: 'O1' }, '-created_date', 500);
+    expect(entities.DiarioObra.filter).toHaveBeenCalledWith({ obra_id: 'O1' }, '-created_date', 5000);
     expect(out[0]).toEqual(expect.objectContaining({ id: 'd1', obra_id: 'O1', entityType: 'DiarioObra' }));
   });
 });

@@ -11,7 +11,7 @@ import EnsaioCard from "./EnsaioCard";
 // pelo AdminInterface (useTableFilters + Pagination).
 const ITEMS_PER_PAGE = 12;
 
-const LaboratoristaInterface = React.memo(({ ensaios, obras, user, allUsers, onFiltersActiveChange }) => {
+const LaboratoristaInterface = React.memo(({ ensaios, obras, user, allUsers }) => {
   const [activeTab, setActiveTab] = useState('emExecucao');
   const [currentPage, setCurrentPage] = useState(1);
 

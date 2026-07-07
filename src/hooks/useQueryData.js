@@ -2,7 +2,7 @@
 // Cache compartilhado: Dashboard e MeusEnsaios reutilizam os mesmos dados em memória
 // sem refazer chamadas ao banco enquanto os dados forem "frescos" (staleTime: 3min)
 
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { loadAllRecords, loadAuxData } from '@/services/recordsService';
 
@@ -11,7 +11,7 @@ export const QUERY_KEYS = {
   currentUser:   ['currentUser'],
   auxData:       (opts = {}) => ['auxData', opts],
   allRecords:    ['allRecords'],          // prefix para invalidação (invalida todos os modos)
-  allRecordsFor: (mode, maxPages) => ['allRecords', mode, maxPages ?? 'default'], // key específica por contexto + limite
+  allRecordsFor: (mode) => ['allRecords', mode], // key específica por contexto
   recordsByObra: (obraId) => ['recordsByObra', obraId],
 };
 
@@ -35,12 +35,11 @@ export function useAuxData({ needsRegionais = true, needsUsers = false } = {}) {
 }
 
 // ─── Todos os registros — cache único compartilhado ───────────────────────────
-export function useAllRecords(mode = 'list', maxPages) {
+export function useAllRecords(mode = 'list') {
   return useQuery({
-    queryKey: QUERY_KEYS.allRecordsFor(mode, maxPages),
-    queryFn: () => loadAllRecords(mode, maxPages),
+    queryKey: QUERY_KEYS.allRecordsFor(mode),
+    queryFn: () => loadAllRecords(mode),
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
-    placeholderData: keepPreviousData,
   });
 }
