@@ -7,7 +7,7 @@ import RecordsByTypeChart from './RecordsByTypeChart';
 /**
  * Grid de gráficos principais e adicionais
  */
-export default function DashboardChartsGrid({
+function DashboardChartsGrid({
   charts,
   filters,
   isClienteUser,
@@ -58,3 +58,5 @@ export default function DashboardChartsGrid({
     </>
   );
 }
+
+export default React.memo(DashboardChartsGrid);

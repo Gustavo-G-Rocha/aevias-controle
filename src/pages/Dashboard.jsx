@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Loader2 } from 'lucide-react';
 import { getUserAccessLevel, canSeeFilters } from '@/utils/accessControl';
 import { getChartVisibility } from '@/utils/dashboardUtils';
@@ -11,6 +11,26 @@ import DashboardPage from '@/components/dashboard/DashboardPage';
 
 export default function Dashboard() {
   const { loading, user, filters, setFilters, clearFilters, hasActiveFilters, stats, charts, approvalPercentage, obras, isClienteUser, isEngenheiroUser } = useDashboardData();
+
+  const handleSliceClick = useCallback((data, chartType) => {
+    setFilters(prev => {
+      if (chartType === 'status') {
+        const statusMap = {
+          'Aprovados': 'approved', 'Pendentes': 'pending', 'Reprovados': 'rejected',
+          'Assinados': 'approved', 'Aguardando': 'pending',
+        };
+        const next = statusMap[data.name];
+        return { ...prev, status: prev.status === next ? null : next };
+      }
+      if (chartType === 'obra') {
+        return { ...prev, obraId: prev.obraId === data.obraId ? null : data.obraId };
+      }
+      if (chartType === 'type') {
+        return { ...prev, tipoRegistro: prev.tipoRegistro === data.entityType ? null : data.entityType };
+      }
+      return prev;
+    });
+  }, [setFilters]);
 
   if (loading) {
     return (
@@ -52,25 +72,7 @@ export default function Dashboard() {
         filters={filters}
         isClienteUser={isClienteUser}
         isEngenheiroUser={isEngenheiroUser}
-        onSliceClick={(data, chartType) => {
-          setFilters(prev => {
-            if (chartType === 'status') {
-              const statusMap = {
-                'Aprovados': 'approved', 'Pendentes': 'pending', 'Reprovados': 'rejected',
-                'Assinados': 'approved', 'Aguardando': 'pending',
-              };
-              const next = statusMap[data.name];
-              return { ...prev, status: prev.status === next ? null : next };
-            }
-            if (chartType === 'obra') {
-              return { ...prev, obraId: prev.obraId === data.obraId ? null : data.obraId };
-            }
-            if (chartType === 'type') {
-              return { ...prev, tipoRegistro: prev.tipoRegistro === data.entityType ? null : data.entityType };
-            }
-            return prev;
-          });
-        }}
+        onSliceClick={handleSliceClick}
         showObraChart={showObraChart}
         showTypeChartSeparate={showTypeChartSeparate}
       />
