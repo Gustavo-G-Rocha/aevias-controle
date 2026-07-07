@@ -29,67 +29,106 @@ export function useTableFilters(ensaios, obras, projects, allUsers, applyCustomF
   const obrasMap = useMemo(() => new Map(obras.map((o) => [o.id, o])), [obras]);
   const projectsMap = useMemo(() => new Map(projects.map((p) => [p.id, p])), [projects]);
 
+  // Pré-computação de campos derivados — executada apenas quando ensaios/allUsers/obras/projects
+  // mudam. Evita chamar getLaboratoristaInfo/getLocalInfo/getEmpireiteiraInfo/getDataEnsaio
+  // (incluindo allUsers.find() O(n)) a cada tecla digitada nos filtros.
+  const precomputedEnsaios = useMemo(() => {
+    return ensaios.map((e) => {
+      const dataEnsaio = getDataEnsaio(e);
+      const dataRaw = dataEnsaio ? new Date(dataEnsaio) : null;
+      const dataRawTs = dataRaw && !isNaN(dataRaw.getTime()) ? dataRaw.getTime() : NaN;
+      let dataStartTs = NaN;
+      if (!isNaN(dataRawTs)) {
+        const ed = new Date(dataRaw);
+        ed.setHours(0, 0, 0, 0);
+        dataStartTs = ed.getTime();
+      }
+      const o = obrasMap.get(e.obra_id);
+      const p = e.project_id ? projectsMap.get(e.project_id) : null;
+      const li = getLocalInfo(e);
+      return {
+        record: e,
+        laboratorista: getLaboratoristaInfo(e, allUsers).toLowerCase(),
+        obraName: o?.name?.toLowerCase() ?? '',
+        obraCode: o?.code?.toLowerCase() ?? '',
+        projectName: p?.name?.toLowerCase() ?? '',
+        localTipo: li?.tipo?.toLowerCase() ?? '',
+        localDetalhes: li?.detalhes?.toLowerCase() ?? '',
+        empreiteira: getEmpireiteiraInfo(e)?.toLowerCase() ?? '',
+        dataStartTs,
+        dataRawTs,
+        entityType: e.entityType,
+      };
+    });
+  }, [ensaios, allUsers, obrasMap, projectsMap]);
+
+  // Mapa record → dataRawTs para ordenação sem chamar getDataEnsaio por comparação
+  const recordTsMap = useMemo(() => {
+    const m = new Map();
+    for (const p of precomputedEnsaios) m.set(p.record, p.dataRawTs);
+    return m;
+  }, [precomputedEnsaios]);
+
   const toggleSortOrder = useCallback(() => {
     setSortOrder((prev) => (prev === 'desc' ? 'asc' : prev === 'asc' ? null : 'desc'));
   }, []);
 
   const filteredEnsaios = useMemo(() => {
-    let filtered = ensaios;
-    
-    if (nomeFilterDebounced) filtered = filtered.filter((e) => getLaboratoristaInfo(e, allUsers).toLowerCase().includes(nomeFilterDebounced.toLowerCase()));
-    if (obraFilterDebounced) filtered = filtered.filter((e) => {
-      const o = obrasMap.get(e.obra_id);
-      return o?.name?.toLowerCase().includes(obraFilterDebounced.toLowerCase()) || o?.code?.toLowerCase().includes(obraFilterDebounced.toLowerCase());
-    });
-    if (projetoFilterDebounced) filtered = filtered.filter((e) => {
-      if (!e.project_id) return false;
-      const p = projectsMap.get(e.project_id);
-      return p?.name?.toLowerCase().includes(projetoFilterDebounced.toLowerCase());
-    });
-    if (localFilterDebounced) filtered = filtered.filter((e) => {
-      const li = getLocalInfo(e);
-      return li.tipo?.toLowerCase().includes(localFilterDebounced.toLowerCase()) || li.detalhes?.toLowerCase().includes(localFilterDebounced.toLowerCase());
-    });
-    if (empreiteiraFilterDebounced) filtered = filtered.filter((e) => getEmpireiteiraInfo(e)?.toLowerCase().includes(empreiteiraFilterDebounced.toLowerCase()) ?? false);
-    
+    let filtered = precomputedEnsaios;
+
+    if (nomeFilterDebounced) {
+      const q = nomeFilterDebounced.toLowerCase();
+      filtered = filtered.filter((p) => p.laboratorista.includes(q));
+    }
+    if (obraFilterDebounced) {
+      const q = obraFilterDebounced.toLowerCase();
+      filtered = filtered.filter((p) => p.obraName.includes(q) || p.obraCode.includes(q));
+    }
+    if (projetoFilterDebounced) {
+      const q = projetoFilterDebounced.toLowerCase();
+      filtered = filtered.filter((p) => p.projectName.includes(q));
+    }
+    if (localFilterDebounced) {
+      const q = localFilterDebounced.toLowerCase();
+      filtered = filtered.filter((p) => p.localTipo.includes(q) || p.localDetalhes.includes(q));
+    }
+    if (empreiteiraFilterDebounced) {
+      const q = empreiteiraFilterDebounced.toLowerCase();
+      filtered = filtered.filter((p) => p.empreiteira.includes(q));
+    }
+
     if (dataInicioFilter) {
       const d = new Date(dataInicioFilter);
       d.setHours(0, 0, 0, 0);
-      filtered = filtered.filter((e) => {
-        const de = getDataEnsaio(e);
-        if (!de) return false;
-        const ed = new Date(de);
-        ed.setHours(0, 0, 0, 0);
-        return ed >= d;
-      });
+      const startTs = d.getTime();
+      filtered = filtered.filter((p) => !isNaN(p.dataStartTs) && p.dataStartTs >= startTs);
     }
-    
+
     if (dataFimFilter) {
       const d = new Date(dataFimFilter);
       d.setHours(23, 59, 59, 999);
-      filtered = filtered.filter((e) => {
-        const de = getDataEnsaio(e);
-        if (!de) return false;
-        const ed = new Date(de);
-        ed.setHours(0, 0, 0, 0);
-        return ed <= d;
+      const endTs = d.getTime();
+      filtered = filtered.filter((p) => !isNaN(p.dataStartTs) && p.dataStartTs <= endTs);
+    }
+
+    if (typeFilter && typeFilter !== 'all') {
+      filtered = filtered.filter((p) => p.entityType === typeFilter);
+    }
+
+    let resultRecords = filtered.map((p) => p.record);
+    if (applyCustomFilters) resultRecords = applyCustomFilters(resultRecords);
+
+    if (sortOrder) {
+      resultRecords = [...resultRecords].sort((a, b) => {
+        const tsA = recordTsMap.get(a);
+        const tsB = recordTsMap.get(b);
+        if (isNaN(tsA) || isNaN(tsB)) return 0;
+        return sortOrder === 'asc' ? tsA - tsB : tsB - tsA;
       });
     }
 
-    if (typeFilter && typeFilter !== 'all') filtered = filtered.filter((e) => e.entityType === typeFilter);
-    
-    if (applyCustomFilters) filtered = applyCustomFilters(filtered);
-    
-    if (sortOrder) {
-      filtered = [...filtered].sort((a, b) => {
-        const dA = new Date(getDataEnsaio(a)), dB = new Date(getDataEnsaio(b));
-        if (isNaN(dA) || isNaN(dB)) return 0;
-        return sortOrder === 'asc' ? dA - dB : dB - dA;
-      });
-    }
-    
-    return filtered;
-  }, [ensaios, nomeFilterDebounced, obraFilterDebounced, projetoFilterDebounced, localFilterDebounced, empreiteiraFilterDebounced, dataInicioFilter, dataFimFilter, typeFilter, obrasMap, projectsMap, sortOrder, allUsers, applyCustomFilters]);
+    return resultRecords;
+  }, [precomputedEnsaios, recordTsMap, nomeFilterDebounced, obraFilterDebounced, projetoFilterDebounced, localFilterDebounced, empreiteiraFilterDebounced, dataInicioFilter, dataFimFilter, typeFilter, sortOrder, applyCustomFilters]);
 
   const clearFilters = useCallback(() => {
     setNomeFilter('');
