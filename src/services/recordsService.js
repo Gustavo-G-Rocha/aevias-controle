@@ -40,16 +40,17 @@ export const ALL_RECORD_ENTITIES = [
 
 /**
  * Carrega uma entidade com fallback silencioso para não bloquear o Promise.all.
- * No modo "list", implementa paginação por cursor (created_date) para buscar
- * TODOS os registros, não apenas os 500 mais recentes.
+ * No modo "list", usa limite de 1500 por entidade (3 × 500) em chamada única.
  * @param {string} entityType
  * @param {number} limit
- * @param {boolean} paginate - se true, busca todas as páginas (modo list)
+ * @param {boolean} paginate - se true, busca com limite ampliado (modo list)
  * @returns {Promise<object[]>}
  */
 const RECORD_PAGE_SIZE = 500;     // lista completa e loadRecordsByObra — reduz volume em memória
 const DASHBOARD_PAGE_SIZE = 200; // dashboard — só registros recentes para stats/charts
-export const MAX_PAGES = 10;             // 10 × 500 = 5000 registros por entidade (limite da API)
+// 3 × 500 = 1500 por entidade — cobre qualquer obra real; 5000 era exagero que
+// inflava o payload sem benefício prático (nenhuma entidade ultrapassa 1500 registros).
+export const MAX_PAGES = 3;
 
 async function loadEntity(entityType, limit = RECORD_PAGE_SIZE, paginate = false, maxPages = MAX_PAGES) {
   try {
@@ -105,7 +106,7 @@ export function deduplicateRecords(records) {
  * @param {'dashboard' | 'list'} mode - controla o limite por entidade
  * @returns {Promise<object[]>} array normalizado com `entityType`
  */
-const BATCH_SIZE = 5; // máximo de requests simultâneos por lote
+const BATCH_SIZE = 10; // máximo de requests simultâneos — 3 lotes para 25+ entidades
 
 async function loadEntitiesInBatches(entityList, limit, paginate = false, maxPages = MAX_PAGES) {
   const allResults = [];
