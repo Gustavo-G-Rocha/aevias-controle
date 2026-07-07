@@ -11,8 +11,11 @@
 export const sanitizeText = (value) => {
   if (typeof value !== 'string' || !value) return value;
   return value
-    .replace(/<[^>]*>/g, '')       // remove tags HTML
-    .replace(/javascript:/gi, ''); // remove protocolo javascript:
+    .replace(/<[^>]*>/g, '')                         // remove tags HTML (inclui atributos onerror=, onload= dentro delas)
+    .replace(/\bon\w+\s*=\s*["']?[^"'\s]*/gi, '')    // remove event handlers remanescentes (onerror=, onload=, onclick=)
+    .replace(/javascript:/gi, '')                      // remove protocolo javascript:
+    .replace(/vbscript:/gi, '')                        // remove protocolo vbscript:
+    .replace(/data:text\/html[^,]*/gi, '');            // neutraliza data URIs com HTML executável
 };
 
 /**

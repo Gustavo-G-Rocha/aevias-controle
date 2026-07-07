@@ -149,6 +149,37 @@ describe('sanitizeText', () => {
   it('retorna string vazia sem modificação', () => {
     expect(sanitizeText('')).toBe('');
   });
+
+  it('remove event handler onerror= remanescente', () => {
+    expect(sanitizeText('onerror=alert(1)')).toBe('');
+  });
+
+  it('remove event handler onload= remanescente', () => {
+    expect(sanitizeText('onload=evil()')).toBe('');
+  });
+
+  it('remove event handler onclick= remanescente', () => {
+    expect(sanitizeText('onclick=doStuff')).toBe('');
+  });
+
+  it('não remove palavra legítima contendo "on"', () => {
+    expect(sanitizeText('direção= norte')).toBe('direção= norte');
+  });
+
+  it('remove protocolo vbscript:', () => {
+    expect(sanitizeText('vbscript:alert(1)')).toBe('alert(1)');
+  });
+
+  it('neutraliza data URI com HTML executável', () => {
+    expect(sanitizeText('data:text/html,<script>alert(1)</script>')).toBe(',alert(1)');
+  });
+
+  it('remove tag malformada sem fechamento preservando texto', () => {
+    // Tag sem > de fechamento — o event handler remanescente é removido
+    const result = sanitizeText('<img src=x onerror=alert(1)');
+    expect(result).not.toContain('onerror');
+    expect(result).not.toContain('alert');
+  });
 });
 
 describe('sanitizeTextFields', () => {
