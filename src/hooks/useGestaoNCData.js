@@ -1,7 +1,8 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { listarRegistros } from "@/services/recordsService";
+import { filterObrasByUserAccess } from "@/utils/relatoriosUnificadosUtils";
 
 const NCS_QUERY_KEY = ["relatorioNC", "gestao"];
 
@@ -17,10 +18,17 @@ export const useGestaoNCData = () => {
   });
 
   const user = userQuery.data ?? null;
-  const obras = auxData.data?.obras ?? [];
+  const obrasRaw = auxData.data?.obras ?? [];
   const regionais = auxData.data?.regionais ?? [];
   const ncs = ncsQuery.data ?? [];
   const loading = userQuery.isLoading || auxData.isLoading || ncsQuery.isLoading;
+
+  const obras = useMemo(() => {
+    if (!user) return [];
+    const userAccessLevel =
+      user.access_level || (user.role === "admin" ? "admin" : "user");
+    return filterObrasByUserAccess(obrasRaw, regionais, user, userAccessLevel);
+  }, [user, obrasRaw, regionais]);
 
   // Wrapper compatível com useGestaoNCActions(setNcs) — atualiza o cache do React Query
   const setNcs = useCallback((updater) => {
