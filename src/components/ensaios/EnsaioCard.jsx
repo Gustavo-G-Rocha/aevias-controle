@@ -10,6 +10,7 @@ import { createPageUrl } from "@/utils";
 import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components/ensaios/ensaioMappers";
 import { getLaboratoristaInfo, getResponsavelInfo, getRodoviaInfo, getTrechoInfo, getNaoConformidades, getStatusInfo } from "@/components/ensaios/utils";
 import { assinarEnsaio } from "@/services/ensaiosService";
+import { QUERY_KEYS } from "@/hooks/useQueryData";
 import { toast } from "@/components/ui/use-toast";
 
 const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
@@ -36,7 +37,7 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
     try {
       await assinarEnsaio(ensaio, user);
       toast({ title: 'Registro assinado com sucesso!' });
-      await queryClient.invalidateQueries();
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords });
     } catch (error) {
       toast({ title: `Erro ao assinar registro: ${error?.message || 'Erro desconhecido'}.`, variant: "destructive" });
     }

@@ -9,6 +9,7 @@ import { useTableFilters } from "@/hooks/useTableFilters";
 import TableRowCliente from "@/components/ensaios/TableRowCliente";
 import EnsaiosTableHeader from "@/components/ensaios/EnsaiosTableHeader";
 import { assinarEnsaio } from "@/services/ensaiosService";
+import { QUERY_KEYS } from "@/hooks/useQueryData";
 import { toast } from "@/components/ui/use-toast";
 
 const ClienteInterface = React.memo(({ ensaios, obras, projects, user, allUsers }) => {
@@ -49,7 +50,7 @@ const ClienteInterface = React.memo(({ ensaios, obras, projects, user, allUsers 
     try {
       await assinarEnsaio(ensaio, user);
       toast({ title: 'Registro assinado com sucesso!' });
-      await queryClient.invalidateQueries();
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords });
     } catch (error) {
       toast({ title: `Erro ao assinar: ${error?.message || 'Erro desconhecido'}.`, variant: "destructive" });
     }
