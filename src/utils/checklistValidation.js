@@ -27,27 +27,3 @@ export function validateChecklistUsinaForm(formData, saveStatus) {
 
   return { valid: true };
 }
-
-export function validateDecimalInput(value, maxDecimals) {
-  if (value === '') return true;
-
-  let regex;
-  switch (maxDecimals) {
-    case 0:
-      regex = /^\d+$/;
-      break;
-    case 1:
-      regex = /^\d*\.?\d{0,1}$/;
-      break;
-    case 2:
-      regex = /^\d*\.?\d{0,2}$/;
-      break;
-    case 3:
-      regex = /^\d*\.?\d{0,3}$/;
-      break;
-    default:
-      regex = /^\d*\.?\d*$/;
-  }
-
-  return regex.test(value);
-}
