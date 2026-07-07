@@ -62,7 +62,8 @@ function canApprove(user) {
 function canDelete(user, record) {
   const level = getUserAccessLevel(user);
   if (APPROVER_LEVELS.includes(level) || user.role === 'admin') return true;
-  return record?.created_by === user.email;
+  // created_by (email, resolvido pelo RLS) ou created_by_id (ID do usuário)
+  return record?.created_by === user.email || record?.created_by_id === user.id;
 }
 
 Deno.serve(async (req) => {
@@ -217,7 +218,15 @@ Deno.serve(async (req) => {
       }
     } else if (action === 'delete') {
       // Busca o registro para verificar autoria (asServiceRole bypassa RLS)
-      const record = await base44.asServiceRole.entities[entityName].get(recordId);
+      let record;
+      try {
+        record = await base44.asServiceRole.entities[entityName].get(recordId);
+      } catch {
+        return Response.json(
+          { error: 'Registro não encontrado' },
+          { status: 404 }
+        );
+      }
       if (!record) {
         return Response.json(
           { error: 'Registro não encontrado' },

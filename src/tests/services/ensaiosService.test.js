@@ -150,9 +150,13 @@ describe('ensaiosService — CRUD e validação de entidade', () => {
     expect(entities.EnsaioCAUQ.update).toHaveBeenCalledWith('e1', { x: 1 });
   });
 
-  it('deletarEnsaio delega delete', async () => {
+  it('deletarEnsaio delega para gerenciarAprovacao com action delete', async () => {
     await deletarEnsaio('EnsaioCAUQ', 'e1');
-    expect(entities.EnsaioCAUQ.delete).toHaveBeenCalledWith('e1');
+    expect(gerenciarAprovacao).toHaveBeenCalledWith({
+      action: 'delete',
+      entityName: 'EnsaioCAUQ',
+      recordId: 'e1',
+    });
   });
 
   it('obterSchemaEnsaio delega schema', async () => {
@@ -312,9 +316,13 @@ describe('ensaiosService — assinar/aprovar/reprovar/excluir', () => {
     });
   });
 
-  it('excluirEnsaio deleta via entidade detectada', async () => {
+  it('excluirEnsaio delega para gerenciarAprovacao com action delete e entidade detectada', async () => {
     await excluirEnsaio({ id: 'e1', entityType: 'EnsaioCAUQ' });
-    expect(entities.EnsaioCAUQ.delete).toHaveBeenCalledWith('e1');
+    expect(gerenciarAprovacao).toHaveBeenCalledWith({
+      action: 'delete',
+      entityName: 'EnsaioCAUQ',
+      recordId: 'e1',
+    });
   });
 
   it('aprovarEnsaio rejeita ensaio sem id', async () => {

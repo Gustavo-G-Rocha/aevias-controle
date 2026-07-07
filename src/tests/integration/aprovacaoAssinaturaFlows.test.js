@@ -93,6 +93,83 @@ vi.mock('@/functions/validarESalvarRegistro', () => ({
   }),
 }));
 
+// Usuários de teste definidos no escopo hoisted para que o mock de
+// gerenciarAprovacao possa referenciá-los (approve/reject → approver,
+// sign → cliente). O serviço não repassa user para gerenciarAprovacao
+// (a backend function real obtém do contexto de auth).
+const { approver, cliente } = vi.hoisted(() => ({
+  approver: {
+    email: 'gestor@afirmaevias.com',
+    full_name: 'Eng. Gestor',
+    access_level: 'gestor_contrato',
+    crea_number: 'CREA-123',
+  },
+  cliente: {
+    email: 'cliente@construtora.com',
+    full_name: 'Eng. Cliente',
+    laboratorista_name: 'Eng. Cliente',
+    crea_number: 'CREA-456',
+  },
+}));
+
+// Mock de gerenciarAprovacao que opera contra o store em memória,
+// espelhando a lógica da backend function real (approve/reject/sign/delete).
+vi.mock('@/functions/gerenciarAprovacao', () => ({
+  gerenciarAprovacao: vi.fn(async ({ action, entityName, recordId, rejectionReason }) => {
+    const { base44 } = await import('@/api/base44Client');
+    const api = base44.entities[entityName];
+    // sign → cliente; approve/reject → approver (espelha quem chama no teste)
+    const user = action === 'sign' ? cliente : approver;
+
+    if (action === 'delete') {
+      await api.delete(recordId);
+      return { data: { success: true, data: { id: recordId, deleted: true } } };
+    }
+    if (action === 'approve') {
+      const updated = await api.update(recordId, {
+        approved: true,
+        was_rejected: false,
+        rejection_reason: undefined,
+        approved_by: user.email,
+        approved_date: new Date().toISOString(),
+        approver_details: {
+          name: user.full_name,
+          position: user.access_level,
+          crea_number: user.crea_number,
+        },
+      });
+      return { data: { success: true, data: updated } };
+    }
+    if (action === 'reject') {
+      const updated = await api.update(recordId, {
+        approved: false,
+        was_rejected: true,
+        rejection_reason: rejectionReason,
+        approved_by: user.email,
+        approved_date: new Date().toISOString(),
+        approver_details: {
+          name: user.full_name,
+          position: user.access_level,
+          crea_number: user.crea_number,
+        },
+      });
+      return { data: { success: true, data: updated } };
+    }
+    if (action === 'sign') {
+      const updated = await api.update(recordId, {
+        client_signature: {
+          signed_by: user.email,
+          signed_date: new Date().toISOString(),
+          engineer_name: user.full_name,
+          crea_number: user.crea_number,
+        },
+      });
+      return { data: { success: true, data: updated } };
+    }
+    throw new Error(`Ação inválida: ${action}`);
+  }),
+}));
+
 import {
   criarChecklist,
   atualizarChecklist,
@@ -111,20 +188,6 @@ import {
   atualizarDiario,
 } from '@/services/diarioObraService';
 import { obterRegistro } from '@/services/recordsService';
-
-const approver = {
-  email: 'gestor@afirmaevias.com',
-  full_name: 'Eng. Gestor',
-  access_level: 'gestor_contrato',
-  crea_number: 'CREA-123',
-};
-
-const cliente = {
-  email: 'cliente@construtora.com',
-  full_name: 'Eng. Cliente',
-  laboratorista_name: 'Eng. Cliente',
-  crea_number: 'CREA-456',
-};
 
 beforeEach(() => {
   for (const n of ENTITY_NAMES) store[n] = {};
