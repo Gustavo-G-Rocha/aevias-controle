@@ -70,8 +70,12 @@ export default function AppSidebar({
   user, userAccessLevel, canCreateRecords, canManageSystem,
   pendingTransfers, minhasObrasOpen, setMinhasObrasOpen,
   naoConformidadesOpen, setNaoConformidadesOpen,
-  isAdmin, isSalaTecnica, isGestorContrato, isCliente
 }) {
+  const isAdmin = userAccessLevel === ACCESS_LEVELS.ADMIN || user?.role === ACCESS_LEVELS.ADMIN;
+  const isSalaTecnica = userAccessLevel === ACCESS_LEVELS.SALA_TECNICA;
+  const isGestorContrato = userAccessLevel === ACCESS_LEVELS.GESTOR_CONTRATO;
+  const isCliente = userAccessLevel === ACCESS_LEVELS.CLIENTE;
+
   const location = useLocation();
   const isActive = (url) => {
     if (location.pathname === url) return true;

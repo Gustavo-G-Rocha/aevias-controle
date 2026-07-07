@@ -44,10 +44,6 @@ const AppLayout = ({ children }) => {
             setMinhasObrasOpen={setMinhasObrasOpen}
             naoConformidadesOpen={naoConformidadesOpen}
             setNaoConformidadesOpen={setNaoConformidadesOpen}
-            isAdmin={isAdmin}
-            isSalaTecnica={isSalaTecnica}
-            isGestorContrato={isGestorContrato}
-            isCliente={isCliente}
           />
 
           <main className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
