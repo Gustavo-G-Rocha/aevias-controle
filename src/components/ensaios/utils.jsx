@@ -83,81 +83,91 @@ export const getTrechoInfo = (ensaio) => {
   return ensaio.trecho || ensaio.estaca || null;
 };
 
-export const getNaoConformidades = (ensaio) => {
-  const naoConformidades = [];
-  
-  if (ensaio.entityType === "ChecklistUsina") {
+// Registry de extração de não conformidades por entityType.
+// Cada entrada é uma função (ensaio) => string[] — adicionar um novo
+// tipo de ensaio significa apenas adicionar uma entrada aqui.
+const NC_EXTRACTORS = {
+  ChecklistUsina: (ensaio) => {
+    const result = [];
     const controle = ensaio.controle_cauq || {};
-    
+
     if (controle.granulometria?.conforme === false) {
-      naoConformidades.push("Granulometria");
+      result.push("Granulometria");
     }
     if (controle.volume_vazios?.conforme === false) {
-      naoConformidades.push("Volume de Vazios");
+      result.push("Volume de Vazios");
     }
     if (controle.rbv?.conforme === false) {
-      naoConformidades.push("RBV");
+      result.push("RBV");
     }
     if (controle.rtcd_25c?.conforme === false) {
-      naoConformidades.push("RTCD a 25°C");
+      result.push("RTCD a 25°C");
     }
     if (controle.estabilidade?.conforme === false) {
-      naoConformidades.push("Estabilidade");
+      result.push("Estabilidade");
     }
     if (controle.fluencia?.conforme === false) {
-      naoConformidades.push("Fluência");
+      result.push("Fluência");
     }
     if (controle.extracao_ligante_rotarex?.conforme === false) {
-      naoConformidades.push("Extração Ligante (Rotarex)");
+      result.push("Extração Ligante (Rotarex)");
     }
     if (controle.extracao_ligante_soxhlet?.conforme === false) {
-      naoConformidades.push("Extração Ligante (Soxhlet)");
+      result.push("Extração Ligante (Soxhlet)");
     }
-  }
-  
-  if (ensaio.entityType === "ChecklistMRAF") {
+    return result;
+  },
+
+  ChecklistMRAF: (ensaio) => {
+    const result = [];
     const acomp = ensaio.acompanhamento_aplicacao || {};
-    
+
     if (acomp.taxa_aplicacao?.conforme === false) {
-      naoConformidades.push("Taxa de Aplicação");
+      result.push("Taxa de Aplicação");
     }
     if (acomp.residuo_emulsao?.conforme === false) {
-      naoConformidades.push("Resíduo da Emulsão");
+      result.push("Resíduo da Emulsão");
     }
     if (acomp.espessura_camada?.conforme === false) {
-      naoConformidades.push("Espessura da Camada");
+      result.push("Espessura da Camada");
     }
-  }
+    return result;
+  },
 
-  if (ensaio.entityType === "ChecklistAplicacao") {
+  ChecklistAplicacao: (ensaio) => {
+    const result = [];
     const pintura = ensaio.pintura_ligacao || {};
-    
+
     if (pintura.taxa_pintura?.conforme === false) {
-      naoConformidades.push("Taxa de Pintura");
+      result.push("Taxa de Pintura");
     }
     if (pintura.taxa_pintura_residual?.conforme === false) {
-      naoConformidades.push("Taxa de Pintura Residual");
+      result.push("Taxa de Pintura Residual");
     }
-  }
+    return result;
+  },
 
-  if (ensaio.entityType === "ChecklistConcretagem") {
+  ChecklistConcretagem: (ensaio) => {
+    const result = [];
     const cargas = ensaio.cargas_concreto || [];
     cargas.forEach((carga, idx) => {
       if (carga.slump_test?.conforme === false) {
-        naoConformidades.push(`Slump Test (Carga ${carga.numero_carga || idx + 1})`);
+        result.push(`Slump Test (Carga ${carga.numero_carga || idx + 1})`);
       }
       if (carga.espessura_camada?.conforme === false) {
-        naoConformidades.push(`Espessura da Camada (Carga ${carga.numero_carga || idx + 1})`);
+        result.push(`Espessura da Camada (Carga ${carga.numero_carga || idx + 1})`);
       }
     });
-  }
-  
-  if (ensaio.entityType === "EnsaioVigaBenkelman") {
+    return result;
+  },
+
+  EnsaioVigaBenkelman: (ensaio) => {
+    const result = [];
     const def_admissivel = parseFloat(ensaio.def_admissivel) || 0;
     if (def_admissivel > 0) {
       const levantamentos = ensaio.levantamentos || [];
       const pontosNC = [];
-      
+
       levantamentos.forEach((lev, idx) => {
         if (lev.bordo_esquerdo?.deflexao > def_admissivel ||
             lev.eixo?.deflexao > def_admissivel ||
@@ -167,20 +177,26 @@ export const getNaoConformidades = (ensaio) => {
           }
         }
       });
-      
+
       if (pontosNC.length > 0) {
-        naoConformidades.push(`Deflexão acima do limite em ${pontosNC.length} ponto(s)`);
+        result.push(`Deflexão acima do limite em ${pontosNC.length} ponto(s)`);
       }
     }
-  }
-  
-  if (ensaio.entityType === "EnsaioManchaPendulo") {
+    return result;
+  },
+
+  EnsaioManchaPendulo: (ensaio) => {
+    const result = [];
     if (ensaio.condicao_conformidade === "NÃO CONFORME") {
-      naoConformidades.push("Resultado não conforme");
+      result.push("Resultado não conforme");
     }
-  }
-  
-  return naoConformidades;
+    return result;
+  },
+};
+
+export const getNaoConformidades = (ensaio) => {
+  const extractor = NC_EXTRACTORS[ensaio.entityType];
+  return extractor ? extractor(ensaio) : [];
 };
 
 export const getStatusInfo = (ensaio) => {
