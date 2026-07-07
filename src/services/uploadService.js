@@ -1,12 +1,29 @@
 import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
+import { validarUploadArquivo } from '@/functions/validarUploadArquivo';
 
 /**
  * Service centralizado para upload de arquivos e imagens
  */
 const VALID_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
 
+/**
+ * Converte um File para string base64 para envio via JSON payload.
+ */
+async function fileToBase64(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
+  let binary = '';
+  const chunkSize = 8192;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode.apply(null, chunk);
+  }
+  return btoa(binary);
+}
+
 export async function uploadImagem(file) {
+  // Validação client-side — feedback rápido ao usuário
   if (!VALID_IMAGE_TYPES.includes(file.type)) {
     throw new Error(`Tipo de arquivo inválido. Aceitos: JPEG, PNG, GIF, WebP`);
   }
@@ -15,10 +32,20 @@ export async function uploadImagem(file) {
     throw new Error('Arquivo excede o tamanho máximo de 10MB');
   }
 
-  return withServiceCall(
-    () => base44.integrations.Core.UploadFile({ file }),
-    'Falha ao enviar imagem'
-  );
+  // Validação server-side — verifica magic bytes (conteúdo real) e tamanho
+  // antes de aceitar o upload definitivo. Impede spoofing de file.type.
+  const fileBase64 = await fileToBase64(file);
+  try {
+    const response = await validarUploadArquivo({
+      fileBase64,
+      fileName: file.name,
+      uploadType: 'imagem',
+    });
+    return { file_url: response.data.file_url };
+  } catch (error) {
+    const serverMessage = error?.response?.data?.error;
+    throw new Error(serverMessage || 'Falha ao enviar imagem');
+  }
 }
 
 export async function uploadMultiplasImagens(files) {
