@@ -1,4 +1,5 @@
 // Utilitários de transformação de dados para o payload da API
+import { normalizarFoto } from '@/utils/photoLegendaUtils';
 
 const toResultadosArray = (resultados) => {
   if (Array.isArray(resultados)) return resultados;
@@ -54,7 +55,12 @@ export const buildDataToSave = (formData, saveStatus, user) => {
       ...p,
       temperatura_ambiente: p.temperatura_ambiente ? parseFloat(p.temperatura_ambiente) : null,
     })),
-    fotos: (formData.fotos || []).map(f => (typeof f === 'string' ? f : (f?.url || ''))).filter(Boolean),
+    fotos: (formData.fotos || [])
+      .map(f => {
+        const n = normalizarFoto(f);
+        return n.url ? { url: n.url, legenda: n.legenda || '' } : null;
+      })
+      .filter(Boolean),
     ensaios_empreiteira: {
       ...formData.ensaios_empreiteira,
       compactacao_proctor: serializeEnsaio(formData.ensaios_empreiteira.compactacao_proctor),

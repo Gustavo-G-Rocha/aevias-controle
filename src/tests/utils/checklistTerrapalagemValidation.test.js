@@ -1,8 +1,8 @@
 /**
- * Testes unitários para validateForm do ChecklistTerraplanagem
+ * Testes unitários para validateForm e buildDataToSave do ChecklistTerraplanagem
  */
 import { describe, it, expect } from 'vitest';
-import { validateForm } from '../../pages/ChecklistTerraplanagem/utils/checklistTerrapalagemMapper';
+import { validateForm, buildDataToSave } from '../../pages/ChecklistTerraplanagem/utils/checklistTerrapalagemMapper';
 
 const baseFormData = {
   obra_id: 'obra-1',
@@ -20,6 +20,13 @@ const baseFormData = {
   acoes_corretivas_descricao: '',
   origem_material: '',
   nome_material: '',
+  ensaios_empreiteira: {
+    compactacao_proctor: { realizado: false, quantidade: null, conforme: null, resultados: '', observacoes: '' },
+    isc: { realizado: false, quantidade: null, conforme: null, resultados: '', observacoes: '' },
+    umidade_frigideira: { realizado: false, quantidade: null, conforme: null, resultados: '', observacoes: '' },
+    massa_especifica_in_situ: { realizado: false, quantidade: null, conforme: null, resultados: '', observacoes: '' },
+    granulometria: { realizado: false, quantidade: null, conforme: null, resultados: '', observacoes: '' },
+  },
 };
 
 describe('validateForm — ChecklistTerraplanagem', () => {
@@ -128,6 +135,65 @@ describe('validateForm — ChecklistTerraplanagem', () => {
     it('válido quando realizado=true e descrição preenchida', () => {
       const data = { ...baseFormData, acoes_corretivas_realizado: true, acoes_corretivas_descricao: 'Recompactação realizada.' };
       expect(validateForm(data, 'finalizado')).toBeNull();
+    });
+  });
+
+  describe('buildDataToSave — preservação de legendas das fotos', () => {
+    it('preserva legendas personalizadas ao salvar', () => {
+      const data = {
+        ...baseFormData,
+        fotos: [
+          { url: 'https://exemplo.com/foto1.jpg', legenda: 'Vista frontal do trecho' },
+          { url: 'https://exemplo.com/foto2.jpg', legenda: 'Detalhe da compactação' },
+        ],
+      };
+      const result = buildDataToSave(data, 'finalizado');
+      expect(result.fotos).toEqual([
+        { url: 'https://exemplo.com/foto1.jpg', legenda: 'Vista frontal do trecho' },
+        { url: 'https://exemplo.com/foto2.jpg', legenda: 'Detalhe da compactação' },
+      ]);
+    });
+
+    it('normaliza fotos string (URLs sem legenda) para {url, legenda}', () => {
+      const data = {
+        ...baseFormData,
+        fotos: ['https://exemplo.com/foto1.jpg', 'https://exemplo.com/foto2.jpg'],
+      };
+      const result = buildDataToSave(data, 'finalizado');
+      expect(result.fotos).toEqual([
+        { url: 'https://exemplo.com/foto1.jpg', legenda: '' },
+        { url: 'https://exemplo.com/foto2.jpg', legenda: '' },
+      ]);
+    });
+
+    it('mistura fotos string e objeto, preservando legendas existentes', () => {
+      const data = {
+        ...baseFormData,
+        fotos: [
+          'https://exemplo.com/foto1.jpg',
+          { url: 'https://exemplo.com/foto2.jpg', legenda: 'Legenda customizada' },
+        ],
+      };
+      const result = buildDataToSave(data, 'finalizado');
+      expect(result.fotos).toEqual([
+        { url: 'https://exemplo.com/foto1.jpg', legenda: '' },
+        { url: 'https://exemplo.com/foto2.jpg', legenda: 'Legenda customizada' },
+      ]);
+    });
+
+    it('filtra fotos sem URL', () => {
+      const data = {
+        ...baseFormData,
+        fotos: [
+          { url: 'https://exemplo.com/foto1.jpg', legenda: 'Boa' },
+          { url: '', legenda: 'Sem URL' },
+          null,
+        ],
+      };
+      const result = buildDataToSave(data, 'finalizado');
+      expect(result.fotos).toEqual([
+        { url: 'https://exemplo.com/foto1.jpg', legenda: 'Boa' },
+      ]);
     });
   });
 });

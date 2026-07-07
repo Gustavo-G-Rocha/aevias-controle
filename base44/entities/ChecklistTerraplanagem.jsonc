@@ -360,7 +360,15 @@
     "fotos": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "legenda": {
+            "type": "string"
+          }
+        }
       }
     },
     "status": {
