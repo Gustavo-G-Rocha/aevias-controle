@@ -1,41 +1,18 @@
-import { MapPin, Building, Clock, CheckCircle, XCircle } from "lucide-react";
+import { MapPin, Clock, CheckCircle, XCircle } from "lucide-react";
+import { ENSAIO_CONFIG } from "@/components/ensaios/ensaioMappers";
+
+// ── Helpers de fallback ──────────────────────────────────────────────────────
+const defaultLocalInfo = (ensaio) => ({
+  tipo: "Local",
+  detalhes: ensaio.collection_point || ensaio.location || "Não informado",
+  icon: MapPin,
+});
+
+// ─── Funções públicas — delegam para o registry único ENSAIO_CONFIG ──────────
 
 export const getLocalInfo = (ensaio) => {
-  const entityType = ensaio.entityType;
-
-  if (entityType === "DiarioObra") {
-    if (ensaio.tipo_local === "usina") {
-      return {
-        tipo: "Usina",
-        detalhes: ensaio.usina_selecionada || "Não informado",
-        icon: Building
-      };
-    } else {
-      return {
-        tipo: "Campo",
-        detalhes: `${ensaio.rodovia || "Rodovia não informada"} - ${ensaio.trecho || "Trecho não informado"}`,
-        icon: MapPin
-      };
-    }
-  } else if (entityType === "ChecklistUsina") {
-    return {
-      tipo: "Usina",
-      detalhes: ensaio.usina || "Não informado",
-      icon: Building
-    };
-  } else if (entityType === "ChecklistAplicacao" || entityType === "ChecklistMRAF" || entityType === "ChecklistConcretagem" || entityType === "ChecklistTerraplanagem" || entityType === "ChecklistReciclagem" || entityType === "EnsaioSondagem" || entityType === "EnsaioTaxaPinturaImprimacao" || entityType === "EnsaioGranulometriaIndividual" || entityType === "EnsaioManchaPendulo" || entityType === "EnsaioVigaBenkelman") {
-    return {
-      tipo: "Campo",
-      detalhes: `${ensaio.rodovia || "Rodovia não informada"} - ${ensaio.trecho || ensaio.estaca || ensaio.local_coleta || "Trecho não informado"}`,
-      icon: MapPin
-    };
-  } else {
-    return {
-      tipo: "Local",
-      detalhes: ensaio.collection_point || ensaio.location || "Não informado",
-      icon: MapPin
-    };
-  }
+  const cfg = ENSAIO_CONFIG[ensaio.entityType];
+  return cfg?.localInfo ? cfg.localInfo(ensaio) : defaultLocalInfo(ensaio);
 };
 
 export const getLaboratoristaInfo = (ensaio, allUsers) => {
@@ -52,27 +29,13 @@ export const getLaboratoristaInfo = (ensaio, allUsers) => {
 };
 
 export const getResponsavelInfo = (ensaio) => {
-  const entityType = ensaio.entityType;
-  
-  if (entityType === "ChecklistUsina" || entityType === "ChecklistAplicacao" || entityType === "ChecklistMRAF") {
-    return ensaio.usina || "Não informado";
-  } else if (entityType === "ChecklistConcretagem") {
-    return ensaio.concreteira || "Não informado";
-  } else if (entityType === "ChecklistTerraplanagem") {
-    return ensaio.empreiteira || "Não informado";
-  }
-  
-  return null;
+  const cfg = ENSAIO_CONFIG[ensaio.entityType];
+  return cfg?.responsavel ? cfg.responsavel(ensaio) : null;
 };
 
 export const getEmpireiteiraInfo = (ensaio) => {
-  const entityType = ensaio.entityType;
-  
-  if (entityType === "DiarioObra" || entityType === "ChecklistAplicacao" || entityType === "ChecklistMRAF" || entityType === "ChecklistConcretagem" || entityType === "ChecklistTerraplanagem" || entityType === "ChecklistReciclagem") {
-    return ensaio.empreiteira || null;
-  }
-  
-  return null;
+  const cfg = ENSAIO_CONFIG[ensaio.entityType];
+  return cfg?.hasEmpreiteira ? (ensaio.empreiteira || null) : null;
 };
 
 export const getRodoviaInfo = (ensaio) => {
@@ -83,120 +46,9 @@ export const getTrechoInfo = (ensaio) => {
   return ensaio.trecho || ensaio.estaca || null;
 };
 
-// Registry de extração de não conformidades por entityType.
-// Cada entrada é uma função (ensaio) => string[] — adicionar um novo
-// tipo de ensaio significa apenas adicionar uma entrada aqui.
-const NC_EXTRACTORS = {
-  ChecklistUsina: (ensaio) => {
-    const result = [];
-    const controle = ensaio.controle_cauq || {};
-
-    if (controle.granulometria?.conforme === false) {
-      result.push("Granulometria");
-    }
-    if (controle.volume_vazios?.conforme === false) {
-      result.push("Volume de Vazios");
-    }
-    if (controle.rbv?.conforme === false) {
-      result.push("RBV");
-    }
-    if (controle.rtcd_25c?.conforme === false) {
-      result.push("RTCD a 25°C");
-    }
-    if (controle.estabilidade?.conforme === false) {
-      result.push("Estabilidade");
-    }
-    if (controle.fluencia?.conforme === false) {
-      result.push("Fluência");
-    }
-    if (controle.extracao_ligante_rotarex?.conforme === false) {
-      result.push("Extração Ligante (Rotarex)");
-    }
-    if (controle.extracao_ligante_soxhlet?.conforme === false) {
-      result.push("Extração Ligante (Soxhlet)");
-    }
-    return result;
-  },
-
-  ChecklistMRAF: (ensaio) => {
-    const result = [];
-    const acomp = ensaio.acompanhamento_aplicacao || {};
-
-    if (acomp.taxa_aplicacao?.conforme === false) {
-      result.push("Taxa de Aplicação");
-    }
-    if (acomp.residuo_emulsao?.conforme === false) {
-      result.push("Resíduo da Emulsão");
-    }
-    if (acomp.espessura_camada?.conforme === false) {
-      result.push("Espessura da Camada");
-    }
-    return result;
-  },
-
-  ChecklistAplicacao: (ensaio) => {
-    const result = [];
-    const pintura = ensaio.pintura_ligacao || {};
-
-    if (pintura.taxa_pintura?.conforme === false) {
-      result.push("Taxa de Pintura");
-    }
-    if (pintura.taxa_pintura_residual?.conforme === false) {
-      result.push("Taxa de Pintura Residual");
-    }
-    return result;
-  },
-
-  ChecklistConcretagem: (ensaio) => {
-    const result = [];
-    const cargas = ensaio.cargas_concreto || [];
-    cargas.forEach((carga, idx) => {
-      if (carga.slump_test?.conforme === false) {
-        result.push(`Slump Test (Carga ${carga.numero_carga || idx + 1})`);
-      }
-      if (carga.espessura_camada?.conforme === false) {
-        result.push(`Espessura da Camada (Carga ${carga.numero_carga || idx + 1})`);
-      }
-    });
-    return result;
-  },
-
-  EnsaioVigaBenkelman: (ensaio) => {
-    const result = [];
-    const def_admissivel = parseFloat(ensaio.def_admissivel) || 0;
-    if (def_admissivel > 0) {
-      const levantamentos = ensaio.levantamentos || [];
-      const pontosNC = [];
-
-      levantamentos.forEach((lev, idx) => {
-        if (lev.bordo_esquerdo?.deflexao > def_admissivel ||
-            lev.eixo?.deflexao > def_admissivel ||
-            lev.bordo_direito?.deflexao > def_admissivel) {
-          if (lev.estaca_km) {
-            pontosNC.push(`Estaca ${lev.estaca_km}`);
-          }
-        }
-      });
-
-      if (pontosNC.length > 0) {
-        result.push(`Deflexão acima do limite em ${pontosNC.length} ponto(s)`);
-      }
-    }
-    return result;
-  },
-
-  EnsaioManchaPendulo: (ensaio) => {
-    const result = [];
-    if (ensaio.condicao_conformidade === "NÃO CONFORME") {
-      result.push("Resultado não conforme");
-    }
-    return result;
-  },
-};
-
 export const getNaoConformidades = (ensaio) => {
-  const extractor = NC_EXTRACTORS[ensaio.entityType];
-  return extractor ? extractor(ensaio) : [];
+  const cfg = ENSAIO_CONFIG[ensaio.entityType];
+  return cfg?.ncExtractor ? cfg.ncExtractor(ensaio) : [];
 };
 
 export const getStatusInfo = (ensaio) => {
