@@ -17,7 +17,7 @@ export default function HomePage() {
           if (user.role === 'admin') {
             navigate(createPageUrl('Dashboard'), { replace: true });
           } else {
-            navigate(createPageUrl('Obras'), { replace: true });
+            navigate(createPageUrl('MeusEnsaios'), { replace: true });
           }
         }
       } catch (error) {
