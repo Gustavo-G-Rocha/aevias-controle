@@ -1,11 +1,12 @@
-import { useState, useEffect, useCallback } from "react";
-import { obterUsuarioAtual } from "@/services/usuariosService";
-import { listarRegionais } from "@/services/regionaisService";
-import { logger } from '@/utils/logger';
+import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useCurrentUser } from "@/hooks/useQueryData";
 import {
   listarRegistros,
   loadRecordsGrouped,
 } from "@/services/recordsService";
+import { listarRegionais } from "@/services/regionaisService";
+import { logger } from '@/utils/logger';
 import {
   TIPOS_CHECKLIST,
   OUTROS_TIPOS_REGISTRO,
@@ -15,27 +16,29 @@ import {
   isOutroRegistroNaoConforme,
 } from "@/utils/naoConformidadesUtils";
 
+const NC_DATA_KEY = ['naoConformidades'];
+
 /**
  * Carrega e normaliza todos os dados necessários para a página de NCs:
  * obras acessíveis, RNCs e CNCs (NCs de checklist/diário/outros registros).
+ * Usa React Query para cache compartilhado e refetch automático.
  */
 export function useNaoConformidadesData() {
-  const [loading, setLoading] = useState(true);
-  const [obras, setObras] = useState([]);
-  const [rncs, setRncs] = useState([]);
-  const [checklistNCs, setChecklistNCs] = useState([]);
+  const userQuery = useCurrentUser();
+  const user = userQuery.data;
 
-  const loadAll = useCallback(async () => {
-    setLoading(true);
-    try {
-      const userData = await obterUsuarioAtual();
+  const query = useQuery({
+    queryKey: [NC_DATA_KEY, user?.email],
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const userData = user;
       const userAccessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
 
       const tiposValues = TIPOS_CHECKLIST.map(t => t.value);
       const outrosValues = OUTROS_TIPOS_REGISTRO.map(t => t.value);
 
       // Dispara TODOS os fetchs em paralelo — nenhum depende de outro.
-      // O filtro por availableIds acontece depois, quando os dados já chegaram.
       const [obrasData, regionaisData, rncsData, checklistGroups, diarioData, outrosGroups] = await Promise.all([
         listarRegistros('Obra', '-created_date', 2000),
         listarRegionais(),
@@ -64,9 +67,8 @@ export function useNaoConformidadesData() {
         availableObras = obrasData.filter(o => ids.has(o.id));
       }
 
-      setObras(availableObras);
       const availableIds = new Set(availableObras.map(o => o.id));
-      setRncs(rncsData.filter(r => availableIds.has(r.obra_id)));
+      const filteredRncs = rncsData.filter(r => availableIds.has(r.obra_id));
 
       const allCNCs = [];
 
@@ -113,15 +115,22 @@ export function useNaoConformidadesData() {
       );
 
       outrosResults.flat().forEach(reg => allCNCs.push(reg));
-      setChecklistNCs(allCNCs);
-    } catch (error) {
-      logger.error("[NaoConformidades] Erro ao carregar dados:", error?.message || error);
-    } finally {
-      setLoading(false);
+
+      return { obras: availableObras, rncs: filteredRncs, checklistNCs: allCNCs };
+    },
+  });
+
+  // Erros são logados via o callback do query — mantém comportamento do hook original
+  useEffect(() => {
+    if (query.isError) {
+      logger.error("[NaoConformidades] Erro ao carregar dados:", query.error?.message || query.error);
     }
-  }, []);
+  }, [query.isError, query.error]);
 
-  useEffect(() => { loadAll(); }, [loadAll]);
-
-  return { loading, obras, rncs, checklistNCs };
+  return {
+    loading: userQuery.isLoading || query.isLoading,
+    obras: query.data?.obras ?? [],
+    rncs: query.data?.rncs ?? [],
+    checklistNCs: query.data?.checklistNCs ?? [],
+  };
 }

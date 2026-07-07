@@ -1,48 +1,48 @@
-import { useState, useCallback, useEffect } from 'react';
-import { obterUsuarioAtual } from '@/services/usuariosService';
+import { useMemo, useCallback, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCurrentUser, useAuxData } from '@/hooks/useQueryData';
 import { listarRegistros } from '@/services/recordsService';
-import { listarRegionais } from '@/services/regionaisService';
 import { filterSolicitacoesByUserAccess } from '@/utils/solicitacoesTransferenciaUtils';
 
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
+
+const SOLICITACOES_KEY = ['solicitacoesTransferencia'];
+
 export function useSolicitacoesTransferenciaData() {
-  const [solicitacoes, setSolicitacoes] = useState([]);
-  const [regionais, setRegionais] = useState([]);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const userQuery = useCurrentUser();
+  const auxData = useAuxData({ needsRegionais: true });
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [userData, solicitacoesData, regionaisData] = await Promise.all([
-        obterUsuarioAtual(),
-        listarRegistros('SolicitacaoTransferenciaRegional', '-created_date'),
-        listarRegionais()
-      ]);
+  const solicitacoesQuery = useQuery({
+    queryKey: SOLICITACOES_KEY,
+    queryFn: () => listarRegistros('SolicitacaoTransferenciaRegional', '-created_date'),
+    staleTime: 5 * 60 * 1000,
+  });
 
-      setUser(userData);
-      setRegionais(regionaisData);
-
-      // Filtrar solicitações conforme acesso do usuário
-      const filtradas = filterSolicitacoesByUserAccess(
-        solicitacoesData,
-        userData,
-        regionaisData
-      );
-
-      setSolicitacoes(filtradas);
-    } catch (error) {
-      logger.error("[SolicitacoesTransferencia] Erro ao carregar dados:", error?.message || error);
-      toast({ title: "Erro ao carregar solicitações.", variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
+  // Preserva o toast de erro do hook original
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    if (solicitacoesQuery.isError) {
+      logger.error("[SolicitacoesTransferencia] Erro ao carregar dados:", solicitacoesQuery.error?.message || solicitacoesQuery.error);
+      toast({ title: "Erro ao carregar solicitações.", variant: "destructive" });
+    }
+  }, [solicitacoesQuery.isError, solicitacoesQuery.error]);
+
+  const user = userQuery.data ?? null;
+  const regionais = auxData.data?.regionais ?? [];
+  const solicitacoesRaw = solicitacoesQuery.data ?? [];
+
+  const solicitacoes = useMemo(() => {
+    if (!user) return [];
+    return filterSolicitacoesByUserAccess(solicitacoesRaw, user, regionais);
+  }, [solicitacoesRaw, user, regionais]);
+
+  const loading = userQuery.isLoading || auxData.isLoading || solicitacoesQuery.isLoading;
+
+  // Wrapper compatível com useSolicitacoesTransferenciaActions(loadData)
+  const loadData = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: SOLICITACOES_KEY });
+  }, [queryClient]);
 
   return { solicitacoes, regionais, user, loading, loadData };
 }

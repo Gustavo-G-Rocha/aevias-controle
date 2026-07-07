@@ -1,53 +1,23 @@
-import { useState, useEffect, useCallback } from "react";
-import { obterUsuarioAtual } from "@/services/usuariosService";
-import { listarRegistros } from "@/services/recordsService";
-import { listarRegionais } from "@/services/regionaisService";
+import { useMemo } from "react";
+import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { filterObrasByUserAccess } from "@/utils/relatoriosUnificadosUtils";
-import { logger } from '@/utils/logger';
 
 export const useRelatoriosUnificadosData = () => {
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
-  const [obras, setObras] = useState([]);
-  const [regionais, setRegionais] = useState([]);
+  const userQuery = useCurrentUser();
+  const auxData = useAuxData({ needsRegionais: true });
 
-  const loadInitialData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const currentUser = await obterUsuarioAtual();
-      setUser(currentUser);
+  const user = userQuery.data ?? null;
+  const obrasRaw = auxData.data?.obras ?? [];
+  const regionais = auxData.data?.regionais ?? [];
 
-      const [obrasData, regionaisData] = await Promise.all([
-        listarRegistros('Obra'),
-        listarRegionais(),
-      ]);
+  const obras = useMemo(() => {
+    if (!user) return [];
+    const userAccessLevel =
+      user.access_level || (user.role === "admin" ? "admin" : "user");
+    return filterObrasByUserAccess(obrasRaw, regionais, user, userAccessLevel);
+  }, [user, obrasRaw, regionais]);
 
-      setRegionais(regionaisData);
-
-      const userAccessLevel =
-        currentUser.access_level ||
-        (currentUser.role === "admin" ? "admin" : "user");
-      const availableObras = filterObrasByUserAccess(
-        obrasData,
-        regionaisData,
-        currentUser,
-        userAccessLevel
-      );
-
-      setObras(availableObras);
-    } catch (err) {
-      logger.error(
-        "[RelatoriosUnificados] Erro ao carregar dados iniciais:",
-        err?.message || err
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadInitialData();
-  }, [loadInitialData]);
+  const loading = userQuery.isLoading || auxData.isLoading;
 
   return { loading, user, obras, regionais };
 };
