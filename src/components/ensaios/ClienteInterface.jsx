@@ -72,7 +72,7 @@ const ClienteInterface = React.memo(({ ensaios, obras, projects, user, allUsers 
         )}
       </div>
 
-      <Card className="bg-card/20 backdrop-blur-lg border border-white/20">
+      <Card className="bg-card/20 backdrop-blur-lg border border-white/20 dark:bg-card/40 dark:border-white/10">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
