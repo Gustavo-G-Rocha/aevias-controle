@@ -63,7 +63,7 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
         <div className="flex flex-col gap-3">
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="font-bold  text-lg flex items-center gap-2">
+              <h3 className="font-bold text-lg flex items-center gap-2 mb-1">
                 <TypeIcon className="w-5 h-5 text-secondary" /> {name}
                 {renderNcBadge()}
               </h3>
