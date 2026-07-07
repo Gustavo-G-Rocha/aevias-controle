@@ -26,7 +26,6 @@ export const OUTROS_TIPOS_REGISTRO = [
   { value: "EnsaioCAUQ", label: "Ensaio CAUQ", page: "RelatorioCAUQ" },
   { value: "EnsaioDensidade", label: "Ensaio de Densidade", page: "RelatorioEnsaio" },
   { value: "EnsaioDensidadeInSitu", label: "Densidade In Situ", page: "RelatorioDensidadeInSitu" },
-  { value: "EnsaioGranAreia", label: "Granulometria + EA", page: "RelatorioEnsaio" },
   { value: "EnsaioGranulometriaIndividual", label: "Gran. Individual", page: "RelatorioGranulometriaIndividual" },
   { value: "EnsaioMRAF", label: "Ensaio MRAF", page: "RelatorioMRAF" },
   { value: "EnsaioManchaPendulo", label: "Mancha + Pêndulo", page: "RelatorioManchaPendulo" },
