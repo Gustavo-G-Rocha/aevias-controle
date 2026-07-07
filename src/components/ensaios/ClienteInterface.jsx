@@ -27,11 +27,6 @@ const ClienteInterface = React.memo(({ ensaios, obras, projects, user, allUsers,
     return filtered;
   }, [appliedStatusFilter]);
 
-  const handleApplyFilters = useCallback(() => {
-    applyFilters();
-    setAppliedStatusFilter(statusFilter);
-  }, [applyFilters, statusFilter]);
-
   const {
     nomeFilter, setNomeFilter,
     obraFilter, setObraFilter,
@@ -52,6 +47,11 @@ const ClienteInterface = React.memo(({ ensaios, obras, projects, user, allUsers,
     toggleSortOrder,
     clearFilters,
   } = useTableFilters(ensaios, obras, projects, allUsers, applyCustomFilters);
+
+  const handleApplyFilters = useCallback(() => {
+    applyFilters();
+    setAppliedStatusFilter(statusFilter);
+  }, [applyFilters, statusFilter]);
 
   // Reporta filtro ativo para o pai permitir carregar mais registros (limite dinâmico)
   useEffect(() => {
