@@ -55,7 +55,8 @@ export function useTableFilters(ensaios, obras, projects, allUsers, applyCustomF
   const filteredEnsaios = useMemo(() => {
     let filtered = ensaios;
 
-    if (applied.nome) filtered = filtered.filter((e) => getLaboratoristaInfo(e, allUsers).toLowerCase().includes(applied.nome.toLowerCase()));
+    // Nome: filtro AO VIVO (digita → filtra instantaneamente)
+    if (nomeFilter) filtered = filtered.filter((e) => getLaboratoristaInfo(e, allUsers).toLowerCase().includes(nomeFilter.toLowerCase()));
     if (applied.obra) filtered = filtered.filter((e) => {
       const o = obrasMap.get(e.obra_id);
       return o?.name?.toLowerCase().includes(applied.obra.toLowerCase()) || o?.code?.toLowerCase().includes(applied.obra.toLowerCase());
@@ -125,11 +126,12 @@ export function useTableFilters(ensaios, obras, projects, allUsers, applyCustomF
     setApplied(EMPTY_FILTERS);
   }, []);
 
-  const isAnyFilterActive = !!(applied.nome || applied.obra || applied.projeto || applied.local || applied.empreiteira || applied.dataInicio || applied.dataFim || applied.type !== 'all');
+  // Nome é ao vivo, então não conta como "pendente"
+  const isAnyFilterActive = !!(nomeFilter || applied.obra || applied.projeto || applied.local || applied.empreiteira || applied.dataInicio || applied.dataFim || applied.type !== 'all');
 
   // Detecta se há valores digitados ainda não aplicados (para destacar o botão)
+  // Nome não entra aqui pois é aplicado em tempo real
   const hasPendingChanges =
-    nomeFilter !== applied.nome ||
     obraFilter !== applied.obra ||
     projetoFilter !== applied.projeto ||
     localFilter !== applied.local ||

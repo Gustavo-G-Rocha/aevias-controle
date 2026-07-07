@@ -96,7 +96,7 @@ const ClienteInterface = React.memo(({ ensaios, obras, projects, user, allUsers,
           variant="outline"
           onClick={handleApplyFilters}
           className={hasPendingChanges ? "border-secondary" : ""}
-          style={hasPendingChanges ? { color: 'var(--color-primary)' } : {}}
+          style={hasPendingChanges ? { color: 'var(--color-secondary)', borderColor: 'var(--color-secondary)', backgroundColor: 'var(--color-secondary-subtle)' } : {}}
         >
           <Filter className="mr-2 h-4 w-4" /> Filtrar
         </Button>
