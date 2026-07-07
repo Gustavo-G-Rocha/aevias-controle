@@ -3,8 +3,7 @@
  *
  * Salvaguarda contra regressões de performance em loadAllRecords.
  * Valida que o carregamento bulk de 25 entidades × 500 registros
- * (volume máximo que a função processa por entidade) completa em
- * tempo aceitável, cobrindo normalizeRecords + deduplicateRecords.
+ * completa em tempo aceitável, cobrindo normalizeRecords + deduplicateRecords.
  *
  * Como os mocks retornam dados síncronos, o limite mede apenas o
  * custo de processamento local (normalização + dedup), não latência
