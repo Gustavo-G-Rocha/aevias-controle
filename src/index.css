@@ -351,8 +351,12 @@
     button, .btn {
       font-size: 0.8rem !important;
     }
-    /* WCAG 2.1 AA — área de toque mínima de 44px em mobile */
-    button, .btn, [role="button"] {
+    /* WCAG 2.1 AA — área de toque mínima de 44px em mobile.
+       Exclui icon-buttons compactos (h-7/h-8) usados em tabelas e
+       barras de ação, preservando o tamanho pretendido pelo design. */
+    button:not(.h-7):not(.h-8),
+    .btn:not(.h-7):not(.h-8),
+    [role="button"]:not(.h-7):not(.h-8) {
       min-height: 44px !important;
     }
   }
