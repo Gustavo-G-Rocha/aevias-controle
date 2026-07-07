@@ -240,6 +240,47 @@ describe('ensaiosService — detectEntityName', () => {
   it('lança erro quando não consegue determinar o tipo', async () => {
     await expect(aprovarEnsaio({ id: 'e6' }, user)).rejects.toThrow('Não foi possível determinar');
   });
+
+  // ── Edge cases de prioridade e ambiguidade do fallback heurístico ──
+
+  it('entityType tem prioridade mesmo quando props heurísticas estão presentes', async () => {
+    await aprovarEnsaio(
+      { id: 'e17', entityType: 'EnsaioMRAF', corpos_prova_marshall: [], pesos: {}, cargas: [] },
+      user,
+    );
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'EnsaioMRAF' }));
+  });
+
+  it('entityName tem prioridade sobre fallback heurístico quando entityType ausente', async () => {
+    await aprovarEnsaio(
+      { id: 'e18', entityName: 'EnsaioDensidadeInSitu', pesos: {}, peneiras: [] },
+      user,
+    );
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'EnsaioDensidadeInSitu' }));
+  });
+
+  it('valor null ainda dispara o fallback (usa !== undefined)', async () => {
+    await aprovarEnsaio({ id: 'e19', cargas: null }, user);
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'AcompanhamentoCarga' }));
+  });
+
+  it('cargas é ambíguo: AcompanhamentoUsinagem sem entityType é classificado como AcompanhamentoCarga', async () => {
+    // Limitação conhecida do fallback: AcompanhamentoUsinagem tem prop "cargas"
+    // mas o fallback classifica como AcompanhamentoCarga. Teste documenta este
+    // comportamento para capturar regressões silenciosas se a heurística mudar.
+    await aprovarEnsaio(
+      { id: 'e20', cargas: [], agregados: [], temperatura_ligante: 150, usina: 'Usina X' },
+      user,
+    );
+    expect(gerenciarAprovacao).toHaveBeenCalledWith(expect.objectContaining({ entityName: 'AcompanhamentoCarga' }));
+  });
+
+  it('campos ausentes (undefined) não disparam fallback incorreto', async () => {
+    await expect(aprovarEnsaio(
+      { id: 'e21', obra_id: 'o1', some_unknown_field: 'x' },
+      user,
+    )).rejects.toThrow('Não foi possível determinar');
+  });
 });
 
 describe('ensaiosService — assinar/aprovar/reprovar/excluir', () => {
