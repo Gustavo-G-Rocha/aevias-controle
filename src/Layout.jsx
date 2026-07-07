@@ -11,7 +11,6 @@ import { ACCESS_LEVELS, getUserAccessLevel } from "@/lib/layoutConstants";
 
 import { useLayoutData } from "@/components/layout/useLayoutData";
 import AppSidebar from "@/components/layout/AppSidebar";
-import MobileHeader from "@/components/layout/MobileHeader";
 import BottomNav from "@/components/layout/BottomNav";
 import CreateEnsaioDialog from "@/components/layout/CreateEnsaioDialog";
 import { REPORT_PAGES } from "@/lib/reportPages";
@@ -52,8 +51,6 @@ const AppLayout = ({ children }) => {
           />
 
           <main className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
-            <MobileHeader user={user} canCreateRecords={canCreateRecords} />
-
             <div className="flex-1 flex flex-col">
               <PullToRefresh>
                 <div className="pb-16 lg:pb-0 overflow-x-hidden" style={{ paddingTop: "env(safe-area-inset-top)" }}>
