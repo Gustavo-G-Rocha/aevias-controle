@@ -110,10 +110,10 @@ describe('recordsService — loadAllRecords', () => {
     }
   });
 
-  it('modo list (padrão) usa limite 5000 por entidade (chamada única)', async () => {
+  it('modo list (padrão) usa limite 1000 por entidade (2 × 500)', async () => {
     await loadAllRecords();
     for (const n of ALL_RECORD_ENTITIES) {
-      expect(entities[n].list).toHaveBeenCalledWith('-created_date', 5000);
+      expect(entities[n].list).toHaveBeenCalledWith('-created_date', 1000);
     }
   });
 

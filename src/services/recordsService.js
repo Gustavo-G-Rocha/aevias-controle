@@ -40,7 +40,7 @@ export const ALL_RECORD_ENTITIES = [
 
 /**
  * Carrega uma entidade com fallback silencioso para não bloquear o Promise.all.
- * No modo "list", usa limite de 5000 por entidade (10 × 500) em chamada única.
+ * No modo "list", usa limite de 1000 por entidade (2 × 500) em chamada única.
  * @param {string} entityType
  * @param {number} limit
  * @param {boolean} paginate - se true, busca com limite ampliado (modo list)
@@ -48,9 +48,12 @@ export const ALL_RECORD_ENTITIES = [
  */
 const RECORD_PAGE_SIZE = 500;     // lista completa e loadRecordsByObra — reduz volume em memória
 const DASHBOARD_PAGE_SIZE = 200; // dashboard — só registros recentes para stats/charts
-// 10 × 500 = 5000 por entidade — limite máximo da API; garante que nenhum registro
-// seja cortado. O paralelismo (BATCH_SIZE=10) compensa a velocidade.
+// 10 × 500 = 5000 por entidade — usado por loadRecordsByObra (escopo de obra única).
 export const MAX_PAGES = 10;
+// modo 'list' (loadAllRecords): 500 × 2 = 1000 por entidade — 80% menos memória que
+// o limite anterior de 5000. A tabela usa paginação client-side (20 itens/página),
+// então 1000 registros recentes por entidade é suficiente para todas as visualizações.
+export const LIST_MAX_PAGES = 2;
 
 async function loadEntity(entityType, limit = RECORD_PAGE_SIZE, paginate = false, maxPages = MAX_PAGES) {
   try {
@@ -125,7 +128,7 @@ async function loadEntitiesInBatches(entityList, limit, paginate = false, maxPag
   return allResults;
 }
 
-export async function loadAllRecords(mode = 'list', maxPages = MAX_PAGES) {
+export async function loadAllRecords(mode = 'list', maxPages = mode === 'list' ? LIST_MAX_PAGES : MAX_PAGES) {
   const limit = mode === 'dashboard' ? DASHBOARD_PAGE_SIZE : RECORD_PAGE_SIZE;
   const paginate = mode === 'list';
   const results = await loadEntitiesInBatches(ALL_RECORD_ENTITIES, limit, paginate, maxPages);
