@@ -40,16 +40,50 @@ export const ALL_RECORD_ENTITIES = [
 
 /**
  * Carrega uma entidade com fallback silencioso para não bloquear o Promise.all.
+ * No modo "list", implementa paginação por cursor (created_date) para buscar
+ * TODOS os registros, não apenas os 500 mais recentes.
  * @param {string} entityType
  * @param {number} limit
+ * @param {boolean} paginate - se true, busca todas as páginas (modo list)
  * @returns {Promise<object[]>}
  */
 const RECORD_PAGE_SIZE = 500;     // lista completa e loadRecordsByObra — reduz volume em memória
-const DASHBOARD_PAGE_SIZE = 200;  // dashboard — só registros recentes para stats/charts
+const DASHBOARD_PAGE_SIZE = 200; // dashboard — só registros recentes para stats/charts
+const MAX_PAGES = 10;             // safety: 10 × 500 = 5000 registros por entidade
 
-async function loadEntity(entityType, limit = RECORD_PAGE_SIZE) {
+async function loadEntity(entityType, limit = RECORD_PAGE_SIZE, paginate = false) {
   try {
-    return await base44.entities[entityType].list('-created_date', limit);
+    if (!paginate) {
+      return await base44.entities[entityType].list('-created_date', limit);
+    }
+
+    // Paginação por cursor: busca lotes de `limit` registros ordenados por
+    // created_date desc. Se o lote tem exatamente `limit` registros, há mais.
+    // Usa o created_date do último registro como cursor ($lt) para a próxima página.
+    const allRecords = [];
+    let cursor = null;
+
+    for (let page = 0; page < MAX_PAGES; page++) {
+      let batch;
+      if (cursor) {
+        batch = await base44.entities[entityType].filter(
+          { created_date: { $lt: cursor } },
+          '-created_date',
+          limit
+        );
+      } else {
+        batch = await base44.entities[entityType].list('-created_date', limit);
+      }
+
+      allRecords.push(...batch);
+
+      if (batch.length < limit) break;
+      if (batch.length === 0) break;
+
+      cursor = batch[batch.length - 1].created_date;
+    }
+
+    return allRecords;
   } catch (e) {
     logger.error(`[recordsService] Falha ao carregar ${entityType}:`, e?.message || e);
     return [];
@@ -74,30 +108,15 @@ export function normalizeRecords(results, entityTypes) {
   return out;
 }
 
-// Chaves de dedup semântico por entidade — evita contagem dupla de registros duplicados na base
-const SEMANTIC_DEDUP_KEYS = {
-  DiarioObra:               ['obra_id', 'data', 'laboratorista_name', 'tipo_local', 'trecho'],
-  ChecklistConcretagem:     ['obra_id', 'data', 'laboratorista_name', 'concreteira', 'estrutura'],
-  ChecklistTerraplanagem:   ['obra_id', 'data', 'laboratorista_name', 'camada'],
-  ChecklistUsina:           ['obra_id', 'data', 'laboratorista_name', 'usina'],
-  ChecklistAplicacao:       ['obra_id', 'data', 'laboratorista_name'],
-};
-
-// Deduplicação por ID + chave semântica para entidades com registros duplicados na base
+// Deduplicação apenas por ID — remove registros duplicados vindos da paginação.
+// O dedup semântico anterior usava campos opcionais (tipo_local, trecho, etc.)
+// que quando nulos faziam registros distintos colapsarem na mesma chave,
+// escondendo registros legítimos do usuário.
 export function deduplicateRecords(records) {
   const seen = new Set();
-  const seenSemantic = new Map();
   return records.filter(r => {
     if (seen.has(r.id)) return false;
     seen.add(r.id);
-
-    const keyFields = SEMANTIC_DEDUP_KEYS[r.entityType];
-    if (keyFields) {
-      const key = keyFields.map(f => r[f] ?? '').join('||');
-      if (seenSemantic.has(key)) return false;
-      seenSemantic.set(key, true);
-    }
-
     return true;
   });
 }
@@ -111,11 +130,11 @@ export function deduplicateRecords(records) {
  */
 const BATCH_SIZE = 5; // máximo de requests simultâneos por lote
 
-async function loadEntitiesInBatches(entityList, limit) {
+async function loadEntitiesInBatches(entityList, limit, paginate = false) {
   const allResults = [];
   for (let i = 0; i < entityList.length; i += BATCH_SIZE) {
     const batch = entityList.slice(i, i + BATCH_SIZE);
-    const settled = await Promise.allSettled(batch.map(type => loadEntity(type, limit)));
+    const settled = await Promise.allSettled(batch.map(type => loadEntity(type, limit, paginate)));
     settled.forEach((r, idx) => {
       if (r.status === 'rejected') {
         logger.warn(`[recordsService] loadAllRecords: ${batch[idx]} rejeitou:`, r.reason?.message || r.reason);
@@ -130,9 +149,53 @@ async function loadEntitiesInBatches(entityList, limit) {
 
 export async function loadAllRecords(mode = 'list') {
   const limit = mode === 'dashboard' ? DASHBOARD_PAGE_SIZE : RECORD_PAGE_SIZE;
-  const results = await loadEntitiesInBatches(ALL_RECORD_ENTITIES, limit);
+  const paginate = mode === 'list';
+  const results = await loadEntitiesInBatches(ALL_RECORD_ENTITIES, limit, paginate);
   const normalized = normalizeRecords(results, ALL_RECORD_ENTITIES);
   return deduplicateRecords(normalized);
+}
+
+/**
+ * Carrega todos os registros de uma entidade para uma obra específica,
+ * com paginação por cursor para não cortar registros antigos.
+ * @param {string} entityType
+ * @param {string} obraId
+ * @returns {Promise<object[]>}
+ */
+async function loadEntityByObra(entityType, obraId) {
+  try {
+    const allRecords = [];
+    let cursor = null;
+
+    for (let page = 0; page < MAX_PAGES; page++) {
+      let batch;
+      if (cursor) {
+        batch = await base44.entities[entityType].filter(
+          { obra_id: obraId, created_date: { $lt: cursor } },
+          '-created_date',
+          RECORD_PAGE_SIZE
+        );
+      } else {
+        batch = await base44.entities[entityType].filter(
+          { obra_id: obraId },
+          '-created_date',
+          RECORD_PAGE_SIZE
+        );
+      }
+
+      allRecords.push(...batch);
+
+      if (batch.length < RECORD_PAGE_SIZE) break;
+      if (batch.length === 0) break;
+
+      cursor = batch[batch.length - 1].created_date;
+    }
+
+    return allRecords;
+  } catch (e) {
+    logger.error(`[recordsService] Falha ao carregar ${entityType} por obra:`, e?.message || e);
+    return [];
+  }
 }
 
 /**
@@ -144,7 +207,7 @@ export async function loadAllRecords(mode = 'list') {
 export async function loadRecordsByObra(obraId) {
   const settled = await Promise.allSettled(
     ALL_RECORD_ENTITIES.map(type =>
-      base44.entities[type].filter({ obra_id: obraId }, '-created_date', RECORD_PAGE_SIZE)
+      loadEntityByObra(type, obraId)
     )
   );
   const results = settled.map((r, i) => {

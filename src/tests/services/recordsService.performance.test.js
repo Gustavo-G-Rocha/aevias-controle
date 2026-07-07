@@ -54,6 +54,7 @@ function generateRecords(count, entityType) {
       laboratorista_name: `Lab ${i % 20}`,
       sample_id: `S-${i}`,
       extraction_date: '2026-01-01',
+      created_date: `2026-01-${String((i % 28) + 1).padStart(2, '0')}T10:00:00.000000`,
     });
   }
   return records;
@@ -63,6 +64,8 @@ beforeEach(() => {
   vi.clearAllMocks();
   for (const n of ALL_RECORD_ENTITIES) {
     entities[n].list.mockResolvedValue(generateRecords(RECORDS_PER_ENTITY, n));
+    // filter retorna [] por padrão — pára a paginação após a 1ª página
+    entities[n].filter.mockResolvedValue([]);
   }
 });
 

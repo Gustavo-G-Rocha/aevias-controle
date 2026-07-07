@@ -84,14 +84,13 @@ describe('recordsService — pure helpers', () => {
     expect(r).toHaveLength(1);
   });
 
-  it('deduplicateRecords aplica dedup semântico para DiarioObra', () => {
+  it('deduplicateRecords mantém registros com mesmo conteúdo mas IDs diferentes (sem dedup semântico)', () => {
     const base = { obra_id: 'o', data: 'd', laboratorista_name: 'l', tipo_local: 't', trecho: 'tr' };
     const r = deduplicateRecords([
       { id: 'a', entityType: 'DiarioObra', ...base },
       { id: 'b', entityType: 'DiarioObra', ...base },
     ]);
-    expect(r).toHaveLength(1);
-    expect(r[0].id).toBe('a');
+    expect(r).toHaveLength(2);
   });
 
   it('deduplicateRecords mantém registros distintos sem chaves semânticas', () => {
@@ -118,14 +117,15 @@ describe('recordsService — loadAllRecords', () => {
     }
   });
 
-  it('normaliza com entityType e aplica dedup id + semântico', async () => {
+  it('normaliza com entityType e aplica dedup por id (sem dedup semântico)', async () => {
     entities.DiarioObra.list.mockResolvedValueOnce([
       { id: 'd1', obra_id: 'o1', data: '2026-01-01', laboratorista_name: 'A', tipo_local: 'x', trecho: 't' },
       { id: 'd2', obra_id: 'o1', data: '2026-01-01', laboratorista_name: 'A', tipo_local: 'x', trecho: 't' },
     ]);
     entities.EnsaioCAUQ.list.mockResolvedValueOnce([{ id: 'd1', obra_id: 'o2' }]);
     const out = await loadAllRecords();
-    expect(out).toHaveLength(1);
+    // d1 aparece duas vezes (DiarioObra + EnsaioCAUQ) — dedup por id mantém apenas a primeira
+    expect(out).toHaveLength(2);
     expect(out[0].entityType).toBe('DiarioObra');
   });
 
