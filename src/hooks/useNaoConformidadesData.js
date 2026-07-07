@@ -31,12 +31,21 @@ export function useNaoConformidadesData() {
       const userData = await obterUsuarioAtual();
       const userAccessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
 
-      const [obrasData, regionaisData, rncsData] = await Promise.all([
+      const tiposValues = TIPOS_CHECKLIST.map(t => t.value);
+      const outrosValues = OUTROS_TIPOS_REGISTRO.map(t => t.value);
+
+      // Dispara TODOS os fetchs em paralelo — nenhum depende de outro.
+      // O filtro por availableIds acontece depois, quando os dados já chegaram.
+      const [obrasData, regionaisData, rncsData, checklistGroups, diarioData, outrosGroups] = await Promise.all([
         listarRegistros('Obra', '-created_date', 2000),
         listarRegionais(),
         listarRegistros('RelatorioNC', '-created_date', 1000),
+        loadRecordsGrouped(tiposValues, 1000),
+        listarRegistros('DiarioObra', '-created_date', 1000),
+        loadRecordsGrouped(outrosValues, 1000),
       ]);
 
+      // Calcula availableObras e availableIds para filtrar os resultados
       let availableObras = obrasData;
       if (userAccessLevel === 'cliente') {
         const regs = regionaisData.filter(r => (r.clientes_responsaveis || []).some(e => e.toLowerCase() === userData.email.toLowerCase()));
@@ -61,19 +70,12 @@ export function useNaoConformidadesData() {
 
       const allCNCs = [];
 
-      const tiposValues = TIPOS_CHECKLIST.map(t => t.value);
-      const [checklistGroups, diarioData] = await Promise.all([
-        loadRecordsGrouped(tiposValues, 1000),
-        listarRegistros('DiarioObra', '-created_date', 1000),
-      ]);
-
       const checklistResults = TIPOS_CHECKLIST.map((t, i) =>
         checklistGroups[i].filter(c => availableIds.has(c.obra_id)).map(c => ({ ...c, _tipo: t.value, _page: t.page }))
       );
       const diarioFiltrado = diarioData.filter(c => availableIds.has(c.obra_id));
 
       checklistResults.flat().forEach(cl => {
-        // NCs automáticas extraídas por lógica de conformidade
         extrairNaoConformidadesChecklist(cl, cl._tipo).forEach(param => {
           allCNCs.push({
             id: cl.id, obra_id: cl.obra_id,
@@ -85,7 +87,6 @@ export function useNaoConformidadesData() {
           });
         });
 
-        // NCs explícitas registradas no checklist
         if (Array.isArray(cl.nao_conformidades) && cl.nao_conformidades.length > 0) {
           const tipoInfo = TIPOS_CHECKLIST.find(t => t.value === cl._tipo);
           cl.nao_conformidades.forEach(nc => {
@@ -96,7 +97,6 @@ export function useNaoConformidadesData() {
         }
       });
 
-      // NCs explícitas do Diário de Obra
       const diarioTipo = { value: 'DiarioObra', page: 'RelatorioDiario' };
       diarioFiltrado.forEach(c => {
         if (Array.isArray(c.nao_conformidades) && c.nao_conformidades.length > 0) {
@@ -106,9 +106,6 @@ export function useNaoConformidadesData() {
         }
       });
 
-      // Outros registros não conformes (approved === false ou condicao_conformidade)
-      const outrosValues = OUTROS_TIPOS_REGISTRO.map(t => t.value);
-      const outrosGroups = await loadRecordsGrouped(outrosValues, 1000);
       const outrosResults = OUTROS_TIPOS_REGISTRO.map((t, i) =>
         outrosGroups[i]
           .filter(c => availableIds.has(c.obra_id) && isOutroRegistroNaoConforme(c, t.value))
