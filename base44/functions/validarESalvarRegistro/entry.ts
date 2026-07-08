@@ -104,7 +104,7 @@ Deno.serve(async (req) => {
     const user = await base44.auth.me();
 
     if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return Response.json({ error: 'Unauthorized', errorCategory: 'permission' }, { status: 401 });
     }
 
     const body = await req.json();
@@ -113,21 +113,21 @@ Deno.serve(async (req) => {
     // Whitelist de entidades permitidas
     if (!ALLOWED_ENTITIES.includes(entityName)) {
       return Response.json(
-        { error: `Entidade não suportada: ${entityName}` },
+        { error: `Entidade não suportada: ${entityName}`, errorCategory: 'schema' },
         { status: 400 }
       );
     }
 
     if (operation !== 'create' && operation !== 'update') {
       return Response.json(
-        { error: 'Operação inválida. Use "create" ou "update".' },
+        { error: 'Operação inválida. Use "create" ou "update".', errorCategory: 'schema' },
         { status: 400 }
       );
     }
 
     if (operation === 'update' && !recordId) {
       return Response.json(
-        { error: 'recordId é obrigatório para operação de update.' },
+        { error: 'recordId é obrigatório para operação de update.', errorCategory: 'schema' },
         { status: 400 }
       );
     }
@@ -136,7 +136,7 @@ Deno.serve(async (req) => {
     const validation = validateRecord(entityName, data);
     if (!validation.valid) {
       return Response.json(
-        { error: validation.message, validationError: true },
+        { error: validation.message, validationError: true, errorCategory: 'schema' },
         { status: 400 }
       );
     }
@@ -171,6 +171,6 @@ Deno.serve(async (req) => {
 
     return Response.json({ success: true, data: result });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ error: error.message, errorCategory: 'unknown' }, { status: 500 });
   }
 });

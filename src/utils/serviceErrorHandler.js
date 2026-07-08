@@ -10,6 +10,7 @@
 // por aqui e borbulham naturalmente com sua mensagem original.
 
 import { logger } from '@/utils/logger';
+import { captureError } from '@/utils/observability';
 
 // Padrões de campos sensíveis para redação em logs de desenvolvimento.
 // Redaction garante que dados como CPF, senha e token não apareçam no
@@ -69,7 +70,10 @@ export async function withServiceCall(operation, friendlyMessage) {
   try {
     return await operation();
   } catch (error) {
-    logger.error(`[Service] ${friendlyMessage}`, redactError(error));
+    const redacted = redactError(error);
+    // Pipeline de observabilidade: categoriza e roteia para sink externo
+    captureError(redacted, { operation: friendlyMessage });
+    logger.error(`[Service] ${friendlyMessage}`, redacted);
     const friendlyError = new Error(friendlyMessage);
     friendlyError.cause = error;
     throw friendlyError;

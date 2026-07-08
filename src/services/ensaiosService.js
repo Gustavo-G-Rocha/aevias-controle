@@ -1,6 +1,7 @@
 import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
 import { logger } from '@/utils/logger';
+import { captureError } from '@/utils/observability';
 import { validarESalvarRegistro } from '@/functions/validarESalvarRegistro';
 import { gerenciarAprovacao } from '@/functions/gerenciarAprovacao';
 
@@ -95,6 +96,7 @@ export async function criarEnsaio(entityName, data) {
     const response = await validarESalvarRegistro({ entityName, data, operation: 'create' });
     return response.data.data;
   } catch (error) {
+    captureError(error, { entity: entityName, operation: 'create' });
     const validationMessage = error?.response?.data?.error;
     if (validationMessage) throw new Error(validationMessage);
     logger.error('[Service] Falha ao criar ensaio', error);
@@ -110,6 +112,7 @@ export async function atualizarEnsaio(entityName, id, data) {
     const response = await validarESalvarRegistro({ entityName, data, operation: 'update', recordId: id });
     return response.data.data;
   } catch (error) {
+    captureError(error, { entity: entityName, operation: 'update' });
     const validationMessage = error?.response?.data?.error;
     if (validationMessage) throw new Error(validationMessage);
     logger.error('[Service] Falha ao atualizar ensaio', error);

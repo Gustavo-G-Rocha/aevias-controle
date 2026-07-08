@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
     const user = await base44.auth.me();
 
     if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return Response.json({ error: 'Unauthorized', errorCategory: 'permission' }, { status: 401 });
     }
 
     const body = await req.json();
@@ -81,14 +81,14 @@ Deno.serve(async (req) => {
     // Whitelist de entidades permitidas
     if (!ALLOWED_ENTITIES.includes(entityName)) {
       return Response.json(
-        { error: `Entidade não suportada: ${entityName}` },
+        { error: `Entidade não suportada: ${entityName}`, errorCategory: 'schema' },
         { status: 400 }
       );
     }
 
     if (!recordId) {
       return Response.json(
-        { error: 'recordId é obrigatório' },
+        { error: 'recordId é obrigatório', errorCategory: 'schema' },
         { status: 400 }
       );
     }
@@ -101,7 +101,7 @@ Deno.serve(async (req) => {
     if (action === 'approve') {
       if (!canApprove(user)) {
         return Response.json(
-          { error: 'Sem permissão para aprovar registros' },
+          { error: 'Sem permissão para aprovar registros', errorCategory: 'permission' },
           { status: 403 }
         );
       }
@@ -117,13 +117,13 @@ Deno.serve(async (req) => {
     } else if (action === 'reject') {
       if (!canApprove(user)) {
         return Response.json(
-          { error: 'Sem permissão para reprovar registros' },
+          { error: 'Sem permissão para reprovar registros', errorCategory: 'permission' },
           { status: 403 }
         );
       }
       if (!rejectionReason || !rejectionReason.trim()) {
         return Response.json(
-          { error: 'Motivo da reprovação é obrigatório' },
+          { error: 'Motivo da reprovação é obrigatório', errorCategory: 'schema' },
           { status: 400 }
         );
       }
@@ -141,7 +141,7 @@ Deno.serve(async (req) => {
       // Assinatura do cliente — requiere nível cliente ou admin/gestor
       if (level !== 'cliente' && !canApprove(user)) {
         return Response.json(
-          { error: 'Sem permissão para assinar registros' },
+          { error: 'Sem permissão para assinar registros', errorCategory: 'permission' },
           { status: 403 }
         );
       }
@@ -155,7 +155,7 @@ Deno.serve(async (req) => {
       // Cliente aprova NC
       if (level !== 'cliente' && !canApprove(user)) {
         return Response.json(
-          { error: 'Sem permissão para aprovar NC' },
+          { error: 'Sem permissão para aprovar NC', errorCategory: 'permission' },
           { status: 403 }
         );
       }
@@ -172,13 +172,13 @@ Deno.serve(async (req) => {
     } else if (action === 'reject_nc') {
       if (level !== 'cliente' && !canApprove(user)) {
         return Response.json(
-          { error: 'Sem permissão para reprovar NC' },
+          { error: 'Sem permissão para reprovar NC', errorCategory: 'permission' },
           { status: 403 }
         );
       }
       if (!rejectionReason || !rejectionReason.trim()) {
         return Response.json(
-          { error: 'Motivo da reprovação é obrigatório' },
+          { error: 'Motivo da reprovação é obrigatório', errorCategory: 'schema' },
           { status: 400 }
         );
       }
@@ -191,7 +191,7 @@ Deno.serve(async (req) => {
     } else if (action === 'solicitar_aprovacao_nc') {
       if (!canApprove(user)) {
         return Response.json(
-          { error: 'Sem permissão para solicitar aprovação' },
+          { error: 'Sem permissão para solicitar aprovação', errorCategory: 'permission' },
           { status: 403 }
         );
       }
@@ -201,14 +201,14 @@ Deno.serve(async (req) => {
     } else if (action === 'update_nc_status') {
       if (!canApprove(user)) {
         return Response.json(
-          { error: 'Sem permissão para alterar status da NC' },
+          { error: 'Sem permissão para alterar status da NC', errorCategory: 'permission' },
           { status: 403 }
         );
       }
       const validStatuses = ['aberta', 'em_tratativa', 'encerrada', 'cancelada'];
       if (!validStatuses.includes(ncStatus)) {
         return Response.json(
-          { error: 'Status inválido' },
+          { error: 'Status inválido', errorCategory: 'schema' },
           { status: 400 }
         );
       }
@@ -223,20 +223,20 @@ Deno.serve(async (req) => {
         record = await base44.asServiceRole.entities[entityName].get(recordId);
       } catch {
         return Response.json(
-          { error: 'Registro não encontrado' },
+          { error: 'Registro não encontrado', errorCategory: 'permission' },
           { status: 404 }
         );
       }
       if (!record) {
         return Response.json(
-          { error: 'Registro não encontrado' },
+          { error: 'Registro não encontrado', errorCategory: 'permission' },
           { status: 404 }
         );
       }
       // Permissão: criador OU approver-level
       if (!canDelete(user, record)) {
         return Response.json(
-          { error: 'Sem permissão para excluir este registro' },
+          { error: 'Sem permissão para excluir este registro', errorCategory: 'permission' },
           { status: 403 }
         );
       }
@@ -244,7 +244,7 @@ Deno.serve(async (req) => {
       return Response.json({ success: true, data: { id: recordId, deleted: true } });
     } else {
       return Response.json(
-        { error: 'Ação inválida' },
+        { error: 'Ação inválida', errorCategory: 'schema' },
         { status: 400 }
       );
     }
@@ -282,6 +282,6 @@ Deno.serve(async (req) => {
     const result = await base44.asServiceRole.entities[entityName].update(recordId, updateData);
     return Response.json({ success: true, data: result });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ error: error.message, errorCategory: 'unknown' }, { status: 500 });
   }
 });
