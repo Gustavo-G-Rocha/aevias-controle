@@ -361,18 +361,14 @@
     }
   }
 
-  /* Mobile form pages — full width, no side padding */
+  /* Mobile form pages — full width containers stretch to viewport */
   @media (max-width: 1023px) {
-    .p-6 {
-      padding-left: 0.25rem !important;
-      padding-right: 0.25rem !important;
-    }
-    .p-4 {
-      padding-left: 0.25rem !important;
-      padding-right: 0.25rem !important;
-    }
-    /* Cards stretch full width */
-    .max-w-6xl, .max-w-7xl, .max-w-5xl, .max-w-4xl, .max-w-3xl, .max-w-2xl {
+    .min-h-screen.bg-transparent .max-w-6xl,
+    .min-h-screen.bg-transparent .max-w-7xl,
+    .min-h-screen.bg-transparent .max-w-5xl,
+    .min-h-screen.bg-transparent .max-w-4xl,
+    .min-h-screen.bg-transparent .max-w-3xl,
+    .min-h-screen.bg-transparent .max-w-2xl {
       max-width: 100% !important;
       margin-left: 0 !important;
       margin-right: 0 !important;
