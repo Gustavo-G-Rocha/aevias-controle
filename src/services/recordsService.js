@@ -51,10 +51,10 @@ const RECORD_PAGE_SIZE = 500;     // lista completa e loadRecordsByObra — redu
 const DASHBOARD_PAGE_SIZE = 200; // dashboard — só registros recentes para stats/charts
 // 10 × 500 = 5000 por entidade — usado por loadRecordsByObra (escopo de obra única).
 export const MAX_PAGES = 10;
-// modo 'list' (loadAllRecords): 500 × 2 = 1000 por entidade — 80% menos memória que
-// o limite anterior de 5000. A tabela usa paginação client-side (20 itens/página),
-// então 1000 registros recentes por entidade é suficiente para todas as visualizações.
-export const LIST_MAX_PAGES = 2;
+// modo 'list' (loadAllRecords): paginação completa via filter+skip.
+// 20 × 500 = 10.000 por entidade — cobre o maior volume atual (DiarioObra: 5.500).
+// O loop para automaticamente quando uma página retorna menos que o limite.
+export const LIST_MAX_PAGES = 20;
 
 async function loadEntity(entityType, limit = RECORD_PAGE_SIZE, paginate = false, maxPages = MAX_PAGES) {
   try {
@@ -62,10 +62,17 @@ async function loadEntity(entityType, limit = RECORD_PAGE_SIZE, paginate = false
       return await base44.entities[entityType].list('-created_date', limit);
     }
 
-    // Uma única chamada list com limite alto — mais rápida e confiável que
-    // paginação por cursor (filter com $lt em created_date não funciona).
-    const totalLimit = limit * maxPages;
-    return await base44.entities[entityType].list('-created_date', totalLimit);
+    // Paginação via filter + skip — carrega TODOS os registros da entidade.
+    // (list() limita a 5000 por chamada; filter com skip não tem esse teto.)
+    const all = [];
+    let skip = 0;
+    for (let page = 0; page < maxPages; page++) {
+      const batch = await base44.entities[entityType].filter({}, '-created_date', limit, skip);
+      all.push(...batch);
+      if (batch.length < limit) break;
+      skip += limit;
+    }
+    return all;
   } catch (e) {
     logger.error(`[recordsService] Falha ao carregar ${entityType}:`, e?.message || e);
     toast({
