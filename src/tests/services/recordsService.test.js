@@ -36,6 +36,7 @@ const { entities } = vi.hoisted(() => {
 vi.mock('@/api/base44Client', () => ({ base44: { entities } }));
 
 import { base44 } from '@/api/base44Client';
+import { logger } from '@/utils/logger';
 import {
   normalizeRecords,
   deduplicateRecords,
@@ -134,6 +135,27 @@ describe('recordsService — loadAllRecords', () => {
     const out = await loadAllRecords();
     expect(Array.isArray(out)).toBe(true);
     expect(out.some((r) => r.entityType === 'EnsaioMRAF')).toBe(false);
+  });
+
+  it('loga aviso de truncamento quando registros batem no limite (modo list)', async () => {
+    const warnSpy = vi.spyOn(logger, 'warn');
+    const fullPage = Array.from({ length: 1000 }, (_, i) => ({ id: `r${i}` }));
+    entities.DiarioObra.list.mockResolvedValueOnce(fullPage);
+    await loadAllRecords();
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Possível truncamento em DiarioObra')
+    );
+    warnSpy.mockRestore();
+  });
+
+  it('não loga truncamento quando registros são menores que o limite', async () => {
+    const warnSpy = vi.spyOn(logger, 'warn');
+    entities.DiarioObra.list.mockResolvedValueOnce([{ id: 'd1' }]);
+    await loadAllRecords();
+    expect(warnSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining('Possível truncamento em DiarioObra')
+    );
+    warnSpy.mockRestore();
   });
 });
 
