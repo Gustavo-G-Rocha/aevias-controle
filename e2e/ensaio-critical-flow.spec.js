@@ -26,6 +26,14 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
   test('percorre todo o ciclo de vida de um ensaio no browser', async ({ page }) => {
     const ctx = setupMockApi(page, ADMIN_USER);
 
+    // ── Warmup: pré-carrega a página EnsaioCAUQ para o Vite otimizar deps ──────
+    // Sem isso, o primeiro carregamento da página lazy causa 504 "Outdated
+    // Optimize Dep" porque o Vite descobre novas dependências e invalida o
+    // cache de otimização. O warmup força a otimização antes do teste real.
+    await page.goto('/EnsaioCAUQ');
+    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForTimeout(2000);
+
     // ═══════════════════════════════════════════════════════════════════════════
     // 1. ACESSAR MEUSENSAIOS — lista deve carregar sem erro
     // ═══════════════════════════════════════════════════════════════════════════
@@ -42,7 +50,15 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
     await page.getByRole('menuitem', { name: /Ensaio de CAUQ/i }).click();
 
     // Formulário deve carregar
-    await expect(page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i })).toBeVisible({ timeout: 15_000 });
+    const consoleErrors = [];
+    page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
+    page.on('pageerror', err => consoleErrors.push(err.message));
+    try {
+      await expect(page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i })).toBeVisible({ timeout: 15_000 });
+    } catch (e) {
+      console.log('CONSOLE ERRORS:', JSON.stringify(consoleErrors, null, 2));
+      throw e;
+    }
 
     // ═══════════════════════════════════════════════════════════════════════════
     // 3. SALVAR PROGRESSO — cria rascunho
@@ -120,6 +136,11 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
     // Se a função validarESalvarRegistro retornar erro, "Salvar Progresso"
     // deve mostrar mensagem de erro — provando que o teste detecta regressões.
     const ctx = setupMockApi(page, ADMIN_USER);
+
+    // ── Warmup: pré-carrega a página EnsaioCAUQ para o Vite otimizar deps ──────
+    await page.goto('/EnsaioCAUQ');
+    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForTimeout(2000);
 
     // Sobrescreve o mock da função para sempre retornar erro
     page.route('**/api/apps/*/functions/validarESalvarRegistro', async (route) => {

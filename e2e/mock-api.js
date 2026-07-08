@@ -264,33 +264,43 @@ function handleFunction(funcName, body, ctx) {
 export function setupMockApi(page, currentUser = ADMIN_USER) {
   const ctx = createStore();
 
+  // ── Token injection via URL param ───────────────────────────────────────────
+  // O SDK lê o token da URL ANTES de qualquer script (app-params.js).
+  // Adicionamos ?access_token=… diretamente na URL ao navegar.
+  // O addInitScript (localStorage) não é confiável com Vite dev server
+  // porque o module preload pode avaliar appParams antes do init script.
+  const TOKEN = 'e2e-mock-token';
+  const originalGoto = page.goto.bind(page);
+  page.goto = async (url, options) => {
+    const fullUrl = typeof url === 'string' && url.startsWith('/')
+      ? `http://localhost:5173${url}`
+      : url;
+    const parsed = new URL(fullUrl);
+    if (!parsed.searchParams.has('access_token')) {
+      parsed.searchParams.set('access_token', TOKEN);
+    }
+    return originalGoto(parsed.toString(), options);
+  };
+
   // ── Context-level routes ────────────────────────────────────────────────────
-  // Usamos page.context().route() em vez de page.route() para que as rotas
-  // se apliquem também a páginas abertas em novas abas (ex: relatório com
-  // target="_blank"). Sem isso, a popup não teria o mock e faria chamadas
-  // reais de rede, quebrando o teste.
+  // Usamos page.context().route() para que as rotas se apliquem também a
+  // páginas abertas em novas abas (ex: relatório com target="_blank").
   const context = page.context();
 
-  // ── Token injection via URL redirect ────────────────────────────────────────
-  // addInitScript (localStorage) não é confiável com Vite dev server — o
-  // module preload pode avaliar appParams antes do init script rodar.
-  // Em vez disso, interceptamos navegações de página e adicionamos
-  // ?access_token=… à URL. O SDK lê da URL ANTES de qualquer script.
-  context.route('**/*', (route) => {
-    const request = route.request();
-    if (request.isNavigationRequest() && request.url().includes('localhost:5173')) {
-      const url = new URL(request.url());
-      // Não injetar em páginas de login/registro
-      if (!url.pathname.startsWith('/login') &&
-          !url.pathname.startsWith('/register') &&
-          !url.pathname.startsWith('/forgot') &&
-          !url.pathname.startsWith('/reset') &&
-          !url.searchParams.has('access_token')) {
-        url.searchParams.set('access_token', 'e2e-mock-token');
-        return route.fulfill({ status: 302, headers: { Location: url.toString() } });
+  // Interceptar navegações de NOVAS abas para injetar o token na URL
+  context.on('page', async (newPage) => {
+    // Aguardar a primeira navegação da nova aba e reescrever a URL com o token
+    newPage.on('framenavigated', async (frame) => {
+      if (frame === newPage.mainFrame()) {
+        const url = new URL(newPage.url());
+        if (!url.searchParams.has('access_token') && !url.pathname.startsWith('/login')) {
+          url.searchParams.set('access_token', TOKEN);
+          try {
+            await newPage.goto(url.toString());
+          } catch { /* página pode ainda estar carregando */ }
+        }
       }
-    }
-    return route.fallback();
+    }, { once: true });
   });
 
   context.route('**/api/apps/**', async (route) => {
@@ -389,8 +399,10 @@ export function setupMockApi(page, currentUser = ADMIN_USER) {
       }
     }
 
-    // Fallback: passa adiante (ex: HMR, assets do Vite)
-    return route.continue();
+    // Fallback: resposta vazia para qualquer outra chamada de API não reconhecida.
+    // Não usar route.continue() — faria uma requisição real ao Vite dev server,
+    // que não tem backend, retornando 404 e poluindo o console.
+    return route.fulfill(jsonResponse([]));
   });
 
   return ctx;
