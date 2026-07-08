@@ -100,7 +100,7 @@ export function prepareNCPayload(form, obraId, obras, tipoChecklist, checklistId
     relatorio_criador: managerName,
     checklist_ref_tipo: tipoChecklist,
     checklist_ref_id: checklistId,
-    fotos,
+    fotos: (fotos || []).map(f => (typeof f === 'string' ? f : (f?.url || ''))).filter(Boolean),
     pdfs: (pdfs || []).map(p => ({ url: p.url || p, nome: p.nome || p })),
     status: "aberta",
     pendente_aprovacao_cliente: true,
