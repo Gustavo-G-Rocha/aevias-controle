@@ -24,6 +24,7 @@ export function useBoletimSondagemTradoActions(formData, user, editingBoletim) {
       const dataToSave = {
         ...formData,
         laboratorista_name: user?.laboratorista_name || user?.full_name,
+        fotos: (formData.fotos || []).map(f => (typeof f === 'string' ? f : (f?.url || ''))).filter(Boolean),
       };
       if (editingBoletim) {
         const updateData = { ...dataToSave };

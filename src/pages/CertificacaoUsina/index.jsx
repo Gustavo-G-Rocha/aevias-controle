@@ -110,7 +110,11 @@ export default function CertificacaoUsinaPage() {
     const validation = validarCertificacao(formData, saveStatus);
     if (!validation.valid) { toast({ title: validation.message }); return; }
 
-    const dataToSave = { ...formData, status: saveStatus };
+    const dataToSave = {
+      ...formData,
+      status: saveStatus,
+      fotos: (formData.fotos || []).map(f => (typeof f === 'string' ? f : (f?.url || ''))).filter(Boolean),
+    };
 
     const editing = editingChecklist?.id;
     if (editing) {

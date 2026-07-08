@@ -22,6 +22,7 @@ export function useEnsaioDensidadeActions(formData, user, editingEnsaio) {
     ...fd,
     status: saveStatus,
     laboratorista_name: user?.laboratorista_name || user?.full_name,
+    fotos: (fd.fotos || []).map(f => (typeof f === 'string' ? f : (f?.url || ''))).filter(Boolean),
   });
 
   return useEnsaioActionsBase({

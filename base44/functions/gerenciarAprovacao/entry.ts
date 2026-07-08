@@ -249,17 +249,29 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Normaliza campos legados que podem quebrar a validação do schema.
-    // Ex.: ChecklistTerraplanagem mudou `fotos` de string[] para {url, legenda}[];
-    // registros antigos ainda têm strings e falham na validação do update.
+    // Normaliza campos legados de `fotos` que podem quebrar a validação do schema.
+    // ChecklistTerraplanagem usa {url, legenda}[] — registros antigos podem ter strings.
+    // Demais entidades usam string[] — registros podem ter objetos por erro de migração.
+    const OBJECT_FOTOS_ENTITIES = new Set(['ChecklistTerraplanagem']);
     try {
       const existing = await base44.asServiceRole.entities[entityName].get(recordId);
       if (existing?.fotos && Array.isArray(existing.fotos)) {
-        const needsNorm = existing.fotos.some((f) => typeof f === 'string');
-        if (needsNorm) {
-          updateData.fotos = existing.fotos.map((f) =>
-            typeof f === 'string' ? { url: f, legenda: '' } : f
-          );
+        if (OBJECT_FOTOS_ENTITIES.has(entityName)) {
+          // Entidade espera {url, legenda}[] — normaliza strings → objetos
+          const needsNorm = existing.fotos.some((f) => typeof f === 'string');
+          if (needsNorm) {
+            updateData.fotos = existing.fotos.map((f) =>
+              typeof f === 'string' ? { url: f, legenda: '' } : f
+            );
+          }
+        } else {
+          // Entidade espera string[] — normaliza objetos → strings
+          const needsNorm = existing.fotos.some((f) => typeof f !== 'string');
+          if (needsNorm) {
+            updateData.fotos = existing.fotos
+              .map((f) => (typeof f === 'string' ? f : (f?.url || '')))
+              .filter(Boolean);
+          }
         }
       }
     } catch {

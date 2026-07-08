@@ -214,6 +214,7 @@ export const validarCPsParaFinalizar = (corposProva, metodo) => {
 export const serializarFormData = (formData, status) => ({
   ...formData,
   status,
+  fotos: (formData.fotos || []).map(f => (typeof f === 'string' ? f : (f?.url || ''))).filter(Boolean),
   fator_correcao_prensa: parseFloat(formData.fator_correcao_prensa),
   dens_agua_25c: parseFloat(formData.dens_agua_25c),
   volume_vazios_projeto: formData.volume_vazios_projeto ? parseFloat(formData.volume_vazios_projeto) : null,
