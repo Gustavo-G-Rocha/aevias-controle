@@ -211,7 +211,7 @@ function detectEntityName(ensaio) {
   // ficar incorreta silenciosamente. O log abaixo sinaliza quando este
   // caminho é usado para facilitar diagnóstico. Sempre prefira injetar
   // entityType/entityName na origem em vez de depender destes checks.
-  logger.warn('[ensaiosService] detectEntityName: usando fallback heurístico para registro', ensaio.id);
+  logger.error('[ensaiosService] detectEntityName: usando fallback heurístico para registro', ensaio.id);
 
   if (ensaio.corpos_prova_marshall !== undefined) return 'EnsaioCAUQ';
   if (ensaio.extracao_ligante !== undefined) return 'EnsaioCAUQ';
