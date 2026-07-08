@@ -58,21 +58,14 @@ export const LIST_MAX_PAGES = 2;
 
 async function loadEntity(entityType, limit = RECORD_PAGE_SIZE, paginate = false, maxPages = MAX_PAGES) {
   try {
-    const requestedLimit = paginate ? limit * maxPages : limit;
-    const records = await base44.entities[entityType].list('-created_date', requestedLimit);
-
-    // Detecta possível truncamento silencioso: se o número de registros
-    // retornados bate no limite solicitado, pode haver mais registros não
-    // carregados. Log apenas — não altera o comportamento de carregamento.
-    if (Array.isArray(records) && records.length >= requestedLimit) {
-      logger.warn(
-        `[recordsService] Possível truncamento em ${entityType}: ` +
-        `retornou ${records.length} registros (limite=${requestedLimit}). ` +
-        `Pode haver mais registros não carregados.`
-      );
+    if (!paginate) {
+      return await base44.entities[entityType].list('-created_date', limit);
     }
 
-    return records;
+    // Uma única chamada list com limite alto — mais rápida e confiável que
+    // paginação por cursor (filter com $lt em created_date não funciona).
+    const totalLimit = limit * maxPages;
+    return await base44.entities[entityType].list('-created_date', totalLimit);
   } catch (e) {
     logger.error(`[recordsService] Falha ao carregar ${entityType}:`, e?.message || e);
     toast({
