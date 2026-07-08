@@ -30,20 +30,7 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
     page.on('console', msg => { if (msg.type() === 'error') console.log(`  [BROWSER ERROR] ${msg.text()}`); });
     page.on('pageerror', err => console.log(`  [PAGE ERROR] ${err.message}`));
     page.on('requestfailed', req => console.log(`  [REQ FAILED] ${req.url().slice(0, 120)} — ${req.failure()?.errorText}`));
-
-    // ── Warmup: pré-carrega a página EnsaioCAUQ ────────────────────────────────
-    // Com o Vite iniciado pelo Playwright (porta 5174, optimizeDeps.include
-    // com zod), o 504 "Outdated Optimize Dep" não deve mais ocorrer.
-    // Mantemos um warmup de segurança: se a página carregar, ótimo; se não,
-    // tentamos mais uma vez após um breve wait (pode haver re-otimização).
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        await page.goto('/EnsaioCAUQ', { waitUntil: 'networkidle', timeout: 30_000 });
-        const heading = page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i });
-        if (await heading.isVisible({ timeout: 10_000 }).catch(() => false)) break;
-      } catch { /* retry */ }
-      await page.waitForTimeout(3000);
-    }
+    page.on('response', resp => { if (resp.status() >= 400) console.log(`  [HTTP ${resp.status()}] ${resp.url().slice(0, 150)}`); });
 
     // ═══════════════════════════════════════════════════════════════════════════
     // 1. ACESSAR MEUSENSAIOS — lista deve carregar sem erro
@@ -60,8 +47,8 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
     await page.locator('main').getByRole('button', { name: /Novo Registro/i }).click();
     await page.getByRole('menuitem', { name: /Ensaio de CAUQ/i }).click();
 
-    // Formulário deve carregar
-    await expect(page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i })).toBeVisible({ timeout: 20_000 });
+    // Formulário deve carregar (CardTitle é um div, não heading semântico)
+    await expect(page.getByText('Novo Ensaio de CAUQ')).toBeVisible({ timeout: 20_000 });
 
     // ═══════════════════════════════════════════════════════════════════════════
     // 3. SALVAR PROGRESSO — cria rascunho
@@ -76,7 +63,7 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
     await expect(page.getByText(/Progresso salvo com sucesso/i)).toBeVisible({ timeout: 10_000 });
 
     // O título muda para "Editar" indicando que o ensaio foi criado e está em edição
-    await expect(page.getByRole('heading', { name: /Editar Ensaio de CAUQ/i })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Editar Ensaio de CAUQ')).toBeVisible({ timeout: 10_000 });
 
     // ═══════════════════════════════════════════════════════════════════════════
     // 4. FINALIZAR REGISTRO — status → finalizado
@@ -140,16 +127,6 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
     // deve mostrar mensagem de erro — provando que o teste detecta regressões.
     const ctx = setupMockApi(page, ADMIN_USER);
 
-    // ── Warmup: pré-carrega a página EnsaioCAUQ ────────────────────────────────
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        await page.goto('/EnsaioCAUQ', { waitUntil: 'networkidle', timeout: 30_000 });
-        const heading = page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i });
-        if (await heading.isVisible({ timeout: 10_000 }).catch(() => false)) break;
-      } catch { /* retry */ }
-      await page.waitForTimeout(3000);
-    }
-
     // Sobrescreve o mock da função para sempre retornar erro
     page.route('**/api/apps/*/functions/validarESalvarRegistro', async (route) => {
       return route.fulfill({
@@ -165,7 +142,7 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
     // Navegar para formulário
     await page.locator('main').getByRole('button', { name: /Novo Registro/i }).click();
     await page.getByRole('menuitem', { name: /Ensaio de CAUQ/i }).click();
-    await expect(page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('Novo Ensaio de CAUQ')).toBeVisible({ timeout: 15_000 });
 
     // Preencher e tentar salvar
     await page.getByLabel(/Observações Gerais/i).fill('Teste de regressão');
@@ -175,6 +152,6 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
     await expect(page.getByText(/Erro ao salvar progresso/i)).toBeVisible({ timeout: 10_000 });
 
     // NÃO deve ter mudado para "Editar" — o ensaio não foi criado
-    await expect(page.getByRole('heading', { name: /Editar Ensaio de CAUQ/i })).not.toBeVisible();
+    await expect(page.getByText('Editar Ensaio de CAUQ')).not.toBeVisible();
   });
 });

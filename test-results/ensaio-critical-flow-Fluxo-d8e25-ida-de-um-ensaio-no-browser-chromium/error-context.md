@@ -14,15 +14,136 @@
 ```
 Error: expect(locator).toBeVisible() failed
 
-Locator: getByRole('heading', { name: 'Ensaios Realizados' })
+Locator: locator('button[title="Aprovar"]').first()
 Expected: visible
-Timeout: 20000ms
+Timeout: 10000ms
 Error: element(s) not found
 
 Call log:
-  - Expect "toBeVisible" with timeout 20000ms
-  - waiting for getByRole('heading', { name: 'Ensaios Realizados' })
+  - Expect "toBeVisible" with timeout 10000ms
+  - waiting for locator('button[title="Aprovar"]').first()
 
+```
+
+```yaml
+- img "Afirmaevias Logo"
+- button "Novo Registro":
+  - img
+  - text: Novo Registro
+- text: Principal
+- list:
+  - listitem:
+    - link "Dashboard":
+      - /url: /Dashboard
+      - img
+      - text: Dashboard
+  - listitem:
+    - link "Regionais":
+      - /url: /Regionais
+      - img
+      - text: Regionais
+  - listitem:
+    - button "Minhas Obras":
+      - img
+      - text: Minhas Obras
+      - img
+  - listitem:
+    - button "Não Conformidades":
+      - img
+      - text: Não Conformidades
+      - img
+- text: Administração
+- list:
+  - listitem:
+    - link "Usuários":
+      - /url: /Users
+      - img
+      - text: Usuários
+  - listitem:
+    - link "Produtividade":
+      - /url: /Produtividade
+      - img
+      - text: Produtividade
+  - listitem:
+    - link "Controle Laboratoristas":
+      - /url: /ControleLaboratoristas
+      - img
+      - text: Controle Laboratoristas
+  - listitem:
+    - link "Faixas Granulométricas":
+      - /url: /FaixasGranulometricas
+      - img
+      - text: Faixas Granulométricas
+  - listitem:
+    - link "Migração de Dados":
+      - /url: /MigracaoDados
+      - img
+      - text: Migração de Dados
+  - listitem:
+    - link "Monitor de Produtividade":
+      - /url: /MonitorProdutividade
+      - img
+      - text: Monitor de Produtividade
+  - listitem:
+    - link "Configurações":
+      - /url: /Settings
+      - img
+      - text: Configurações
+- button "Admin E2E admin@e2e.test Admin":
+  - img
+  - paragraph: Admin E2E
+  - paragraph: admin@e2e.test
+  - text: Admin
+- main:
+  - heading "Ensaios Realizados" [level=1]
+  - paragraph: Gerencie e aprove todos os registros de suas obras.
+  - text: 0 registro(s) encontrado(s)
+  - button "Novo Registro":
+    - img
+    - text: Novo Registro
+  - table:
+    - rowgroup:
+      - row "Tipo Data Filtrar período Obra Lab. Local Empreiteira Projeto Status Ações":
+        - columnheader "Tipo":
+          - text: Tipo
+          - button:
+            - img
+        - columnheader "Data Filtrar período":
+          - button "Data":
+            - text: Data
+            - img
+          - button "Filtrar período":
+            - img
+            - text: Filtrar período
+        - columnheader "Obra":
+          - text: Obra
+          - button:
+            - img
+        - columnheader "Lab.":
+          - text: Lab.
+          - button:
+            - img
+        - columnheader "Local":
+          - text: Local
+          - button:
+            - img
+        - columnheader "Empreiteira":
+          - text: Empreiteira
+          - button:
+            - img
+        - columnheader "Projeto":
+          - text: Projeto
+          - button:
+            - img
+        - columnheader "Status":
+          - text: Status
+          - button:
+            - img
+        - columnheader "Ações"
+    - rowgroup
+  - img
+  - heading "Nenhum registro encontrado" [level=3]
+  - paragraph: Ajuste os filtros ou aguarde novos registros.
 ```
 
 # Test source
@@ -60,125 +181,130 @@ Call log:
   30  |     page.on('console', msg => { if (msg.type() === 'error') console.log(`  [BROWSER ERROR] ${msg.text()}`); });
   31  |     page.on('pageerror', err => console.log(`  [PAGE ERROR] ${err.message}`));
   32  |     page.on('requestfailed', req => console.log(`  [REQ FAILED] ${req.url().slice(0, 120)} — ${req.failure()?.errorText}`));
-  33  | 
-  34  |     // ── Warmup: pré-carrega a página EnsaioCAUQ ────────────────────────────────
-  35  |     // Com o Vite iniciado pelo Playwright (porta 5174, optimizeDeps.include
-  36  |     // com zod), o 504 "Outdated Optimize Dep" não deve mais ocorrer.
-  37  |     // Mantemos um warmup de segurança: se a página carregar, ótimo; se não,
-  38  |     // tentamos mais uma vez após um breve wait (pode haver re-otimização).
-  39  |     for (let attempt = 0; attempt < 2; attempt++) {
-  40  |       try {
-  41  |         await page.goto('/EnsaioCAUQ', { waitUntil: 'networkidle', timeout: 30_000 });
-  42  |         const heading = page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i });
-  43  |         if (await heading.isVisible({ timeout: 10_000 }).catch(() => false)) break;
-  44  |       } catch { /* retry */ }
-  45  |       await page.waitForTimeout(3000);
-  46  |     }
-  47  | 
-  48  |     // ═══════════════════════════════════════════════════════════════════════════
-  49  |     // 1. ACESSAR MEUSENSAIOS — lista deve carregar sem erro
-  50  |     // ═══════════════════════════════════════════════════════════════════════════
-  51  |     await page.goto('/MeusEnsaios');
-> 52  |     await expect(page.getByRole('heading', { name: 'Ensaios Realizados' })).toBeVisible({ timeout: 20_000 });
-      |                                                                             ^ Error: expect(locator).toBeVisible() failed
-  53  | 
-  54  |     // ═══════════════════════════════════════════════════════════════════════════
-  55  |     // 2. CRIAR ENSAIO CAUQ — navegar para o formulário
-  56  |     // ═══════════════════════════════════════════════════════════════════════════
-  57  |     // Como admin, clica em "Novo Registro" → "Ensaio de CAUQ"
-  58  |     // Scope to main content — a sidebar também tem um botão "Novo Registro"
-  59  |     // (que abre um Dialog, não o dropdown com menuitem).
-  60  |     await page.locator('main').getByRole('button', { name: /Novo Registro/i }).click();
-  61  |     await page.getByRole('menuitem', { name: /Ensaio de CAUQ/i }).click();
-  62  | 
-  63  |     // Formulário deve carregar
-  64  |     await expect(page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i })).toBeVisible({ timeout: 20_000 });
-  65  | 
-  66  |     // ═══════════════════════════════════════════════════════════════════════════
-  67  |     // 3. SALVAR PROGRESSO — cria rascunho
+  33  |     page.on('response', resp => { if (resp.status() >= 400) console.log(`  [HTTP ${resp.status()}] ${resp.url().slice(0, 150)}`); });
+  34  | 
+  35  |     // ═══════════════════════════════════════════════════════════════════════════
+  36  |     // 1. ACESSAR MEUSENSAIOS — lista deve carregar sem erro
+  37  |     // ═══════════════════════════════════════════════════════════════════════════
+  38  |     await page.goto('/MeusEnsaios');
+  39  |     await expect(page.getByRole('heading', { name: 'Ensaios Realizados' })).toBeVisible({ timeout: 20_000 });
+  40  | 
+  41  |     // ═══════════════════════════════════════════════════════════════════════════
+  42  |     // 2. CRIAR ENSAIO CAUQ — navegar para o formulário
+  43  |     // ═══════════════════════════════════════════════════════════════════════════
+  44  |     // Como admin, clica em "Novo Registro" → "Ensaio de CAUQ"
+  45  |     // Scope to main content — a sidebar também tem um botão "Novo Registro"
+  46  |     // (que abre um Dialog, não o dropdown com menuitem).
+  47  |     await page.locator('main').getByRole('button', { name: /Novo Registro/i }).click();
+  48  |     await page.getByRole('menuitem', { name: /Ensaio de CAUQ/i }).click();
+  49  | 
+  50  |     // Formulário deve carregar (CardTitle é um div, não heading semântico)
+  51  |     await expect(page.getByText('Novo Ensaio de CAUQ')).toBeVisible({ timeout: 20_000 });
+  52  | 
+  53  |     // ═══════════════════════════════════════════════════════════════════════════
+  54  |     // 3. SALVAR PROGRESSO — cria rascunho
+  55  |     // ═══════════════════════════════════════════════════════════════════════════
+  56  |     // Preencher observações (campo sempre presente)
+  57  |     await page.getByLabel(/Observações Gerais/i).fill('Ensaio E2E — dados de teste');
+  58  | 
+  59  |     // Clicar em "Salvar Progresso"
+  60  |     await page.getByRole('button', { name: /Salvar Progresso/i }).click();
+  61  | 
+  62  |     // Toast de sucesso deve aparecer
+  63  |     await expect(page.getByText(/Progresso salvo com sucesso/i)).toBeVisible({ timeout: 10_000 });
+  64  | 
+  65  |     // O título muda para "Editar" indicando que o ensaio foi criado e está em edição
+  66  |     await expect(page.getByText('Editar Ensaio de CAUQ')).toBeVisible({ timeout: 10_000 });
+  67  | 
   68  |     // ═══════════════════════════════════════════════════════════════════════════
-  69  |     // Preencher observações (campo sempre presente)
-  70  |     await page.getByLabel(/Observações Gerais/i).fill('Ensaio E2E — dados de teste');
-  71  | 
-  72  |     // Clicar em "Salvar Progresso"
-  73  |     await page.getByRole('button', { name: /Salvar Progresso/i }).click();
-  74  | 
-  75  |     // Toast de sucesso deve aparecer
-  76  |     await expect(page.getByText(/Progresso salvo com sucesso/i)).toBeVisible({ timeout: 10_000 });
-  77  | 
-  78  |     // O título muda para "Editar" indicando que o ensaio foi criado e está em edição
-  79  |     await expect(page.getByRole('heading', { name: /Editar Ensaio de CAUQ/i })).toBeVisible({ timeout: 10_000 });
-  80  | 
+  69  |     // 4. FINALIZAR REGISTRO — status → finalizado
+  70  |     // ═══════════════════════════════════════════════════════════════════════════
+  71  |     await page.getByRole('button', { name: /Finalizar Registro/i }).click();
+  72  | 
+  73  |     // Toast de sucesso
+  74  |     await expect(page.getByText(/finalizado com sucesso/i)).toBeVisible({ timeout: 10_000 });
+  75  | 
+  76  |     // Deve redirecionar para MeusEnsaios
+  77  |     await expect(page.getByRole('heading', { name: 'Ensaios Realizados' })).toBeVisible({ timeout: 15_000 });
+  78  | 
+  79  |     // ═══════════════════════════════════════════════════════════════════════════
+  80  |     // 5. APROVAR — admin aprova o ensaio finalizado
   81  |     // ═══════════════════════════════════════════════════════════════════════════
-  82  |     // 4. FINALIZAR REGISTRO — status → finalizado
-  83  |     // ═══════════════════════════════════════════════════════════════════════════
-  84  |     await page.getByRole('button', { name: /Finalizar Registro/i }).click();
-  85  | 
-  86  |     // Toast de sucesso
-  87  |     await expect(page.getByText(/finalizado com sucesso/i)).toBeVisible({ timeout: 10_000 });
-  88  | 
-  89  |     // Deve redirecionar para MeusEnsaios
-  90  |     await expect(page.getByRole('heading', { name: 'Ensaios Realizados' })).toBeVisible({ timeout: 15_000 });
-  91  | 
-  92  |     // ═══════════════════════════════════════════════════════════════════════════
-  93  |     // 5. APROVAR — admin aprova o ensaio finalizado
+  82  |     // O registro recém-criado deve aparecer na lista (primeira linha da tabela)
+  83  |     // O botão de aprovar tem title="Aprovar" e ícone CheckCircle
+  84  |     const approveBtn = page.locator('button[title="Aprovar"]').first();
+> 85  |     await expect(approveBtn).toBeVisible({ timeout: 10_000 });
+      |                              ^ Error: expect(locator).toBeVisible() failed
+  86  | 
+  87  |     // Confirmar o dialog de confirmação
+  88  |     page.on('dialog', dialog => dialog.accept());
+  89  |     await approveBtn.click();
+  90  | 
+  91  |     // Toast de aprovação
+  92  |     await expect(page.getByText(/aprovado com sucesso/i)).toBeVisible({ timeout: 10_000 });
+  93  | 
   94  |     // ═══════════════════════════════════════════════════════════════════════════
-  95  |     // O registro recém-criado deve aparecer na lista (primeira linha da tabela)
-  96  |     // O botão de aprovar tem title="Aprovar" e ícone CheckCircle
-  97  |     const approveBtn = page.locator('button[title="Aprovar"]').first();
-  98  |     await expect(approveBtn).toBeVisible({ timeout: 10_000 });
-  99  | 
-  100 |     // Confirmar o dialog de confirmação
-  101 |     page.on('dialog', dialog => dialog.accept());
-  102 |     await approveBtn.click();
-  103 | 
-  104 |     // Toast de aprovação
-  105 |     await expect(page.getByText(/aprovado com sucesso/i)).toBeVisible({ timeout: 10_000 });
-  106 | 
-  107 |     // ═══════════════════════════════════════════════════════════════════════════
-  108 |     // 6. ABRIR RELATÓRIO — página de relatório renderiza
-  109 |     // ═══════════════════════════════════════════════════════════════════════════
-  110 |     // Clicar no botão de relatório (ícone FileText, abre em nova aba)
-  111 |     const reportLink = page.locator('a[target="_blank"]').first();
-  112 |     const [reportPage] = await Promise.all([
-  113 |       page.context().waitForEvent('page'),
-  114 |       reportLink.click(),
-  115 |     ]);
-  116 |     await reportPage.waitForLoadState('networkidle');
-  117 | 
-  118 |     // Relatório deve carregar com o cabeçalho
-  119 |     await expect(reportPage.getByText(/Relatório de Ensaio Marshall/i)).toBeVisible({ timeout: 15_000 });
+  95  |     // 6. ABRIR RELATÓRIO — página de relatório renderiza
+  96  |     // ═══════════════════════════════════════════════════════════════════════════
+  97  |     // Clicar no botão de relatório (ícone FileText, abre em nova aba)
+  98  |     const reportLink = page.locator('a[target="_blank"]').first();
+  99  |     const [reportPage] = await Promise.all([
+  100 |       page.context().waitForEvent('page'),
+  101 |       reportLink.click(),
+  102 |     ]);
+  103 |     await reportPage.waitForLoadState('networkidle');
+  104 | 
+  105 |     // Relatório deve carregar com o cabeçalho
+  106 |     await expect(reportPage.getByText(/Relatório de Ensaio Marshall/i)).toBeVisible({ timeout: 15_000 });
+  107 | 
+  108 |     // ═══════════════════════════════════════════════════════════════════════════
+  109 |     // 7. GERAR PDF — botão visível e clicável
+  110 |     // ═══════════════════════════════════════════════════════════════════════════
+  111 |     const pdfButton = reportPage.getByRole('button', { name: /Gerar PDF/i });
+  112 |     await expect(pdfButton).toBeVisible({ timeout: 10_000 });
+  113 | 
+  114 |     // ═══════════════════════════════════════════════════════════════════════════
+  115 |     // 8. ASSINATURA — cliente assina via AprovacaoBar no relatório
+  116 |     // ═══════════════════════════════════════════════════════════════════════════
+  117 |     // Como admin não pode assinar (apenas cliente), validamos que o AprovacaoBar
+  118 |     // renderizou com status "Aprovado" — o ensaio foi aprovado na etapa 5.
+  119 |     await expect(reportPage.getByText(/Aprovado/i).first()).toBeVisible({ timeout: 10_000 });
   120 | 
-  121 |     // ═══════════════════════════════════════════════════════════════════════════
-  122 |     // 7. GERAR PDF — botão visível e clicável
-  123 |     // ═══════════════════════════════════════════════════════════════════════════
-  124 |     const pdfButton = reportPage.getByRole('button', { name: /Gerar PDF/i });
-  125 |     await expect(pdfButton).toBeVisible({ timeout: 10_000 });
-  126 | 
-  127 |     // ═══════════════════════════════════════════════════════════════════════════
-  128 |     // 8. ASSINATURA — cliente assina via AprovacaoBar no relatório
-  129 |     // ═══════════════════════════════════════════════════════════════════════════
-  130 |     // Como admin não pode assinar (apenas cliente), validamos que o AprovacaoBar
-  131 |     // renderizou com status "Aprovado" — o ensaio foi aprovado na etapa 5.
-  132 |     await expect(reportPage.getByText(/Aprovado/i).first()).toBeVisible({ timeout: 10_000 });
-  133 | 
-  134 |     await reportPage.close();
-  135 |   });
-  136 | 
-  137 |   test('regressão: remover o mock de criar ensaio faz o teste falhar claramente', async ({ page }) => {
-  138 |     // Este teste valida que o teste E2E é sensível a quebras no fluxo.
-  139 |     // Se a função validarESalvarRegistro retornar erro, "Salvar Progresso"
-  140 |     // deve mostrar mensagem de erro — provando que o teste detecta regressões.
-  141 |     const ctx = setupMockApi(page, ADMIN_USER);
-  142 | 
-  143 |     // ── Warmup: pré-carrega a página EnsaioCAUQ ────────────────────────────────
-  144 |     for (let attempt = 0; attempt < 2; attempt++) {
-  145 |       try {
-  146 |         await page.goto('/EnsaioCAUQ', { waitUntil: 'networkidle', timeout: 30_000 });
-  147 |         const heading = page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i });
-  148 |         if (await heading.isVisible({ timeout: 10_000 }).catch(() => false)) break;
-  149 |       } catch { /* retry */ }
-  150 |       await page.waitForTimeout(3000);
-  151 |     }
-  152 | 
+  121 |     await reportPage.close();
+  122 |   });
+  123 | 
+  124 |   test('regressão: remover o mock de criar ensaio faz o teste falhar claramente', async ({ page }) => {
+  125 |     // Este teste valida que o teste E2E é sensível a quebras no fluxo.
+  126 |     // Se a função validarESalvarRegistro retornar erro, "Salvar Progresso"
+  127 |     // deve mostrar mensagem de erro — provando que o teste detecta regressões.
+  128 |     const ctx = setupMockApi(page, ADMIN_USER);
+  129 | 
+  130 |     // Sobrescreve o mock da função para sempre retornar erro
+  131 |     page.route('**/api/apps/*/functions/validarESalvarRegistro', async (route) => {
+  132 |       return route.fulfill({
+  133 |         status: 400,
+  134 |         contentType: 'application/json',
+  135 |         body: JSON.stringify({ error: 'Erro simulado: validação falhou' }),
+  136 |       });
+  137 |     });
+  138 | 
+  139 |     await page.goto('/MeusEnsaios');
+  140 |     await expect(page.getByRole('heading', { name: 'Ensaios Realizados' })).toBeVisible({ timeout: 20_000 });
+  141 | 
+  142 |     // Navegar para formulário
+  143 |     await page.locator('main').getByRole('button', { name: /Novo Registro/i }).click();
+  144 |     await page.getByRole('menuitem', { name: /Ensaio de CAUQ/i }).click();
+  145 |     await expect(page.getByText('Novo Ensaio de CAUQ')).toBeVisible({ timeout: 15_000 });
+  146 | 
+  147 |     // Preencher e tentar salvar
+  148 |     await page.getByLabel(/Observações Gerais/i).fill('Teste de regressão');
+  149 |     await page.getByRole('button', { name: /Salvar Progresso/i }).click();
+  150 | 
+  151 |     // Deve mostrar erro (toast) — provando que o teste detecta a falha
+  152 |     await expect(page.getByText(/Erro ao salvar progresso/i)).toBeVisible({ timeout: 10_000 });
+  153 | 
+  154 |     // NÃO deve ter mudado para "Editar" — o ensaio não foi criado
+  155 |     await expect(page.getByText('Editar Ensaio de CAUQ')).not.toBeVisible();
+  156 |   });
+  157 | });
 ```

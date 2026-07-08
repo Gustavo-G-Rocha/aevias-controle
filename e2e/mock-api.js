@@ -1,3 +1,6 @@
+import fs from 'fs';
+import { execSync } from 'child_process';
+
 /**
  * e2e/mock-api.js
  *
@@ -257,7 +260,8 @@ function handleFunction(funcName, body, ctx) {
     return errorResponse(`Ação não suportada: ${action}`);
   }
 
-  return errorResponse(`Função não mockada: ${funcName}`, 404);
+  // Funções não especificamente mockadas (ex: updateLastLogin) retornam sucesso genérico
+  return jsonResponse({ success: true });
 }
 
 // ── Setup do mock ─────────────────────────────────────────────────────────────
@@ -287,6 +291,26 @@ export function setupMockApi(page, currentUser = ADMIN_USER) {
   // páginas abertas em novas abas (ex: relatório com target="_blank").
   const context = page.context();
 
+  // ── Intercepta 504 "Outdated Optimize Dep" do Vite para zod ─────────────────
+  // O Vite dev server da plataforma tem um cache de deps stale que retorna 504
+  // para zod.js quando descoberto em chunk lazy-loaded. Servimos um bundle ESM
+  // pre-compilado com esbuild como fallback.
+  try {
+    const bundlePath = '/tmp/zod-bundle.js';
+    if (!fs.existsSync(bundlePath)) {
+      execSync(
+        'npx esbuild /app/node_modules/zod/index.js --bundle --format=esm --outfile=' + bundlePath + ' --platform=browser',
+        { encoding: 'utf8', timeout: 30000 }
+      );
+    }
+    const zodBundle = fs.readFileSync(bundlePath, 'utf8');
+    context.route('**/.vite/deps/zod.js*', async (route) => {
+      return route.fulfill({ status: 200, contentType: 'application/javascript', body: zodBundle });
+    });
+  } catch (e) {
+    console.log('[MOCK] Aviso: não foi possível carregar bundle zod:', e.message);
+  }
+
   // Interceptar navegações de NOVAS abas para injetar o token na URL
   context.on('page', async (newPage) => {
     // Aguardar a primeira navegação da nova aba e reescrever a URL com o token
@@ -301,6 +325,11 @@ export function setupMockApi(page, currentUser = ADMIN_USER) {
         }
       }
     }, { once: true });
+  });
+
+  // ── Intercepta chamadas de logging (app-logs) ────────────────────────────────
+  context.route('**/api/app-logs/**', async (route) => {
+    return route.fulfill(jsonResponse({ success: true }));
   });
 
   context.route('**/api/apps/**', async (route) => {
