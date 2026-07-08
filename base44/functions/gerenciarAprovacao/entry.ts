@@ -249,6 +249,23 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Normaliza campos legados que podem quebrar a validação do schema.
+    // Ex.: ChecklistTerraplanagem mudou `fotos` de string[] para {url, legenda}[];
+    // registros antigos ainda têm strings e falham na validação do update.
+    try {
+      const existing = await base44.asServiceRole.entities[entityName].get(recordId);
+      if (existing?.fotos && Array.isArray(existing.fotos)) {
+        const needsNorm = existing.fotos.some((f) => typeof f === 'string');
+        if (needsNorm) {
+          updateData.fotos = existing.fotos.map((f) =>
+            typeof f === 'string' ? { url: f, legenda: '' } : f
+          );
+        }
+      }
+    } catch {
+      // Se não conseguir buscar, segue com updateData apenas (comportamento original)
+    }
+
     // Service role bypassa RLS — permissões já verificadas server-side acima
     const result = await base44.asServiceRole.entities[entityName].update(recordId, updateData);
     return Response.json({ success: true, data: result });
