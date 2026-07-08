@@ -264,12 +264,19 @@ function handleFunction(funcName, body, ctx) {
 export function setupMockApi(page, currentUser = ADMIN_USER) {
   const ctx = createStore();
 
+  // ── Context-level routes ────────────────────────────────────────────────────
+  // Usamos page.context().route() em vez de page.route() para que as rotas
+  // se apliquem também a páginas abertas em novas abas (ex: relatório com
+  // target="_blank"). Sem isso, a popup não teria o mock e faria chamadas
+  // reais de rede, quebrando o teste.
+  const context = page.context();
+
   // ── Token injection via URL redirect ────────────────────────────────────────
   // addInitScript (localStorage) não é confiável com Vite dev server — o
   // module preload pode avaliar appParams antes do init script rodar.
   // Em vez disso, interceptamos navegações de página e adicionamos
   // ?access_token=… à URL. O SDK lê da URL ANTES de qualquer script.
-  page.route('**/*', (route) => {
+  context.route('**/*', (route) => {
     const request = route.request();
     if (request.isNavigationRequest() && request.url().includes('localhost:5173')) {
       const url = new URL(request.url());
@@ -286,7 +293,7 @@ export function setupMockApi(page, currentUser = ADMIN_USER) {
     return route.fallback();
   });
 
-  page.route('**/api/apps/**', async (route) => {
+  context.route('**/api/apps/**', async (route) => {
     const request = route.request();
     const url = new URL(request.url());
     const pathname = url.pathname;

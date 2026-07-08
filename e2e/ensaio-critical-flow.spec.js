@@ -36,7 +36,9 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
     // 2. CRIAR ENSAIO CAUQ — navegar para o formulário
     // ═══════════════════════════════════════════════════════════════════════════
     // Como admin, clica em "Novo Registro" → "Ensaio de CAUQ"
-    await page.getByRole('button', { name: /Novo Registro/i }).click();
+    // Scope to main content — a sidebar também tem um botão "Novo Registro"
+    // (que abre um Dialog, não o dropdown com menuitem).
+    await page.locator('main').getByRole('button', { name: /Novo Registro/i }).click();
     await page.getByRole('menuitem', { name: /Ensaio de CAUQ/i }).click();
 
     // Formulário deve carregar
@@ -132,7 +134,7 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
     await expect(page.getByRole('heading', { name: 'Ensaios Realizados' })).toBeVisible({ timeout: 20_000 });
 
     // Navegar para formulário
-    await page.getByRole('button', { name: /Novo Registro/i }).click();
+    await page.locator('main').getByRole('button', { name: /Novo Registro/i }).click();
     await page.getByRole('menuitem', { name: /Ensaio de CAUQ/i }).click();
     await expect(page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i })).toBeVisible({ timeout: 15_000 });
 
