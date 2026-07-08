@@ -32,8 +32,13 @@ export function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccess
   }
 
   // Laboratorista: próprios registros
+  // Garantia simétrica: se currentUser.email for undefined/null, emailMatch é false
+  // (evita que undefined === undefined retorne true e mostre registros de terceiros).
   return combinedEnsaios.filter(e => {
-    const emailMatch = e.created_by?.toLowerCase() === currentUser.email?.toLowerCase();
+    const emailMatch =
+      currentUser.email != null &&
+      e.created_by != null &&
+      e.created_by.toLowerCase() === currentUser.email.toLowerCase();
     const nameMatch =
       currentUser.laboratorista_name &&
       e.laboratorista_name?.toLowerCase() === currentUser.laboratorista_name?.toLowerCase();
