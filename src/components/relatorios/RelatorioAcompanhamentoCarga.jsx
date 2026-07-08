@@ -120,51 +120,53 @@ export default function RelatorioAcompanhamentoCarga({ acompanhamento, obra, reg
               <table className="w-full border-collapse border border-slate-300" style={{ fontSize: '7px', tableLayout: 'fixed' }}>
                 <thead className="bg-slate-100">
                   <tr>
-                    <th className="border border-slate-300 px-0.5 py-1 text-center font-bold" colSpan="3">DADOS DA USINA</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-center font-bold" colSpan="6">DADOS DA PISTA</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-center font-bold" colSpan="4">DADOS DA USINA</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-center font-bold" colSpan="10">DADOS DA PISTA</th>
                   </tr>
                   <tr>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '8%' }}>N° CARGA</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '12%' }}>PLACA</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '10%' }}>PESO (t)</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '10%' }}>HORA APLIC.</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '11%' }}>TEMP. ESPALH. (°C)</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '11%' }}>TEMP. COMPACT. (°C)</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '10%' }}>PISTA</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '10%' }}>ESPESSURA (cm)</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '18%' }}>ESTACA IN/FIN</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7.14%' }}>N° CARGA</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7.14%' }}>PLACA</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7.14%' }}>HORA SAÍDA</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7.14%' }}>PESO (t)</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7.14%' }}>HORA CHEGADA</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7.14%' }}>TEMP. CHEGADA (°C)</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7.14%' }}>HORA APLICAÇÃO</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7.14%' }}>TEMP. ESPALHAM. (°C)</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7.14%' }}>TEMP. COMPACT. (°C)</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7.14%' }}>PISTA</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7.14%' }}>ESPESSURA (cm)</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7.14%' }}>ESTACA INICIAL</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7.14%' }}>ESTACA FINAL</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7.14%' }}>OBSERVAÇÕES</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {(acompanhamento.cargas?.length ? acompanhamento.cargas : []).map((carga, index) => (
-                    <tr key={index} className="even:bg-slate-50" style={{ fontSize: '7px', height: '20px' }}>
-                      <td className="border border-slate-300 px-0.5 py-1 text-center">{index + 1}</td>
-                      <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.placa || ''}</td>
-                      <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.peso_toneladas || ''}</td>
-                      <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.hora_aplicacao || ''}</td>
-                      <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.temp_espalhamento || ''}</td>
-                      <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.temp_compactacao || ''}</td>
-                      <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.pista || ''}</td>
-                      <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.espessura_cm || ''}</td>
-                      <td className="border border-slate-300 px-0.5 py-1 text-center">
-                        {carga?.estaca_inicial || carga?.estaca_final
-                          ? `${carga?.estaca_inicial || ''} / ${carga?.estaca_final || ''}`
-                          : ''}
-                      </td>
-                    </tr>
-                  ))}
+                  {Array.from({ length: 20 }).map((_, index) => {
+                    const carga = acompanhamento.cargas?.[index];
+                    return (
+                      <tr key={index} className="even:bg-slate-50" style={{ fontSize: '7px', height: '20px' }}>
+                        <td className="border border-slate-300 px-0.5 py-1 text-center">{carga ? index + 1 : ''}</td>
+                        <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.placa || ''}</td>
+                        <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.hora_saida || ''}</td>
+                        <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.peso_toneladas || ''}</td>
+                        <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.hora_chegada || ''}</td>
+                        <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.temp_chegada || ''}</td>
+                        <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.hora_aplicacao || ''}</td>
+                        <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.temp_espalhamento || ''}</td>
+                        <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.temp_compactacao || ''}</td>
+                        <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.pista || ''}</td>
+                        <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.espessura_cm || ''}</td>
+                        <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.estaca_inicial || ''}</td>
+                        <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.estaca_final || ''}</td>
+                        <td className="border border-slate-300 px-0.5 py-1 text-[6px] leading-tight">{carga?.observacoes || ''}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
 
-            <div className="mt-2">
-              <SectionTitle>Observação Geral</SectionTitle>
-              <div className="border border-slate-300 bg-slate-50 p-1.5 mt-0.5" style={{ minHeight: '40px', fontSize: '9px' }}>
-                <p className="text-slate-700 whitespace-pre-wrap">
-                  {acompanhamento.observacoes_gerais || ''}
-                </p>
-              </div>
-            </div>
+
           </div>
 
           <div className="mt-auto pt-2 print:pt-3 break-inside-avoid">
