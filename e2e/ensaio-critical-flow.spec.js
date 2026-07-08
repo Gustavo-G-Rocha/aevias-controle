@@ -76,6 +76,12 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
     // Deve redirecionar para MeusEnsaios
     await expect(page.getByRole('heading', { name: 'Ensaios Realizados' })).toBeVisible({ timeout: 15_000 });
 
+    // Força reload da página para bypassar cache do React Query (staleTime: 10min)
+    // — sem isso, a lista mostra dados stale e o registro recém-criado não aparece.
+    // Usa page.goto (não page.reload) para que o wrapper injete o access_token na URL.
+    await page.goto('/MeusEnsaios');
+    await expect(page.getByRole('heading', { name: 'Ensaios Realizados' })).toBeVisible({ timeout: 15_000 });
+
     // ═══════════════════════════════════════════════════════════════════════════
     // 5. APROVAR — admin aprova o ensaio finalizado
     // ═══════════════════════════════════════════════════════════════════════════
@@ -100,7 +106,7 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
       page.context().waitForEvent('page'),
       reportLink.click(),
     ]);
-    await reportPage.waitForLoadState('networkidle');
+    await reportPage.waitForLoadState('domcontentloaded');
 
     // Relatório deve carregar com o cabeçalho
     await expect(reportPage.getByText(/Relatório de Ensaio Marshall/i)).toBeVisible({ timeout: 15_000 });

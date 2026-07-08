@@ -179,6 +179,8 @@ function handleFunction(funcName, body, ctx) {
         created_date: nowISO(),
         updated_date: nowISO(),
         created_by: ADMIN_USER.email,
+        approved: null,
+        status: 'rascunho',
         ...data,
       };
       entityStore.set(id, record);
@@ -312,19 +314,22 @@ export function setupMockApi(page, currentUser = ADMIN_USER) {
   }
 
   // Interceptar navegações de NOVAS abas para injetar o token na URL
+  // Playwright's page.on() não suporta { once: true } — usamos uma flag.
   context.on('page', async (newPage) => {
-    // Aguardar a primeira navegação da nova aba e reescrever a URL com o token
+    let tokenInjected = false;
     newPage.on('framenavigated', async (frame) => {
-      if (frame === newPage.mainFrame()) {
-        const url = new URL(newPage.url());
-        if (!url.searchParams.has('access_token') && !url.pathname.startsWith('/login')) {
-          url.searchParams.set('access_token', TOKEN);
-          try {
-            await newPage.goto(url.toString());
-          } catch { /* página pode ainda estar carregando */ }
-        }
+      if (tokenInjected || frame !== newPage.mainFrame()) return;
+      const currentUrl = newPage.url();
+      if (!currentUrl) return;
+      const url = new URL(currentUrl);
+      if (!url.searchParams.has('access_token') && !url.pathname.startsWith('/login')) {
+        tokenInjected = true;
+        url.searchParams.set('access_token', TOKEN);
+        try {
+          await newPage.goto(url.toString());
+        } catch { /* página pode ainda estar carregando */ }
       }
-    }, { once: true });
+    });
   });
 
   // ── Intercepta chamadas de logging (app-logs) ────────────────────────────────
@@ -382,6 +387,7 @@ export function setupMockApi(page, currentUser = ADMIN_USER) {
         if (method === 'GET' && !id) return route.fulfill(jsonResponse([]));
         return route.fulfill(jsonResponse([]));
       }
+
 
       // GET /entities/{entity} → list or filter (com query params)
       if (method === 'GET' && !id) {
