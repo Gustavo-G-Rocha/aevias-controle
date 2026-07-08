@@ -31,21 +31,18 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
     page.on('pageerror', err => console.log(`  [PAGE ERROR] ${err.message}`));
     page.on('requestfailed', req => console.log(`  [REQ FAILED] ${req.url().slice(0, 120)} — ${req.failure()?.errorText}`));
 
-    // ── Warmup: pré-carrega a página EnsaioCAUQ para o Vite otimizar deps ──────
-    // O primeiro carregamento de uma página lazy pode causar 504 "Outdated
-    // Optimize Dep" — o Vite descobre novas dependências, invalida o cache,
-    // e recarrega a página. Tentamos até 3 vezes; após o reload do Vite,
-    // as deps já estão otimizadas e a página carrega normalmente.
-    for (let attempt = 0; attempt < 3; attempt++) {
+    // ── Warmup: pré-carrega a página EnsaioCAUQ ────────────────────────────────
+    // Com o Vite iniciado pelo Playwright (porta 5174, optimizeDeps.include
+    // com zod), o 504 "Outdated Optimize Dep" não deve mais ocorrer.
+    // Mantemos um warmup de segurança: se a página carregar, ótimo; se não,
+    // tentamos mais uma vez após um breve wait (pode haver re-otimização).
+    for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        await page.goto('/EnsaioCAUQ');
-        await page.waitForLoadState('networkidle').catch(() => {});
-        // Se o formulário carregar (heading visível), warmup concluído
+        await page.goto('/EnsaioCAUQ', { waitUntil: 'networkidle', timeout: 30_000 });
         const heading = page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i });
-        const visible = await heading.isVisible({ timeout: 10_000 }).catch(() => false);
-        if (visible) break;
-      } catch { /* reload do Vite pode interromper o goto — tentar de novo */ }
-      await page.waitForTimeout(2000);
+        if (await heading.isVisible({ timeout: 10_000 }).catch(() => false)) break;
+      } catch { /* retry */ }
+      await page.waitForTimeout(3000);
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -143,15 +140,14 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
     // deve mostrar mensagem de erro — provando que o teste detecta regressões.
     const ctx = setupMockApi(page, ADMIN_USER);
 
-    // ── Warmup: pré-carrega a página EnsaioCAUQ para o Vite otimizar deps ──────
-    for (let attempt = 0; attempt < 3; attempt++) {
+    // ── Warmup: pré-carrega a página EnsaioCAUQ ────────────────────────────────
+    for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        await page.goto('/EnsaioCAUQ');
+        await page.goto('/EnsaioCAUQ', { waitUntil: 'networkidle', timeout: 30_000 });
         const heading = page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i });
-        const visible = await heading.isVisible({ timeout: 10_000 }).catch(() => false);
-        if (visible) break;
-      } catch { /* reload do Vite pode interromper o goto */ }
-      await page.waitForTimeout(2000);
+        if (await heading.isVisible({ timeout: 10_000 }).catch(() => false)) break;
+      } catch { /* retry */ }
+      await page.waitForTimeout(3000);
     }
 
     // Sobrescreve o mock da função para sempre retornar erro

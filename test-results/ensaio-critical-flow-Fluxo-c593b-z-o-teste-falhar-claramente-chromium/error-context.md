@@ -6,8 +6,8 @@
 
 # Test info
 
-- Name: ensaio-critical-flow.spec.js >> Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprovar → Assinar → Relatório >> percorre todo o ciclo de vida de um ensaio no browser
-- Location: e2e/ensaio-critical-flow.spec.js:26:3
+- Name: ensaio-critical-flow.spec.js >> Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprovar → Assinar → Relatório >> regressão: remover o mock de criar ensaio faz o teste falhar claramente
+- Location: e2e/ensaio-critical-flow.spec.js:137:3
 
 # Error details
 
@@ -28,69 +28,6 @@ Call log:
 # Test source
 
 ```ts
-  1   | /**
-  2   |  * e2e/ensaio-critical-flow.spec.js
-  3   |  *
-  4   |  * Teste E2E do fluxo crítico completo no browser:
-  5   |  *   Iniciar Ensaio → Preencher Dados → Assinar → Aprovar → Gerar PDF
-  6   |  *
-  7   |  * Cobre a integração entre múltiplas etapas que testes isolados não pegam:
-  8   |  *   1. Navegar para MeusEnsaios (lista carrega)
-  9   |  *   2. Criar Ensaio CAUQ (navegar para formulário)
-  10  |  *   3. Preencher dados + Salvar Progresso (rascunho persiste)
-  11  |  *   4. Finalizar Registro (status → finalizado)
-  12  |  *   5. Voltar à lista, aprovar (gestor aprova)
-  13  |  *   6. Assinar (cliente assina registro aprovado)
-  14  |  *   7. Abrir relatório (renderiza com dados de assinatura)
-  15  |  *   8. Botão Gerar PDF visível
-  16  |  *
-  17  |  * Anti-flakiness:
-  18  |  *   - Mock API determinístico (zero dependência de rede/backend)
-  19  |  *   - Esperas por texto/elemento (nunca sleep fixo)
-  20  |  *   - 1 worker, 1 browser, retries: 0
-  21  |  */
-  22  | import { test, expect } from '@playwright/test';
-  23  | import { setupMockApi, ADMIN_USER, GESTOR_USER, CLIENTE_USER } from './mock-api';
-  24  | 
-  25  | test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprovar → Assinar → Relatório', () => {
-  26  |   test('percorre todo o ciclo de vida de um ensaio no browser', async ({ page }) => {
-  27  |     const ctx = setupMockApi(page, ADMIN_USER);
-  28  | 
-  29  |     // ── Debug: captura erros do browser para diagnóstico ──────────────────────
-  30  |     page.on('console', msg => { if (msg.type() === 'error') console.log(`  [BROWSER ERROR] ${msg.text()}`); });
-  31  |     page.on('pageerror', err => console.log(`  [PAGE ERROR] ${err.message}`));
-  32  |     page.on('requestfailed', req => console.log(`  [REQ FAILED] ${req.url().slice(0, 120)} — ${req.failure()?.errorText}`));
-  33  | 
-  34  |     // ── Warmup: pré-carrega a página EnsaioCAUQ ────────────────────────────────
-  35  |     // Com o Vite iniciado pelo Playwright (porta 5174, optimizeDeps.include
-  36  |     // com zod), o 504 "Outdated Optimize Dep" não deve mais ocorrer.
-  37  |     // Mantemos um warmup de segurança: se a página carregar, ótimo; se não,
-  38  |     // tentamos mais uma vez após um breve wait (pode haver re-otimização).
-  39  |     for (let attempt = 0; attempt < 2; attempt++) {
-  40  |       try {
-  41  |         await page.goto('/EnsaioCAUQ', { waitUntil: 'networkidle', timeout: 30_000 });
-  42  |         const heading = page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i });
-  43  |         if (await heading.isVisible({ timeout: 10_000 }).catch(() => false)) break;
-  44  |       } catch { /* retry */ }
-  45  |       await page.waitForTimeout(3000);
-  46  |     }
-  47  | 
-  48  |     // ═══════════════════════════════════════════════════════════════════════════
-  49  |     // 1. ACESSAR MEUSENSAIOS — lista deve carregar sem erro
-  50  |     // ═══════════════════════════════════════════════════════════════════════════
-  51  |     await page.goto('/MeusEnsaios');
-> 52  |     await expect(page.getByRole('heading', { name: 'Ensaios Realizados' })).toBeVisible({ timeout: 20_000 });
-      |                                                                             ^ Error: expect(locator).toBeVisible() failed
-  53  | 
-  54  |     // ═══════════════════════════════════════════════════════════════════════════
-  55  |     // 2. CRIAR ENSAIO CAUQ — navegar para o formulário
-  56  |     // ═══════════════════════════════════════════════════════════════════════════
-  57  |     // Como admin, clica em "Novo Registro" → "Ensaio de CAUQ"
-  58  |     // Scope to main content — a sidebar também tem um botão "Novo Registro"
-  59  |     // (que abre um Dialog, não o dropdown com menuitem).
-  60  |     await page.locator('main').getByRole('button', { name: /Novo Registro/i }).click();
-  61  |     await page.getByRole('menuitem', { name: /Ensaio de CAUQ/i }).click();
-  62  | 
   63  |     // Formulário deve carregar
   64  |     await expect(page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i })).toBeVisible({ timeout: 20_000 });
   65  | 
@@ -181,4 +118,33 @@ Call log:
   150 |       await page.waitForTimeout(3000);
   151 |     }
   152 | 
+  153 |     // Sobrescreve o mock da função para sempre retornar erro
+  154 |     page.route('**/api/apps/*/functions/validarESalvarRegistro', async (route) => {
+  155 |       return route.fulfill({
+  156 |         status: 400,
+  157 |         contentType: 'application/json',
+  158 |         body: JSON.stringify({ error: 'Erro simulado: validação falhou' }),
+  159 |       });
+  160 |     });
+  161 | 
+  162 |     await page.goto('/MeusEnsaios');
+> 163 |     await expect(page.getByRole('heading', { name: 'Ensaios Realizados' })).toBeVisible({ timeout: 20_000 });
+      |                                                                             ^ Error: expect(locator).toBeVisible() failed
+  164 | 
+  165 |     // Navegar para formulário
+  166 |     await page.locator('main').getByRole('button', { name: /Novo Registro/i }).click();
+  167 |     await page.getByRole('menuitem', { name: /Ensaio de CAUQ/i }).click();
+  168 |     await expect(page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i })).toBeVisible({ timeout: 15_000 });
+  169 | 
+  170 |     // Preencher e tentar salvar
+  171 |     await page.getByLabel(/Observações Gerais/i).fill('Teste de regressão');
+  172 |     await page.getByRole('button', { name: /Salvar Progresso/i }).click();
+  173 | 
+  174 |     // Deve mostrar erro (toast) — provando que o teste detecta a falha
+  175 |     await expect(page.getByText(/Erro ao salvar progresso/i)).toBeVisible({ timeout: 10_000 });
+  176 | 
+  177 |     // NÃO deve ter mudado para "Editar" — o ensaio não foi criado
+  178 |     await expect(page.getByRole('heading', { name: /Editar Ensaio de CAUQ/i })).not.toBeVisible();
+  179 |   });
+  180 | });
 ```
