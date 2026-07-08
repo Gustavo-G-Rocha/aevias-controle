@@ -6,7 +6,7 @@ import { FileText, CheckCircle, XCircle, Trash2, Pencil } from "lucide-react";
 import { Link as RouterLink } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components/ensaios/ensaioMappers";
-import { getLocalInfo, getLaboratoristaInfo, getEmpireiteiraInfo, getNaoConformidades, getStatusInfo } from "@/components/ensaios/utils";
+import { getLocalInfo, getLaboratoristaInfo, getEmpreiteiraInfo, getNaoConformidades, getStatusInfo } from "@/components/ensaios/utils";
 import { CopyIdButton } from "@/components/ensaios/TableFilters";
 import { canGestorPreencherResultado } from "@/utils/certificacaoUsinaAccess";
 
@@ -47,7 +47,7 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
         <div className="text-muted-foreground text-xs">{localInfo.tipo}</div>
         <div className="text-xs text-muted-foreground truncate max-w-[120px]" title={localInfo.detalhes}>{localInfo.detalhes}</div>
       </td>
-      <td className="px-2 py-2">{getEmpireiteiraInfo(ensaio) ? <div className="text-muted-foreground text-xs truncate max-w-[100px]">{getEmpireiteiraInfo(ensaio)}</div> : <div className="text-muted-foreground/60 text-center text-xs">-</div>}</td>
+      <td className="px-2 py-2">{getEmpreiteiraInfo(ensaio) ? <div className="text-muted-foreground text-xs truncate max-w-[100px]">{getEmpreiteiraInfo(ensaio)}</div> : <div className="text-muted-foreground/60 text-center text-xs">-</div>}</td>
       <td className="px-2 py-2">{projeto ? <div className="text-muted-foreground text-xs truncate max-w-[100px]" title={projeto.name}>{projeto.name}</div> : <div className="text-muted-foreground/60 text-center text-xs">-</div>}</td>
       <td className="px-2 py-2 text-center">
         <Badge className={`${status.className} text-xs px-2 py-0.5 gap-1`}><status.icon className="w-3 h-3" />{status.text}</Badge>

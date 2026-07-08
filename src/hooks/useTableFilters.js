@@ -1,7 +1,7 @@
 // Hook customizado para gerenciar estado de filtros de tabela
 import { useState, useCallback, useMemo } from 'react';
 import { getDataEnsaio } from '@/components/ensaios/ensaioMappers';
-import { getLocalInfo, getLaboratoristaInfo, getEmpireiteiraInfo } from '@/components/ensaios/utils';
+import { getLocalInfo, getLaboratoristaInfo, getEmpreiteiraInfo } from '@/components/ensaios/utils';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
 export function useTableFilters(ensaios, obras, projects, allUsers, applyCustomFilters = null) {
@@ -30,7 +30,7 @@ export function useTableFilters(ensaios, obras, projects, allUsers, applyCustomF
   const projectsMap = useMemo(() => new Map(projects.map((p) => [p.id, p])), [projects]);
 
   // Pré-computação de campos derivados — executada apenas quando ensaios/allUsers/obras/projects
-  // mudam. Evita chamar getLaboratoristaInfo/getLocalInfo/getEmpireiteiraInfo/getDataEnsaio
+  // mudam. Evita chamar getLaboratoristaInfo/getLocalInfo/getEmpreiteiraInfo/getDataEnsaio
   // (incluindo allUsers.find() O(n)) a cada tecla digitada nos filtros.
   const precomputedEnsaios = useMemo(() => {
     return ensaios.map((e) => {
@@ -54,7 +54,7 @@ export function useTableFilters(ensaios, obras, projects, allUsers, applyCustomF
         projectName: p?.name?.toLowerCase() ?? '',
         localTipo: li?.tipo?.toLowerCase() ?? '',
         localDetalhes: li?.detalhes?.toLowerCase() ?? '',
-        empreiteira: getEmpireiteiraInfo(e)?.toLowerCase() ?? '',
+        empreiteira: getEmpreiteiraInfo(e)?.toLowerCase() ?? '',
         dataStartTs,
         dataRawTs,
         entityType: e.entityType,

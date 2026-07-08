@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { FileText, MessageSquare } from "lucide-react";
 import { Link as RouterLink } from "react-router-dom";
 import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components/ensaios/ensaioMappers";
-import { getLocalInfo, getLaboratoristaInfo, getEmpireiteiraInfo, getNaoConformidades, getStatusInfo } from "@/components/ensaios/utils";
+import { getLocalInfo, getLaboratoristaInfo, getEmpreiteiraInfo, getNaoConformidades, getStatusInfo } from "@/components/ensaios/utils";
 import { CopyIdButton } from "@/components/ensaios/TableFilters";
 
 const TableRowCliente = React.memo(({ ensaio, obra, projeto, index, allUsers, onAssinar }) => {
@@ -40,7 +40,7 @@ const TableRowCliente = React.memo(({ ensaio, obra, projeto, index, allUsers, on
         <div className="text-foreground/90 text-xs">{localInfo.tipo}</div>
         <div className="text-[10px] text-foreground/70 truncate max-w-[120px]" title={localInfo.detalhes}>{localInfo.detalhes}</div>
       </td>
-      <td className="px-2 py-2">{getEmpireiteiraInfo(ensaio) ? <div className="text-foreground/90 text-xs truncate max-w-[100px]">{getEmpireiteiraInfo(ensaio)}</div> : <div className="text-foreground/50 text-center text-xs">-</div>}</td>
+      <td className="px-2 py-2">{getEmpreiteiraInfo(ensaio) ? <div className="text-foreground/90 text-xs truncate max-w-[100px]">{getEmpreiteiraInfo(ensaio)}</div> : <div className="text-foreground/50 text-center text-xs">-</div>}</td>
       <td className="px-2 py-2">{projeto ? <div className="text-foreground/90 text-xs truncate max-w-[100px]" title={projeto.name}>{projeto.name}</div> : <div className="text-foreground/50 text-center text-xs">-</div>}</td>
       <td className="px-2 py-2 text-center">
         <Badge className={`${status.className} gap-1 text-[10px] px-2 py-0.5`}><status.icon className="w-3 h-3" />{status.text}</Badge>

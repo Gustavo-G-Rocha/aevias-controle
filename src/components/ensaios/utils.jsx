@@ -33,7 +33,7 @@ export const getResponsavelInfo = (ensaio) => {
   return cfg?.responsavel ? cfg.responsavel(ensaio) : null;
 };
 
-export const getEmpireiteiraInfo = (ensaio) => {
+export const getEmpreiteiraInfo = (ensaio) => {
   const cfg = ENSAIO_CONFIG[ensaio.entityType];
   return cfg?.hasEmpreiteira ? (ensaio.empreiteira || null) : null;
 };
