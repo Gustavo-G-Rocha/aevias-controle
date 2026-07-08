@@ -16,7 +16,7 @@ import { logger } from '@/utils/logger';
 // console mesmo em ambiente de desenvolvimento.
 const SENSITIVE_KEY_PATTERNS = [
   /cpf/i, /senha/i, /password/i, /token/i, /secret/i,
-  /cnpj/i, /email/i, /phone/i, /telefone/i, /celular/i,
+  /cnpj/i, /^email$/i, /phone/i, /telefone/i, /celular/i,
   /crea/i, /rg/i, /cartao/i, /card/i, /cvv/i, /cep/i,
 ];
 

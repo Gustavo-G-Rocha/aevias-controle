@@ -92,6 +92,25 @@ describe('serviceErrorHandler — withServiceCall', () => {
     expect(logged.config.data.nome).toBe('Maria');
   });
 
+  it('redada "email" exato mas preserva campos compostos como email_notificacao', async () => {
+    const original = new Error('validation failed');
+    original.response = {
+      status: 400,
+      statusText: 'Bad Request',
+      data: {
+        email: 'joao@example.com',
+        email_notificacao: 'sistema@afirmaevias.com',
+        email_responsavel: 'resp@afirmaevias.com',
+      },
+    };
+    const op = vi.fn().mockRejectedValue(original);
+    await expect(withServiceCall(op, 'Falha')).rejects.toThrow();
+    const logged = logger.error.mock.calls[0][1];
+    expect(logged.response.data.email).toBe('[REDACTED]');
+    expect(logged.response.data.email_notificacao).toBe('sistema@afirmaevias.com');
+    expect(logged.response.data.email_responsavel).toBe('resp@afirmaevias.com');
+  });
+
   it('preserva a causa original (objeto bruto) em error.cause mesmo após redação', async () => {
     const original = new Error('boom');
     original.response = { status: 500, data: { cpf: '123' } };
