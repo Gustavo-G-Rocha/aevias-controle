@@ -117,38 +117,46 @@ export default function RelatorioAcompanhamentoCarga({ acompanhamento, obra, reg
 
           <div className="mt-3">
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-slate-300" style={{ fontSize: '8px', tableLayout: 'fixed' }}>
+              <table className="w-full border-collapse border border-slate-300" style={{ fontSize: '7px', tableLayout: 'fixed' }}>
                 <thead className="bg-slate-100">
                   <tr>
-                    <th className="border border-slate-300 px-0.5 py-1 text-center font-bold" colSpan="3">DADOS DA USINA</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-center font-bold" colSpan="7">DADOS DA PISTA</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-center font-bold" colSpan="4">DADOS DA USINA</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-center font-bold" colSpan="10">DADOS DA PISTA</th>
                   </tr>
                   <tr>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '6%' }}>N° CARGA</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '9%' }}>PLACA</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7%' }}>PESO (t)</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '8%' }}>HORA APLIC.</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '9%' }}>TEMP. ESPALH. (°C)</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '9%' }}>TEMP. COMPACT. (°C)</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7%' }}>PISTA</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '8%' }}>ESPESSURA (cm)</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '12%' }}>ESTACA IN/FIN</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '25%' }}>OBSERVAÇÕES</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '5.5%' }}>N° CARGA</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '6.5%' }}>PLACA</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '6%' }}>HORA SAÍDA</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '5.5%' }}>PESO (t)</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '6%' }}>HORA CHEGADA</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7%' }}>TEMP. CHEGADA (°C)</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '6.5%' }}>HORA APLIC.</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7%' }}>TEMP. ESPALH. (°C)</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '7%' }}>TEMP. COMPACT. (°C)</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '5.5%' }}>PISTA</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '6%' }}>ESPESSURA (cm)</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '6%' }}>ESTACA IN.</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '6%' }}>ESTACA FIN.</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '24%' }}>OBSERVAÇÕES</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {(acompanhamento.cargas?.length ? acompanhamento.cargas : []).map((carga, index) => (
-                    <tr key={index} className="even:bg-slate-50" style={{ fontSize: '8px' }}>
+                  {(acompanhamento.cargas || []).map((carga, index) => (
+                    <tr key={index} className="even:bg-slate-50" style={{ fontSize: '7px' }}>
                       <td className="border border-slate-300 px-0.5 py-1 text-center">{index + 1}</td>
                       <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.placa || ''}</td>
+                      <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.hora_saida || ''}</td>
                       <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.peso_toneladas || ''}</td>
+                      <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.hora_chegada || ''}</td>
+                      <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.temp_chegada || ''}</td>
                       <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.hora_aplicacao || ''}</td>
                       <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.temp_espalhamento || ''}</td>
                       <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.temp_compactacao || ''}</td>
                       <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.pista || ''}</td>
                       <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.espessura_cm || ''}</td>
-                      <td className="border border-slate-300 px-0.5 py-1 text-center">{[carga?.estaca_inicial, carga?.estaca_final].filter(Boolean).join(' / ') || ''}</td>
-                      <td className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight">{carga?.observacoes || ''}</td>
+                      <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.estaca_inicial || ''}</td>
+                      <td className="border border-slate-300 px-0.5 py-1 text-center">{carga?.estaca_final || ''}</td>
+                      <td className="border border-slate-300 px-0.5 py-1 text-[6px] leading-tight">{carga?.observacoes || ''}</td>
                     </tr>
                   ))}
                 </tbody>
