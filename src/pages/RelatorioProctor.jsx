@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Loader2 } from "lucide-react";
+import LoadingState from "@/components/LoadingState";
 import { useReportMode } from "@/hooks/useReportMode";
 import { fitParabola } from "@/components/ensaios/ProctorChart";
 import RelatorioLimites from "@/components/relatorios/RelatorioLimites";
@@ -41,7 +41,7 @@ export default function RelatorioProctor() {
   const iscAtWotima = useMemo(() => evalParabola(iscParabola, wOtima), [iscParabola, wOtima]);
   const expAtWotima = useMemo(() => evalParabola(expParabola, wOtima), [expParabola, wOtima]);
 
-  if (loading) return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin text-slate-500" /></div>;
+  if (loading) return <LoadingState />;
   if (error || !ensaio) return <div className="flex justify-center items-center h-screen text-red-600">{error || "Erro"}</div>;
 
   const infoFields = buildInfoFields(ensaio, obra);

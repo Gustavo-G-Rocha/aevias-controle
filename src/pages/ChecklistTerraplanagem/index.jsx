@@ -1,4 +1,5 @@
-import { Loader2, AlertTriangle, XCircle } from "lucide-react";
+import { AlertTriangle, XCircle } from "lucide-react";
+import LoadingState from "@/components/LoadingState";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,7 +25,7 @@ export default function ChecklistTerraplanagem() {
   } = useChecklistTerrapalagemForm();
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+    return <LoadingState />;
   }
 
   return (

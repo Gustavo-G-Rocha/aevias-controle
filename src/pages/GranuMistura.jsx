@@ -1,7 +1,7 @@
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2 } from "lucide-react";
+import LoadingState from "@/components/LoadingState";
 
 import { useGranuMisturaData }    from "@/hooks/useGranuMisturaData";
 import { useGranuMisturaForm }    from "@/hooks/useGranuMisturaForm";
@@ -29,7 +29,7 @@ export default function GranuMistura() {
 
   const { saving, handleSubmit } = useGranuMisturaActions({ formData, editingId, user });
 
-  if (loading) return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+  if (loading) return <LoadingState />;
 
   const obraSelecionada    = obras.find(o => o.id === formData.obra_id);
   const regionalSelecionada = obraSelecionada ? regionais.find(r => r.id === obraSelecionada.regional_id) : null;

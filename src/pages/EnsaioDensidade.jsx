@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
+import LoadingState from "@/components/LoadingState";
 import { obterUsuarioAtual } from "@/services/usuariosService";
 import { listarObrasRecentes } from "@/services/obrasService";
 import { listarRegionais } from "@/services/regionaisService";
@@ -140,7 +141,7 @@ export default function EnsaioDensidadePage() {
   };
   
   if (loading) {
-    return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+    return <LoadingState />;
   }
 
   return (

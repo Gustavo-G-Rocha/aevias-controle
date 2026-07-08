@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2 } from 'lucide-react';
+import LoadingState from '@/components/LoadingState';
 
 import { useEnsaioRompimentoConcretoData }    from '@/hooks/useEnsaioRompimentoConcretoData';
 import { useEnsaioRompimentoConcretoForm }    from '@/hooks/useEnsaioRompimentoConcretoForm';
@@ -36,11 +36,7 @@ export default function EnsaioRompimentoConcretoPage() {
     ? projects.filter(p => p.regional_id === obraAtual.regional_id)
     : [];
 
-  if (loading) return (
-    <div className="p-6 flex justify-center items-center h-screen bg-transparent">
-      <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-    </div>
-  );
+  if (loading) return <LoadingState />;
 
   return (
     <div className="p-6 bg-transparent min-h-screen">

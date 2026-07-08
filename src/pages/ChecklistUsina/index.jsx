@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import LoadingState from "@/components/LoadingState";
 import { criarChecklist, atualizarChecklist } from "@/services/checklistsService";
 import { uploadMultipleFiles } from "@/utils/imageUpload";
 import { createPageUrl } from "@/utils";
@@ -109,7 +109,7 @@ export default function ChecklistUsinaPage() {
     }
   }, [formData, editingChecklist, user, clearSavedData, navigate]);
 
-  if (loading) return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+  if (loading) return <LoadingState />;
 
   return (
     <div className="p-6 bg-transparent min-h-screen">

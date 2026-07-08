@@ -1,4 +1,5 @@
-import { Loader2, Save, CheckCircle, AlertTriangle } from "lucide-react";
+import { Save, CheckCircle, AlertTriangle } from "lucide-react";
+import LoadingState from "@/components/LoadingState";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -21,7 +22,7 @@ export default function DiarioObraPage() {
   } = useDiarioObra();
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+    return <LoadingState />;
   }
 
   return (

@@ -1,4 +1,5 @@
 import { Loader2, AlertTriangle, XCircle } from "lucide-react";
+import LoadingState from "@/components/LoadingState";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +26,7 @@ export default function ChecklistReciclagem() {
   } = useChecklistReciclagemForm();
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+    return <LoadingState />;
   }
 
   return (

@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { Loader2 } from 'lucide-react';
+import LoadingState from '@/components/LoadingState';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -17,11 +17,7 @@ import ResetPassword from '@/pages/ResetPassword';
 
 // Fallback leve exibido enquanto o chunk da página lazy é baixado.
 // O Layout (sidebar/header/bottom-nav) já está renderizado — só o conteúdo suspende.
-const PageLoadingFallback = () => (
-  <div className="flex justify-center items-center h-screen" style={{ backgroundColor: 'var(--color-background)' }}>
-    <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--color-text-subtle)' }} />
-  </div>
-);
+const PageLoadingFallback = () => <LoadingState />;
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];

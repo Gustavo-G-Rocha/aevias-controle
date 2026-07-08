@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Loader2, Save, CheckCircle } from "lucide-react";
+import LoadingState from "@/components/LoadingState";
 import { createPageUrl } from "@/utils";
 import { useEnsaioForm } from "@/hooks/useEnsaioForm";
 import { PENEIRAS_CONFIG, filtrarPeneirasPorFaixa } from "@/constants/sieves";
@@ -101,7 +102,7 @@ export default function EnsaioCAUQPage() {
   });
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+    return <LoadingState />;
   }
 
   return (

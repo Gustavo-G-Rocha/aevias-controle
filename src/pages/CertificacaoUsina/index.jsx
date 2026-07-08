@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import LoadingState from "@/components/LoadingState";
 import { createPageUrl } from "@/utils";
 import { useChecklistForm } from "@/hooks/useChecklistForm";
 import { useCertificacaoUsinaForm } from "@/hooks/useCertificacaoUsinaForm";
@@ -135,7 +135,7 @@ export default function CertificacaoUsinaPage() {
   }, [formData, editingChecklist, user, clearSavedData, navigate]);
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+    return <LoadingState />;
   }
 
   // Edição geral (todas as seções exceto Resultado). O gestor liberado via

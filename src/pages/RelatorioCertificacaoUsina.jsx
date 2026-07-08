@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CertificacaoUsinaFotoPage from "@/components/certificacao-usina/CertificacaoUsinaFotoPage";
-import { Loader2, Printer } from "lucide-react";
+import { Printer } from "lucide-react";
+import LoadingState from "@/components/LoadingState";
 import { Button } from "@/components/ui/button";
 import { obterCertificacaoById } from "@/services/certificacaoUsinaService";
 import {
@@ -26,7 +27,7 @@ export default function RelatorioCertificacaoUsina() {
     load();
   }, []);
 
-  if (loading) return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+  if (loading) return <LoadingState />;
   if (!data) return <div className="p-8 text-center text-slate-500">Certificação não encontrada.</div>;
 
   const al = data.aspectos_legais || {};

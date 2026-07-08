@@ -1,4 +1,5 @@
 import { Loader2, AlertTriangle, Save } from "lucide-react";
+import LoadingState from "@/components/LoadingState";
 import { XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ export default function ChecklistConcretagem() {
   } = useChecklistConcretagem();
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+    return <LoadingState />;
   }
 
   const selectedProject = projects.find(p => p.id === formData.project_id);
