@@ -26,13 +26,21 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
   test('percorre todo o ciclo de vida de um ensaio no browser', async ({ page }) => {
     const ctx = setupMockApi(page, ADMIN_USER);
 
-    // ── Warmup: pré-carrega a página EnsaioCAUQ para o Vite otimizar deps ──────
-    // Sem isso, o primeiro carregamento da página lazy causa 504 "Outdated
-    // Optimize Dep" porque o Vite descobre novas dependências e invalida o
-    // cache de otimização. O warmup força a otimização antes do teste real.
-    await page.goto('/EnsaioCAUQ');
+    // ── Warmup: força o Vite a pré-otimizar as dependências do EnsaioCAUQ ──────
+    // O primeiro carregamento de uma página lazy pode causar 504 "Outdated
+    // Optimize Dep". Em vez de navegar para a rota (que dispara o ErrorBoundary
+    // e interfere na re-otimização), usamos page.evaluate para importar o
+    // módulo dinamicamente — o Vite re-otimiza sem quebrar a página.
+    await page.goto('/');
     await page.waitForLoadState('networkidle').catch(() => {});
-    await page.waitForTimeout(2000);
+    await page.evaluate(async () => {
+      // Primeira tentativa — pode falhar com 504 (triggers re-optimization)
+      try { await import('/src/pages/EnsaioCAUQ/index.jsx'); } catch {}
+      // Aguarda o Vite re-otimizar as dependências
+      await new Promise(r => setTimeout(r, 4000));
+      // Segunda tentativa — deps já otimizadas, deve succeed
+      try { await import('/src/pages/EnsaioCAUQ/index.jsx'); } catch {}
+    });
 
     // ═══════════════════════════════════════════════════════════════════════════
     // 1. ACESSAR MEUSENSAIOS — lista deve carregar sem erro
@@ -50,15 +58,7 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
     await page.getByRole('menuitem', { name: /Ensaio de CAUQ/i }).click();
 
     // Formulário deve carregar
-    const consoleErrors = [];
-    page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
-    page.on('pageerror', err => consoleErrors.push(err.message));
-    try {
-      await expect(page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i })).toBeVisible({ timeout: 15_000 });
-    } catch (e) {
-      console.log('CONSOLE ERRORS:', JSON.stringify(consoleErrors, null, 2));
-      throw e;
-    }
+    await expect(page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i })).toBeVisible({ timeout: 20_000 });
 
     // ═══════════════════════════════════════════════════════════════════════════
     // 3. SALVAR PROGRESSO — cria rascunho
@@ -137,10 +137,14 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
     // deve mostrar mensagem de erro — provando que o teste detecta regressões.
     const ctx = setupMockApi(page, ADMIN_USER);
 
-    // ── Warmup: pré-carrega a página EnsaioCAUQ para o Vite otimizar deps ──────
-    await page.goto('/EnsaioCAUQ');
+    // ── Warmup: força o Vite a pré-otimizar as dependências do EnsaioCAUQ ──────
+    await page.goto('/');
     await page.waitForLoadState('networkidle').catch(() => {});
-    await page.waitForTimeout(2000);
+    await page.evaluate(async () => {
+      try { await import('/src/pages/EnsaioCAUQ/index.jsx'); } catch {}
+      await new Promise(r => setTimeout(r, 4000));
+      try { await import('/src/pages/EnsaioCAUQ/index.jsx'); } catch {}
+    });
 
     // Sobrescreve o mock da função para sempre retornar erro
     page.route('**/api/apps/*/functions/validarESalvarRegistro', async (route) => {

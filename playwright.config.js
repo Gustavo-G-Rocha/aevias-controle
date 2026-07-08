@@ -37,9 +37,9 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'npm run dev -- --force',
+    command: 'npm run dev',
     url: 'http://localhost:5173',
-    reuseExistingServer: false,
+    reuseExistingServer: true,
     timeout: 60_000,
   },
 });
