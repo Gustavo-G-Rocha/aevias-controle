@@ -264,21 +264,38 @@ function handleFunction(funcName, body, ctx) {
 export function setupMockApi(page, currentUser = ADMIN_USER) {
   const ctx = createStore();
 
-  page.addInitScript((user) => {
-    // Injeta token fake para o SDK considerar autenticado
-    try {
-      window.localStorage.setItem('base44_access_token', 'e2e-mock-token');
-      window.localStorage.setItem('base44_app_id', 'e2e-app-id');
-    } catch {}
-  }, currentUser);
+  // ── Token injection via URL redirect ────────────────────────────────────────
+  // addInitScript (localStorage) não é confiável com Vite dev server — o
+  // module preload pode avaliar appParams antes do init script rodar.
+  // Em vez disso, interceptamos navegações de página e adicionamos
+  // ?access_token=… à URL. O SDK lê da URL ANTES de qualquer script.
+  page.route('**/*', (route) => {
+    const request = route.request();
+    if (request.isNavigationRequest() && request.url().includes('localhost:5173')) {
+      const url = new URL(request.url());
+      // Não injetar em páginas de login/registro
+      if (!url.pathname.startsWith('/login') &&
+          !url.pathname.startsWith('/register') &&
+          !url.pathname.startsWith('/forgot') &&
+          !url.pathname.startsWith('/reset') &&
+          !url.searchParams.has('access_token')) {
+        url.searchParams.set('access_token', 'e2e-mock-token');
+        return route.fulfill({ status: 302, headers: { Location: url.toString() } });
+      }
+    }
+    return route.fallback();
+  });
 
-  page.route('**/api/**', async (route) => {
+  page.route('**/api/apps/**', async (route) => {
     const request = route.request();
     const url = new URL(request.url());
     const pathname = url.pathname;
     const method = request.method();
 
-    console.log(`[MOCK] ${method} ${pathname}`);
+    // ── Analytics (no-op — evita falha de rede) ─────────────────────────────
+    if (pathname.includes('/analytics/track/batch')) {
+      return route.fulfill(jsonResponse({ success: true }));
+    }
 
     // ── Public settings (bootstrap do AuthContext) ───────────────────────────
     if (pathname.includes('/public-settings/by-id/')) {
@@ -292,7 +309,6 @@ export function setupMockApi(page, currentUser = ADMIN_USER) {
 
     // ── Auth: User/me ────────────────────────────────────────────────────────
     if (pathname.endsWith('/entities/User/me') && method === 'GET') {
-      console.log('[MOCK] → User/me:', currentUser.email);
       return route.fulfill(jsonResponse(currentUser));
     }
 

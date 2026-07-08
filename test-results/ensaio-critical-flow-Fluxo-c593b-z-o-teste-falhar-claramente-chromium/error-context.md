@@ -6,8 +6,8 @@
 
 # Test info
 
-- Name: ensaio-critical-flow.spec.js >> Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprovar → Assinar → Relatório >> percorre todo o ciclo de vida de um ensaio no browser
-- Location: e2e/ensaio-critical-flow.spec.js:26:3
+- Name: ensaio-critical-flow.spec.js >> Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprovar → Assinar → Relatório >> regressão: remover o mock de criar ensaio faz o teste falhar claramente
+- Location: e2e/ensaio-critical-flow.spec.js:116:3
 
 # Error details
 
@@ -394,47 +394,11 @@ Call log:
 # Test source
 
 ```ts
-  1   | /**
-  2   |  * e2e/ensaio-critical-flow.spec.js
-  3   |  *
-  4   |  * Teste E2E do fluxo crítico completo no browser:
-  5   |  *   Iniciar Ensaio → Preencher Dados → Assinar → Aprovar → Gerar PDF
-  6   |  *
-  7   |  * Cobre a integração entre múltiplas etapas que testes isolados não pegam:
-  8   |  *   1. Navegar para MeusEnsaios (lista carrega)
-  9   |  *   2. Criar Ensaio CAUQ (navegar para formulário)
-  10  |  *   3. Preencher dados + Salvar Progresso (rascunho persiste)
-  11  |  *   4. Finalizar Registro (status → finalizado)
-  12  |  *   5. Voltar à lista, aprovar (gestor aprova)
-  13  |  *   6. Assinar (cliente assina registro aprovado)
-  14  |  *   7. Abrir relatório (renderiza com dados de assinatura)
-  15  |  *   8. Botão Gerar PDF visível
-  16  |  *
-  17  |  * Anti-flakiness:
-  18  |  *   - Mock API determinístico (zero dependência de rede/backend)
-  19  |  *   - Esperas por texto/elemento (nunca sleep fixo)
-  20  |  *   - 1 worker, 1 browser, retries: 0
-  21  |  */
-  22  | import { test, expect } from '@playwright/test';
-  23  | import { setupMockApi, ADMIN_USER, GESTOR_USER, CLIENTE_USER } from './mock-api';
-  24  | 
-  25  | test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprovar → Assinar → Relatório', () => {
-  26  |   test('percorre todo o ciclo de vida de um ensaio no browser', async ({ page }) => {
-  27  |     const ctx = setupMockApi(page, ADMIN_USER);
-  28  | 
-  29  |     // ═══════════════════════════════════════════════════════════════════════════
-  30  |     // 1. ACESSAR MEUSENSAIOS — lista deve carregar sem erro
-  31  |     // ═══════════════════════════════════════════════════════════════════════════
-  32  |     await page.goto('/MeusEnsaios');
-  33  |     await expect(page.getByRole('heading', { name: 'Ensaios Realizados' })).toBeVisible({ timeout: 20_000 });
-  34  | 
-  35  |     // ═══════════════════════════════════════════════════════════════════════════
   36  |     // 2. CRIAR ENSAIO CAUQ — navegar para o formulário
   37  |     // ═══════════════════════════════════════════════════════════════════════════
   38  |     // Como admin, clica em "Novo Registro" → "Ensaio de CAUQ"
   39  |     await page.getByRole('button', { name: /Novo Registro/i }).click();
-> 40  |     await page.getByRole('menuitem', { name: /Ensaio de CAUQ/i }).click();
-      |                                                                   ^ TimeoutError: locator.click: Timeout 15000ms exceeded.
+  40  |     await page.getByRole('menuitem', { name: /Ensaio de CAUQ/i }).click();
   41  | 
   42  |     // Formulário deve carregar
   43  |     await expect(page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i })).toBeVisible({ timeout: 15_000 });
@@ -530,9 +494,19 @@ Call log:
   133 | 
   134 |     // Navegar para formulário
   135 |     await page.getByRole('button', { name: /Novo Registro/i }).click();
-  136 |     await page.getByRole('menuitem', { name: /Ensaio de CAUQ/i }).click();
+> 136 |     await page.getByRole('menuitem', { name: /Ensaio de CAUQ/i }).click();
+      |                                                                   ^ TimeoutError: locator.click: Timeout 15000ms exceeded.
   137 |     await expect(page.getByRole('heading', { name: /Novo Ensaio de CAUQ/i })).toBeVisible({ timeout: 15_000 });
   138 | 
   139 |     // Preencher e tentar salvar
   140 |     await page.getByLabel(/Observações Gerais/i).fill('Teste de regressão');
+  141 |     await page.getByRole('button', { name: /Salvar Progresso/i }).click();
+  142 | 
+  143 |     // Deve mostrar erro (toast) — provando que o teste detecta a falha
+  144 |     await expect(page.getByText(/Erro ao salvar progresso/i)).toBeVisible({ timeout: 10_000 });
+  145 | 
+  146 |     // NÃO deve ter mudado para "Editar" — o ensaio não foi criado
+  147 |     await expect(page.getByRole('heading', { name: /Editar Ensaio de CAUQ/i })).not.toBeVisible();
+  148 |   });
+  149 | });
 ```
