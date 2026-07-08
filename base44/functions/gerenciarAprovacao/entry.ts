@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
 
     const now = new Date().toISOString();
     const level = getUserAccessLevel(user);
-    const approverName = user.full_name || user.laboratorista_name || '';
+    const approverName = user.laboratorista_name || user.full_name || '';
     const updateData: Record<string, unknown> = {};
 
     if (action === 'approve') {
