@@ -8,6 +8,7 @@ import {
 import { SidebarProvider } from "@/components/ui/sidebar";
 import PullToRefresh from "@/components/PullToRefresh";
 import { ACCESS_LEVELS, getUserAccessLevel } from "@/lib/layoutConstants";
+import { isFormPage } from "@/lib/reportPages";
 
 import { useLayoutData } from "@/components/layout/useLayoutData";
 import AppSidebar from "@/components/layout/AppSidebar";
@@ -15,7 +16,7 @@ import BottomNav from "@/components/layout/BottomNav";
 import CreateEnsaioDialog from "@/components/layout/CreateEnsaioDialog";
 import { REPORT_PAGES } from "@/lib/reportPages";
 
-const AppLayout = ({ children }) => {
+const AppLayout = ({ children, currentPageName }) => {
   const [isCreateEnsaioOpen, setIsCreateEnsaioOpen] = useState(false);
   const [naoConformidadesOpen, setNaoConformidadesOpen] = useState(false);
   const [minhasObrasOpen, setMinhasObrasOpen] = useState(false);
@@ -48,7 +49,7 @@ const AppLayout = ({ children }) => {
 
           <main className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
             <div className="flex-1 flex flex-col">
-              <PullToRefresh>
+              <PullToRefresh disabled={isFormPage(currentPageName)}>
                 <div className="pb-16 lg:pb-0 overflow-x-hidden" style={{ paddingTop: "env(safe-area-inset-top)" }}>
                   {children}
                 </div>
@@ -78,5 +79,5 @@ export default function Layout({ children, currentPageName }) {
   if (currentPageName && REPORT_PAGES.has(currentPageName)) {
     return <div className="report-scope">{children}</div>;
   }
-  return <AppLayout>{children}</AppLayout>;
+  return <AppLayout currentPageName={currentPageName}>{children}</AppLayout>;
 }

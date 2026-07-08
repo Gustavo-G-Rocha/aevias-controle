@@ -8,6 +8,22 @@
  * Se uma página de relatório for renomeada, adicionar o novo nome aqui
  * para preservar o escape de layout.
  */
+/**
+ * Prefixos de páginas de formulário/digitação onde o pull-to-refresh
+ * deve ser desabilitado para não interferir na digitação do usuário.
+ * Usado pelo Layout para calcular a prop `disabled` do PullToRefresh.
+ */
+export const FORM_PAGE_PREFIXES = [
+  "Checklist",
+  "Ensaio",
+  "Diario",
+  "Boletim",
+  "Acompanhamento",
+];
+
+export const isFormPage = (pageName) =>
+  !!pageName && FORM_PAGE_PREFIXES.some((prefix) => pageName.startsWith(prefix));
+
 export const REPORT_PAGES = new Set([
   "RelatorioCertificacaoUsina",
   "RelatorioAcompanhamentoCarga",

@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 const THRESHOLD = 80;
 
-export default function PullToRefresh({ children }) {
+export default function PullToRefresh({ children, disabled = false }) {
   const queryClient = useQueryClient();
   const [pullDistance, setPullDistance] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
@@ -49,13 +49,9 @@ export default function PullToRefresh({ children }) {
   const progress = Math.min(pullDistance / THRESHOLD, 1);
   const showIndicator = pullDistance > 5;
 
-  // Desabilitar pull-to-refresh em páginas de formulário/digitação
-  const isFormPage = typeof window !== 'undefined' && 
-    (window.location.pathname.includes('Checklist') || 
-     window.location.pathname.includes('Ensaio') ||
-     window.location.pathname.includes('Diario') ||
-     window.location.pathname.includes('Boletim') ||
-     window.location.pathname.includes('Acompanhamento'));
+  // `disabled` é informado pelo Layout com base no currentPageName,
+  // evitando detecção por string da URL (que pode falhar silenciosamente).
+  const isFormPage = disabled;
 
   return (
     <div className="relative flex-1 flex flex-col overflow-hidden">
