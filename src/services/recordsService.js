@@ -5,6 +5,7 @@
 import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
 import { logger } from '@/utils/logger';
+import { toast } from '@/components/ui/use-toast';
 
 // ─── Mapa canônico de todas as entidades de registro ──────────────────────────
 // Limite único por entidade — cache unificado entre Dashboard e MeusEnsaios
@@ -67,6 +68,11 @@ async function loadEntity(entityType, limit = RECORD_PAGE_SIZE, paginate = false
     return await base44.entities[entityType].list('-created_date', totalLimit);
   } catch (e) {
     logger.error(`[recordsService] Falha ao carregar ${entityType}:`, e?.message || e);
+    toast({
+      title: `Falha ao carregar ${entityType}`,
+      description: 'Alguns registros podem não aparecer na lista.',
+      variant: 'destructive',
+    });
     return [];
   }
 }
