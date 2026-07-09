@@ -3,12 +3,13 @@ import { logger } from '@/utils/logger';
 /**
  * offlineStorageService.js
  * Gerencia IndexedDB para armazenamento offline
- * Store: queueItems (fila de sincronização)
+ * Stores: queueItems (fila de sincronização), conflicts (conflitos LWW)
  */
 
 const DB_NAME = 'aevias-offline-v1';
 const STORE_QUEUE = 'queueItems';
-const DB_VERSION = 1;
+const STORE_CONFLICTS = 'conflicts';
+const DB_VERSION = 2;
 
 let db = null;
 
@@ -19,7 +20,6 @@ let db = null;
 async function initDB() {
   if (db) return db;
 
-  // Guard para ambiente de teste (sem indexedDB)
   if (typeof indexedDB === 'undefined') {
     throw new Error('[offlineStorage] IndexedDB não disponível neste ambiente');
   }
@@ -40,8 +40,8 @@ async function initDB() {
 
     request.onupgradeneeded = (event) => {
       const database = event.target.result;
-      
-      // Criar store para fila de sincronização
+
+      // Store para fila de sincronização
       if (!database.objectStoreNames.contains(STORE_QUEUE)) {
         const store = database.createObjectStore(STORE_QUEUE, { keyPath: 'id' });
         store.createIndex('timestamp', 'timestamp', { unique: false });
@@ -50,9 +50,20 @@ async function initDB() {
         store.createIndex('dataHash', 'dataHash', { unique: false });
         logger.log('[offlineStorage] Store criado:', STORE_QUEUE);
       }
+
+      // Store para conflitos de sincronização (LWW)
+      if (!database.objectStoreNames.contains(STORE_CONFLICTS)) {
+        const conflictStore = database.createObjectStore(STORE_CONFLICTS, { keyPath: 'id' });
+        conflictStore.createIndex('entityType', 'entityType', { unique: false });
+        conflictStore.createIndex('status', 'status', { unique: false });
+        conflictStore.createIndex('queueItemId', 'queueItemId', { unique: false });
+        logger.log('[offlineStorage] Store criado:', STORE_CONFLICTS);
+      }
     };
   });
 }
+
+// ── Queue Items ──────────────────────────────────────────────────
 
 /**
  * Adiciona item à fila
@@ -61,7 +72,7 @@ async function initDB() {
  */
 export async function addQueueItem(item) {
   const database = await initDB();
-  
+
   return new Promise((resolve, reject) => {
     const transaction = database.transaction([STORE_QUEUE], 'readwrite');
     const store = transaction.objectStore(STORE_QUEUE);
@@ -86,7 +97,7 @@ export async function addQueueItem(item) {
  */
 export async function getQueueItem(itemId) {
   const database = await initDB();
-  
+
   return new Promise((resolve, reject) => {
     const transaction = database.transaction([STORE_QUEUE], 'readonly');
     const store = transaction.objectStore(STORE_QUEUE);
@@ -105,7 +116,7 @@ export async function getQueueItem(itemId) {
  */
 export async function updateQueueItem(itemId, updates) {
   const database = await initDB();
-  
+
   const item = await getQueueItem(itemId);
   if (!item) {
     throw new Error(`Item ${itemId} não encontrado`);
@@ -133,7 +144,7 @@ export async function updateQueueItem(itemId, updates) {
  */
 export async function removeQueueItem(itemId) {
   const database = await initDB();
-  
+
   return new Promise((resolve, reject) => {
     const transaction = database.transaction([STORE_QUEUE], 'readwrite');
     const store = transaction.objectStore(STORE_QUEUE);
@@ -154,7 +165,7 @@ export async function removeQueueItem(itemId) {
  */
 export async function getQueueItemsByStatus(status) {
   const database = await initDB();
-  
+
   return new Promise((resolve, reject) => {
     const transaction = database.transaction([STORE_QUEUE], 'readonly');
     const store = transaction.objectStore(STORE_QUEUE);
@@ -175,7 +186,7 @@ export async function getQueueItemsByStatus(status) {
  */
 export async function findDuplicateQueueItem(entityType, operation, dataHash) {
   const database = await initDB();
-  
+
   return new Promise((resolve, reject) => {
     const transaction = database.transaction([STORE_QUEUE], 'readonly');
     const store = transaction.objectStore(STORE_QUEUE);
@@ -202,7 +213,7 @@ export async function findDuplicateQueueItem(entityType, operation, dataHash) {
  */
 export async function getAllQueueItems() {
   const database = await initDB();
-  
+
   return new Promise((resolve, reject) => {
     const transaction = database.transaction([STORE_QUEUE], 'readonly');
     const store = transaction.objectStore(STORE_QUEUE);
@@ -219,7 +230,7 @@ export async function getAllQueueItems() {
  */
 export async function clearQueue() {
   const database = await initDB();
-  
+
   return new Promise((resolve, reject) => {
     const transaction = database.transaction([STORE_QUEUE], 'readwrite');
     const store = transaction.objectStore(STORE_QUEUE);
@@ -241,4 +252,142 @@ export async function clearQueue() {
 export async function countQueueItemsByStatus(status) {
   const items = await getQueueItemsByStatus(status);
   return items.length;
+}
+
+// ── Conflicts (LWW) ──────────────────────────────────────────────
+
+/**
+ * Adiciona um conflito de sincronização ao IndexedDB
+ * @param {object} conflict
+ * @returns {Promise<string>} id do conflito
+ */
+export async function addConflict(conflict) {
+  const database = await initDB();
+
+  const conflictWithId = {
+    ...conflict,
+    id: conflict.id || crypto.randomUUID?.() || `conflict-${Date.now()}`,
+    createdDate: new Date().toISOString(),
+  };
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction([STORE_CONFLICTS], 'readwrite');
+    const store = transaction.objectStore(STORE_CONFLICTS);
+    const request = store.add(conflictWithId);
+
+    request.onerror = () => {
+      logger.error('[offlineStorage] Erro ao adicionar conflito:', request.error);
+      reject(request.error);
+    };
+
+    request.onsuccess = () => {
+      logger.log('[offlineStorage] Conflito adicionado:', conflictWithId.id);
+      resolve(conflictWithId.id);
+    };
+  });
+}
+
+/**
+ * Lista todos os conflitos com status específico
+ * @param {string} status
+ * @returns {Promise<object[]>}
+ */
+export async function getConflictsByStatus(status) {
+  const database = await initDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction([STORE_CONFLICTS], 'readonly');
+    const store = transaction.objectStore(STORE_CONFLICTS);
+    const index = store.index('status');
+    const request = index.getAll(status);
+
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result || []);
+  });
+}
+
+/**
+ * Lista todos os conflitos
+ * @returns {Promise<object[]>}
+ */
+export async function getAllConflicts() {
+  const database = await initDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction([STORE_CONFLICTS], 'readonly');
+    const store = transaction.objectStore(STORE_CONFLICTS);
+    const request = store.getAll();
+
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result || []);
+  });
+}
+
+/**
+ * Obtém um conflito por ID
+ * @param {string} conflictId
+ * @returns {Promise<object|null>}
+ */
+export async function getConflict(conflictId) {
+  const database = await initDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction([STORE_CONFLICTS], 'readonly');
+    const store = transaction.objectStore(STORE_CONFLICTS);
+    const request = store.get(conflictId);
+
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result || null);
+  });
+}
+
+/**
+ * Remove um conflito
+ * @param {string} conflictId
+ * @returns {Promise<void>}
+ */
+export async function removeConflict(conflictId) {
+  const database = await initDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction([STORE_CONFLICTS], 'readwrite');
+    const store = transaction.objectStore(STORE_CONFLICTS);
+    const request = store.delete(conflictId);
+
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      logger.log('[offlineStorage] Conflito removido:', conflictId);
+      resolve();
+    };
+  });
+}
+
+/**
+ * Conta conflitos com status específico
+ * @param {string} status
+ * @returns {Promise<number>}
+ */
+export async function countConflictsByStatus(status) {
+  const items = await getConflictsByStatus(status);
+  return items.length;
+}
+
+/**
+ * Limpa todos os conflitos
+ * @returns {Promise<void>}
+ */
+export async function clearConflicts() {
+  const database = await initDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction([STORE_CONFLICTS], 'readwrite');
+    const store = transaction.objectStore(STORE_CONFLICTS);
+    const request = store.clear();
+
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      logger.log('[offlineStorage] Conflitos limpos');
+      resolve();
+    };
+  });
 }

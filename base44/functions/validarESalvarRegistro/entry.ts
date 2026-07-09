@@ -216,7 +216,7 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { entityName, data, operation, recordId } = body;
+    const { entityName, data, operation, recordId, client_updated_at, force_overwrite, base_updated_date } = body;
 
     // Whitelist de entidades permitidas
     if (!ALLOWED_ENTITIES.includes(entityName)) {
@@ -314,6 +314,68 @@ Deno.serve(async (req) => {
             { status: obraResult.status || 403 }
           );
         }
+      }
+    }
+
+    // ── CONFLICT DETECTION (LWW) ──────────────────────────────────────
+    // Detecta conflitos quando o cliente está sincronizando uma edição
+    // feita sobre uma versão desatualizada do registro.
+    // Estratégia: Last-Write-Wins com notificação ao usuário.
+    if (operation === 'update' && !force_overwrite) {
+      let serverRecord;
+      try {
+        serverRecord = await base44.asServiceRole.entities[entityName].get(recordId);
+      } catch {
+        serverRecord = null;
+      }
+
+      if (serverRecord) {
+        // Check 1: base_updated_date mismatch (registro modificado após carregar formulário)
+        if (base_updated_date && serverRecord.updated_date) {
+          const baseTime = new Date(base_updated_date).getTime();
+          const serverTime = new Date(serverRecord.updated_date).getTime();
+          if (!isNaN(baseTime) && !isNaN(serverTime) && baseTime !== serverTime) {
+            return Response.json({
+              error: 'Conflito de sincronização: o registro foi modificado por outro usuário enquanto você editava.',
+              conflict: true,
+              serverData: serverRecord,
+              clientUpdatedAt: client_updated_at,
+              serverUpdatedDate: serverRecord.updated_date,
+              errorCategory: 'conflict',
+            }, { status: 409 });
+          }
+        }
+
+        // Check 2: client_updated_at < server.updated_date (cliente salvou antes do servidor atualizar)
+        if (client_updated_at && serverRecord.updated_date) {
+          const clientTime = new Date(client_updated_at).getTime();
+          const serverTime = new Date(serverRecord.updated_date).getTime();
+          if (!isNaN(clientTime) && !isNaN(serverTime) && clientTime < serverTime) {
+            return Response.json({
+              error: 'Conflito de sincronização: o registro foi modificado por outro usuário após o seu salvamento.',
+              conflict: true,
+              serverData: serverRecord,
+              clientUpdatedAt: client_updated_at,
+              serverUpdatedDate: serverRecord.updated_date,
+              errorCategory: 'conflict',
+            }, { status: 409 });
+          }
+        }
+      }
+    }
+
+    // Force overwrite: remove campos server-authoritative antes de aplicar
+    // (aprovação, assinatura, integridade — sempre controlados pelo servidor)
+    if (operation === 'update' && force_overwrite) {
+      const SERVER_AUTH_FIELDS = [
+        'approved', 'approved_by', 'approved_date', 'approver_details',
+        'rejection_reason', 'was_rejected', 'client_signature', 'manager_signature',
+        'integrity_hash', 'integrity_hash_date',
+        'pendente_aprovacao_cliente', 'cliente_aprovacao', 'cliente_aprovacao_data',
+        'cliente_aprovacao_responsavel', 'cliente_reprovacao_motivo',
+      ];
+      for (const field of SERVER_AUTH_FIELDS) {
+        delete sanitizedData[field];
       }
     }
 

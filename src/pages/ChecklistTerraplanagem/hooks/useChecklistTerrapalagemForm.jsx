@@ -246,6 +246,8 @@ export function useChecklistTerrapalagemForm() {
           entityType: 'ChecklistTerraplanagem',
           entityId: editingChecklist?.id || null,
           payload: dataToSave,
+          clientUpdatedAt: new Date().toISOString(),
+          baseUpdatedDate: editingChecklist?.updated_date || null,
         });
 
         await addOrUpdateQueueItem(queueItem);

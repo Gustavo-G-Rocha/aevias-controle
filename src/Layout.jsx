@@ -14,6 +14,7 @@ import { useLayoutData } from "@/components/layout/useLayoutData";
 import AppSidebar from "@/components/layout/AppSidebar";
 import BottomNav from "@/components/layout/BottomNav";
 import CreateEnsaioDialog from "@/components/layout/CreateEnsaioDialog";
+import OfflineStatusBar from "@/components/offline/OfflineStatusBar";
 import { REPORT_PAGES } from "@/lib/reportPages";
 
 const AppLayout = ({ children, currentPageName }) => {
@@ -56,6 +57,7 @@ const AppLayout = ({ children, currentPageName }) => {
               </PullToRefresh>
             </div>
             <BottomNav />
+            <OfflineStatusBar />
           </main>
         </div>
 

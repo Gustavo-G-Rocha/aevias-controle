@@ -38,6 +38,8 @@ export function createQueueItem({
   entityType = '',
   entityId = null,
   payload = {},
+  clientUpdatedAt = null,
+  baseUpdatedDate = null,
 } = {}) {
   const dataHash = generatePayloadHash(payload);
   
@@ -49,9 +51,11 @@ export function createQueueItem({
     entityId,
     payload,
     dataHash,
+    clientUpdatedAt: clientUpdatedAt || new Date().toISOString(),
+    baseUpdatedDate,
     attempts: 0,
     lastError: null,
-    status: 'pending', // pending | syncing | synced | failed
+    status: 'pending', // pending | syncing | synced | failed | conflict
   };
 }
 
@@ -69,7 +73,7 @@ export function isValidQueueItem(item) {
     item.operation &&
     item.entityType &&
     item.payload &&
-    ['pending', 'syncing', 'synced', 'failed'].includes(item.status)
+    ['pending', 'syncing', 'synced', 'failed', 'conflict'].includes(item.status)
   );
 }
 

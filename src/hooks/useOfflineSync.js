@@ -1,12 +1,18 @@
 /**
  * useOfflineSync.js
- * Hook que gerencia sincronização automática quando conexão volta
+ * Hook que gerencia sincronização automática quando conexão volta.
+ * Expõe contadores de pendências, falhas e conflitos (LWW).
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useOfflineDetection } from './useOfflineDetection';
-import { syncPendingItems, syncQueueItem } from '@/services/syncService';
-import { getQueueItemsByStatus, countQueueItemsByStatus } from '@/services/offlineStorageService';
+import { syncPendingItems, resolveConflict as resolveConflictService } from '@/services/syncService';
+import {
+  getQueueItemsByStatus,
+  countQueueItemsByStatus,
+  getAllConflicts,
+  countConflictsByStatus,
+} from '@/services/offlineStorageService';
 import { logger } from '@/utils/logger';
 
 /**
@@ -18,16 +24,22 @@ export function useOfflineSync() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [failedCount, setFailedCount] = useState(0);
+  const [conflictCount, setConflictCount] = useState(0);
+  const [conflicts, setConflicts] = useState([]);
   const [lastSyncTime, setLastSyncTime] = useState(null);
   const [lastError, setLastError] = useState(null);
 
-  // Atualizar contadores de pendência
+  // Atualizar contadores de pendência e conflitos
   const refreshCounts = useCallback(async () => {
     try {
       const pending = await countQueueItemsByStatus('pending');
       const failed = await countQueueItemsByStatus('failed');
+      const conflict = await countConflictsByStatus('pending');
+      const allConflicts = await getAllConflicts();
       setPendingCount(pending);
       setFailedCount(failed);
+      setConflictCount(conflict);
+      setConflicts(allConflicts);
     } catch (e) {
       logger.error('[useOfflineSync] Erro ao atualizar contadores:', e);
     }
@@ -44,18 +56,17 @@ export function useOfflineSync() {
     try {
       const result = await syncPendingItems();
       setLastSyncTime(new Date());
-      
+
       if (result.synced > 0) {
         logger.log(`[useOfflineSync] ${result.synced} items sincronizados`);
       }
-      
+
       if (result.failed > 0) {
         const errorMsg = `${result.failed} items falharam: ${result.errors.join('; ')}`;
         logger.warn('[useOfflineSync]', errorMsg);
         setLastError(errorMsg);
       }
 
-      // Atualizar contadores
       await refreshCounts();
     } catch (e) {
       logger.error('[useOfflineSync] Erro durante sincronização:', e);
@@ -65,14 +76,29 @@ export function useOfflineSync() {
     }
   }, [isOnline, isSyncing, refreshCounts]);
 
+  // Resolver conflito (force overwrite ou discard)
+  const resolveConflict = useCallback(async (conflict, resolution) => {
+    try {
+      const result = await resolveConflictService(conflict, resolution);
+      if (result.success) {
+        logger.log('[useOfflineSync] Conflito resolvido:', conflict.id, resolution);
+      } else {
+        logger.error('[useOfflineSync] Erro ao resolver conflito:', result.error);
+      }
+      await refreshCounts();
+      return result;
+    } catch (e) {
+      logger.error('[useOfflineSync] Erro ao resolver conflito:', e);
+      return { success: false, error: e?.message || String(e) };
+    }
+  }, [refreshCounts]);
+
   // Sincronizar automaticamente quando voltar online
   useEffect(() => {
     if (!isOnline) return;
 
-    // Sincronizar imediatamente ao conectar
     performSync();
 
-    // Depois, sincronizar periodicamente a cada 30s
     const interval = setInterval(performSync, 30000);
 
     return () => clearInterval(interval);
@@ -88,8 +114,12 @@ export function useOfflineSync() {
     isSyncing,
     pendingCount,
     failedCount,
+    conflictCount,
+    conflicts,
     lastSyncTime,
     lastError,
-    performSync, // Para sincronizar manualmente se necessário
+    performSync,
+    resolveConflict,
+    refreshCounts,
   };
 }

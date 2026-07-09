@@ -1,17 +1,18 @@
 /**
  * OfflineStatusBar.jsx
- * Barra discreta de status offline/sincronização
+ * Barra discreta de status offline/sincronização com notificação de conflitos.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useOfflineSync } from '@/hooks/useOfflineSync';
-import { AlertCircle, WifiOff, Loader } from 'lucide-react';
+import { AlertCircle, WifiOff, Loader, AlertTriangle } from 'lucide-react';
+import { ConflictResolutionDialog } from '@/components/offline/ConflictResolutionDialog';
 
 export default function OfflineStatusBar() {
-  const { isOnline, isSyncing, pendingCount, failedCount, lastError } = useOfflineSync();
+  const { isOnline, isSyncing, pendingCount, failedCount, conflictCount, conflicts, resolveConflict } = useOfflineSync();
+  const [selectedConflict, setSelectedConflict] = useState(null);
 
-  // Não exibir se tudo está OK
-  if (isOnline && pendingCount === 0 && failedCount === 0) {
+  if (isOnline && pendingCount === 0 && failedCount === 0 && conflictCount === 0) {
     return null;
   }
 
@@ -41,6 +42,22 @@ export default function OfflineStatusBar() {
         </div>
       )}
 
+      {/* Conflito de Sincronização */}
+      {conflictCount > 0 && (
+        <button
+          onClick={() => setSelectedConflict(conflicts[0])}
+          className="w-full text-left bg-amber-50 border border-amber-300 rounded-lg p-3 mb-2 shadow-sm flex items-start gap-2 cursor-pointer hover:bg-amber-100 transition-colors"
+        >
+          <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div className="text-sm">
+            <p className="text-amber-800 font-medium">Conflito de sincronização</p>
+            <p className="text-amber-700 text-xs">
+              {conflictCount} registro(s) com conflito. Toque para resolver.
+            </p>
+          </div>
+        </button>
+      )}
+
       {/* Erro de Sincronização */}
       {failedCount > 0 && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-3 shadow-sm flex items-start gap-2">
@@ -52,6 +69,20 @@ export default function OfflineStatusBar() {
             </p>
           </div>
         </div>
+      )}
+
+      {selectedConflict && (
+        <ConflictResolutionDialog
+          conflict={selectedConflict}
+          isOpen={!!selectedConflict}
+          onClose={() => setSelectedConflict(null)}
+          onResolve={async (conflict, resolution) => {
+            const result = await resolveConflict(conflict, resolution);
+            if (result.success) {
+              setSelectedConflict(null);
+            }
+          }}
+        />
       )}
     </div>
   );
