@@ -135,11 +135,21 @@ export default function RelatorioCAUQTabelas({ ensaio, project, faixa, dadosGran
                       </tr>
                     )}
 
-                    {ensaio.extracao_ligante.amostra_umida && (
-                      <tr className="bg-blue-50">
-                        <td className={`border-r border-slate-300 font-bold ${paddingExtracaoLigante}`}>UMIDADE:</td>
-                        <td className={`font-semibold text-blue-700 ${paddingExtracaoLigante}`}>{ensaio.extracao_ligante.umidade || 0}%</td>
-                      </tr>
+                    {ensaio.extracao_ligante.amostra_umida != null && (
+                      <>
+                        <tr className="bg-blue-50">
+                          <td className={`border-r border-slate-300 font-bold ${paddingExtracaoLigante}`}>AM. ÚMIDA:</td>
+                          <td className={`${paddingExtracaoLigante}`}>{ensaio.extracao_ligante.amostra_umida ?? '-'} g</td>
+                        </tr>
+                        <tr className="bg-blue-50">
+                          <td className={`border-r border-slate-300 font-bold ${paddingExtracaoLigante}`}>AM. SECA:</td>
+                          <td className={`${paddingExtracaoLigante}`}>{ensaio.extracao_ligante.amostra_seca ?? '-'} g</td>
+                        </tr>
+                        <tr className="bg-blue-50">
+                          <td className={`border-r border-slate-300 font-bold ${paddingExtracaoLigante}`}>UMIDADE:</td>
+                          <td className={`font-semibold text-blue-700 ${paddingExtracaoLigante}`}>{ensaio.extracao_ligante.umidade ?? '-'}%</td>
+                        </tr>
+                      </>
                     )}
                   </>
                 )}

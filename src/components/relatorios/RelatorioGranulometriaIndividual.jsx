@@ -172,6 +172,33 @@ export default function RelatorioGranulometriaIndividual({ ensaio, obra, project
 
       </section>
 
+      {/* Determinação de Umidade */}
+      {ensaio.agregados?.some(agg => agg.umidade != null || agg.peso_umido != null) && (
+        <section className="mb-4">
+          <p className="text-xs text-center font-bold mb-2">DETERMINAÇÃO DE UMIDADE</p>
+          <table className="w-full border-collapse border border-gray-400 text-xs">
+            <thead className="bg-slate-700">
+              <tr>
+                <th className="border border-gray-400 p-2 text-xs text-white">Agregado</th>
+                <th className="border border-gray-400 p-2 text-xs text-white">Amostra Úmida (g)</th>
+                <th className="border border-gray-400 p-2 text-xs text-white">Amostra Seca (g)</th>
+                <th className="border border-gray-400 p-2 text-xs text-white">Umidade (%)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ensaio.agregados?.map((agg, idx) => (
+                <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                  <td className="border border-gray-400 p-2 font-semibold text-center text-xs">{agg.nome || `Agregado ${idx + 1}`}</td>
+                  <td className="border border-gray-400 p-2 text-center text-xs">{agg.peso_umido ?? '-'}</td>
+                  <td className="border border-gray-400 p-2 text-center text-xs">{agg.peso_seco ?? '-'}</td>
+                  <td className="border border-gray-400 p-2 text-center text-xs font-semibold">{agg.umidade != null ? `${agg.umidade}%` : '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
+
       {/* Gráfico de Granulometria */}
       <div className="border border-gray-400 p-4 mb-4 bg-white" style={{ pageBreakBefore: 'always' }}>
         <h3 className="text-xs font-bold text-center mb-2">GRANULOMETRIA DA AMOSTRA</h3>
