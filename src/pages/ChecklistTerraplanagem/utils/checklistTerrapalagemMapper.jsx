@@ -1,5 +1,6 @@
 // Utilitários de transformação de dados para o payload da API
 import { normalizarFoto } from '@/utils/photoLegendaUtils';
+import { validateChecklistTerraplanagemForm } from '@/utils/formValidationSchemas';
 
 const toResultadosArray = (resultados) => {
   if (Array.isArray(resultados)) return resultados;
@@ -76,20 +77,10 @@ export const buildDataToSave = (formData, saveStatus, user) => {
   };
 };
 
-export const validateForm = (formData, saveStatus) => {
-  if (!formData.obra_id) return "Por favor, selecione uma obra.";
-  if (saveStatus !== 'finalizado') return null;
-
-  if (!formData.rodovia?.trim()) return "Por favor, selecione a Rodovia.";
-  if (!formData.empreiteira?.trim()) return "Por favor, selecione a Empreiteira.";
-  if (!formData.estaca?.trim()) return "Por favor, preencha o campo Estaca.";
-  if (!formData.camada?.trim()) return "Por favor, preencha o campo Camada.";
-  if (!formData.material?.trim()) return "Por favor, preencha o campo Material.";
-  if (!formData.jornada?.horario_inicio?.trim()) return "Por favor, preencha o Horário de Início.";
-  if (!formData.jornada?.horario_fim?.trim()) return "Por favor, preencha o Horário Fim.";
-
-  if (formData.acoes_corretivas_realizado === true && !formData.acoes_corretivas_descricao?.trim())
-    return "Por favor, descreva as ações corretivas realizadas.";
-
-  return null;
-};
+/**
+ * Valida o formulário usando o schema zod centralizado.
+ * Delega para validateChecklistTerraplanagemForm (fonte única da verdade).
+ * Mantém a assinatura (formData, saveStatus) → string|null para compatibilidade.
+ */
+export const validateForm = (formData, saveStatus) =>
+  validateChecklistTerraplanagemForm(formData, saveStatus);
