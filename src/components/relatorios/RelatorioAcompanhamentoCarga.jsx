@@ -1,55 +1,14 @@
 import React from 'react';
-import { mapAcompanhamentoToPresentation } from '@/utils/relatorioAcompanhamentoCargaMapper';
+import { useRelatorioAcompanhamentoCargaCtx } from './acompanhamento-carga/RelatorioAcompanhamentoCargaContext';
+import ReportPrintHeader from './acompanhamento-carga/ReportPrintHeader';
+import SignatureFooter from './SignatureFooter';
 
 const SectionTitle = ({ children }) => (
   <h2 className="text-sm print:text-xs font-bold text-center bg-slate-100 p-0.5 my-0.5 uppercase tracking-wider">{children}</h2>
 );
 
-const ReportPrintHeader = ({ data, regional }) => {
-  const logoUrl = regional?.logo_url ||
-    'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png';
-
-  return (
-    <>
-      <div className="print:hidden">
-        <header className="grid grid-cols-3 items-center border-b-2 border-slate-900 pb-1 mb-2">
-          <div className="flex justify-start">
-            <picture><source srcSet={logoUrl} /><img src={logoUrl} alt="Logo Regional" className="h-10 object-contain" width="auto" height="40" /></picture>
-          </div>
-          <div className="text-center">
-            <h1 className="text-sm font-bold text-gray-800 whitespace-nowrap">Acompanhamento de Aplicação de CAUQ</h1>
-          </div>
-          <div className="flex justify-end">
-            <div className="border border-gray-400 p-1 rounded-md text-xs">
-              <p className="font-semibold text-gray-800">{data.data}</p>
-            </div>
-          </div>
-        </header>
-      </div>
-
-      <div className="hidden print:block mb-4">
-        <div className="grid grid-cols-3 items-start border-b-2 border-slate-900 pb-2">
-          <div className="flex justify-start">
-            <picture><source srcSet={logoUrl} /><img src={logoUrl} alt="Logo Regional" className="h-12 object-contain" width="auto" height="48" /></picture>
-          </div>
-          <div className="text-center">
-            <h1 className="text-base font-bold text-gray-800">Acompanhamento de Aplicação de CAUQ</h1>
-          </div>
-          <div className="flex justify-end">
-            <div className="border border-gray-400 px-2 py-1 rounded text-sm">
-              <p className="font-semibold text-gray-800">{data.data}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
-
-import SignatureFooter from './SignatureFooter';
-
-export default function RelatorioAcompanhamentoCarga({ acompanhamento, obra, regional, projeto, faixaGranulometrica }) {
-  const data = mapAcompanhamentoToPresentation({ acompanhamento, obra, regional, projeto, faixaGranulometrica });
+export default function RelatorioAcompanhamentoCarga() {
+  const { data } = useRelatorioAcompanhamentoCargaCtx();
 
   if (!data) {
     return <div className="p-8">Dados do acompanhamento não encontrados.</div>;
@@ -59,7 +18,7 @@ export default function RelatorioAcompanhamentoCarga({ acompanhamento, obra, reg
     <div className="bg-white font-sans">
       <div className="p-6 print:p-0 flex flex-col min-h-screen print:min-h-0">
         <div className="w-full flex flex-col">
-          <ReportPrintHeader data={data} regional={regional} />
+          <ReportPrintHeader />
           
           <main className="text-xs mt-1 print:mt-3">
             <SectionTitle>Dados da Obra</SectionTitle>

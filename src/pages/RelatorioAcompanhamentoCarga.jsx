@@ -10,6 +10,7 @@ import { obterFaixaById } from '@/services/faixasService';
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
 
 import RelatorioAcompanhamentoCarga from "@/components/relatorios/RelatorioAcompanhamentoCarga";
+import { RelatorioAcompanhamentoCargaProvider } from "@/components/relatorios/acompanhamento-carga/RelatorioAcompanhamentoCargaContext";
 import { logger } from '@/utils/logger';
 
 export default function RelatorioAcompanhamentoCargaPage() {
@@ -111,13 +112,15 @@ export default function RelatorioAcompanhamentoCargaPage() {
       </div>
 
       <div className="max-w-[297mm] mx-auto bg-white shadow-lg my-4 print:my-0 print:shadow-none">
-        <RelatorioAcompanhamentoCarga
+        <RelatorioAcompanhamentoCargaProvider
           acompanhamento={acompanhamento}
           obra={obra}
           regional={regional}
           projeto={projeto}
           faixaGranulometrica={faixaGranulometrica}
-        />
+        >
+          <RelatorioAcompanhamentoCarga />
+        </RelatorioAcompanhamentoCargaProvider>
       </div>
 
       <style>{`
