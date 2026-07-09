@@ -1,10 +1,12 @@
 import React from "react";
+import { useAcompanhamentoCargaCtx } from "./AcompanhamentoCargaContext";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
-export default function AcompanhamentoCargaHeader({ editMode }) {
+export default function AcompanhamentoCargaHeader() {
+  const { editMode } = useAcompanhamentoCargaCtx();
   const navigate = useNavigate();
   return (
     <div className="mb-6 flex items-center justify-between">

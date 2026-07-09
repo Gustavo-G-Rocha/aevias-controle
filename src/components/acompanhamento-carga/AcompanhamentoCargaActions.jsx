@@ -1,8 +1,10 @@
 import React from "react";
+import { useAcompanhamentoCargaCtx } from "./AcompanhamentoCargaContext";
 import { Button } from "@/components/ui/button";
 import { Save, Send, Loader2 } from "lucide-react";
 
-export default function AcompanhamentoCargaActions({ canEdit, saving, handleSubmit }) {
+export default function AcompanhamentoCargaActions() {
+  const { canEdit, saving, handleSubmit } = useAcompanhamentoCargaCtx();
   if (!canEdit) return null;
   return (
     <div className="flex gap-3 justify-end pt-4 border-t">

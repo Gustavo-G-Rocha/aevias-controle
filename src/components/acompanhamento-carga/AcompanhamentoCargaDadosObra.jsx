@@ -1,15 +1,17 @@
 import React from "react";
+import { useAcompanhamentoCargaCtx } from "./AcompanhamentoCargaContext";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export default function AcompanhamentoCargaDadosObra({
-  formData, setFormData,
-  obras, availableProjects,
-  obraSelecionada, regionalSelecionada, projetoSelecionado,
-  canEdit,
-  handleObraChange, handleProjectChange,
-}) {
+export default function AcompanhamentoCargaDadosObra() {
+  const {
+    formData, setFormData,
+    obras, availableProjects,
+    obraSelecionada, regionalSelecionada, projetoSelecionado,
+    canEdit,
+    handleObraChange, handleProjectChange,
+  } = useAcompanhamentoCargaCtx();
   return (
     <div>
       <h2 className="text-lg font-bold text-foreground mb-4 border-b pb-2">DADOS DA OBRA</h2>

@@ -2,75 +2,30 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
 
-import { useAcompanhamentoCargaData }    from "@/hooks/useAcompanhamentoCargaData";
-import { useAcompanhamentoCargaActions } from "@/hooks/useAcompanhamentoCargaActions";
-import { calcCanEdit }                   from "@/utils/acompanhamentoCargaUtils";
+import {
+  AcompanhamentoCargaProvider,
+  useAcompanhamentoCargaCtx,
+} from "@/components/acompanhamento-carga/AcompanhamentoCargaContext";
 
 import AcompanhamentoCargaHeader   from "@/components/acompanhamento-carga/AcompanhamentoCargaHeader";
 import AcompanhamentoCargaDadosObra from "@/components/acompanhamento-carga/AcompanhamentoCargaDadosObra";
 import AcompanhamentoCargaCargas   from "@/components/acompanhamento-carga/AcompanhamentoCargaCargas";
 import AcompanhamentoCargaActions  from "@/components/acompanhamento-carga/AcompanhamentoCargaActions";
 
-export default function AcompanhamentoCarga() {
-  const {
-    formData, setFormData,
-    user, obras, regionais, projects, availableProjects, setAvailableProjects,
-    loading, editMode, editId, clearSavedData,
-  } = useAcompanhamentoCargaData();
-
-  const {
-    saving,
-    handleObraChange, handleProjectChange,
-    handleAddCarga, handleRemoveCarga, handleCargaChange,
-    handleSubmit,
-  } = useAcompanhamentoCargaActions({
-    formData, setFormData,
-    obras, regionais, projects, setAvailableProjects,
-    editMode, editId, clearSavedData,
-  });
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-transparent">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
-  const obraSelecionada     = obras.find(o => o.id === formData.obra_id);
-  const regionalSelecionada = regionais.find(r => r.id === obraSelecionada?.regional_id);
-  const projetoSelecionado  = projects.find(p => p.id === formData.project_id);
-  const canEdit             = calcCanEdit(editMode, formData, user?.email);
+function AcompanhamentoCargaContent() {
+  const { formData, setFormData, canEdit } = useAcompanhamentoCargaCtx();
 
   return (
     <div className="min-h-screen bg-transparent p-4 space-y-6">
       <div className="max-w-7xl mx-auto">
-        <AcompanhamentoCargaHeader editMode={editMode} />
+        <AcompanhamentoCargaHeader />
 
         <Card className="bg-card border border-border text-card-foreground">
           <CardContent className="p-6 space-y-6">
-            <AcompanhamentoCargaDadosObra
-              formData={formData}
-              setFormData={setFormData}
-              obras={obras}
-              availableProjects={availableProjects}
-              obraSelecionada={obraSelecionada}
-              regionalSelecionada={regionalSelecionada}
-              projetoSelecionado={projetoSelecionado}
-              canEdit={canEdit}
-              handleObraChange={handleObraChange}
-              handleProjectChange={handleProjectChange}
-            />
+            <AcompanhamentoCargaDadosObra />
 
-            <AcompanhamentoCargaCargas
-              cargas={formData.cargas}
-              canEdit={canEdit}
-              handleAddCarga={handleAddCarga}
-              handleRemoveCarga={handleRemoveCarga}
-              handleCargaChange={handleCargaChange}
-            />
+            <AcompanhamentoCargaCargas />
 
             <div>
               <Label>Observações Gerais</Label>
@@ -83,14 +38,18 @@ export default function AcompanhamentoCarga() {
               />
             </div>
 
-            <AcompanhamentoCargaActions
-              canEdit={canEdit}
-              saving={saving}
-              handleSubmit={handleSubmit}
-            />
+            <AcompanhamentoCargaActions />
           </CardContent>
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function AcompanhamentoCarga() {
+  return (
+    <AcompanhamentoCargaProvider>
+      <AcompanhamentoCargaContent />
+    </AcompanhamentoCargaProvider>
   );
 }

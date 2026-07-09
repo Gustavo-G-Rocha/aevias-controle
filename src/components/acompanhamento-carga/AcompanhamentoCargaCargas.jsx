@@ -1,12 +1,12 @@
 import React from "react";
+import { useAcompanhamentoCargaCtx } from "./AcompanhamentoCargaContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Trash2 } from "lucide-react";
 
-export default function AcompanhamentoCargaCargas({
-  cargas, canEdit,
-  handleAddCarga, handleRemoveCarga, handleCargaChange,
-}) {
+export default function AcompanhamentoCargaCargas() {
+  const { formData, canEdit, handleAddCarga, handleRemoveCarga, handleCargaChange } = useAcompanhamentoCargaCtx();
+  const cargas = formData.cargas;
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
