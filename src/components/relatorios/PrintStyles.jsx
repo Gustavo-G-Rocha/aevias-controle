@@ -25,6 +25,20 @@ export default function PrintStyles() {
         }
         ::-webkit-scrollbar { display: none !important; }
         * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+
+        /* Evitar página em branco no final do PDF */
+        .report-scope, [data-print-container] {
+          min-height: 0 !important;
+          height: auto !important;
+          overflow: visible !important;
+        }
+        html, body, #root {
+          height: auto !important;
+          overflow: visible !important;
+        }
+        .min-h-screen {
+          min-height: 0 !important;
+        }
       }
     `}</style>
   );
