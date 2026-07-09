@@ -17,23 +17,27 @@ export default function ValidationQrCode({ url }) {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      gap: '4px',
+      gap: '3px',
+      border: '1px solid #cbd5e1',
+      borderRadius: '6px',
+      padding: '4px 6px',
+      backgroundColor: '#f8fafc',
     }}>
       <img
         src={qrSrc}
         alt="QR Code de Validação"
-        width="80"
-        height="80"
-        style={{ width: '80px', height: '80px', display: 'block' }}
+        width="60"
+        height="60"
+        style={{ width: '60px', height: '60px', display: 'block' }}
       />
       <span style={{
-        fontSize: '8px',
+        fontSize: '7px',
         color: '#64748b',
         textAlign: 'center',
-        maxWidth: '180px',
-        lineHeight: '1.2',
+        maxWidth: '140px',
+        lineHeight: '1.1',
       }}>
-        Escaneie para verificar a autenticidade deste documento
+        Escaneie para validar
       </span>
     </div>
   );

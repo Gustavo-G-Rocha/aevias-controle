@@ -134,7 +134,7 @@ export default function SignatureFooter({
       </div>
 
       {isSigned && (
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px' }}>
           <ValidationQrCode url={verificationUrl} />
         </div>
       )}
