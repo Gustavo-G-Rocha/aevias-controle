@@ -42,6 +42,12 @@ export default defineConfig({
       'next-themes',
     ],
   },
+  // Garante uma única instância de React — previne "dispatcher is null"
+  // quando o cache de deps do Vite fica desatualizado e React é split em
+  // chunks diferentes com dispatchers incompatíveis.
+  resolve: {
+    dedupe: ['react', 'react-dom'],
+  },
   plugins: [
     base44({
       // Support for legacy code that imports the base44 SDK with @/integrations, @/entities, etc.
