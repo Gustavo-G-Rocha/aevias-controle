@@ -23,7 +23,10 @@ export function useTableFilters(ensaios, obras, projects, allUsers, applyCustomF
   const [typeFilter, setTypeFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState('desc');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+  // Página maior (100) + virtualização: mais registros visíveis sem degradar o scroll.
+  // A virtualização no AdminInterface/ClienteInterface renderiza apenas as linhas
+  // visíveis na viewport (~10-15), mantendo o DOM enxuto mesmo com 100+ registros.
+  const itemsPerPage = 100;
 
   // Índices O(1) para evitar .find() dentro de useMemo/loops
   const obrasMap = useMemo(() => new Map(obras.map((o) => [o.id, o])), [obras]);

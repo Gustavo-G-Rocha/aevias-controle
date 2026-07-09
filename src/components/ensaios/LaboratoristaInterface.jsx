@@ -1,15 +1,15 @@
 // Interface de visualização para laboratoristas (cards por status)
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { FileText, CheckCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Pagination } from "@/components/ensaios/Pagination";
 import EnsaioCard from "./EnsaioCard";
+import VirtualizedCardList from "@/components/ensaios/VirtualizedCardList";
 
-// P5 — paginação client-side: limita os cards renderizados por aba (~12),
-// evitando lag com dezenas/centenas de registros. Mesmo padrão já usado
-// pelo AdminInterface (useTableFilters + Pagination).
-const ITEMS_PER_PAGE = 12;
+// Página maior (100) + virtualização: mais cards visíveis sem degradar o scroll.
+// A virtualização renderiza apenas os cards na viewport (~5-8), mantendo o DOM enxuto.
+const ITEMS_PER_PAGE = 100;
 
 const LaboratoristaInterface = React.memo(({ ensaios, obras, user, allUsers }) => {
   const [activeTab, setActiveTab] = useState('emExecucao');
@@ -36,7 +36,6 @@ const LaboratoristaInterface = React.memo(({ ensaios, obras, user, allUsers }) =
     [ensaios]
   );
 
-  // P5 — fatia apenas a página atual de cada aba (o resto fica fora do DOM).
   const pageStart = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedExecucao = useMemo(() => emExecucao.slice(pageStart, pageStart + ITEMS_PER_PAGE), [emExecucao, pageStart]);
   const paginatedPendentes = useMemo(() => pendentes.slice(pageStart, pageStart + ITEMS_PER_PAGE), [pendentes, pageStart]);
@@ -60,6 +59,10 @@ const LaboratoristaInterface = React.memo(({ ensaios, obras, user, allUsers }) =
     </div>
   );
 
+  const renderCard = useCallback((ensaio) => (
+    <EnsaioCard ensaio={ensaio} obra={obrasMap.get(ensaio.obra_id)} user={user} allUsers={allUsers} />
+  ), [obrasMap, user, allUsers]);
+
   return (
     <div className="space-y-4">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
@@ -81,7 +84,13 @@ const LaboratoristaInterface = React.memo(({ ensaios, obras, user, allUsers }) =
         <TabsContent value="emExecucao" className="mt-4 space-y-4">
           {emExecucao.length > 0
             ? (<>
-                {paginatedExecucao.map((ensaio) => <EnsaioCard key={ensaio.id} ensaio={ensaio} obra={obrasMap.get(ensaio.obra_id)} user={user} allUsers={allUsers} />)}
+                <VirtualizedCardList
+                  items={paginatedExecucao}
+                  estimateSize={240}
+                  overscan={4}
+                  renderCard={renderCard}
+                  emptyState={<EmptyState icon={FileText} title="Nenhum registro em execução" subtitle="Comece criando um novo registro ou finalize os em rascunho." />}
+                />
                 <Pagination currentPage={currentPage} totalPages={totalPagesExecucao} onPageChange={setCurrentPage} />
               </>)
             : <EmptyState icon={FileText} title="Nenhum registro em execução" subtitle="Comece criando um novo registro ou finalize os em rascunho." />
@@ -91,7 +100,13 @@ const LaboratoristaInterface = React.memo(({ ensaios, obras, user, allUsers }) =
         <TabsContent value="pendentes" className="mt-4 space-y-4">
           {pendentes.length > 0
             ? (<>
-                {paginatedPendentes.map((ensaio) => <EnsaioCard key={ensaio.id} ensaio={ensaio} obra={obrasMap.get(ensaio.obra_id)} user={user} allUsers={allUsers} />)}
+                <VirtualizedCardList
+                  items={paginatedPendentes}
+                  estimateSize={240}
+                  overscan={4}
+                  renderCard={renderCard}
+                  emptyState={<EmptyState icon={FileText} title="Nenhum registro pendente" subtitle="Todos os ensaios e diários estão aprovados ou não há registros." />}
+                />
                 <Pagination currentPage={currentPage} totalPages={totalPagesPendentes} onPageChange={setCurrentPage} />
               </>)
             : <EmptyState icon={FileText} title="Nenhum registro pendente" subtitle="Todos os ensaios e diários estão aprovados ou não há registros." />
@@ -101,7 +116,13 @@ const LaboratoristaInterface = React.memo(({ ensaios, obras, user, allUsers }) =
         <TabsContent value="aprovados" className="mt-4 space-y-4">
           {aprovados.length > 0
             ? (<>
-                {paginatedAprovados.map((ensaio) => <EnsaioCard key={ensaio.id} ensaio={ensaio} obra={obrasMap.get(ensaio.obra_id)} user={user} allUsers={allUsers} />)}
+                <VirtualizedCardList
+                  items={paginatedAprovados}
+                  estimateSize={240}
+                  overscan={4}
+                  renderCard={renderCard}
+                  emptyState={<EmptyState icon={CheckCircle} title="Nenhum registro aprovado ainda" subtitle="Aguarde a aprovação dos ensaios pelo administrador." />}
+                />
                 <Pagination currentPage={currentPage} totalPages={totalPagesAprovados} onPageChange={setCurrentPage} />
               </>)
             : <EmptyState icon={CheckCircle} title="Nenhum registro aprovado ainda" subtitle="Aguarde a aprovação dos ensaios pelo administrador." />
