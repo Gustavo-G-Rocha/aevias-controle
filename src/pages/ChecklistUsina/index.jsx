@@ -5,7 +5,7 @@ import { criarChecklist, atualizarChecklist } from "@/services/checklistsService
 import { uploadMultipleFiles } from "@/utils/imageUpload";
 import { createPageUrl } from "@/utils";
 import { useChecklistForm } from "@/hooks/useChecklistForm";
-import { validateChecklistUsinaForm } from "@/utils/checklistValidation";
+import { validateChecklistUsinaForm } from "@/utils/formValidationSchemas";
 import MedicaoUsina from "@/components/checklists/MedicaoUsina";
 import ChecklistUsinaHeader from "@/components/checklists/ChecklistUsinaHeader";
 import ChecklistFooter from "@/components/checklists/ChecklistFooter";

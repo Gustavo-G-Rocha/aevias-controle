@@ -1,29 +1,10 @@
 /**
- * Funções de validação para formulários de checklist
+ * Funções de validação para formulários de checklist.
+ *
+ * MIGRADO PARA SCHEMA-DRIVEN: validateChecklistUsinaForm agora delega
+ * para o schema Zod centralizado em formValidationSchemas.js.
+ * Este módulo re-exporta para manter compatibilidade com importadores existentes.
+ *
+ * Nova migração: importar diretamente de formValidationSchemas.js.
  */
-
-export function validateChecklistUsinaForm(formData, saveStatus) {
-  if (saveStatus === 'finalizado') {
-    const requiredFields = {
-      obra_id: "Obra",
-      project_id: "Projeto",
-      usina: "Usina", // ChecklistUsina specific
-      pedreira: "Pedreira",
-      faixa_especificada: "Faixa especificada",
-      ligante: "Ligante asfáltico",
-    };
-
-    for (const [field, label] of Object.entries(requiredFields)) {
-      if (!formData[field]) {
-        return { valid: false, message: `Por favor, preencha ${label}.` };
-      }
-    }
-  } else {
-    // Salvar progresso - apenas obra é obrigatória
-    if (!formData.obra_id) {
-      return { valid: false, message: "Por favor, selecione uma obra." };
-    }
-  }
-
-  return { valid: true };
-}
+export { validateChecklistUsinaForm } from '@/utils/formValidationSchemas';

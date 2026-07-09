@@ -160,3 +160,56 @@ export function validateChecklistTerraplanagemForm(formData, saveStatus = 'rascu
   }
   return null;
 }
+
+// ── ChecklistUsina ────────────────────────────────────────────────────
+// Regras (paridade com validateChecklistUsinaForm do checklistValidation.js):
+// - rascunho: apenas obra_id é obrigatório
+// - finalizado: obra_id + project_id, usina, pedreira, faixa_especificada, ligante
+export const checklistUsinaSchema = z.object({
+  obra_id: requiredString('Por favor, selecione uma obra.'),
+  // Campos nullable() para aceitar null de formulários/selects desmarcados;
+  // a obrigatoriedade é validada no superRefine (status=finalizado).
+  project_id: z.string().nullable().optional(),
+  usina: z.string().nullable().optional(),
+  pedreira: z.string().nullable().optional(),
+  faixa_especificada: z.string().nullable().optional(),
+  ligante: z.string().nullable().optional(),
+  status: z.enum(['rascunho', 'finalizado']),
+}).superRefine((data, ctx) => {
+  if (data.status !== 'finalizado') return;
+
+  const requiredFields = [
+    { field: 'project_id', message: 'Por favor, preencha Projeto.' },
+    { field: 'usina', message: 'Por favor, preencha Usina.' },
+    { field: 'pedreira', message: 'Por favor, preencha Pedreira.' },
+    { field: 'faixa_especificada', message: 'Por favor, preencha Faixa especificada.' },
+    { field: 'ligante', message: 'Por favor, preencha Ligante asfáltico.' },
+  ];
+
+  for (const { field, message } of requiredFields) {
+    if (!data[field]) {
+      ctx.addIssue({ code: 'custom', message, path: [field] });
+    }
+  }
+});
+
+/**
+ * Valida formData de ChecklistUsina contra o schema zod.
+ * Substitui a validação manual de checklistValidation.js.
+ *
+ * Mantém o contrato { valid, message } para paridade com o consumidor.
+ *
+ * @param {object} formData
+ * @param {'rascunho'|'finalizado'} saveStatus
+ * @returns {{ valid: boolean, message?: string }}
+ */
+export function validateChecklistUsinaForm(formData, saveStatus = 'rascunho') {
+  const result = checklistUsinaSchema.safeParse({
+    ...formData,
+    status: saveStatus,
+  });
+  if (!result.success) {
+    return { valid: false, message: result.error.errors[0]?.message ?? 'Dados inválidos.' };
+  }
+  return { valid: true };
+}
