@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Save, CheckCircle, AlertTriangle } from "lucide-react";
 import LoadingState from "@/components/LoadingState";
+import TruthConfirmationDialog from "@/components/forms/TruthConfirmationDialog";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -18,8 +20,10 @@ export default function DiarioObraPage() {
     loading, obras, regionais, editingDiarioOriginal,
     formData, handleChange, loadingUpload, selectedFileNames, uploadProgress,
     handleFileChange, handleRemovePhoto, handleSubmit, handleCancel,
-    isApproved, isEditable,
+    isApproved, isEditable, saving,
   } = useDiarioObra();
+
+  const [showTruthConfirm, setShowTruthConfirm] = useState(false);
 
   if (loading) {
     return <LoadingState />;
@@ -123,12 +127,12 @@ export default function DiarioObraPage() {
                 <Button type="button" variant="outline" onClick={handleCancel}>Cancelar</Button>
                 {isEditable && !isApproved && (
                   <>
-                    <Button type="button" variant="outline" disabled={loadingUpload}
+                    <Button type="button" variant="outline" disabled={loadingUpload || saving}
                       onClick={(e) => handleSubmit(e, "rascunho")}
                       >
                       <Save className="mr-2 h-4 w-4" /> Salvar Progresso
                     </Button>
-                    <Button type="button" disabled={loadingUpload} onClick={(e) => handleSubmit(e, "finalizado")}>
+                    <Button type="button" disabled={loadingUpload || saving} onClick={() => setShowTruthConfirm(true)}>
                       <Save className="mr-2 h-4 w-4" /> Finalizar
                     </Button>
                   </>
@@ -139,6 +143,14 @@ export default function DiarioObraPage() {
                   </Badge>
                 )}
               </div>
+              <TruthConfirmationDialog
+                open={showTruthConfirm}
+                onOpenChange={setShowTruthConfirm}
+                onConfirm={() => {
+                  setShowTruthConfirm(false);
+                  handleSubmit({ preventDefault: () => {} }, "finalizado");
+                }}
+              />
             </form>
           </CardContent>
         </Card>

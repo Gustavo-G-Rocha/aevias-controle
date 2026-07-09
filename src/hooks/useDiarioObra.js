@@ -104,6 +104,7 @@ export function useDiarioObra() {
   const [loadingUpload, setLoadingUpload] = useState(false);
   const [selectedFileNames, setSelectedFileNames] = useState("Nenhum ficheiro selecionado");
   const [uploadProgress, setUploadProgress] = useState([]);
+  const [saving, setSaving] = useState(false);
 
   const handleChange = useCallback((name, value) => {
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -168,6 +169,7 @@ export function useDiarioObra() {
       fotos: (formData.fotos || []).map(f => (typeof f === 'string' ? f : (f?.url || ''))).filter(Boolean),
     };
 
+    setSaving(true);
     try {
       if (editingDiarioOriginal?.id) {
         const updateData = { ...dataToSave };
@@ -184,6 +186,8 @@ export function useDiarioObra() {
     } catch (error) {
       logger.error("[DiarioObra] Erro:", error?.message || error);
       toast({ title: "Ocorreu um erro ao salvar o diário.", variant: "destructive" });
+    } finally {
+      setSaving(false);
     }
   }, [formData, editingDiarioOriginal, obras, user, navigate]);
 
@@ -238,6 +242,6 @@ export function useDiarioObra() {
     formData, setFormData, handleChange,
     loadingUpload, selectedFileNames, uploadProgress,
     handleFileChange, handleRemovePhoto, handleSubmit, handleCancel,
-    isApproved, isEditable, isCreatingNew,
+    isApproved, isEditable, isCreatingNew, saving,
   };
 }

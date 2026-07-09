@@ -215,6 +215,7 @@ export function useChecklistTerrapalagemForm() {
     setSaving(true);
     try {
       const dataToSave = buildDataToSave(formData, saveStatus);
+      dataToSave.laboratorista_name = user.laboratorista_name || user.full_name;
 
       if (isOnline) {
         // ONLINE: Comportamento original

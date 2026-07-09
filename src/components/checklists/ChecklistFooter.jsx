@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Save, CheckCircle } from "lucide-react";
+import TruthConfirmationDialog from "@/components/forms/TruthConfirmationDialog";
 
 export default function ChecklistFooter({
   isEditable,
@@ -11,37 +12,54 @@ export default function ChecklistFooter({
   onSaveProgress,
   onFinalize,
 }) {
+  const [showTruthConfirm, setShowTruthConfirm] = useState(false);
+
+  const handleFinalizeClick = (e) => {
+    e.preventDefault();
+    setShowTruthConfirm(true);
+  };
+
+  const handleConfirmTruth = () => {
+    setShowTruthConfirm(false);
+    onFinalize({ preventDefault: () => {} });
+  };
+
   return (
-    <div className="flex justify-end gap-4 mt-6">
-      <Button type="button" variant="outline" onClick={onCancel}>
-        Cancelar
-      </Button>
-      {isEditable && !isApproved && (
-        <>
-          <Button 
-            type="button" 
-            variant="outline"
-            disabled={loadingUpload}
-            onClick={onSaveProgress}
-
-          >
-            <Save className="mr-2 h-4 w-4" /> Salvar Progresso
-          </Button>
-          <Button
-            type={onFinalize ? "button" : "submit"}
-            disabled={loadingUpload}
-            onClick={onFinalize}
-
-          >
-            <Save className="mr-2 h-4 w-4" /> Finalizar
-          </Button>
-        </>
-      )}
-      {isApproved && (
-        <Badge className="bg-green-500 hover:bg-green-500 px-4 py-2 text-md">
-          <CheckCircle className="mr-2 h-4 w-4" /> Aprovado
-        </Badge>
-      )}
-    </div>
+    <>
+      <div className="flex justify-end gap-4 mt-6">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancelar
+        </Button>
+        {isEditable && !isApproved && (
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={loadingUpload}
+              onClick={onSaveProgress}
+            >
+              <Save className="mr-2 h-4 w-4" /> Salvar Progresso
+            </Button>
+            <Button
+              type="button"
+              disabled={loadingUpload}
+              onClick={handleFinalizeClick}
+            >
+              <Save className="mr-2 h-4 w-4" /> Finalizar
+            </Button>
+          </>
+        )}
+        {isApproved && (
+          <Badge className="bg-green-500 hover:bg-green-500 px-4 py-2 text-md">
+            <CheckCircle className="mr-2 h-4 w-4" /> Aprovado
+          </Badge>
+        )}
+      </div>
+      <TruthConfirmationDialog
+        open={showTruthConfirm}
+        onOpenChange={setShowTruthConfirm}
+        onConfirm={handleConfirmTruth}
+      />
+    </>
   );
 }
