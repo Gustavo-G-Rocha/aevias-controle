@@ -301,22 +301,28 @@ export default function ChangeEntry({ entry }) {
                   {diffRows.map((row, rIdx) => (
                     <div key={rIdx} className="px-3 py-1.5">
                       <div className="text-[11px] text-slate-500 font-medium mb-0.5">{row.label}</div>
-                      <div className="flex flex-col gap-0.5">
-                        {row.oldValue !== "—" && (
-                          <div className="flex items-start gap-1.5 text-xs text-red-600 bg-red-50/60 rounded px-2 py-0.5">
-                            <Minus className="w-3 h-3 mt-0.5 flex-shrink-0 opacity-70" />
-                            <span className={`break-words ${row.changed ? "line-through opacity-80" : ""}`}>
-                              {row.oldValue}
-                            </span>
-                          </div>
-                        )}
-                        {row.newValue !== "—" && (
-                          <div className="flex items-start gap-1.5 text-xs text-green-700 bg-green-50/60 rounded px-2 py-0.5">
-                            <Plus className="w-3 h-3 mt-0.5 flex-shrink-0 opacity-70" />
-                            <span className="break-words">{row.newValue}</span>
-                          </div>
-                        )}
-                      </div>
+                      {!row.changed ? (
+                        <div className="text-xs text-slate-600 bg-slate-100/60 rounded px-2 py-0.5 break-words">
+                          {row.newValue}
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-0.5">
+                          {row.oldValue !== "—" && (
+                            <div className="flex items-start gap-1.5 text-xs text-red-600 bg-red-50/60 rounded px-2 py-0.5">
+                              <Minus className="w-3 h-3 mt-0.5 flex-shrink-0 opacity-70" />
+                              <span className="break-words line-through opacity-80">
+                                {row.oldValue}
+                              </span>
+                            </div>
+                          )}
+                          {row.newValue !== "—" && (
+                            <div className="flex items-start gap-1.5 text-xs text-green-700 bg-green-50/60 rounded px-2 py-0.5">
+                              <Plus className="w-3 h-3 mt-0.5 flex-shrink-0 opacity-70" />
+                              <span className="break-words">{row.newValue}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
