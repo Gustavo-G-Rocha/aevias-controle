@@ -12,7 +12,6 @@ import { ExclusaoModal } from "@/components/ensaios/ExclusaoModal";
 import { useTableFilters } from "@/hooks/useTableFilters";
 import TableRowAdmin from "@/components/ensaios/TableRowAdmin";
 import EnsaiosTableHeader from "@/components/ensaios/EnsaiosTableHeader";
-import VirtualizedTableBody from "@/components/ensaios/VirtualizedTableBody";
 
 const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReject, onDelete, user, canApprove, canCreate, allUsers, regionais = [] }) => {
   const [statusFilter, setStatusFilter] = useState('all');
@@ -102,51 +101,50 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
 
       <Card className="border-0" style={{ backgroundColor: 'var(--color-surface)', borderRadius: 'var(--card-radius)', boxShadow: 'var(--card-shadow)' }}>
         <CardContent className="p-0">
-          <VirtualizedTableBody
-            items={paginatedEnsaios}
-            rowHeight={52}
-            overscan={6}
-            colCount={9}
-            emptyState={
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <EnsaiosTableHeader
+                typeFilter={typeFilter} setTypeFilter={setTypeFilter}
+                sortOrder={sortOrder} toggleSortOrder={toggleSortOrder}
+                dataInicioFilter={dataInicioFilter} setDataInicioFilter={setDataInicioFilter}
+                dataFimFilter={dataFimFilter} setDataFimFilter={setDataFimFilter}
+                obraFilter={obraFilter} setObraFilter={setObraFilter}
+                nomeFilter={nomeFilter} setNomeFilter={setNomeFilter}
+                localFilter={localFilter} setLocalFilter={setLocalFilter}
+                empreiteiraFilter={empreiteiraFilter} setEmpreiteiraFilter={setEmpreiteiraFilter}
+                projetoFilter={projetoFilter} setProjetoFilter={setProjetoFilter}
+                statusFilter={statusFilter} setStatusFilter={setStatusFilter}
+                statusOptions={statusOptions}
+                acoesWidth="140px"
+              />
+              <tbody>
+                {paginatedEnsaios.map((ensaio, index) => (
+                  <TableRowAdmin
+                    key={ensaio.id}
+                    ensaio={ensaio}
+                    obra={obrasMap.get(ensaio.obra_id)}
+                    projeto={ensaio.project_id ? projectsMap.get(ensaio.project_id) : null}
+                    index={index}
+                    canApprove={canApprove}
+                    allUsers={allUsers}
+                    obras={obras}
+                    user={user}
+                    regionais={regionais}
+                    onApprove={onApprove}
+                    onReject={() => setReprovingEnsaio(ensaio)}
+                    onDelete={() => setDeletingEnsaio(ensaio)}
+                  />
+                ))}
+              </tbody>
+            </table>
+            {filteredEnsaios.length === 0 && (
               <div className="text-center py-12" style={{ color: 'var(--color-text-muted)' }}>
                 <FileText className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--color-text-subtle)' }} />
                 <h3 className="font-medium mb-2" style={{ color: 'var(--color-text)' }}>Nenhum registro encontrado</h3>
                 <p>Ajuste os filtros ou aguarde novos registros.</p>
               </div>
-            }
-            renderRow={(ensaio, index) => (
-              <TableRowAdmin
-                key={ensaio.id}
-                ensaio={ensaio}
-                obra={obrasMap.get(ensaio.obra_id)}
-                projeto={ensaio.project_id ? projectsMap.get(ensaio.project_id) : null}
-                index={index}
-                canApprove={canApprove}
-                allUsers={allUsers}
-                obras={obras}
-                user={user}
-                regionais={regionais}
-                onApprove={onApprove}
-                onReject={() => setReprovingEnsaio(ensaio)}
-                onDelete={() => setDeletingEnsaio(ensaio)}
-              />
             )}
-          >
-            <EnsaiosTableHeader
-              typeFilter={typeFilter} setTypeFilter={setTypeFilter}
-              sortOrder={sortOrder} toggleSortOrder={toggleSortOrder}
-              dataInicioFilter={dataInicioFilter} setDataInicioFilter={setDataInicioFilter}
-              dataFimFilter={dataFimFilter} setDataFimFilter={setDataFimFilter}
-              obraFilter={obraFilter} setObraFilter={setObraFilter}
-              nomeFilter={nomeFilter} setNomeFilter={setNomeFilter}
-              localFilter={localFilter} setLocalFilter={setLocalFilter}
-              empreiteiraFilter={empreiteiraFilter} setEmpreiteiraFilter={setEmpreiteiraFilter}
-              projetoFilter={projetoFilter} setProjetoFilter={setProjetoFilter}
-              statusFilter={statusFilter} setStatusFilter={setStatusFilter}
-              statusOptions={statusOptions}
-              acoesWidth="140px"
-            />
-          </VirtualizedTableBody>
+          </div>
         </CardContent>
       </Card>
 

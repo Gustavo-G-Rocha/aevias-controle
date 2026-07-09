@@ -8,7 +8,6 @@ import { Pagination } from "@/components/ensaios/Pagination";
 import { useTableFilters } from "@/hooks/useTableFilters";
 import TableRowCliente from "@/components/ensaios/TableRowCliente";
 import EnsaiosTableHeader from "@/components/ensaios/EnsaiosTableHeader";
-import VirtualizedTableBody from "@/components/ensaios/VirtualizedTableBody";
 import { assinarEnsaio } from "@/services/ensaiosService";
 import { QUERY_KEYS } from "@/hooks/useQueryData";
 import { toast } from "@/components/ui/use-toast";
@@ -76,46 +75,45 @@ const ClienteInterface = React.memo(({ ensaios, obras, projects, user, allUsers 
 
       <Card className="border-0" style={{ backgroundColor: 'var(--color-surface)', borderRadius: 'var(--card-radius)', boxShadow: 'var(--card-shadow)' }}>
         <CardContent className="p-0">
-          <VirtualizedTableBody
-            items={paginatedEnsaios}
-            rowHeight={52}
-            overscan={6}
-            colCount={9}
-            emptyState={
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <EnsaiosTableHeader
+                typeFilter={typeFilter} setTypeFilter={setTypeFilter}
+                sortOrder={sortOrder} toggleSortOrder={toggleSortOrder}
+                dataInicioFilter={dataInicioFilter} setDataInicioFilter={setDataInicioFilter}
+                dataFimFilter={dataFimFilter} setDataFimFilter={setDataFimFilter}
+                obraFilter={obraFilter} setObraFilter={setObraFilter}
+                nomeFilter={nomeFilter} setNomeFilter={setNomeFilter}
+                localFilter={localFilter} setLocalFilter={setLocalFilter}
+                empreiteiraFilter={empreiteiraFilter} setEmpreiteiraFilter={setEmpreiteiraFilter}
+                projetoFilter={projetoFilter} setProjetoFilter={setProjetoFilter}
+                statusFilter={statusFilter} setStatusFilter={setStatusFilter}
+                statusOptions={statusOptions}
+                acoesLabel="Ações"
+                acoesWidth="120px"
+              />
+              <tbody>
+                {paginatedEnsaios.map((ensaio, index) => (
+                  <TableRowCliente
+                    key={ensaio.id}
+                    ensaio={ensaio}
+                    obra={obrasMap.get(ensaio.obra_id)}
+                    projeto={ensaio.project_id ? projectsMap.get(ensaio.project_id) : null}
+                    index={index}
+                    allUsers={allUsers}
+                    onAssinar={handleAssinar}
+                  />
+                ))}
+              </tbody>
+            </table>
+            {filteredEnsaios.length === 0 && (
               <div className="text-center py-12 text-foreground/70">
                 <FileText className="w-12 h-12 text-foreground/30 mx-auto mb-4" />
                 <h3 className="font-medium text-foreground mb-2">Nenhum registro encontrado</h3>
                 <p>Ajuste os filtros ou aguarde novos registros aprovados.</p>
               </div>
-            }
-            renderRow={(ensaio, index) => (
-              <TableRowCliente
-                key={ensaio.id}
-                ensaio={ensaio}
-                obra={obrasMap.get(ensaio.obra_id)}
-                projeto={ensaio.project_id ? projectsMap.get(ensaio.project_id) : null}
-                index={index}
-                allUsers={allUsers}
-                onAssinar={handleAssinar}
-              />
             )}
-          >
-            <EnsaiosTableHeader
-              typeFilter={typeFilter} setTypeFilter={setTypeFilter}
-              sortOrder={sortOrder} toggleSortOrder={toggleSortOrder}
-              dataInicioFilter={dataInicioFilter} setDataInicioFilter={setDataInicioFilter}
-              dataFimFilter={dataFimFilter} setDataFimFilter={setDataFimFilter}
-              obraFilter={obraFilter} setObraFilter={setObraFilter}
-              nomeFilter={nomeFilter} setNomeFilter={setNomeFilter}
-              localFilter={localFilter} setLocalFilter={setLocalFilter}
-              empreiteiraFilter={empreiteiraFilter} setEmpreiteiraFilter={setEmpreiteiraFilter}
-              projetoFilter={projetoFilter} setProjetoFilter={setProjetoFilter}
-              statusFilter={statusFilter} setStatusFilter={setStatusFilter}
-              statusOptions={statusOptions}
-              acoesLabel="Ações"
-              acoesWidth="120px"
-            />
-          </VirtualizedTableBody>
+          </div>
         </CardContent>
       </Card>
 
