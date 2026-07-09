@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useReportMode } from "@/hooks/useReportMode";
 import { Button } from "@/components/ui/button";
-import { Loader2, Printer } from "lucide-react";
+import { Loader2, Printer, FileDown } from "lucide-react";
 import { obterEnsaioById } from '@/services/ensaiosService';
 import { obterObraById } from '@/services/obrasService';
 import { obterRegionalById } from '@/services/regionaisService';
 import { obterProjectById } from '@/services/projectsService';
 import { obterFaixaById } from '@/services/faixasService';
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import { generateReportPdf } from '@/services/reportPdfService';
 
 import RelatorioAcompanhamentoCarga from "@/components/relatorios/RelatorioAcompanhamentoCarga";
 import { logger } from '@/utils/logger';
@@ -21,6 +22,7 @@ export default function RelatorioAcompanhamentoCargaPage() {
   const [faixaGranulometrica, setFaixaGranulometrica] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -73,6 +75,17 @@ export default function RelatorioAcompanhamentoCargaPage() {
     }
   };
 
+  const handleGerarPdf = async () => {
+    if (!acompanhamento?.id) return;
+    setGeneratingPdf(true);
+    const result = await generateReportPdf('AcompanhamentoCarga', acompanhamento.id);
+    setGeneratingPdf(false);
+    if (!result.success) {
+      logger.warn('Fallback para window.print() devido a erro:', result.error);
+      window.print();
+    }
+  };
+
   const handlePrint = () => {
     window.print();
   };
@@ -102,9 +115,25 @@ export default function RelatorioAcompanhamentoCargaPage() {
           </h2>
           <div className="flex items-center gap-2">
             {acompanhamento && <AprovacaoBar entityName="AcompanhamentoCarga" recordId={acompanhamento.id} />}
-            <Button onClick={handlePrint} className="bg-[#00233B] text-white hover:bg-[#00233B]/90">
+            <Button
+              onClick={handleGerarPdf}
+              disabled={generatingPdf}
+              className="bg-[#00233B] text-white hover:bg-[#00233B]/90"
+            >
+              {generatingPdf ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <FileDown className="w-4 h-4 mr-2" />
+              )}
+              {generatingPdf ? 'Gerando...' : 'Baixar PDF'}
+            </Button>
+            <Button
+              onClick={handlePrint}
+              variant="outline"
+              className="border-slate-300 text-slate-600 hover:bg-slate-50"
+            >
               <Printer className="w-4 h-4 mr-2" />
-              Gerar PDF
+              Imprimir
             </Button>
           </div>
         </div>
