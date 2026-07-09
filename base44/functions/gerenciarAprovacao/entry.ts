@@ -112,6 +112,18 @@ function canApprove(user) {
   return APPROVER_LEVELS.includes(level) || user.role === 'admin';
 }
 
+function canDelete(user, record) {
+  // admin: pode excluir qualquer registro
+  if (user.role === 'admin' || getUserAccessLevel(user) === 'admin') return true;
+
+  // laboratorista: apenas registros que criou
+  if (record.created_by === user.email || record.created_by_id === user.id) return true;
+
+  // approver-level (sala_tecnica, gestor_contrato): podem excluir registros do seu tenant
+  // (tenant já validado por verifyTenantAccess acima)
+  return APPROVER_LEVELS.includes(getUserAccessLevel(user));
+}
+
 // ── DEFENSE-IN-DEPTH: validação funcional de tenant ──────────────────
 // Segunda camada de proteção que não depende do RLS.
 // Verifica explicitamente o direito do usuário sobre o registro,
