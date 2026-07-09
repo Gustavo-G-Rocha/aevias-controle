@@ -50,7 +50,7 @@ export default function UserMenu({ user, isAdmin, isSalaTecnica, isGestorContrat
               <UserIcon className="w-4 h-4" style={{ color: 'var(--color-sidebar-icon)' }} />
             </div>
             <div className="flex-1 text-left min-w-0">
-              <p className="font-medium truncate text-xs" style={{ color: 'var(--color-sidebar-text)' }}>{user.full_name || user.laboratorista_name || user.email}</p>
+              <p className="font-medium truncate text-xs" style={{ color: 'var(--color-sidebar-text)' }}>{user.laboratorista_name || user.email}</p>
               <div className="flex items-center gap-2 mt-0.5">
                 <p className="text-xs truncate" style={{ color: 'var(--color-sidebar-text-muted)' }}>{user.email}</p>
                 <Badge variant="secondary" className="text-xs flex-shrink-0" style={{ backgroundColor: 'rgba(191,207,153,0.2)', color: 'var(--color-secondary)', border: 'none' }}>
