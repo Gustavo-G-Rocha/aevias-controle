@@ -1,3 +1,5 @@
+/** @file dashboardUtils — utilitários de configuração do Dashboard */
+
 /**
  * Determina quais gráficos devem ser mostrados baseado no access level
  */
