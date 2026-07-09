@@ -320,6 +320,26 @@ Deno.serve(async (req) => {
     const userLevel = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
     const isTenantScoped = ['cliente', 'sala_tecnica_afirmaevias', 'gestor_contrato'].includes(userLevel);
 
+    // ── DEFENSE-IN-DEPTH: verificar existência da obra para TODOS os usuários ──
+    // Previne registros órfãos: mesmo laboratoristas (user) não podem criar
+    // registros vinculados a obras inexistentes.
+    const obraIdForCheck = sanitizedData.obra_id;
+    if (obraIdForCheck) {
+      let obraExists = false;
+      try {
+        const obraCheck = await base44.asServiceRole.entities.Obra.get(obraIdForCheck);
+        obraExists = !!obraCheck;
+      } catch {
+        obraExists = false;
+      }
+      if (!obraExists) {
+        return Response.json(
+          { error: 'Obra não encontrada. O registro não pode ser criado sem uma obra válida.', errorCategory: 'schema' },
+          { status: 400 }
+        );
+      }
+    }
+
     if (isTenantScoped) {
       if (operation === 'update') {
         const tenantResult = await verifyTenantAccessForRecord(base44, user, oldRecord);

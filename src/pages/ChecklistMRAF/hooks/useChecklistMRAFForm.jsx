@@ -5,6 +5,7 @@ import { useOfflineDetection } from "@/hooks/useOfflineDetection";
 import { buildDataToSave, validateForm } from "../utils/checklistMRAFMapper";
 import { createQueueItem } from "@/utils/offlineQueue";
 import { addOrUpdateQueueItem } from "@/services/syncService";
+import { validateReferentialIntegrity } from "@/utils/referentialIntegrity";
 import { todayISO } from "@/utils/formInitialData";
 import { criarChecklist, atualizarChecklist } from "@/services/checklistsService";
 import { uploadImagem } from "@/services/uploadService";
@@ -211,6 +212,13 @@ export function useChecklistMRAFForm() {
         clearSavedData();
         navigate(createPageUrl("MeusEnsaios"));
       } else {
+        // OFFLINE: Validar integridade referencial antes de enfileirar
+        const refCheck = validateReferentialIntegrity(dataToSave, { obras, projects });
+        if (!refCheck.valid) {
+          toast({ title: refCheck.errorMessage, variant: "destructive" });
+          return;
+        }
+
         // OFFLINE: Enfileirar sincronização
         const operation = editingChecklist?.id ? 'update' : 'create';
         const queueItem = createQueueItem({
