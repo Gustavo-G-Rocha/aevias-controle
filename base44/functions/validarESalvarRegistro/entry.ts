@@ -98,6 +98,114 @@ function validateRecord(entityName, data) {
   return { valid: true };
 }
 
+// ── DEFENSE-IN-DEPTH: validação funcional de tenant ──────────────────
+// Funções inlinadas (não é possível compartilhar módulos entre functions).
+// Espelham src/utils/tenantSecurity.js — testado em src/tests/security/.
+
+function getUserAccessLevel(user) {
+  if (!user) return 'user';
+  return user.access_level || (user.role === 'admin' ? 'admin' : 'user');
+}
+
+// Verifica direito do usuário sobre um registro existente (update).
+async function verifyTenantAccessForRecord(base44, user, record) {
+  const level = getUserAccessLevel(user);
+
+  if (level === 'admin' || user.role === 'admin') return { allowed: true };
+
+  if (level === 'user') {
+    if (record.created_by === user.email || record.created_by_id === user.id) {
+      return { allowed: true };
+    }
+    return { allowed: false, reason: 'Sem permissão sobre este registro', status: 403 };
+  }
+
+  if (!record.obra_id) {
+    return { allowed: false, reason: 'Registro sem obra vinculada', status: 403 };
+  }
+
+  let obra;
+  try {
+    obra = await base44.asServiceRole.entities.Obra.get(record.obra_id);
+  } catch {
+    return { allowed: false, reason: 'Obra não encontrada', status: 404 };
+  }
+  if (!obra || !obra.regional_id) {
+    return { allowed: false, reason: 'Obra sem regional vinculada', status: 403 };
+  }
+
+  let regional;
+  try {
+    regional = await base44.asServiceRole.entities.Regional.get(obra.regional_id);
+  } catch {
+    return { allowed: false, reason: 'Regional não encontrada', status: 404 };
+  }
+  if (!regional) {
+    return { allowed: false, reason: 'Regional não encontrada', status: 404 };
+  }
+
+  const userEmail = (user.email || '').toLowerCase();
+
+  if (level === 'cliente') {
+    const emails = (regional.clientes_responsaveis || []).map((e) => e.toLowerCase());
+    if (emails.includes(userEmail)) return { allowed: true };
+  } else if (level === 'sala_tecnica_afirmaevias') {
+    const emails = (regional.salas_tecnicas_responsaveis || []).map((e) => e.toLowerCase());
+    if (emails.includes(userEmail)) return { allowed: true };
+  } else if (level === 'gestor_contrato') {
+    const emails = (regional.gestores_contrato_responsaveis || []).map((e) => e.toLowerCase());
+    const legacy = (regional.gestor_contrato_responsavel || '').toLowerCase();
+    if (emails.includes(userEmail) || legacy === userEmail) return { allowed: true };
+  }
+
+  return { allowed: false, reason: 'Sem permissão sobre este registro (tenant)', status: 403 };
+}
+
+// Verifica direito do usuário sobre uma obra (create/update).
+async function verifyObraTenantAccess(base44, user, obraId) {
+  const level = getUserAccessLevel(user);
+
+  if (level === 'admin' || user.role === 'admin' || level === 'user') {
+    return { allowed: true };
+  }
+
+  let obra;
+  try {
+    obra = await base44.asServiceRole.entities.Obra.get(obraId);
+  } catch {
+    return { allowed: false, reason: 'Obra não encontrada', status: 404 };
+  }
+  if (!obra || !obra.regional_id) {
+    return { allowed: false, reason: 'Obra sem regional vinculada', status: 403 };
+  }
+
+  let regional;
+  try {
+    regional = await base44.asServiceRole.entities.Regional.get(obra.regional_id);
+  } catch {
+    return { allowed: false, reason: 'Regional não encontrada', status: 404 };
+  }
+  if (!regional) {
+    return { allowed: false, reason: 'Regional não encontrada', status: 404 };
+  }
+
+  const userEmail = (user.email || '').toLowerCase();
+
+  if (level === 'cliente') {
+    const emails = (regional.clientes_responsaveis || []).map((e) => e.toLowerCase());
+    if (emails.includes(userEmail)) return { allowed: true };
+  } else if (level === 'sala_tecnica_afirmaevias') {
+    const emails = (regional.salas_tecnicas_responsaveis || []).map((e) => e.toLowerCase());
+    if (emails.includes(userEmail)) return { allowed: true };
+  } else if (level === 'gestor_contrato') {
+    const emails = (regional.gestores_contrato_responsaveis || []).map((e) => e.toLowerCase());
+    const legacy = (regional.gestor_contrato_responsavel || '').toLowerCase();
+    if (emails.includes(userEmail) || legacy === userEmail) return { allowed: true };
+  }
+
+  return { allowed: false, reason: 'Sem permissão sobre a obra (tenant)', status: 403 };
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -160,6 +268,54 @@ Deno.serve(async (req) => {
       return obj;
     };
     const sanitizedData = sanitizeTextFields(data);
+
+    // ── DEFENSE-IN-DEPTH: validação funcional de tenant ───────────────
+    // Verifica explicitamente o direito do usuário sobre o registro/obra,
+    // independente do RLS. Previne acesso cross-tenant mesmo se o RLS
+    // estiver mal configurado.
+    const userLevel = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
+    const isTenantScoped = ['cliente', 'sala_tecnica_afirmaevias', 'gestor_contrato'].includes(userLevel);
+
+    if (isTenantScoped) {
+      // Para update: buscar o registro existente e validar tenant
+      if (operation === 'update') {
+        let existingRecord;
+        try {
+          existingRecord = await base44.asServiceRole.entities[entityName].get(recordId);
+        } catch {
+          return Response.json(
+            { error: 'Registro não encontrado', errorCategory: 'permission' },
+            { status: 404 }
+          );
+        }
+        if (!existingRecord) {
+          return Response.json(
+            { error: 'Registro não encontrado', errorCategory: 'permission' },
+            { status: 404 }
+          );
+        }
+
+        const tenantResult = await verifyTenantAccessForRecord(base44, user, existingRecord);
+        if (!tenantResult.allowed) {
+          return Response.json(
+            { error: tenantResult.reason, errorCategory: 'permission' },
+            { status: tenantResult.status || 403 }
+          );
+        }
+      }
+
+      // Para create e update: validar que o obra_id pertence ao tenant do usuário
+      const obraId = sanitizedData.obra_id;
+      if (obraId) {
+        const obraResult = await verifyObraTenantAccess(base44, user, obraId);
+        if (!obraResult.allowed) {
+          return Response.json(
+            { error: obraResult.reason, errorCategory: 'permission' },
+            { status: obraResult.status || 403 }
+          );
+        }
+      }
+    }
 
     // Persistir (user-scoped — respeita RLS da entidade)
     let result;

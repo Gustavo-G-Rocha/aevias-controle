@@ -57,13 +57,74 @@ function canApprove(user) {
   return APPROVER_LEVELS.includes(level) || user.role === 'admin';
 }
 
-// Permissão de exclusão: criador do registro OU approver-level
-// (espelha a RLS de delete das entidades)
-function canDelete(user, record) {
+// ── DEFENSE-IN-DEPTH: validação funcional de tenant ──────────────────
+// Segunda camada de proteção que não depende do RLS.
+// Verifica explicitamente o direito do usuário sobre o registro,
+// percorrendo a cadeia: registro → obra → regional → emails do usuário.
+//
+// Mesmo que o RLS esteja mal configurado ou ausente, esta função impede
+// acesso cross-tenant entre clientes/regionais diferentes.
+async function verifyTenantAccess(base44, user, entityName, record) {
   const level = getUserAccessLevel(user);
-  if (APPROVER_LEVELS.includes(level) || user.role === 'admin') return true;
-  // created_by (email, resolvido pelo RLS) ou created_by_id (ID do usuário)
-  return record?.created_by === user.email || record?.created_by_id === user.id;
+
+  // admin: acesso irrestrito (não precisa verificar tenant)
+  if (level === 'admin' || user.role === 'admin') {
+    return { allowed: true };
+  }
+
+  if (!record) {
+    return { allowed: false, reason: 'Registro não encontrado', status: 404 };
+  }
+
+  // laboratorista: apenas registros que criou
+  if (level === 'user') {
+    if (record.created_by === user.email || record.created_by_id === user.id) {
+      return { allowed: true };
+    }
+    return { allowed: false, reason: 'Sem permissão sobre este registro', status: 403 };
+  }
+
+  // tenant-scoped users (cliente, sala_tecnica, gestor_contrato):
+  // precisam da cadeia registro → obra → regional
+  if (!record.obra_id) {
+    return { allowed: false, reason: 'Registro sem obra vinculada', status: 403 };
+  }
+
+  let obra;
+  try {
+    obra = await base44.asServiceRole.entities.Obra.get(record.obra_id);
+  } catch {
+    return { allowed: false, reason: 'Obra não encontrada', status: 404 };
+  }
+  if (!obra || !obra.regional_id) {
+    return { allowed: false, reason: 'Obra sem regional vinculada', status: 403 };
+  }
+
+  let regional;
+  try {
+    regional = await base44.asServiceRole.entities.Regional.get(obra.regional_id);
+  } catch {
+    return { allowed: false, reason: 'Regional não encontrada', status: 404 };
+  }
+  if (!regional) {
+    return { allowed: false, reason: 'Regional não encontrada', status: 404 };
+  }
+
+  const userEmail = (user.email || '').toLowerCase();
+
+  if (level === 'cliente') {
+    const emails = (regional.clientes_responsaveis || []).map((e) => e.toLowerCase());
+    if (emails.includes(userEmail)) return { allowed: true };
+  } else if (level === 'sala_tecnica_afirmaevias') {
+    const emails = (regional.salas_tecnicas_responsaveis || []).map((e) => e.toLowerCase());
+    if (emails.includes(userEmail)) return { allowed: true };
+  } else if (level === 'gestor_contrato') {
+    const emails = (regional.gestores_contrato_responsaveis || []).map((e) => e.toLowerCase());
+    const legacy = (regional.gestor_contrato_responsavel || '').toLowerCase();
+    if (emails.includes(userEmail) || legacy === userEmail) return { allowed: true };
+  }
+
+  return { allowed: false, reason: 'Sem permissão sobre este registro (tenant)', status: 403 };
 }
 
 Deno.serve(async (req) => {
@@ -97,6 +158,34 @@ Deno.serve(async (req) => {
     const level = getUserAccessLevel(user);
     const approverName = user.laboratorista_name || user.full_name || '';
     const updateData: Record<string, unknown> = {};
+
+    // ── DEFENSE-IN-DEPTH: buscar registro e validar tenant ────────────
+    // Busca o registro uma vez (asServiceRole bypassa RLS) e valida o
+    // direito do usuário sobre ele ANTES de qualquer mutação.
+    // O registro é reutilizado na normalização de fotos mais abaixo.
+    let existingRecord;
+    try {
+      existingRecord = await base44.asServiceRole.entities[entityName].get(recordId);
+    } catch {
+      return Response.json(
+        { error: 'Registro não encontrado', errorCategory: 'permission' },
+        { status: 404 }
+      );
+    }
+    if (!existingRecord) {
+      return Response.json(
+        { error: 'Registro não encontrado', errorCategory: 'permission' },
+        { status: 404 }
+      );
+    }
+
+    const tenantCheck = await verifyTenantAccess(base44, user, entityName, existingRecord);
+    if (!tenantCheck.allowed) {
+      return Response.json(
+        { error: tenantCheck.reason, errorCategory: 'permission' },
+        { status: tenantCheck.status || 403 }
+      );
+    }
 
     if (action === 'approve') {
       if (!canApprove(user)) {
@@ -217,24 +306,9 @@ Deno.serve(async (req) => {
         updateData.pendente_aprovacao_cliente = true;
       }
     } else if (action === 'delete') {
-      // Busca o registro para verificar autoria (asServiceRole bypassa RLS)
-      let record;
-      try {
-        record = await base44.asServiceRole.entities[entityName].get(recordId);
-      } catch {
-        return Response.json(
-          { error: 'Registro não encontrado', errorCategory: 'permission' },
-          { status: 404 }
-        );
-      }
-      if (!record) {
-        return Response.json(
-          { error: 'Registro não encontrado', errorCategory: 'permission' },
-          { status: 404 }
-        );
-      }
-      // Permissão: criador OU approver-level
-      if (!canDelete(user, record)) {
+      // Registro já foi buscado e tenant-validado acima.
+      // Permissão de exclusão: criador OU approver-level (espelha RLS de delete).
+      if (!canDelete(user, existingRecord)) {
         return Response.json(
           { error: 'Sem permissão para excluir este registro', errorCategory: 'permission' },
           { status: 403 }
@@ -250,32 +324,24 @@ Deno.serve(async (req) => {
     }
 
     // Normaliza campos legados de `fotos` que podem quebrar a validação do schema.
-    // ChecklistTerraplanagem usa {url, legenda}[] — registros antigos podem ter strings.
-    // Demais entidades usam string[] — registros podem ter objetos por erro de migração.
+    // Reutiliza o registro já buscado (existingRecord) — sem nova chamada à API.
     const OBJECT_FOTOS_ENTITIES = new Set(['ChecklistTerraplanagem']);
-    try {
-      const existing = await base44.asServiceRole.entities[entityName].get(recordId);
-      if (existing?.fotos && Array.isArray(existing.fotos)) {
-        if (OBJECT_FOTOS_ENTITIES.has(entityName)) {
-          // Entidade espera {url, legenda}[] — normaliza strings → objetos
-          const needsNorm = existing.fotos.some((f) => typeof f === 'string');
-          if (needsNorm) {
-            updateData.fotos = existing.fotos.map((f) =>
-              typeof f === 'string' ? { url: f, legenda: '' } : f
-            );
-          }
-        } else {
-          // Entidade espera string[] — normaliza objetos → strings
-          const needsNorm = existing.fotos.some((f) => typeof f !== 'string');
-          if (needsNorm) {
-            updateData.fotos = existing.fotos
-              .map((f) => (typeof f === 'string' ? f : (f?.url || '')))
-              .filter(Boolean);
-          }
+    if (existingRecord?.fotos && Array.isArray(existingRecord.fotos)) {
+      if (OBJECT_FOTOS_ENTITIES.has(entityName)) {
+        const needsNorm = existingRecord.fotos.some((f) => typeof f === 'string');
+        if (needsNorm) {
+          updateData.fotos = existingRecord.fotos.map((f) =>
+            typeof f === 'string' ? { url: f, legenda: '' } : f
+          );
+        }
+      } else {
+        const needsNorm = existingRecord.fotos.some((f) => typeof f !== 'string');
+        if (needsNorm) {
+          updateData.fotos = existingRecord.fotos
+            .map((f) => (typeof f === 'string' ? f : (f?.url || '')))
+            .filter(Boolean);
         }
       }
-    } catch {
-      // Se não conseguir buscar, segue com updateData apenas (comportamento original)
     }
 
     // Service role bypassa RLS — permissões já verificadas server-side acima
