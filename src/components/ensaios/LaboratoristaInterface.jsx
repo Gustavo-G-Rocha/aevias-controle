@@ -1,10 +1,11 @@
 // Interface de visualização para laboratoristas (cards por status)
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { FileText, CheckCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Pagination } from "@/components/ensaios/Pagination";
 import EnsaioCard from "./EnsaioCard";
+import { groupEnsaiosByStatus } from "@/utils/ensaioStatusGrouper";
 
 // P5 — paginação client-side: limita os cards renderizados por aba (~12),
 // evitando lag com dezenas/centenas de registros. Mesmo padrão já usado
@@ -18,21 +19,9 @@ const LaboratoristaInterface = React.memo(({ ensaios, obras, user, allUsers }) =
   // O(1) lookup — evita obras.find() dentro dos três .map() das tabs
   const obrasMap = useMemo(() => new Map(obras.map((o) => [o.id, o])), [obras]);
 
-  const emExecucao = useMemo(() =>
-    ensaios.filter((e) => (e.status === 'rascunho' || e.approved === false) && !e.client_signature?.signed_by),
-    [ensaios]
-  );
-
-  const pendentes = useMemo(() =>
-    ensaios.filter((e) => {
-      const isFinalizadoOuSemStatus = e.status === 'finalizado' || (!e.status && e.status !== 'rascunho');
-      return isFinalizadoOuSemStatus && e.approved === null && !e.client_signature?.signed_by && e.approved !== false;
-    }),
-    [ensaios]
-  );
-
-  const aprovados = useMemo(() =>
-    ensaios.filter((e) => e.approved === true || e.client_signature?.signed_by),
+  // Categorização delegada ao mapper — componente recebe dados já agrupados
+  const { emExecucao, pendentes, aprovados } = useMemo(
+    () => groupEnsaiosByStatus(ensaios),
     [ensaios]
   );
 
