@@ -12,6 +12,61 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.36';
  * Retorna:  { success: true, data: <record> } | { error: <message> }
  */
 
+// ── HASH DE INTEGRIDADE — lógica inlinada (espelha src/utils/integrityHash.js) ──
+// Campos excluídos do hash: mudam legitimamente após a assinatura.
+const INTEGRITY_EXCLUDED_FIELDS = new Set([
+  'id', 'created_date', 'updated_date', 'created_by_id',
+  'status',
+  'approved', 'approved_by', 'approved_date', 'approver_details',
+  'rejection_reason', 'was_rejected', 'client_signature',
+  'integrity_hash', 'integrity_hash_date',
+  'pendente_aprovacao_cliente', 'cliente_aprovacao', 'cliente_aprovacao_data',
+  'cliente_aprovacao_responsavel', 'cliente_reprovacao_motivo',
+  'manager_signature',
+]);
+
+function serializeForHash(record: unknown): string {
+  if (record === null || record === undefined) return 'null';
+  if (typeof record !== 'object') return JSON.stringify(record);
+  if (Array.isArray(record)) {
+    return '[' + record.map(serializeForHash).join(',') + ']';
+  }
+  const obj = record as Record<string, unknown>;
+  const keys = Object.keys(obj)
+    .filter((k) => !INTEGRITY_EXCLUDED_FIELDS.has(k))
+    .sort();
+  const parts = keys.map((k) => JSON.stringify(k) + ':' + serializeForHash(obj[k]));
+  return '{' + parts.join(',') + '}';
+}
+
+async function computeIntegrityHash(record: unknown): Promise<string> {
+  const serialized = serializeForHash(record);
+  const subtle = globalThis.crypto?.subtle;
+  if (!subtle) {
+    // Fallback não-criptográfico (ambientes sem Web Crypto API)
+    return simpleHash(serialized);
+  }
+  const encoder = new TextEncoder();
+  const data = encoder.encode(serialized);
+  const hashBuffer = await subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+function simpleHash(str: string): string {
+  let h1 = 0xdeadbeef;
+  let h2 = 0x41c6ce57;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  const hash = 4294967296 * (2097151 & h2) + (h1 >>> 0);
+  return hash.toString(16).padStart(16, '0').repeat(4).slice(0, 64);
+}
+
 const ALLOWED_ENTITIES = [
   // Ensaios
   'EnsaioCAUQ',
@@ -194,6 +249,13 @@ Deno.serve(async (req) => {
           { status: 403 }
         );
       }
+
+      // ── HASH DE INTEGRIDADE ─────────────────────────────────────────
+      // Calcula SHA-256 do conteúdo do registro no momento da aprovação.
+      // Permite detectar alterações posteriores à assinatura.
+      // Campos administrativos (status, approved, etc.) são excluídos.
+      const integrityHash = await computeIntegrityHash(existingRecord);
+
       updateData.approved = true;
       updateData.approved_by = user.email;
       updateData.approved_date = now;
@@ -201,6 +263,8 @@ Deno.serve(async (req) => {
         name: approverName,
         position: level,
         crea_number: user.crea_number || '',
+        integrity_hash: integrityHash,
+        integrity_hash_date: now,
       };
       updateData.rejection_reason = null;
     } else if (action === 'reject') {

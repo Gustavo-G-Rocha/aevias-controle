@@ -9,6 +9,7 @@ import { obterRegistro } from "@/services/recordsService";
 import { gerenciarAprovacao } from "@/functions/gerenciarAprovacao";
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
+import IntegrityBanner from "@/components/relatorios/IntegrityBanner";
 
 // Props:
 //   entityName: string (e.g. "ChecklistConcretagem")
@@ -128,8 +129,10 @@ export default function AprovacaoBar({ entityName, recordId }) {
 
   return (
     <>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {statusBadge()}
+
+        {isApproved && <IntegrityBanner record={record} />}
 
         {canApprove && isPending && (
           <>
