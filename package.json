@@ -10,7 +10,9 @@
     "lint": "eslint . --quiet",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p ./jsconfig.json",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "npx playwright test --reporter=list",
+    "test:e2e:ci": "npx playwright install chromium --with-deps && npx playwright test --reporter=line"
   },
   "dependencies": {
     "@base44/sdk": "^0.8.37",

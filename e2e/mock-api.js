@@ -1,5 +1,6 @@
 import fs from 'fs';
 import { execSync } from 'child_process';
+import { createHash } from 'crypto';
 
 /**
  * e2e/mock-api.js
@@ -19,7 +20,36 @@ import { execSync } from 'child_process';
  *   GET  /api/apps/public/prod/public-settings/by-id  → AuthContext bootstrap
  *
  * O store é um Map<entityName, Map<id, record>> resetado a cada teste.
+ *
+ * Hash de integridade: o mock espelha a lógica do backend function
+ * gerenciarAprovacao — calcula SHA-256 do conteúdo do registro no
+ * momento de approve/sign, permitindo que o E2E valide o fluxo de
+ * integridade end-to-end (IntegrityBanner no relatório).
  */
+
+// ── Hash de integridade (espelha src/utils/integrityHash.js) ──────────────────
+const INTEGRITY_EXCLUDED = new Set([
+  'id', 'created_date', 'updated_date', 'created_by_id',
+  'status', 'approved', 'approved_by', 'approved_date', 'approver_details',
+  'rejection_reason', 'was_rejected', 'client_signature',
+  'integrity_hash', 'integrity_hash_date',
+  'pendente_aprovacao_cliente', 'cliente_aprovacao', 'cliente_aprovacao_data',
+  'cliente_aprovacao_responsavel', 'cliente_reprovacao_motivo',
+  'manager_signature',
+]);
+
+function serializeForHash(record) {
+  if (record === null || record === undefined) return 'null';
+  if (typeof record !== 'object') return JSON.stringify(record);
+  if (Array.isArray(record)) return '[' + record.map(serializeForHash).join(',') + ']';
+  const keys = Object.keys(record).filter((k) => !INTEGRITY_EXCLUDED.has(k)).sort();
+  const parts = keys.map((k) => JSON.stringify(k) + ':' + serializeForHash(record[k]));
+  return '{' + parts.join(',') + '}';
+}
+
+function computeIntegrityHash(record) {
+  return createHash('sha256').update(serializeForHash(record)).digest('hex');
+}
 
 // ── Usuários de teste ─────────────────────────────────────────────────────────
 const ADMIN_USER = {
@@ -207,15 +237,19 @@ function handleFunction(funcName, body, ctx) {
     if (!record) return errorResponse('Registro não encontrado', 404);
 
     if (action === 'approve') {
+      const integrityHash = computeIntegrityHash(record);
+      const now = nowISO();
       const updated = {
         ...record,
         approved: true,
         approved_by: GESTOR_USER.email,
-        approved_date: nowISO(),
+        approved_date: now,
         approver_details: {
           name: GESTOR_USER.full_name,
           position: GESTOR_USER.access_level,
           crea_number: GESTOR_USER.crea_number,
+          integrity_hash: integrityHash,
+          integrity_hash_date: now,
         },
       };
       entityStore.set(recordId, updated);
@@ -241,13 +275,19 @@ function handleFunction(funcName, body, ctx) {
     }
 
     if (action === 'sign') {
+      const existingHash = record?.approver_details?.integrity_hash
+        || record?.client_signature?.integrity_hash;
+      const integrityHash = existingHash || computeIntegrityHash(record);
+      const now = nowISO();
       const updated = {
         ...record,
         client_signature: {
           signed_by: CLIENTE_USER.email,
-          signed_date: nowISO(),
+          signed_date: now,
           engineer_name: CLIENTE_USER.full_name,
           crea_number: CLIENTE_USER.crea_number,
+          integrity_hash: integrityHash,
+          integrity_hash_date: now,
         },
       };
       entityStore.set(recordId, updated);

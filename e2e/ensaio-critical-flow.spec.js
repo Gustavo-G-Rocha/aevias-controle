@@ -124,6 +124,17 @@ test.describe('Fluxo crítico E2E: Iniciar → Preencher → Finalizar → Aprov
     // renderizou com status "Aprovado" — o ensaio foi aprovado na etapa 5.
     await expect(reportPage.getByText(/Aprovado/i).first()).toBeVisible({ timeout: 10_000 });
 
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 9. INTEGRIDADE — hash de integridade calculado na aprovação
+    // ═══════════════════════════════════════════════════════════════════════════
+    // O mock de gerenciarAprovacao calcula SHA-256 no momento do approve,
+    // armazenando em approver_details.integrity_hash. O IntegrityBanner
+    // no relatório deve renderizar (verde = íntegro) ou ao menos não
+    // mostrar "integridade comprometida".
+    // Como admin pode ver o banner, validamos que NÃO há alerta de comprometimento.
+    const compromisedAlert = reportPage.getByText(/integridade comprometida/i);
+    await expect(compromisedAlert).not.toBeVisible({ timeout: 5_000 });
+
     await reportPage.close();
   });
 
