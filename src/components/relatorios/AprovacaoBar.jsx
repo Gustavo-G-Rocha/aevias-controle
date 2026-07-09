@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle, Loader2, Clock } from "lucide-react";
+import { CheckCircle, XCircle, Loader2, Clock, History } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -131,6 +132,13 @@ export default function AprovacaoBar({ entityName, recordId }) {
     <>
       <div className="flex flex-wrap items-center gap-2">
         {statusBadge()}
+
+        <Button size="sm" variant="outline" asChild className="h-8 gap-1">
+          <Link to={`/historico-auditoria?entity_name=${entityName}&entity_id=${recordId}`}>
+            <History className="w-3.5 h-3.5" />
+            Histórico
+          </Link>
+        </Button>
 
         {isApproved && <IntegrityBanner record={record} />}
 

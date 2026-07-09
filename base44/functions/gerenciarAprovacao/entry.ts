@@ -194,6 +194,31 @@ async function verifyTenantAccess(base44, user, entityName, record) {
   return { allowed: false, reason: 'Sem permissão sobre este registro (tenant)', status: 403 };
 }
 
+// ── AUDIT TRAIL: Diff computation ──────────────────────────────────────
+const AUDIT_SYSTEM_FIELDS = new Set([
+  'id', 'created_date', 'updated_date', 'created_by_id', 'created_by', 'is_sample',
+]);
+
+function computeAuditDiff(oldData: any, newData: any) {
+  const changes: Array<{ field: string; old_value: any; new_value: any }> = [];
+  if (!oldData || !newData) return changes;
+
+  const allKeys = new Set([...Object.keys(oldData), ...Object.keys(newData)]);
+  for (const key of allKeys) {
+    if (AUDIT_SYSTEM_FIELDS.has(key)) continue;
+
+    const oldVal = oldData[key];
+    const newVal = newData[key];
+
+    if (oldVal == null && newVal == null) continue;
+
+    if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
+      changes.push({ field: key, old_value: oldVal, new_value: newVal });
+    }
+  }
+  return changes;
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -390,6 +415,22 @@ Deno.serve(async (req) => {
           { status: 403 }
         );
       }
+      // ── AUDIT TRAIL (delete) ──────────────────────────────────────
+      try {
+        await base44.asServiceRole.entities.AuditTrail.create({
+          entity_name: entityName,
+          entity_id: recordId,
+          operation: 'delete',
+          changes: [],
+          changed_by: user.email,
+          changed_by_name: user.laboratorista_name || user.full_name || '',
+          client_timestamp: null,
+          is_offline_sync: false,
+        });
+      } catch (auditError) {
+        console.error('[gerenciarAprovacao] Audit error (delete):', auditError?.message);
+      }
+
       await base44.asServiceRole.entities[entityName].delete(recordId);
       return Response.json({ success: true, data: { id: recordId, deleted: true } });
     } else {
@@ -422,6 +463,27 @@ Deno.serve(async (req) => {
 
     // Service role bypassa RLS — permissões já verificadas server-side acima
     const result = await base44.asServiceRole.entities[entityName].update(recordId, updateData);
+
+    // ── AUDIT TRAIL ──────────────────────────────────────────────────
+    // Registra diff campo-a-campo. Falhas de auditoria NÃO bloqueiam a operação.
+    try {
+      const diff = computeAuditDiff(existingRecord, result);
+      if (diff.length > 0) {
+        await base44.asServiceRole.entities.AuditTrail.create({
+          entity_name: entityName,
+          entity_id: recordId,
+          operation: action,
+          changes: diff,
+          changed_by: user.email,
+          changed_by_name: user.laboratorista_name || user.full_name || '',
+          client_timestamp: null,
+          is_offline_sync: false,
+        });
+      }
+    } catch (auditError) {
+      console.error('[gerenciarAprovacao] Audit error:', auditError?.message);
+    }
+
     return Response.json({ success: true, data: result });
   } catch (error) {
     return Response.json({ error: error.message, errorCategory: 'unknown' }, { status: 500 });

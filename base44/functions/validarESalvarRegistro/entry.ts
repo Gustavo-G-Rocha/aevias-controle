@@ -206,6 +206,34 @@ async function verifyObraTenantAccess(base44, user, obraId) {
   return { allowed: false, reason: 'Sem permissão sobre a obra (tenant)', status: 403 };
 }
 
+// ── AUDIT TRAIL: Diff computation ──────────────────────────────────────
+// Campos gerenciados pelo plataforma — nunca aparecem no diff de auditoria.
+const AUDIT_SYSTEM_FIELDS = new Set([
+  'id', 'created_date', 'updated_date', 'created_by_id', 'created_by', 'is_sample',
+]);
+
+function computeAuditDiff(oldData: any, newData: any) {
+  const changes: Array<{ field: string; old_value: any; new_value: any }> = [];
+  if (!oldData || !newData) return changes;
+
+  const allKeys = new Set([...Object.keys(oldData), ...Object.keys(newData)]);
+  for (const key of allKeys) {
+    if (AUDIT_SYSTEM_FIELDS.has(key)) continue;
+
+    const oldVal = oldData[key];
+    const newVal = newData[key];
+
+    // Pular null→null / undefined→undefined
+    if (oldVal == null && newVal == null) continue;
+
+    // Comparação profura via JSON (cobre objetos, arrays, primitivos)
+    if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
+      changes.push({ field: key, old_value: oldVal, new_value: newVal });
+    }
+  }
+  return changes;
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -269,33 +297,32 @@ Deno.serve(async (req) => {
     };
     const sanitizedData = sanitizeTextFields(data);
 
+    // ── Buscar registro antigo (para audit + conflict detection + tenant) ──
+    let oldRecord = null;
+    if (operation === 'update') {
+      try {
+        oldRecord = await base44.asServiceRole.entities[entityName].get(recordId);
+      } catch {
+        return Response.json(
+          { error: 'Registro não encontrado', errorCategory: 'permission' },
+          { status: 404 }
+        );
+      }
+      if (!oldRecord) {
+        return Response.json(
+          { error: 'Registro não encontrado', errorCategory: 'permission' },
+          { status: 404 }
+        );
+      }
+    }
+
     // ── DEFENSE-IN-DEPTH: validação funcional de tenant ───────────────
-    // Verifica explicitamente o direito do usuário sobre o registro/obra,
-    // independente do RLS. Previne acesso cross-tenant mesmo se o RLS
-    // estiver mal configurado.
     const userLevel = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
     const isTenantScoped = ['cliente', 'sala_tecnica_afirmaevias', 'gestor_contrato'].includes(userLevel);
 
     if (isTenantScoped) {
-      // Para update: buscar o registro existente e validar tenant
       if (operation === 'update') {
-        let existingRecord;
-        try {
-          existingRecord = await base44.asServiceRole.entities[entityName].get(recordId);
-        } catch {
-          return Response.json(
-            { error: 'Registro não encontrado', errorCategory: 'permission' },
-            { status: 404 }
-          );
-        }
-        if (!existingRecord) {
-          return Response.json(
-            { error: 'Registro não encontrado', errorCategory: 'permission' },
-            { status: 404 }
-          );
-        }
-
-        const tenantResult = await verifyTenantAccessForRecord(base44, user, existingRecord);
+        const tenantResult = await verifyTenantAccessForRecord(base44, user, oldRecord);
         if (!tenantResult.allowed) {
           return Response.json(
             { error: tenantResult.reason, errorCategory: 'permission' },
@@ -322,12 +349,7 @@ Deno.serve(async (req) => {
     // feita sobre uma versão desatualizada do registro.
     // Estratégia: Last-Write-Wins com notificação ao usuário.
     if (operation === 'update' && !force_overwrite) {
-      let serverRecord;
-      try {
-        serverRecord = await base44.asServiceRole.entities[entityName].get(recordId);
-      } catch {
-        serverRecord = null;
-      }
+      const serverRecord = oldRecord;
 
       if (serverRecord) {
         // Check 1: base_updated_date mismatch (registro modificado após carregar formulário)
@@ -385,6 +407,47 @@ Deno.serve(async (req) => {
       result = await base44.entities[entityName].create(sanitizedData);
     } else {
       result = await base44.entities[entityName].update(recordId, sanitizedData);
+    }
+
+    // ── AUDIT TRAIL ──────────────────────────────────────────────────
+    // Registra diff campo-a-campo. Falhas de auditoria NÃO bloqueiam o salvamento.
+    try {
+      const changedByName = user.laboratorista_name || user.full_name || '';
+      const isOfflineSync = !!client_updated_at;
+
+      if (operation === 'create') {
+        const newFields = Object.keys(result)
+          .filter((k) => !AUDIT_SYSTEM_FIELDS.has(k))
+          .map((k) => ({ field: k, old_value: null, new_value: result[k] }))
+          .filter((c) => c.new_value != null);
+
+        await base44.asServiceRole.entities.AuditTrail.create({
+          entity_name: entityName,
+          entity_id: result.id,
+          operation: 'create',
+          changes: newFields,
+          changed_by: user.email,
+          changed_by_name: changedByName,
+          client_timestamp: client_updated_at || null,
+          is_offline_sync: isOfflineSync,
+        });
+      } else if (operation === 'update' && oldRecord) {
+        const diff = computeAuditDiff(oldRecord, result);
+        if (diff.length > 0) {
+          await base44.asServiceRole.entities.AuditTrail.create({
+            entity_name: entityName,
+            entity_id: result.id,
+            operation: 'update',
+            changes: diff,
+            changed_by: user.email,
+            changed_by_name: changedByName,
+            client_timestamp: client_updated_at || null,
+            is_offline_sync: isOfflineSync,
+          });
+        }
+      }
+    } catch (auditError) {
+      console.error('[validarESalvarRegistro] Audit error:', auditError?.message);
     }
 
     return Response.json({ success: true, data: result });

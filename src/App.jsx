@@ -14,6 +14,7 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
+import HistoricoAuditoria from '@/pages/HistoricoAuditoria';
 
 // Fallback leve exibido enquanto o chunk da página lazy é baixado.
 // O Layout (sidebar/header/bottom-nav) já está renderizado — só o conteúdo suspende.
@@ -57,6 +58,11 @@ function AuthenticatedApp() {
             }
           />
         ))}
+        <Route path="/historico-auditoria" element={
+          <LayoutWrapper currentPageName="HistoricoAuditoria">
+            <HistoricoAuditoria />
+          </LayoutWrapper>
+        } />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>

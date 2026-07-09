@@ -1,0 +1,95 @@
+{
+  "name": "AuditTrail",
+  "type": "object",
+  "properties": {
+    "entity_name": {
+      "type": "string",
+      "description": "Nome da entidade auditada (ex: EnsaioCAUQ, ChecklistTerraplanagem)"
+    },
+    "entity_id": {
+      "type": "string",
+      "description": "ID do registro auditado"
+    },
+    "operation": {
+      "type": "string",
+      "enum": [
+        "create",
+        "update",
+        "delete",
+        "approve",
+        "reject",
+        "sign",
+        "approve_nc",
+        "reject_nc",
+        "solicitar_aprovacao_nc",
+        "update_nc_status"
+      ],
+      "description": "Tipo de opera\u00e7\u00e3o realizada"
+    },
+    "changes": {
+      "type": "array",
+      "description": "Lista de campos alterados com valores anterior e novo",
+      "items": {
+        "type": "object"
+      }
+    },
+    "changed_by": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio que fez a altera\u00e7\u00e3o"
+    },
+    "changed_by_name": {
+      "type": "string",
+      "description": "Nome do usu\u00e1rio que fez a altera\u00e7\u00e3o"
+    },
+    "client_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp do cliente (quando editado offline)"
+    },
+    "is_offline_sync": {
+      "type": "boolean",
+      "default": false,
+      "description": "Se a altera\u00e7\u00e3o foi sincronizada de uma edi\u00e7\u00e3o offline"
+    }
+  },
+  "required": [
+    "entity_name",
+    "entity_id",
+    "operation"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "gestor_contrato"
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    },
+    "create": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
