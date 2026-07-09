@@ -1,4 +1,5 @@
 import React from 'react';
+import ValidationQrCode from './ValidationQrCode';
 
 const formatDateBrasilia = (dateString) => {
   if (!dateString) return 'N/A';
@@ -77,55 +78,66 @@ export default function SignatureFooter({
   clientCREA,
   clientDate,
 }) {
+  const isSigned = !!approverEmail;
+  const verificationUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px', width: '100%', alignItems: 'end' }}>
-      
-      {/* Laboratorista */}
-      <div style={colStyle}>
-        <div style={signatureAreaStyle}>
-          {labName && <span style={signatureStyle}>{labName}</span>}
-          {labEmail && <span style={infoStyle}>{labEmail}</span>}
-          {labCreatedDate && <span style={infoStyle}>em {formatDateBrasilia(labCreatedDate)}</span>}
+    <div style={{ width: '100%' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px', width: '100%', alignItems: 'end' }}>
+        
+        {/* Laboratorista */}
+        <div style={colStyle}>
+          <div style={signatureAreaStyle}>
+            {labName && <span style={signatureStyle}>{labName}</span>}
+            {labEmail && <span style={infoStyle}>{labEmail}</span>}
+            {labCreatedDate && <span style={infoStyle}>em {formatDateBrasilia(labCreatedDate)}</span>}
+          </div>
+          <div style={lineStyle}>
+            <span style={labelStyle}>{labPosition || 'Laboratorista'}</span>
+          </div>
         </div>
-        <div style={lineStyle}>
-          <span style={labelStyle}>{labPosition || 'Laboratorista'}</span>
+
+        {/* Aprovador */}
+        <div style={colStyle}>
+          <div style={signatureAreaStyle}>
+            {approverEmail ? (
+              <>
+                {approverName && <span style={signatureStyle}>{approverName}</span>}
+                <span style={infoStyle}>{approverEmail}</span>
+                {approverCREA && <span style={infoStyle}>CREA: {approverCREA}</span>}
+                {approverDate && <span style={infoStyle}>em {formatDateBrasilia(approverDate)}</span>}
+              </>
+            ) : null}
+          </div>
+          <div style={lineStyle}>
+            <span style={labelStyle}>Responsável</span>
+          </div>
         </div>
+
+        {/* Cliente */}
+        <div style={colStyle}>
+          <div style={signatureAreaStyle}>
+            {clientEmail ? (
+              <>
+                {clientName && <span style={signatureStyle}>{clientName}</span>}
+                <span style={infoStyle}>{clientEmail}</span>
+                {clientCREA && <span style={infoStyle}>CREA: {clientCREA}</span>}
+                {clientDate && <span style={infoStyle}>em {formatDateBrasilia(clientDate)}</span>}
+              </>
+            ) : null}
+          </div>
+          <div style={lineStyle}>
+            <span style={labelStyle}>Cliente</span>
+          </div>
+        </div>
+
       </div>
 
-      {/* Aprovador */}
-      <div style={colStyle}>
-        <div style={signatureAreaStyle}>
-          {approverEmail ? (
-            <>
-              {approverName && <span style={signatureStyle}>{approverName}</span>}
-              <span style={infoStyle}>{approverEmail}</span>
-              {approverCREA && <span style={infoStyle}>CREA: {approverCREA}</span>}
-              {approverDate && <span style={infoStyle}>em {formatDateBrasilia(approverDate)}</span>}
-            </>
-          ) : null}
+      {isSigned && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+          <ValidationQrCode url={verificationUrl} />
         </div>
-        <div style={lineStyle}>
-          <span style={labelStyle}>Responsável</span>
-        </div>
-      </div>
-
-      {/* Cliente */}
-      <div style={colStyle}>
-        <div style={signatureAreaStyle}>
-          {clientEmail ? (
-            <>
-              {clientName && <span style={signatureStyle}>{clientName}</span>}
-              <span style={infoStyle}>{clientEmail}</span>
-              {clientCREA && <span style={infoStyle}>CREA: {clientCREA}</span>}
-              {clientDate && <span style={infoStyle}>em {formatDateBrasilia(clientDate)}</span>}
-            </>
-          ) : null}
-        </div>
-        <div style={lineStyle}>
-          <span style={labelStyle}>Cliente</span>
-        </div>
-      </div>
-
+      )}
     </div>
   );
 }
