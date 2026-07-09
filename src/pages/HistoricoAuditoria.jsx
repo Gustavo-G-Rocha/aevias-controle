@@ -70,12 +70,14 @@ export default function HistoricoAuditoria() {
         </Button>
       </div>
 
-      <div className="flex items-center gap-2 mb-6">
-        <History className="w-6 h-6 text-slate-400" />
+      <div className="flex items-center gap-3 mb-6 pb-6 border-b border-slate-200">
+        <div className="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+          <History className="w-5 h-5 text-slate-500" />
+        </div>
         <div>
           <h1 className="text-xl font-bold text-slate-800">Histórico de Alterações</h1>
-          <p className="text-sm text-slate-500">
-            {entityName} · ID: {entityId?.slice(0, 12)}...
+          <p className="text-sm text-slate-500 font-mono">
+            {entityName} · {entityId?.slice(0, 12)}...
           </p>
         </div>
       </div>

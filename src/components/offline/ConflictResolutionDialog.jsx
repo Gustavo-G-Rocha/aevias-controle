@@ -10,6 +10,22 @@ import {
 import { AlertTriangle, User, Server } from "lucide-react";
 import { compareFields } from "@/utils/conflictResolution";
 
+function displayValue(value) {
+  if (value === null || value === undefined) return "vazio";
+  if (typeof value === "boolean") return value ? "Sim" : "Não";
+  if (typeof value === "object") {
+    if (Array.isArray(value)) {
+      if (value.length === 0) return "lista vazia";
+      if (value.every(v => typeof v !== "object" || v === null)) return value.join(", ");
+      return `${value.length} ${value.length === 1 ? "item" : "itens"}`;
+    }
+    const keys = Object.keys(value);
+    if (keys.length === 0) return "vazio";
+    return keys.map(k => `${k}: ${typeof value[k] === "object" ? "…" : value[k]}`).join(", ");
+  }
+  return String(value);
+}
+
 /**
  * Diálogo de resolução de conflitos de sincronização.
  *
@@ -92,13 +108,13 @@ export const ConflictResolutionDialog = ({
                         <div className="flex items-center gap-1 text-blue-600 min-w-0">
                           <User className="w-3 h-3 flex-shrink-0" />
                           <span className="truncate">
-                            {JSON.stringify(diff.localValue)?.substring(0, 80) || "vazio"}
+                            {displayValue(diff.localValue)}
                           </span>
                         </div>
                         <div className="flex items-center gap-1 text-green-600 min-w-0">
                           <Server className="w-3 h-3 flex-shrink-0" />
                           <span className="truncate">
-                            {JSON.stringify(diff.serverValue)?.substring(0, 80) || "vazio"}
+                            {displayValue(diff.serverValue)}
                           </span>
                         </div>
                       </div>
