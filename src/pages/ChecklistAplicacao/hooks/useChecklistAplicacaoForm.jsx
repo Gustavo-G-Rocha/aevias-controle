@@ -12,10 +12,12 @@
  * Não importa nem renderiza JSX.
  */
 import { useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { createPageUrl } from "@/utils";
 import { uploadMultipleFiles } from "@/utils/imageUpload";
 import { criarChecklist, atualizarChecklist } from "@/services/checklistsService";
 import { toast } from "@/components/ui/use-toast";
+import { QUERY_KEYS } from "@/hooks/useQueryData";
 import { logger } from '@/utils/logger';
 
 export function useChecklistAplicacaoForm({
@@ -30,6 +32,7 @@ export function useChecklistAplicacaoForm({
   clearSavedData,
   navigate,
 }) {
+  const queryClient = useQueryClient();
 
   // ── campo simples / primeiro nível ───────────────────────────────────────────
   const handleInputChange = useCallback((field, value) => {
@@ -145,6 +148,7 @@ export function useChecklistAplicacaoForm({
         toast({ title: saveStatus === 'rascunho' ? "Progresso salvo com sucesso!" : "Checklist criado com sucesso!" });
       }
       clearSavedData();
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords });
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
       logger.error("[ChecklistAplicacao] Erro ao salvar checklist:", error?.message || error);
@@ -152,7 +156,7 @@ export function useChecklistAplicacaoForm({
     } finally {
       setSaving(false);
     }
-  }, [formData, editingChecklist, user, setSaving, clearSavedData, navigate]);
+  }, [formData, editingChecklist, user, setSaving, clearSavedData, navigate, queryClient]);
 
   return {
     handleInputChange,
