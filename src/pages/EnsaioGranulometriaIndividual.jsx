@@ -15,6 +15,11 @@ import EnsaioGranIndividualAgregados   from "@/components/ensaio-granulometria-i
 import EnsaioGranIndividualEquivalente from "@/components/ensaio-granulometria-individual/EnsaioGranIndividualEquivalente";
 import EnsaioGranIndividualActions     from "@/components/ensaio-granulometria-individual/EnsaioGranIndividualActions";
 
+// Constante estável para evitar recriação a cada render — se passasse como
+// literal inline, o useMemo de obras recomputaria a cada render, disparando
+// o useEffect de useEnsaioForm que reseta o formData (incluindo tipo_material).
+const FILTRO_TIPO_OBRA = ['conservacao', 'implantacao'];
+
 export default function EnsaioGranulometriaIndividualPage() {
   const {
     obras, regionais, projects,
@@ -23,7 +28,7 @@ export default function EnsaioGranulometriaIndividualPage() {
     obraSelecionada, projetosDisponiveis,
     isApproved, isEditable, navigate,
   } = useEnsaioForm(getInitialFormData, 'EnsaioGranulometriaIndividual', 'ensaio_gran_individual', {
-    filtroTipoObra: ['conservacao', 'implantacao'],
+    filtroTipoObra: FILTRO_TIPO_OBRA,
   });
 
   const {
