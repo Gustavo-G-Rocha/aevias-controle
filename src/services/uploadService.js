@@ -1,6 +1,7 @@
 import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
 import { validarUploadArquivo } from '@/functions/validarUploadArquivo';
+import { compressImage } from '@/utils/imageUpload';
 
 /**
  * Service centralizado para upload de arquivos e imagens
@@ -32,9 +33,13 @@ export async function uploadImagem(file) {
     throw new Error('Arquivo excede o tamanho máximo de 10MB');
   }
 
+  // Comprimir imagem antes do upload — reduz fotos de câmera
+  // de ~5-10MB para ~200-500KB, acelerando drasticamente o envio.
+  const compressedFile = await compressImage(file);
+
   // Validação server-side — verifica magic bytes (conteúdo real) e tamanho
   // antes de aceitar o upload definitivo. Impede spoofing de file.type.
-  const fileBase64 = await fileToBase64(file);
+  const fileBase64 = await fileToBase64(compressedFile);
   try {
     const response = await validarUploadArquivo({
       fileBase64,

@@ -162,12 +162,25 @@ export function useChecklistTerrapalagemForm() {
     setSelectedFileNames(files.length === 1 ? files[0].name : `${files.length} ficheiros selecionados`);
 
     try {
+      // Upload em paralelo — todas as imagens são enviadas simultaneamente
+      // em vez de uma por vez, reduzindo o tempo total drasticamente.
+      const results = await Promise.allSettled(files.map(file => uploadImagem(file)));
       const uploadedUrls = [];
-      for (const file of files) {
-        const result = await uploadImagem(file);
-        uploadedUrls.push(result.file_url);
+      let firstError = null;
+      for (const result of results) {
+        if (result.status === 'fulfilled') {
+          uploadedUrls.push(result.value.file_url);
+        } else if (!firstError) {
+          firstError = result.reason;
+        }
       }
-      setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...uploadedUrls] }));
+      if (uploadedUrls.length > 0) {
+        setFormData(prev => ({ ...prev, fotos: [...(prev.fotos || []), ...uploadedUrls] }));
+      }
+      if (uploadedUrls.length < files.length) {
+        const failed = files.length - uploadedUrls.length;
+        toast({ title: `${failed} imagem(ns) falharam ao enviar. ${uploadedUrls.length} enviada(s) com sucesso.`, variant: "destructive" });
+      }
     } catch (error) {
       logger.error("Erro ao fazer upload das fotos:", error);
       toast({ title: "Erro ao fazer upload das fotos.", variant: "destructive" });
