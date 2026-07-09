@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { ArrowLeft, History, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,8 +7,11 @@ import ChangeEntry from "@/components/auditoria/ChangeEntry";
 
 export default function HistoricoAuditoria() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const entityName = searchParams.get("entity_name");
   const entityId = searchParams.get("entity_id");
+
+  const handleBack = () => navigate(-1);
 
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,8 +54,8 @@ export default function HistoricoAuditoria() {
     return (
       <div className="max-w-4xl mx-auto p-6">
         <p className="text-red-600">{error}</p>
-        <Button variant="outline" asChild className="mt-4">
-          <Link to="/">Voltar</Link>
+        <Button variant="outline" onClick={handleBack} className="mt-4">
+          Voltar
         </Button>
       </div>
     );
@@ -61,11 +64,9 @@ export default function HistoricoAuditoria() {
   return (
     <div className="max-w-4xl mx-auto p-4 lg:p-6">
       <div className="flex items-center gap-3 mb-6">
-        <Button variant="outline" size="sm" asChild>
-          <Link to="/meus-ensaios">
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Voltar
-          </Link>
+        <Button variant="outline" size="sm" onClick={handleBack}>
+          <ArrowLeft className="w-4 h-4 mr-1" />
+          Voltar
         </Button>
       </div>
 
