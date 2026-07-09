@@ -108,15 +108,27 @@ export async function computeIntegrityHash(record) {
 }
 
 /**
+ * Extrai o hash armazenado de um registro.
+ * Suporta hash em approver_details (aprovação gestor) e em
+ * client_signature (assinatura do cliente / aprovação NC).
+ * Retorna o primeiro hash encontrado.
+ */
+export function getStoredHash(record) {
+  return record?.approver_details?.integrity_hash
+    || record?.client_signature?.integrity_hash
+    || null;
+}
+
+/**
  * Verifica a integridade de um registro assinado.
- * Compara o hash armazenado (em approver_details.integrity_hash)
- * com o hash recalculado do conteúdo atual.
+ * Compara o hash armazenado (em approver_details.integrity_hash ou
+ * client_signature.integrity_hash) com o hash recalculado do conteúdo atual.
  *
  * @param {object} record - O registro a verificar
  * @returns {Promise<{hasHash: boolean, valid: boolean, storedHash?: string, computedHash?: string}>}
  */
 export async function verifyIntegrity(record) {
-  const storedHash = record?.approver_details?.integrity_hash;
+  const storedHash = getStoredHash(record);
 
   if (!storedHash) {
     // Registro não assinado — nada a verificar
@@ -134,17 +146,11 @@ export async function verifyIntegrity(record) {
 }
 
 /**
- * Extrai o hash armazenado de um registro (ou null se não assinado).
- */
-export function getStoredHash(record) {
-  return record?.approver_details?.integrity_hash || null;
-}
-
-/**
- * Verifica se um registro possui hash de integridade (foi assinado).
+ * Verifica se um registro possui hash de integridade (foi assinado/aprovado).
+ * Suporta hash em approver_details (aprovação) e client_signature (assinatura).
  */
 export function hasIntegrityHash(record) {
-  return !!record?.approver_details?.integrity_hash;
+  return !!(record?.approver_details?.integrity_hash || record?.client_signature?.integrity_hash);
 }
 
 // ── Fallback: hash simples (não-criptográfico) ─────────────────────────

@@ -397,3 +397,268 @@ describe('integrityHash — caso de ataque: bypass de RLS', () => {
     expect(result.computedHash).not.toBe('fake-hash-12345');
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════
+// CENÁRIOS: Hash na assinatura do cliente (client_signature.integrity_hash)
+// ═════════════════════════════════════════════════════════════════════
+describe('integrityHash — hash em client_signature (assinatura do cliente)', () => {
+  it('registro assinado pelo cliente sem aprovação prévia → hash em client_signature', async () => {
+    // Cenário: cliente assina um registro que NÃO foi aprovado por gestor.
+    // O hash deve ser calculado e armazenado em client_signature.integrity_hash.
+    const recordSemAprovacao = {
+      ...BASE_RECORD,
+      approved: null,
+      approver_details: undefined,
+    };
+    const hash = await computeIntegrityHash(recordSemAprovacao);
+    const signedRecord = {
+      ...recordSemAprovacao,
+      client_signature: {
+        signed_by: 'cliente@empresa.com',
+        signed_date: '2025-01-20T14:00:00Z',
+        engineer_name: 'Eng. Cliente',
+        crea_number: '67890',
+        integrity_hash: hash,
+        integrity_hash_date: '2025-01-20T14:00:00Z',
+      },
+    };
+
+    const result = await verifyIntegrity(signedRecord);
+    expect(result.hasHash).toBe(true);
+    expect(result.valid).toBe(true);
+  });
+
+  it('hasIntegrityHash detecta hash em client_signature', async () => {
+    const record = {
+      ...BASE_RECORD,
+      approver_details: undefined,
+      client_signature: {
+        signed_by: 'cliente@empresa.com',
+        integrity_hash: 'some-hash',
+      },
+    };
+    expect(hasIntegrityHash(record)).toBe(true);
+  });
+
+  it('getStoredHash retorna hash de client_signature quando não há em approver_details', async () => {
+    const hash = await computeIntegrityHash(BASE_RECORD);
+    const record = {
+      ...BASE_RECORD,
+      approver_details: { name: 'Gestor', position: 'gestor_contrato' }, // sem integrity_hash
+      client_signature: {
+        signed_by: 'cliente@empresa.com',
+        integrity_hash: hash,
+      },
+    };
+    expect(getStoredHash(record)).toBe(hash);
+  });
+
+  it('getStoredHash prioriza approver_details.integrity_hash sobre client_signature', async () => {
+    const record = {
+      ...BASE_RECORD,
+      approver_details: { ...BASE_RECORD.approver_details, integrity_hash: 'hash-from-approval' },
+      client_signature: {
+        signed_by: 'cliente@empresa.com',
+        integrity_hash: 'hash-from-sign',
+      },
+    };
+    // approver_details tem precedência (foi calculado primeiro, na aprovação)
+    expect(getStoredHash(record)).toBe('hash-from-approval');
+  });
+
+  // ── Cenário completo: assinar → adulterar → detectar ──
+  it('FLUXO COMPLETO: assinar → adulterar campo coberto → divergência detectada', async () => {
+    // 1. Registro assinado pelo cliente (sem aprovação prévia)
+    const recordToSign = {
+      ...BASE_RECORD,
+      approved: null,
+      approver_details: undefined,
+    };
+    const hash = await computeIntegrityHash(recordToSign);
+    const signedRecord = {
+      ...recordToSign,
+      client_signature: {
+        signed_by: 'cliente@empresa.com',
+        signed_date: '2025-01-20T14:00:00Z',
+        engineer_name: 'Eng. Cliente',
+        crea_number: '67890',
+        integrity_hash: hash,
+        integrity_hash_date: '2025-01-20T14:00:00Z',
+      },
+    };
+
+    // 2. Verificar que o registro assinado está íntegro
+    const resultBefore = await verifyIntegrity(signedRecord);
+    expect(resultBefore.valid).toBe(true);
+
+    // 3. Adulterar um campo COBERTO pelo hash após a assinatura
+    const tamperedRecord = {
+      ...signedRecord,
+      observacoes: 'CONTEÚDO ALTERADO APÓS ASSINATURA DO CLIENTE',
+    };
+
+    // 4. Verificar que a divergência é detectada
+    const resultAfter = await verifyIntegrity(tamperedRecord);
+    expect(resultAfter.hasHash).toBe(true);
+    expect(resultAfter.valid).toBe(false);
+    expect(resultAfter.storedHash).toBe(hash);
+    expect(resultAfter.computedHash).not.toBe(hash);
+  });
+
+  // ── Cenário: assinar → atualizar campo excluído → sem falso positivo ──
+  it('FLUXO COMPLETO: assinar → gestor aprova depois (campos excluídos) → sem falso positivo', async () => {
+    // 1. Cliente assina primeiro (sem aprovação prévia)
+    const recordToSign = {
+      ...BASE_RECORD,
+      approved: null,
+      approver_details: undefined,
+    };
+    const signHash = await computeIntegrityHash(recordToSign);
+    const signedRecord = {
+      ...recordToSign,
+      client_signature: {
+        signed_by: 'cliente@empresa.com',
+        signed_date: '2025-01-20T14:00:00Z',
+        integrity_hash: signHash,
+        integrity_hash_date: '2025-01-20T14:00:00Z',
+      },
+    };
+
+    // 2. Gestor aprova depois (adiciona approver_details com novo hash)
+    // O conteúdo não mudou — o hash deve ser o mesmo
+    const approvalHash = await computeIntegrityHash(signedRecord);
+    const approvedRecord = {
+      ...signedRecord,
+      approved: true,
+      approved_by: 'gestor@evias.com',
+      approved_date: '2025-01-21T10:00:00Z',
+      approver_details: {
+        name: 'Carlos Gestor',
+        position: 'gestor_contrato',
+        crea_number: '12345',
+        integrity_hash: approvalHash,
+        integrity_hash_date: '2025-01-21T10:00:00Z',
+      },
+    };
+
+    // 3. Verificar que o registro aprovado está íntegro
+    // (approver_details.integrity_hash tem precedência)
+    const result = await verifyIntegrity(approvedRecord);
+    expect(result.hasHash).toBe(true);
+    expect(result.valid).toBe(true);
+    expect(result.storedHash).toBe(approvalHash);
+    // O hash de aprovação deve ser igual ao de assinatura (conteúdo não mudou)
+    expect(approvalHash).toBe(signHash);
+  });
+
+  it('FLUXO COMPLETO: assinar → alterar ensaio aninhado → divergência detectada', async () => {
+    // 1. Assinar
+    const recordToSign = {
+      ...BASE_RECORD,
+      approved: null,
+      approver_details: undefined,
+    };
+    const hash = await computeIntegrityHash(recordToSign);
+    const signedRecord = {
+      ...recordToSign,
+      client_signature: {
+        signed_by: 'cliente@empresa.com',
+        integrity_hash: hash,
+      },
+    };
+
+    // 2. Adulterar valor dentro de array aninhado
+    const tampered = {
+      ...signedRecord,
+      ensaios: [{ numero: 1, valor: 99.9 }, { numero: 2, valor: 47.1 }],
+    };
+
+    // 3. Detectar
+    const result = await verifyIntegrity(tampered);
+    expect(result.valid).toBe(false);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════
+// CENÁRIOS: Proteção de campos server-authoritative
+// (validarESalvarRegistro não deve permitir que o cliente defina integrity_hash)
+// ═════════════════════════════════════════════════════════════════════
+describe('integrityHash — proteção contra injeção via endpoint de salvamento', () => {
+  // Estes testes validam o PRINCÍPIO de que campos server-authoritative
+  // (incluindo integrity_hash, approver_details, client_signature) não
+  // devem ser definíveis pelo cliente via validarESalvarRegistro.
+  // A lógica real está no backend function, mas o princípio é testável aqui.
+
+  const SERVER_AUTH_FIELDS = [
+    'approved', 'approved_by', 'approved_date', 'approver_details',
+    'rejection_reason', 'was_rejected', 'client_signature', 'manager_signature',
+    'integrity_hash', 'integrity_hash_date',
+    'pendente_aprovacao_cliente', 'cliente_aprovacao', 'cliente_aprovacao_data',
+    'cliente_aprovacao_responsavel', 'cliente_reprovacao_motivo',
+  ];
+
+  it('lista de campos server-authoritative inclui integrity_hash e approver_details', () => {
+    expect(SERVER_AUTH_FIELDS).toContain('integrity_hash');
+    expect(SERVER_AUTH_FIELDS).toContain('integrity_hash_date');
+    expect(SERVER_AUTH_FIELDS).toContain('approver_details');
+    expect(SERVER_AUTH_FIELDS).toContain('client_signature');
+  });
+
+  it('cliente não pode injetar integrity_hash forjado via payload de salvamento', async () => {
+    // Cenário: atacante envia um payload com approver_details.integrity_hash forjado
+    // via validarESalvarRegistro. O backend deve stripar esse campo antes de salvar.
+    //
+    // Simulação: payload malicioso do cliente
+    const maliciousPayload = {
+      ...BASE_RECORD,
+      observacoes: 'Tentativa de injeção',
+      approver_details: {
+        name: 'Atacante',
+        position: 'admin',
+        crea_number: 'fake',
+        integrity_hash: 'FORGED-HASH-VALUE',
+      },
+    };
+
+    // O backend striparia SERVER_AUTH_FIELDS do payload.
+    // Simulamos o stripping aqui:
+    const stripped = { ...maliciousPayload };
+    for (const field of SERVER_AUTH_FIELDS) {
+      delete stripped[field];
+    }
+
+    // O payload após stripping não contém integrity_hash forjado
+    expect(stripped.approver_details).toBeUndefined();
+    expect(stripped.integrity_hash).toBeUndefined();
+
+    // Mas o conteúdo legítimo (observacoes) é preservado
+    expect(stripped.observacoes).toBe('Tentativa de injeção');
+  });
+
+  it('stripping de campos server-authoritative não afeta conteúdo legítimo', async () => {
+    // Cenário: laboratorista edita um campo legítimo em um registro assinado.
+    // O backend deve preservar o campo editado e stripar apenas os campos
+    // server-authoritative.
+    const legitimatePayload = {
+      ...BASE_RECORD,
+      observacoes: 'Observação atualizada pelo laboratorista',
+      rodovia: 'BR-116',
+      // Campos server-authoritative que o cliente não deveria enviar
+      // (mas que podem estar no payload se o cliente carregou o registro completo)
+      approved: true,
+      approver_details: { name: 'Gestor', integrity_hash: 'existing-hash' },
+    };
+
+    const stripped = { ...legitimatePayload };
+    for (const field of SERVER_AUTH_FIELDS) {
+      delete stripped[field];
+    }
+
+    // Conteúdo legítimo preservado
+    expect(stripped.observacoes).toBe('Observação atualizada pelo laboratorista');
+    expect(stripped.rodovia).toBe('BR-116');
+    // Campos server-authoritative removidos
+    expect(stripped.approved).toBeUndefined();
+    expect(stripped.approver_details).toBeUndefined();
+  });
+});

@@ -335,11 +335,21 @@ Deno.serve(async (req) => {
           { status: 403 }
         );
       }
+      // ── HASH DE INTEGRIDADE (assinatura) ──────────────────────────
+      // Se o registro ainda não tem hash (não foi aprovado antes),
+      // calcula e armazena em client_signature.integrity_hash.
+      // Se já tem hash de aprovação, mantém — client_signature é excluído
+      // do hash, então assinar não invalida o hash existente.
+      const existingHash = existingRecord?.approver_details?.integrity_hash
+        || existingRecord?.client_signature?.integrity_hash;
+      const integrityHash = existingHash || await computeIntegrityHash(existingRecord);
       updateData.client_signature = {
         signed_by: user.email,
         signed_date: now,
         engineer_name: approverName,
         crea_number: user.crea_number || '',
+        integrity_hash: integrityHash,
+        integrity_hash_date: now,
       };
     } else if (action === 'approve_nc') {
       // Cliente aprova NC
@@ -349,6 +359,11 @@ Deno.serve(async (req) => {
           { status: 403 }
         );
       }
+      // ── HASH DE INTEGRIDADE (aprovação NC) ──────────────────────────
+      // Mesma lógica do sign: reusa hash existente ou calcula novo.
+      const existingNcHash = existingRecord?.approver_details?.integrity_hash
+        || existingRecord?.client_signature?.integrity_hash;
+      const ncIntegrityHash = existingNcHash || await computeIntegrityHash(existingRecord);
       updateData.pendente_aprovacao_cliente = false;
       updateData.cliente_aprovacao = 'aprovada';
       updateData.cliente_aprovacao_data = now;
@@ -358,6 +373,8 @@ Deno.serve(async (req) => {
         signed_date: now,
         engineer_name: approverName,
         crea_number: user.crea_number || '',
+        integrity_hash: ncIntegrityHash,
+        integrity_hash_date: now,
       };
     } else if (action === 'reject_nc') {
       if (level !== 'cliente' && !canApprove(user)) {

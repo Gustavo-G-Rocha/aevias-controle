@@ -406,9 +406,13 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Force overwrite: remove campos server-authoritative antes de aplicar
-    // (aprovação, assinatura, integridade — sempre controlados pelo servidor)
-    if (operation === 'update' && force_overwrite) {
+    // ── SERVER-AUTHORITATIVE FIELDS ────────────────────────────────────
+    // Campos de aprovação, assinatura e integridade são SEMPRE controlados
+    // pelo servidor (via gerenciarAprovacao). O cliente nunca pode defini-los
+    // ou sobrescrevê-los via este endpoint — mesmo em force_overwrite.
+    // Isso impede que um atacante injete um integrity_hash forjado ou
+    // sobrescreva o hash armazenado para mascarar uma adulteração.
+    if (operation === 'update') {
       const SERVER_AUTH_FIELDS = [
         'approved', 'approved_by', 'approved_date', 'approver_details',
         'rejection_reason', 'was_rejected', 'client_signature', 'manager_signature',
