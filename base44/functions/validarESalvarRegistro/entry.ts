@@ -423,6 +423,21 @@ Deno.serve(async (req) => {
       for (const field of SERVER_AUTH_FIELDS) {
         delete sanitizedData[field];
       }
+
+      // ── RESET DE REPROVAÇÃO AO RE-FINALIZAR ───────────────────────────
+      // Quando um registro reprovado (approved === false) é re-finalizado
+      // pelo laboratorista (corrige e envia novamente), o servidor reset
+      // approved → null automaticamente. Sem isso, approved=false persiste
+      // e o registro fica preso em "Em Execução" no dashboard, pois o
+      // grouper considera approved===false como "precisa correção".
+      // Server-authoritative: o cliente não controla esse reset.
+      if (oldRecord && oldRecord.approved === false && sanitizedData.status === 'finalizado') {
+        sanitizedData.approved = null;
+        sanitizedData.rejection_reason = null;
+        sanitizedData.approved_by = null;
+        sanitizedData.approved_date = null;
+        sanitizedData.was_rejected = true;
+      }
     }
 
     // Persistir (user-scoped — respeita RLS da entidade)
