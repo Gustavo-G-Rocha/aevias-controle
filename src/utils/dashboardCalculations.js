@@ -1,5 +1,5 @@
 // Funções puras de cálculo para o Dashboard — sem dependência de React
-// ETAPA 4/5: single-pass, Map para lookups, sem .filter() duplicado
+// single-pass, Map para lookups, sem .filter() duplicado
 
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { ptBR } from 'date-fns/locale';

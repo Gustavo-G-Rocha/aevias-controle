@@ -1,4 +1,4 @@
-import { base44 } from '@/api/base44Client';
+import { carregarRegistrosSupervisor } from '@/functions/carregarRegistrosSupervisor';
 
 /**
  * Busca registros via backend function para cliente_supervisor,
@@ -6,7 +6,7 @@ import { base44 } from '@/api/base44Client';
  * registros criados por subordinados.
  * Retorna array normalizado com entityType, já filtrado por obras/subordinados.
  */
-export async function carregarRegistrosSupervisor() {
-  const response = await base44.functions.invoke('carregarRegistrosSupervisor', {});
+export async function carregarRegistrosSupervisorService() {
+  const response = await carregarRegistrosSupervisor({});
   return response.data?.records ?? [];
 }

@@ -6,7 +6,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getUserAccessLevel, getAccessibleObraIds } from '@/utils/accessControl';
 import { useCurrentUser, useAuxData, useAllRecords, QUERY_KEYS } from '@/hooks/useQueryData';
 import { getDataEnsaio } from '@/components/ensaios/ensaioMappers';
-import { carregarRegistrosSupervisor } from '@/services/supervisorRecordsService';
+import { carregarRegistrosSupervisorService } from '@/services/supervisorRecordsService';
 
 export function sortByEnsaioDate(records) {
   return [...records].sort((a, b) => {
@@ -73,7 +73,7 @@ export function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccess
 function useSupervisorRecords(user, enabled) {
   return useQuery({
     queryKey: ['supervisorRecords', user?.email],
-    queryFn: () => carregarRegistrosSupervisor(),
+    queryFn: () => carregarRegistrosSupervisorService(),
     enabled,
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
