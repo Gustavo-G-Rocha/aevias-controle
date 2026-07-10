@@ -62,7 +62,7 @@ export default function RelatorioDiario({ diario, obra, user, regional, creatorU
     ? (diario.empreiteira || 'N/A')
     : (diario.cliente || regional?.cliente || 'N/A');
 
-  const photoChunks = compressedPhotos.length > 0 ? chunkArray(compressedPhotos, 6) : [];
+  const photoChunks = compressedPhotos.length > 0 ? chunkArray(compressedPhotos, 4) : [];
 
   return (
     <div className="bg-white font-sans">

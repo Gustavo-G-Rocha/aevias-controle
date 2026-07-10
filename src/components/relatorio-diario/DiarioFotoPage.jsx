@@ -4,7 +4,7 @@ const DEFAULT_LOGO = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object
 
 export default function DiarioFotoPage({ chunk, pageIndex, diario, obra, regional }) {
   return (
-    <div className="break-before-page p-8 print:p-8 min-h-[26cm] flex flex-col">
+    <div className="break-before-page p-8 print:p-8">
       <header className="grid grid-cols-3 items-center border-b-2 border-gray-800 pb-4">
         <div className="flex justify-start">
           <picture>
@@ -33,7 +33,7 @@ export default function DiarioFotoPage({ chunk, pageIndex, diario, obra, regiona
                 <source srcSet={fotoUrl} />
                 <img
                   src={fotoUrl}
-                  alt={`Foto ${pageIndex * 6 + fotoIndex + 1}`}
+                  alt={`Foto ${pageIndex * 4 + fotoIndex + 1}`}
                   className="w-full h-auto object-contain"
                   style={{ maxHeight: '280px' }}
                   width="auto"
@@ -42,7 +42,7 @@ export default function DiarioFotoPage({ chunk, pageIndex, diario, obra, regiona
               </picture>
             </div>
             <p className="text-center text-sm mt-2 font-medium">
-              Foto {pageIndex * 6 + fotoIndex + 1}
+              Foto {pageIndex * 4 + fotoIndex + 1}
             </p>
           </div>
         ))}
