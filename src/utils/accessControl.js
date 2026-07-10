@@ -52,6 +52,29 @@ export function isEngenheiroCliente(user) {
   return isCliente(user) && Boolean(user?.position?.toLowerCase().includes('engenheiro'));
 }
 
+/**
+ * Verifica se o usuário pode aprovar/reprovar/excluir um registro específico,
+ * considerando a obra à qual o registro pertence.
+ *
+ * - admin / sala_tecnica / gestor_contrato → sempre pode
+ * - cliente_supervisor → só pode se o seu email estiver em clientes_responsaveis
+ *   da regional da obra do registro
+ * - cliente / user / funcionarios_cliente → não pode
+ */
+export function canApproveRecord(user, obra, regionais) {
+  if (!user) return false;
+  const level = getUserAccessLevel(user);
+
+  if (['admin', 'sala_tecnica_afirmaevias', 'gestor_contrato'].includes(level)) return true;
+  if (level !== 'cliente_supervisor') return false;
+
+  if (!obra || !regionais) return false;
+  const regional = regionais.find(r => r.id === obra.regional_id);
+  if (!regional) return false;
+  const emailLower = (user.email || '').toLowerCase();
+  return (regional.clientes_responsaveis || []).some(e => e.toLowerCase() === emailLower);
+}
+
 export function canSeeFilters(user) {
   return !isLaboratorista(user);
 }
