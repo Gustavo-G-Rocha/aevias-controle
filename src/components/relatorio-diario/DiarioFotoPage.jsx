@@ -33,16 +33,16 @@ export default function DiarioFotoPage({ chunk, pageIndex, diario, obra, regiona
                 <source srcSet={fotoUrl} />
                 <img
                   src={fotoUrl}
-                  alt={`Foto ${pageIndex * 4 + fotoIndex + 1}`}
+                  alt={`Foto ${pageIndex * 6 + fotoIndex + 1}`}
                   className="w-full h-auto object-contain"
-                  style={{ maxHeight: '280px' }}
+                  style={{ maxHeight: '200px' }}
                   width="auto"
                   height="auto"
                 />
               </picture>
             </div>
             <p className="text-center text-sm mt-2 font-medium">
-              Foto {pageIndex * 4 + fotoIndex + 1}
+              Foto {pageIndex * 6 + fotoIndex + 1}
             </p>
           </div>
         ))}
