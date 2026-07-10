@@ -104,7 +104,10 @@ function validateRecord(entityName, data) {
 
 function getUserAccessLevel(user) {
   if (!user) return 'user';
-  return user.access_level || (user.role === 'admin' ? 'admin' : 'user');
+  const raw = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
+  if (raw === 'cliente_supervisor') return 'cliente';
+  if (raw === 'funcionarios_cliente') return 'user';
+  return raw;
 }
 
 // Verifica direito do usuário sobre um registro existente (update).
