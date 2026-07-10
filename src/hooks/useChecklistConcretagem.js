@@ -314,6 +314,7 @@ export function useChecklistConcretagem() {
       }
     }
 
+    try {
     const dataToSave = {
       ...formData,
       status: saveStatus,
@@ -323,14 +324,12 @@ export function useChecklistConcretagem() {
       periodos_clima: formData.periodos_clima.map(p => ({ ...p, temperatura_ambiente: p.temperatura_ambiente ? parseFloat(p.temperatura_ambiente) : null })),
       cargas_concreto: formData.cargas_concreto.map(c => ({
         ...c,
-        slump_test: { ...c.slump_test, resultado: c.slump_test.resultado !== null && c.slump_test.resultado !== "" ? parseFloat(c.slump_test.resultado) : null },
-        flow_test: { ...c.flow_test, resultado: c.flow_test.resultado !== null && c.flow_test.resultado !== "" ? parseFloat(c.flow_test.resultado) : null },
-        espessura_camada: { ...c.espessura_camada, resultado: c.espessura_camada.resultado !== null && c.espessura_camada.resultado !== "" ? parseFloat(c.espessura_camada.resultado) : null },
-        corpos_prova: c.corpos_prova.map(cp => ({ ...cp, dias_ruptura: cp.dias_ruptura != null ? parseInt(cp.dias_ruptura) : null })),
+        slump_test: { ...(c.slump_test || {}), resultado: c.slump_test?.resultado !== null && c.slump_test?.resultado !== undefined && c.slump_test?.resultado !== "" ? parseFloat(c.slump_test.resultado) : null },
+        flow_test: { ...(c.flow_test || {}), resultado: c.flow_test?.resultado !== null && c.flow_test?.resultado !== undefined && c.flow_test?.resultado !== "" ? parseFloat(c.flow_test.resultado) : null },
+        espessura_camada: { ...(c.espessura_camada || {}), resultado: c.espessura_camada?.resultado !== null && c.espessura_camada?.resultado !== undefined && c.espessura_camada?.resultado !== "" ? parseFloat(c.espessura_camada.resultado) : null },
+        corpos_prova: (c.corpos_prova || []).map(cp => ({ ...cp, dias_ruptura: cp.dias_ruptura != null ? parseInt(cp.dias_ruptura) : null })),
       })),
     };
-
-    try {
       if (editingChecklist?.id) {
         const updateData = { ...dataToSave };
         if (editingChecklist.approved === false && saveStatus === "finalizado") {
