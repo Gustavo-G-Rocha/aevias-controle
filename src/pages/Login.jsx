@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, Loader2, LogIn } from "lucide-react";
 
-const LOGO_URL = "https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/66ca39c89_AfirmaE-vias-Logoprincipal.svg";
+const LOGO_URL = "https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/290985b58_AE-LogoHorPrincipal_2.png";
 
 export default function Login() {
   const [email, setEmail] = useState("");
