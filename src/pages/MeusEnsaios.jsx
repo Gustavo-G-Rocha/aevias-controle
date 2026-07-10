@@ -1,7 +1,11 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import { Loader2, Plus } from "lucide-react";
 import { useEnsaiosList } from "@/hooks/useEnsaiosList";
 import { useEnsaiosActions } from "@/hooks/useEnsaiosActions";
+import { assinarEnsaio } from "@/services/ensaiosService";
+import { QUERY_KEYS } from "@/hooks/useQueryData";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "@/components/ui/use-toast";
 import { isAdmin, isCliente as isClienteUser, isGestorContrato, isSalaTecnica, isLaboratorista, isClienteSupervisor, isSupervisorInRegional } from "@/utils/accessControl";
 import AdminInterface from "@/components/ensaios/AdminInterface";
 import ClienteInterface from "@/components/ensaios/ClienteInterface";
@@ -9,8 +13,21 @@ import LaboratoristaInterface from "@/components/ensaios/LaboratoristaInterface"
 import { DialogTrigger } from "@/components/ui/dialog";
 
 export default function MeusEnsaios() {
+  const queryClient = useQueryClient();
   const { ensaios, obras, projects, allUsers, regionais, user, loading, reload } = useEnsaiosList();
   const { handleApprove, handleReject, handleDelete } = useEnsaiosActions(user, obras, reload);
+
+  const handleAssinar = useCallback(async (ensaio) => {
+    if (!window.confirm(`Confirma a assinatura digital do registro "${ensaio.sample_id || ensaio.id}"?`)) return;
+    try {
+      await assinarEnsaio(ensaio, user);
+      toast({ title: 'Registro assinado com sucesso!' });
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords });
+      await queryClient.invalidateQueries({ queryKey: ['supervisorRecords'] });
+    } catch (error) {
+      toast({ title: `Erro ao assinar: ${error?.message || 'Erro desconhecido'}.`, variant: "destructive" });
+    }
+  }, [user, queryClient]);
 
   const _isAdmin = isAdmin(user);
   const _isSalaTecnica = isSalaTecnica(user);
@@ -73,6 +90,7 @@ export default function MeusEnsaios() {
             onApprove={handleApprove}
             onReject={handleReject}
             onDelete={handleDelete}
+            onAssinar={handleAssinar}
             user={user}
             canApprove={canApprove}
             canApproveRecord={canApproveRecord}

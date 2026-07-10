@@ -2,7 +2,7 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, CheckCircle, XCircle, Trash2, Pencil } from "lucide-react";
+import { FileText, CheckCircle, XCircle, Trash2, Pencil, MessageSquare } from "lucide-react";
 import { Link as RouterLink } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components/ensaios/ensaioMappers";
@@ -10,7 +10,7 @@ import { getLocalInfo, getLaboratoristaInfo, getEmpreiteiraInfo, getNaoConformid
 import { CopyIdButton } from "@/components/ensaios/TableFilters";
 import { canGestorPreencherResultado } from "@/utils/certificacaoUsinaAccess";
 
-const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, allUsers, obras, user, regionais = [], onApprove, onReject, onDelete }) => {
+const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, allUsers, obras, user, regionais = [], onApprove, onReject, onDelete, onAssinar }) => {
   const status = getStatusInfo(ensaio);
   const { name, icon: TypeIcon } = getEnsaioTypeInfo(ensaio);
   const reportUrl = getReportLink(ensaio);
@@ -24,6 +24,7 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
   const podeEditarCertificacao =
     ensaio.entityType === "CertificacaoUsina" &&
     canGestorPreencherResultado(user, ensaio, obra, regionais);
+  const podeAssinar = ensaio.approved === true && !ensaio.client_signature?.signed_by && onAssinar;
 
   return (
     <tr className={`border-b border-border hover:bg-muted/50 ${index % 2 === 0 ? 'bg-transparent' : 'bg-muted/20'}`}>
@@ -70,6 +71,11 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
                 </Button>
               )}
             </div>
+          )}
+          {podeAssinar && (
+            <Button size="sm" style={{ backgroundColor: '#566E3D' }} className="text-white hover:opacity-90 h-7 px-2" onClick={() => onAssinar(ensaio)} title="Assinar">
+              <MessageSquare className="w-3 h-3" />
+            </Button>
           )}
           {canApprove && ensaio.status === 'rascunho' && <span className="text-xs italic text-muted-foreground ml-2">Em execução</span>}
           {podeEditarCertificacao && (

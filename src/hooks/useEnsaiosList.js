@@ -36,10 +36,14 @@ export function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccess
         .map(u => (u.email || '').toLowerCase())
         .filter(Boolean)
     );
-    return combinedEnsaios.filter(e =>
-      obrasIds.has(e.obra_id) ||
-      (e.created_by && subordinateEmails.has(e.created_by.toLowerCase()))
-    );
+    return combinedEnsaios.filter(e => {
+      const isFromObra = obrasIds.has(e.obra_id);
+      const isFromSubordinate = e.created_by && subordinateEmails.has(e.created_by.toLowerCase());
+      const isApprovedOrSigned = e.approved === true || e.client_signature?.signed_by;
+      // Aprovados/assinados das suas obras → mostra
+      // Pendentes/reprovados → mostra apenas se criados por subordinado
+      return (isFromObra && isApprovedOrSigned) || isFromSubordinate;
+    });
   }
 
   // Normaliza para nível efetivo (funcionarios_cliente→user)
