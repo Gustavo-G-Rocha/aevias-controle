@@ -85,15 +85,27 @@ export function useDiarioObra() {
   const obras = useMemo(() => {
     if (!auxData?.obras || !user) return [];
     const emailLower = user.email.toLowerCase();
-    const regionaisDoUsuario = regionais
-      .filter(r =>
-        (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-        (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-      )
-      .map(r => r.id);
+    const isFuncionarioCliente = user.access_level === 'funcionarios_cliente';
+    const supervisorEmailLower = user.supervisor_email?.toLowerCase();
+
+    let regionaisDoUsuario;
+    if (isFuncionarioCliente && supervisorEmailLower) {
+      regionaisDoUsuario = regionais
+        .filter(r => (r.clientes_responsaveis || []).some(e => e.toLowerCase() === supervisorEmailLower))
+        .map(r => r.id);
+    } else {
+      regionaisDoUsuario = regionais
+        .filter(r =>
+          (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+          (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+        )
+        .map(r => r.id);
+    }
+
     if (regionaisDoUsuario.length > 0) {
       const regionaisSet = new Set(regionaisDoUsuario);
-      return auxData.obras.filter(o => regionaisSet.has(o.regional_id) && o.status === "em_andamento");
+      const statusFilter = isFuncionarioCliente ? () => true : (o) => o.status === "em_andamento";
+      return auxData.obras.filter(o => regionaisSet.has(o.regional_id) && statusFilter(o));
     } else if (user.role !== "admin") {
       return [];
     }
