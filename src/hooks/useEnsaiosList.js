@@ -117,11 +117,9 @@ export function useEnsaiosList() {
     const records = isSupervisor ? (supervisorRecords ?? []) : (allRecords ?? []);
     if (!records.length) return [];
 
-    // Supervisor: registros já vêm filtrados do backend, só ordenar
-    if (isSupervisor) {
-      return sortByEnsaioDate(records);
-    }
-
+    // Supervisor: registros vêm do backend (bypass RLS), mas ainda precisam
+    // do filtro de aprovacao do filtrarPorAcesso (aprovados/assinados das obras
+    // + pendentes apenas de subordinados)
     const filtered = filtrarPorAcesso(
       records,
       user,
