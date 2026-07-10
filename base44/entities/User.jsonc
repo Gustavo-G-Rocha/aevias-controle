@@ -4,23 +4,23 @@
   "properties": {
     "nickname": {
       "type": "string",
-      "description": "Apelido do usuário (exibido no Dashboard)"
+      "description": "Apelido do usu\u00e1rio (exibido no Dashboard)"
     },
     "company": {
       "type": "string",
-      "description": "Empresa do usuário"
+      "description": "Empresa do usu\u00e1rio"
     },
     "phone": {
       "type": "string",
-      "description": "Telefone do usuário"
+      "description": "Telefone do usu\u00e1rio"
     },
     "position": {
       "type": "string",
-      "description": "Cargo do usuário"
+      "description": "Cargo do usu\u00e1rio"
     },
     "crea_number": {
       "type": "string",
-      "description": "Número do CREA"
+      "description": "N\u00famero do CREA"
     },
     "laboratorista_name": {
       "type": "string",
@@ -29,7 +29,7 @@
     "is_active": {
       "type": "boolean",
       "default": true,
-      "description": "Se o usuário está ativo"
+      "description": "Se o usu\u00e1rio est\u00e1 ativo"
     },
     "access_level": {
       "type": "string",
@@ -38,15 +38,17 @@
         "sala_tecnica_afirmaevias",
         "gestor_contrato",
         "user",
-        "cliente"
+        "cliente",
+        "cliente_supervisor",
+        "funcionarios_cliente"
       ],
       "default": "user",
-      "description": "Nível de acesso funcional do usuário"
+      "description": "N\u00edvel de acesso funcional do usu\u00e1rio"
     },
     "last_login": {
       "type": "string",
       "format": "date-time",
-      "description": "Data e hora do último login do usuário"
+      "description": "Data e hora do \u00faltimo login do usu\u00e1rio"
     }
   },
   "required": [
@@ -69,6 +71,11 @@
         {
           "user_condition": {
             "access_level": "gestor_contrato"
+          }
+        },
+        {
+          "user_condition": {
+            "access_level": "cliente_supervisor"
           }
         }
       ]
