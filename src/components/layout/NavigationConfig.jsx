@@ -27,7 +27,7 @@ export const MAIN_NAVIGATION = [
     title: "Regionais",
     url: createPageUrl("Regionais"),
     icon: Grid,
-    allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "user", "funcionarios_cliente", "cliente_supervisor"],
+    allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "user", "funcionarios_cliente", "cliente", "cliente_supervisor"],
   },
 ];
 

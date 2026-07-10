@@ -35,12 +35,12 @@
         },
         {
           "user_condition": {
-            "access_level": "sala_tecnica_afirmaevias"
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
           "user_condition": {
-            "access_level": "gestor_contrato"
+            "data.access_level": "gestor_contrato"
           }
         },
         {
@@ -61,12 +61,12 @@
         },
         {
           "user_condition": {
-            "access_level": "sala_tecnica_afirmaevias"
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
           "user_condition": {
-            "access_level": "gestor_contrato"
+            "data.access_level": "gestor_contrato"
           }
         }
       ]
@@ -83,12 +83,12 @@
         },
         {
           "user_condition": {
-            "access_level": "sala_tecnica_afirmaevias"
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
           "user_condition": {
-            "access_level": "gestor_contrato"
+            "data.access_level": "gestor_contrato"
           }
         }
       ]

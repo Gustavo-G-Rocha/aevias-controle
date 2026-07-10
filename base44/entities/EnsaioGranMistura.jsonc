@@ -176,17 +176,15 @@
           }
         },
         {
-          "user_condition": {
-            "access_level": "sala_tecnica_afirmaevias"
+          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": {
-            "access_level": "gestor_contrato"
+          "user_condition": { "data.access_level": "gestor_contrato"
           }
         },
-        { "user_condition": { "access_level": "cliente" } },
-        { "user_condition": { "access_level": "cliente_supervisor" } },
+        { "user_condition": { "data.access_level": "cliente" } },
+        { "user_condition": { "data.access_level": "cliente_supervisor" } },
         {
           "created_by": "{{user.email}}"
         }
@@ -204,13 +202,11 @@
           }
         },
         {
-          "user_condition": {
-            "access_level": "sala_tecnica_afirmaevias"
+          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": {
-            "access_level": "gestor_contrato"
+          "user_condition": { "data.access_level": "gestor_contrato"
           }
         }
       ]
@@ -226,13 +222,11 @@
           }
         },
         {
-          "user_condition": {
-            "access_level": "sala_tecnica_afirmaevias"
+          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": {
-            "access_level": "gestor_contrato"
+          "user_condition": { "data.access_level": "gestor_contrato"
           }
         }
       ]

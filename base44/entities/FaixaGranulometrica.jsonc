@@ -83,7 +83,7 @@
         },
         {
           "user_condition": {
-            "access_level": "sala_tecnica_afirmaevias"
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         }
       ]
