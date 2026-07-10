@@ -308,64 +308,64 @@ export default function ReportarErro() {
           </Card>
         )}
 
-        {/* Admin: Lista de todos os relatos */}
-        {isAdmin && (
-          <div>
-            <h2 className="text-xl font-semibold text-primary mb-4">
-              Relatos Recebidos ({bugReports.length})
-            </h2>
-            {loadingReports ? (
-              <div className="text-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin mx-auto text-muted-foreground" />
-              </div>
-            ) : bugReports.length === 0 ? (
-              <Card>
-                <CardContent className="py-8 text-center text-muted-foreground">
-                  Nenhum relato recebido ainda.
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                {bugReports.map((report) => {
-                  const StatusIcon = STATUS_CONFIG[report.status]?.icon || AlertCircle;
-                  return (
-                    <Card key={report.id}>
-                      <CardContent className="py-4">
-                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap mb-2">
-                              <Badge className={STATUS_CONFIG[report.status]?.color}>
-                                <StatusIcon className="w-3 h-3 mr-1" />
-                                {STATUS_CONFIG[report.status]?.label}
-                              </Badge>
-                              <Badge variant="outline" className="font-mono text-xs">
-                                {report.pagina}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground">
-                                {formatDate(report.created_date)}
-                              </span>
-                            </div>
-                            <p className="text-sm text-foreground whitespace-pre-wrap">
-                              {report.descricao}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-2">
-                              Por: {report.created_by}
-                            </p>
-                            {report.prints && report.prints.length > 0 && (
-                              <div className="flex flex-wrap gap-2 mt-3">
-                                {report.prints.map((url, i) => (
-                                  <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                                    <img
-                                      src={url}
-                                      alt={`Print ${i + 1}`}
-                                      className="w-20 h-20 object-cover rounded border hover:opacity-80 transition-opacity"
-                                    />
-                                  </a>
-                                ))}
-                              </div>
-                            )}
+        {/* Lista de relatos — admins veem todos, usuários veem apenas os próprios (RLS) */}
+        <div>
+          <h2 className="text-xl font-semibold text-primary mb-4">
+            {isAdmin ? `Relatos Recebidos (${bugReports.length})` : `Seus Relatos (${bugReports.length})`}
+          </h2>
+          {loadingReports ? (
+            <div className="text-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin mx-auto text-muted-foreground" />
+            </div>
+          ) : bugReports.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                {isAdmin ? "Nenhum relato recebido ainda." : "Você ainda não relatou nenhum erro."}
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {bugReports.map((report) => {
+                const StatusIcon = STATUS_CONFIG[report.status]?.icon || AlertCircle;
+                return (
+                  <Card key={report.id}>
+                    <CardContent className="py-4">
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-2">
+                            <Badge className={STATUS_CONFIG[report.status]?.color}>
+                              <StatusIcon className="w-3 h-3 mr-1" />
+                              {STATUS_CONFIG[report.status]?.label}
+                            </Badge>
+                            <Badge variant="outline" className="font-mono text-xs">
+                              {report.pagina}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {formatDate(report.created_date)}
+                            </span>
                           </div>
-                          {/* Admin actions */}
+                          <p className="text-sm text-foreground whitespace-pre-wrap">
+                            {report.descricao}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            Por: {report.created_by}
+                          </p>
+                          {report.prints && report.prints.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-3">
+                              {report.prints.map((url, i) => (
+                                <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                                  <img
+                                    src={url}
+                                    alt={`Print ${i + 1}`}
+                                    className="w-20 h-20 object-cover rounded border hover:opacity-80 transition-opacity"
+                                  />
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        {/* Admin actions */}
+                        {isAdmin && (
                           <div className="shrink-0">
                             <Select
                               value={report.status}
@@ -381,48 +381,15 @@ export default function ReportarErro() {
                               </SelectContent>
                             </Select>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Non-admin: Seus próprios relatos */}
-        {!isAdmin && bugReports.length > 0 && !showForm && (
-          <div>
-            <h2 className="text-lg font-semibold text-primary mb-4">Seus Relatos</h2>
-            <div className="space-y-3">
-              {bugReports.map((report) => {
-                const StatusIcon = STATUS_CONFIG[report.status]?.icon || AlertCircle;
-                return (
-                  <Card key={report.id}>
-                    <CardContent className="py-3">
-                      <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <Badge className={STATUS_CONFIG[report.status]?.color}>
-                          <StatusIcon className="w-3 h-3 mr-1" />
-                          {STATUS_CONFIG[report.status]?.label}
-                        </Badge>
-                        <Badge variant="outline" className="font-mono text-xs">
-                          {report.pagina}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {formatDate(report.created_date)}
-                        </span>
+                        )}
                       </div>
-                      <p className="text-sm text-foreground whitespace-pre-wrap line-clamp-2">
-                        {report.descricao}
-                      </p>
                     </CardContent>
                   </Card>
                 );
               })}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
