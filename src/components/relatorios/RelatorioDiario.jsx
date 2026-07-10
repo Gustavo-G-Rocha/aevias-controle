@@ -185,27 +185,24 @@ export default function RelatorioDiario({ diario, obra, user, regional, creatorU
             </section>
           )}
 
-          {compressedPhotos.length > 0 && (
-            <section className="mt-4">
-              <h2 className="text-lg font-bold text-gray-700 border-b pb-2 mb-3">Registro Fotográfico</h2>
-              <div className="grid grid-cols-3 gap-3">
-                {compressedPhotos.map((fotoUrl, idx) => (
-                  <div key={idx} className="border p-1 rounded-lg break-inside-avoid flex flex-col">
-                    <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden">
-                      <img src={fotoUrl} alt={`Foto ${idx + 1}`} className="w-full h-auto object-contain" style={{ maxHeight: '150px' }} />
-                    </div>
-                    <p className="text-center text-xs mt-1 font-medium text-gray-700">Foto {idx + 1}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
         </main>
 
         <footer className="mt-auto pt-4 flex-shrink-0">
           <SignatureFooter {...buildSignatureProps(diario, creatorUser)} />
         </footer>
       </div>
+
+      {/* Páginas de Registro Fotográfico — após assinaturas */}
+      {photoChunks.map((chunk, pageIndex) => (
+        <DiarioFotoPage
+          key={`foto-page-${pageIndex}`}
+          chunk={chunk}
+          pageIndex={pageIndex}
+          diario={diario}
+          obra={obra}
+          regional={regional}
+        />
+      ))}
 
       {/* Página do Efetivo de Obra */}
       {diario.efetivo_obra_ativo && (
