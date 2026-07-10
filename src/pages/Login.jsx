@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, Loader2, LogIn } from "lucide-react";
 
-const LOGO_URL = "https://www.afirmaevias.com.br/wp-content/uploads/2025/05/Logo.png";
+const LOGO_URL = "https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/66ca39c89_AfirmaE-vias-Logoprincipal.svg";
 
 export default function Login() {
   const [email, setEmail] = useState("");
