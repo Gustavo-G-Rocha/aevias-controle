@@ -90,11 +90,11 @@ export function useEnsaiosList() {
   const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true, needsUsers: true });
 
   const currentUserAccessLevel = user ? getUserAccessLevel(user) : null;
-  const isSupervisor = currentUserAccessLevel === 'cliente_supervisor';
+  // cliente e cliente_supervisor: usa backend function (asServiceRole) para contornar RLS
+  const useBackendRecords = currentUserAccessLevel === 'cliente_supervisor' || currentUserAccessLevel === 'cliente';
 
-  // Para cliente_supervisor: usa backend function (asServiceRole) em vez de SDK direto
   const { data: allRecords, isLoading: loadingRecords } = useAllRecords('list');
-  const { data: supervisorRecords, isLoading: loadingSupervisorRecords } = useSupervisorRecords(user, isSupervisor);
+  const { data: supervisorRecords, isLoading: loadingSupervisorRecords } = useSupervisorRecords(user, useBackendRecords);
 
   // Invalida ambos os caches para forçar recarregamento após ações (aprovar/excluir)
   const reload = useCallback(() => {
@@ -102,7 +102,7 @@ export function useEnsaiosList() {
     queryClient.invalidateQueries({ queryKey: ['supervisorRecords'] });
   }, [queryClient]);
 
-  const loading = loadingUser || loadingAux || (isSupervisor ? loadingSupervisorRecords : loadingRecords);
+  const loading = loadingUser || loadingAux || (useBackendRecords ? loadingSupervisorRecords : loadingRecords);
 
   // Campos específicos que filtrarPorAcesso consome — referências estáveis do React Query
   const obras = auxData?.obras;
@@ -114,7 +114,7 @@ export function useEnsaiosList() {
   const ensaios = useMemo(() => {
     if (!user || !obras) return [];
 
-    const records = isSupervisor ? (supervisorRecords ?? []) : (allRecords ?? []);
+    const records = useBackendRecords ? (supervisorRecords ?? []) : (allRecords ?? []);
     if (!records.length) return [];
 
     // Supervisor: registros vêm do backend (bypass RLS), mas ainda precisam
@@ -129,7 +129,7 @@ export function useEnsaiosList() {
       allUsers
     );
     return sortByEnsaioDate(filtered);
-  }, [user, currentUserAccessLevel, allRecords, supervisorRecords, obras, regionais, allUsers, isSupervisor]);
+  }, [user, currentUserAccessLevel, allRecords, supervisorRecords, obras, regionais, allUsers, useBackendRecords]);
 
   return {
     ensaios,

@@ -50,8 +50,8 @@ Deno.serve(async (req) => {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const accessLevel = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
-    if (accessLevel !== 'cliente_supervisor') {
-      return Response.json({ error: 'Apenas supervisores podem usar este endpoint' }, { status: 403 });
+    if (accessLevel !== 'cliente_supervisor' && accessLevel !== 'cliente') {
+      return Response.json({ error: 'Apenas clientes e supervisores podem usar este endpoint' }, { status: 403 });
     }
 
     const userEmail = (user.email || '').toLowerCase();
