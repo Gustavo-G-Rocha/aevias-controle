@@ -229,7 +229,7 @@ export default function Register() {
                   type="email"
                   autoComplete="email"
                   autoFocus
-                  placeholder="seu@email.com"
+                  placeholder="seu@afirmaevias.com.br"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 h-12"
