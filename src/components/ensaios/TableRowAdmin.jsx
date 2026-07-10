@@ -9,7 +9,6 @@ import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components
 import { getLocalInfo, getLaboratoristaInfo, getEmpreiteiraInfo, getNaoConformidades, getStatusInfo } from "@/components/ensaios/utils";
 import { CopyIdButton } from "@/components/ensaios/TableFilters";
 import { canGestorPreencherResultado } from "@/utils/certificacaoUsinaAccess";
-import { canApproveRecord } from "@/utils/accessControl";
 
 const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, allUsers, obras, user, regionais = [], onApprove, onReject, onDelete }) => {
   const status = getStatusInfo(ensaio);
@@ -25,9 +24,6 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
   const podeEditarCertificacao =
     ensaio.entityType === "CertificacaoUsina" &&
     canGestorPreencherResultado(user, ensaio, obra, regionais);
-  // Permissão de aprovar/reprovar/excluir por registro:
-  // cliente_supervisor só pode na obra onde é supervisor (email em clientes_responsaveis da regional)
-  const canApproveThis = canApprove && canApproveRecord(user, obra, regionais);
 
   return (
     <tr className={`border-b border-border hover:bg-muted/50 ${index % 2 === 0 ? 'bg-transparent' : 'bg-muted/20'}`}>
@@ -61,7 +57,7 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
           <Button asChild variant="outline" size="sm" className="text-foreground hover:bg-muted h-7 px-2">
             <RouterLink to={reportUrl} target="_blank"><FileText className="w-3 h-3" /></RouterLink>
           </Button>
-          {canApproveThis && ensaio.status !== 'rascunho' && (
+          {canApprove && ensaio.status !== 'rascunho' && (
             <div className="flex gap-1">
               {(ensaio.approved === null || ensaio.approved === false) && (
                 <Button size="sm" style={{ backgroundColor: '#566E3D' }} className="text-white hover:opacity-90 h-7 px-2" onClick={() => onApprove(ensaio)} title="Aprovar">
@@ -75,13 +71,13 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
               )}
             </div>
           )}
-          {canApproveThis && ensaio.status === 'rascunho' && <span className="text-xs italic text-muted-foreground ml-2">Em execução</span>}
+          {canApprove && ensaio.status === 'rascunho' && <span className="text-xs italic text-muted-foreground ml-2">Em execução</span>}
           {podeEditarCertificacao && (
             <Button asChild size="sm" style={{ backgroundColor: '#00233B' }} className="text-white hover:opacity-90 h-7 px-2" title="Editar / Preencher Resultado">
               <RouterLink to={createPageUrl(`CertificacaoUsina?editId=${ensaio.id}`)}><Pencil className="w-3 h-3" /></RouterLink>
             </Button>
           )}
-          {canApproveThis && (
+          {canApprove && (
             <Button size="sm" variant="destructive" className="h-7 px-2" onClick={() => onDelete(ensaio)} title="Excluir">
               <Trash2 className="w-3 h-3" />
             </Button>

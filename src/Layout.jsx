@@ -25,7 +25,7 @@ const AppLayout = ({ children, currentPageName }) => {
   const { user, obrasDoUsuario, loadingUser, pendingTransfers } = useLayoutData();
 
   const userAccessLevel = getUserAccessLevel(user);
-  const isAdmin = userAccessLevel === ACCESS_LEVELS.ADMIN;
+  const isAdmin = userAccessLevel === ACCESS_LEVELS.ADMIN || user?.role === ACCESS_LEVELS.ADMIN;
   const isSalaTecnica = userAccessLevel === ACCESS_LEVELS.SALA_TECNICA;
   const isGestorContrato = userAccessLevel === ACCESS_LEVELS.GESTOR_CONTRATO;
   const isCliente = userAccessLevel === ACCESS_LEVELS.CLIENTE || userAccessLevel === ACCESS_LEVELS.CLIENTE_SUPERVISOR;
