@@ -9,7 +9,8 @@ export function useUsersFilters(users, currentUser) {
   const isSalaTecnica      = userAccessLevel === 'sala_tecnica_afirmaevias';
   const isGestorContrato   = userAccessLevel === 'gestor_contrato';
   const isCliente          = userAccessLevel === 'cliente';
-  const canManageUsers     = isAdmin || isSalaTecnica || isGestorContrato;
+  const isClienteSupervisor = userAccessLevel === 'cliente_supervisor';
+  const canManageUsers     = isAdmin || isSalaTecnica || isGestorContrato || isClienteSupervisor;
 
   const filteredUsers = useMemo(
     () => filterUsers(users, searchTerm),
@@ -19,6 +20,6 @@ export function useUsersFilters(users, currentUser) {
   return {
     searchTerm, setSearchTerm,
     filteredUsers,
-    userAccessLevel, isAdmin, isSalaTecnica, isGestorContrato, isCliente, canManageUsers,
+    userAccessLevel,     isAdmin, isSalaTecnica, isGestorContrato, isCliente, isClienteSupervisor, canManageUsers,
   };
 }

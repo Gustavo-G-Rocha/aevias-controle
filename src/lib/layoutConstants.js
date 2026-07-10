@@ -47,3 +47,8 @@ export const ALL_OBRA_TYPE_STUBS = [
   { tipo_obra: 'levantamentos' },
   { tipo_obra: 'homologacao_usinas' },
 ];
+
+/** Níveis que se comportam como "cliente" para exibição de obras/stubs */
+export const CLIENTE_LIKE_LEVELS = ['cliente', 'cliente_supervisor'];
+/** Níveis que se comportam como "user" (laboratorista) para carregar obras reais */
+export const USER_LIKE_LEVELS = ['user', 'funcionarios_cliente'];

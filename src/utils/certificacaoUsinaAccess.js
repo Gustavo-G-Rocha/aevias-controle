@@ -73,5 +73,6 @@ export function canGestorPreencherResultado(user, editingChecklist, obra, region
  * Qualquer perfil não-laboratorista (admin, gestor, sala técnica) enxerga a etapa.
  */
 export function laboratoristaDeveOcultarResultado(user) {
-  return getUserAccessLevel(user) === 'user';
+  const level = getUserAccessLevel(user);
+  return level === 'user' || level === 'funcionarios_cliente';
 }

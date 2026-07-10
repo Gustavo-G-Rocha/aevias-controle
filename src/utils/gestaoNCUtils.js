@@ -35,7 +35,10 @@ export const STATUS_ICONS = {
  */
 export const getUserAccessLevel = (user) => {
   if (!user) return "user";
-  return user.access_level || (user.role === "admin" ? "admin" : "user");
+  const raw = user.access_level || (user.role === "admin" ? "admin" : "user");
+  if (raw === "cliente_supervisor") return "cliente";
+  if (raw === "funcionarios_cliente") return "user";
+  return raw;
 };
 
 /**
@@ -56,7 +59,8 @@ export const isUserAdmin = (user) => {
  * Check if user is cliente
  */
 export const isUserCliente = (user) => {
-  return getUserAccessLevel(user) === "cliente";
+  const level = getUserAccessLevel(user);
+  return level === "cliente" || level === "cliente_supervisor";
 };
 
 /**
@@ -64,7 +68,7 @@ export const isUserCliente = (user) => {
  */
 export const canUserChangeStatus = (user) => {
   const level = getUserAccessLevel(user);
-  return level === "gestor_contrato" || level === "admin" || level === "cliente";
+  return level === "gestor_contrato" || level === "admin" || level === "cliente" || level === "cliente_supervisor";
 };
 
 /**

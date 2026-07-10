@@ -132,6 +132,8 @@ const UserForm = React.memo(({ user: editingUser, onSave, onCancel, currentUser,
               {!isGestorOrSalaTecnica && <SelectItem value="gestor_contrato">Gestor de Contrato</SelectItem>}
               <SelectItem value="user">Laboratorista</SelectItem>
               {!isGestorOrSalaTecnica && <SelectItem value="cliente">Cliente</SelectItem>}
+              {!isGestorOrSalaTecnica && <SelectItem value="cliente_supervisor">Cliente Supervisor</SelectItem>}
+              {!isGestorOrSalaTecnica && <SelectItem value="funcionarios_cliente">Funcionário Cliente</SelectItem>}
             </SelectContent>
           </Select>
           {isGestorOrSalaTecnica && (

@@ -257,11 +257,11 @@ export const validarArquivoFoto = (file) => {
  */
 export const filtrarObrasPorAcesso = (obrasData, regionaisData, userData) => {
   const accessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
-  const tiposValidos = accessLevel === 'user'
+  const tiposValidos = accessLevel === 'user' || accessLevel === 'funcionarios_cliente'
     ? ['implantacao', 'supervisao']
     : ['implantacao', 'conservacao', 'supervisao'];
   const tiposSet = new Set(tiposValidos);
-  const exigeEmAndamento = accessLevel === 'user';
+  const exigeEmAndamento = accessLevel === 'user' || accessLevel === 'funcionarios_cliente';
   const porAcesso = filtrarObrasPorAcessoRegional(obrasData, regionaisData, userData);
   return porAcesso.filter(o =>
     tiposSet.has(o.tipo_obra) && (!exigeEmAndamento || o.status === 'em_andamento')

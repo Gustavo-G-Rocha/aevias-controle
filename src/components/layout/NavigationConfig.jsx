@@ -21,18 +21,18 @@ export const MAIN_NAVIGATION = [
     title: "Dashboard",
     url: createPageUrl("Dashboard"),
     icon: LayoutDashboard,
-    allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "cliente"],
+    allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "cliente", "cliente_supervisor"],
   },
   {
     title: "Regionais",
     url: createPageUrl("Regionais"),
     icon: Grid,
-    allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "user"],
+    allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "user", "funcionarios_cliente"],
   },
 ];
 
 export const ADMIN_NAVIGATION = [
-  { title: "Usuários", url: createPageUrl("Users"), icon: Users, allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "cliente"] },
+  { title: "Usuários", url: createPageUrl("Users"), icon: Users, allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "cliente", "cliente_supervisor"] },
   { title: "Produtividade", url: createPageUrl("Produtividade"), icon: BarChart3, allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias"] },
   { title: "Controle Laboratoristas", url: createPageUrl("ControleLaboratoristas"), icon: Users, allowedLevels: ["admin"] },
   { title: "Faixas Granulométricas", url: createPageUrl("FaixasGranulometricas"), icon: Grid, allowedLevels: ["admin"] },

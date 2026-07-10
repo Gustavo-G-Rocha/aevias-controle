@@ -48,8 +48,8 @@ export function hasTenantAccess(user, record, obra, regional) {
     return { allowed: true };
   }
 
-  // laboratorista: apenas registros que criou
-  if (level === 'user') {
+  // laboratorista / funcionarios_cliente: apenas registros que criou
+  if (level === 'user' || level === 'funcionarios_cliente') {
     if (record.created_by === user.email || record.created_by_id === user.id) {
       return { allowed: true };
     }
@@ -70,7 +70,7 @@ export function hasTenantAccess(user, record, obra, regional) {
 
   const userEmail = (user.email || '').toLowerCase();
 
-  if (level === 'cliente') {
+  if (level === 'cliente' || level === 'cliente_supervisor') {
     const emails = (regional.clientes_responsaveis || []).map((e) => e.toLowerCase());
     if (emails.includes(userEmail)) return { allowed: true };
   } else if (level === 'sala_tecnica_afirmaevias') {
@@ -105,7 +105,7 @@ export function canAccessObra(user, obraId, obra, regional) {
 
   // admin e laboratorista: irrestrito na criação
   // (laboratorista cria livremente; a filtragem de leitura é por created_by)
-  if (level === 'admin' || user.role === 'admin' || level === 'user') {
+  if (level === 'admin' || user.role === 'admin' || level === 'user' || level === 'funcionarios_cliente') {
     return { allowed: true };
   }
 
@@ -121,7 +121,7 @@ export function canAccessObra(user, obraId, obra, regional) {
 
   const userEmail = (user.email || '').toLowerCase();
 
-  if (level === 'cliente') {
+  if (level === 'cliente' || level === 'cliente_supervisor') {
     const emails = (regional.clientes_responsaveis || []).map((e) => e.toLowerCase());
     if (emails.includes(userEmail)) return { allowed: true };
   } else if (level === 'sala_tecnica_afirmaevias') {

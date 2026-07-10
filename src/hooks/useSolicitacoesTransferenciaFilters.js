@@ -17,7 +17,7 @@ export function useSolicitacoesTransferenciaFilters(solicitacoes, user, regionai
   );
 
   const isLaboratorista = useMemo(() => 
-    userAccessLevel === 'user',
+    userAccessLevel === 'user' || userAccessLevel === 'funcionarios_cliente',
     [userAccessLevel]
   );
 

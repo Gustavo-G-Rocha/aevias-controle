@@ -107,6 +107,14 @@ function getUserAccessLevel(user) {
   return user.access_level || (user.role === 'admin' ? 'admin' : 'user');
 }
 
+/** Normaliza para nível efetivo (cliente_supervisor→cliente, funcionarios_cliente→user) */
+function getEffectiveAccessLevel(user) {
+  const level = getUserAccessLevel(user);
+  if (level === 'cliente_supervisor') return 'cliente';
+  if (level === 'funcionarios_cliente') return 'user';
+  return level;
+}
+
 function canApprove(user) {
   const level = getUserAccessLevel(user);
   return APPROVER_LEVELS.includes(level) || user.role === 'admin';
@@ -133,6 +141,7 @@ function canDelete(user, record) {
 // acesso cross-tenant entre clientes/regionais diferentes.
 async function verifyTenantAccess(base44, user, entityName, record) {
   const level = getUserAccessLevel(user);
+  const effectiveLevel = getEffectiveAccessLevel(user);
 
   // admin: acesso irrestrito (não precisa verificar tenant)
   if (level === 'admin' || user.role === 'admin') {
@@ -143,15 +152,15 @@ async function verifyTenantAccess(base44, user, entityName, record) {
     return { allowed: false, reason: 'Registro não encontrado', status: 404 };
   }
 
-  // laboratorista: apenas registros que criou
-  if (level === 'user') {
+  // laboratorista / funcionarios_cliente: apenas registros que criou
+  if (effectiveLevel === 'user') {
     if (record.created_by === user.email || record.created_by_id === user.id) {
       return { allowed: true };
     }
     return { allowed: false, reason: 'Sem permissão sobre este registro', status: 403 };
   }
 
-  // tenant-scoped users (cliente, sala_tecnica, gestor_contrato):
+  // tenant-scoped users (cliente/cliente_supervisor, sala_tecnica, gestor_contrato):
   // precisam da cadeia registro → obra → regional
   if (!record.obra_id) {
     return { allowed: false, reason: 'Registro sem obra vinculada', status: 403 };
@@ -179,13 +188,14 @@ async function verifyTenantAccess(base44, user, entityName, record) {
 
   const userEmail = (user.email || '').toLowerCase();
 
-  if (level === 'cliente') {
+  // cliente e cliente_supervisor: mesmas regionais (clientes_responsaveis)
+  if (effectiveLevel === 'cliente') {
     const emails = (regional.clientes_responsaveis || []).map((e) => e.toLowerCase());
     if (emails.includes(userEmail)) return { allowed: true };
-  } else if (level === 'sala_tecnica_afirmaevias') {
+  } else if (effectiveLevel === 'sala_tecnica_afirmaevias') {
     const emails = (regional.salas_tecnicas_responsaveis || []).map((e) => e.toLowerCase());
     if (emails.includes(userEmail)) return { allowed: true };
-  } else if (level === 'gestor_contrato') {
+  } else if (effectiveLevel === 'gestor_contrato') {
     const emails = (regional.gestores_contrato_responsaveis || []).map((e) => e.toLowerCase());
     const legacy = (regional.gestor_contrato_responsavel || '').toLowerCase();
     if (emails.includes(userEmail) || legacy === userEmail) return { allowed: true };

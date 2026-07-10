@@ -74,7 +74,7 @@ export default function AppSidebar({
   const isAdmin = userAccessLevel === ACCESS_LEVELS.ADMIN || user?.role === ACCESS_LEVELS.ADMIN;
   const isSalaTecnica = userAccessLevel === ACCESS_LEVELS.SALA_TECNICA;
   const isGestorContrato = userAccessLevel === ACCESS_LEVELS.GESTOR_CONTRATO;
-  const isCliente = userAccessLevel === ACCESS_LEVELS.CLIENTE;
+  const isCliente = userAccessLevel === ACCESS_LEVELS.CLIENTE || userAccessLevel === ACCESS_LEVELS.CLIENTE_SUPERVISOR;
 
   const location = useLocation();
   const isActive = (url) => {
@@ -83,7 +83,7 @@ export default function AppSidebar({
     return false;
   };
 
-  const showNaoConformidades = [ACCESS_LEVELS.ADMIN, ACCESS_LEVELS.GESTOR_CONTRATO, ACCESS_LEVELS.SALA_TECNICA, ACCESS_LEVELS.CLIENTE].includes(userAccessLevel);
+  const showNaoConformidades = [ACCESS_LEVELS.ADMIN, ACCESS_LEVELS.GESTOR_CONTRATO, ACCESS_LEVELS.SALA_TECNICA, ACCESS_LEVELS.CLIENTE, ACCESS_LEVELS.CLIENTE_SUPERVISOR].includes(userAccessLevel);
   const showMinhasObras = Object.values(ACCESS_LEVELS).includes(userAccessLevel);
   const gestaoNavigation = ADMIN_NAVIGATION.filter((i) => !i.allowedLevels || i.allowedLevels.includes(userAccessLevel));
 
@@ -185,7 +185,7 @@ export default function AppSidebar({
         </SidebarGroup>
 
         {/* Administração / Gestão */}
-        {(canManageSystem || isGestorContrato || isSalaTecnica || isCliente) && gestaoNavigation.length > 0 &&
+        {(canManageSystem || isGestorContrato || isSalaTecnica || isCliente || userAccessLevel === ACCESS_LEVELS.CLIENTE_SUPERVISOR) && gestaoNavigation.length > 0 &&
         <SidebarGroup>
             <SidebarGroupLabel className="text-xs font-semibold uppercase tracking-wider px-3 py-2" style={{ color: 'var(--color-sidebar-text-muted)' }}>
               {canManageSystem ? "Administração" : "Gestão"}

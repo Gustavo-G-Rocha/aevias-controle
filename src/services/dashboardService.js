@@ -3,11 +3,11 @@
 // (era 5000 — redução de 96% no volume de dados carregados)
 
 import { base44 } from '@/api/base44Client';
-import { getUserAccessLevel, filterRegionaisByUser, isCliente } from '@/utils/accessControl';
+import { getEffectiveAccessLevel, filterRegionaisByUser, isCliente } from '@/utils/accessControl';
 import { loadAllRecords, loadAuxData } from '@/services/recordsService';
 
 export async function loadDashboardData(user) {
-  const userAccessLevel = getUserAccessLevel(user);
+  const userAccessLevel = getEffectiveAccessLevel(user);
   const isClienteUser = isCliente(user);
   const needsRegionais = ['cliente', 'sala_tecnica_afirmaevias', 'gestor_contrato'].includes(userAccessLevel);
 

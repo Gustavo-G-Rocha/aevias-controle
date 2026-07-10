@@ -4,7 +4,7 @@
  */
 import { useMemo, useState, useCallback } from 'react';
 import { subMonths } from 'date-fns';
-import { getUserAccessLevel, filterRegionaisByUser, getAccessibleObraIds, isCliente, isEngenheiroCliente } from '@/utils/accessControl';
+import { getEffectiveAccessLevel, filterRegionaisByUser, getAccessibleObraIds, isCliente, isEngenheiroCliente } from '@/utils/accessControl';
 import {
   calcularStats,
   calcularGraficoMensal,
@@ -26,7 +26,7 @@ export function useDashboardData() {
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
   const { data: user, isLoading: loadingUser } = useCurrentUser();
-  const userAccessLevel = getUserAccessLevel(user);
+  const userAccessLevel = getEffectiveAccessLevel(user);
   const needsRegionais = ['cliente', 'sala_tecnica_afirmaevias', 'gestor_contrato'].includes(userAccessLevel);
 
   const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais });

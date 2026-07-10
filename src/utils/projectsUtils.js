@@ -4,7 +4,7 @@
 const getUserRegionalsAccess = (regional, user, userAccessLevel) => {
   const emailUsuario = user.email.trim().toLowerCase();
 
-  if (userAccessLevel === "cliente") {
+  if (userAccessLevel === "cliente" || userAccessLevel === "cliente_supervisor") {
     const clientes = regional.clientes_responsaveis || [];
     return clientes.some((email) => email.trim().toLowerCase() === emailUsuario);
   } else if (userAccessLevel === "sala_tecnica_afirmaevias") {
@@ -18,7 +18,7 @@ const getUserRegionalsAccess = (regional, user, userAccessLevel) => {
       gestores.some((email) => email.trim().toLowerCase() === emailUsuario)
     );
   } else {
-    // laboratorista (user)
+    // laboratorista (user / funcionarios_cliente)
     const laboratoristas = regional.laboratoristas_responsaveis || [];
     return laboratoristas.some(
       (email) => email.trim().toLowerCase() === emailUsuario

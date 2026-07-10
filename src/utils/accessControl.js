@@ -1,8 +1,23 @@
 // Regras de controle de acesso centralizadas
+// cliente_supervisor → tem mesmas permissões de registro que cliente
+// funcionarios_cliente → tem mesmas permissões de registro que user (laboratorista)
+
+// Níveis que se comportam como "cliente" para fins de acesso a registros
+const CLIENTE_LIKE_LEVELS = ['cliente', 'cliente_supervisor'];
+// Níveis que se comportam como "user" (laboratorista) para fins de acesso a registros
+const USER_LIKE_LEVELS = ['user', 'funcionarios_cliente'];
 
 export function getUserAccessLevel(user) {
   if (!user) return 'user';
   return user.access_level || (user.role === 'admin' ? 'admin' : 'user');
+}
+
+/** Normaliza o nível para o equivalente base (cliente_supervisor→cliente, funcionarios_cliente→user) */
+export function getEffectiveAccessLevel(user) {
+  const level = getUserAccessLevel(user);
+  if (level === 'cliente_supervisor') return 'cliente';
+  if (level === 'funcionarios_cliente') return 'user';
+  return level;
 }
 
 export function isAdmin(user) {
@@ -10,7 +25,15 @@ export function isAdmin(user) {
 }
 
 export function isCliente(user) {
-  return getUserAccessLevel(user) === 'cliente';
+  return CLIENTE_LIKE_LEVELS.includes(getUserAccessLevel(user));
+}
+
+export function isClienteSupervisor(user) {
+  return getUserAccessLevel(user) === 'cliente_supervisor';
+}
+
+export function isFuncionarioCliente(user) {
+  return getUserAccessLevel(user) === 'funcionarios_cliente';
 }
 
 export function isGestorContrato(user) {
@@ -22,7 +45,7 @@ export function isSalaTecnica(user) {
 }
 
 export function isLaboratorista(user) {
-  return getUserAccessLevel(user) === 'user';
+  return USER_LIKE_LEVELS.includes(getUserAccessLevel(user));
 }
 
 export function isEngenheiroCliente(user) {
@@ -34,12 +57,12 @@ export function canSeeFilters(user) {
 }
 
 export function canSeeObraChart(user) {
-  const level = getUserAccessLevel(user);
+  const level = getEffectiveAccessLevel(user);
   return level === 'admin' || level === 'cliente';
 }
 
 export function filterRegionaisByUser(regionais, user) {
-  const level = getUserAccessLevel(user);
+  const level = getEffectiveAccessLevel(user);
   return regionais.filter(regional => {
     if (regional.status === 'inativa') return false;
     if (level === 'cliente') {
@@ -60,6 +83,12 @@ export function filterRegionaisByUser(regionais, user) {
         )
       );
     }
+    // user (laboratorista / funcionarios_cliente): pode ver regionais onde está alocado
+    if (level === 'user') {
+      return (regional.laboratoristas_responsaveis || []).some(
+        email => email.toLowerCase() === user.email.toLowerCase()
+      );
+    }
     return false;
   });
 }
@@ -68,21 +97,13 @@ export function filterRegionaisByUser(regionais, user) {
  * Retorna o conjunto de IDs de obras acessíveis ao usuário,
  * baseado nas regionais às quais ele pertence.
  *
- * Núcleo único de permissão de obra — substitui a lógica duplicada
- * em useEnsaiosList, useDashboardData e useNaoConformidadesData.
- *
  * - admin: todas as obras
- * - user (laboratorista): todas as obras (filtragem de registros é por created_by)
- * - cliente/sala_tecnica_afirmaevias/gestor_contrato: obras das regionais vinculadas
- *
- * @param {Array} obras
- * @param {Array} regionais
- * @param {object} user
- * @returns {Set<string>} Set de obra IDs acessíveis
+ * - user (laboratorista / funcionarios_cliente): todas as obras (filtragem de registros é por created_by)
+ * - cliente/cliente_supervisor/sala_tecnica_afirmaevias/gestor_contrato: obras das regionais vinculadas
  */
 export function getAccessibleObraIds(obras, regionais, user) {
   if (!obras || !user) return new Set();
-  const level = getUserAccessLevel(user);
+  const level = getEffectiveAccessLevel(user);
 
   if (level === 'admin' || level === 'user') {
     return new Set(obras.map(o => o.id));

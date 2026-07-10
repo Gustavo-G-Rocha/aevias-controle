@@ -169,7 +169,7 @@ export default function RegionalForm({ regional, users, projects, onSave, onCanc
                  <div>
                      <Label>Laboratoristas Responsáveis</Label>
                       <MultiSelect
-                         options={userOptions.filter(u => users.find(user => user.email === u.value && user.access_level === 'user'))}
+                         options={userOptions.filter(u => users.find(user => user.email === u.value && (user.access_level === 'user' || user.access_level === 'funcionarios_cliente')))}
                          selected={formData.laboratoristas_responsaveis}
                          onSelectedChange={(value) => handleMultiSelectChange('laboratoristas_responsaveis', value)}
                          placeholder="Selecione os laboratoristas"
@@ -201,7 +201,7 @@ export default function RegionalForm({ regional, users, projects, onSave, onCanc
                      <MultiSelect
                         options={userOptions.filter(u => {
                             const user = users.find(user => user.email === u.value);
-                            return user && user.access_level === 'cliente';
+                            return user && (user.access_level === 'cliente' || user.access_level === 'cliente_supervisor');
                         })}
                         selected={formData.clientes_responsaveis || []}
                         onSelectedChange={(value) => handleMultiSelectChange('clientes_responsaveis', value)}

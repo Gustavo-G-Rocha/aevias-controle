@@ -38,7 +38,7 @@ export function useRegionaisData() {
 
       // Carregar users apenas se não for laboratorista (sem permissão de listagem)
       let usersData = [];
-      if (accessLevel !== 'user') {
+      if (accessLevel !== 'user' && accessLevel !== 'funcionarios_cliente') {
         try {
           usersData = await listarUsuarios();
         } catch (e) {

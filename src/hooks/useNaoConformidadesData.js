@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useCurrentUser } from "@/hooks/useQueryData";
-import { getAccessibleObraIds, getUserAccessLevel } from "@/utils/accessControl";
+import { getAccessibleObraIds, getEffectiveAccessLevel } from "@/utils/accessControl";
 import {
   listarRegistros,
   filtrarRegistros,
@@ -27,7 +27,7 @@ const NC_DATA_KEY = ['naoConformidades'];
  * @returns {Promise<{ obras: Array, rncs: Array, checklistNCs: Array }>}
  */
 export async function loadNaoConformidadesData(user) {
-  const level = getUserAccessLevel(user);
+  const level = getEffectiveAccessLevel(user);
   const isFullAccess = level === 'admin' || level === 'user';
 
   // Phase 1: fetch obras + regionais to compute accessible obra IDs

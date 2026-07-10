@@ -2,7 +2,7 @@ import React from "react";
 import { Loader2, Plus } from "lucide-react";
 import { useEnsaiosList } from "@/hooks/useEnsaiosList";
 import { useEnsaiosActions } from "@/hooks/useEnsaiosActions";
-import { isAdmin, isCliente as isClienteUser, isGestorContrato, isSalaTecnica } from "@/utils/accessControl";
+import { isAdmin, isCliente as isClienteUser, isGestorContrato, isSalaTecnica, isLaboratorista } from "@/utils/accessControl";
 import AdminInterface from "@/components/ensaios/AdminInterface";
 import ClienteInterface from "@/components/ensaios/ClienteInterface";
 import LaboratoristaInterface from "@/components/ensaios/LaboratoristaInterface";
@@ -17,7 +17,7 @@ export default function MeusEnsaios() {
   const _isGestorContrato = isGestorContrato(user);
   const _isCliente = isClienteUser(user);
   const canApprove = _isAdmin || _isSalaTecnica || _isGestorContrato;
-  const canCreate = _isAdmin || (!_isSalaTecnica && !_isGestorContrato && !_isCliente);
+  const canCreate = _isAdmin || isLaboratorista(user);
 
   const subtitle = _isAdmin || _isSalaTecnica || _isGestorContrato
     ? "Gerencie e aprove todos os registros de suas obras."

@@ -13,7 +13,7 @@ export const obrasDeRegionais = (regionais, obras) => {
 export const filtrarObrasPorAcesso = (obras, regionais, accessLevel, email) => {
   const emailLow = email.toLowerCase();
 
-  if (accessLevel === 'cliente') {
+  if (accessLevel === 'cliente' || accessLevel === 'cliente_supervisor') {
     const regionaisDoUsuario = regionais.filter(r =>
       (r.clientes_responsaveis || []).some(e => e.toLowerCase() === emailLow)
     );

@@ -184,7 +184,7 @@ export function calcularDensidade(d) {
  */
 export function filtrarObrasParaTrado(obrasData, regionaisData, currentUser) {
   const accessLevel = currentUser.access_level || (currentUser.role === 'admin' ? 'admin' : 'user');
-  const exigeEmAndamento = accessLevel === 'user';
+  const exigeEmAndamento = accessLevel === 'user' || accessLevel === 'funcionarios_cliente';
   const porAcesso = filtrarObrasPorAcessoRegional(obrasData, regionaisData, currentUser);
   return porAcesso.filter(
     o => o.tipo_obra === 'sondagem' && (!exigeEmAndamento || o.status === 'em_andamento')

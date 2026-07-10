@@ -34,7 +34,7 @@ export function useLayoutData() {
       setUser(userData);
       const userAccessLevel = getUserAccessLevel(userData);
 
-      if (userAccessLevel === ACCESS_LEVELS.USER) {
+      if (userAccessLevel === ACCESS_LEVELS.USER || userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE) {
         const [obrasData, regionaisData] = await Promise.all([listarObrasRecentes(), listarRegionais()]);
 
         const emailLower = userData.email.toLowerCase();

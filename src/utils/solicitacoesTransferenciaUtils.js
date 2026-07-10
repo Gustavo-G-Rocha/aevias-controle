@@ -91,7 +91,7 @@ export function filterSolicitacoesByUserAccess(solicitacoes, user, regionais) {
   }
 
   // Laboratorista vê apenas suas próprias solicitações
-  if (accessLevel === 'user') {
+  if (accessLevel === 'user' || accessLevel === 'funcionarios_cliente') {
     return solicitacoes.filter(s => 
       s.laboratorista_email.toLowerCase() === user.email.toLowerCase()
     );

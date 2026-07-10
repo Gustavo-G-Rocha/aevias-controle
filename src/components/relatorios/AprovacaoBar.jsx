@@ -52,7 +52,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
   // Mesma lógica do layout principal:
   // Só laboratoristas comuns (access_level ausente + role='user') NÃO podem aprovar
   const accessLevel = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
-  const canApprove = accessLevel !== 'user';
+  const canApprove = accessLevel !== 'user' && accessLevel !== 'funcionarios_cliente';
 
 
 

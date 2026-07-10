@@ -58,7 +58,7 @@ export function useUsersActions({ currentUser, regionais, loadData }) {
         );
 
         // Alocar na regional se gestor/sala técnica criando laboratorista
-        if (isGestorOrSalaTecnica && userData.access_level === 'user') {
+        if (isGestorOrSalaTecnica && (userData.access_level === 'user' || userData.access_level === 'funcionarios_cliente')) {
           const regionaisDoUsuario = getRegionaisDoUsuario(currentAccessLevel, currentUser.email, regionais);
           const regionalDoUsuario  = regionaisDoUsuario[0];
 
@@ -73,7 +73,7 @@ export function useUsersActions({ currentUser, regionais, loadData }) {
           }
         }
 
-        const successMessage = isGestorOrSalaTecnica && userData.access_level === 'user'
+        const successMessage = isGestorOrSalaTecnica && (userData.access_level === 'user' || userData.access_level === 'funcionarios_cliente')
           ? "Usuário cadastrado com sucesso! O laboratorista foi automaticamente alocado na sua regional. Um convite foi enviado por email."
           : "Usuário cadastrado com sucesso! Um convite foi enviado por email.";
 

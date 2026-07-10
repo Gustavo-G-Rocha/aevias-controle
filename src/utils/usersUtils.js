@@ -13,6 +13,8 @@ export function getAccessLevelLabel(accessLevel) {
     case 'gestor_contrato':          return 'Gestor Contrato';
     case 'user':                     return 'Laboratorista';
     case 'cliente':                  return 'Cliente';
+    case 'cliente_supervisor':       return 'Cliente Supervisor';
+    case 'funcionarios_cliente':     return 'Funcionário Cliente';
     default:                         return 'Desconhecido';
   }
 }
@@ -24,6 +26,8 @@ export function getAccessLevelBadgeVariant(accessLevel) {
     case 'gestor_contrato':          return 'secondary';
     case 'user':                     return 'secondary';
     case 'cliente':                  return 'outline';
+    case 'cliente_supervisor':       return 'outline';
+    case 'funcionarios_cliente':     return 'secondary';
     default:                         return 'secondary';
   }
 }
@@ -88,7 +92,7 @@ export function resolveAccessLevel(user) {
 }
 
 export function deriveRoleFromAccessLevel(accessLevel) {
-  return ['admin', 'sala_tecnica_afirmaevias', 'gestor_contrato'].includes(accessLevel) ? 'admin' : 'user';
+  return ['admin', 'sala_tecnica_afirmaevias', 'gestor_contrato', 'cliente_supervisor'].includes(accessLevel) ? 'admin' : 'user';
 }
 
 // ── Filtro de usuários por regional (para não-admins) ─────────────────────────
@@ -107,17 +111,24 @@ export function getEmailsPermitidosPorRegional(regionaisDoUsuario) {
 }
 
 export function getRegionaisDoUsuario(accessLevel, userEmail, regionais) {
+  const effectiveLevel = accessLevel === 'cliente_supervisor' ? 'cliente'
+    : accessLevel === 'funcionarios_cliente' ? 'user'
+    : accessLevel;
   return regionais.filter(regional => {
-    if (accessLevel === 'sala_tecnica_afirmaevias') {
+    if (effectiveLevel === 'sala_tecnica_afirmaevias') {
       const salas = regional.salas_tecnicas_responsaveis || [];
       return salas.some(e => e.toLowerCase() === userEmail.toLowerCase());
     }
-    if (accessLevel === 'gestor_contrato') {
+    if (effectiveLevel === 'gestor_contrato') {
       return regional.gestor_contrato_responsavel?.toLowerCase() === userEmail.toLowerCase();
     }
-    if (accessLevel === 'cliente') {
+    if (effectiveLevel === 'cliente') {
       const clientes = regional.clientes_responsaveis || [];
       return clientes.some(e => e.toLowerCase() === userEmail.toLowerCase());
+    }
+    if (effectiveLevel === 'user') {
+      const labs = regional.laboratoristas_responsaveis || [];
+      return labs.some(e => e.toLowerCase() === userEmail.toLowerCase());
     }
     return false;
   });
@@ -138,6 +149,7 @@ export function validateEmailDomain(email, accessLevel) {
     }
     return null;
   }
+  // cliente_supervisor e funcionarios_cliente usam os mesmos domínios gerais do cliente/user
   if (!ALLOWED_DOMAINS_GENERAL.includes(domain)) {
     return 'Apenas emails dos domínios autorizados são permitidos: ' + ALLOWED_DOMAINS_GENERAL.join(', ');
   }

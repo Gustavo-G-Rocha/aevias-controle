@@ -177,7 +177,7 @@ export function filtrarObrasDisponiveis(obrasData, regionaisData, currentUser) {
   const accessLevel =
     currentUser.access_level || (currentUser.role === 'admin' ? 'admin' : 'user');
   const tiposSet = new Set(['implantacao', 'conservacao']);
-  const exigeEmAndamento = accessLevel === 'user';
+  const exigeEmAndamento = accessLevel === 'user' || accessLevel === 'funcionarios_cliente';
   const porAcesso = filtrarObrasPorAcessoRegional(obrasData, regionaisData, currentUser);
   return porAcesso.filter(
     obra => tiposSet.has(obra.tipo_obra) && (!exigeEmAndamento || obra.status === 'em_andamento')

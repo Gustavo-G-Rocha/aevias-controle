@@ -3,7 +3,7 @@
 
 import { useMemo, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { getUserAccessLevel, getAccessibleObraIds } from '@/utils/accessControl';
+import { getUserAccessLevel, getEffectiveAccessLevel, getAccessibleObraIds } from '@/utils/accessControl';
 import { useCurrentUser, useAuxData, useAllRecords, QUERY_KEYS } from '@/hooks/useQueryData';
 import { getDataEnsaio } from '@/components/ensaios/ensaioMappers';
 
@@ -24,9 +24,14 @@ export function sortByEnsaioDate(records) {
 export function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccessLevel, obrasData, regionaisData) {
   if (currentUserAccessLevel === 'admin') return combinedEnsaios;
 
-  if (['cliente', 'sala_tecnica_afirmaevias', 'gestor_contrato'].includes(currentUserAccessLevel)) {
+  // Normaliza para nível efetivo (cliente_supervisor→cliente, funcionarios_cliente→user)
+  const effectiveLevel = currentUserAccessLevel === 'cliente_supervisor' ? 'cliente'
+    : currentUserAccessLevel === 'funcionarios_cliente' ? 'user'
+    : currentUserAccessLevel;
+
+  if (['cliente', 'sala_tecnica_afirmaevias', 'gestor_contrato'].includes(effectiveLevel)) {
     const obrasIds = getAccessibleObraIds(obrasData, regionaisData, currentUser);
-    return currentUserAccessLevel === 'cliente'
+    return effectiveLevel === 'cliente'
       ? combinedEnsaios.filter(e => obrasIds.has(e.obra_id) && (e.approved === true || e.client_signature?.signed_by))
       : combinedEnsaios.filter(e => obrasIds.has(e.obra_id));
   }
@@ -62,7 +67,7 @@ export function useEnsaiosList() {
   // Campos específicos que filtrarPorAcesso consome — referências estáveis do React Query
   const obras = auxData?.obras;
   const regionais = auxData?.regionais;
-  const currentUserAccessLevel = user ? getUserAccessLevel(user) : null;
+  const currentUserAccessLevel = user ? getEffectiveAccessLevel(user) : null;
 
   // Memoização com dependências reais: só recalcula a cascata regionais→obras→ensaios
   // quando user, accessLevel, allRecords, obras ou regionais mudam de referência.

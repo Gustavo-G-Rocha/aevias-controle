@@ -8,7 +8,11 @@
  */
 export function getUserAccessLevel(user) {
   if (!user) return 'user';
-  return user.access_level || (user.role === 'admin' ? 'admin' : 'user');
+  const raw = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
+  // Normaliza níveis derivados para o nível base
+  if (raw === 'cliente_supervisor') return 'cliente';
+  if (raw === 'funcionarios_cliente') return 'user';
+  return raw;
 }
 
 /**
@@ -18,7 +22,7 @@ export function calcularPermissoes(accessLevel) {
   const isAdmin = accessLevel === 'admin';
   const isSalaTecnica = accessLevel === 'sala_tecnica_afirmaevias';
   const isGestorContrato = accessLevel === 'gestor_contrato';
-  const isLaboratorista = accessLevel === 'user';
+  const isLaboratorista = accessLevel === 'user' || accessLevel === 'funcionarios_cliente';
   const canManage = isAdmin || isSalaTecnica || isGestorContrato;
   return { isAdmin, isSalaTecnica, isGestorContrato, isLaboratorista, canManage };
 }
@@ -45,7 +49,7 @@ export function filtrarRegionaisPorAcesso(regionaisData, userData, accessLevel) 
     });
   }
 
-  if (accessLevel === 'user') {
+  if (accessLevel === 'user' || accessLevel === 'funcionarios_cliente') {
     return regionaisData.filter(regional => {
       const laboratoristas = regional.laboratoristas_responsaveis || [];
       return laboratoristas.some(email => email.toLowerCase() === userData.email.toLowerCase());

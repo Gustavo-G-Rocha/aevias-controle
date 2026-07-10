@@ -22,7 +22,7 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
   const dataFormatted = getDataFormatted(ensaio);
 
   const editLink = createPageUrl(`${ensaio.entityType}?editId=${ensaio.id}`);
-  const isCliente = user?.access_level === 'cliente';
+  const isCliente = user?.access_level === 'cliente' || user?.access_level === 'cliente_supervisor';
   const podeVerPDF = ensaio.approved === true || ensaio.client_signature?.signed_by;
   const isOwner = (
     (user?.email && ensaio.created_by?.toLowerCase() === user.email.toLowerCase()) ||

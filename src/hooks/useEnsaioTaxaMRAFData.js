@@ -32,7 +32,7 @@ export const useEnsaioTaxaMRAFData = () => {
     let available = auxData.obras.filter(o =>
       o.tipo_obra === 'implantacao' || o.tipo_obra === 'conservacao' || o.tipo_obra === 'supervisao'
     );
-    if (accessLevel === 'user') {
+    if (accessLevel === 'user' || accessLevel === 'funcionarios_cliente') {
       const emailLower = user.email.toLowerCase();
       const regionaisIds = regionais
         .filter(r =>

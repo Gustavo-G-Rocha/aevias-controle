@@ -69,7 +69,7 @@ export function useChecklistConcretagem() {
   const obras = useMemo(() => {
     if (!auxData?.obras || !user) return [];
     const userAccessLevel = user.access_level || (user.role === "admin" ? "admin" : "user");
-    if (userAccessLevel === "user") {
+    if (userAccessLevel === "user" || userAccessLevel === 'funcionarios_cliente') {
       const emailLower = user.email.toLowerCase();
       const regionaisIds = regionais
         .filter(r =>

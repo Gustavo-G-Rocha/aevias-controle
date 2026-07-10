@@ -50,7 +50,7 @@ export function useFormDataLoader({
     // useAccessLevel=true (ensaio): access_level 'user' é laboratorista.
     // useAccessLevel=false (checklist): role !== 'admin' é laboratorista.
     const isLaboratorista = useAccessLevel
-      ? (user.access_level || (user.role === 'admin' ? 'admin' : 'user')) === 'user'
+      ? ['user', 'funcionarios_cliente'].includes(user.access_level || (user.role === 'admin' ? 'admin' : 'user'))
       : user.role !== 'admin';
 
     if (isLaboratorista) {

@@ -28,7 +28,7 @@ export function useBoletimSondagemData() {
   const obras = useMemo(() => {
     if (!auxData?.obras || !user) return [];
     const accessLevel = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
-    if (accessLevel === 'user') {
+    if (accessLevel === 'user' || accessLevel === 'funcionarios_cliente') {
       const emailLower = user.email.toLowerCase();
       const regionaisIds = regionais
         .filter(r =>

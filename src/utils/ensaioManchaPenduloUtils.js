@@ -184,7 +184,7 @@ export const filterObrasPorAcesso = (obras, user, regionais, isAdmin, userAccess
     o.tipo_obra === 'implantacao'
   );
 
-  if (!isAdmin && userAccessLevel === 'user') {
+  if (!isAdmin && userAccessLevel === 'user' || userAccessLevel === 'funcionarios_cliente') {
     return filtrarObrasPorAcessoRegional(porTipo, regionais, user);
   }
 

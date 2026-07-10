@@ -119,7 +119,7 @@ const CreateEnsaioDialog = React.memo(({ onSelect, user, obrasDoUsuario }) => {
         </>
       )}
 
-      {categoriasDisponiveis.length === 0 && (!user || user.access_level !== "user" || obrasDoUsuario?.length > 0) && (
+      {categoriasDisponiveis.length === 0 && (!user || (user.access_level !== "user" && user.access_level !== "funcionarios_cliente") || obrasDoUsuario?.length > 0) && (
         <div className="text-center py-8">
           <AlertTriangle className="w-12 h-12 text-primary mx-auto mb-3" />
           <p className="text-sm text-muted-foreground">Nenhum tipo de ensaio disponível para as obras alocadas.</p>

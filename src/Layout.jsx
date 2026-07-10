@@ -28,9 +28,9 @@ const AppLayout = ({ children, currentPageName }) => {
   const isAdmin = userAccessLevel === ACCESS_LEVELS.ADMIN || user?.role === ACCESS_LEVELS.ADMIN;
   const isSalaTecnica = userAccessLevel === ACCESS_LEVELS.SALA_TECNICA;
   const isGestorContrato = userAccessLevel === ACCESS_LEVELS.GESTOR_CONTRATO;
-  const isCliente = userAccessLevel === ACCESS_LEVELS.CLIENTE;
+  const isCliente = userAccessLevel === ACCESS_LEVELS.CLIENTE || userAccessLevel === ACCESS_LEVELS.CLIENTE_SUPERVISOR;
   const canManageSystem = isAdmin;
-  const canCreateRecords = !loadingUser && (isAdmin || (!isSalaTecnica && !isGestorContrato && !isCliente));
+  const canCreateRecords = !loadingUser && (isAdmin || userAccessLevel === ACCESS_LEVELS.USER || userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE);
 
   return (
     <SidebarProvider>

@@ -30,7 +30,7 @@ export const filterRegionaisByAccessLevel = (regionais, user) => {
     });
   }
   
-  if (userAccessLevel === 'cliente') {
+  if (userAccessLevel === 'cliente' || userAccessLevel === 'cliente_supervisor') {
     const emailUsuario = user.email.toLowerCase();
     return regionais.filter(r => {
       if (r.status !== 'ativa') return false;
@@ -38,9 +38,9 @@ export const filterRegionaisByAccessLevel = (regionais, user) => {
       return clientes.some(email => email.toLowerCase() === emailUsuario);
     });
   }
-  
-  // laboratorista (user)
-  if (userAccessLevel === 'user') {
+
+  // laboratorista (user / funcionarios_cliente)
+  if (userAccessLevel === 'user' || userAccessLevel === 'funcionarios_cliente') {
     return regionais.filter(r => {
       if (r.status !== 'ativa') return false;
       const laboratoristas = r.laboratoristas_responsaveis || [];
@@ -72,7 +72,7 @@ export const filterRegionaisByAccessLevel = (regionais, user) => {
 export const filtrarObrasPorAcessoRegional = (obras, regionais, user) => {
   if (!obras || !regionais || !user) return [];
   const accessLevel = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
-  if (accessLevel !== 'user') return obras;
+  if (accessLevel !== 'user' && accessLevel !== 'funcionarios_cliente') return obras;
   const emailLower = (user.email || '').toLowerCase();
   const regionaisIds = regionais
     .filter(r =>
