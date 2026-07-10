@@ -41,7 +41,7 @@
       "$or": [
         {
           "user_condition": {
-            "role": "admin"
+            "data.access_level": "admin"
           }
         },
         {
@@ -51,13 +51,20 @@
     },
     "create": {},
     "update": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "data.access_level": "admin"
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
     },
     "delete": {
       "user_condition": {
-        "role": "admin"
+        "data.access_level": "admin"
       }
     }
   }
