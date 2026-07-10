@@ -49,6 +49,13 @@ export function filtrarRegionaisPorAcesso(regionaisData, userData, accessLevel) 
     });
   }
 
+  if (accessLevel === 'cliente') {
+    return regionaisData.filter(regional => {
+      const clientes = regional.clientes_responsaveis || [];
+      return clientes.some(email => email?.toLowerCase() === userData.email.toLowerCase());
+    });
+  }
+
   if (accessLevel === 'user' || accessLevel === 'funcionarios_cliente') {
     return regionaisData.filter(regional => {
       const laboratoristas = regional.laboratoristas_responsaveis || [];
@@ -56,7 +63,7 @@ export function filtrarRegionaisPorAcesso(regionaisData, userData, accessLevel) 
     });
   }
 
-  // admin e sala_tecnica vêem tudo
+  // admin vê tudo
   return regionaisData;
 }
 
