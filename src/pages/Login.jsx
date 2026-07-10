@@ -4,9 +4,9 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LogIn, Mail, Lock, Loader2 } from "lucide-react";
-import AuthLayout from "@/components/AuthLayout";
-import GoogleIcon from "@/components/GoogleIcon";
+import { Mail, Lock, Loader2, LogIn } from "lucide-react";
+
+const LOGO_URL = "https://www.afirmaevias.com.br/wp-content/uploads/2025/05/Logo.png";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -22,104 +22,143 @@ export default function Login() {
       await base44.auth.loginViaEmailPassword(email, password);
       window.location.href = "/";
     } catch (err) {
-      setError(err.message || "Invalid email or password");
+      setError(err.message || "E-mail ou senha inválidos");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGoogle = () => {
-    base44.auth.loginWithProvider("google", "/");
-  };
-
   return (
-    <AuthLayout
-      icon={LogIn}
-      title="Welcome back"
-      subtitle="Log in to your account"
-      footer={
-        <>
-          Don't have an account?{" "}
-          <Link to="/register" className="text-primary font-medium hover:underline">
-            Create one
-          </Link>
-        </>
-      }
+    <div
+      className="min-h-screen flex items-center justify-center px-4"
+      style={{ backgroundColor: "var(--color-primary)" }}
     >
-      <Button
-        variant="outline"
-        className="w-full h-12 text-sm font-medium mb-6"
-        onClick={handleGoogle}
-      >
-        <GoogleIcon className="w-5 h-5 mr-2" />
-        Continue with Google
-      </Button>
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <img
+            src={LOGO_URL}
+            alt="Afirma Evias"
+            className="h-16 mx-auto mb-4 object-contain"
+          />
+          <h1
+            className="text-2xl font-bold tracking-tight"
+            style={{ color: "var(--color-sidebar-text)", fontFamily: "var(--font-heading)" }}
+          >
+            Bem-vindo de volta
+          </h1>
+          <p
+            className="mt-1 text-sm"
+            style={{ color: "var(--color-sidebar-text-muted)" }}
+          >
+            Acesse sua conta para continuar
+          </p>
+        </div>
 
-      <div className="relative mb-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-card px-3 text-muted-foreground">or</span>
-        </div>
-      </div>
-
-      {error && (
-        <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-          {error}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              autoFocus
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="pl-10 h-12"
-              required
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
-            <Link to="/forgot-password" className="text-xs text-primary hover:underline">
-              Forgot password?
-            </Link>
-          </div>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-            <Input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 h-12"
-              required
-            />
-          </div>
-        </div>
-        <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Logging in...
-            </>
-          ) : (
-            "Log in"
+        <div
+          className="rounded-2xl border p-8"
+          style={{
+            backgroundColor: "var(--color-surface)",
+            borderColor: "var(--color-border)",
+            boxShadow: "var(--shadow-lg)",
+          }}
+        >
+          {error && (
+            <div
+              className="mb-4 p-3 rounded-lg text-sm"
+              style={{
+                backgroundColor: "var(--color-danger-bg)",
+                color: "var(--color-danger)",
+              }}
+            >
+              {error}
+            </div>
           )}
-        </Button>
-      </form>
-    </AuthLayout>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">E-mail</Label>
+              <div className="relative">
+                <Mail
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+                  style={{ color: "var(--color-text-subtle)" }}
+                  aria-hidden="true"
+                />
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  autoFocus
+                  placeholder="seu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10 h-12"
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Senha</Label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs hover:underline"
+                  style={{ color: "var(--color-primary)" }}
+                >
+                  Esqueceu a senha?
+                </Link>
+              </div>
+              <div className="relative">
+                <Lock
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+                  style={{ color: "var(--color-text-subtle)" }}
+                  aria-hidden="true"
+                />
+                <Input
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10 h-12"
+                  required
+                />
+              </div>
+            </div>
+            <Button
+              type="submit"
+              className="w-full h-12 font-medium"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Entrando...
+                </>
+              ) : (
+                <>
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Entrar
+                </>
+              )}
+            </Button>
+          </form>
+        </div>
+
+        <p
+          className="text-center text-sm mt-6"
+          style={{ color: "var(--color-sidebar-text-muted)" }}
+        >
+          Não tem uma conta?{" "}
+          <Link
+            to="/register"
+            className="font-medium hover:underline"
+            style={{ color: "var(--color-secondary)" }}
+          >
+            Criar conta
+          </Link>
+        </p>
+      </div>
+    </div>
   );
 }
