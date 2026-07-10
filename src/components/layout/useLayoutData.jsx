@@ -57,8 +57,13 @@ export function useLayoutData() {
         }
 
         const regionaisSet = new Set(regionaisIds);
+        // funcionarios_cliente: vê todas as obras da regional do supervisor (independente de status);
+        // user (laboratorista): apenas obras em andamento
+        const statusFilter = userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE
+          ? () => true
+          : (o) => o.status === "em_andamento";
         const obrasRegional = regionaisIds.length > 0
-          ? obrasData.filter(o => regionaisSet.has(o.regional_id) && o.status === "em_andamento")
+          ? obrasData.filter(o => regionaisSet.has(o.regional_id) && statusFilter(o))
           : [];
 
         setObrasDoUsuario(obrasRegional);
