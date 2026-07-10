@@ -18,6 +18,8 @@ export const ACCESS_LEVELS = {
   SALA_TECNICA: 'sala_tecnica_afirmaevias',
   GESTOR_CONTRATO: 'gestor_contrato',
   CLIENTE: 'cliente',
+  CLIENTE_SUPERVISOR: 'cliente_supervisor',
+  FUNCIONARIOS_CLIENTE: 'funcionarios_cliente',
   USER: 'user',
 };
 
