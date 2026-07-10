@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Lock, Loader2, AlertTriangle } from "lucide-react";
-import AuthLayout from "@/components/AuthLayout";
+
+const LOGO_URL = "https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/290985b58_AE-LogoHorPrincipal_2.png";
 
 export default function ResetPassword() {
   const [searchParams] = useSearchParams();
@@ -20,7 +21,7 @@ export default function ResetPassword() {
     e.preventDefault();
     setError("");
     if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
+      setError("As senhas não coincidem");
       return;
     }
     setLoading(true);
@@ -28,7 +29,7 @@ export default function ResetPassword() {
       await base44.auth.resetPassword({ resetToken, newPassword });
       window.location.href = "/login";
     } catch (err) {
-      setError(err.message || "Failed to reset password");
+      setError(err.message || "Falha ao redefinir senha");
     } finally {
       setLoading(false);
     }
@@ -36,79 +37,172 @@ export default function ResetPassword() {
 
   if (!resetToken) {
     return (
-      <AuthLayout
-        icon={AlertTriangle}
-        title="Invalid reset link"
-        subtitle="This password reset link is missing or invalid"
-        footer={
-          <Link to="/forgot-password" className="text-primary font-medium hover:underline">
-            Request a new link
-          </Link>
-        }
+      <div
+        className="min-h-screen flex items-center justify-center px-4"
+        style={{ backgroundColor: "var(--color-primary)" }}
       >
-        <p className="text-sm text-foreground text-center">
-          The link you used appears to be incomplete. Please request a new password reset email.
-        </p>
-      </AuthLayout>
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <img
+              src={LOGO_URL}
+              alt="Afirma Evias"
+              className="h-16 mx-auto mb-4 object-contain"
+            />
+            <h1
+              className="text-2xl font-bold tracking-tight"
+              style={{ color: "var(--color-sidebar-text)", fontFamily: "var(--font-heading)" }}
+            >
+              Link inválido
+            </h1>
+            <p
+              className="mt-1 text-sm"
+              style={{ color: "var(--color-sidebar-text-muted)" }}
+            >
+              Este link de recuperação está ausente ou é inválido
+            </p>
+          </div>
+
+          <div
+            className="rounded-2xl border p-8"
+            style={{
+              backgroundColor: "var(--color-surface)",
+              borderColor: "var(--color-border)",
+              boxShadow: "var(--shadow-lg)",
+            }}
+          >
+            <p
+              className="text-sm text-center"
+              style={{ color: "var(--color-text)" }}
+            >
+              O link utilizado parece estar incompleto. Solicite um novo e-mail de recuperação de senha.
+            </p>
+          </div>
+
+          <p
+            className="text-center text-sm mt-6"
+            style={{ color: "var(--color-sidebar-text-muted)" }}
+          >
+            <Link
+              to="/forgot-password"
+              className="font-medium hover:underline"
+              style={{ color: "var(--color-secondary)" }}
+            >
+              Solicitar novo link
+            </Link>
+          </p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <AuthLayout
-      icon={Lock}
-      title="New password"
-      subtitle="Enter your new password below"
+    <div
+      className="min-h-screen flex items-center justify-center px-4"
+      style={{ backgroundColor: "var(--color-primary)" }}
     >
-      {error && (
-        <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-          {error}
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <img
+            src={LOGO_URL}
+            alt="Afirma Evias"
+            className="h-16 mx-auto mb-4 object-contain"
+          />
+          <h1
+            className="text-2xl font-bold tracking-tight"
+            style={{ color: "var(--color-sidebar-text)", fontFamily: "var(--font-heading)" }}
+          >
+            Nova senha
+          </h1>
+          <p
+            className="mt-1 text-sm"
+            style={{ color: "var(--color-sidebar-text-muted)" }}
+          >
+            Digite sua nova senha abaixo
+          </p>
         </div>
-      )}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="password">New Password</Label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-            <Input
-              id="password"
-              type="password"
-              autoComplete="new-password"
-              autoFocus
-              placeholder="••••••••"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="pl-10 h-12"
-              required
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="confirm">Confirm Password</Label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-            <Input
-              id="confirm"
-              type="password"
-              autoComplete="new-password"
-              placeholder="••••••••"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="pl-10 h-12"
-              required
-            />
-          </div>
-        </div>
-        <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Resetting...
-            </>
-          ) : (
-            "Reset password"
+
+        <div
+          className="rounded-2xl border p-8"
+          style={{
+            backgroundColor: "var(--color-surface)",
+            borderColor: "var(--color-border)",
+            boxShadow: "var(--shadow-lg)",
+          }}
+        >
+          {error && (
+            <div
+              className="mb-4 p-3 rounded-lg text-sm"
+              style={{
+                backgroundColor: "var(--color-danger-bg)",
+                color: "var(--color-danger)",
+              }}
+            >
+              {error}
+            </div>
           )}
-        </Button>
-      </form>
-    </AuthLayout>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="password">Nova senha</Label>
+              <div className="relative">
+                <Lock
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+                  style={{ color: "var(--color-text-subtle)" }}
+                  aria-hidden="true"
+                />
+                <Input
+                  id="password"
+                  type="password"
+                  autoComplete="new-password"
+                  autoFocus
+                  placeholder="••••••••"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="pl-10 h-12"
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirm">Confirmar senha</Label>
+              <div className="relative">
+                <Lock
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+                  style={{ color: "var(--color-text-subtle)" }}
+                  aria-hidden="true"
+                />
+                <Input
+                  id="confirm"
+                  type="password"
+                  autoComplete="new-password"
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="pl-10 h-12"
+                  required
+                />
+              </div>
+            </div>
+            <Button
+              type="submit"
+              className="w-full h-12 font-medium"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Redefinindo...
+                </>
+              ) : (
+                <>
+                  <Lock className="w-4 h-4 mr-2" />
+                  Redefinir senha
+                </>
+              )}
+            </Button>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }
