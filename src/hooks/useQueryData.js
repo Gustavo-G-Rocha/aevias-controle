@@ -59,8 +59,19 @@ export function useRecordCacheUpdate() {
 
   const updateRecord = useCallback((updatedRecord) => {
     if (!updatedRecord?.id) return;
+    // Atualiza cache allRecords (admin, gestor, sala_tecnica, laboratorista)
     queryClient.setQueriesData(
       { queryKey: QUERY_KEYS.allRecords },
+      (oldData) => {
+        if (!Array.isArray(oldData)) return oldData;
+        return oldData.map(r =>
+          r.id === updatedRecord.id ? { ...r, ...updatedRecord } : r
+        );
+      }
+    );
+    // Atualiza cache supervisorRecords (cliente_supervisor)
+    queryClient.setQueriesData(
+      { queryKey: ['supervisorRecords'] },
       (oldData) => {
         if (!Array.isArray(oldData)) return oldData;
         return oldData.map(r =>
@@ -74,6 +85,13 @@ export function useRecordCacheUpdate() {
     if (!recordId) return;
     queryClient.setQueriesData(
       { queryKey: QUERY_KEYS.allRecords },
+      (oldData) => {
+        if (!Array.isArray(oldData)) return oldData;
+        return oldData.filter(r => r.id !== recordId);
+      }
+    );
+    queryClient.setQueriesData(
+      { queryKey: ['supervisorRecords'] },
       (oldData) => {
         if (!Array.isArray(oldData)) return oldData;
         return oldData.filter(r => r.id !== recordId);

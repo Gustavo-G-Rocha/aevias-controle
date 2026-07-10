@@ -2,10 +2,11 @@
 // Cache compartilhado com useDashboardData: mesma query key = zero recarregamentos ao navegar
 
 import { useMemo, useCallback } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getUserAccessLevel, getAccessibleObraIds } from '@/utils/accessControl';
 import { useCurrentUser, useAuxData, useAllRecords, QUERY_KEYS } from '@/hooks/useQueryData';
 import { getDataEnsaio } from '@/components/ensaios/ensaioMappers';
+import { carregarRegistrosSupervisor } from '@/services/supervisorRecordsService';
 
 export function sortByEnsaioDate(records) {
   return [...records].sort((a, b) => {
@@ -67,33 +68,58 @@ export function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccess
   });
 }
 
+// Hook específico para cliente_supervisor: busca registros via backend function
+// que usa asServiceRole, contornando o RLS que não retorna registros de subordinados
+function useSupervisorRecords(user, enabled) {
+  return useQuery({
+    queryKey: ['supervisorRecords', user?.email],
+    queryFn: () => carregarRegistrosSupervisor(),
+    enabled,
+    staleTime: 10 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+  });
+}
+
 export function useEnsaiosList() {
   const queryClient = useQueryClient();
   const { data: user, isLoading: loadingUser } = useCurrentUser();
   const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true, needsUsers: true });
-  const { data: allRecords, isLoading: loadingRecords } = useAllRecords('list');
 
-  // Invalida o cache de registros para forçar recarregamento após ações (aprovar/excluir)
+  const currentUserAccessLevel = user ? getUserAccessLevel(user) : null;
+  const isSupervisor = currentUserAccessLevel === 'cliente_supervisor';
+
+  // Para cliente_supervisor: usa backend function (asServiceRole) em vez de SDK direto
+  const { data: allRecords, isLoading: loadingRecords } = useAllRecords('list');
+  const { data: supervisorRecords, isLoading: loadingSupervisorRecords } = useSupervisorRecords(user, isSupervisor);
+
+  // Invalida ambos os caches para forçar recarregamento após ações (aprovar/excluir)
   const reload = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords });
+    queryClient.invalidateQueries({ queryKey: ['supervisorRecords'] });
   }, [queryClient]);
 
-  const loading = loadingUser || loadingAux || loadingRecords;
+  const loading = loadingUser || loadingAux || (isSupervisor ? loadingSupervisorRecords : loadingRecords);
 
   // Campos específicos que filtrarPorAcesso consome — referências estáveis do React Query
   const obras = auxData?.obras;
   const regionais = auxData?.regionais;
   const allUsers = auxData?.users ?? [];
-  // Passa o nível RAW (não normalizado) — filtrarPorAcesso trata cliente_supervisor especial
-  const currentUserAccessLevel = user ? getUserAccessLevel(user) : null;
 
-  // Memoização com dependências reais: só recalcula a cascata regionais→obras→ensaios
-  // quando user, accessLevel, allRecords, obras ou regionais mudam de referência.
+  // Para supervisor: os registros já vêm filtrados do backend (obras + subordinados)
+  // Para outros: usa filtrarPorAcesso no frontend
   const ensaios = useMemo(() => {
-    if (!user || !obras || !allRecords) return [];
+    if (!user || !obras) return [];
+
+    const records = isSupervisor ? (supervisorRecords ?? []) : (allRecords ?? []);
+    if (!records.length) return [];
+
+    // Supervisor: registros já vêm filtrados do backend, só ordenar
+    if (isSupervisor) {
+      return sortByEnsaioDate(records);
+    }
 
     const filtered = filtrarPorAcesso(
-      allRecords,
+      records,
       user,
       currentUserAccessLevel,
       obras,
@@ -101,7 +127,7 @@ export function useEnsaiosList() {
       allUsers
     );
     return sortByEnsaioDate(filtered);
-  }, [user, currentUserAccessLevel, allRecords, obras, regionais, allUsers]);
+  }, [user, currentUserAccessLevel, allRecords, supervisorRecords, obras, regionais, allUsers, isSupervisor]);
 
   return {
     ensaios,
