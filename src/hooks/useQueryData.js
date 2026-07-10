@@ -21,7 +21,8 @@ export function useCurrentUser() {
   return useQuery({
     queryKey: QUERY_KEYS.currentUser,
     queryFn: () => base44.auth.me(),
-    staleTime: 5 * 60 * 1000, // usuário muda pouco — 5 min
+    staleTime: 30 * 1000, // 30s — access_level pode mudar via admin; precisa estar fresco
+    refetchOnMount: true,
   });
 }
 

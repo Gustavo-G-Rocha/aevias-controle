@@ -18,7 +18,7 @@ export default function MeusEnsaios() {
   const _isCliente = isClienteUser(user);
   const _isClienteSupervisor = isClienteSupervisor(user);
   const canApprove = _isAdmin || _isSalaTecnica || _isGestorContrato || _isClienteSupervisor;
-  const canCreate = _isAdmin || isLaboratorista(user);
+  const canCreate = _isAdmin || isLaboratorista(user) || _isClienteSupervisor;
 
   // Para cliente_supervisor: canApproveRecord verifica por-regional se é supervisor.
   // Outros approvers (admin, sala_tecnica, gestor_contrato) têm canApprove global.
