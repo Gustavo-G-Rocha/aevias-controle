@@ -102,9 +102,9 @@ export default function Login() {
                 <Link
                   to="/forgot-password"
                   className="text-xs hover:underline"
-                  style={{ color: "var(--color-primary)" }}
+                  style={{ color: "var(--color-secondary)" }}
                 >
-                  Esqueceu a senha?
+                  Esqueci minha senha
                 </Link>
               </div>
               <div className="relative">
