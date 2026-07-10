@@ -10,6 +10,9 @@ const TOOLTIP_STYLE = {
   boxShadow: 'var(--shadow-md)',
 };
 
+const TOOLTIP_ITEM_STYLE = { color: 'var(--color-text)' };
+const TOOLTIP_LABEL_STYLE = { color: 'var(--color-text-muted)' };
+
 export default function RecordsByTypeChart({ data, activeTipoRegistro, onSliceClick }) {
   if (!data.length) return null;
   return (
@@ -31,7 +34,7 @@ export default function RecordsByTypeChart({ data, activeTipoRegistro, onSliceCl
             <CartesianGrid stroke="none" />
             <XAxis type="number" stroke="var(--color-text-subtle)" allowDecimals={false} domain={[0, dataMax => Math.ceil(dataMax * 1.2)]} />
             <YAxis type="category" dataKey="name" stroke="var(--color-text-subtle)" width={140} tick={{ fontSize: 12 }} />
-            <Tooltip contentStyle={TOOLTIP_STYLE} />
+            <Tooltip contentStyle={TOOLTIP_STYLE} itemStyle={TOOLTIP_ITEM_STYLE} labelStyle={TOOLTIP_LABEL_STYLE} />
             <Bar dataKey="value" name="Registros" radius={[0, 4, 4, 0]} style={{ cursor: 'pointer' }}>
               {data.map((entry, index) => (
                 <Cell
