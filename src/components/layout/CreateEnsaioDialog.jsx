@@ -72,7 +72,7 @@ const CreateEnsaioDialog = React.memo(({ onSelect, user, obrasDoUsuario }) => {
     onSelect();
   }, [navigate, onSelect]);
 
-  if (user?.access_level === ACCESS_LEVELS.USER && obrasDoUsuario?.length === 0) {
+  if ((user?.access_level === ACCESS_LEVELS.USER || user?.access_level === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE) && obrasDoUsuario?.length === 0) {
     return (
       <div className="text-center py-12 px-4">
         <AlertTriangle className="w-16 h-16 text-primary mx-auto mb-4" />

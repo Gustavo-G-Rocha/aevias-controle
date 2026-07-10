@@ -38,12 +38,23 @@ export function useLayoutData() {
         const [obrasData, regionaisData] = await Promise.all([listarObrasRecentes(), listarRegionais()]);
 
         const emailLower = userData.email.toLowerCase();
-        const regionaisIds = regionaisData
-          .filter(r =>
-            (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-            (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-          )
-          .map(r => r.id);
+        const supervisorEmailLower = userData.supervisor_email?.toLowerCase();
+
+        let regionaisIds;
+        if (userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE && supervisorEmailLower) {
+          // funcionarios_cliente: encontra regionais do seu supervisor (cliente_supervisor)
+          regionaisIds = regionaisData
+            .filter(r => (r.clientes_responsaveis || []).some(e => e.toLowerCase() === supervisorEmailLower))
+            .map(r => r.id);
+        } else {
+          // user (laboratorista): regionais onde está alocado
+          regionaisIds = regionaisData
+            .filter(r =>
+              (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+              (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+            )
+            .map(r => r.id);
+        }
 
         const regionaisSet = new Set(regionaisIds);
         const obrasRegional = regionaisIds.length > 0
