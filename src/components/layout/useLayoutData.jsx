@@ -67,6 +67,18 @@ export function useLayoutData() {
           : [];
 
         setObrasDoUsuario(obrasRegional);
+      } else if (userAccessLevel === ACCESS_LEVELS.CLIENTE || userAccessLevel === ACCESS_LEVELS.CLIENTE_SUPERVISOR) {
+        // cliente / cliente_supervisor: apenas obras das regionais onde seu email está em clientes_responsaveis
+        const [obrasData, regionaisData] = await Promise.all([listarObrasRecentes(), listarRegionais()]);
+        const emailLower = userData.email.toLowerCase();
+        const regionaisIds = regionaisData
+          .filter(r => (r.clientes_responsaveis || []).some(e => e.toLowerCase() === emailLower))
+          .map(r => r.id);
+        const regionaisSet = new Set(regionaisIds);
+        const obrasRegional = regionaisIds.length > 0
+          ? obrasData.filter(o => regionaisSet.has(o.regional_id))
+          : [];
+        setObrasDoUsuario(obrasRegional.length > 0 ? obrasRegional : ALL_OBRA_TYPE_STUBS);
       } else {
         setObrasDoUsuario(ALL_OBRA_TYPE_STUBS);
       }
