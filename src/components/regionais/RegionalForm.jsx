@@ -70,6 +70,7 @@ export default function RegionalForm({ regional, users, projects, onSave, onCanc
         gestores_contrato_responsaveis: regional?.gestores_contrato_responsaveis?.length > 0 ? regional.gestores_contrato_responsaveis : (regional?.gestor_contrato_responsavel ? [regional.gestor_contrato_responsavel] : []),
         salas_tecnicas_responsaveis: regional?.salas_tecnicas_responsaveis || [],
         clientes_responsaveis: regional?.clientes_responsaveis || [],
+        supervisores_responsaveis: regional?.supervisores_responsaveis || [],
         descricao: regional?.descricao || "",
         logo_url: regional?.logo_url || "",
     });
@@ -206,9 +207,23 @@ export default function RegionalForm({ regional, users, projects, onSave, onCanc
                         selected={formData.clientes_responsaveis || []}
                         onSelectedChange={(value) => handleMultiSelectChange('clientes_responsaveis', value)}
                         placeholder="Selecione os clientes"
-                    />
-                </div>
-            </div>
+                        />
+                        </div>
+                        </div>
+
+                        <div>
+                        <Label>Supervisores Responsáveis (Cliente Supervisor)</Label>
+                        <p className="text-xs text-muted-foreground mb-2">Cliente Supervisor com poder de aprovação nesta regional. Os demais clientes terão apenas função de assinatura.</p>
+                        <MultiSelect
+                        options={userOptions.filter(u => {
+                        const user = users.find(user => user.email === u.value);
+                        return user && user.access_level === 'cliente_supervisor';
+                        })}
+                        selected={formData.supervisores_responsaveis || []}
+                        onSelectedChange={(value) => handleMultiSelectChange('supervisores_responsaveis', value)}
+                        placeholder="Selecione os supervisores"
+                        />
+                        </div>
 
             <div>
                 <Label htmlFor="status">Status</Label>

@@ -120,16 +120,25 @@ function canApprove(user) {
   return APPROVER_LEVELS.includes(level);
 }
 
-function canDelete(user, record) {
+// Para cliente_supervisor: canApprove global é true, mas a verificação
+// per-regional é feada por verifyTenantAccess → isSupervisor.
+// Esta função apenas checa se o nível tem POTENCIAL de aprovar.
+// O enforcement real está no handler: se level === 'cliente_supervisor'
+// e tenantCheck.isSupervisor === false, a aprovação é bloqueada.
+
+function canDelete(user, record, isSupervisor) {
   // admin: pode excluir qualquer registro
   if (getUserAccessLevel(user) === 'admin') return true;
 
   // laboratorista: apenas registros que criou
   if (record.created_by === user.email || record.created_by_id === user.id) return true;
 
-  // approver-level (sala_tecnica, gestor_contrato, cliente_supervisor): podem excluir registros do seu tenant
-  // (tenant já validado por verifyTenantAccess acima)
-  return APPROVER_LEVELS.includes(getUserAccessLevel(user));
+  // cliente_supervisor: só pode excluir se for supervisor nesta regional
+  const level = getUserAccessLevel(user);
+  if (level === 'cliente_supervisor') return Boolean(isSupervisor);
+
+  // approver-level (sala_tecnica, gestor_contrato): podem excluir registros do seu tenant
+  return APPROVER_LEVELS.includes(level);
 }
 
 // ── DEFENSE-IN-DEPTH: validação funcional de tenant ──────────────────
@@ -191,7 +200,12 @@ async function verifyTenantAccess(base44, user, entityName, record) {
   // cliente e cliente_supervisor: mesmas regionais (clientes_responsaveis)
   if (effectiveLevel === 'cliente') {
     const emails = (regional.clientes_responsaveis || []).map((e) => e.toLowerCase());
-    if (emails.includes(userEmail)) return { allowed: true };
+    if (emails.includes(userEmail)) {
+      // cliente_supervisor: verifica se é supervisor nesta regional
+      const supervisores = (regional.supervisores_responsaveis || []).map((e) => e.toLowerCase());
+      const isSupervisor = level === 'cliente_supervisor' && supervisores.includes(userEmail);
+      return { allowed: true, isSupervisor };
+    }
   } else if (effectiveLevel === 'sala_tecnica_afirmaevias') {
     const emails = (regional.salas_tecnicas_responsaveis || []).map((e) => e.toLowerCase());
     if (emails.includes(userEmail)) return { allowed: true };
@@ -290,9 +304,9 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'approve') {
-      if (!canApprove(user)) {
+      if (!canApprove(user) || (level === 'cliente_supervisor' && !tenantCheck.isSupervisor)) {
         return Response.json(
-          { error: 'Sem permissão para aprovar registros', errorCategory: 'permission' },
+          { error: 'Sem permissão para aprovar registros nesta regional', errorCategory: 'permission' },
           { status: 403 }
         );
       }
@@ -315,9 +329,9 @@ Deno.serve(async (req) => {
       };
       updateData.rejection_reason = null;
     } else if (action === 'reject') {
-      if (!canApprove(user)) {
+      if (!canApprove(user) || (level === 'cliente_supervisor' && !tenantCheck.isSupervisor)) {
         return Response.json(
-          { error: 'Sem permissão para reprovar registros', errorCategory: 'permission' },
+          { error: 'Sem permissão para reprovar registros nesta regional', errorCategory: 'permission' },
           { status: 403 }
         );
       }
@@ -436,7 +450,7 @@ Deno.serve(async (req) => {
     } else if (action === 'delete') {
       // Registro já foi buscado e tenant-validado acima.
       // Permissão de exclusão: criador OU approver-level (espelha RLS de delete).
-      if (!canDelete(user, existingRecord)) {
+      if (!canDelete(user, existingRecord, tenantCheck.isSupervisor)) {
         return Response.json(
           { error: 'Sem permissão para excluir este registro', errorCategory: 'permission' },
           { status: 403 }

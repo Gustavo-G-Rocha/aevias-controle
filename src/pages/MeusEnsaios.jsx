@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { Loader2, Plus } from "lucide-react";
 import { useEnsaiosList } from "@/hooks/useEnsaiosList";
 import { useEnsaiosActions } from "@/hooks/useEnsaiosActions";
-import { isAdmin, isCliente as isClienteUser, isGestorContrato, isSalaTecnica, isLaboratorista, isClienteSupervisor } from "@/utils/accessControl";
+import { isAdmin, isCliente as isClienteUser, isGestorContrato, isSalaTecnica, isLaboratorista, isClienteSupervisor, isSupervisorInRegional } from "@/utils/accessControl";
 import AdminInterface from "@/components/ensaios/AdminInterface";
 import ClienteInterface from "@/components/ensaios/ClienteInterface";
 import LaboratoristaInterface from "@/components/ensaios/LaboratoristaInterface";
@@ -19,6 +19,17 @@ export default function MeusEnsaios() {
   const _isClienteSupervisor = isClienteSupervisor(user);
   const canApprove = _isAdmin || _isSalaTecnica || _isGestorContrato || _isClienteSupervisor;
   const canCreate = _isAdmin || isLaboratorista(user);
+
+  // Para cliente_supervisor: canApproveRecord verifica por-regional se é supervisor.
+  // Outros approvers (admin, sala_tecnica, gestor_contrato) têm canApprove global.
+  const obrasMap = React.useMemo(() => new Map((obras || []).map(o => [o.id, o])), [obras]);
+  const regionaisMap = React.useMemo(() => new Map((regionais || []).map(r => [r.id, r])), [regionais]);
+  const canApproveRecord = React.useCallback((ensaio) => {
+    if (!canApprove) return false;
+    const obra = obrasMap.get(ensaio.obra_id);
+    const regional = obra ? regionaisMap.get(obra.regional_id) : null;
+    return isSupervisorInRegional(user, regional);
+  }, [canApprove, obrasMap, regionaisMap, user]);
 
   const subtitle = _isAdmin || _isSalaTecnica || _isGestorContrato
     ? "Gerencie e aprove todos os registros de suas obras."
@@ -64,6 +75,7 @@ export default function MeusEnsaios() {
             onDelete={handleDelete}
             user={user}
             canApprove={canApprove}
+            canApproveRecord={canApproveRecord}
             canCreate={canCreate}
             allUsers={allUsers}
             regionais={regionais}

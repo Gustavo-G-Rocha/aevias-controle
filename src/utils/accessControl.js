@@ -48,6 +48,36 @@ export function isLaboratorista(user) {
   return USER_LIKE_LEVELS.includes(getUserAccessLevel(user));
 }
 
+/**
+ * Verifica se um cliente_supervisor é supervisor (tem poder de aprovação)
+ * em uma regional específica.
+ *
+ * - Usuários que NÃO são cliente_supervisor: retorna true se já são approver
+ *   (admin, sala_tecnica, gestor_contrato) — esses têm poder global.
+ * - cliente_supervisor: só pode aprovar se seu email estiver em
+ *   supervisores_responsaveis da regional.
+ * - cliente comum: nunca pode aprovar (apenas assinar).
+ */
+export function isSupervisorInRegional(user, regional) {
+  if (!user) return false;
+  const level = getUserAccessLevel(user);
+
+  // Approvers globais: admin, sala_tecnica, gestor_contrato
+  if (level === 'admin' || level === 'sala_tecnica_afirmaevias' || level === 'gestor_contrato') {
+    return true;
+  }
+
+  // cliente_supervisor: verifica supervisores_responsaveis da regional
+  if (level === 'cliente_supervisor') {
+    const userEmail = (user.email || '').toLowerCase();
+    const supervisores = (regional?.supervisores_responsaveis || []).map(e => e.toLowerCase());
+    return supervisores.includes(userEmail);
+  }
+
+  // cliente comum, user, funcionarios_cliente: não podem aprovar
+  return false;
+}
+
 export function isEngenheiroCliente(user) {
   return isCliente(user) && Boolean(user?.position?.toLowerCase().includes('engenheiro'));
 }

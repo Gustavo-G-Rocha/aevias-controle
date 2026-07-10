@@ -11,6 +11,7 @@ import { gerenciarAprovacao } from "@/functions/gerenciarAprovacao";
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
 import IntegrityBanner from "@/components/relatorios/IntegrityBanner";
+import { isSupervisorInRegional } from "@/utils/accessControl";
 
 // Props:
 //   entityName: string (e.g. "ChecklistConcretagem")
@@ -18,6 +19,7 @@ import IntegrityBanner from "@/components/relatorios/IntegrityBanner";
 export default function AprovacaoBar({ entityName, recordId }) {
   const [user, setUser] = useState(null);
   const [record, setRecord] = useState(null);
+  const [regional, setRegional] = useState(null);
   const [saving, setSaving] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
@@ -40,6 +42,18 @@ export default function AprovacaoBar({ entityName, recordId }) {
       try {
         const data = await obterRegistro(entityName, recordId);
         setRecord(data);
+        // Carrega obra → regional para verificação de supervisor
+        if (data?.obra_id) {
+          try {
+            const obra = await base44.entities.Obra.get(data.obra_id);
+            if (obra?.regional_id) {
+              const reg = await base44.entities.Regional.get(obra.regional_id);
+              setRegional(reg);
+            }
+          } catch (e) {
+            logger.error('AprovacaoBar: erro ao carregar regional', e);
+          }
+        }
       } catch (err) {
         logger.error('AprovacaoBar: erro ao carregar registro', err);
       }
@@ -49,10 +63,9 @@ export default function AprovacaoBar({ entityName, recordId }) {
 
   if (!user || !record) return null;
 
-  // Mesma lógica do layout principal:
-  // Só laboratoristas comuns (access_level ausente + role='user') NÃO podem aprovar
-  const accessLevel = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
-  const canApprove = accessLevel !== 'user' && accessLevel !== 'funcionarios_cliente';
+  // Verifica se pode aprovar/reprovar neste registro específico.
+  // Para cliente_supervisor: só se for supervisor na regional do registro.
+  const canApprove = isSupervisorInRegional(user, regional);
 
 
 

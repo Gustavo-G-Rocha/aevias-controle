@@ -185,6 +185,14 @@ export default function RegionalDetails({ regional, users, projects }) {
                     displayKey="laboratorista_name"
                     valueKey="email"
                 />
+
+                <DetailList 
+                    label="Supervisores (Cliente Supervisor)"
+                    items={regional.supervisores_responsaveis}
+                    allItems={users}
+                    displayKey="laboratorista_name"
+                    valueKey="email"
+                />
             </div>
         </div>
     );
