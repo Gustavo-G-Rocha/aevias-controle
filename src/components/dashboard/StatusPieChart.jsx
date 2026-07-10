@@ -10,6 +10,9 @@ const TOOLTIP_STYLE = {
   boxShadow: 'var(--shadow-md)',
 };
 
+const TOOLTIP_ITEM_STYLE = { color: 'var(--color-text)' };
+const TOOLTIP_LABEL_STYLE = { color: 'var(--color-text-muted)' };
+
 const STATUS_MAP = {
   'Aprovados': 'approved', 'Pendentes': 'pending', 'Reprovados': 'rejected',
   'Assinados': 'approved', 'Aguardando': 'pending',
@@ -30,7 +33,7 @@ export default function StatusPieChart({ data, activeStatus, isClienteUser, onSl
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
             <XAxis dataKey="name" stroke="var(--color-text-subtle)" tick={{ fontSize: 12 }} />
             <YAxis stroke="var(--color-text-subtle)" tick={{ fontSize: 12 }} />
-            <Tooltip contentStyle={TOOLTIP_STYLE} />
+            <Tooltip contentStyle={TOOLTIP_STYLE} itemStyle={TOOLTIP_ITEM_STYLE} labelStyle={TOOLTIP_LABEL_STYLE} />
             <Bar dataKey="value" name="Registros" style={{ cursor: 'pointer' }} radius={[4, 4, 0, 0]}>
               {data.map((entry, index) => (
                 <Cell

@@ -143,6 +143,9 @@
   --transition-base:   200ms ease;
   --transition-slow:   300ms ease;
 
+  /* ── Cor de barras de gráfico (visível em ambos os temas) ── */
+  --color-chart-bar: #00233B;
+
   /* ── Superfície de relatório (fundo fixo claro, ignora tema escuro) ── */
   --color-report-surface: #FFFFFF;
 
@@ -198,6 +201,9 @@
   --color-warning-bg:        rgba(217,119,6,0.16);
   --color-danger-bg:         rgba(220,38,38,0.16);
   --color-info-bg:           rgba(37,99,235,0.16);
+
+  /* ── Cor de barras de gráfico — azul mais claro e visível no dark ── */
+  --color-chart-bar: #4A90D9;
 
   /* ── Superfície de relatório permanece branca no dark ── */
   --color-report-surface:    #FFFFFF;

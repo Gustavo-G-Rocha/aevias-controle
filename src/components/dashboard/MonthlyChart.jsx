@@ -10,6 +10,9 @@ const TOOLTIP_STYLE = {
   boxShadow: 'var(--shadow-md)',
 };
 
+const TOOLTIP_ITEM_STYLE = { color: 'var(--color-text)' };
+const TOOLTIP_LABEL_STYLE = { color: 'var(--color-text-muted)' };
+
 export default function MonthlyChart({ data, isClienteUser }) {
   return (
     <Card className="border-0" style={{ backgroundColor: 'var(--color-surface)', borderRadius: 'var(--card-radius)', boxShadow: 'var(--card-shadow)' }}>
@@ -24,9 +27,9 @@ export default function MonthlyChart({ data, isClienteUser }) {
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
             <XAxis dataKey="name" stroke="var(--color-text-subtle)" tick={{ fontSize: 12 }} />
             <YAxis stroke="var(--color-text-subtle)" tick={{ fontSize: 12 }} />
-            <Tooltip contentStyle={TOOLTIP_STYLE} />
+            <Tooltip contentStyle={TOOLTIP_STYLE} itemStyle={TOOLTIP_ITEM_STYLE} labelStyle={TOOLTIP_LABEL_STYLE} />
             <Legend wrapperStyle={{ color: 'var(--color-text-muted)', fontSize: 12 }} />
-            <Bar dataKey="ensaios" fill="var(--color-primary)" name="Total de Registros" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="ensaios" fill="var(--color-chart-bar)" name="Total de Registros" radius={[4, 4, 0, 0]} />
             {isClienteUser
               ? <Bar dataKey="assinados" fill="#BFCF99" name="Assinados" radius={[4, 4, 0, 0]} />
               : <Bar dataKey="aprovados" fill="#BFCF99" name="Aprovados" radius={[4, 4, 0, 0]} />
