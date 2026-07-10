@@ -45,6 +45,10 @@
       "default": "user",
       "description": "N\u00edvel de acesso funcional do usu\u00e1rio"
     },
+    "supervisor_email": {
+      "type": "string",
+      "description": "Email do cliente_supervisor respons\u00e1vel (para funcionarios_cliente)"
+    },
     "last_login": {
       "type": "string",
       "format": "date-time",

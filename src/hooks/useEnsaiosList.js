@@ -3,7 +3,7 @@
 
 import { useMemo, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { getUserAccessLevel, getEffectiveAccessLevel, getAccessibleObraIds } from '@/utils/accessControl';
+import { getUserAccessLevel, getAccessibleObraIds } from '@/utils/accessControl';
 import { useCurrentUser, useAuxData, useAllRecords, QUERY_KEYS } from '@/hooks/useQueryData';
 import { getDataEnsaio } from '@/components/ensaios/ensaioMappers';
 
@@ -21,12 +21,28 @@ export function sortByEnsaioDate(records) {
   });
 }
 
-export function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccessLevel, obrasData, regionaisData) {
+export function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccessLevel, obrasData, regionaisData, allUsers) {
   if (currentUserAccessLevel === 'admin') return combinedEnsaios;
 
-  // Normaliza para nível efetivo (cliente_supervisor→cliente, funcionarios_cliente→user)
-  const effectiveLevel = currentUserAccessLevel === 'cliente_supervisor' ? 'cliente'
-    : currentUserAccessLevel === 'funcionarios_cliente' ? 'user'
+  // cliente_supervisor: vê TODOS os registros de suas obras (incl. pendentes)
+  // + registros criados por seus funcionarios_cliente subordinados
+  if (currentUserAccessLevel === 'cliente_supervisor') {
+    const obrasIds = getAccessibleObraIds(obrasData, regionaisData, currentUser);
+    const userEmail = (currentUser.email || '').toLowerCase();
+    const subordinateEmails = new Set(
+      (allUsers || [])
+        .filter(u => u.access_level === 'funcionarios_cliente' && (u.supervisor_email || '').toLowerCase() === userEmail)
+        .map(u => (u.email || '').toLowerCase())
+        .filter(Boolean)
+    );
+    return combinedEnsaios.filter(e =>
+      obrasIds.has(e.obra_id) ||
+      (e.created_by && subordinateEmails.has(e.created_by.toLowerCase()))
+    );
+  }
+
+  // Normaliza para nível efetivo (funcionarios_cliente→user)
+  const effectiveLevel = currentUserAccessLevel === 'funcionarios_cliente' ? 'user'
     : currentUserAccessLevel;
 
   if (['cliente', 'sala_tecnica_afirmaevias', 'gestor_contrato'].includes(effectiveLevel)) {
@@ -67,7 +83,9 @@ export function useEnsaiosList() {
   // Campos específicos que filtrarPorAcesso consome — referências estáveis do React Query
   const obras = auxData?.obras;
   const regionais = auxData?.regionais;
-  const currentUserAccessLevel = user ? getEffectiveAccessLevel(user) : null;
+  const allUsers = auxData?.users ?? [];
+  // Passa o nível RAW (não normalizado) — filtrarPorAcesso trata cliente_supervisor especial
+  const currentUserAccessLevel = user ? getUserAccessLevel(user) : null;
 
   // Memoização com dependências reais: só recalcula a cascata regionais→obras→ensaios
   // quando user, accessLevel, allRecords, obras ou regionais mudam de referência.
@@ -79,10 +97,11 @@ export function useEnsaiosList() {
       user,
       currentUserAccessLevel,
       obras,
-      regionais ?? []
+      regionais ?? [],
+      allUsers
     );
     return sortByEnsaioDate(filtered);
-  }, [user, currentUserAccessLevel, allRecords, obras, regionais]);
+  }, [user, currentUserAccessLevel, allRecords, obras, regionais, allUsers]);
 
   return {
     ensaios,

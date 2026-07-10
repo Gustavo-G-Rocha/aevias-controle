@@ -38,6 +38,7 @@ export function useUsersActions({ currentUser, regionais, loadData }) {
           crea_number:        userData.crea_number,
           is_active:          userData.is_active,
           access_level:       userData.access_level,
+          supervisor_email:   userData.supervisor_email,
         };
 
         const cleanedFields = Object.fromEntries(

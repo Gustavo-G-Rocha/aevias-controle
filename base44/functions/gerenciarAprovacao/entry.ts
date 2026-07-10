@@ -100,7 +100,7 @@ const ALLOWED_ENTITIES = [
   'RelatorioNC',
 ];
 
-const APPROVER_LEVELS = ['admin', 'sala_tecnica_afirmaevias', 'gestor_contrato'];
+const APPROVER_LEVELS = ['admin', 'sala_tecnica_afirmaevias', 'gestor_contrato', 'cliente_supervisor'];
 
 function getUserAccessLevel(user) {
   if (!user) return 'user';
@@ -117,17 +117,17 @@ function getEffectiveAccessLevel(user) {
 
 function canApprove(user) {
   const level = getUserAccessLevel(user);
-  return APPROVER_LEVELS.includes(level) || user.role === 'admin';
+  return APPROVER_LEVELS.includes(level);
 }
 
 function canDelete(user, record) {
   // admin: pode excluir qualquer registro
-  if (user.role === 'admin' || getUserAccessLevel(user) === 'admin') return true;
+  if (getUserAccessLevel(user) === 'admin') return true;
 
   // laboratorista: apenas registros que criou
   if (record.created_by === user.email || record.created_by_id === user.id) return true;
 
-  // approver-level (sala_tecnica, gestor_contrato): podem excluir registros do seu tenant
+  // approver-level (sala_tecnica, gestor_contrato, cliente_supervisor): podem excluir registros do seu tenant
   // (tenant já validado por verifyTenantAccess acima)
   return APPROVER_LEVELS.includes(getUserAccessLevel(user));
 }
@@ -144,7 +144,7 @@ async function verifyTenantAccess(base44, user, entityName, record) {
   const effectiveLevel = getEffectiveAccessLevel(user);
 
   // admin: acesso irrestrito (não precisa verificar tenant)
-  if (level === 'admin' || user.role === 'admin') {
+  if (level === 'admin') {
     return { allowed: true };
   }
 

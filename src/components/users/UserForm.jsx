@@ -158,6 +158,18 @@ const UserForm = React.memo(({ user: editingUser, onSave, onCancel, currentUser,
           </div>
         </div>
 
+        {formData.access_level === 'funcionarios_cliente' && (
+          <div>
+            <Label htmlFor="supervisor_email">Supervisor (Cliente Supervisor) *</Label>
+            <Input id="supervisor_email" type="email" value={formData.supervisor_email || ''}
+              onChange={(e) => handleInputChange("supervisor_email", e.target.value)}
+              placeholder="email do cliente_supervisor responsável" required />
+            <p className="text-xs text-muted-foreground mt-1">
+              Email do Cliente Supervisor que gerenciará este funcionário
+            </p>
+          </div>
+        )}
+
         <div className="flex items-center space-x-2">
           <Switch id="is_active" checked={formData.is_active}
             onCheckedChange={(checked) => handleInputChange("is_active", checked)} />

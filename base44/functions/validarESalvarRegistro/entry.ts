@@ -114,7 +114,7 @@ function getUserAccessLevel(user) {
 async function verifyTenantAccessForRecord(base44, user, record) {
   const level = getUserAccessLevel(user);
 
-  if (level === 'admin' || user.role === 'admin') return { allowed: true };
+  if (level === 'admin') return { allowed: true };
 
   if (level === 'user') {
     if (record.created_by === user.email || record.created_by_id === user.id) {
@@ -168,7 +168,7 @@ async function verifyTenantAccessForRecord(base44, user, record) {
 async function verifyObraTenantAccess(base44, user, obraId) {
   const level = getUserAccessLevel(user);
 
-  if (level === 'admin' || user.role === 'admin' || level === 'user') {
+  if (level === 'admin' || level === 'user') {
     return { allowed: true };
   }
 
@@ -320,7 +320,7 @@ Deno.serve(async (req) => {
     }
 
     // ── DEFENSE-IN-DEPTH: validação funcional de tenant ───────────────
-    const userLevel = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
+    const userLevel = getUserAccessLevel(user); // já normaliza cliente_supervisor→cliente, funcionarios_cliente→user
     const isTenantScoped = ['cliente', 'sala_tecnica_afirmaevias', 'gestor_contrato'].includes(userLevel);
 
     // ── DEFENSE-IN-DEPTH: verificar existência da obra para TODOS os usuários ──

@@ -163,6 +163,7 @@ export function sanitizeUserFormData(formData) {
   if (!cleaned.phone    || cleaned.phone.trim()    === '' || cleaned.phone    === '(XX) XXXXX-XXXX')  delete cleaned.phone;
   if (!cleaned.crea_number || cleaned.crea_number.trim() === '' || cleaned.crea_number === 'Ex: CREA-PR 12345/D') delete cleaned.crea_number;
   if (!cleaned.position || cleaned.position.trim() === '') delete cleaned.position;
+  if (!cleaned.supervisor_email || cleaned.supervisor_email.trim() === '') delete cleaned.supervisor_email;
   cleaned.role = deriveRoleFromAccessLevel(cleaned.access_level);
   return cleaned;
 }

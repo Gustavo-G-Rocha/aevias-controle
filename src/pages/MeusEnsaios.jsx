@@ -2,7 +2,7 @@ import React from "react";
 import { Loader2, Plus } from "lucide-react";
 import { useEnsaiosList } from "@/hooks/useEnsaiosList";
 import { useEnsaiosActions } from "@/hooks/useEnsaiosActions";
-import { isAdmin, isCliente as isClienteUser, isGestorContrato, isSalaTecnica, isLaboratorista } from "@/utils/accessControl";
+import { isAdmin, isCliente as isClienteUser, isGestorContrato, isSalaTecnica, isLaboratorista, isClienteSupervisor } from "@/utils/accessControl";
 import AdminInterface from "@/components/ensaios/AdminInterface";
 import ClienteInterface from "@/components/ensaios/ClienteInterface";
 import LaboratoristaInterface from "@/components/ensaios/LaboratoristaInterface";
@@ -16,11 +16,14 @@ export default function MeusEnsaios() {
   const _isSalaTecnica = isSalaTecnica(user);
   const _isGestorContrato = isGestorContrato(user);
   const _isCliente = isClienteUser(user);
-  const canApprove = _isAdmin || _isSalaTecnica || _isGestorContrato;
+  const _isClienteSupervisor = isClienteSupervisor(user);
+  const canApprove = _isAdmin || _isSalaTecnica || _isGestorContrato || _isClienteSupervisor;
   const canCreate = _isAdmin || isLaboratorista(user);
 
   const subtitle = _isAdmin || _isSalaTecnica || _isGestorContrato
     ? "Gerencie e aprove todos os registros de suas obras."
+    : _isClienteSupervisor
+    ? "Aprove registros dos seus funcionários e visualize os ensaios das suas obras."
     : _isCliente
     ? "Visualize os ensaios e diários aprovados das suas obras."
     : "Visualize e gerencie todos os ensaios e diários registrados.";
