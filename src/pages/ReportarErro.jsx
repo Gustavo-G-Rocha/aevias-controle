@@ -83,7 +83,7 @@ export default function ReportarErro() {
     base44.auth.me().then(setUser).catch(() => {});
   }, []);
 
-  const isAdmin = user && (getUserAccessLevel(user) === "admin" || user.role === "admin");
+  const isAdmin = user && getUserAccessLevel(user) === "admin";
 
   const { data: bugReports = [], isLoading: loadingReports } = useQuery({
     queryKey: ["bugReports"],
