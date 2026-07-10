@@ -69,7 +69,7 @@ export default function RelatorioDiario({ diario, obra, user, regional, creatorU
       <PrintStyles />
 
       {/* Página 1 — Dados do Diário */}
-      <div className="p-8 print:p-8 min-h-[29.7cm] flex flex-col">
+      <div className="p-8 print:p-8 min-h-[26cm] flex flex-col">
         <header className="grid grid-cols-3 items-center border-b-2 border-slate-900 pb-4">
           <div className="flex justify-start">
             <picture>

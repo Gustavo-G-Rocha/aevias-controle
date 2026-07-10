@@ -4,7 +4,7 @@ const DEFAULT_LOGO = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object
 
 export default function DiarioFotoPage({ chunk, pageIndex, diario, obra, regional }) {
   return (
-    <div className="break-before-page p-8 print:p-8 min-h-[29.7cm] flex flex-col">
+    <div className="break-before-page p-8 print:p-8 min-h-[26cm] flex flex-col">
       <header className="grid grid-cols-3 items-center border-b-2 border-gray-800 pb-4">
         <div className="flex justify-start">
           <picture>
