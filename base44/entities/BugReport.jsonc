@@ -1,0 +1,64 @@
+{
+  "name": "BugReport",
+  "type": "object",
+  "properties": {
+    "descricao": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o do problema relatado"
+    },
+    "pagina": {
+      "type": "string",
+      "description": "P\u00e1gina/tela onde o erro ocorreu"
+    },
+    "prints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "URLs dos prints anexados"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "aberto",
+        "em_analise",
+        "resolvido"
+      ],
+      "default": "aberto",
+      "description": "Status do relato"
+    },
+    "resposta_admin": {
+      "type": "string",
+      "description": "Resposta/coment\u00e1rio do admin sobre o relato"
+    }
+  },
+  "required": [
+    "descricao",
+    "pagina"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    },
+    "create": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -14,6 +14,7 @@ import {
   BarChart3,
   TrendingUp,
   Factory,
+  Bug,
 } from "lucide-react";
 
 export const MAIN_NAVIGATION = [
@@ -27,6 +28,12 @@ export const MAIN_NAVIGATION = [
     title: "Regionais",
     url: createPageUrl("Regionais"),
     icon: Grid,
+    allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "user", "funcionarios_cliente", "cliente", "cliente_supervisor"],
+  },
+  {
+    title: "Reportar Erros",
+    url: createPageUrl("ReportarErro"),
+    icon: Bug,
     allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "user", "funcionarios_cliente", "cliente", "cliente_supervisor"],
   },
 ];
