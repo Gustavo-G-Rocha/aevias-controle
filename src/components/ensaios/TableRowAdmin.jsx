@@ -61,8 +61,8 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
           {canApprove && ensaio.status !== 'rascunho' && (
             <div className="flex gap-1">
               {(ensaio.approved === null || ensaio.approved === false) && (
-                <Button size="sm" style={{ backgroundColor: '#566E3D' }} className="text-white hover:opacity-90 h-7 px-2" onClick={() => onApprove(ensaio)} title="Aprovar">
-                  <CheckCircle className="w-3 h-3" />
+                <Button asChild size="sm" style={{ backgroundColor: '#566E3D' }} className="text-white hover:opacity-90 h-7 px-2" title="Aprovar (abre relatório para assinatura)">
+                  <RouterLink to={reportUrl}><CheckCircle className="w-3 h-3" /></RouterLink>
                 </Button>
               )}
               {ensaio.approved === null && (
