@@ -69,7 +69,7 @@ export default function RelatorioDiario({ diario, obra, user, regional, creatorU
       <PrintStyles />
 
       {/* Página 1 — Dados do Diário */}
-      <div className="p-8 print:p-8 min-h-[27cm] flex flex-col">
+      <div className="p-8 print:p-8 flex flex-col">
         <header className="grid grid-cols-3 items-center border-b-2 border-slate-900 pb-4">
           <div className="flex justify-start">
             <picture>
@@ -90,7 +90,7 @@ export default function RelatorioDiario({ diario, obra, user, regional, creatorU
           </div>
         </header>
 
-        <main className="flex-grow overflow-y-auto">
+        <main>
           <section className="mt-6">
             <h2 className="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wide">Informações Gerais</h2>
             <div className="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
@@ -187,7 +187,7 @@ export default function RelatorioDiario({ diario, obra, user, regional, creatorU
 
         </main>
 
-        <footer className="mt-auto pt-4 flex-shrink-0">
+        <footer className="pt-4">
           <SignatureFooter {...buildSignatureProps(diario, creatorUser)} />
         </footer>
       </div>
