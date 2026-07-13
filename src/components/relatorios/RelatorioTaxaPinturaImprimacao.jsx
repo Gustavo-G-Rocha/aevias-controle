@@ -252,6 +252,59 @@ export default function RelatorioTaxaPinturaImprimacao({ ensaio, obra, regional 
           </table>
         </div>
 
+        {/* ENSAIO DE RESÍDUO */}
+        <div className="mt-2">
+          <div className="bg-slate-100 px-1 py-0.5 font-bold text-[8px] text-center">ENSAIO DE RESÍDUO</div>
+          <table className="w-full border-collapse text-[9px]">
+            <thead>
+              <tr className="bg-slate-50">
+                <th className="border border-slate-300 px-1 py-1 text-left font-semibold w-1/4">CAMPO</th>
+                <th className="border border-slate-300 px-1 py-1 text-left font-semibold w-[8%]">UNIDADE</th>
+                {ensaios.map((_, i) => (
+                  <th key={i} className="border border-slate-300 px-1 py-1 text-center font-semibold">{i + 1}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="border border-slate-300 px-1 py-1 font-semibold">DATA</td>
+                <td className="border border-slate-300 px-1 py-1 text-center">-</td>
+                {ensaios.map((e, i) => (
+                  <td key={i} className="border border-slate-300 px-1 py-1 text-center">{e.ensaio_residuo?.data ? formatDate(e.ensaio_residuo.data) : ''}</td>
+                ))}
+              </tr>
+              <tr>
+                <td className="border border-slate-300 px-1 py-1 font-semibold">TARA</td>
+                <td className="border border-slate-300 px-1 py-1 text-center">g</td>
+                {ensaios.map((e, i) => (
+                  <td key={i} className="border border-slate-300 px-1 py-1 text-center">{e.ensaio_residuo?.tara ?? ''}</td>
+                ))}
+              </tr>
+              <tr>
+                <td className="border border-slate-300 px-1 py-1 font-semibold">PESO INICIAL</td>
+                <td className="border border-slate-300 px-1 py-1 text-center">g</td>
+                {ensaios.map((e, i) => (
+                  <td key={i} className="border border-slate-300 px-1 py-1 text-center">{e.ensaio_residuo?.peso_inicial ?? ''}</td>
+                ))}
+              </tr>
+              <tr>
+                <td className="border border-slate-300 px-1 py-1 font-semibold">PESO FINAL</td>
+                <td className="border border-slate-300 px-1 py-1 text-center">g</td>
+                {ensaios.map((e, i) => (
+                  <td key={i} className="border border-slate-300 px-1 py-1 text-center">{e.ensaio_residuo?.peso_final ?? ''}</td>
+                ))}
+              </tr>
+              <tr className="bg-slate-50">
+                <td className="border border-slate-300 px-1 py-1 font-bold">RESÍDUO</td>
+                <td className="border border-slate-300 px-1 py-1 text-center">%</td>
+                {ensaios.map((e, i) => (
+                  <td key={i} className="border border-slate-300 px-1 py-1 text-center font-bold">{e.ensaio_residuo?.residuo != null ? e.ensaio_residuo.residuo.toFixed(2) : ''}</td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
         {/* OBSERVAÇÕES */}
         {ensaio.observacoes && (
           <div className="mt-3">
