@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Lock, Loader2, AlertTriangle } from "lucide-react";
 import { validatePasswordComplexity } from "@/utils/passwordPolicy";
 import PasswordStrengthChecklist from "@/components/auth/PasswordStrengthChecklist";
+import { logPasswordReset } from "@/utils/auditEvents";
 
 const LOGO_URL = "https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/290985b58_AE-LogoHorPrincipal_2.png";
 
@@ -34,6 +35,7 @@ export default function ResetPassword() {
     setLoading(true);
     try {
       await base44.auth.resetPassword({ resetToken, newPassword });
+      logPasswordReset();
       window.location.href = "/login";
     } catch (err) {
       setError(err.message || "Falha ao redefinir senha");

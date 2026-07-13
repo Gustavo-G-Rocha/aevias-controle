@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, Loader2, LogIn } from "lucide-react";
+import { logLoginSuccess, logLoginFailure } from "@/utils/auditEvents";
 
 const LOGO_URL = "https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/290985b58_AE-LogoHorPrincipal_2.png";
 
@@ -20,8 +21,10 @@ export default function Login() {
     setLoading(true);
     try {
       await base44.auth.loginViaEmailPassword(email, password);
+      await logLoginSuccess(email);
       window.location.href = "/";
     } catch (err) {
+      await logLoginFailure(email, err.message);
       setError(err.message || "E-mail ou senha inválidos");
     } finally {
       setLoading(false);

@@ -5,6 +5,7 @@ import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 import { logger } from '@/utils/logger';
 import { useSessionTimeout } from '@/hooks/useSessionTimeout';
 import SessionTimeoutWarning from '@/components/auth/SessionTimeoutWarning';
+import { logLogout } from '@/utils/auditEvents';
 
 const AuthContext = createContext();
 
@@ -111,7 +112,8 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = (shouldRedirect = true) => {
+  const logout = (shouldRedirect = true, reason = 'manual') => {
+    logLogout(reason);
     setUser(null);
     setIsAuthenticated(false);
     
@@ -133,7 +135,7 @@ export const AuthProvider = ({ children }) => {
   // Timeout: 15 min. Aviso: 60s antes. Só ativo quando autenticado.
   const handleSessionTimeout = useCallback(() => {
     logger.info('Session expired due to inactivity — logging out');
-    logout(true);
+    logout(true, 'inactivity');
   }, []);
 
   const {

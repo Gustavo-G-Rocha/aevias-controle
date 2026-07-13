@@ -98,6 +98,34 @@ export function getChangedFields(auditEntries) {
 }
 
 /**
+ * Verifica a integridade da cadeia de hashes (tamper-evident).
+ *
+ * Percorre as entradas em ordem cronológica e verifica que o `previous_hash`
+ * de cada entrada corresponde ao `chain_hash` da entrada anterior.
+ *
+ * NÃO recomputa os hashes — apenas verifica os links da cadeia.
+ * Isto é suficiente para detectar adulteração: se uma entrada for modificada
+ * ou removida, o link quebrará.
+ *
+ * @param {Array} auditEntries - entradas de auditoria (qualquer ordem)
+ * @returns {{ valid: boolean, brokenAt?: number, entry?: object }}
+ */
+export function verifyChainIntegrity(auditEntries) {
+  if (!Array.isArray(auditEntries) || auditEntries.length === 0) {
+    return { valid: true };
+  }
+  const sorted = reconstructHistory(auditEntries);
+  for (let i = 1; i < sorted.length; i++) {
+    const prevHash = sorted[i - 1].chain_hash;
+    const expectedPrev = sorted[i].previous_hash;
+    if (prevHash && expectedPrev && prevHash !== expectedPrev) {
+      return { valid: false, brokenAt: i, entry: sorted[i] };
+    }
+  }
+  return { valid: true };
+}
+
+/**
  * Reconstrói o valor de um campo específico ao longo do tempo.
  * Retorna array de { timestamp, value, operation, changed_by } em ordem cronológica.
  *

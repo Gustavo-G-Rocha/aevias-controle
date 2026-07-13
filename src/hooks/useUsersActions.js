@@ -8,6 +8,7 @@ import {
 } from "@/utils/usersUtils";
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
+import { logUserCreated, logPermissionUpdated, logUserDeactivated } from '@/utils/auditEvents';
 
 export function useUsersActions({ currentUser, regionais, loadData }) {
   const [isFormOpen,   setIsFormOpen]   = useState(false);
@@ -50,6 +51,12 @@ export function useUsersActions({ currentUser, regionais, loadData }) {
         }
 
         await atualizarUsuario(editingUser.id, cleanedFields);
+        if (cleanedFields.access_level && cleanedFields.access_level !== editingUser.access_level) {
+          logPermissionUpdated(editingUser.id, editingUser.access_level, cleanedFields.access_level);
+        }
+        if (cleanedFields.is_active === false && editingUser.is_active !== false) {
+          logUserDeactivated(editingUser.id);
+        }
         toast({ title: "Usuário atualizado com sucesso!" });
       } else {
         // CRIAÇÃO via invite (User.create retorna 405 — usuários entram por convite)
@@ -57,6 +64,7 @@ export function useUsersActions({ currentUser, regionais, loadData }) {
           userData.email,
           deriveRoleFromAccessLevel(userData.access_level) === 'admin' ? 'admin' : 'user'
         );
+        logUserCreated(userData.email, deriveRoleFromAccessLevel(userData.access_level) === 'admin' ? 'admin' : 'user');
 
         // Alocar na regional se gestor/sala técnica criando laboratorista
         if (isGestorOrSalaTecnica && (userData.access_level === 'user' || userData.access_level === 'funcionarios_cliente')) {

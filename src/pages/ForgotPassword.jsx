@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, ArrowLeft, Loader2 } from "lucide-react";
+import { logPasswordResetRequest } from "@/utils/auditEvents";
 
 const LOGO_URL = "https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/290985b58_AE-LogoHorPrincipal_2.png";
 
@@ -18,6 +19,7 @@ export default function ForgotPassword() {
     setLoading(true);
     try {
       await base44.auth.resetPasswordRequest(email);
+      logPasswordResetRequest(email);
     } catch {
       // Sempre mostra sucesso, independentemente do resultado
     } finally {

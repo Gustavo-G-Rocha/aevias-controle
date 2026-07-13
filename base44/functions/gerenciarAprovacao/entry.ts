@@ -243,6 +243,78 @@ function computeAuditDiff(oldData: any, newData: any) {
   return changes;
 }
 
+// ── AUDIT ENRICHMENT: IP, dispositivo e chain hash ──────────────────
+function extractIpAddress(req: Request): string {
+  const xff = req.headers.get('x-forwarded-for');
+  if (xff) {
+    const firstIp = xff.split(',')[0].trim();
+    if (firstIp) return firstIp;
+  }
+  const xRealIp = req.headers.get('x-real-ip');
+  if (xRealIp) return xRealIp.trim();
+  return '';
+}
+
+function extractDeviceInfo(req: Request): string {
+  const ua = req.headers.get('user-agent');
+  return ua ? ua.substring(0, 500) : '';
+}
+
+async function computeChainHash(entryData: Record<string, unknown>, previousHash: string | null): Promise<string> {
+  const payload = JSON.stringify(entryData) + (previousHash || '');
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(payload));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function createAuditEntry(base44: any, req: Request, user: any, entry: {
+  entity_name: string;
+  entity_id?: string;
+  operation: string;
+  changes?: any[];
+  result?: string;
+  failure_reason?: string;
+  client_timestamp?: string | null;
+  is_offline_sync?: boolean;
+}) {
+  const ipAddress = extractIpAddress(req);
+  const deviceInfo = extractDeviceInfo(req);
+  const now = new Date().toISOString();
+  const actorRole = user?.access_level || user?.role || '';
+
+  let previousHash: string | null = null;
+  try {
+    const latest = await base44.asServiceRole.entities.AuditTrail.list('-created_date', 1);
+    if (latest && latest.length > 0) {
+      previousHash = latest[0].chain_hash || null;
+    }
+  } catch { /* previousHash stays null */ }
+
+  const entryData = {
+    entity_name: entry.entity_name,
+    entity_id: entry.entity_id || null,
+    operation: entry.operation,
+    changed_by: user?.email || '',
+    changed_by_name: user?.laboratorista_name || user?.full_name || '',
+    actor_role: actorRole,
+    ip_address: ipAddress,
+    device_info: deviceInfo,
+    result: entry.result || 'success',
+    failure_reason: entry.failure_reason || null,
+    timestamp: now,
+  };
+
+  const chainHash = await computeChainHash(entryData, previousHash);
+
+  return base44.asServiceRole.entities.AuditTrail.create({
+    ...entryData,
+    changes: entry.changes || [],
+    client_timestamp: entry.client_timestamp || null,
+    is_offline_sync: entry.is_offline_sync || false,
+    chain_hash: chainHash,
+    previous_hash: previousHash,
+  });
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -478,15 +550,11 @@ Deno.serve(async (req) => {
       }
       // ── AUDIT TRAIL (delete) ──────────────────────────────────────
       try {
-        await base44.asServiceRole.entities.AuditTrail.create({
+        await createAuditEntry(base44, req, user, {
           entity_name: entityName,
           entity_id: recordId,
           operation: 'delete',
           changes: [],
-          changed_by: user.email,
-          changed_by_name: user.laboratorista_name || user.full_name || '',
-          client_timestamp: null,
-          is_offline_sync: false,
         });
       } catch (auditError) {
         console.error('[gerenciarAprovacao] Audit error (delete):', auditError?.message);
@@ -530,15 +598,11 @@ Deno.serve(async (req) => {
     try {
       const diff = computeAuditDiff(existingRecord, result);
       if (diff.length > 0) {
-        await base44.asServiceRole.entities.AuditTrail.create({
+        await createAuditEntry(base44, req, user, {
           entity_name: entityName,
           entity_id: recordId,
           operation: action,
           changes: diff,
-          changed_by: user.email,
-          changed_by_name: user.laboratorista_name || user.full_name || '',
-          client_timestamp: null,
-          is_offline_sync: false,
         });
       }
     } catch (auditError) {

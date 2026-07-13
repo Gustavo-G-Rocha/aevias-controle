@@ -1,5 +1,5 @@
 import React from "react";
-import { User, Clock, FileEdit, Trash2, CheckCircle, XCircle, PenLine, Cloud, Minus, Plus } from "lucide-react";
+import { User, Clock, FileEdit, Trash2, CheckCircle, XCircle, PenLine, Cloud, Minus, Plus, LogIn, LogOut, FileText, Shield, UserPlus, UserMinus, Mail, Lock, Globe, Monitor } from "lucide-react";
 
 const OPERATION_META = {
   create: { label: "Criação", icon: FileEdit, color: "text-blue-600", bg: "bg-blue-50", dot: "bg-blue-500" },
@@ -12,6 +12,17 @@ const OPERATION_META = {
   reject_nc: { label: "Reprovação NC", icon: XCircle, color: "text-red-600", bg: "bg-red-50", dot: "bg-red-500" },
   solicitar_aprovacao_nc: { label: "Solicitar Aprovação NC", icon: Clock, color: "text-amber-600", bg: "bg-amber-50", dot: "bg-amber-500" },
   update_nc_status: { label: "Alteração de Status NC", icon: FileEdit, color: "text-amber-600", bg: "bg-amber-50", dot: "bg-amber-500" },
+  login_success: { label: "Login", icon: LogIn, color: "text-green-600", bg: "bg-green-50", dot: "bg-green-500" },
+  login_failure: { label: "Login Falhou", icon: XCircle, color: "text-red-600", bg: "bg-red-50", dot: "bg-red-500" },
+  logout: { label: "Logout", icon: LogOut, color: "text-slate-600", bg: "bg-slate-100", dot: "bg-slate-400" },
+  logout_inactivity: { label: "Logout (Inatividade)", icon: Clock, color: "text-amber-600", bg: "bg-amber-50", dot: "bg-amber-500" },
+  password_reset_request: { label: "Solicitação Reset de Senha", icon: Mail, color: "text-blue-600", bg: "bg-blue-50", dot: "bg-blue-500" },
+  password_reset: { label: "Redefinição de Senha", icon: Lock, color: "text-indigo-600", bg: "bg-indigo-50", dot: "bg-indigo-500" },
+  report_exported: { label: "Exportação de Relatório", icon: FileText, color: "text-purple-600", bg: "bg-purple-50", dot: "bg-purple-500" },
+  permission_updated: { label: "Permissão Alterada", icon: Shield, color: "text-amber-600", bg: "bg-amber-50", dot: "bg-amber-500" },
+  user_created: { label: "Usuário Criado", icon: UserPlus, color: "text-green-600", bg: "bg-green-50", dot: "bg-green-500" },
+  user_deactivated: { label: "Usuário Desativado", icon: UserMinus, color: "text-red-600", bg: "bg-red-50", dot: "bg-red-500" },
+  token_expired: { label: "Token Expirado", icon: Clock, color: "text-red-600", bg: "bg-red-50", dot: "bg-red-500" },
 };
 
 // Traduz chaves técnicas para rótulos legíveis
@@ -273,13 +284,36 @@ export default function ChangeEntry({ entry }) {
         )}
       </div>
 
-      <div className="text-sm text-slate-700 flex items-center gap-1.5 mb-2">
+      <div className="text-sm text-slate-700 flex items-center gap-1.5 mb-1">
         <User className="w-3.5 h-3.5 text-slate-400" />
         <span className="font-medium">{entry.changed_by_name || "—"}</span>
         {entry.changed_by && (
           <span className="text-slate-400">({entry.changed_by})</span>
         )}
+        {entry.actor_role && (
+          <span className="text-xs text-slate-400 ml-1">[{entry.actor_role}]</span>
+        )}
       </div>
+
+      {(entry.ip_address || entry.device_info || entry.result === 'failure') && (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mb-2 text-xs text-slate-400">
+          {entry.ip_address && (
+            <span className="flex items-center gap-0.5">
+              <Globe className="w-3 h-3" />
+              {entry.ip_address}
+            </span>
+          )}
+          {entry.device_info && (
+            <span className="flex items-center gap-0.5 truncate max-w-xs" title={entry.device_info}>
+              <Monitor className="w-3 h-3" />
+              {entry.device_info.substring(0, 60)}
+            </span>
+          )}
+          {entry.result === 'failure' && entry.failure_reason && (
+            <span className="text-red-500 font-medium">Motivo: {entry.failure_reason}</span>
+          )}
+        </div>
+      )}
 
       {changes.length > 0 && (
         <div className="mt-2 space-y-2">
