@@ -1,0 +1,168 @@
+{
+  "name": "AssinaturaEletronica",
+  "type": "object",
+  "properties": {
+    "entity_name": {
+      "type": "string",
+      "description": "Nome da entidade do documento assinado (ex: EnsaioCAUQ, RelatorioNC)"
+    },
+    "entity_id": {
+      "type": "string",
+      "description": "ID do registro assinado"
+    },
+    "status_assinatura": {
+      "type": "string",
+      "enum": [
+        "nao_assinado",
+        "assinado"
+      ],
+      "default": "nao_assinado",
+      "description": "Status da assinatura"
+    },
+    "signature_method": {
+      "type": "string",
+      "default": "eletronica_simples_reforcada",
+      "description": "M\u00e9todo de assinatura. Hoje sempre 'eletronica_simples_reforcada'. Reservado para futuro 'pades_icp_brasil'."
+    },
+    "signature_type": {
+      "type": "string",
+      "enum": [
+        "approve",
+        "approve_nc",
+        "sign"
+      ],
+      "description": "Tipo do ato de assinatura: approve (gestor), approve_nc (cliente aprova NC), sign (cliente assina)"
+    },
+    "signed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp do servidor no momento da assinatura (nunca do cliente)"
+    },
+    "signature_hash": {
+      "type": "string",
+      "description": "Hash SHA-256 do documento no estado em que foi assinado"
+    },
+    "signature_evidence": {
+      "type": "object",
+      "description": "Evid\u00eancias do ato de assinatura (for\u00e7a probat\u00f3ria Lei 14.063/2020)",
+      "properties": {
+        "ip_address": {
+          "type": "string",
+          "description": "IP de origem da requisi\u00e7\u00e3o"
+        },
+        "user_agent": {
+          "type": "string",
+          "description": "User-Agent / dispositivo"
+        },
+        "geolocation": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Geolocaliza\u00e7\u00e3o do ato (se consentida pelo usu\u00e1rio \u2014 LGPD)",
+          "properties": {
+            "latitude": {
+              "type": "number"
+            },
+            "longitude": {
+              "type": "number"
+            }
+          }
+        },
+        "reauth_factor": {
+          "type": "string",
+          "description": "Fator de reautentica\u00e7\u00e3o utilizado (ex: 'password')"
+        }
+      }
+    },
+    "signed_by": {
+      "type": "string",
+      "description": "Email do signat\u00e1rio"
+    },
+    "signed_by_name": {
+      "type": "string",
+      "description": "Nome do signat\u00e1rio"
+    },
+    "signed_by_role": {
+      "type": "string",
+      "description": "N\u00edvel de acesso/papel do signat\u00e1rio no momento do ato"
+    },
+    "signed_by_crea": {
+      "type": "string",
+      "description": "N\u00famero CREA do signat\u00e1rio (se aplic\u00e1vel)"
+    },
+    "signature_provider": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null,
+      "description": "Reservado para futuro provedor PAdES/ICP-Brasil. Hoje sempre null."
+    },
+    "signature_request_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null,
+      "description": "Reservado para futuro ID de requisi\u00e7\u00e3o no provedor PAdES. Hoje sempre null."
+    },
+    "certificate_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null,
+      "description": "Reservado para futuro ID de certificado digital ICP-Brasil. Hoje sempre null."
+    }
+  },
+  "required": [
+    "entity_name",
+    "entity_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "cliente"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "cliente_supervisor"
+          }
+        },
+        {
+          "data.signed_by": "{{user.email}}"
+        }
+      ]
+    },
+    "create": {},
+    "update": {
+      "user_condition": {
+        "role": "__append_only__"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "__append_only__"
+      }
+    }
+  }
+}

@@ -362,6 +362,41 @@ Deno.serve(async (req) => {
       );
     }
 
+    // ── ADAPTER PATTERN: SignatureAdapter ──────────────────────────────
+    // Ações de assinatura são delegadas para o adapter de assinatura
+    // eletrônica. Hoje: EletronicaSimplesAdapter (assinarEletronicamente).
+    // Futuro: PAdESAdapter pode ser adicionado como novo adapter (nova
+    // backend function), trocando apenas a chamada abaixo — o restante
+    // do fluxo de aprovação permanece inalterado.
+    //
+    // Por ora, apenas 'approve' (relatório final de ensaio) usa o adapter.
+    // 'sign' e 'approve_nc' (termo de fechamento de NC) serão migrados em
+    // etapa futura, quando os componentes de UI de NC passarem a exigir
+    // reautenticação no momento do ato.
+    const SIGNING_ACTIONS = new Set(['approve']);
+    if (SIGNING_ACTIONS.has(action)) {
+      if (!body.reauthPassword) {
+        return Response.json(
+          { error: 'Reautenticação obrigatória para assinatura eletrônica', errorCategory: 'schema' },
+          { status: 400 }
+        );
+      }
+      try {
+        const signResult = await base44.functions.invoke('assinarEletronicamente', {
+          entityName,
+          recordId,
+          reauthPassword: body.reauthPassword,
+          signatureType: action,
+          geolocation: body.geolocation || null,
+        });
+        return Response.json(signResult);
+      } catch (signError) {
+        const errData = signError?.response?.data || signError?.data || { error: signError?.message || 'Erro na assinatura eletrônica' };
+        const errStatus = signError?.response?.status || signError?.status || 500;
+        return Response.json(errData, { status: errStatus });
+      }
+    }
+
     const now = new Date().toISOString();
     const level = getUserAccessLevel(user);
     const approverName = user.laboratorista_name || user.full_name || '';

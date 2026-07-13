@@ -77,9 +77,15 @@ export default function SignatureFooter({
   clientPosition,
   clientCREA,
   clientDate,
+  entityName,
+  recordId,
 }) {
   const isSigned = !!approverEmail;
-  const verificationUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const verificationUrl = typeof window !== 'undefined'
+    ? (entityName && recordId
+      ? `${window.location.origin}/verificar-assinatura?entityName=${entityName}&recordId=${recordId}`
+      : window.location.href)
+    : '';
 
   return (
     <div style={{ width: '100%' }}>

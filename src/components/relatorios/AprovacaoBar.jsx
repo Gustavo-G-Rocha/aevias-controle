@@ -11,6 +11,8 @@ import { gerenciarAprovacao } from "@/functions/gerenciarAprovacao";
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
 import IntegrityBanner from "@/components/relatorios/IntegrityBanner";
+import SignatureReauthModal from "@/components/relatorios/SignatureReauthModal";
+import SignatureSeal from "@/components/relatorios/SignatureSeal";
 import { isSupervisorInRegional } from "@/utils/accessControl";
 
 // Props:
@@ -23,6 +25,9 @@ export default function AprovacaoBar({ entityName, recordId }) {
   const [saving, setSaving] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
+  const [showReauthModal, setShowReauthModal] = useState(false);
+  const [reauthError, setReauthError] = useState('');
+  const [signature, setSignature] = useState(null);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -73,20 +78,26 @@ export default function AprovacaoBar({ entityName, recordId }) {
   const isApproved = record.approved === true;
   const isRejected = record.approved === false;
 
-  const handleApprove = async () => {
+  const handleApprove = async (password) => {
     setSaving(true);
+    setReauthError('');
     try {
       const response = await gerenciarAprovacao({
         action: 'approve',
         entityName,
         recordId,
+        reauthPassword: password,
       });
-      const updated = response.data.data;
-      setRecord(prev => ({ ...prev, approved: true, approver_details: updated.approver_details }));
-      toast({ title: 'Registro aprovado com sucesso!' });
+      const result = response.data.data;
+      const updatedRecord = result.record || result;
+      setRecord(prev => ({ ...prev, ...updatedRecord }));
+      setSignature(result.signature || null);
+      setShowReauthModal(false);
+      toast({ title: 'Documento assinado eletronicamente!' });
     } catch (err) {
-      logger.error('[AprovacaoBar] Erro ao aprovar registro:', err?.message || err);
-      toast({ title: err?.response?.data?.error || 'Erro ao aprovar registro.', variant: "destructive" });
+      const errMsg = err?.response?.data?.error || err?.message || 'Erro ao assinar documento.';
+      setReauthError(errMsg);
+      logger.error('[AprovacaoBar] Erro ao assinar:', errMsg);
     } finally {
       setSaving(false);
     }
@@ -157,7 +168,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
 
         {canApprove && isPending && (
           <>
-            <Button size="sm" onClick={handleApprove} disabled={saving}
+            <Button size="sm" onClick={() => { setReauthError(''); setShowReauthModal(true); }} disabled={saving}
               className="bg-green-700 text-white hover:bg-green-800 gap-1 h-8">
               {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
               Aprovar
@@ -170,7 +181,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
           </>
         )}
         {canApprove && isRejected && (
-          <Button size="sm" onClick={handleApprove} disabled={saving}
+          <Button size="sm" onClick={() => { setReauthError(''); setShowReauthModal(true); }} disabled={saving}
             className="bg-green-700 text-white hover:bg-green-800 gap-1 h-8">
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
             Aprovar mesmo assim
@@ -201,6 +212,30 @@ export default function AprovacaoBar({ entityName, recordId }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {isApproved && (
+        <SignatureSeal
+          signature={signature || (record.approver_details ? {
+            signed_by_name: record.approver_details.name,
+            signed_by_role: record.approver_details.position,
+            signed_by_crea: record.approver_details.crea_number,
+            signed_at: record.approved_date,
+            signature_hash: record.approver_details.integrity_hash,
+            signature_method: record.approver_details.signature_method,
+          } : null)}
+          compact
+        />
+      )}
+
+      <SignatureReauthModal
+        open={showReauthModal}
+        onClose={() => setShowReauthModal(false)}
+        onConfirm={handleApprove}
+        signerName={user?.laboratorista_name || user?.full_name || user?.email}
+        documentDescription={`${entityName} #${recordId}`}
+        loading={saving}
+        error={reauthError}
+      />
     </>
   );
 }
