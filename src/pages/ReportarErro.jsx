@@ -134,6 +134,26 @@ export default function ReportarErro() {
         prints,
         status: "aberto",
       });
+
+      const solicitante = user ? (user.full_name || user.email) : "Usuário não identificado";
+      const printsHtml = prints.length > 0
+        ? prints.map((url) => `<img src="${url}" style="max-width:300px;margin:5px;border:1px solid #ccc;" />`).join("")
+        : "<p>Nenhum print anexado.</p>";
+
+      await base44.integrations.Core.SendEmail({
+        to: "gustavo.rocha@afirmaevias.com.br",
+        subject: `Novo relato de erro — ${paginaFinal}`,
+        body: `
+          <h2>Novo relato de erro</h2>
+          <p><strong>Solicitante:</strong> ${solicitante}</p>
+          <p><strong>Página:</strong> ${paginaFinal}</p>
+          <p><strong>Descrição:</strong></p>
+          <p style="white-space:pre-wrap;">${descricao.trim()}</p>
+          <h3>Prints:</h3>
+          ${printsHtml}
+        `,
+      });
+
       toast({ title: "Relato enviado com sucesso!", description: "Obrigado pelo feedback." });
       setDescricao("");
       setPagina("");
