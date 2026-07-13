@@ -15,14 +15,14 @@ export default function UsersTable({ filteredUsers, regionais, canManageUsers, i
       <table className="min-w-full" style={{ borderColor: 'var(--color-border)' }}>
         <thead style={{ backgroundColor: 'var(--color-surface-muted)' }}>
           <tr>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Usuário</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Empresa/Cargo</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Regional</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Nível</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Ativo</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Status</th>
+            <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Usuário</th>
+            <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Empresa/Cargo</th>
+            <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Regional</th>
+            <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Nível</th>
+            <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Ativo</th>
+            <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Status</th>
             {(canManageUsers && !isCliente) && (
-              <th scope="col" className="relative px-6 py-3"><span className="sr-only">Editar</span></th>
+              <th scope="col" className="relative px-4 py-3"><span className="sr-only">Editar</span></th>
             )}
           </tr>
         </thead>
@@ -34,48 +34,48 @@ export default function UsersTable({ filteredUsers, regionais, canManageUsers, i
               <tr key={user.id} className="border-t transition-colors" style={{ borderColor: 'var(--color-border)' }}
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--color-surface-muted)'}
                 onMouseLeave={e => e.currentTarget.style.backgroundColor = ''}>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 py-4 whitespace-nowrap">
                   <div>
                     <div className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>{user.laboratorista_name}</div>
                     <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{user.email}</div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div>
-                    <div className="text-sm" style={{ color: 'var(--color-text)' }}>{user.company || "—"}</div>
-                    <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{user.position || "—"}</div>
+                <td className="px-4 py-4">
+                  <div className="max-w-[180px]">
+                    <div className="text-sm truncate" style={{ color: 'var(--color-text)' }}>{user.company || "—"}</div>
+                    <div className="text-sm truncate" style={{ color: 'var(--color-text-muted)' }}>{user.position || "—"}</div>
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-4 py-4">
                   {regional ? (
-                    <div>
-                      <div className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>{regional.nome}</div>
-                      <div className="text-xs" style={{ color: 'var(--color-text-subtle)' }}>{regional.codigo}</div>
+                    <div className="max-w-[160px]">
+                      <div className="text-sm font-medium truncate" style={{ color: 'var(--color-text)' }}>{regional.nome}</div>
+                      <div className="text-xs truncate" style={{ color: 'var(--color-text-subtle)' }}>{regional.codigo}</div>
                     </div>
                   ) : (
                     <span className="text-sm" style={{ color: 'var(--color-text-subtle)' }}>—</span>
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 py-4 whitespace-nowrap">
                   <Badge variant={getAccessLevelBadgeVariant(user.access_level)}>
                     {getAccessLevelLabel(user.access_level)}
                   </Badge>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 py-4 whitespace-nowrap">
                   <Badge variant={user.is_active ? 'success' : 'destructive'}>
                     {user.is_active ? 'Ativo' : 'Inativo'}
                   </Badge>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center gap-2">
+                <td className="px-4 py-4">
+                  <div className="flex items-center gap-2 max-w-[200px]">
                     {loginStatus.status === 'online' && (
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shrink-0" />
                     )}
                     <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{loginStatus.text}</span>
                   </div>
                 </td>
                 {(canManageUsers && !isCliente) && (
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <Button variant="ghost" size="sm" onClick={() => onEdit(user)}>
                       <Edit className="w-4 h-4 mr-1" />
                       Editar
