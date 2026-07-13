@@ -253,7 +253,27 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { action, entityName, recordId, rejectionReason, ncStatus, requestApproval } = body;
+    const { action, entityName, recordId, rejectionReason: rawRejectionReason, ncStatus, requestApproval } = body;
+
+    // ── SANITIZAÇÃO XSS — defense-in-depth (espelha src/utils/dataSanitization.js) ──
+    // rejectionReason é texto livre do usuário — sanitiza antes de persistir.
+    const DANGEROUS_TAGS_R = 'script|iframe|object|embed|style|svg|math|template|noscript|noframes|applet|xml';
+    const DANGEROUS_VOID_TAGS_R = `${DANGEROUS_TAGS_R}|link|meta|base|form|input|button`;
+    const sanitizeTextR = (val: unknown): string => {
+      if (typeof val !== 'string' || !val) return val as string;
+      let s = val;
+      s = s.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+      s = s.replace(new RegExp(`<\\s*(${DANGEROUS_TAGS_R})\\b[^>]*>[\\s\\S]*?<\\s*\\/\\s*\\1\\s*>`, 'gi'), '');
+      s = s.replace(new RegExp(`<\\s*(?:${DANGEROUS_VOID_TAGS_R})\\b[^>]*>`, 'gi'), '');
+      s = s.replace(new RegExp(`<\\s*\\/\\s*(?:${DANGEROUS_TAGS_R})\\s*>`, 'gi'), '');
+      s = s.replace(/\bon\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)?/gi, '');
+      s = s.replace(/javascript:/gi, '').replace(/vbscript:/gi, '').replace(/data:text\/html/gi, '');
+      s = s.replace(/\{\{/g, '{ {').replace(/\}\}/g, '} }');
+      s = s.replace(/<%/g, '< %').replace(/%>/g, '% >');
+      if (s.length > 10000) s = s.substring(0, 10000);
+      return s;
+    };
+    const rejectionReason = rawRejectionReason ? sanitizeTextR(rawRejectionReason) : rawRejectionReason;
 
     // Whitelist de entidades permitidas
     if (!ALLOWED_ENTITIES.includes(entityName)) {

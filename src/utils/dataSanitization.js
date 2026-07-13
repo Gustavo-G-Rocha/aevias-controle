@@ -5,17 +5,90 @@
  */
 
 /**
- * Sanitiza uma string removendo tags HTML e protocolos perigosos.
- * Defense-in-depth contra XSS — aplicado em texto livre antes de persistir.
+ * Lista de tags HTML perigosas que devem ser removidas inteiramente
+ * (incluindo conteúdo). Estas tags podem executar código ou carregar
+ * recursos externos — nunca são legítimas em texto livre do usuário.
  */
-export const sanitizeText = (value) => {
+const DANGEROUS_TAGS = [
+  'script', 'iframe', 'object', 'embed', 'style', 'svg', 'math',
+  'template', 'noscript', 'noframes', 'applet', 'xml',
+];
+
+/** Tags perigosas que aparecem como elementos vazios/self-closing. */
+const DANGEROUS_VOID_TAGS = [
+  'link', 'meta', 'base', 'form', 'input', 'button',
+];
+
+const DANGEROUS_TAGS_PATTERN = DANGEROUS_TAGS.join('|');
+const DANGEROUS_VOID_TAGS_PATTERN = DANGEROUS_VOID_TAGS.join('|');
+
+/**
+ * Sanitiza uma string removendo estruturas HTML/JS perigosas.
+ *
+ * Política: TEXTO PURO por padrão. Nenhum HTML é permitido em campos
+ * de texto livre. Tags perigosas (script, iframe, etc.) são removidas
+ * integralmente com seu conteúdo. Demais caracteres (incluindo `<` e `>`
+ * que não formam tags perigosas) são preservados como texto literal —
+ * o React escapa automaticamente na renderização via `{}`.
+ *
+ * Defense-in-depth contra XSS armazenado e SSTI.
+ *
+ * @param {string} value - String a sanitizar
+ * @param {{maxLength?: number}} options - Limite de tamanho (padrão 10000)
+ * @returns {string} String sanitizada
+ */
+export const sanitizeText = (value, options = {}) => {
   if (typeof value !== 'string' || !value) return value;
-  return value
-    .replace(/<[^>]*>/g, '')                         // remove tags HTML (inclui atributos onerror=, onload= dentro delas)
-    .replace(/\bon\w+\s*=\s*["']?[^"'\s]*/gi, '')    // remove event handlers remanescentes (onerror=, onload=, onclick=)
-    .replace(/javascript:/gi, '')                      // remove protocolo javascript:
-    .replace(/vbscript:/gi, '')                        // remove protocolo vbscript:
-    .replace(/data:text\/html[^,]*/gi, '');            // neutraliza data URIs com HTML executável
+
+  const { maxLength = 10000 } = options;
+
+  let result = value;
+
+  // 1. Remover caracteres de controle (exceto \t \n \r) — previne bypass
+  //    via encoding alternativo e normaliza para UTF-8 limpo.
+  result = result.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+
+  // 2. Remover blocos de tags perigosas COM conteúdo (script, iframe, etc.)
+  //    Captura tag de abertura + conteúdo + tag de fechamento.
+  result = result.replace(
+    new RegExp(`<\\s*(${DANGEROUS_TAGS_PATTERN})\\b[^>]*>[\\s\\S]*?<\\s*\\/\\s*\\1\\s*>`, 'gi'),
+    ''
+  );
+
+  // 3. Remover tags perigosas sem fechamento (self-closing ou órfãs)
+  const allDangerousTags = [...DANGEROUS_TAGS, ...DANGEROUS_VOID_TAGS].join('|');
+  result = result.replace(
+    new RegExp(`<\\s*(?:${allDangerousTags})\\b[^>]*>`, 'gi'),
+    ''
+  );
+  result = result.replace(
+    new RegExp(`<\\s*\\/\\s*(?:${DANGEROUS_TAGS_PATTERN})\\s*>`, 'gi'),
+    ''
+  );
+
+  // 4. Remover atributos de evento (onerror=, onclick=, onload=, etc.)
+  //    Cobre valores entre aspas duplas, simples e sem aspas.
+  result = result.replace(
+    /\bon\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)?/gi,
+    ''
+  );
+
+  // 5. Remover protocolos perigosos
+  result = result.replace(/javascript:/gi, '');
+  result = result.replace(/vbscript:/gi, '');
+  result = result.replace(/data:text\/html/gi, '');
+
+  // 6. Neutralizar sintaxe de template engine (SSTI defense-in-depth)
+  //    {{ }} → { {  e  <% %> → < % % >
+  result = result.replace(/\{\{/g, '{ {').replace(/\}\}/g, '} }');
+  result = result.replace(/<%/g, '< %').replace(/%>/g, '% >');
+
+  // 7. Limite de tamanho — defense-in-depth contra payloads excessivos
+  if (result.length > maxLength) {
+    result = result.substring(0, maxLength);
+  }
+
+  return result;
 };
 
 /**

@@ -280,10 +280,31 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Sanitização de texto — remove tags HTML de todos os campos string (defense-in-depth contra XSS)
+    // Sanitização de texto — defense-in-depth contra XSS (espelha src/utils/dataSanitization.js)
+    // Política: texto puro, sem HTML. Tags perigosas removidas com conteúdo.
+    // Event handlers, protocolos perigosos e sintaxe de template neutralizados.
+    const DANGEROUS_TAGS = 'script|iframe|object|embed|style|svg|math|template|noscript|noframes|applet|xml';
+    const DANGEROUS_VOID_TAGS = `${DANGEROUS_TAGS}|link|meta|base|form|input|button`;
     const sanitizeText = (val: unknown): unknown => {
       if (typeof val !== 'string' || !val) return val;
-      return val.replace(/<[^>]*>/g, '').replace(/javascript:/gi, '');
+      let s = val;
+      // 1. Remover caracteres de controle (exceto \t \n \r)
+      s = s.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+      // 2. Remover blocos de tags perigosas com conteúdo
+      s = s.replace(new RegExp(`<\\s*(${DANGEROUS_TAGS})\\b[^>]*>[\\s\\S]*?<\\s*\\/\\s*\\1\\s*>`, 'gi'), '');
+      // 3. Remover tags perigosas sem fechamento
+      s = s.replace(new RegExp(`<\\s*(?:${DANGEROUS_VOID_TAGS})\\b[^>]*>`, 'gi'), '');
+      s = s.replace(new RegExp(`<\\s*\\/\\s*(?:${DANGEROUS_TAGS})\\s*>`, 'gi'), '');
+      // 4. Remover atributos de evento (onerror=, onclick=, onload=, etc.)
+      s = s.replace(/\bon\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)?/gi, '');
+      // 5. Remover protocolos perigosos
+      s = s.replace(/javascript:/gi, '').replace(/vbscript:/gi, '').replace(/data:text\/html/gi, '');
+      // 6. Neutralizar sintaxe de template engine (SSTI)
+      s = s.replace(/\{\{/g, '{ {').replace(/\}\}/g, '} }');
+      s = s.replace(/<%/g, '< %').replace(/%>/g, '% >');
+      // 7. Limite de tamanho
+      if (s.length > 10000) s = s.substring(0, 10000);
+      return s;
     };
     const sanitizeTextFields = (obj: unknown): unknown => {
       if (obj === null || obj === undefined) return obj;

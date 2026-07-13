@@ -124,8 +124,8 @@ describe('sanitizeEquivalenteAreia', () => {
 });
 
 describe('sanitizeText', () => {
-  it('remove tags HTML de uma string', () => {
-    expect(sanitizeText('<script>alert("xss")</script>')).toBe('alert("xss")');
+  it('remove blocos de tags perigosas com conteúdo', () => {
+    expect(sanitizeText('<script>alert("xss")</script>')).toBe('');
   });
 
   it('remove protocolo javascript:', () => {
@@ -136,8 +136,8 @@ describe('sanitizeText', () => {
     expect(sanitizeText('Observação normal do diário')).toBe('Observação normal do diário');
   });
 
-  it('remove tags HTML misturadas com texto', () => {
-    expect(sanitizeText('Texto <b>com</b> <img src=x> tags')).toBe('Texto com  tags');
+  it('preserva tags não-perigosas como texto literal (React escapa na renderização)', () => {
+    expect(sanitizeText('Texto <b>com</b> <img src=x> tags')).toBe('Texto <b>com</b> <img src=x> tags');
   });
 
   it('retorna valor original para não-string', () => {
@@ -170,13 +170,50 @@ describe('sanitizeText', () => {
     expect(sanitizeText('vbscript:alert(1)')).toBe('alert(1)');
   });
 
-  it('neutraliza data URI com HTML executável', () => {
-    expect(sanitizeText('data:text/html,<script>alert(1)</script>')).toBe(',alert(1)');
+  it('neutraliza data URI com HTML executável e remove script block', () => {
+    expect(sanitizeText('data:text/html,<script>alert(1)</script>')).toBe(',');
   });
 
   it('remove tag malformada sem fechamento preservando texto', () => {
-    // Tag sem > de fechamento — o event handler remanescente é removido
     const result = sanitizeText('<img src=x onerror=alert(1)');
+    expect(result).not.toContain('onerror');
+    expect(result).not.toContain('alert');
+  });
+
+  it('neutraliza sintaxe de template engine {{ }}', () => {
+    expect(sanitizeText('{{7*7}}')).toBe('{ {7*7} }');
+  });
+
+  it('neutraliza sintaxe de template engine <% %>', () => {
+    expect(sanitizeText('<%= 7*7 %>')).toBe('< %= 7*7 % >');
+  });
+
+  it('remove caracteres de controle', () => {
+    expect(sanitizeText('texto\x00com\x07controle\x1F')).toBe('textocomcontrole');
+  });
+
+  it('preserva quebras de linha e tabulação', () => {
+    expect(sanitizeText('linha1\nlinha2\ttab')).toBe('linha1\nlinha2\ttab');
+  });
+
+  it('aplica limite de tamanho', () => {
+    const long = 'a'.repeat(15000);
+    const result = sanitizeText(long, { maxLength: 100 });
+    expect(result.length).toBe(100);
+  });
+
+  it('remove iframe tag com conteúdo', () => {
+    expect(sanitizeText('<iframe src="evil">conteúdo</iframe>')).toBe('');
+  });
+
+  it('remove event handler entre aspas duplas', () => {
+    const result = sanitizeText('<img src=x onerror="alert(1)">');
+    expect(result).not.toContain('onerror');
+    expect(result).not.toContain('alert');
+  });
+
+  it('remove event handler entre aspas simples', () => {
+    const result = sanitizeText("<img src=x onerror='alert(1)'>");
     expect(result).not.toContain('onerror');
     expect(result).not.toContain('alert');
   });
@@ -190,7 +227,7 @@ describe('sanitizeTextFields', () => {
       numero: 42,
     };
     const result = sanitizeTextFields(input);
-    expect(result.observacoes).toBe('evil()Texto limpo');
+    expect(result.observacoes).toBe('Texto limpo');
     expect(result.descricao).toBe('Normal');
     expect(result.numero).toBe(42);
   });
@@ -205,13 +242,13 @@ describe('sanitizeTextFields', () => {
     expect(result.nivel1.observacoes).toBe('Dados');
   });
 
-  it('sanitiza arrays de objetos', () => {
+  it('sanitiza arrays de objetos preservando tags não-perigosas como texto', () => {
     const input = [
       { descricao: '<b>Item 1</b>' },
       { descricao: 'Item 2' },
     ];
     const result = sanitizeTextFields(input);
-    expect(result[0].descricao).toBe('Item 1');
+    expect(result[0].descricao).toBe('<b>Item 1</b>');
     expect(result[1].descricao).toBe('Item 2');
   });
 
@@ -226,7 +263,7 @@ describe('sanitizeTextFields', () => {
     expect(sanitizeTextFields(undefined)).toBeUndefined();
   });
 
-  it('trata string direta', () => {
-    expect(sanitizeTextFields('<script>x</script>')).toBe('x');
+  it('trata string direta — remove bloco script inteiro', () => {
+    expect(sanitizeTextFields('<script>x</script>')).toBe('');
   });
 });
