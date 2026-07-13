@@ -15,6 +15,7 @@ import AppSidebar from "@/components/layout/AppSidebar";
 import BottomNav from "@/components/layout/BottomNav";
 import CreateEnsaioDialog from "@/components/layout/CreateEnsaioDialog";
 import OfflineStatusBar from "@/components/offline/OfflineStatusBar";
+import SidebarToggle from "@/components/layout/SidebarToggle";
 import { REPORT_PAGES } from "@/lib/reportPages";
 
 const AppLayout = ({ children, currentPageName }) => {
@@ -49,6 +50,7 @@ const AppLayout = ({ children, currentPageName }) => {
           />
 
           <main className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
+            <SidebarToggle />
             <div className="flex-1 flex flex-col">
               <PullToRefresh disabled={isFormPage(currentPageName)}>
                 <div className="pb-16 lg:pb-0 overflow-x-hidden" style={{ paddingTop: "env(safe-area-inset-top)" }}>
