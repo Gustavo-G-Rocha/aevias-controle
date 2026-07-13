@@ -32,14 +32,13 @@ export default function MRAFPhotosPage({ photos, pageIndex, regional, obra }) {
         <div className="grid grid-cols-2 gap-4 w-full">
           {photos.map((foto, index) => (
             <div key={index} className="break-inside-avoid flex flex-col">
-              <div className="border-2 border-slate-300 rounded overflow-hidden bg-slate-50 flex items-center justify-center">
+              <div className="border-2 border-slate-300 rounded overflow-hidden bg-slate-50 flex items-center justify-center" style={{ height: '280px' }}>
                 <picture>
                   <source srcSet={foto} />
                   <img 
                     src={foto} 
                     alt={`Foto ${photoNumber(index)}`} 
-                    className="w-full h-auto object-contain" 
-                    style={{ maxHeight: '280px' }} 
+                    className="w-full h-full object-contain"
                     width="auto" 
                     height="auto" 
                     loading="lazy" 

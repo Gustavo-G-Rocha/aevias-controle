@@ -35,14 +35,13 @@ export default function PhotoGalleryPage({
             const legenda = extrairLegenda(foto, pageIndex * 6 + fotoIndex);
             return (
               <div key={`foto-${fotoIndex}`} className="border p-2 rounded-lg break-inside-avoid flex flex-col">
-                <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden">
+                <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden" style={{ height: '280px' }}>
                   <picture>
                     <source srcSet={fotoNormalizada.url} />
                     <img 
                       src={fotoNormalizada.url} 
                       alt={legenda} 
-                      className="w-full h-auto object-contain" 
-                      style={{ maxHeight: '280px' }} 
+                      className="w-full h-full object-contain"
                       width="auto" 
                       height="auto" 
                     />

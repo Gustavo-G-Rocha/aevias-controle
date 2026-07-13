@@ -13,14 +13,13 @@ export default function ConcretagemFotoPage({ chunk, pageIndex, regional, data }
       <div className="grid grid-cols-2 gap-2">
         {chunk.map((fotoUrl, fotoIndex) => (
           <div key={fotoIndex} className="border border-slate-300 p-1 rounded flex flex-col">
-            <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden">
+            <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden" style={{ height: '280px' }}>
               <picture>
                 <source srcSet={fotoUrl} />
                 <img
                   src={fotoUrl}
                   alt={`Foto ${pageIndex * 6 + fotoIndex + 1}`}
-                  className="w-full h-auto object-contain"
-                  style={{ maxHeight: '280px' }}
+                  className="w-full h-full object-contain"
                   width="auto"
                   height="auto"
                 />

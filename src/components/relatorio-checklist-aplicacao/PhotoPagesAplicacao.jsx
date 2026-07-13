@@ -32,10 +32,10 @@ export default function PhotoPagesAplicacao({ photos, regional, checklist, obra 
             <main className="grid grid-cols-2 gap-4 mt-4">
               {chunk.map((fotoUrl, fotoIndex) => (
                 <div key={fotoIndex} className="border p-2 rounded-lg break-inside-avoid flex flex-col">
-                  <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden">
+                  <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden" style={{ height: '280px' }}>
                     <picture>
                       <source srcSet={fotoUrl} />
-                      <img src={fotoUrl} alt={`Foto ${pageIndex * 6 + fotoIndex + 1}`} className="w-full h-auto object-contain" style={{ maxHeight: '280px' }} width="auto" height="auto" />
+                      <img src={fotoUrl} alt={`Foto ${pageIndex * 6 + fotoIndex + 1}`} className="w-full h-full object-contain" width="auto" height="auto" />
                     </picture>
                   </div>
                   <p className="text-center text-base print:text-sm mt-2 font-medium">

@@ -62,16 +62,18 @@ export default function FotosSection({
               key={i}
               className="border border-slate-200 rounded p-2 flex flex-col items-center break-inside-avoid"
             >
-              <picture>
-                <source srcSet={url} />
-                <img
-                  src={url}
-                  alt={`Foto ${i + 1}`}
-                  className="max-h-64 object-contain w-full"
-                  width="auto"
-                  height="auto"
-                />
-              </picture>
+              <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden w-full" style={{ height: '256px' }}>
+                <picture>
+                  <source srcSet={url} />
+                  <img
+                    src={url}
+                    alt={`Foto ${i + 1}`}
+                    className="w-full h-full object-contain"
+                    width="auto"
+                    height="auto"
+                  />
+                </picture>
+              </div>
               <p className="text-xs text-center text-gray-500 mt-1">
                 Foto {i + 1}
               </p>
