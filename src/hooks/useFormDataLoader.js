@@ -49,23 +49,43 @@ export function useFormDataLoader({
     // Determina se o usuário deve ver apenas obras das suas regionais.
     // useAccessLevel=true (ensaio): access_level 'user' é laboratorista.
     // useAccessLevel=false (checklist): role !== 'admin' é laboratorista.
+    const userAccessLevel = useAccessLevel
+      ? (user.access_level || (user.role === 'admin' ? 'admin' : 'user'))
+      : (user.role === 'admin' ? 'admin' : 'user');
+    const isFuncionarioCliente = userAccessLevel === 'funcionarios_cliente';
     const isLaboratorista = useAccessLevel
-      ? ['user', 'funcionarios_cliente'].includes(user.access_level || (user.role === 'admin' ? 'admin' : 'user'))
+      ? ['user', 'funcionarios_cliente'].includes(userAccessLevel)
       : user.role !== 'admin';
 
     if (isLaboratorista) {
       const emailLower = user.email.toLowerCase();
-      const regionaisIds = regionais
-        .filter(r =>
-          (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-          (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-        )
-        .map(r => r.id);
+      const supervisorEmailLower = user.supervisor_email?.toLowerCase();
+      let regionaisIds;
+      if (isFuncionarioCliente) {
+        // funcionarios_cliente: regionais onde o supervisor OU o próprio email
+        // está em clientes_responsaveis
+        const emailsToCheck = new Set([emailLower]);
+        if (supervisorEmailLower) emailsToCheck.add(supervisorEmailLower);
+        regionaisIds = regionais
+          .filter(r => (r.clientes_responsaveis || []).some(e => emailsToCheck.has(e.toLowerCase())))
+          .map(r => r.id);
+      } else {
+        // user (laboratorista): regionais onde está alocado
+        regionaisIds = regionais
+          .filter(r =>
+            (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+            (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+          )
+          .map(r => r.id);
+      }
       if (regionaisIds.length > 0) {
         const regionaisSet = new Set(regionaisIds);
+        // funcionarios_cliente: vê obras de qualquer status (igual ao useLayoutData);
+        // user (laboratorista): apenas obras em andamento
+        const statusOk = isFuncionarioCliente ? () => true : (obra) => obra.status === 'em_andamento';
         return auxData.obras.filter(obra =>
           regionaisSet.has(obra.regional_id) &&
-          obra.status === 'em_andamento' &&
+          statusOk(obra) &&
           (filtroTipoObra ? filtroTipoObra.includes(obra.tipo_obra) : true)
         );
       }

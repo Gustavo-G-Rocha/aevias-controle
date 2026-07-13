@@ -34,13 +34,27 @@ export const filterRegionaisByAccessLevel = (regionais, user) => {
     const emailUsuario = user.email.toLowerCase();
     return regionais.filter(r => {
       if (r.status !== 'ativa') return false;
-      const clientes = r.clientes_responsaveis || [];
-      return clientes.some(email => email.toLowerCase() === emailUsuario);
+      const clientes = (r.clientes_responsaveis || []).map(e => e.toLowerCase());
+      const supervisores = (r.supervisores_responsaveis || []).map(e => e.toLowerCase());
+      return clientes.includes(emailUsuario) || supervisores.includes(emailUsuario);
     });
   }
 
-  // laboratorista (user / funcionarios_cliente)
-  if (userAccessLevel === 'user' || userAccessLevel === 'funcionarios_cliente') {
+  // funcionarios_cliente: regionais onde o supervisor OU o próprio email
+  // está em clientes_responsaveis
+  if (userAccessLevel === 'funcionarios_cliente') {
+    const emailUsuario = user.email.toLowerCase();
+    const supervisorEmail = (user.supervisor_email || '').toLowerCase();
+    return regionais.filter(r => {
+      if (r.status !== 'ativa') return false;
+      const clientes = (r.clientes_responsaveis || []).map(e => e.toLowerCase());
+      return clientes.includes(emailUsuario) ||
+        (supervisorEmail && clientes.includes(supervisorEmail));
+    });
+  }
+
+  // laboratorista (user)
+  if (userAccessLevel === 'user') {
     return regionais.filter(r => {
       if (r.status !== 'ativa') return false;
       const laboratoristas = r.laboratoristas_responsaveis || [];
@@ -74,12 +88,27 @@ export const filtrarObrasPorAcessoRegional = (obras, regionais, user) => {
   const accessLevel = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
   if (accessLevel !== 'user' && accessLevel !== 'funcionarios_cliente') return obras;
   const emailLower = (user.email || '').toLowerCase();
-  const regionaisIds = regionais
-    .filter(r =>
-      (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-      (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-    )
-    .map(r => r.id);
+  const supervisorEmailLower = (user.supervisor_email || '').toLowerCase();
+
+  let regionaisIds;
+  if (accessLevel === 'funcionarios_cliente') {
+    // funcionarios_cliente: regionais onde o supervisor OU o próprio email
+    // está em clientes_responsaveis
+    const emailsToCheck = new Set([emailLower]);
+    if (supervisorEmailLower) emailsToCheck.add(supervisorEmailLower);
+    regionaisIds = regionais
+      .filter(r => (r.clientes_responsaveis || []).some(e => emailsToCheck.has(e.toLowerCase())))
+      .map(r => r.id);
+  } else {
+    // user (laboratorista): regionais onde está alocado
+    regionaisIds = regionais
+      .filter(r =>
+        (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+        (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+      )
+      .map(r => r.id);
+  }
+
   if (regionaisIds.length === 0) return [];
   const regionaisSet = new Set(regionaisIds);
   return obras.filter(o => regionaisSet.has(o.regional_id));

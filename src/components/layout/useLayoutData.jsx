@@ -41,10 +41,13 @@ export function useLayoutData() {
         const supervisorEmailLower = userData.supervisor_email?.toLowerCase();
 
         let regionaisIds;
-        if (userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE && supervisorEmailLower) {
-          // funcionarios_cliente: encontra regionais do seu supervisor (cliente_supervisor)
+        if (userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE) {
+          // funcionarios_cliente: encontra regionais onde o supervisor OU o próprio email
+          // está em clientes_responsaveis
+          const emailsToCheck = new Set([emailLower]);
+          if (supervisorEmailLower) emailsToCheck.add(supervisorEmailLower);
           regionaisIds = regionaisData
-            .filter(r => (r.clientes_responsaveis || []).some(e => e.toLowerCase() === supervisorEmailLower))
+            .filter(r => (r.clientes_responsaveis || []).some(e => emailsToCheck.has(e.toLowerCase())))
             .map(r => r.id);
         } else {
           // user (laboratorista): regionais onde está alocado

@@ -93,30 +93,40 @@ export function canSeeObraChart(user) {
 
 export function filterRegionaisByUser(regionais, user) {
   const level = getEffectiveAccessLevel(user);
+  const rawLevel = getUserAccessLevel(user);
+  const emailLower = (user.email || '').toLowerCase();
+  const supervisorEmailLower = (user.supervisor_email || '').toLowerCase();
   return regionais.filter(regional => {
     if (regional.status === 'inativa') return false;
     if (level === 'cliente') {
-      return (regional.clientes_responsaveis || []).some(
-        email => email.toLowerCase() === user.email.toLowerCase()
-      );
+      // cliente e cliente_supervisor: checa clientes_responsaveis e supervisores_responsaveis
+      const clientes = (regional.clientes_responsaveis || []).map(e => e.toLowerCase());
+      const supervisores = (regional.supervisores_responsaveis || []).map(e => e.toLowerCase());
+      return clientes.includes(emailLower) || supervisores.includes(emailLower);
     }
     if (level === 'sala_tecnica_afirmaevias') {
       return (regional.salas_tecnicas_responsaveis || []).some(
-        email => email.toLowerCase() === user.email.toLowerCase()
+        email => email.toLowerCase() === emailLower
       );
     }
     if (level === 'gestor_contrato') {
       return (
-        regional.gestor_contrato_responsavel?.toLowerCase() === user.email.toLowerCase() ||
+        regional.gestor_contrato_responsavel?.toLowerCase() === emailLower ||
         (regional.gestores_contrato_responsaveis || []).some(
-          email => email.toLowerCase() === user.email.toLowerCase()
+          email => email.toLowerCase() === emailLower
         )
       );
     }
-    // user (laboratorista / funcionarios_cliente): pode ver regionais onde está alocado
+    // funcionarios_cliente: checa clientes_responsaveis via supervisor ou próprio email
+    if (rawLevel === 'funcionarios_cliente') {
+      const clientes = (regional.clientes_responsaveis || []).map(e => e.toLowerCase());
+      return clientes.includes(emailLower) ||
+        (supervisorEmailLower && clientes.includes(supervisorEmailLower));
+    }
+    // user (laboratorista): pode ver regionais onde está alocado
     if (level === 'user') {
       return (regional.laboratoristas_responsaveis || []).some(
-        email => email.toLowerCase() === user.email.toLowerCase()
+        email => email.toLowerCase() === emailLower
       );
     }
     return false;
