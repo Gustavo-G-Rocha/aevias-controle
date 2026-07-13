@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { UserPlus, Mail, Lock, Loader2 } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { toast } from "@/components/ui/use-toast";
+import { validatePasswordComplexity } from "@/utils/passwordPolicy";
+import PasswordStrengthChecklist from "@/components/auth/PasswordStrengthChecklist";
 
 const LOGO_URL = "https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/290985b58_AE-LogoHorPrincipal_2.png";
 
@@ -24,6 +26,11 @@ export default function Register() {
     setError("");
     if (password !== confirmPassword) {
       setError("As senhas não coincidem");
+      return;
+    }
+    const { valid, errors } = validatePasswordComplexity(password, email);
+    if (!valid) {
+      setError(errors.join(" "));
       return;
     }
     setLoading(true);
@@ -256,6 +263,7 @@ export default function Register() {
                   required
                 />
               </div>
+              <PasswordStrengthChecklist password={password} email={email} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm">Confirmar senha</Label>

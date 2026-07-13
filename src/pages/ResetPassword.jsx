@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Lock, Loader2, AlertTriangle } from "lucide-react";
+import { validatePasswordComplexity } from "@/utils/passwordPolicy";
+import PasswordStrengthChecklist from "@/components/auth/PasswordStrengthChecklist";
 
 const LOGO_URL = "https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/290985b58_AE-LogoHorPrincipal_2.png";
 
@@ -22,6 +24,11 @@ export default function ResetPassword() {
     setError("");
     if (newPassword !== confirmPassword) {
       setError("As senhas não coincidem");
+      return;
+    }
+    const { valid, errors } = validatePasswordComplexity(newPassword);
+    if (!valid) {
+      setError(errors.join(" "));
       return;
     }
     setLoading(true);
@@ -162,6 +169,7 @@ export default function ResetPassword() {
                   required
                 />
               </div>
+              <PasswordStrengthChecklist password={newPassword} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm">Confirmar senha</Label>
