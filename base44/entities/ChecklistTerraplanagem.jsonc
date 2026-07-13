@@ -47,6 +47,14 @@
     "material": {
       "type": "string"
     },
+    "origem_material": {
+      "type": "string",
+      "description": "Local de origem do material (ex: Jazida km 15, Bota-fora A)"
+    },
+    "nome_material": {
+      "type": "string",
+      "description": "Nome do material (ex: Solo argiloso, Brita 0, Macadame)"
+    },
     "umidade_otima_proctor": {
       "type": "number"
     },
@@ -420,15 +428,25 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         },
-        { "user_condition": { "data.access_level": "cliente" } },
-        { "user_condition": { "data.access_level": "cliente_supervisor" } },
+        {
+          "user_condition": {
+            "data.access_level": "cliente"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "cliente_supervisor"
+          }
+        },
         {
           "created_by": "{{user.email}}"
         }
@@ -446,11 +464,13 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         }
       ]
@@ -466,11 +486,13 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         }
       ]
