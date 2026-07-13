@@ -72,12 +72,13 @@ export default function RelatorioAcompanhamentoCarga() {
               <table className="w-full border-collapse border border-slate-300" style={{ fontSize: '7px', tableLayout: 'fixed' }}>
                 <thead className="bg-slate-100">
                   <tr>
-                    <th className="border border-slate-300 px-0.5 py-1 text-center font-bold" colSpan="4">DADOS DA USINA</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-center font-bold" colSpan="5">DADOS DA USINA</th>
                     <th className="border border-slate-300 px-0.5 py-1 text-center font-bold" colSpan="10">DADOS DA PISTA</th>
                   </tr>
                   <tr>
                     <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '5.5%' }}>N° CARGA</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '6.5%' }}>PLACA</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '6%' }}>N° TICKET/NF</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '6%' }}>PLACA</th>
                     <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '6%' }}>HORA SAÍDA</th>
                     <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '5.5%' }}>PESO (t)</th>
                     <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '6%' }}>HORA CHEGADA</th>
@@ -89,13 +90,14 @@ export default function RelatorioAcompanhamentoCarga() {
                     <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '6%' }}>ESPESSURA (cm)</th>
                     <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '6%' }}>ESTACA IN.</th>
                     <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '6%' }}>ESTACA FIN.</th>
-                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '24%' }}>OBSERVAÇÕES</th>
+                    <th className="border border-slate-300 px-0.5 py-1 text-[7px] leading-tight" style={{ width: '23%' }}>OBSERVAÇÕES</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.cargas.map((carga, index) => (
                     <tr key={index} className="even:bg-slate-50" style={{ fontSize: '7px' }}>
                       <td className="border border-slate-300 px-0.5 py-1 text-center">{carga.numero}</td>
+                      <td className="border border-slate-300 px-0.5 py-1 text-center">{carga.numero_ticket_nf}</td>
                       <td className="border border-slate-300 px-0.5 py-1 text-center">{carga.placa}</td>
                       <td className="border border-slate-300 px-0.5 py-1 text-center">{carga.hora_saida}</td>
                       <td className="border border-slate-300 px-0.5 py-1 text-center">{carga.peso_toneladas}</td>

@@ -33,6 +33,7 @@ export default function AcompanhamentoCargaCargas() {
             <thead className="bg-muted">
               <tr>
                 <th className="border border-border p-2">N°</th>
+                <th className="border border-border p-2">N° Ticket/NF</th>
                 <th className="border border-border p-2">Placa</th>
                 <th className="border border-border p-2">Hora Saída</th>
                 <th className="border border-border p-2">Peso (t)</th>
@@ -53,6 +54,9 @@ export default function AcompanhamentoCargaCargas() {
               {cargas.map((carga, index) => (
                 <tr key={index} className="even:bg-muted/30">
                   <td className="border border-border p-1 text-center">{carga.numero_carga}</td>
+                  <td className="border border-border p-1">
+                    <Input value={carga.numero_ticket_nf} onChange={(e) => handleCargaChange(index, 'numero_ticket_nf', e.target.value)} disabled={!canEdit} className="h-8 text-xs" />
+                  </td>
                   <td className="border border-border p-1">
                     <Input value={carga.placa} onChange={(e) => handleCargaChange(index, 'placa', e.target.value)} disabled={!canEdit} className="h-8 text-xs" />
                   </td>

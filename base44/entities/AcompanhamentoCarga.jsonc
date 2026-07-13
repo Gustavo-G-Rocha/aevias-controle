@@ -66,6 +66,10 @@
           "numero_carga": {
             "type": "number"
           },
+          "numero_ticket_nf": {
+            "type": "string",
+            "description": "N\u00b0 ticket / nota fiscal"
+          },
           "placa": {
             "type": "string"
           },
@@ -188,15 +192,25 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         },
-        { "user_condition": { "data.access_level": "cliente" } },
-        { "user_condition": { "data.access_level": "cliente_supervisor" } },
+        {
+          "user_condition": {
+            "data.access_level": "cliente"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "cliente_supervisor"
+          }
+        },
         {
           "created_by": "{{user.email}}"
         }
@@ -214,11 +228,13 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         }
       ]
@@ -234,11 +250,13 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         }
       ]

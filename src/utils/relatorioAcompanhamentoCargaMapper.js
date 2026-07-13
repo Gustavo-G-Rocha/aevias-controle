@@ -43,6 +43,7 @@ export const getServicoLabel = (servico) =>
  */
 export const mapCargaToRow = (carga, index) => ({
   numero: index + 1,
+  numero_ticket_nf: display(carga?.numero_ticket_nf, ''),
   placa: display(carga?.placa, ''),
   hora_saida: display(carga?.hora_saida, ''),
   peso_toneladas: display(carga?.peso_toneladas, ''),

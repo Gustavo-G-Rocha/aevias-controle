@@ -25,6 +25,7 @@ export const getInitialFormData = () => ({
 
 export const getInitialCarga = (numeroCarga) => ({
   numero_carga: numeroCarga,
+  numero_ticket_nf: "",
   placa: "",
   hora_saida: "",
   peso_toneladas: null,
