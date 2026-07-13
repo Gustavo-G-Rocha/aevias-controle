@@ -389,7 +389,10 @@ Deno.serve(async (req) => {
           signatureType: action,
           geolocation: body.geolocation || null,
         });
-        return Response.json(signResult);
+        // base44.functions.invoke retorna o envelope HTTP completo (com request/response
+        // que têm referências circulares). Extrai apenas o body JSON serializável.
+        const signData = signResult?.data ?? signResult;
+        return Response.json(signData);
       } catch (signError) {
         const errData = signError?.response?.data || signError?.data || { error: signError?.message || 'Erro na assinatura eletrônica' };
         const errStatus = signError?.response?.status || signError?.status || 500;
