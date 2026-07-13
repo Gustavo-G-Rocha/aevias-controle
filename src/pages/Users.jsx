@@ -48,7 +48,7 @@ export default function UsersPage() {
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-3" style={{ color: 'var(--color-text)' }}>
               <UsersIcon className="w-8 h-8" style={{ color: 'var(--color-accent)' }} />
-              {isAdmin ? 'Gestão de Usuários Corporativos' : 'Usuários da Minha Regional'}
+              {isAdmin ? 'Gestão de Usuários' : 'Usuários da Minha Regional'}
             </h1>
             <p className="mt-2" style={{ color: 'var(--color-text-muted)' }}>
               {isAdmin
