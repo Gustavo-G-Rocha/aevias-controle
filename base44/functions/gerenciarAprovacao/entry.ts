@@ -375,17 +375,10 @@ Deno.serve(async (req) => {
     // reautenticação no momento do ato.
     const SIGNING_ACTIONS = new Set(['approve']);
     if (SIGNING_ACTIONS.has(action)) {
-      if (!body.reauthPassword) {
-        return Response.json(
-          { error: 'Reautenticação obrigatória para assinatura eletrônica', errorCategory: 'schema' },
-          { status: 400 }
-        );
-      }
       try {
         const signResult = await base44.functions.invoke('assinarEletronicamente', {
           entityName,
           recordId,
-          reauthPassword: body.reauthPassword,
           signatureType: action,
           geolocation: body.geolocation || null,
         });

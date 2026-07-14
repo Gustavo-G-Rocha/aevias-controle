@@ -3,8 +3,6 @@ import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 import { logger } from '@/utils/logger';
-import { useSessionTimeout } from '@/hooks/useSessionTimeout';
-import SessionTimeoutWarning from '@/components/auth/SessionTimeoutWarning';
 import { logLogout } from '@/utils/auditEvents';
 import { getDataCache } from '@/services/offlineStorageService';
 import { prepararCacheOffline } from '@/services/offlineCacheService';
@@ -174,25 +172,6 @@ export const AuthProvider = ({ children }) => {
     base44.auth.redirectToLogin(window.location.href);
   };
 
-  // ── Logout automático por inatividade ──
-  // Timeout: 15 min. Aviso: 60s antes. Só ativo quando autenticado.
-  const handleSessionTimeout = useCallback(() => {
-    logger.info('Session expired due to inactivity — logging out');
-    logout(true, 'inactivity');
-  }, []);
-
-  const {
-    showWarning: sessionWarning,
-    countdown: sessionCountdown,
-    extendSession,
-    logoutNow: sessionLogoutNow,
-  } = useSessionTimeout({
-    enabled: isAuthenticated,
-    timeoutMs: 15 * 60 * 1000,
-    warningMs: 60 * 1000,
-    onTimeout: handleSessionTimeout,
-  });
-
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -206,12 +185,6 @@ export const AuthProvider = ({ children }) => {
       checkAppState
     }}>
       {children}
-      <SessionTimeoutWarning
-        open={sessionWarning}
-        countdown={sessionCountdown}
-        onExtend={extendSession}
-        onLogoutNow={sessionLogoutNow}
-      />
     </AuthContext.Provider>
   );
 };

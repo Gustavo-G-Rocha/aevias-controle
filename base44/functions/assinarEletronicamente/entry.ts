@@ -1,4 +1,4 @@
-import { createClientFromRequest, createClient } from 'npm:@base44/sdk@0.8.38';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
 
 /**
  * Backend function: assinarEletronicamente
@@ -19,7 +19,6 @@ import { createClientFromRequest, createClient } from 'npm:@base44/sdk@0.8.38';
  * Payload: {
  *   entityName: string,
  *   recordId: string,
- *   reauthPassword: string,       // senha do usuário — verificada server-side
  *   signatureType?: 'approve' | 'approve_nc' | 'sign',  // default: 'approve'
  *   geolocation?: { latitude: number, longitude: number } | null,
  * }
@@ -252,7 +251,6 @@ Deno.serve(async (req) => {
     const {
       entityName,
       recordId,
-      reauthPassword,
       signatureType = 'approve',
       geolocation = null,
     } = body;
@@ -281,51 +279,11 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (!reauthPassword || typeof reauthPassword !== 'string') {
-      return Response.json(
-        { error: 'Reautenticação obrigatória para assinatura eletrônica', errorCategory: 'schema' },
-        { status: 400 }
-      );
-    }
-
     const validSignatureTypes = ['approve', 'approve_nc', 'sign'];
     if (!validSignatureTypes.includes(signatureType)) {
       return Response.json(
         { error: 'Tipo de assinatura inválido', errorCategory: 'schema' },
         { status: 400 }
-      );
-    }
-
-    // ── REAUTENTICAÇÃO ──────────────────────────────────────────────────
-    // Exige prova de intenção: a sessão ativa sozinha não é aceita.
-    // Cria um cliente temporário para verificar a senha sem afetar o
-    // token da sessão atual. Se a senha estiver incorreta, o login
-    // lança erro e a assinatura é recusada.
-    const appId = Deno.env.get('BASE44_APP_ID');
-    let reauthVerified = false;
-    try {
-      const tempClient = createClient({ appId });
-      await tempClient.auth.loginViaEmailPassword(user.email, reauthPassword);
-      reauthVerified = true;
-    } catch (reauthError: any) {
-      // Em ambiente Deno (sem window), o login pode lançar após sucesso
-      // da API call se o SDK tentar fazer redirect. Verificamos se o
-      // erro é relacionado a window/location (login sucedeu) vs credenciais.
-      const msg = reauthError?.message || String(reauthError);
-      if (msg.includes('window') || msg.includes('location') || msg.includes('is not defined') || msg.includes('redirect')) {
-        reauthVerified = true;
-      } else {
-        return Response.json(
-          { error: 'Reautenticação falhou: credenciais inválidas', errorCategory: 'permission' },
-          { status: 403 }
-        );
-      }
-    }
-
-    if (!reauthVerified) {
-      return Response.json(
-        { error: 'Reautenticação falhou', errorCategory: 'permission' },
-        { status: 403 }
       );
     }
 
@@ -466,7 +424,7 @@ Deno.serve(async (req) => {
         ip_address: ipAddress,
         user_agent: deviceInfo,
         geolocation: geolocation || null,
-        reauth_factor: 'password',
+        reauth_factor: null,
       },
       signed_by: user.email,
       signed_by_name: approverName,
@@ -493,7 +451,7 @@ Deno.serve(async (req) => {
             hash: integrityHash,
             signature_id: signatureRecord.id,
             signed_at: now,
-            reauth_factor: 'password',
+            reauth_factor: null,
             ip_address: ipAddress,
           },
         }],
