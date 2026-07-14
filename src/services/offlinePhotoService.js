@@ -52,6 +52,18 @@ function generatePhotoId() {
 }
 
 /**
+ * Converte base64 de volta para File (para upload multipart direto).
+ */
+function base64ToFile(base64, fileName, mimeType) {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return new File([bytes], fileName || 'foto.jpg', { type: mimeType || 'image/jpeg' });
+}
+
+/**
  * Salva uma foto offline e retorna a referência para usar no formulário.
  * Retorna { file_url } compatível com o fluxo online.
  *
@@ -80,29 +92,42 @@ export async function salvarFotoOffline(file) {
  * Usa a validação server-side (validarUploadArquivo).
  *
  * @param {string} photoId
- * @returns {Promise<string|null>} URL real ou null se falhar
+ * @returns {Promise<string>} URL real (lança erro com o motivo se falhar)
  */
 export async function uploadFotoPendente(photoId) {
   const photo = await getOfflinePhoto(photoId);
-  if (!photo) return null;
+  if (!photo) throw new Error('Foto não encontrada no armazenamento local');
 
-  // Import dinâmico para evitar dependência circular
-  const { validarUploadArquivo } = await import('@/functions/validarUploadArquivo');
+  let realUrl = null;
+
+  // 1ª tentativa: função de validação server-side (base64 via JSON).
+  // Pode falhar para fotos grandes (limite de tamanho do corpo da requisição).
   try {
+    const { validarUploadArquivo } = await import('@/functions/validarUploadArquivo');
     const response = await validarUploadArquivo({
       fileBase64: photo.base64,
       fileName: photo.fileName,
       uploadType: 'imagem',
     });
-    const realUrl = response.data.file_url;
-    if (!realUrl) throw new Error('Upload concluído sem URL da imagem');
-    await updateOfflinePhoto(photoId, { status: 'uploaded', uploadedUrl: realUrl });
-    logger.log(`[offlinePhoto] Foto enviada: ${photoId} → ${realUrl}`);
-    return realUrl;
+    realUrl = response?.data?.file_url || null;
   } catch (error) {
-    logger.error(`[offlinePhoto] Falha ao enviar foto ${photoId}:`, error?.message);
-    return null;
+    logger.warn(`[offlinePhoto] Validação server-side falhou para ${photoId}, tentando upload direto:`, error?.response?.data?.error || error?.message);
   }
+
+  // 2ª tentativa (fallback): upload multipart direto — mesmo caminho do modo
+  // online para arquivos, sem limite de JSON/base64.
+  if (!realUrl) {
+    const { base44 } = await import('@/api/base44Client');
+    const file = base64ToFile(photo.base64, photo.fileName, photo.mimeType);
+    const result = await base44.integrations.Core.UploadFile({ file });
+    realUrl = result?.file_url || null;
+  }
+
+  if (!realUrl) throw new Error('Upload concluído sem URL da imagem');
+
+  await updateOfflinePhoto(photoId, { status: 'uploaded', uploadedUrl: realUrl });
+  logger.log(`[offlinePhoto] Foto enviada: ${photoId} → ${realUrl}`);
+  return realUrl;
 }
 
 /**
@@ -122,11 +147,19 @@ export async function resolverFotosOffline(data) {
     const photo = await getOfflinePhoto(photoId);
     if (!photo) throw new Error(`Foto offline não encontrada: ${photoId}`);
 
-    const realUrl = photo.status === 'uploaded' && photo.uploadedUrl
-      ? photo.uploadedUrl
-      : await uploadFotoPendente(photoId);
+    let realUrl;
+    if (photo.status === 'uploaded' && photo.uploadedUrl) {
+      realUrl = photo.uploadedUrl;
+    } else {
+      try {
+        realUrl = await uploadFotoPendente(photoId);
+      } catch (error) {
+        // Propaga o motivo real da falha para aparecer na barra de status
+        const detail = error?.response?.data?.error || error?.message || 'erro desconhecido';
+        throw new Error(`Falha ao enviar a foto "${photo.fileName || photoId}": ${detail}`);
+      }
+    }
 
-    if (!realUrl) throw new Error(`Não foi possível enviar a foto: ${photo.fileName || photoId}`);
     urlMap.set(photoId, realUrl);
   }
 
