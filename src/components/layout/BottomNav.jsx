@@ -54,7 +54,7 @@ export default function BottomNav({ userAccessLevel, canManageSystem, pendingTra
     <>
     <nav
       className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-col"
-      style={{ backgroundColor: 'var(--color-sidebar-bg)', borderTop: '1px solid var(--color-sidebar-border)', paddingBottom: "env(safe-area-inset-bottom)" }}>
+      style={{ backgroundColor: 'var(--color-sidebar-bg)', paddingBottom: "env(safe-area-inset-bottom)" }}>
 
       <button
         type="button"
@@ -62,10 +62,8 @@ export default function BottomNav({ userAccessLevel, canManageSystem, pendingTra
         onClick={() => setSheetOpen(true)}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
-        className="w-full flex flex-col items-center gap-0.5 pt-1.5 pb-1 active:bg-white/5">
+        className="w-full flex items-center justify-center py-1 active:bg-white/5">
         <ChevronUp className="w-4 h-4" style={{ color: 'var(--color-sidebar-text-muted)' }} />
-        <span className="block w-12 h-1 rounded-full" style={{ backgroundColor: 'var(--color-sidebar-text-muted)' }} />
-        <span className="text-[10px] font-medium" style={{ color: 'var(--color-sidebar-text-muted)' }}>Menu</span>
       </button>
 
       <div className="flex items-center justify-around">
