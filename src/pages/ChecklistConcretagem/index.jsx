@@ -121,7 +121,7 @@ export default function ChecklistConcretagem() {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
                   {formData.fotos?.map((url, i) => (
                     <div key={i} className="relative group">
-                      <picture><source srcSet={url} /><img src={url} alt={`Foto ${i + 1}`} className="w-full h-32 object-cover rounded-md border" width="auto" height="128" /></picture>
+                      <picture><source srcSet={url} /><img src={url} alt={`Foto ${i + 1}`} className="w-full h-32 object-contain rounded-md border bg-muted" width="auto" height="128" /></picture>
                       <Button type="button" variant="destructive" size="icon"
                         className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
                         onClick={() => handleRemovePhoto(i)}>
