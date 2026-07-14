@@ -2,6 +2,8 @@
  * Utilitário centralizado de compressão de imagens para relatórios impressos.
  * Elimina o mesmo bloco async duplicado em 5+ componentes de relatório.
  */
+import { isLocalPhotoRef, getPhotoIdFromRef } from '@/services/offlinePhotoService';
+import { getOfflinePhoto } from '@/services/offlineStorageService';
 
 /**
  * Extrai a URL de string ou objeto { url, legenda }.
@@ -30,6 +32,16 @@ export async function compressImage(photoUrl, opts = {}) {
   } = opts;
 
   try {
+    let resolvedUrl = photoUrl;
+    if (isLocalPhotoRef(photoUrl)) {
+      const photo = await getOfflinePhoto(getPhotoIdFromRef(photoUrl));
+      if (!photo?.base64) throw new Error('foto offline não encontrada');
+      const mimeType = photo.mimeType || 'image/jpeg';
+      resolvedUrl = photo.base64.startsWith('data:')
+        ? photo.base64
+        : `data:${mimeType};base64,${photo.base64}`;
+    }
+
     const img = new Image();
     img.crossOrigin = 'anonymous';
 
@@ -37,7 +49,7 @@ export async function compressImage(photoUrl, opts = {}) {
       const timer = setTimeout(() => reject(new Error('timeout')), timeout);
       img.onload = () => { clearTimeout(timer); resolve(); };
       img.onerror = () => { clearTimeout(timer); reject(new Error('load error')); };
-      img.src = photoUrl;
+      img.src = resolvedUrl;
     });
 
     const canvas = document.createElement('canvas');

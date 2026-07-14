@@ -39,12 +39,7 @@ export async function syncQueueItem(item) {
 
     // Resolver fotos offline ANTES de enviar — substitui placeholders
     // "local-photo:<id>" pelas URLs reais (faz upload das pendentes).
-    let payloadToSync = payload;
-    try {
-      payloadToSync = await resolverFotosOffline(payload);
-    } catch (e) {
-      logger.warn(`[syncService] Não foi possível resolver fotos offline para ${item.id}:`, e?.message);
-    }
+    const payloadToSync = await resolverFotosOffline(payload);
 
     // Rotear através de validarESalvarRegistro para validação server-side
     // e detecção de conflitos (LWW).
@@ -140,10 +135,11 @@ export async function forceSyncQueueItem(item) {
     await updateQueueItem(item.id, { status: 'syncing' });
 
     const { operation, entityType, entityId, payload, clientUpdatedAt } = item;
+    const payloadToSync = await resolverFotosOffline(payload);
 
     const response = await validarESalvarRegistro({
       entityName: entityType,
-      data: payload,
+      data: payloadToSync,
       operation,
       recordId: entityId || undefined,
       client_updated_at: clientUpdatedAt,

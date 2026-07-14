@@ -8,7 +8,7 @@
  *   ANTES de enviar o registro, substituindo os placeholders pelas URLs reais.
  */
 
-import { addOfflinePhoto, getOfflinePhoto, getPendingPhotos, updateOfflinePhoto } from '@/services/offlineStorageService';
+import { addOfflinePhoto, getOfflinePhoto, updateOfflinePhoto } from '@/services/offlineStorageService';
 import { compressImage } from '@/utils/imageUpload';
 import { logger } from '@/utils/logger';
 
@@ -67,6 +67,7 @@ export async function salvarFotoOffline(file) {
     photoId,
     base64,
     fileName: file.name,
+    mimeType: compressed.type || file.type,
     status: 'pending',
   });
 
@@ -94,6 +95,7 @@ export async function uploadFotoPendente(photoId) {
       uploadType: 'imagem',
     });
     const realUrl = response.data.file_url;
+    if (!realUrl) throw new Error('Upload concluído sem URL da imagem');
     await updateOfflinePhoto(photoId, { status: 'uploaded', uploadedUrl: realUrl });
     logger.log(`[offlinePhoto] Foto enviada: ${photoId} → ${realUrl}`);
     return realUrl;
@@ -111,21 +113,38 @@ export async function uploadFotoPendente(photoId) {
  * @returns {Promise<object>} payload com URLs reais
  */
 export async function resolverFotosOffline(data) {
-  const pending = await getPendingPhotos();
-  if (pending.length === 0) return data;
+  const photoIds = new Set();
+  coletarReferencias(data, photoIds);
+  if (photoIds.size === 0) return data;
 
-  // Mapear photoId → URL real (fazer upload das pendentes)
   const urlMap = new Map();
-  for (const photo of pending) {
-    if (photo.status === 'uploaded' && photo.uploadedUrl) {
-      urlMap.set(photo.photoId, photo.uploadedUrl);
-    } else if (photo.status === 'pending') {
-      const realUrl = await uploadFotoPendente(photo.photoId);
-      if (realUrl) urlMap.set(photo.photoId, realUrl);
-    }
+  for (const photoId of photoIds) {
+    const photo = await getOfflinePhoto(photoId);
+    if (!photo) throw new Error(`Foto offline não encontrada: ${photoId}`);
+
+    const realUrl = photo.status === 'uploaded' && photo.uploadedUrl
+      ? photo.uploadedUrl
+      : await uploadFotoPendente(photoId);
+
+    if (!realUrl) throw new Error(`Não foi possível enviar a foto: ${photo.fileName || photoId}`);
+    urlMap.set(photoId, realUrl);
   }
 
   return substituirReferencias(data, urlMap);
+}
+
+function coletarReferencias(obj, photoIds) {
+  if (typeof obj === 'string' && isLocalPhotoRef(obj)) {
+    photoIds.add(getPhotoIdFromRef(obj));
+    return;
+  }
+  if (Array.isArray(obj)) {
+    obj.forEach((item) => coletarReferencias(item, photoIds));
+    return;
+  }
+  if (obj && typeof obj === 'object') {
+    Object.values(obj).forEach((value) => coletarReferencias(value, photoIds));
+  }
 }
 
 /**

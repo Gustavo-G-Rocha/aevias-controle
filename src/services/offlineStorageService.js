@@ -510,6 +510,7 @@ export async function addOfflinePhoto(photo) {
       photoId: photo.photoId,
       base64: photo.base64,
       fileName: photo.fileName,
+      mimeType: photo.mimeType || null,
       status: photo.status || 'pending',
       uploadedUrl: null,
       createdAt: Date.now(),

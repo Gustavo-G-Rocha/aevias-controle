@@ -26,7 +26,11 @@ export default function OfflinePhoto({ src, className, style, alt, ...rest }) {
     const photoId = src.replace('local-photo:', '');
     getOfflinePhoto(photoId).then((photo) => {
       if (!cancelled && photo?.base64) {
-        setDisplaySrc(photo.base64);
+        const mimeType = photo.mimeType || 'image/jpeg';
+        const dataUrl = photo.base64.startsWith('data:')
+          ? photo.base64
+          : `data:${mimeType};base64,${photo.base64}`;
+        setDisplaySrc(dataUrl);
       }
     }).catch(() => {});
     return () => { cancelled = true; };
