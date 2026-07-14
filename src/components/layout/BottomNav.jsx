@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, FolderOpen, Grid, LayoutDashboard, Settings } from "lucide-react";
+import { Home, FolderOpen, Grid, LayoutDashboard, Settings, ChevronUp } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { SESSION_KEYS, getTabZone } from "@/lib/layoutConstants";
 import MobileNavSheet from "./MobileNavSheet";
@@ -53,19 +53,22 @@ export default function BottomNav({ userAccessLevel, canManageSystem, pendingTra
   return (
     <>
     <nav
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-wrap items-center justify-around rounded-[10px] pt-2"
-      style={{ backgroundColor: 'var(--color-sidebar-bg)', borderTop: '1px solid var(--color-sidebar-border)', paddingBottom: "env(safe-area-inset-bottom)" }}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}>
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-col"
+      style={{ backgroundColor: 'var(--color-sidebar-bg)', borderTop: '1px solid var(--color-sidebar-border)', paddingBottom: "env(safe-area-inset-bottom)" }}>
 
       <button
         type="button"
         aria-label="Abrir menu completo"
         onClick={() => setSheetOpen(true)}
-        className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-16 h-4 flex items-start justify-center">
-        <span className="block w-10 h-1 rounded-full" style={{ backgroundColor: 'var(--color-sidebar-text-muted)' }} />
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        className="w-full flex flex-col items-center gap-0.5 pt-1.5 pb-1 active:bg-white/5">
+        <ChevronUp className="w-4 h-4" style={{ color: 'var(--color-sidebar-text-muted)' }} />
+        <span className="block w-12 h-1 rounded-full" style={{ backgroundColor: 'var(--color-sidebar-text-muted)' }} />
+        <span className="text-[10px] font-medium" style={{ color: 'var(--color-sidebar-text-muted)' }}>Menu</span>
       </button>
-      
+
+      <div className="flex items-center justify-around">
       {NAV_ITEMS.map((item) => {
         const isActive = item.zone === "settings"
           ? location.pathname.toLowerCase().startsWith("/settings")
@@ -86,6 +89,7 @@ export default function BottomNav({ userAccessLevel, canManageSystem, pendingTra
           </button>);
 
       })}
+      </div>
     </nav>
     <MobileNavSheet
       open={sheetOpen}
