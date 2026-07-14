@@ -9,8 +9,7 @@ const NAV_ITEMS = [
 { label: "Início", icon: Home, path: "/", zone: "home" },
 { label: "Obras", icon: FolderOpen, path: createPageUrl("Regionais"), zone: "regionais" },
 { label: "Projetos", icon: Grid, path: createPageUrl("Projects"), zone: "projects" },
-{ label: "Registros", icon: LayoutDashboard, path: createPageUrl("MeusEnsaios"), zone: "registros" },
-{ label: "Ajustes", icon: Settings, path: createPageUrl("Settings"), zone: "settings" }];
+{ label: "Registros", icon: LayoutDashboard, path: createPageUrl("MeusEnsaios"), zone: "registros" }];
 
 
 export default function BottomNav({ userAccessLevel, canManageSystem, pendingTransfers }) {
@@ -37,10 +36,6 @@ export default function BottomNav({ userAccessLevel, canManageSystem, pendingTra
   }, [location]);
 
   const handleTabPress = useCallback((item) => {
-    if (item.zone === "settings") {
-      navigate(item.path);
-      return;
-    }
     const currentZone = getTabZone(location.pathname);
     if (currentZone === item.zone) {
       navigate(item.path);
@@ -68,9 +63,7 @@ export default function BottomNav({ userAccessLevel, canManageSystem, pendingTra
 
       <div className="flex items-center justify-around">
       {NAV_ITEMS.map((item) => {
-        const isActive = item.zone === "settings"
-          ? location.pathname.toLowerCase().startsWith("/settings")
-          : getTabZone(location.pathname) === item.zone;
+        const isActive = getTabZone(location.pathname) === item.zone;
         return (
           <button
             key={item.label}
