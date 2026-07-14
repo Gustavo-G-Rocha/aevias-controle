@@ -12,7 +12,6 @@ import { validarESalvarRegistro } from '@/functions/validarESalvarRegistro';
 import { createQueueItem } from '@/utils/offlineQueue';
 import { addOrUpdateQueueItem } from '@/services/syncService';
 import { saveDataCache, getDataCache } from '@/services/offlineStorageService';
-import { resolverFotosOffline } from '@/services/offlinePhotoService';
 import { logger } from '@/utils/logger';
 
 /**
@@ -74,20 +73,10 @@ export async function salvarRegistroOfflineAware({
     };
   }
 
-  // Online — caminho normal com validação server-side.
-  // Resolve fotos offline (placeholders "local-photo:") ANTES de enviar,
-  // para cobrir o caso de foto adicionada offline e salvamento online
-  // (conexão instável): o upload da foto pendente é feito aqui.
-  let dataToSync = data;
-  try {
-    dataToSync = await resolverFotosOffline(data);
-  } catch (e) {
-    logger.warn('[offlineSave] Não foi possível resolver fotos offline no caminho online:', e?.message);
-  }
-
+  // Online — caminho normal com validação server-side
   const response = await validarESalvarRegistro({
     entityName,
-    data: dataToSync,
+    data,
     operation,
     recordId: recordId || undefined,
     client_updated_at: clientUpdatedAt,

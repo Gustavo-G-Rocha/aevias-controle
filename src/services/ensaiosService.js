@@ -5,7 +5,6 @@ import { captureError } from '@/utils/observability';
 import { validarESalvarRegistro } from '@/functions/validarESalvarRegistro';
 import { gerenciarAprovacao } from '@/functions/gerenciarAprovacao';
 import { salvarRegistroOfflineAware } from '@/services/offlineSaveService';
-import { obterRegistroOfflineAware } from '@/services/offlineRecordLoader';
 
 /**
  * Service centralizado para operações com Ensaios
@@ -84,7 +83,10 @@ export async function obterEnsaioById(entityName, id) {
   if (!ENSAIO_ENTITIES[entityName]) {
     throw new Error(`Entidade ensaio desconhecida: ${entityName}`);
   }
-  return obterRegistroOfflineAware(entityName, id);
+  return withServiceCall(
+    () => base44.entities[entityName].get(id),
+    'Falha ao carregar ensaio'
+  );
 }
 
 export async function criarEnsaio(entityName, data) {

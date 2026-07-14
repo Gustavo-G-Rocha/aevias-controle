@@ -3,7 +3,6 @@ import { withServiceCall } from '@/utils/serviceErrorHandler';
 import { logger } from '@/utils/logger';
 import { validarESalvarRegistro } from '@/functions/validarESalvarRegistro';
 import { salvarRegistroOfflineAware } from '@/services/offlineSaveService';
-import { obterRegistroOfflineAware } from '@/services/offlineRecordLoader';
 
 /**
  * Service centralizado para operações com Diário de Obra
@@ -23,7 +22,10 @@ export async function listarDiariosPorObra(obraId) {
 }
 
 export async function obterDiarioById(id) {
-  return obterRegistroOfflineAware('DiarioObra', id);
+  return withServiceCall(
+    () => base44.entities.DiarioObra.get(id),
+    'Falha ao carregar diário'
+  );
 }
 
 export async function criarDiario(data) {
