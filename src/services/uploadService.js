@@ -56,6 +56,11 @@ export async function uploadImagem(file) {
     });
     return { file_url: response.data.file_url };
   } catch (error) {
+    const message = String(error?.message || '').toLowerCase();
+    const networkFailure = error?.code === 'ERR_NETWORK' || (!error?.response && (
+      message.includes('network') || message.includes('fetch') || message.includes('internet') || message.includes('load failed')
+    ));
+    if (networkFailure) return salvarFotoOffline(file);
     const serverMessage = error?.response?.data?.error;
     throw new Error(serverMessage || 'Falha ao enviar imagem');
   }

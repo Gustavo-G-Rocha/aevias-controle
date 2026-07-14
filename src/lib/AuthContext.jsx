@@ -7,6 +7,7 @@ import { useSessionTimeout } from '@/hooks/useSessionTimeout';
 import SessionTimeoutWarning from '@/components/auth/SessionTimeoutWarning';
 import { logLogout } from '@/utils/auditEvents';
 import { getDataCache } from '@/services/offlineStorageService';
+import { prepararCacheOffline } from '@/services/offlineCacheService';
 
 const AuthContext = createContext();
 
@@ -132,6 +133,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       const currentUser = await base44.auth.me();
+      await prepararCacheOffline(currentUser);
       setUser(currentUser);
       setIsAuthenticated(true);
       setIsLoadingAuth(false);

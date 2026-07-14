@@ -21,6 +21,45 @@ function isOffline() {
   return typeof navigator !== 'undefined' && !navigator.onLine;
 }
 
+function isNetworkError(error) {
+  const message = String(error?.message || '').toLowerCase();
+  return error?.code === 'ERR_NETWORK' ||
+    (!error?.response && !error?.status && (
+      message.includes('network') ||
+      message.includes('fetch') ||
+      message.includes('internet') ||
+      message.includes('load failed')
+    ));
+}
+
+async function enqueueOffline({ entityName, data, operation, recordId, clientUpdatedAt, baseUpdatedDate }) {
+  logger.log(`[offlineSave] Enfileirando ${operation} ${entityName}`);
+  const timestamp = clientUpdatedAt || new Date().toISOString();
+  const queueItem = createQueueItem({
+    operation,
+    entityType: entityName,
+    entityId: recordId || null,
+    payload: data,
+    clientUpdatedAt: timestamp,
+    baseUpdatedDate: baseUpdatedDate || null,
+  });
+
+  await addOrUpdateQueueItem(queueItem);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('offline-queue-updated'));
+  }
+
+  return {
+    id: recordId || `offline-${queueItem.id}`,
+    ...data,
+    entityType: entityName,
+    _offline: true,
+    _queueId: queueItem.id,
+    created_date: timestamp,
+    updated_date: timestamp,
+  };
+}
+
 /**
  * Salva (cria ou atualiza) um registro com suporte offline.
  *
@@ -42,47 +81,25 @@ export async function salvarRegistroOfflineAware({
   baseUpdatedDate,
 }) {
   if (isOffline()) {
-    logger.log(`[offlineSave] Offline — enfileirando ${operation} ${entityName}`);
-
-    const queueItem = createQueueItem({
-      operation,
-      entityType: entityName,
-      entityId: recordId || null,
-      payload: data,
-      clientUpdatedAt: clientUpdatedAt || new Date().toISOString(),
-      baseUpdatedDate: baseUpdatedDate || null,
-    });
-
-    await addOrUpdateQueueItem(queueItem);
-
-    // Notificar a barra de status para atualizar o contador de pendentes
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('offline-queue-updated'));
-    }
-
-    // Registro temporário para a UI continuar trabalhando.
-    // Marcado com _offline para a UI distinguir (ex: mostrar badge "Pendente sync").
-    const tempId = recordId || `offline-${queueItem.id}`;
-    return {
-      id: tempId,
-      ...data,
-      _offline: true,
-      _queueId: queueItem.id,
-      created_date: clientUpdatedAt || new Date().toISOString(),
-      updated_date: new Date().toISOString(),
-    };
+    return enqueueOffline({ entityName, data, operation, recordId, clientUpdatedAt, baseUpdatedDate });
   }
 
-  // Online — caminho normal com validação server-side
-  const response = await validarESalvarRegistro({
-    entityName,
-    data,
-    operation,
-    recordId: recordId || undefined,
-    client_updated_at: clientUpdatedAt,
-    base_updated_date: baseUpdatedDate,
-  });
-  return response.data.data;
+  // Tenta o caminho online. Se o aparelho ainda indicar conexão, mas a rede
+  // já tiver caído, salva automaticamente na fila offline em vez de falhar.
+  try {
+    const response = await validarESalvarRegistro({
+      entityName,
+      data,
+      operation,
+      recordId: recordId || undefined,
+      client_updated_at: clientUpdatedAt,
+      base_updated_date: baseUpdatedDate,
+    });
+    return response.data.data;
+  } catch (error) {
+    if (!isNetworkError(error)) throw error;
+    return enqueueOffline({ entityName, data, operation, recordId, clientUpdatedAt, baseUpdatedDate });
+  }
 }
 
 /**
