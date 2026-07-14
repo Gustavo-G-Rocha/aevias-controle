@@ -5,6 +5,7 @@ import { obterProjectById } from './projectsService';
 import { obterFaixaById } from './faixasService';
 import { filtrarUsuarios } from './usuariosService';
 import { logger } from '@/utils/logger';
+import { obterRegistroOfflineAware } from '@/services/offlineRecordLoader';
 
 /**
  * Carrega o par obra → regional a partir do obra_id de um registro.
@@ -98,5 +99,5 @@ export async function carregarContextoRelatorio(record) {
  * Usado por hooks de relatório para entidades sem service dedicado.
  */
 export async function obterRegistroPorEntidade(entityName, id) {
-  return base44.entities[entityName].get(id);
+  return obterRegistroOfflineAware(entityName, id);
 }

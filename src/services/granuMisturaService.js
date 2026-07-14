@@ -2,6 +2,7 @@ import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
 import { sanitizeTextFields } from '@/utils/dataSanitization';
 import { salvarRegistroOfflineAware } from '@/services/offlineSaveService';
+import { obterRegistroOfflineAware } from '@/services/offlineRecordLoader';
 
 /**
  * Service centralizado para operações com GranuMistura
@@ -21,10 +22,7 @@ export async function listarGranuMisturaPorObra(obraId) {
 }
 
 export async function obterGranuMisturaById(id) {
-  return withServiceCall(
-    () => base44.entities.GranuMistura.get(id),
-    'Falha ao carregar ensaio de granulometria'
-  );
+  return obterRegistroOfflineAware('GranuMistura', id);
 }
 
 export async function criarGranuMistura(data) {

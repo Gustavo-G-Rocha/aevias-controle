@@ -2,6 +2,7 @@ import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
 import { sanitizeTextFields } from '@/utils/dataSanitization';
 import { salvarRegistroOfflineAware } from '@/services/offlineSaveService';
+import { obterRegistroOfflineAware } from '@/services/offlineRecordLoader';
 
 export async function listarCertificacoes(limit = 200) {
   return withServiceCall(
@@ -18,10 +19,7 @@ export async function listarCertificacoesPorObra(obraId) {
 }
 
 export async function obterCertificacaoById(id) {
-  return withServiceCall(
-    () => base44.entities.CertificacaoUsina.get(id),
-    'Falha ao carregar certificação'
-  );
+  return obterRegistroOfflineAware('CertificacaoUsina', id);
 }
 
 export async function criarCertificacao(data) {

@@ -3,6 +3,7 @@ import { withServiceCall } from '@/utils/serviceErrorHandler';
 import { logger } from '@/utils/logger';
 import { validarESalvarRegistro } from '@/functions/validarESalvarRegistro';
 import { salvarRegistroOfflineAware } from '@/services/offlineSaveService';
+import { obterRegistroOfflineAware } from '@/services/offlineRecordLoader';
 
 /**
  * Service centralizado para operações com Checklists
@@ -41,10 +42,7 @@ export async function obterChecklistById(entityName, id) {
   if (!CHECKLIST_ENTITIES[entityName]) {
     throw new Error(`Entidade checklist desconhecida: ${entityName}`);
   }
-  return withServiceCall(
-    () => base44.entities[entityName].get(id),
-    'Falha ao carregar checklist'
-  );
+  return obterRegistroOfflineAware(entityName, id);
 }
 
 export async function criarChecklist(entityName, data) {

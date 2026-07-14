@@ -25,7 +25,7 @@ export function getPhotoIdFromRef(url) {
 /**
  * Verifica se o dispositivo está offline.
  */
-function isOffline() {
+export function isOffline() {
   return typeof navigator !== 'undefined' && !navigator.onLine;
 }
 
@@ -182,5 +182,3 @@ function substituirReferencias(obj, urlMap) {
   }
   return obj;
 }
-
-export { isOffline };

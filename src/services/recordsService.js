@@ -6,6 +6,7 @@ import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
 import { logger } from '@/utils/logger';
 import { toast } from '@/components/ui/use-toast';
+import { obterRegistroOfflineAware } from '@/services/offlineRecordLoader';
 
 // ─── Mapa canônico de todas as entidades de registro ──────────────────────────
 // Limite único por entidade — cache unificado entre Dashboard e MeusEnsaios
@@ -299,10 +300,7 @@ export async function atualizarRegistro(entityName, id, data) {
  * @returns {Promise<object>}
  */
 export async function obterRegistro(entityName, id) {
-  return withServiceCall(
-    () => base44.entities[entityName].get(id),
-    'Falha ao carregar registro'
-  );
+  return obterRegistroOfflineAware(entityName, id);
 }
 
 /**
