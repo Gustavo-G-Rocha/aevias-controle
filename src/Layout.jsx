@@ -70,7 +70,10 @@ const AppLayout = ({ children, currentPageName }) => {
                 </motion.div>
               </PullToRefresh>
             </div>
-            <BottomNav />
+            <BottomNav
+              userAccessLevel={userAccessLevel}
+              canManageSystem={canManageSystem}
+              pendingTransfers={pendingTransfers} />
             <OfflineStatusBar />
           </main>
         </div>

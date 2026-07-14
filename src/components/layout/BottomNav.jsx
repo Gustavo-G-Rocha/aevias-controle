@@ -1,8 +1,9 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Home, FolderOpen, Grid, LayoutDashboard, Settings } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { SESSION_KEYS, getTabZone } from "@/lib/layoutConstants";
+import MobileNavSheet from "./MobileNavSheet";
 
 const NAV_ITEMS = [
 { label: "Início", icon: Home, path: "/", zone: "home" },
@@ -12,9 +13,23 @@ const NAV_ITEMS = [
 { label: "Ajustes", icon: Settings, path: createPageUrl("Settings"), zone: "settings" }];
 
 
-export default function BottomNav() {
+export default function BottomNav({ userAccessLevel, canManageSystem, pendingTransfers }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const touchStartY = useRef(null);
+
+  const handleTouchStart = useCallback((e) => {
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleTouchMove = useCallback((e) => {
+    if (touchStartY.current === null) return;
+    if (touchStartY.current - e.touches[0].clientY > 30) {
+      touchStartY.current = null;
+      setSheetOpen(true);
+    }
+  }, []);
 
   useEffect(() => {
     const zone = getTabZone(location.pathname);
@@ -36,9 +51,20 @@ export default function BottomNav() {
   }, [location.pathname, navigate]);
 
   return (
+    <>
     <nav
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around rounded-[10px]"
-      style={{ backgroundColor: 'var(--color-sidebar-bg)', borderTop: '1px solid var(--color-sidebar-border)', paddingBottom: "env(safe-area-inset-bottom)" }}>
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-wrap items-center justify-around rounded-[10px] pt-2"
+      style={{ backgroundColor: 'var(--color-sidebar-bg)', borderTop: '1px solid var(--color-sidebar-border)', paddingBottom: "env(safe-area-inset-bottom)" }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}>
+
+      <button
+        type="button"
+        aria-label="Abrir menu completo"
+        onClick={() => setSheetOpen(true)}
+        className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-16 h-4 flex items-start justify-center">
+        <span className="block w-10 h-1 rounded-full" style={{ backgroundColor: 'var(--color-sidebar-text-muted)' }} />
+      </button>
       
       {NAV_ITEMS.map((item) => {
         const isActive = item.zone === "settings"
@@ -60,6 +86,13 @@ export default function BottomNav() {
           </button>);
 
       })}
-    </nav>);
+    </nav>
+    <MobileNavSheet
+      open={sheetOpen}
+      onOpenChange={setSheetOpen}
+      userAccessLevel={userAccessLevel}
+      canManageSystem={canManageSystem}
+      pendingTransfers={pendingTransfers} />
+    </>);
 
 }
