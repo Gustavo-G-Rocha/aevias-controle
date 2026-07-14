@@ -17,7 +17,7 @@ export default function OfflineStatusBar() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-40 max-w-xs">
+    <div className="fixed top-4 right-4 z-40 max-w-xs">
       {/* Status Offline */}
       {!isOnline && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-2 shadow-sm flex items-start gap-2">
