@@ -8,7 +8,7 @@
  *   ANTES de enviar o registro, substituindo os placeholders pelas URLs reais.
  */
 
-import { addOfflinePhoto, getOfflinePhoto, getPendingPhotos, updateOfflinePhoto } from '@/services/offlineStorageService';
+import { addOfflinePhoto, getOfflinePhoto, updateOfflinePhoto } from '@/services/offlineStorageService';
 import { compressImage } from '@/utils/imageUpload';
 import { logger } from '@/utils/logger';
 
@@ -104,24 +104,54 @@ export async function uploadFotoPendente(photoId) {
 }
 
 /**
+ * Coleta todos os photoIds referenciados como "local-photo:<id>" em um objeto.
+ */
+function coletarPhotoIds(obj, acc = new Set()) {
+  if (obj === null || obj === undefined) return acc;
+  if (typeof obj === 'string') {
+    if (isLocalPhotoRef(obj)) {
+      acc.add(getPhotoIdFromRef(obj));
+    }
+    return acc;
+  }
+  if (Array.isArray(obj)) {
+    for (const item of obj) coletarPhotoIds(item, acc);
+    return acc;
+  }
+  if (typeof obj === 'object') {
+    for (const key of Object.keys(obj)) coletarPhotoIds(obj[key], acc);
+    return acc;
+  }
+  return acc;
+}
+
+/**
  * Substitui todos os placeholders "local-photo:" em um objeto de dados
  * pelas URLs reais (fazendo upload das fotos pendentes se necessário).
+ *
+ * Robusto contra retentativas: procura cada referência no payload e resolve
+ * pelo photoId — usa a URL já enviada (status 'uploaded') se existir, ou faz
+ * upload agora (status 'pending').
  *
  * @param {object} data - payload do registro
  * @returns {Promise<object>} payload com URLs reais
  */
 export async function resolverFotosOffline(data) {
-  const pending = await getPendingPhotos();
-  if (pending.length === 0) return data;
+  const photoIds = coletarPhotoIds(data);
+  if (photoIds.size === 0) return data;
 
-  // Mapear photoId → URL real (fazer upload das pendentes)
   const urlMap = new Map();
-  for (const photo of pending) {
+  for (const photoId of photoIds) {
+    const photo = await getOfflinePhoto(photoId);
+    if (!photo) {
+      logger.warn(`[offlinePhoto] PhotoId não encontrado no IndexedDB: ${photoId}`);
+      continue;
+    }
     if (photo.status === 'uploaded' && photo.uploadedUrl) {
-      urlMap.set(photo.photoId, photo.uploadedUrl);
-    } else if (photo.status === 'pending') {
-      const realUrl = await uploadFotoPendente(photo.photoId);
-      if (realUrl) urlMap.set(photo.photoId, realUrl);
+      urlMap.set(photoId, photo.uploadedUrl);
+    } else {
+      const realUrl = await uploadFotoPendente(photoId);
+      if (realUrl) urlMap.set(photoId, realUrl);
     }
   }
 
