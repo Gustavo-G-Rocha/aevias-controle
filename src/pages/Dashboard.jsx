@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { Loader2, Plus } from 'lucide-react';
-import { getUserAccessLevel, canSeeFilters, isAdmin, isLaboratorista, isClienteSupervisor } from '@/utils/accessControl';
+import { getUserAccessLevel, canSeeFilters, isAdmin, isSalaTecnica, isLaboratorista, isClienteSupervisor } from '@/utils/accessControl';
 import { DialogTrigger } from '@/components/ui/dialog';
 import { getChartVisibility } from '@/utils/dashboardUtils';
 import { useDashboardData } from '@/hooks/useDashboardData';
@@ -46,7 +46,7 @@ export default function Dashboard() {
 
   const userAccessLevel = getUserAccessLevel(user);
   const { showObraChart, showTypeChartSeparate } = getChartVisibility(userAccessLevel, charts);
-  const canCreate = isAdmin(user) || isLaboratorista(user) || isClienteSupervisor(user);
+  const canCreate = isAdmin(user) || isSalaTecnica(user) || isLaboratorista(user) || isClienteSupervisor(user);
 
   return (
     <DashboardPage>
