@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, FolderOpen, Grid, LayoutDashboard } from "lucide-react";
+import { Home, FolderOpen, Grid, LayoutDashboard, Settings } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { SESSION_KEYS, getTabZone } from "@/lib/layoutConstants";
 
@@ -8,7 +8,8 @@ const NAV_ITEMS = [
 { label: "Início", icon: Home, path: "/", zone: "home" },
 { label: "Obras", icon: FolderOpen, path: createPageUrl("Regionais"), zone: "regionais" },
 { label: "Projetos", icon: Grid, path: createPageUrl("Projects"), zone: "projects" },
-{ label: "Registros", icon: LayoutDashboard, path: createPageUrl("MeusEnsaios"), zone: "registros" }];
+{ label: "Registros", icon: LayoutDashboard, path: createPageUrl("MeusEnsaios"), zone: "registros" },
+{ label: "Ajustes", icon: Settings, path: createPageUrl("Settings"), zone: "settings" }];
 
 
 export default function BottomNav() {
@@ -21,6 +22,10 @@ export default function BottomNav() {
   }, [location]);
 
   const handleTabPress = useCallback((item) => {
+    if (item.zone === "settings") {
+      navigate(item.path);
+      return;
+    }
     const currentZone = getTabZone(location.pathname);
     if (currentZone === item.zone) {
       navigate(item.path);
@@ -36,13 +41,15 @@ export default function BottomNav() {
       style={{ backgroundColor: 'var(--color-sidebar-bg)', borderTop: '1px solid var(--color-sidebar-border)', paddingBottom: "env(safe-area-inset-bottom)" }}>
       
       {NAV_ITEMS.map((item) => {
-        const isActive = getTabZone(location.pathname) === item.zone;
+        const isActive = item.zone === "settings"
+          ? location.pathname.toLowerCase().startsWith("/settings")
+          : getTabZone(location.pathname) === item.zone;
         return (
           <button
             key={item.label}
             type="button"
             onClick={() => handleTabPress(item)}
-            className="flex flex-col items-center gap-1 py-3 px-6 transition-colors select-none rounded-xl"
+            className="flex flex-col items-center gap-1 py-3 px-4 transition-colors select-none rounded-xl"
             style={{
               color: isActive ? 'var(--color-secondary)' : 'var(--color-sidebar-text-muted)',
               backgroundColor: isActive ? 'rgba(255,255,255,0.12)' : 'transparent'

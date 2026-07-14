@@ -20,6 +20,8 @@ import {
 "@/components/ui/alert-dialog";
 import { useState, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
+import { excluirMinhaConta } from "@/functions/excluirMinhaConta";
+import { toast } from "@/components/ui/use-toast";
 
 export default function UserMenu({ user, isAdmin, isSalaTecnica, isGestorContrato, isCliente }) {
   const navigate = useNavigate();
@@ -30,7 +32,16 @@ export default function UserMenu({ user, isAdmin, isSalaTecnica, isGestorContrat
   }, []);
 
   const handleDeleteAccount = useCallback(async () => {
-    base44.auth.logout();
+    try {
+      await excluirMinhaConta({});
+      await base44.auth.logout();
+    } catch (error) {
+      toast({
+        title: "Erro ao excluir conta",
+        description: error?.response?.data?.error || error.message,
+        variant: "destructive",
+      });
+    }
   }, []);
 
   const roleLabel = isAdmin ? "Admin" :
