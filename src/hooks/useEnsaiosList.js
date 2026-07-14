@@ -7,6 +7,8 @@ import { getUserAccessLevel, getAccessibleObraIds } from '@/utils/accessControl'
 import { useCurrentUser, useAuxData, useAllRecords, QUERY_KEYS } from '@/hooks/useQueryData';
 import { getDataEnsaio } from '@/components/ensaios/ensaioMappers';
 import { carregarRegistrosSupervisorService } from '@/services/supervisorRecordsService';
+import { useOfflineDetection } from '@/hooks/useOfflineDetection';
+import { saveDataCache, getDataCache } from '@/services/offlineStorageService';
 
 export function sortByEnsaioDate(records) {
   return [...records].sort((a, b) => {
@@ -75,9 +77,19 @@ export function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccess
 // Hook específico para cliente_supervisor: busca registros via backend function
 // que usa asServiceRole, contornando o RLS que não retorna registros de subordinados
 function useSupervisorRecords(user, enabled) {
+  const { isOnline } = useOfflineDetection();
   return useQuery({
     queryKey: ['supervisorRecords', user?.email],
-    queryFn: () => carregarRegistrosSupervisorService(),
+    queryFn: async () => {
+      if (!isOnline) {
+        const cached = await getDataCache(`supervisorRecords:${user?.email}`);
+        if (cached) return cached.data;
+        return [];
+      }
+      const data = await carregarRegistrosSupervisorService();
+      saveDataCache(`supervisorRecords:${user?.email}`, data, 'records').catch(() => {});
+      return data;
+    },
     enabled,
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,

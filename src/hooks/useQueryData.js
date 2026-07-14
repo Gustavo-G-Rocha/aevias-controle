@@ -6,6 +6,9 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
 import { loadAllRecords, loadAuxData } from '@/services/recordsService';
+import { saveDataCache, getDataCache } from '@/services/offlineStorageService';
+import { useOfflineDetection } from './useOfflineDetection';
+import { logger } from '@/utils/logger';
 
 // ─── Query Keys canônicas ──────────────────────────────────────────────────────
 export const QUERY_KEYS = {
@@ -17,30 +20,75 @@ export const QUERY_KEYS = {
 };
 
 // ─── Usuário autenticado ───────────────────────────────────────────────────────
+// Quando offline: lê do cache para manter a identidade e nível de acesso.
 export function useCurrentUser() {
+  const { isOnline } = useOfflineDetection();
   return useQuery({
     queryKey: QUERY_KEYS.currentUser,
-    queryFn: () => base44.auth.me(),
+    queryFn: async () => {
+      if (!isOnline) {
+        const cached = await getDataCache('currentUser');
+        if (cached) {
+          logger.log('[useQueryData] Offline — lendo usuário do cache');
+          return cached.data;
+        }
+        throw new Error('Offline e sem cache de usuário');
+      }
+      const user = await base44.auth.me();
+      saveDataCache('currentUser', user, 'auth').catch(() => {});
+      return user;
+    },
     staleTime: 30 * 1000, // 30s — access_level pode mudar via admin; precisa estar fresco
     refetchOnMount: true,
   });
 }
 
 // ─── Dados auxiliares (Obras, Projetos, Regionais, Usuários) ──────────────────
+// Quando online: busca do servidor e salva no cache offline (IndexedDB).
+// Quando offline: lê do cache offline para visualização.
 export function useAuxData({ needsRegionais = true, needsUsers = false } = {}) {
+  const { isOnline } = useOfflineDetection();
   return useQuery({
     queryKey: QUERY_KEYS.auxData({ needsRegionais, needsUsers }),
-    queryFn: () => loadAuxData({ needsRegionais, needsUsers }),
+    queryFn: async () => {
+      const cacheKey = `auxData:${needsRegionais ? 'R' : ''}${needsUsers ? 'U' : ''}`;
+      if (!isOnline) {
+        const cached = await getDataCache(cacheKey);
+        if (cached) {
+          logger.log('[useQueryData] Offline — lendo dados auxiliares do cache');
+          return cached.data;
+        }
+        return { obras: [], projects: [], regionais: [], users: [] };
+      }
+      const data = await loadAuxData({ needsRegionais, needsUsers });
+      saveDataCache(cacheKey, data, 'auxData').catch(() => {});
+      return data;
+    },
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
   });
 }
 
 // ─── Todos os registros — cache único compartilhado ───────────────────────────
+// Quando online: busca do servidor e salva no cache offline (IndexedDB).
+// Quando offline: lê do cache offline para visualização.
 export function useAllRecords(mode = 'list') {
+  const { isOnline } = useOfflineDetection();
   return useQuery({
     queryKey: QUERY_KEYS.allRecordsFor(mode),
-    queryFn: () => loadAllRecords(mode),
+    queryFn: async () => {
+      if (!isOnline) {
+        const cached = await getDataCache(`records:${mode}`);
+        if (cached) {
+          logger.log(`[useQueryData] Offline — lendo registros do cache (${mode})`);
+          return cached.data;
+        }
+        return [];
+      }
+      const data = await loadAllRecords(mode);
+      saveDataCache(`records:${mode}`, data, 'records').catch(() => {});
+      return data;
+    },
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
   });

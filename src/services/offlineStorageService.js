@@ -9,7 +9,8 @@ import { logger } from '@/utils/logger';
 const DB_NAME = 'aevias-offline-v1';
 const STORE_QUEUE = 'queueItems';
 const STORE_CONFLICTS = 'conflicts';
-const DB_VERSION = 2;
+const STORE_DATA_CACHE = 'dataCache';
+const DB_VERSION = 3;
 
 let db = null;
 
@@ -58,6 +59,13 @@ async function initDB() {
         conflictStore.createIndex('status', 'status', { unique: false });
         conflictStore.createIndex('queueItemId', 'queueItemId', { unique: false });
         logger.log('[offlineStorage] Store criado:', STORE_CONFLICTS);
+      }
+
+      // Store para cache de dados de leitura (offline viewing)
+      if (!database.objectStoreNames.contains(STORE_DATA_CACHE)) {
+        const cacheStore = database.createObjectStore(STORE_DATA_CACHE, { keyPath: 'cacheKey' });
+        cacheStore.createIndex('category', 'category', { unique: false });
+        logger.log('[offlineStorage] Store criado:', STORE_DATA_CACHE);
       }
     };
   });
@@ -389,5 +397,91 @@ export async function clearConflicts() {
       logger.log('[offlineStorage] Conflitos limpos');
       resolve();
     };
+  });
+}
+
+// ── Data Cache (offline reading) ────────────────────────────────
+
+/**
+ * Salva dados no cache de leitura (offline viewing).
+ * @param {string} cacheKey - chave única (ex: 'records:list', 'auxData:regionais+users')
+ * @param {any} data - dados a cachear
+ * @param {string} category - categoria para limpeza seletiva ('records' | 'auxData')
+ * @returns {Promise<void>}
+ */
+export async function saveDataCache(cacheKey, data, category = 'records') {
+  const database = await initDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction([STORE_DATA_CACHE], 'readwrite');
+    const store = transaction.objectStore(STORE_DATA_CACHE);
+    const request = store.put({
+      cacheKey,
+      category,
+      data,
+      cachedAt: Date.now(),
+    });
+
+    request.onerror = () => {
+      logger.error('[offlineStorage] Erro ao salvar cache:', request.error);
+      reject(request.error);
+    };
+    request.onsuccess = () => {
+      resolve();
+    };
+  });
+}
+
+/**
+ * Recupera dados do cache de leitura.
+ * @param {string} cacheKey
+ * @returns {Promise<{data: any, cachedAt: number} | null>}
+ */
+export async function getDataCache(cacheKey) {
+  const database = await initDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction([STORE_DATA_CACHE], 'readonly');
+    const store = transaction.objectStore(STORE_DATA_CACHE);
+    const request = store.get(cacheKey);
+
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      const result = request.result || null;
+      resolve(result ? { data: result.data, cachedAt: result.cachedAt } : null);
+    };
+  });
+}
+
+/**
+ * Limpa todo o cache de dados de leitura, ou apenas uma categoria.
+ * @param {string} [category] - se fornecido, limpa apenas essa categoria
+ * @returns {Promise<void>}
+ */
+export async function clearDataCache(category = null) {
+  const database = await initDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction([STORE_DATA_CACHE], 'readwrite');
+    const store = transaction.objectStore(STORE_DATA_CACHE);
+
+    if (!category) {
+      const request = store.clear();
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve();
+      return;
+    }
+
+    const index = store.index('category');
+    const request = index.openCursor(IDBKeyRange.only(category));
+    request.onerror = () => reject(request.error);
+    request.onsuccess = (event) => {
+      const cursor = event.target.result;
+      if (cursor) {
+        cursor.delete();
+        cursor.continue();
+      }
+    };
+    transaction.oncomplete = () => resolve();
   });
 }
