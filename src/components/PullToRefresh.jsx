@@ -8,6 +8,7 @@ export default function PullToRefresh({ children, disabled = false }) {
   const [pullDistance, setPullDistance] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const startYRef = useRef(null);
+  const startXRef = useRef(null);
   const containerRef = useRef(null);
 
   const isInputFocused = useCallback(() => {
@@ -19,18 +20,28 @@ export default function PullToRefresh({ children, disabled = false }) {
 
   const handleTouchStart = useCallback((e) => {
     if (isInputFocused()) return;
+    const target = e.target;
+    const gestureSurface = target?.closest?.('[data-no-pull-to-refresh], .recharts-wrapper, .leaflet-container, [role="application"]');
+    const horizontalScroller = target?.closest?.('.overflow-x-auto, .overflow-x-scroll');
+    if (gestureSurface || horizontalScroller) return;
     const scrollTop = containerRef.current?.scrollTop ?? 0;
     if (scrollTop === 0) {
+      startXRef.current = e.touches[0].clientX;
       startYRef.current = e.touches[0].clientY;
     }
   }, [isInputFocused]);
 
   const handleTouchMove = useCallback((e) => {
     if (startYRef.current === null || refreshing || isInputFocused()) return;
-    const delta = e.touches[0].clientY - startYRef.current;
-    if (delta > 0) {
-      setPullDistance(Math.min(delta * 0.5, THRESHOLD + 20));
+    const deltaX = e.touches[0].clientX - startXRef.current;
+    const deltaY = e.touches[0].clientY - startYRef.current;
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      startXRef.current = null;
+      startYRef.current = null;
+      setPullDistance(0);
+      return;
     }
+    if (deltaY > 0) setPullDistance(Math.min(deltaY * 0.5, THRESHOLD + 20));
   }, [refreshing, isInputFocused]);
 
   const handleTouchEnd = useCallback(async () => {
@@ -43,6 +54,7 @@ export default function PullToRefresh({ children, disabled = false }) {
     } else {
       setPullDistance(0);
     }
+    startXRef.current = null;
     startYRef.current = null;
   }, [pullDistance, isInputFocused, queryClient]);
 

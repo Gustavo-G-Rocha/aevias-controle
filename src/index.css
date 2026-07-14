@@ -478,9 +478,10 @@
     max-width: 100vw;
   }
 
-  button, a, [role="button"], nav, .sidebar-menu-button {
+  button, a, [role="button"], [role="option"], [role="tab"], [role="menuitem"], summary, nav, .sidebar-menu-button {
     user-select: none;
     -webkit-user-select: none;
+    -webkit-touch-callout: none;
   }
 
   /* ── UserMenu button na sidebar ── */

@@ -15,7 +15,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { base44 } from "@/api/base44Client";
-import { excluirMinhaConta } from "@/functions/excluirMinhaConta";
+import * as usersService from "@/services/usuariosService";
 import { toast } from "@/components/ui/use-toast";
 
 export default function Settings() {
@@ -24,7 +24,7 @@ export default function Settings() {
   const handleDeleteAccount = async () => {
     setDeleting(true);
     try {
-      await excluirMinhaConta({});
+      await usersService.deletarUsuario();
       await base44.auth.logout();
     } catch (error) {
       toast({
