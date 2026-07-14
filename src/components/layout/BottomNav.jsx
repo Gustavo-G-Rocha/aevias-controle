@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, FolderOpen, Grid, LayoutDashboard, Settings, ChevronUp } from "lucide-react";
+import { Home, FolderOpen, Grid, LayoutDashboard, Menu } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { SESSION_KEYS, getTabZone } from "@/lib/layoutConstants";
 import MobileNavSheet from "./MobileNavSheet";
@@ -8,6 +8,7 @@ import MobileNavSheet from "./MobileNavSheet";
 const NAV_ITEMS = [
 { label: "Início", icon: Home, path: "/", zone: "home" },
 { label: "Obras", icon: FolderOpen, path: createPageUrl("Regionais"), zone: "regionais" },
+{ label: "Menu", icon: Menu, path: "__menu__", zone: "menu" },
 { label: "Projetos", icon: Grid, path: createPageUrl("Projects"), zone: "projects" },
 { label: "Registros", icon: LayoutDashboard, path: createPageUrl("MeusEnsaios"), zone: "registros" }];
 
@@ -36,6 +37,10 @@ export default function BottomNav({ userAccessLevel, canManageSystem, pendingTra
   }, [location]);
 
   const handleTabPress = useCallback((item) => {
+    if (item.zone === "menu") {
+      setSheetOpen(true);
+      return;
+    }
     const currentZone = getTabZone(location.pathname);
     if (currentZone === item.zone) {
       navigate(item.path);
@@ -51,19 +56,11 @@ export default function BottomNav({ userAccessLevel, canManageSystem, pendingTra
       className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-col"
       style={{ backgroundColor: 'var(--color-sidebar-bg)', paddingBottom: "env(safe-area-inset-bottom)" }}>
 
-      <button
-        type="button"
-        aria-label="Abrir menu completo"
-        onClick={() => setSheetOpen(true)}
+      <div className="flex items-center justify-around"
         onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        className="w-full flex items-center justify-center py-1 active:bg-white/5">
-        <ChevronUp className="w-4 h-4" style={{ color: 'var(--color-sidebar-text-muted)' }} />
-      </button>
-
-      <div className="flex items-center justify-around">
+        onTouchMove={handleTouchMove}>
       {NAV_ITEMS.map((item) => {
-        const isActive = getTabZone(location.pathname) === item.zone;
+        const isActive = item.zone !== "menu" && getTabZone(location.pathname) === item.zone;
         return (
           <button
             key={item.label}
