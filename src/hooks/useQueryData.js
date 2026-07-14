@@ -34,9 +34,21 @@ export function useCurrentUser() {
         }
         throw new Error('Offline e sem cache de usuário');
       }
-      const user = await base44.auth.me();
-      saveDataCache('currentUser', user, 'auth').catch(() => {});
-      return user;
+      try {
+        const user = await base44.auth.me();
+        saveDataCache('currentUser', user, 'auth').catch(() => {});
+        return user;
+      } catch (e) {
+        // Erro de autenticação real: propaga. Falha de rede (navigator.onLine
+        // mentiu — comum em mobile): usa o cache para não deslogar o usuário.
+        if (e?.status === 401 || e?.status === 403) throw e;
+        const cached = await getDataCache('currentUser');
+        if (cached) {
+          logger.warn('[useQueryData] Rede falhou — usando usuário do cache');
+          return cached.data;
+        }
+        throw e;
+      }
     },
     staleTime: 30 * 1000, // 30s — access_level pode mudar via admin; precisa estar fresco
     refetchOnMount: true,
@@ -52,17 +64,42 @@ export function useAuxData({ needsRegionais = true, needsUsers = false } = {}) {
     queryKey: QUERY_KEYS.auxData({ needsRegionais, needsUsers }),
     queryFn: async () => {
       const cacheKey = `auxData:${needsRegionais ? 'R' : ''}${needsUsers ? 'U' : ''}`;
+      const readCache = () => getDataCache(cacheKey);
       if (!isOnline) {
-        const cached = await getDataCache(cacheKey);
+        const cached = await readCache();
         if (cached) {
           logger.log('[useQueryData] Offline — lendo dados auxiliares do cache');
           return cached.data;
         }
         return { obras: [], projects: [], regionais: [], users: [] };
       }
-      const data = await loadAuxData({ needsRegionais, needsUsers });
-      saveDataCache(cacheKey, data, 'auxData').catch(() => {});
-      return data;
+      try {
+        const data = await loadAuxData({ needsRegionais, needsUsers });
+        const hasData = data.obras.length > 0 || data.regionais.length > 0 || data.projects.length > 0;
+        if (hasData) {
+          // Só sobrescreve o cache com dados reais — nunca com listas vazias
+          // vindas de uma rede instável (loadAuxData engole falhas por entidade).
+          saveDataCache(cacheKey, data, 'auxData').catch(() => {});
+          saveDataCache('auxData:obras', data.obras, 'auxData').catch(() => {});
+          saveDataCache('auxData:regionais', data.regionais, 'auxData').catch(() => {});
+          saveDataCache('auxData:projects', data.projects, 'auxData').catch(() => {});
+          return data;
+        }
+        // Tudo veio vazio (provável falha de rede silenciosa) — prefere o cache.
+        const cached = await readCache();
+        if (cached?.data && (cached.data.obras?.length || cached.data.regionais?.length)) {
+          logger.warn('[useQueryData] Dados auxiliares vazios da rede — usando cache');
+          return cached.data;
+        }
+        return data;
+      } catch (e) {
+        const cached = await readCache();
+        if (cached) {
+          logger.warn('[useQueryData] Rede falhou — dados auxiliares do cache');
+          return cached.data;
+        }
+        throw e;
+      }
     },
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
@@ -85,9 +122,27 @@ export function useAllRecords(mode = 'list') {
         }
         return [];
       }
-      const data = await loadAllRecords(mode);
-      saveDataCache(`records:${mode}`, data, 'records').catch(() => {});
-      return data;
+      try {
+        const data = await loadAllRecords(mode);
+        if (data.length > 0) {
+          saveDataCache(`records:${mode}`, data, 'records').catch(() => {});
+          return data;
+        }
+        // Zero registros pode ser falha de rede silenciosa — prefere o cache.
+        const cached = await getDataCache(`records:${mode}`);
+        if (cached?.data?.length) {
+          logger.warn(`[useQueryData] Registros vazios da rede — usando cache (${mode})`);
+          return cached.data;
+        }
+        return data;
+      } catch (e) {
+        const cached = await getDataCache(`records:${mode}`);
+        if (cached) {
+          logger.warn(`[useQueryData] Rede falhou — registros do cache (${mode})`);
+          return cached.data;
+        }
+        throw e;
+      }
     },
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,

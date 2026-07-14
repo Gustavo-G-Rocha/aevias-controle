@@ -60,8 +60,10 @@ export const AuthProvider = ({ children }) => {
       } catch (appError) {
         logger.error('App state check failed:', appError);
 
-        // Offline + token: tentar abrir mesmo sem public settings
-        if (isOffline && appParams.token) {
+        // Offline (ou falha de rede sem status HTTP — mobile com sinal fraco)
+        // + token: tentar abrir mesmo sem public settings, usando o cache.
+        const isNetworkFailure = !appError.status;
+        if ((isOffline || isNetworkFailure) && appParams.token) {
           await checkUserAuth();
           setIsLoadingPublicSettings(false);
           return;
@@ -140,16 +142,33 @@ export const AuthProvider = ({ children }) => {
       setIsLoadingAuth(false);
     } catch (error) {
       logger.error('User auth check failed:', error);
-      setIsLoadingAuth(false);
-      setIsAuthenticated(false);
-      
-      // If user auth fails, it might be an expired token
+
+      // Token expirado/inválido: exigir login
       if (error.status === 401 || error.status === 403) {
+        setIsLoadingAuth(false);
+        setIsAuthenticated(false);
         setAuthError({
           type: 'auth_required',
           message: 'Authentication required'
         });
+        return;
       }
+
+      // Falha de rede (sem status HTTP) com navigator.onLine mentindo —
+      // comum em mobile: usar o usuário em cache para não bloquear o app.
+      try {
+        const cached = await getDataCache('currentUser');
+        if (cached?.data) {
+          logger.warn('[AuthContext] Rede falhou — usuário carregado do cache');
+          setUser(cached.data);
+          setIsAuthenticated(true);
+          setIsLoadingAuth(false);
+          return;
+        }
+      } catch { /* sem cache disponível */ }
+
+      setIsLoadingAuth(false);
+      setIsAuthenticated(false);
     }
   };
 

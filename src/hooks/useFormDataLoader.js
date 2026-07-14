@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { listarFaixas } from "@/services/faixasService";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
+import { saveDataCache, getDataCache } from "@/services/offlineStorageService";
 
 /**
  * Hook base compartilhado que encapsula a lógica comum de carregamento de
@@ -34,9 +35,24 @@ export function useFormDataLoader({
   const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true, needsUsers });
 
   // FaixaGranulometrica — cache próprio (não está no useAuxData)
+  // Online: busca e salva no IndexedDB; offline/falha de rede: lê do cache.
   const { data: faixas } = useQuery({
     queryKey: ['faixasGranulometricas'],
-    queryFn: () => listarFaixas(),
+    queryFn: async () => {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        const cached = await getDataCache('auxData:faixas');
+        return cached?.data ?? [];
+      }
+      try {
+        const data = await listarFaixas();
+        if (data?.length) saveDataCache('auxData:faixas', data, 'auxData').catch(() => {});
+        return data;
+      } catch (e) {
+        const cached = await getDataCache('auxData:faixas');
+        if (cached) return cached.data;
+        throw e;
+      }
+    },
     staleTime: 10 * 60 * 1000,
   });
 

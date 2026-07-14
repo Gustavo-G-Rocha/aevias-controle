@@ -20,6 +20,55 @@ function isOffline() {
   return typeof navigator !== 'undefined' && !navigator.onLine;
 }
 
+/**
+ * Carrega usuário e obras do cache offline (IndexedDB).
+ * Usado quando não há rede OU quando a rede falha silenciosamente
+ * (navigator.onLine true, mas requisições falham — comum em mobile).
+ * @returns {{ userData: object|null, obras: object[] }}
+ */
+async function carregarDoCacheOffline() {
+  const cachedUser = await getDataCache('currentUser');
+  const userData = cachedUser?.data || null;
+  if (!userData) return { userData: null, obras: [] };
+
+  const userAccessLevel = getUserAccessLevel(userData);
+  if (userAccessLevel !== ACCESS_LEVELS.USER && userAccessLevel !== ACCESS_LEVELS.FUNCIONARIOS_CLIENTE) {
+    return { userData, obras: ALL_OBRA_TYPE_STUBS };
+  }
+
+  const cachedObras = await getDataCache('auxData:obras');
+  const cachedRegionais = await getDataCache('auxData:regionais');
+  const obrasData = cachedObras?.data || [];
+  const regionaisData = cachedRegionais?.data || [];
+  const emailLower = userData.email.toLowerCase();
+  const supervisorEmailLower = userData.supervisor_email?.toLowerCase();
+
+  let regionaisIds;
+  if (userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE) {
+    const emailsToCheck = new Set([emailLower]);
+    if (supervisorEmailLower) emailsToCheck.add(supervisorEmailLower);
+    regionaisIds = regionaisData
+      .filter(r => (r.clientes_responsaveis || []).some(e => emailsToCheck.has(e.toLowerCase())))
+      .map(r => r.id);
+  } else {
+    regionaisIds = regionaisData
+      .filter(r =>
+        (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+        (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+      )
+      .map(r => r.id);
+  }
+
+  const regionaisSet = new Set(regionaisIds);
+  const statusFilter = userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE
+    ? () => true
+    : (o) => o.status === "em_andamento";
+  const obras = regionaisIds.length > 0
+    ? obrasData.filter(o => regionaisSet.has(o.regional_id) && statusFilter(o))
+    : [];
+  return { userData, obras };
+}
+
 export function useLayoutData() {
   const [user, setUser] = useState(null);
   const [obrasDoUsuario, setObrasDoUsuario] = useState([]);
@@ -34,42 +83,9 @@ export function useLayoutData() {
     if (isOffline()) {
       logger.log('[useLayoutData] Offline — carregando do cache');
       try {
-        const cachedUser = await getDataCache('currentUser');
-        const userData = cachedUser?.data || null;
-        if (userData) {
-          setUser(userData);
-          const userAccessLevel = getUserAccessLevel(userData);
-          if (userAccessLevel === ACCESS_LEVELS.USER || userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE) {
-            const cachedObras = await getDataCache('auxData:obras');
-            const cachedRegionais = await getDataCache('auxData:regionais');
-            const obrasData = cachedObras?.data || [];
-            const regionaisData = cachedRegionais?.data || [];
-            const emailLower = userData.email.toLowerCase();
-            const regionaisIds = userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE
-              ? regionaisData
-                  .filter(r => (r.clientes_responsaveis || []).some(e => e.toLowerCase() === emailLower))
-                  .map(r => r.id)
-              : regionaisData
-                  .filter(r =>
-                    (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-                    (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-                  )
-                  .map(r => r.id);
-            const regionaisSet = new Set(regionaisIds);
-            const statusFilter = userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE
-              ? () => true
-              : (o) => o.status === "em_andamento";
-            setObrasDoUsuario(regionaisIds.length > 0
-              ? obrasData.filter(o => regionaisSet.has(o.regional_id) && statusFilter(o))
-              : []);
-          } else {
-            setObrasDoUsuario(ALL_OBRA_TYPE_STUBS);
-          }
-        } else {
-          // Sem cache de usuário — não há como determinar acesso
-          setUser(null);
-          setObrasDoUsuario([]);
-        }
+        const { userData, obras } = await carregarDoCacheOffline();
+        setUser(userData);
+        setObrasDoUsuario(obras);
       } catch (e) {
         logger.error('[useLayoutData] Erro ao carregar cache offline:', e);
         setUser(null);
@@ -161,8 +177,22 @@ export function useLayoutData() {
       }
     } catch (error) {
       logger.error("Erro ao carregar usuário e obras:", error);
-      setUser(null);
-      setObrasDoUsuario([]);
+      // Erro de autenticação real: desloga. Falha de rede (comum em mobile
+      // com navigator.onLine mentindo): cai para o cache offline.
+      if (error?.status === 401 || error?.status === 403) {
+        setUser(null);
+        setObrasDoUsuario([]);
+      } else {
+        try {
+          const { userData, obras } = await carregarDoCacheOffline();
+          logger.warn('[useLayoutData] Rede falhou — usando cache offline');
+          setUser(userData);
+          setObrasDoUsuario(obras);
+        } catch {
+          setUser(null);
+          setObrasDoUsuario([]);
+        }
+      }
     } finally {
       setLoadingUser(false);
     }
