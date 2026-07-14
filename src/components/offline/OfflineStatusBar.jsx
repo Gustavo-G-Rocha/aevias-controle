@@ -9,7 +9,7 @@ import { AlertCircle, WifiOff, Loader, AlertTriangle } from 'lucide-react';
 import { ConflictResolutionDialog } from '@/components/offline/ConflictResolutionDialog';
 
 export default function OfflineStatusBar() {
-  const { isOnline, isSyncing, pendingCount, failedCount, conflictCount, conflicts, resolveConflict } = useOfflineSync();
+  const { isOnline, isSyncing, pendingCount, failedCount, conflictCount, conflicts, resolveConflict, retryFailed, failedError } = useOfflineSync();
   const [selectedConflict, setSelectedConflict] = useState(null);
 
   if (isOnline && pendingCount === 0 && failedCount === 0 && conflictCount === 0) {
@@ -59,15 +59,28 @@ export default function OfflineStatusBar() {
       )}
 
       {/* Erro de Sincronização */}
-      {failedCount > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3 shadow-sm flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
-          <div className="text-sm">
-            <p className="text-destructive font-medium">Erro na sincronização</p>
-            <p className="text-destructive text-xs">
-              {failedCount} registro(s) falharam. Tente novamente mais tarde.
-            </p>
+      {failedCount > 0 && !isSyncing && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3 shadow-sm">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
+            <div className="text-sm min-w-0">
+              <p className="text-destructive font-medium">Erro na sincronização</p>
+              <p className="text-destructive text-xs">
+                {failedCount} registro(s) não puderam ser enviados.
+              </p>
+              {failedError && (
+                <p className="text-red-600 text-xs mt-1 break-words">{failedError}</p>
+              )}
+            </div>
           </div>
+          {isOnline && (
+            <button
+              onClick={retryFailed}
+              className="mt-2 w-full text-center text-xs font-medium bg-red-600 text-white rounded-md py-1.5 hover:bg-red-700 transition-colors"
+            >
+              Tentar novamente
+            </button>
+          )}
         </div>
       )}
 

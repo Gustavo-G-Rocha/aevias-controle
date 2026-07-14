@@ -99,24 +99,45 @@ export async function syncQueueItem(item) {
 
     return { success: true };
   } catch (error) {
-    logger.error(`[syncService] Erro ao sincronizar ${item.id}:`, error?.message);
+    // Extrai a mensagem real do servidor (ex: "Obra não encontrada") em vez
+    // de um genérico "Request failed with status code 400".
+    const errorStatus = error?.response?.status || error?.status;
+    const serverMsg = error?.response?.data?.error || error?.message || String(error);
+    logger.error(`[syncService] Erro ao sincronizar ${item.id}:`, serverMsg);
 
-    const newAttempts = item.attempts + 1;
+    const newAttempts = (item.attempts || 0) + 1;
     const maxAttempts = 5;
+
+    // Erros permanentes (validação/permissão 4xx) nunca vão passar retentando —
+    // marca como 'failed' imediatamente para não ficar enviando infinitamente.
+    const isPermanent = errorStatus >= 400 && errorStatus < 500 && errorStatus !== 408 && errorStatus !== 429;
 
     const updates = {
       attempts: newAttempts,
-      lastError: error?.message || String(error),
-      status: newAttempts >= maxAttempts ? 'failed' : 'pending',
+      lastError: serverMsg,
+      status: (isPermanent || newAttempts >= maxAttempts) ? 'failed' : 'pending',
     };
 
     await updateQueueItem(item.id, updates);
 
     return {
       success: false,
-      error: error?.message || String(error),
+      error: serverMsg,
     };
   }
+}
+
+/**
+ * Recoloca os itens 'failed' na fila como 'pending' (zera tentativas)
+ * e dispara uma nova sincronização. Usado pelo botão "Tentar novamente".
+ * @returns {Promise<{synced: number, failed: number, errors: string[]}>}
+ */
+export async function retryFailedItems() {
+  const failedItems = await getQueueItemsByStatus('failed');
+  for (const item of failedItems) {
+    await updateQueueItem(item.id, { status: 'pending', attempts: 0, lastError: null });
+  }
+  return syncPendingItems();
 }
 
 /**

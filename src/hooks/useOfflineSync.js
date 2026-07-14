@@ -4,10 +4,10 @@
  * Expõe contadores de pendências, falhas e conflitos (LWW).
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useOfflineDetection } from './useOfflineDetection';
-import { syncPendingItems, resolveConflict as resolveConflictService } from '@/services/syncService';
+import { syncPendingItems, retryFailedItems, resolveConflict as resolveConflictService } from '@/services/syncService';
 import {
   getQueueItemsByStatus,
   countQueueItemsByStatus,
@@ -30,16 +30,23 @@ export function useOfflineSync() {
   const [conflicts, setConflicts] = useState([]);
   const [lastSyncTime, setLastSyncTime] = useState(null);
   const [lastError, setLastError] = useState(null);
+  const [failedError, setFailedError] = useState(null);
+  // Guarda em ref para o performSync ter identidade estável — evita o loop
+  // em que setIsSyncing recriava o callback e o useEffect disparava uma nova
+  // sincronização imediatamente ("enviando infinito").
+  const isSyncingRef = useRef(false);
 
   // Atualizar contadores de pendência e conflitos
   const refreshCounts = useCallback(async () => {
     try {
       const pending = await countQueueItemsByStatus('pending');
-      const failed = await countQueueItemsByStatus('failed');
+      const failedItems = await getQueueItemsByStatus('failed');
+      const failed = failedItems.length;
       const conflict = await countConflictsByStatus('pending');
       const allConflicts = await getAllConflicts();
       setPendingCount(pending);
       setFailedCount(failed);
+      setFailedError(failedItems[0]?.lastError || null);
       setConflictCount(conflict);
       setConflicts(allConflicts);
     } catch (e) {
@@ -47,11 +54,12 @@ export function useOfflineSync() {
     }
   }, []);
 
-  // Sincronizar items
+  // Sincronizar items (identidade estável — não depende de isOnline/isSyncing)
   const performSync = useCallback(async () => {
-    if (!isOnline || isSyncing) return;
+    if ((typeof navigator !== 'undefined' && !navigator.onLine) || isSyncingRef.current) return;
 
     logger.log('[useOfflineSync] Iniciando sincronização');
+    isSyncingRef.current = true;
     setIsSyncing(true);
     setLastError(null);
 
@@ -79,9 +87,35 @@ export function useOfflineSync() {
       logger.error('[useOfflineSync] Erro durante sincronização:', e);
       setLastError(e?.message || String(e));
     } finally {
+      isSyncingRef.current = false;
       setIsSyncing(false);
     }
-  }, [isOnline, isSyncing, refreshCounts, queryClient]);
+  }, [refreshCounts, queryClient]);
+
+  // Tentar novamente os itens que falharam (botão "Tentar novamente")
+  const retryFailed = useCallback(async () => {
+    if (isSyncingRef.current) return;
+    isSyncingRef.current = true;
+    setIsSyncing(true);
+    setLastError(null);
+    try {
+      const result = await retryFailedItems();
+      setLastSyncTime(new Date());
+      if (result.synced > 0) {
+        queryClient.invalidateQueries({ queryKey: ['allRecords'] });
+        queryClient.invalidateQueries({ queryKey: ['auxData'] });
+        queryClient.invalidateQueries({ queryKey: ['supervisorRecords'] });
+        queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      }
+      await refreshCounts();
+    } catch (e) {
+      logger.error('[useOfflineSync] Erro ao retentar:', e);
+      setLastError(e?.message || String(e));
+    } finally {
+      isSyncingRef.current = false;
+      setIsSyncing(false);
+    }
+  }, [refreshCounts, queryClient]);
 
   // Resolver conflito (force overwrite ou discard)
   const resolveConflict = useCallback(async (conflict, resolution) => {
@@ -132,7 +166,9 @@ export function useOfflineSync() {
     conflicts,
     lastSyncTime,
     lastError,
+    failedError,
     performSync,
+    retryFailed,
     resolveConflict,
     refreshCounts,
   };
