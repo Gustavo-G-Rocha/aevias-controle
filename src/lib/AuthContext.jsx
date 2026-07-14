@@ -8,6 +8,7 @@ import SessionTimeoutWarning from '@/components/auth/SessionTimeoutWarning';
 import { logLogout } from '@/utils/auditEvents';
 import { getDataCache } from '@/services/offlineStorageService';
 import { prepararCacheOffline } from '@/services/offlineCacheService';
+import { prefetchFieldPages } from '@/lib/prefetchPages';
 
 const AuthContext = createContext();
 
@@ -133,7 +134,9 @@ export const AuthProvider = ({ children }) => {
       }
 
       const currentUser = await base44.auth.me();
-      await prepararCacheOffline(currentUser);
+      // Preparação offline roda em background — não atrasa a abertura do app
+      prepararCacheOffline(currentUser).catch(() => {});
+      prefetchFieldPages();
       setUser(currentUser);
       setIsAuthenticated(true);
       setIsLoadingAuth(false);
