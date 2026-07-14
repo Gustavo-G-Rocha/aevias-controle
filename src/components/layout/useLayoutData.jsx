@@ -14,6 +14,11 @@ import {
   ALL_OBRA_TYPE_STUBS,
   getUserAccessLevel,
 } from "@/lib/layoutConstants";
+import { getDataCache, saveDataCache } from "@/services/offlineStorageService";
+
+function isOffline() {
+  return typeof navigator !== 'undefined' && !navigator.onLine;
+}
 
 export function useLayoutData() {
   const [user, setUser] = useState(null);
@@ -23,6 +28,58 @@ export function useLayoutData() {
 
   const loadUserAndObras = useCallback(async () => {
     setLoadingUser(true);
+
+    // ── Modo offline (modelo WhatsApp) ──
+    // Sem rede: usar usuário e dados auxiliares em cache para não quebrar a navegação.
+    if (isOffline()) {
+      logger.log('[useLayoutData] Offline — carregando do cache');
+      try {
+        const cachedUser = await getDataCache('currentUser');
+        const userData = cachedUser?.data || null;
+        if (userData) {
+          setUser(userData);
+          const userAccessLevel = getUserAccessLevel(userData);
+          if (userAccessLevel === ACCESS_LEVELS.USER || userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE) {
+            const cachedObras = await getDataCache('auxData:obras');
+            const cachedRegionais = await getDataCache('auxData:regionais');
+            const obrasData = cachedObras?.data || [];
+            const regionaisData = cachedRegionais?.data || [];
+            const emailLower = userData.email.toLowerCase();
+            const regionaisIds = userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE
+              ? regionaisData
+                  .filter(r => (r.clientes_responsaveis || []).some(e => e.toLowerCase() === emailLower))
+                  .map(r => r.id)
+              : regionaisData
+                  .filter(r =>
+                    (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+                    (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+                  )
+                  .map(r => r.id);
+            const regionaisSet = new Set(regionaisIds);
+            const statusFilter = userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE
+              ? () => true
+              : (o) => o.status === "em_andamento";
+            setObrasDoUsuario(regionaisIds.length > 0
+              ? obrasData.filter(o => regionaisSet.has(o.regional_id) && statusFilter(o))
+              : []);
+          } else {
+            setObrasDoUsuario(ALL_OBRA_TYPE_STUBS);
+          }
+        } else {
+          // Sem cache de usuário — não há como determinar acesso
+          setUser(null);
+          setObrasDoUsuario([]);
+        }
+      } catch (e) {
+        logger.error('[useLayoutData] Erro ao carregar cache offline:', e);
+        setUser(null);
+        setObrasDoUsuario([]);
+      } finally {
+        setLoadingUser(false);
+      }
+      return;
+    }
+
     try {
       const userData = await obterUsuarioAtual();
 
@@ -36,6 +93,9 @@ export function useLayoutData() {
 
       if (userAccessLevel === ACCESS_LEVELS.USER || userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE) {
         const [obrasData, regionaisData] = await Promise.all([listarObrasRecentes(), listarRegionais()]);
+        // Cachear para uso offline
+        saveDataCache('auxData:obras', obrasData, 'auxData').catch(() => {});
+        saveDataCache('auxData:regionais', regionaisData, 'auxData').catch(() => {});
 
         const emailLower = userData.email.toLowerCase();
         const supervisorEmailLower = userData.supervisor_email?.toLowerCase();

@@ -6,6 +6,7 @@ import { logger } from '@/utils/logger';
 import { useSessionTimeout } from '@/hooks/useSessionTimeout';
 import SessionTimeoutWarning from '@/components/auth/SessionTimeoutWarning';
 import { logLogout } from '@/utils/auditEvents';
+import { getDataCache } from '@/services/offlineStorageService';
 
 const AuthContext = createContext();
 
@@ -21,7 +22,18 @@ export const AuthProvider = ({ children }) => {
     try {
       setIsLoadingPublicSettings(true);
       setAuthError(null);
-      
+
+      // ── Modo offline (modelo WhatsApp) ──
+      // Sem rede: não tentar validar public settings (falharia). Se há token,
+      // assumir autenticado usando o usuário em cache para o app abrir.
+      const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+      if (isOffline && appParams.token) {
+        logger.log('[AuthContext] Offline — pulando validação de public settings, usando cache');
+        await checkUserAuth();
+        setIsLoadingPublicSettings(false);
+        return;
+      }
+
       // First, check app public settings (with token if available)
       // This will tell us if auth is required, user not registered, etc.
       const appClient = createAxiosClient({
@@ -47,6 +59,13 @@ export const AuthProvider = ({ children }) => {
         setIsLoadingPublicSettings(false);
       } catch (appError) {
         logger.error('App state check failed:', appError);
+
+        // Offline + token: tentar abrir mesmo sem public settings
+        if (isOffline && appParams.token) {
+          await checkUserAuth();
+          setIsLoadingPublicSettings(false);
+          return;
+        }
         
         // Handle app-level errors
         if (appError.status === 403 && appError.data?.extra_data?.reason) {
@@ -93,6 +112,25 @@ export const AuthProvider = ({ children }) => {
     try {
       // Now check if the user is authenticated
       setIsLoadingAuth(true);
+      const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+
+      if (isOffline) {
+        // Offline: ler usuário do cache para o app funcionar sem rede
+        const cached = await getDataCache('currentUser');
+        if (cached?.data) {
+          logger.log('[AuthContext] Offline — usuário carregado do cache');
+          setUser(cached.data);
+          setIsAuthenticated(true);
+          setIsLoadingAuth(false);
+          return;
+        }
+        // Sem cache e offline — não há como autenticar
+        logger.warn('[AuthContext] Offline e sem cache de usuário');
+        setIsLoadingAuth(false);
+        setIsAuthenticated(false);
+        return;
+      }
+
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       setIsAuthenticated(true);

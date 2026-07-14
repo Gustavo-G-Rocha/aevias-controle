@@ -1,6 +1,7 @@
 import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
 import { sanitizeTextFields } from '@/utils/dataSanitization';
+import { salvarRegistroOfflineAware } from '@/services/offlineSaveService';
 
 /**
  * Service centralizado para operações com GranuMistura
@@ -27,17 +28,11 @@ export async function obterGranuMisturaById(id) {
 }
 
 export async function criarGranuMistura(data) {
-  return withServiceCall(
-    () => base44.entities.GranuMistura.create(sanitizeTextFields(data)),
-    'Falha ao criar ensaio de granulometria'
-  );
+  return salvarRegistroOfflineAware({ entityName: 'GranuMistura', data: sanitizeTextFields(data), operation: 'create' });
 }
 
 export async function atualizarGranuMistura(id, data) {
-  return withServiceCall(
-    () => base44.entities.GranuMistura.update(id, sanitizeTextFields(data)),
-    'Falha ao atualizar ensaio de granulometria'
-  );
+  return salvarRegistroOfflineAware({ entityName: 'GranuMistura', data: sanitizeTextFields(data), operation: 'update', recordId: id });
 }
 
 export async function deletarGranuMistura(id) {

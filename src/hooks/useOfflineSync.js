@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useOfflineDetection } from './useOfflineDetection';
 import { syncPendingItems, resolveConflict as resolveConflictService } from '@/services/syncService';
 import {
@@ -21,6 +22,7 @@ import { logger } from '@/utils/logger';
  */
 export function useOfflineSync() {
   const { isOnline } = useOfflineDetection();
+  const queryClient = useQueryClient();
   const [isSyncing, setIsSyncing] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [failedCount, setFailedCount] = useState(0);
@@ -59,6 +61,11 @@ export function useOfflineSync() {
 
       if (result.synced > 0) {
         logger.log(`[useOfflineSync] ${result.synced} items sincronizados`);
+        // Invalidar cache do React Query para a UI buscar os registros sincronizados
+        queryClient.invalidateQueries({ queryKey: ['allRecords'] });
+        queryClient.invalidateQueries({ queryKey: ['auxData'] });
+        queryClient.invalidateQueries({ queryKey: ['supervisorRecords'] });
+        queryClient.invalidateQueries({ queryKey: ['currentUser'] });
       }
 
       if (result.failed > 0) {
@@ -74,7 +81,7 @@ export function useOfflineSync() {
     } finally {
       setIsSyncing(false);
     }
-  }, [isOnline, isSyncing, refreshCounts]);
+  }, [isOnline, isSyncing, refreshCounts, queryClient]);
 
   // Resolver conflito (force overwrite ou discard)
   const resolveConflict = useCallback(async (conflict, resolution) => {

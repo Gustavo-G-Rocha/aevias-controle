@@ -53,6 +53,7 @@ export function useEnsaioActionsBase({
         ? prepareData(fd, saveStatus)
         : { ...fd, status: saveStatus };
 
+      let savedRecord;
       if (ee) {
         const updateData = { ...dataToSave };
         if (ee.approved === false && saveStatus === "finalizado") {
@@ -62,13 +63,20 @@ export function useEnsaioActionsBase({
           updateData.approved_date = null;
           if (setWasRejectedOnReset) updateData.was_rejected = true;
         }
-        await atualizarEnsaio(entityName, ee.id, updateData);
+        savedRecord = await atualizarEnsaio(entityName, ee.id, updateData);
       } else {
-        const novo = await criarEnsaio(entityName, dataToSave);
-        if (setEditingEnsaio) setEditingEnsaio(novo);
+        savedRecord = await criarEnsaio(entityName, dataToSave);
+        if (setEditingEnsaio) setEditingEnsaio(savedRecord);
       }
 
-      if (saveStatus === "rascunho") {
+      // Feedback offline-aware (modelo WhatsApp)
+      if (savedRecord?._offline) {
+        toast({
+          title: saveStatus === "finalizado"
+            ? "Registro salvo offline — será enviado quando houver conexão."
+            : "Rascunho salvo offline — será enviado quando houver conexão.",
+        });
+      } else if (saveStatus === "rascunho") {
         toast({ title: successMessageRascunho || "Progresso salvo!" });
       } else {
         toast({ title: successMessageFinalizar || "Ensaio finalizado com sucesso!" });

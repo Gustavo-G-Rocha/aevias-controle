@@ -4,6 +4,7 @@ import { logger } from '@/utils/logger';
 import { captureError } from '@/utils/observability';
 import { validarESalvarRegistro } from '@/functions/validarESalvarRegistro';
 import { gerenciarAprovacao } from '@/functions/gerenciarAprovacao';
+import { salvarRegistroOfflineAware } from '@/services/offlineSaveService';
 
 /**
  * Service centralizado para operações com Ensaios
@@ -93,8 +94,7 @@ export async function criarEnsaio(entityName, data) {
     throw new Error(`Entidade ensaio desconhecida: ${entityName}`);
   }
   try {
-    const response = await validarESalvarRegistro({ entityName, data, operation: 'create' });
-    return response.data.data;
+    return await salvarRegistroOfflineAware({ entityName, data, operation: 'create' });
   } catch (error) {
     captureError(error, { entity: entityName, operation: 'create' });
     const validationMessage = error?.response?.data?.error;
@@ -109,8 +109,7 @@ export async function atualizarEnsaio(entityName, id, data) {
     throw new Error(`Entidade ensaio desconhecida: ${entityName}`);
   }
   try {
-    const response = await validarESalvarRegistro({ entityName, data, operation: 'update', recordId: id });
-    return response.data.data;
+    return await salvarRegistroOfflineAware({ entityName, data, operation: 'update', recordId: id });
   } catch (error) {
     captureError(error, { entity: entityName, operation: 'update' });
     const validationMessage = error?.response?.data?.error;

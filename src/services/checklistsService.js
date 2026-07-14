@@ -2,6 +2,7 @@ import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
 import { logger } from '@/utils/logger';
 import { validarESalvarRegistro } from '@/functions/validarESalvarRegistro';
+import { salvarRegistroOfflineAware } from '@/services/offlineSaveService';
 
 /**
  * Service centralizado para operações com Checklists
@@ -51,8 +52,7 @@ export async function criarChecklist(entityName, data) {
     throw new Error(`Entidade checklist desconhecida: ${entityName}`);
   }
   try {
-    const response = await validarESalvarRegistro({ entityName, data, operation: 'create' });
-    return response.data.data;
+    return await salvarRegistroOfflineAware({ entityName, data, operation: 'create' });
   } catch (error) {
     const validationMessage = error?.response?.data?.error;
     if (validationMessage) throw new Error(validationMessage);
@@ -66,8 +66,7 @@ export async function atualizarChecklist(entityName, id, data) {
     throw new Error(`Entidade checklist desconhecida: ${entityName}`);
   }
   try {
-    const response = await validarESalvarRegistro({ entityName, data, operation: 'update', recordId: id });
-    return response.data.data;
+    return await salvarRegistroOfflineAware({ entityName, data, operation: 'update', recordId: id });
   } catch (error) {
     const validationMessage = error?.response?.data?.error;
     if (validationMessage) throw new Error(validationMessage);

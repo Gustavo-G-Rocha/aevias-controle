@@ -2,6 +2,7 @@ import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
 import { logger } from '@/utils/logger';
 import { validarESalvarRegistro } from '@/functions/validarESalvarRegistro';
+import { salvarRegistroOfflineAware } from '@/services/offlineSaveService';
 
 /**
  * Service centralizado para operações com Diário de Obra
@@ -29,8 +30,7 @@ export async function obterDiarioById(id) {
 
 export async function criarDiario(data) {
   try {
-    const response = await validarESalvarRegistro({ entityName: 'DiarioObra', data, operation: 'create' });
-    return response.data.data;
+    return await salvarRegistroOfflineAware({ entityName: 'DiarioObra', data, operation: 'create' });
   } catch (error) {
     const validationMessage = error?.response?.data?.error;
     if (validationMessage) throw new Error(validationMessage);
@@ -41,8 +41,7 @@ export async function criarDiario(data) {
 
 export async function atualizarDiario(id, data) {
   try {
-    const response = await validarESalvarRegistro({ entityName: 'DiarioObra', data, operation: 'update', recordId: id });
-    return response.data.data;
+    return await salvarRegistroOfflineAware({ entityName: 'DiarioObra', data, operation: 'update', recordId: id });
   } catch (error) {
     const validationMessage = error?.response?.data?.error;
     if (validationMessage) throw new Error(validationMessage);
