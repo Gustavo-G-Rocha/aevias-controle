@@ -10,7 +10,8 @@ const DB_NAME = 'aevias-offline-v1';
 const STORE_QUEUE = 'queueItems';
 const STORE_CONFLICTS = 'conflicts';
 const STORE_DATA_CACHE = 'dataCache';
-const DB_VERSION = 3;
+const STORE_PHOTOS = 'offlinePhotos';
+const DB_VERSION = 4;
 
 let db = null;
 
@@ -66,6 +67,13 @@ async function initDB() {
         const cacheStore = database.createObjectStore(STORE_DATA_CACHE, { keyPath: 'cacheKey' });
         cacheStore.createIndex('category', 'category', { unique: false });
         logger.log('[offlineStorage] Store criado:', STORE_DATA_CACHE);
+      }
+
+      // Store para fotos tiradas offline (base64) — upload pendente
+      if (!database.objectStoreNames.contains(STORE_PHOTOS)) {
+        const photoStore = database.createObjectStore(STORE_PHOTOS, { keyPath: 'photoId' });
+        photoStore.createIndex('status', 'status', { unique: false });
+        logger.log('[offlineStorage] Store criado:', STORE_PHOTOS);
       }
     };
   });
@@ -484,4 +492,89 @@ export async function clearDataCache(category = null) {
     };
     transaction.oncomplete = () => resolve();
   });
+}
+
+// ── Offline Photos (upload pendente) ─────────────────────────────
+
+/**
+ * Salva uma foto offline (base64) para upload quando a conexão voltar.
+ * @param {object} photo - { photoId, base64, fileName, status: 'pending' }
+ * @returns {Promise<void>}
+ */
+export async function addOfflinePhoto(photo) {
+  const database = await initDB();
+  return new Promise((resolve, reject) => {
+    const tx = database.transaction([STORE_PHOTOS], 'readwrite');
+    const store = tx.objectStore(STORE_PHOTOS);
+    const request = store.put({
+      photoId: photo.photoId,
+      base64: photo.base64,
+      fileName: photo.fileName,
+      status: photo.status || 'pending',
+      uploadedUrl: null,
+      createdAt: Date.now(),
+    });
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve();
+  });
+}
+
+/**
+ * Obtém uma foto offline pelo ID.
+ * @param {string} photoId
+ * @returns {Promise<object|null>}
+ */
+export async function getOfflinePhoto(photoId) {
+  const database = await initDB();
+  return new Promise((resolve, reject) => {
+    const tx = database.transaction([STORE_PHOTOS], 'readonly');
+    const store = tx.objectStore(STORE_PHOTOS);
+    const request = store.get(photoId);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result || null);
+  });
+}
+
+/**
+ * Lista todas as fotos pendentes de upload.
+ * @returns {Promise<object[]>}
+ */
+export async function getPendingPhotos() {
+  const database = await initDB();
+  return new Promise((resolve, reject) => {
+    const tx = database.transaction([STORE_PHOTOS], 'readonly');
+    const store = tx.objectStore(STORE_PHOTOS);
+    const index = store.index('status');
+    const request = index.getAll('pending');
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result || []);
+  });
+}
+
+/**
+ * Atualiza o status de uma foto (ex: marcar como uploaded com a URL real).
+ * @param {string} photoId
+ * @param {object} updates
+ * @returns {Promise<void>}
+ */
+export async function updateOfflinePhoto(photoId, updates) {
+  const database = await initDB();
+  const existing = await getOfflinePhoto(photoId);
+  if (!existing) return;
+  return new Promise((resolve, reject) => {
+    const tx = database.transaction([STORE_PHOTOS], 'readwrite');
+    const store = tx.objectStore(STORE_PHOTOS);
+    const request = store.put({ ...existing, ...updates });
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve();
+  });
+}
+
+/**
+ * Conta fotos pendentes de upload.
+ * @returns {Promise<number>}
+ */
+export async function countPendingPhotos() {
+  const photos = await getPendingPhotos();
+  return photos.length;
 }

@@ -116,6 +116,13 @@ export function useOfflineSync() {
     refreshCounts();
   }, [refreshCounts]);
 
+  // Atualizar contadores quando um novo item é enfileirado offline
+  useEffect(() => {
+    const handler = () => refreshCounts();
+    window.addEventListener('offline-queue-updated', handler);
+    return () => window.removeEventListener('offline-queue-updated', handler);
+  }, [refreshCounts]);
+
   return {
     isOnline,
     isSyncing,

@@ -16,6 +16,7 @@ import {
   addConflict,
   removeConflict,
 } from './offlineStorageService';
+import { resolverFotosOffline } from '@/services/offlinePhotoService';
 import { validarESalvarRegistro } from '@/functions/validarESalvarRegistro';
 import { logger } from '@/utils/logger';
 
@@ -36,13 +37,22 @@ export async function syncQueueItem(item) {
 
     const { operation, entityType, entityId, payload, clientUpdatedAt, baseUpdatedDate } = item;
 
+    // Resolver fotos offline ANTES de enviar — substitui placeholders
+    // "local-photo:<id>" pelas URLs reais (faz upload das pendentes).
+    let payloadToSync = payload;
+    try {
+      payloadToSync = await resolverFotosOffline(payload);
+    } catch (e) {
+      logger.warn(`[syncService] Não foi possível resolver fotos offline para ${item.id}:`, e?.message);
+    }
+
     // Rotear através de validarESalvarRegistro para validação server-side
     // e detecção de conflitos (LWW).
     let result;
     try {
       const response = await validarESalvarRegistro({
         entityName: entityType,
-        data: payload,
+        data: payloadToSync,
         operation,
         recordId: entityId || undefined,
         client_updated_at: clientUpdatedAt,

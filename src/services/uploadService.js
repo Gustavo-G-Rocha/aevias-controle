@@ -2,6 +2,7 @@ import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
 import { validarUploadArquivo } from '@/functions/validarUploadArquivo';
 import { compressImage } from '@/utils/imageUpload';
+import { salvarFotoOffline, isOffline } from '@/services/offlinePhotoService';
 
 /**
  * Service centralizado para upload de arquivos e imagens
@@ -31,6 +32,13 @@ export async function uploadImagem(file) {
 
   if (file.size > 10 * 1024 * 1024) {
     throw new Error('Arquivo excede o tamanho máximo de 10MB');
+  }
+
+  // ── Modo offline (modelo WhatsApp) ──
+  // Sem rede: salvar a foto comprimida localmente no IndexedDB.
+  // O sync fará o upload quando a conexão voltar, substituindo o placeholder.
+  if (isOffline()) {
+    return salvarFotoOffline(file);
   }
 
   // Comprimir imagem antes do upload — reduz fotos de câmera
@@ -80,6 +88,12 @@ export async function uploadMultiplasImagens(files) {
 export async function uploadArquivo(file) {
   if (file.size > 50 * 1024 * 1024) {
     throw new Error('Arquivo excede o tamanho máximo de 50MB');
+  }
+
+  // ── Modo offline (modelo WhatsApp) ──
+  // Imagens são salvas localmente no IndexedDB e enviadas no sincronizar.
+  if (isOffline() && VALID_IMAGE_TYPES.includes(file.type)) {
+    return salvarFotoOffline(file);
   }
 
   return withServiceCall(

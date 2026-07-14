@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { normalizarFoto } from "@/utils/photoLegendaUtils";
+import OfflinePhoto from "@/components/offline/OfflinePhoto";
 
 /**
  * Componente reutilizável de upload + galeria de fotos.
@@ -97,10 +98,7 @@ export default function UploadGallery({
               const fotoNormalizada = normalizarFoto(foto);
               return (
                 <div key={i} className="relative group">
-                  <picture>
-                    <source srcSet={fotoNormalizada.url} />
-                    <img src={fotoNormalizada.url} alt={`Foto ${i + 1}`} className="w-full h-32 object-cover rounded-md border" width="auto" height="128" />
-                  </picture>
+                  <OfflinePhoto src={fotoNormalizada.url} alt={`Foto ${i + 1}`} className="w-full h-32 object-cover rounded-md border" width="auto" height="128" />
                   {canEdit && (
                     <Button
                       type="button"
