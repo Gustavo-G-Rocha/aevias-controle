@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import AcoesCorretivasNC from "@/components/checklists/AcoesCorretivasNC";
+import OfflinePhoto from "@/components/offline/OfflinePhoto";
 import { useChecklistConcretagem } from "@/hooks/useChecklistConcretagem";
 
 import DadosObraSection from "./components/DadosObraSection";
@@ -121,7 +122,7 @@ export default function ChecklistConcretagem() {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
                   {formData.fotos?.map((url, i) => (
                     <div key={i} className="relative group flex items-center justify-center">
-                      <picture><source srcSet={url} /><img src={url} alt={`Foto ${i + 1}`} className="w-full h-32 object-contain rounded-md border bg-muted" width="auto" height="128" /></picture>
+                      <OfflinePhoto src={url} alt={`Foto ${i + 1}`} className="w-full h-32 object-contain rounded-md border bg-muted" />
                       <Button type="button" variant="destructive" size="icon"
                         className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
                         onClick={() => handleRemovePhoto(i)}>
