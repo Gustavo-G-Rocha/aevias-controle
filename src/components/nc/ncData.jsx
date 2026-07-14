@@ -13,7 +13,7 @@ export const NC_DATA = [
   { local: "CAMPO", categoria: "Execução - Drenagem", parametros: ["ÂNGULO DE QUEDA", "MATERIAL DRENANTE", "MANTA GEOTÊXTIL", "ÂNGULO DE SAÍDA"] },
   { local: "CAMPO", categoria: "Execução - Manutenção", parametros: ["ROÇADA", "LIMPEZA", "TROCA DE DISPOSITIVOS"] },
   { local: "CAMPO", categoria: "Execução - OAE", parametros: ["SLUMP", "TRAÇO DE CONCRETO", "ARMAÇÃO", "RESISTÊNCIA"] },
-  { local: "CAMPO", categoria: "Execução - Contenção em Concreto Projetado", parametros: ["SLUMP", "TRAÇO DE CONCRETO", "ARMAÇÃO", "RESISTÊNCIA"] },
+  { local: "CAMPO", categoria: "Execução - Contenção em Concreto Projetado", parametros: ["SLUMP", "TRAÇO DE CONCRETO", "ARMAÇÃO", "RESISTÊNCIA", "TEMPO EXCEDIDO"] },
   { local: "CAMPO", categoria: "Execução - Terraplanagem", parametros: ["DEFLEXÃO", "ISC", "EXPANSÃO", "VARIAÇÃO DE UMIDADE", "GRAU DE COMPACTAÇÃO", "TAXA DE IMPRIMAÇÃO", "TEMPO EXCEDIDO"] },
   { local: "CAMPO", categoria: "Execução - Sinalização", parametros: ["PINTURA", "PLACAS DE SINALIZAÇÃO"] },
   { local: "CAMPO", categoria: "Execução - Reciclagem", parametros: ["RESISTÊNCIA", "GRAU DE COMPACTAÇÃO", "VARIAÇÃO DE UMIDADE", "DEFLEXÃO", "TAXA DE CIMENTO", "TAXA DE IMPRIMAÇÃO"] },
