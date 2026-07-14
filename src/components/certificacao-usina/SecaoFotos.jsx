@@ -2,6 +2,7 @@ import { Loader2, CheckCircle, XCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import OfflinePhoto from "@/components/offline/OfflinePhoto";
 
 /**
  * Seção de relatório fotográfico para a Certificação de Usina.
@@ -81,10 +82,7 @@ export default function SecaoFotos({
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2">
           {fotos.map((url, i) => (
             <div key={i} className="relative group">
-              <picture>
-                <source srcSet={url} />
-                <img src={url} alt={`Foto ${i + 1}`} className="w-full h-32 object-cover rounded-md border" width="auto" height="128" />
-              </picture>
+              <OfflinePhoto src={url} alt={`Foto ${i + 1}`} className="w-full h-32 object-cover rounded-md border" />
               <p className="text-xs text-center text-muted-foreground mt-1">Foto {i + 1}</p>
               {canEdit && (
                 <Button

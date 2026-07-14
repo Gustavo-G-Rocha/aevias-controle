@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Loader2, ImagePlus, FileUp, X } from "lucide-react";
 import { removePhotoByIndex, removePdfByIndex } from "@/utils/editarNCUtils";
+import OfflinePhoto from "@/components/offline/OfflinePhoto";
 
 export default function AttachmentsSection({
   fotos,
@@ -64,16 +65,11 @@ export default function AttachmentsSection({
             <div className="grid grid-cols-3 gap-3 mt-3">
               {fotos.map((url, i) => (
                 <div key={i} className="relative group">
-                  <picture>
-                    <source srcSet={url} />
-                    <img
-                      src={url}
-                      alt={`Foto ${i + 1}`}
-                      className="w-full h-28 object-cover rounded-md border border-white/20"
-                      width="auto"
-                      height="112"
-                    />
-                  </picture>
+                  <OfflinePhoto
+                    src={url}
+                    alt={`Foto ${i + 1}`}
+                    className="w-full h-28 object-cover rounded-md border border-white/20"
+                  />
                   <button
                     type="button"
                     onClick={() =>

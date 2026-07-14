@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Upload, X } from "lucide-react";
 import AcoesCorretivasNC from "@/components/checklists/AcoesCorretivasNC";
 import MedicoesGeometricasSection from "@/components/checklists/aplicacao/MedicoesGeometricasSection";
+import OfflinePhoto from "@/components/offline/OfflinePhoto";
 
 export default function ObservacoesSection({
   formData,
@@ -66,12 +67,8 @@ export default function ObservacoesSection({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
             {formData.fotos.map((foto, index) => (
               <div key={index} className="relative group">
-                <picture>
-                  <source srcSet={foto} />
-                  <img src={foto} alt={`Foto ${index + 1}`}
-                    className="w-full h-32 object-cover rounded-lg border-2 border-border"
-                    width="auto" height="128" />
-                </picture>
+                <OfflinePhoto src={foto} alt={`Foto ${index + 1}`}
+                    className="w-full h-32 object-cover rounded-lg border-2 border-border" />
                 {isEditable && (
                   <button type="button" onClick={() => onRemovePhoto(index)}
                     className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">

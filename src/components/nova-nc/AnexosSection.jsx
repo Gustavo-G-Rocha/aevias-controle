@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ImagePlus, FileUp, Loader2, X } from "lucide-react";
+import OfflinePhoto from "@/components/offline/OfflinePhoto";
 
 export function AnexosSection({
   fotos,
@@ -54,16 +55,11 @@ export function AnexosSection({
             <div className="grid grid-cols-3 gap-3 mt-3">
               {fotos.map((url, i) => (
                 <div key={`foto-nc-${i}`} className="relative group">
-                  <picture>
-                    <source srcSet={url} />
-                    <img
-                      src={url}
-                      alt={`Foto ${i + 1}`}
-                      className="w-full h-28 object-cover rounded-md border border-border"
-                      width="auto"
-                      height={112}
-                    />
-                  </picture>
+                  <OfflinePhoto
+                    src={url}
+                    alt={`Foto ${i + 1}`}
+                    className="w-full h-28 object-cover rounded-md border border-border"
+                  />
                   <button
                     type="button"
                     onClick={() => setFotos(prev => prev.filter((_, idx) => idx !== i))}

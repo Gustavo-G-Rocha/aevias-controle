@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { createPageUrl } from "@/utils";
 import AcoesCorretivasNC from "@/components/checklists/AcoesCorretivasNC";
 import ChecklistFooter from "@/components/checklists/ChecklistFooter";
+import OfflinePhoto from "@/components/offline/OfflinePhoto";
 
 import { useChecklistReciclagemForm } from "./hooks/useChecklistReciclagemForm";
 import DadosObraSection from "./components/DadosObraSection";
@@ -134,7 +135,7 @@ export default function ChecklistReciclagem() {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
                   {(formData.fotos || []).map((url, index) => (
                     <div key={index} className="relative group">
-                      <picture><source srcSet={url} /><img src={url} alt={`Foto ${index + 1}`} className="w-full h-32 object-cover rounded-md border" width="auto" height="128" /></picture>
+                      <OfflinePhoto src={url} alt={`Foto ${index + 1}`} className="w-full h-32 object-cover rounded-md border" />
                       {isEditable && (
                         <Button type="button" variant="destructive" size="icon"
                           className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"

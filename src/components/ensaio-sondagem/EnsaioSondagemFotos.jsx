@@ -2,6 +2,7 @@ import React from "react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Loader2, XCircle } from "lucide-react";
+import OfflinePhoto from "@/components/offline/OfflinePhoto";
 
 export default function EnsaioSondagemFotos({ fotos, uploadingPhotos, selectedFileNames, onFileChange, onRemove }) {
   return (
@@ -24,7 +25,7 @@ export default function EnsaioSondagemFotos({ fotos, uploadingPhotos, selectedFi
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
           {fotos.map((url, index) => (
             <div key={index} className="relative group">
-              <img src={url} alt={`Foto ${index + 1}`} className="w-full h-32 object-cover rounded-md border border-border" />
+              <OfflinePhoto src={url} alt={`Foto ${index + 1}`} className="w-full h-32 object-cover rounded-md border border-border" />
               <Button
                 type="button" variant="destructive" size="icon"
                 className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
