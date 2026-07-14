@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
-import { Loader2 } from 'lucide-react';
-import { getUserAccessLevel, canSeeFilters } from '@/utils/accessControl';
+import { Loader2, Plus } from 'lucide-react';
+import { getUserAccessLevel, canSeeFilters, isAdmin, isLaboratorista, isClienteSupervisor } from '@/utils/accessControl';
+import { DialogTrigger } from '@/components/ui/dialog';
 import { getChartVisibility } from '@/utils/dashboardUtils';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
@@ -45,9 +46,22 @@ export default function Dashboard() {
 
   const userAccessLevel = getUserAccessLevel(user);
   const { showObraChart, showTypeChartSeparate } = getChartVisibility(userAccessLevel, charts);
+  const canCreate = isAdmin(user) || isLaboratorista(user) || isClienteSupervisor(user);
 
   return (
     <DashboardPage>
+      {/* FAB mobile para criar novo registro (mesmo painel do "Ensaios Realizados") */}
+      {canCreate && (
+        <DialogTrigger asChild>
+          <button
+            className="lg:hidden fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
+            style={{ backgroundColor: 'var(--color-primary)' }}
+            aria-label="Novo Registro"
+          >
+            <Plus className="w-7 h-7 text-white" />
+          </button>
+        </DialogTrigger>
+      )}
       <DashboardHeader user={user} isClienteUser={isClienteUser} />
 
       {canSeeFilters(user) && (
