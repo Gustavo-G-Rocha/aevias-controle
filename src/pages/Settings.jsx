@@ -15,13 +15,25 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { base44 } from "@/api/base44Client";
+import { excluirMinhaConta } from "@/functions/excluirMinhaConta";
+import { toast } from "@/components/ui/use-toast";
 
 export default function Settings() {
   const [deleting, setDeleting] = useState(false);
 
   const handleDeleteAccount = async () => {
     setDeleting(true);
-    await base44.auth.logout();
+    try {
+      await excluirMinhaConta({});
+      await base44.auth.logout();
+    } catch (error) {
+      toast({
+        title: "Erro ao excluir conta",
+        description: error?.response?.data?.error || error.message,
+        variant: "destructive",
+      });
+      setDeleting(false);
+    }
   };
 
   return (

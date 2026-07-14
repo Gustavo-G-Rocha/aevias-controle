@@ -2,6 +2,13 @@ import React from "react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { getCategoriasByLocal, getParametrosByLocalCategoria } from "@/components/nc/ncData";
 
 export default function NaoConformidadesForm({ 
@@ -82,50 +89,59 @@ export default function NaoConformidadesForm({
                 {/* Local */}
                 <div>
                   <Label className="text-xs">Local *</Label>
-                  <select
+                  <Select
                     value={nc.local_nc || ""}
-                    onChange={(e) => handleNCChange(index, 'local_nc', e.target.value)}
+                    onValueChange={(value) => handleNCChange(index, 'local_nc', value)}
                     disabled={disabled || locaisPermitidos.length === 1}
-                    className="flex h-9 w-full rounded-md border border-input bg-card px-2 py-1 text-sm disabled:opacity-50"
                   >
-                    <option value="">Selecione</option>
-                    {locaisPermitidos.map(local => (
-                      <option key={local} value={local}>{local}</option>
-                    ))}
-                  </select>
+                    <SelectTrigger className="h-9 bg-card">
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {locaisPermitidos.map(local => (
+                        <SelectItem key={local} value={local}>{local}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Categoria */}
                 <div>
                   <Label className="text-xs">Categoria *</Label>
-                  <select
+                  <Select
                     value={nc.categoria_nc || ""}
-                    onChange={(e) => handleNCChange(index, 'categoria_nc', e.target.value)}
+                    onValueChange={(value) => handleNCChange(index, 'categoria_nc', value)}
                     disabled={disabled || !nc.local_nc}
-                    className="flex h-9 w-full rounded-md border border-input bg-card px-2 py-1 text-sm disabled:opacity-50"
                   >
-                    <option value="">Selecione</option>
-                    {getCategoriasByLocal(nc.local_nc).map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
+                    <SelectTrigger className="h-9 bg-card">
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60">
+                      {getCategoriasByLocal(nc.local_nc).map(cat => (
+                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Parâmetro */}
                 <div>
                   <Label className="text-xs">Parâmetro *</Label>
                   {getParametrosByLocalCategoria(nc.local_nc, nc.categoria_nc).length > 0 ? (
-                    <select
+                    <Select
                       value={nc.parametro_nc || ""}
-                      onChange={(e) => handleNCChange(index, 'parametro_nc', e.target.value)}
+                      onValueChange={(value) => handleNCChange(index, 'parametro_nc', value)}
                       disabled={disabled || !nc.categoria_nc}
-                      className="flex h-9 w-full rounded-md border border-input bg-card px-2 py-1 text-sm disabled:opacity-50"
                     >
-                      <option value="">Selecione</option>
-                      {getParametrosByLocalCategoria(nc.local_nc, nc.categoria_nc).map(param => (
-                        <option key={param} value={param}>{param}</option>
-                      ))}
-                    </select>
+                      <SelectTrigger className="h-9 bg-card">
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-60">
+                        {getParametrosByLocalCategoria(nc.local_nc, nc.categoria_nc).map(param => (
+                          <SelectItem key={param} value={param}>{param}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   ) : (
                     <input
                       type="text"

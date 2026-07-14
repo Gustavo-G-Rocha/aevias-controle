@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +16,7 @@ import { useLayoutData } from "@/components/layout/useLayoutData";
 import AppSidebar from "@/components/layout/AppSidebar";
 import BottomNav from "@/components/layout/BottomNav";
 import CreateEnsaioDialog from "@/components/layout/CreateEnsaioDialog";
+import MobileBackHeader from "@/components/layout/MobileBackHeader";
 import OfflineStatusBar from "@/components/offline/OfflineStatusBar";
 import SidebarToggle from "@/components/layout/SidebarToggle";
 import { REPORT_PAGES } from "@/lib/reportPages";
@@ -24,6 +27,7 @@ const AppLayout = ({ children, currentPageName }) => {
   const [minhasObrasOpen, setMinhasObrasOpen] = useState(false);
 
   const { user, obrasDoUsuario, loadingUser, pendingTransfers } = useLayoutData();
+  const location = useLocation();
 
   const userAccessLevel = getUserAccessLevel(user);
   const isAdmin = userAccessLevel === ACCESS_LEVELS.ADMIN || user?.role === ACCESS_LEVELS.ADMIN;
@@ -51,11 +55,19 @@ const AppLayout = ({ children, currentPageName }) => {
 
           <main className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
             <SidebarToggle />
+            <MobileBackHeader />
             <div className="flex-1 flex flex-col">
               <PullToRefresh disabled={isFormPage(currentPageName)}>
-                <div className="pb-16 lg:pb-0 overflow-x-hidden" style={{ paddingTop: "env(safe-area-inset-top)" }}>
+                <motion.div
+                  key={location.pathname}
+                  initial={{ x: 24, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                  className="pb-16 lg:pb-0 overflow-x-hidden"
+                  style={{ paddingTop: "env(safe-area-inset-top)" }}
+                >
                   {children}
-                </div>
+                </motion.div>
               </PullToRefresh>
             </div>
             <BottomNav />
