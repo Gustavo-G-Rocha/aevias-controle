@@ -169,7 +169,8 @@ export default function RelatorioChecklistConcretagem({ checklist, creatorUser, 
           html { -webkit-print-color-adjust: exact; }
           html, body { margin: 0 !important; padding: 0 !important; background: white !important; color-adjust: exact; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
           aside, nav, [data-sidebar], [role="navigation"] { display: none !important; }
-          .print-page { width: 100% !important; min-height: 100vh; box-sizing: border-box !important; page-break-after: always; }
+          .print-page { width: 100% !important; min-height: 0 !important; height: auto !important; box-sizing: border-box !important; page-break-after: always; }
+          .print-page:last-child { page-break-after: auto !important; }
           img { max-width: 80% !important; height: auto !important; display: block !important; }
           table { max-width: 100% !important; table-layout: fixed !important; }
           td, th { word-break: break-word !important; overflow-wrap: break-word !important; }
