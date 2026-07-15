@@ -12,6 +12,14 @@ const NAV_ITEMS = [
 { label: "Projetos", icon: Grid, path: createPageUrl("Projects"), zone: "projects" },
 { label: "Registros", icon: LayoutDashboard, path: createPageUrl("MeusEnsaios"), zone: "registros" }];
 
+const readSessionPath = (key) => {
+  try { return window.sessionStorage?.getItem(key) || null; } catch { return null; }
+};
+
+const saveSessionPath = (key, value) => {
+  try { window.sessionStorage?.setItem(key, value); } catch { /* storage indisponível no APK */ }
+};
+
 
 export default function BottomNav({ userAccessLevel, canManageSystem, pendingTransfers }) {
   const location = useLocation();
@@ -33,7 +41,7 @@ export default function BottomNav({ userAccessLevel, canManageSystem, pendingTra
 
   useEffect(() => {
     const zone = getTabZone(location.pathname);
-    if (zone) sessionStorage.setItem(`${SESSION_KEYS.TAB_STACK_PREFIX}${zone}`, location.pathname + location.search);
+    if (zone) saveSessionPath(`${SESSION_KEYS.TAB_STACK_PREFIX}${zone}`, location.pathname + location.search);
   }, [location]);
 
   const handleTabPress = useCallback((item) => {
@@ -45,7 +53,7 @@ export default function BottomNav({ userAccessLevel, canManageSystem, pendingTra
     if (currentZone === item.zone) {
       navigate(item.path);
     } else {
-      const saved = sessionStorage.getItem(`${SESSION_KEYS.TAB_STACK_PREFIX}${item.zone}`);
+      const saved = readSessionPath(`${SESSION_KEYS.TAB_STACK_PREFIX}${item.zone}`);
       navigate(saved || item.path);
     }
   }, [location.pathname, navigate]);
