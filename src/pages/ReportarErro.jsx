@@ -163,9 +163,11 @@ export default function ReportarErro() {
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
-    // As datas do banco vêm em UTC sem indicador de fuso — adiciona 'Z'
-    // para que a conversão para o horário de Brasília fique correta.
-    const iso = /Z|[+-]\d{2}:?\d{2}$/.test(dateStr) ? dateStr : `${dateStr}Z`;
+    // As datas do banco vêm em UTC sem indicador de fuso e com microssegundos
+    // (ex: 2026-07-15T14:46:09.900000). Normaliza para milissegundos e adiciona
+    // 'Z' para que a conversão para o horário de Brasília fique correta.
+    let iso = String(dateStr).replace(/(\.\d{3})\d+/, "$1");
+    if (!/Z$|[+-]\d{2}:?\d{2}$/.test(iso)) iso = `${iso}Z`;
     return new Date(iso).toLocaleString("pt-BR", {
       timeZone: "America/Sao_Paulo",
       day: "2-digit",
