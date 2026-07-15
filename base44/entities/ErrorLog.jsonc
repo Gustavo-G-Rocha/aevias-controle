@@ -1,0 +1,59 @@
+{
+  "name": "ErrorLog",
+  "type": "object",
+  "properties": {
+    "category": {
+      "type": "string",
+      "description": "Categoria do erro (via errorCategorizer)"
+    },
+    "message": {
+      "type": "string",
+      "description": "Mensagem t\u00e9cnica do erro"
+    },
+    "stack": {
+      "type": "string",
+      "description": "Stack trace truncado"
+    },
+    "component_stack": {
+      "type": "string",
+      "description": "Component stack do React (quando via ErrorBoundary)"
+    },
+    "source": {
+      "type": "string",
+      "description": "Origem: react_error_boundary, window.onerror, unhandledrejection, etc."
+    },
+    "page": {
+      "type": "string",
+      "description": "Pathname no momento do erro"
+    },
+    "user_agent": {
+      "type": "string",
+      "description": "User-Agent do dispositivo"
+    },
+    "context": {
+      "type": "object",
+      "description": "Contexto adicional do evento de observabilidade"
+    }
+  },
+  "required": [
+    "message"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

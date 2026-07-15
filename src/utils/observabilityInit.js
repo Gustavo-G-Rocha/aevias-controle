@@ -26,7 +26,34 @@
 
 import { setObservabilitySink, captureError } from '@/utils/observability';
 
-function structuredConsoleSink(event) {
+/**
+ * Persiste o evento remotamente (entidade ErrorLog) — best-effort.
+ * Import dinâmico do client para não criar dependência circular na inicialização.
+ * Nunca lança: falha de rede/auth é silenciosa.
+ */
+function persistRemoteLog(event, error) {
+  try {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return;
+    import('@/api/base44Client')
+      .then(({ base44 }) =>
+        base44.entities.ErrorLog.create({
+          category: event.category,
+          message: String(event.message || 'unknown').slice(0, 500),
+          stack: String(error?.stack || '').slice(0, 3000),
+          component_stack: String(event.context?.componentStack || '').slice(0, 3000),
+          source: event.context?.source || '',
+          page: typeof window !== 'undefined' ? window.location.pathname : '',
+          user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+          context: event.context || {},
+        })
+      )
+      .catch(() => {});
+  } catch {
+    // logging nunca quebra a aplicação
+  }
+}
+
+function structuredConsoleSink(event, error) {
   // Event é PII-safe: category, fingerprint, message (string técnica),
   // context (entity/operation/status), timestamp.
   // O erro bruto NÃO é logado para evitar vazamento de PII em erros
@@ -35,6 +62,7 @@ function structuredConsoleSink(event) {
   if (typeof console !== 'undefined' && console.error) {
     console.error('[Observability]', JSON.stringify(event));
   }
+  persistRemoteLog(event, error);
 }
 
 function handleGlobalError(event) {

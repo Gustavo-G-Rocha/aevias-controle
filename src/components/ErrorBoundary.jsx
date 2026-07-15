@@ -11,11 +11,11 @@ import { captureError } from '@/utils/observability';
 export default class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, errorMessage: '' };
   }
 
-  static getDerivedStateFromError() {
-    return { hasError: true };
+  static getDerivedStateFromError(error) {
+    return { hasError: true, errorMessage: error?.message || '' };
   }
 
   componentDidCatch(error, errorInfo) {
@@ -43,6 +43,14 @@ export default class ErrorBoundary extends React.Component {
               Ocorreu um erro inesperado. A equipe técnica foi notificada
               automaticamente.
             </p>
+            {this.state.errorMessage && (
+              <p
+                className="mb-4 text-xs break-words"
+                style={{ color: 'var(--color-text-subtle)' }}
+              >
+                Detalhe técnico: {this.state.errorMessage}
+              </p>
+            )}
             <button
               onClick={() => window.location.reload()}
               className="px-4 py-2 rounded-lg text-white text-sm font-medium"
