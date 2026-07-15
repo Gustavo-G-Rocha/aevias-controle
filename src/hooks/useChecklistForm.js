@@ -7,6 +7,7 @@ import { useFormDataLoader } from "@/hooks/useFormDataLoader";
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
 import { validateChecklistForm } from '@/utils/formValidationSchemas';
+import { normalizeChecklistEditData } from '@/utils/checklistEditNormalization';
 
 /**
  * Hook reutilizável para formulários de checklist.
@@ -60,21 +61,7 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
             : false;
           if (user.role === 'admin' || extraCanEdit || (isOwnerCheck && (checklistToEdit.status === 'rascunho' || checklistToEdit.approved === false || checklistToEdit.approved === null))) {
             const initialForm = getInitialFormData();
-            // Deep-merge object fields so saved records don't lose keys added after initial save
-            const mergedObjectFields = {};
-            for (const key of Object.keys(initialForm)) {
-              if (initialForm[key] !== null && typeof initialForm[key] === 'object' && !Array.isArray(initialForm[key])) {
-                mergedObjectFields[key] = { ...initialForm[key], ...(checklistToEdit[key] || {}) };
-              }
-            }
-            const loadedFormData = {
-              ...initialForm,
-              ...checklistToEdit,
-              ...mergedObjectFields,
-              data: checklistToEdit.data ? new Date(checklistToEdit.data).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-              fotos: Array.isArray(checklistToEdit.fotos) ? checklistToEdit.fotos : [],
-            };
-            setFormData(loadedFormData);
+            setFormData(normalizeChecklistEditData(initialForm, checklistToEdit));
           } else {
             toast({ title: "Você não tem permissão para editar este registro.", variant: "destructive" });
             navigate(createPageUrl('MeusEnsaios'));

@@ -20,6 +20,7 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const src = readFileSync(resolve(__dirname, '../../hooks/useChecklistForm.js'), 'utf-8');
 const loaderSrc = readFileSync(resolve(__dirname, '../../hooks/useFormDataLoader.js'), 'utf-8');
+const normalizationSrc = readFileSync(resolve(__dirname, '../../utils/checklistEditNormalization.js'), 'utf-8');
 
 const returnBlock = (() => {
   const blocks = [...src.matchAll(/return\s*{([\s\S]*?)};/g)];
@@ -50,15 +51,16 @@ describe('useChecklistForm — contrato', () => {
     expect(loaderSrc).toContain('return auxData.obras;');
   });
 
-  it('faz deep-merge de campos objeto ao editar (preserva chaves adicionadas depois)', () => {
-    expect(src).toContain('mergedObjectFields');
-    expect(src).toContain("typeof initialForm[key] === 'object' && !Array.isArray(initialForm[key])");
-    expect(src).toContain('{ ...initialForm[key], ...(checklistToEdit[key] || {}) }');
+  it('delega a normalização de edição ao helper compartilhado', () => {
+    expect(src).toContain('normalizeChecklistEditData(initialForm, checklistToEdit)');
   });
 
-  it('normaliza data e garante fotos como array', () => {
-    expect(src).toContain('checklistToEdit.data ? new Date(checklistToEdit.data)');
-    expect(src).toContain('Array.isArray(checklistToEdit.fotos) ? checklistToEdit.fotos : []');
+  it('helper faz deep-merge de objetos, normaliza data e garante fotos como array', () => {
+    expect(normalizationSrc).toContain('isPlainObject(initialForm[key])');
+    expect(normalizationSrc).toContain('...initialForm[key]');
+    expect(normalizationSrc).toContain('...savedData[key]');
+    expect(normalizationSrc).toContain("new Date(savedData.data).toISOString().split('T')[0]");
+    expect(normalizationSrc).toContain('Array.isArray(savedData.fotos) ? savedData.fotos : []');
   });
 
   it('isApproved considera approved true e status diferente de rascunho', () => {
