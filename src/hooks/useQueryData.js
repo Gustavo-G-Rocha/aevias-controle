@@ -184,6 +184,21 @@ export function useRecordCacheUpdate() {
     );
   }, [queryClient]);
 
+  // Snapshot/restore para atualizações OTIMISTAS: captura o estado atual dos
+  // caches de registros antes de aplicar a mudança otimista; em caso de erro
+  // da API, restaura o snapshot revertendo a UI.
+  const snapshotRecords = useCallback(() => {
+    return [
+      ...queryClient.getQueriesData({ queryKey: QUERY_KEYS.allRecords }),
+      ...queryClient.getQueriesData({ queryKey: ['supervisorRecords'] }),
+    ];
+  }, [queryClient]);
+
+  const restoreRecords = useCallback((snapshot) => {
+    if (!snapshot) return;
+    snapshot.forEach(([key, data]) => queryClient.setQueryData(key, data));
+  }, [queryClient]);
+
   const removeRecord = useCallback((recordId) => {
     if (!recordId) return;
     queryClient.setQueriesData(
@@ -202,5 +217,5 @@ export function useRecordCacheUpdate() {
     );
   }, [queryClient]);
 
-  return { updateRecord, removeRecord };
+  return { updateRecord, removeRecord, snapshotRecords, restoreRecords };
 }

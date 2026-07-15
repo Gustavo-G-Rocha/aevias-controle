@@ -7,21 +7,30 @@ import { logger } from '@/utils/logger';
 /**
  * Hook que encapsula as ações de aprovação, reprovação e exclusão de ensaios.
  *
- * Após cada ação bem-sucedida, atualiza APENAS o registro afetado no cache
- * do React Query via setQueriesData (granular), evitando refetch da coleção
- * inteira (25+ entidades). Agregados derivados (dashboard stats/charts)
- * recomputam in-memory a partir do cache atualizado.
+ * ATUALIZAÇÃO OTIMISTA: a UI reflete a mudança IMEDIATAMENTE (antes da resposta
+ * da API), mantendo a interface responsiva em mobile. Em caso de falha, o
+ * snapshot do cache é restaurado (rollback) e um toast de erro é exibido.
+ *
+ * Após confirmação do backend, o registro real substitui o otimista no cache
+ * (granular, via setQueriesData — sem refetch da coleção inteira).
  *
  * @param {object} user - usuário autenticado
  * @param {object[]} obras - lista de obras (para aprovarEnsaio)
- * @param {Function} [onSuccess] - callback opcional de fallback; se fornecido,
- *   é chamado APENAS se a atualização granular não for possível (ex: resposta
- *   sem id). Não é chamado no caminho padrão para evitar refetch amplo.
+ * @param {Function} [onSuccess] - callback opcional de fallback; chamado APENAS
+ *   se a atualização granular não for possível (ex: resposta sem id).
  */
 export function useEnsaiosActions(user, obras, onSuccess) {
-  const { updateRecord, removeRecord } = useRecordCacheUpdate();
+  const { updateRecord, removeRecord, snapshotRecords, restoreRecords } = useRecordCacheUpdate();
 
   const handleApprove = useCallback(async (ensaio) => {
+    const snapshot = snapshotRecords();
+    // Otimista: marca como aprovado imediatamente na UI
+    updateRecord({
+      ...ensaio,
+      approved: true,
+      approved_by: user?.email,
+      approved_date: new Date().toISOString(),
+    });
     try {
       const updatedRecord = await aprovarEnsaio(ensaio, user, obras);
       if (updatedRecord?.id) {
@@ -31,12 +40,22 @@ export function useEnsaiosActions(user, obras, onSuccess) {
       }
       toast({ title: 'Registro aprovado com sucesso!' });
     } catch (error) {
+      restoreRecords(snapshot);
       logger.error('[useEnsaiosActions] Erro ao aprovar ensaio:', error?.message || error);
-      toast({ title: 'Erro ao aprovar ensaio. Tente novamente.', variant: "destructive" });
+      toast({ title: 'Erro ao aprovar ensaio. A alteração foi desfeita.', variant: "destructive" });
     }
-  }, [user, obras, onSuccess, updateRecord]);
+  }, [user, obras, onSuccess, updateRecord, snapshotRecords, restoreRecords]);
 
   const handleReject = useCallback(async (ensaio, motivo) => {
+    const snapshot = snapshotRecords();
+    // Otimista: marca como reprovado imediatamente na UI
+    updateRecord({
+      ...ensaio,
+      approved: false,
+      rejection_reason: motivo,
+      approved_by: user?.email,
+      approved_date: new Date().toISOString(),
+    });
     try {
       const updatedRecord = await reprovarEnsaio(ensaio, user, motivo);
       if (updatedRecord?.id) {
@@ -46,25 +65,28 @@ export function useEnsaiosActions(user, obras, onSuccess) {
       }
       toast({ title: 'Registro reprovado com sucesso!' });
     } catch (error) {
+      restoreRecords(snapshot);
       logger.error('[useEnsaiosActions] Erro ao reprovar registro:', error?.message || error);
-      toast({ title: 'Erro ao reprovar registro. Tente novamente.', variant: "destructive" });
+      toast({ title: 'Erro ao reprovar registro. A alteração foi desfeita.', variant: "destructive" });
     }
-  }, [user, onSuccess, updateRecord]);
+  }, [user, onSuccess, updateRecord, snapshotRecords, restoreRecords]);
 
   const handleDelete = useCallback(async (ensaio) => {
+    const snapshot = snapshotRecords();
+    // Otimista: remove da lista imediatamente na UI
+    if (ensaio?.id) removeRecord(ensaio.id);
     try {
       await excluirEnsaio(ensaio);
-      if (ensaio?.id) {
-        removeRecord(ensaio.id);
-      } else {
+      if (!ensaio?.id) {
         onSuccess?.();
       }
       toast({ title: 'Registro excluído com sucesso!' });
     } catch (error) {
+      restoreRecords(snapshot);
       logger.error('[useEnsaiosActions] Erro ao excluir registro:', error?.message || error);
-      toast({ title: 'Erro ao excluir registro. Tente novamente.', variant: "destructive" });
+      toast({ title: 'Erro ao excluir registro. A alteração foi desfeita.', variant: "destructive" });
     }
-  }, [onSuccess, removeRecord]);
+  }, [onSuccess, removeRecord, snapshotRecords, restoreRecords]);
 
   return {
     handleApprove,

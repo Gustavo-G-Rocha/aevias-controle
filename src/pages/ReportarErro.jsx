@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Bug, Send, Loader2, Image as ImageIcon, X, CheckCircle2, Clock, AlertCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/components/ui/use-toast";
 import { getUserAccessLevel } from "@/lib/layoutConstants";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -75,7 +75,6 @@ export default function ReportarErro() {
   const [paginaOutra, setPaginaOutra] = useState("");
   const [prints, setPrints] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const queryClient = useQueryClient();
 
@@ -115,7 +114,43 @@ export default function ReportarErro() {
     setPrints((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (e) => {
+  // Criação OTIMISTA: o novo relato aparece na lista imediatamente;
+  // em caso de falha da API, a lista é revertida e um erro é exibido.
+  const createMutation = useMutation({
+    mutationFn: (payload) => base44.entities.BugReport.create(payload),
+    onMutate: async (payload) => {
+      await queryClient.cancelQueries({ queryKey: ["bugReports"] });
+      const previous = queryClient.getQueryData(["bugReports"]);
+      const tempReport = {
+        id: `temp-${Date.now()}`,
+        ...payload,
+        created_by: user?.email,
+        created_date: new Date().toISOString(),
+      };
+      queryClient.setQueryData(["bugReports"], (old = []) => [tempReport, ...old]);
+      // Limpa o formulário imediatamente — UI responsiva
+      setDescricao("");
+      setPagina("");
+      setPaginaOutra("");
+      setPrints([]);
+      setShowForm(false);
+      return { previous };
+    },
+    onSuccess: () => {
+      // O e-mail de cópia é enviado automaticamente pela automação backend
+      // (notificarBugReport) ao detectar a criação do BugReport.
+      toast({ title: "Relato enviado com sucesso!", description: "Obrigado pelo feedback." });
+    },
+    onError: (error, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(["bugReports"], context.previous);
+      toast({ title: "Erro ao enviar relato", description: error.message, variant: "destructive" });
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["bugReports"] }),
+  });
+
+  const submitting = createMutation.isPending;
+
+  const handleSubmit = (e) => {
     e.preventDefault();
     const paginaFinal = pagina === "Outra" ? paginaOutra.trim() : pagina;
     if (!descricao.trim()) {
@@ -126,40 +161,36 @@ export default function ReportarErro() {
       toast({ title: "Selecione a página onde o erro ocorreu", variant: "destructive" });
       return;
     }
-    setSubmitting(true);
-    try {
-      await base44.entities.BugReport.create({
-        descricao: descricao.trim(),
-        pagina: paginaFinal,
-        prints,
-        status: "aberto",
-      });
-
-      // O e-mail de cópia é enviado automaticamente pela automação backend
-      // (notificarBugReport) ao detectar a criação do BugReport.
-      toast({ title: "Relato enviado com sucesso!", description: "Obrigado pelo feedback." });
-      setDescricao("");
-      setPagina("");
-      setPaginaOutra("");
-      setPrints([]);
-      setShowForm(false);
-      await queryClient.invalidateQueries({ queryKey: ["bugReports"] });
-    } catch (error) {
-      toast({ title: "Erro ao enviar relato", description: error.message, variant: "destructive" });
-    } finally {
-      setSubmitting(false);
-    }
+    createMutation.mutate({
+      descricao: descricao.trim(),
+      pagina: paginaFinal,
+      prints,
+      status: "aberto",
+    });
   };
 
-  const handleStatusChange = async (reportId, newStatus) => {
-    try {
-      await base44.entities.BugReport.update(reportId, { status: newStatus });
-      await queryClient.invalidateQueries({ queryKey: ["bugReports"] });
-      toast({ title: "Status atualizado" });
-    } catch (error) {
+  // Mudança de status OTIMISTA: o badge atualiza na hora; rollback em erro.
+  const statusMutation = useMutation({
+    mutationFn: ({ reportId, newStatus }) =>
+      base44.entities.BugReport.update(reportId, { status: newStatus }),
+    onMutate: async ({ reportId, newStatus }) => {
+      await queryClient.cancelQueries({ queryKey: ["bugReports"] });
+      const previous = queryClient.getQueryData(["bugReports"]);
+      queryClient.setQueryData(["bugReports"], (old = []) =>
+        old.map((r) => (r.id === reportId ? { ...r, status: newStatus } : r))
+      );
+      return { previous };
+    },
+    onSuccess: () => toast({ title: "Status atualizado" }),
+    onError: (error, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(["bugReports"], context.previous);
       toast({ title: "Erro ao atualizar status", description: error.message, variant: "destructive" });
-    }
-  };
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["bugReports"] }),
+  });
+
+  const handleStatusChange = (reportId, newStatus) =>
+    statusMutation.mutate({ reportId, newStatus });
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
