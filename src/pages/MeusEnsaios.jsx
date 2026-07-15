@@ -28,13 +28,13 @@ export default function MeusEnsaios() {
     }
   }, [user, queryClient]);
 
-  const _isAdmin = isAdmin(user);
-  const _isSalaTecnica = isSalaTecnica(user);
-  const _isGestorContrato = isGestorContrato(user);
-  const _isCliente = isClienteUser(user);
-  const _isClienteSupervisor = isClienteSupervisor(user);
-  const canApprove = _isAdmin || _isSalaTecnica || _isGestorContrato || _isClienteSupervisor;
-  const canCreate = _isAdmin || _isSalaTecnica || isLaboratorista(user) || _isClienteSupervisor;
+  const userIsAdmin = isAdmin(user);
+  const userIsSalaTecnica = isSalaTecnica(user);
+  const userIsGestorContrato = isGestorContrato(user);
+  const userIsCliente = isClienteUser(user);
+  const userIsClienteSupervisor = isClienteSupervisor(user);
+  const canApprove = userIsAdmin || userIsSalaTecnica || userIsGestorContrato || userIsClienteSupervisor;
+  const canCreate = userIsAdmin || userIsSalaTecnica || isLaboratorista(user) || userIsClienteSupervisor;
 
   // Para cliente_supervisor: canApproveRecord verifica por-regional se é supervisor.
   // Outros approvers (admin, sala_tecnica, gestor_contrato) têm canApprove global.
@@ -47,11 +47,11 @@ export default function MeusEnsaios() {
     return isSupervisorInRegional(user, regional);
   }, [canApprove, obrasMap, regionaisMap, user]);
 
-  const subtitle = _isAdmin || _isSalaTecnica || _isGestorContrato
+  const subtitle = userIsAdmin || userIsSalaTecnica || userIsGestorContrato
     ? "Gerencie e aprove todos os registros de suas obras."
-    : _isClienteSupervisor
+    : userIsClienteSupervisor
     ? "Aprove registros dos seus funcionários e visualize os ensaios das suas obras."
-    : _isCliente
+    : userIsCliente
     ? "Visualize os ensaios e diários aprovados das suas obras."
     : "Visualize e gerencie todos os ensaios e diários registrados.";
 
@@ -97,7 +97,7 @@ export default function MeusEnsaios() {
             allUsers={allUsers}
             regionais={regionais}
           />
-        ) : _isCliente ? (
+        ) : userIsCliente ? (
           <ClienteInterface
             ensaios={ensaios}
             obras={obras}
