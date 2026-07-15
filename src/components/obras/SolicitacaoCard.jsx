@@ -13,6 +13,17 @@ import {
   MapPin,
   Loader2
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { listarUsuarios } from "@/services/usuariosService";
 import { validarLaboratoristaTransferivel } from "@/utils/gerenciarSolicitacoesUtils";
 import { toast } from "@/components/ui/use-toast";
@@ -31,10 +42,6 @@ export default function SolicitacaoCard({ solicitacao, onAprovar, onRejeitar, us
   const status = statusConfig[solicitacao.status];
 
   const handleAprovar = async () => {
-    if (!window.confirm(`Confirma a aprovação da transferência de ${solicitacao.laboratorista_name} para ${solicitacao.regional_destino_nome}?`)) {
-      return;
-    }
-
     setProcessando(true);
     try {
       const allUsers = await listarUsuarios();
@@ -43,11 +50,12 @@ export default function SolicitacaoCard({ solicitacao, onAprovar, onRejeitar, us
       const validacao = validarLaboratoristaTransferivel(usuario);
       if (!validacao.valido) {
         toast({ title: `❌ Erro: ${validacao.mensagem}`, variant: "destructive" });
-        setProcessando(false);
         return;
       }
 
       await onAprovar(solicitacao);
+    } catch (error) {
+      toast({ title: "Erro ao processar aprovação.", variant: "destructive" });
     } finally {
       setProcessando(false);
     }
@@ -133,15 +141,38 @@ export default function SolicitacaoCard({ solicitacao, onAprovar, onRejeitar, us
 
         {solicitacao.status === 'pendente' && !rejeitando && (
           <div className="flex flex-col sm:flex-row gap-2">
-            <Button
-              size="sm"
-              className="flex-1 bg-green-600 hover:bg-green-700"
-              onClick={handleAprovar}
-              disabled={processando}
-            >
-              {processando ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4 mr-1" />}
-              Aprovar
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  size="sm"
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  disabled={processando}
+                >
+                  {processando ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4 mr-1" />}
+                  Aprovar
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Aprovar Transferência</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Confirma a aprovação da transferência de <strong>{solicitacao.laboratorista_name}</strong> para
+                    {' '}{solicitacao.regional_destino_nome}?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={processando}>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleAprovar}
+                    disabled={processando}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    {processando ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <CheckCircle className="w-4 h-4 mr-1" />}
+                    Confirmar
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <Button
               size="sm"
               variant="destructive"

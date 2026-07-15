@@ -49,6 +49,12 @@ export default function GerenciarSolicitacoesModal({ isOpen, onClose, user, onUp
   }, [loadSolicitacoesCallback]);
 
   const handleAprovar = async (solicitacao) => {
+    if (!user?.email) {
+      toast({ title: "Usuário não carregado. Tente novamente.", variant: "destructive" });
+      return;
+    }
+
+    let solicitacaoAprovada = false;
     try {
       // 1. Atualizar status da solicitação
       await atualizarSolicitacaoTransferenciaRegional(solicitacao.id, {
@@ -56,6 +62,7 @@ export default function GerenciarSolicitacoesModal({ isOpen, onClose, user, onUp
         aprovado_por: user.email,
         aprovado_em: new Date().toISOString()
       });
+      solicitacaoAprovada = true;
 
       // 2. Remover laboratorista da regional atual
       const regionalAtual = await obterRegionalById(solicitacao.regional_atual_id);
@@ -70,7 +77,6 @@ export default function GerenciarSolicitacoesModal({ isOpen, onClose, user, onUp
       // 3. Adicionar laboratorista na regional destino
       const regionalDestino = await obterRegionalById(solicitacao.regional_destino_id);
       const laboratoristasDestino = regionalDestino.laboratoristas_responsaveis || [];
-      // Ensure the laboratorista is not duplicated if they somehow already exist
       if (!laboratoristasDestino.some(email => email.toLowerCase() === solicitacao.laboratorista_email.toLowerCase())) {
         await atualizarRegional(solicitacao.regional_destino_id, {
           laboratoristas_responsaveis: [...laboratoristasDestino, solicitacao.laboratorista_email]
@@ -81,12 +87,33 @@ export default function GerenciarSolicitacoesModal({ isOpen, onClose, user, onUp
       await loadSolicitacoes();
       onUpdate();
     } catch (error) {
-      logger.error("Erro ao aprovar solicitação:", error);
-      toast({ title: "Erro ao aprovar solicitação. Tente novamente.", variant: "destructive" });
+      logger.error("Erro ao aprovar solicitação:", error?.message || error);
+      // Rollback: reverter solicitação para pendente se já foi marcada como aprovada
+      if (solicitacaoAprovada) {
+        try {
+          await atualizarSolicitacaoTransferenciaRegional(solicitacao.id, {
+            status: "pendente",
+            aprovado_por: null,
+            aprovado_em: null
+          });
+          toast({ title: "Falha ao transferir laboratorista. Solicitação revertida para pendente.", variant: "destructive" });
+        } catch (rollbackError) {
+          logger.error("Erro ao reverter solicitação:", rollbackError?.message || rollbackError);
+          toast({ title: "Falha ao aprovar e ao reverter. Verifique os dados manualmente.", variant: "destructive" });
+        }
+      } else {
+        toast({ title: "Erro ao aprovar solicitação. Tente novamente.", variant: "destructive" });
+      }
+      await loadSolicitacoes();
     }
   };
 
   const handleRejeitar = async (solicitacao, motivoRejeicao) => {
+    if (!user?.email) {
+      toast({ title: "Usuário não carregado. Tente novamente.", variant: "destructive" });
+      return;
+    }
+
     try {
       await atualizarSolicitacaoTransferenciaRegional(solicitacao.id, {
         status: "rejeitada",

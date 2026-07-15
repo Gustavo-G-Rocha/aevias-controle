@@ -5,7 +5,18 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { CheckCircle, XCircle, Clock, MapPin, User as UserIcon } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { CheckCircle, XCircle, Clock, MapPin, User as UserIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { getStatusInfo, ACTION_COLORS, validateMotivoRejeicao } from "@/utils/solicitacoesTransferenciaUtils";
@@ -20,8 +31,18 @@ const STATUS_ICONS = {
 export const SolicitacaoCard = React.memo(({ solicitacao, onApprove, onReject, canManage, regionais }) => {
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [motivoRejeicao, setMotivoRejeicao] = useState('');
+  const [isApproving, setIsApproving] = useState(false);
   const statusInfo = getStatusInfo(solicitacao.status);
   const StatusIcon = STATUS_ICONS[statusInfo.icon];
+
+  const handleApproveClick = useCallback(async () => {
+    setIsApproving(true);
+    try {
+      await onApprove(solicitacao);
+    } finally {
+      setIsApproving(false);
+    }
+  }, [solicitacao, onApprove]);
 
   const regionalAtual = useMemo(() => 
     regionais.find(r => r.id === solicitacao.regional_atual_id),
@@ -33,15 +54,24 @@ export const SolicitacaoCard = React.memo(({ solicitacao, onApprove, onReject, c
     [regionais, solicitacao.regional_destino_id]
   );
 
-  const handleReject = useCallback(() => {
+  const [isRejecting, setIsRejecting] = useState(false);
+
+  const handleReject = useCallback(async () => {
     const validation = validateMotivoRejeicao(motivoRejeicao);
     if (!validation.valid) {
       toast({ title: validation.message });
       return;
     }
-    onReject(solicitacao, motivoRejeicao);
-    setIsRejectDialogOpen(false);
-    setMotivoRejeicao('');
+    setIsRejecting(true);
+    try {
+      const success = await onReject(solicitacao, motivoRejeicao);
+      if (success) {
+        setIsRejectDialogOpen(false);
+        setMotivoRejeicao('');
+      }
+    } finally {
+      setIsRejecting(false);
+    }
   }, [solicitacao, motivoRejeicao, onReject]);
 
   return (
@@ -111,15 +141,49 @@ export const SolicitacaoCard = React.memo(({ solicitacao, onApprove, onReject, c
 
           {canManage && solicitacao.status === 'pendente' && (
             <div className="flex gap-2 pt-2">
-              <Button
-                size="sm"
-                style={{ backgroundColor: ACTION_COLORS.approve }}
-                className="text-white hover:opacity-90 flex-1"
-                onClick={() => onApprove(solicitacao)}
-              >
-                <CheckCircle className="w-4 h-4 mr-1" />
-                Aprovar
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    style={{ backgroundColor: ACTION_COLORS.approve }}
+                    className="text-white hover:opacity-90 flex-1"
+                    disabled={isApproving}
+                  >
+                    {isApproving ? (
+                      <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                    ) : (
+                      <CheckCircle className="w-4 h-4 mr-1" />
+                    )}
+                    {isApproving ? 'Aprovando...' : 'Aprovar'}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Aprovar Solicitação de Transferência</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Deseja aprovar a transferência de <strong>{solicitacao.laboratorista_name}</strong> de
+                      {' '}{regionalAtual?.nome || solicitacao.regional_atual_nome} para
+                      {' '}{regionalDestino?.nome || solicitacao.regional_destino_nome}?
+                      {'\n\n'}Esta ação moverá o laboratorista para a nova regional.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel disabled={isApproving}>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleApproveClick}
+                      disabled={isApproving}
+                      style={{ backgroundColor: ACTION_COLORS.approve }}
+                    >
+                      {isApproving ? (
+                        <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                      ) : (
+                        <CheckCircle className="w-4 h-4 mr-1" />
+                      )}
+                      Confirmar Aprovação
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
               <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
@@ -148,8 +212,11 @@ export const SolicitacaoCard = React.memo(({ solicitacao, onApprove, onReject, c
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsRejectDialogOpen(false)}>Cancelar</Button>
-                    <Button variant="destructive" onClick={handleReject}>Confirmar Rejeição</Button>
+                    <Button variant="outline" onClick={() => setIsRejectDialogOpen(false)} disabled={isRejecting}>Cancelar</Button>
+                    <Button variant="destructive" onClick={handleReject} disabled={isRejecting}>
+                      {isRejecting && <Loader2 className="w-4 h-4 mr-1 animate-spin" />}
+                      Confirmar Rejeição
+                    </Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>

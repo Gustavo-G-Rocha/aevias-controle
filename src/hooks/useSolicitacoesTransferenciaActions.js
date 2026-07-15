@@ -39,17 +39,23 @@ export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
   }, [user, regionais, loadData]);
 
   const handleApprove = useCallback(async (solicitacao) => {
-    if (!window.confirm('Deseja aprovar esta solicitação de transferência?')) return false;
+    if (!user?.email) {
+      toast({ title: 'Usuário não carregado. Tente novamente.', variant: "destructive" });
+      return false;
+    }
+
+    let solicitationoAprovada = false;
 
     try {
-      // Atualizar a solicitação
+      // 1. Atualizar a solicitação
       await atualizarSolicitacaoTransferenciaRegional(solicitacao.id, {
         status: 'aprovada',
         aprovado_por: user.email,
         aprovado_em: new Date().toISOString()
       });
+      solicitationoAprovada = true;
 
-      // Remover laboratorista da regional atual
+      // 2. Remover laboratorista da regional atual
       const regionalAtualData = regionais.find(r => r.id === solicitacao.regional_atual_id);
       if (regionalAtualData) {
         const novosLaboratoristas = (regionalAtualData.laboratoristas_responsaveis || [])
@@ -59,7 +65,7 @@ export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
         });
       }
 
-      // Adicionar laboratorista na regional de destino
+      // 3. Adicionar laboratorista na regional de destino
       const regionalDestinoData = regionais.find(r => r.id === solicitacao.regional_destino_id);
       if (regionalDestinoData) {
         const novosLaboratoristas = [
@@ -75,13 +81,36 @@ export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
       loadData();
       return true;
     } catch (error) {
-      logger.error("Erro ao aprovar solicitação:", error);
-      toast({ title: 'Erro ao aprovar solicitação.', variant: "destructive" });
+      logger.error("Erro ao aprovar solicitação:", error?.message || error);
+
+      // Rollback: se a solicitação foi marcada como aprovada mas a transferência falhou,
+      // reverter para pendente para evitar inconsistência de dados.
+      if (solicitationoAprovada) {
+        try {
+          await atualizarSolicitacaoTransferenciaRegional(solicitacao.id, {
+            status: 'pendente',
+            aprovado_por: null,
+            aprovado_em: null
+          });
+          toast({ title: 'Falha ao transferir laboratorista. Solicitação revertida para pendente.', variant: "destructive" });
+        } catch (rollbackError) {
+          logger.error("Erro ao reverter solicitação:", rollbackError?.message || rollbackError);
+          toast({ title: 'Falha ao aprovar e ao reverter. Verifique os dados manualmente.', variant: "destructive" });
+        }
+      } else {
+        toast({ title: 'Erro ao aprovar solicitação.', variant: "destructive" });
+      }
+      loadData();
       return false;
     }
   }, [user, regionais, loadData]);
 
   const handleReject = useCallback(async (solicitacao, motivoRejeicao) => {
+    if (!user?.email) {
+      toast({ title: 'Usuário não carregado. Tente novamente.', variant: "destructive" });
+      return false;
+    }
+
     try {
       await atualizarSolicitacaoTransferenciaRegional(solicitacao.id, {
         status: 'rejeitada',
