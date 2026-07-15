@@ -163,7 +163,10 @@ export default function ReportarErro() {
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
-    return new Date(dateStr).toLocaleString("pt-BR", {
+    // As datas do banco vêm em UTC sem indicador de fuso — adiciona 'Z'
+    // para que a conversão para o horário de Brasília fique correta.
+    const iso = /Z|[+-]\d{2}:?\d{2}$/.test(dateStr) ? dateStr : `${dateStr}Z`;
+    return new Date(iso).toLocaleString("pt-BR", {
       timeZone: "America/Sao_Paulo",
       day: "2-digit",
       month: "2-digit",
