@@ -5,7 +5,7 @@
  *  - Assets estáticos (js/css/fontes): cache-first com atualização em background.
  *  - Navegação (HTML): network-first com fallback para o index em cache.
  */
-const CACHE_NAME = 'aevias-app-v1';
+const CACHE_NAME = 'aevias-app-v2';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();

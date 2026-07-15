@@ -25,6 +25,25 @@ export default class ErrorBoundary extends React.Component {
     });
   }
 
+  // Limpa a versão antiga do app guardada no dispositivo (service worker +
+  // caches) antes de recarregar — garante que o usuário receba a versão
+  // mais recente com as correções, em vez de recarregar o código com bug.
+  async handleReload() {
+    try {
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((r) => r.unregister()));
+      }
+      if (typeof caches !== 'undefined') {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+    } catch {
+      // Mesmo se a limpeza falhar, recarrega
+    }
+    window.location.reload();
+  }
+
   render() {
     if (this.state.hasError) {
       return (
@@ -52,7 +71,7 @@ export default class ErrorBoundary extends React.Component {
               </p>
             )}
             <button
-              onClick={() => window.location.reload()}
+              onClick={() => this.handleReload()}
               className="px-4 py-2 rounded-lg text-white text-sm font-medium"
               style={{ backgroundColor: 'var(--color-primary)' }}
             >
