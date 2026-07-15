@@ -56,10 +56,11 @@ Deno.serve(async (req) => {
 
     const userEmail = (user.email || '').toLowerCase();
 
-    // Regionais onde o supervisor está em clientes_responsaveis
+    // Regionais onde o usuário está em clientes_responsaveis OU supervisores_responsaveis
     const regionais = await base44.asServiceRole.entities.Regional.list();
     const supervisorRegionais = regionais.filter(r =>
-      (r.clientes_responsaveis || []).some(e => e.toLowerCase() === userEmail)
+      [...(r.clientes_responsaveis || []), ...(r.supervisores_responsaveis || [])]
+        .some(e => e?.toLowerCase() === userEmail)
     );
     const regionaisIds = new Set(supervisorRegionais.map(r => r.id));
 

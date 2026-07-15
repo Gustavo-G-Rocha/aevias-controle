@@ -5,8 +5,12 @@ const getUserRegionalsAccess = (regional, user, userAccessLevel) => {
   const emailUsuario = user.email.trim().toLowerCase();
 
   if (userAccessLevel === "cliente" || userAccessLevel === "cliente_supervisor") {
+    // Checa clientes_responsaveis e supervisores_responsaveis
     const clientes = regional.clientes_responsaveis || [];
-    return clientes.some((email) => email.trim().toLowerCase() === emailUsuario);
+    const supervisores = regional.supervisores_responsaveis || [];
+    return [...clientes, ...supervisores].some(
+      (email) => email?.trim().toLowerCase() === emailUsuario
+    );
   } else if (userAccessLevel === "sala_tecnica_afirmaevias") {
     const salas = regional.salas_tecnicas_responsaveis || [];
     return salas.some((email) => email.trim().toLowerCase() === emailUsuario);

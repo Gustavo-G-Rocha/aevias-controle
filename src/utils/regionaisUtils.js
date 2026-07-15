@@ -51,8 +51,12 @@ export function filtrarRegionaisPorAcesso(regionaisData, userData, accessLevel) 
 
   if (accessLevel === 'cliente') {
     return regionaisData.filter(regional => {
+      // cliente e cliente_supervisor: checa clientes_responsaveis e supervisores_responsaveis
       const clientes = regional.clientes_responsaveis || [];
-      return clientes.some(email => email?.toLowerCase() === userData.email.toLowerCase());
+      const supervisores = regional.supervisores_responsaveis || [];
+      return [...clientes, ...supervisores].some(
+        email => email?.toLowerCase() === userData.email.toLowerCase()
+      );
     });
   }
 
