@@ -44,7 +44,7 @@ export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
       return false;
     }
 
-    let solicitationoAprovada = false;
+    let solicitacaoAprovada = false;
 
     try {
       // 1. Atualizar a solicitação
@@ -53,7 +53,7 @@ export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
         aprovado_por: user.email,
         aprovado_em: new Date().toISOString()
       });
-      solicitationoAprovada = true;
+      solicitacaoAprovada = true;
 
       // 2. Remover laboratorista da regional atual
       const regionalAtualData = regionais.find(r => r.id === solicitacao.regional_atual_id);
@@ -85,7 +85,7 @@ export function useSolicitacoesTransferenciaActions(user, regionais, loadData) {
 
       // Rollback: se a solicitação foi marcada como aprovada mas a transferência falhou,
       // reverter para pendente para evitar inconsistência de dados.
-      if (solicitationoAprovada) {
+      if (solicitacaoAprovada) {
         try {
           await atualizarSolicitacaoTransferenciaRegional(solicitacao.id, {
             status: 'pendente',
