@@ -71,10 +71,10 @@ export default function CargaConcretoCard({
                   </td>
                   <td className="border border-border px-2 py-1 text-center">
                     {carga.slump_test?.realizado
-                      ? carga.slump_test.conforme === true ? <span className="text-green-600 font-bold text-xl">✓</span>
-                        : carga.slump_test.conforme === false ? <span className="text-destructive font-bold text-xl">✗</span>
-                        : <span className="text-muted-foreground">-</span>
-                      : <span className="text-muted-foreground">-</span>}
+                      ? carga.slump_test.conforme === true ? <span role="img" aria-label="Conforme" className="text-green-600 font-bold text-xl">✓</span>
+                        : carga.slump_test.conforme === false ? <span role="img" aria-label="Não conforme" className="text-destructive font-bold text-xl">✗</span>
+                        : <span role="img" aria-label="Conformidade não determinada" className="text-muted-foreground">-</span>
+                      : <span role="img" aria-label="Ensaio não realizado" className="text-muted-foreground">-</span>}
                   </td>
                 </tr>
                 {/* Flow Test */}
@@ -99,14 +99,14 @@ export default function CargaConcretoCard({
                       <label className="flex items-center gap-1 cursor-pointer">
                         <input type="checkbox" checked={carga.flow_test?.conforme === true}
                           onChange={(e) => onCargaChange(index, "flow_test.conforme", e.target.checked ? true : null)}
-                          disabled={!carga.flow_test?.realizado} className="w-4 h-4 accent-green-500" />
-                        <span className="text-xs text-green-600">✓</span>
+                          disabled={!carga.flow_test?.realizado} aria-label="Flow Test conforme" className="w-4 h-4 accent-green-500" />
+                        <span aria-hidden="true" className="text-xs text-green-600">✓</span>
                       </label>
                       <label className="flex items-center gap-1 cursor-pointer">
                         <input type="checkbox" checked={carga.flow_test?.conforme === false}
                           onChange={(e) => onCargaChange(index, "flow_test.conforme", e.target.checked ? false : null)}
-                          disabled={!carga.flow_test?.realizado} className="w-4 h-4 accent-red-500" />
-                        <span className="text-xs text-destructive">✗</span>
+                          disabled={!carga.flow_test?.realizado} aria-label="Flow Test não conforme" className="w-4 h-4 accent-red-500" />
+                        <span aria-hidden="true" className="text-xs text-destructive">✗</span>
                       </label>
                     </div>
                   </td>
@@ -133,14 +133,14 @@ export default function CargaConcretoCard({
                       <label className="flex items-center gap-1 cursor-pointer">
                         <input type="checkbox" checked={carga.espessura_camada?.conforme === true}
                           onChange={(e) => onCargaChange(index, "espessura_camada.conforme", e.target.checked ? true : null)}
-                          disabled={!carga.espessura_camada?.realizado} className="w-4 h-4 accent-green-500" />
-                        <span className="text-xs text-green-600">✓</span>
+                          disabled={!carga.espessura_camada?.realizado} aria-label="Espessura da camada conforme" className="w-4 h-4 accent-green-500" />
+                        <span aria-hidden="true" className="text-xs text-green-600">✓</span>
                       </label>
                       <label className="flex items-center gap-1 cursor-pointer">
                         <input type="checkbox" checked={carga.espessura_camada?.conforme === false}
                           onChange={(e) => onCargaChange(index, "espessura_camada.conforme", e.target.checked ? false : null)}
-                          disabled={!carga.espessura_camada?.realizado} className="w-4 h-4 accent-red-500" />
-                        <span className="text-xs text-destructive">✗</span>
+                          disabled={!carga.espessura_camada?.realizado} aria-label="Espessura da camada não conforme" className="w-4 h-4 accent-red-500" />
+                        <span aria-hidden="true" className="text-xs text-destructive">✗</span>
                       </label>
                     </div>
                   </td>
