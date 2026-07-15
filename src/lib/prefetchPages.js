@@ -4,7 +4,6 @@
  * O service worker guarda cada chunk baixado no cache do dispositivo.
  */
 import { logger } from '@/utils/logger';
-import { REPORT_PAGE_LOADERS } from '@/lib/prefetchReportPages';
 
 const FIELD_PAGES = [
   () => import('@/pages/DiarioObra/index'),
@@ -35,7 +34,6 @@ const FIELD_PAGES = [
   () => import('@/pages/CertificacaoUsina/index'),
   () => import('@/pages/NovaNC'),
   () => import('@/pages/Dashboard'),
-  ...REPORT_PAGE_LOADERS,
 ];
 
 let started = false;
