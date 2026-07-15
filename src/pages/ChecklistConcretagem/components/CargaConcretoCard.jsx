@@ -58,19 +58,19 @@ export default function CargaConcretoCard({
                 <tr>
                   <td className="border border-border px-2 py-2 font-medium bg-muted/30">Slump Test</td>
                   <td className="border border-border px-2 py-1 text-center">
-                    <input type="checkbox" checked={carga.slump_test.realizado}
+                    <input type="checkbox" checked={!!carga.slump_test?.realizado}
                       onChange={(e) => onCargaChange(index, "slump_test.realizado", e.target.checked)} className="w-4 h-4" />
                   </td>
                   <td className="border border-border px-1 py-1">
-                    <Input type="number" step="0.1" value={carga.slump_test.resultado || ""}
+                    <Input type="number" step="0.1" value={carga.slump_test?.resultado || ""}
                       onChange={(e) => onCargaChange(index, "slump_test.resultado", e.target.value)}
-                      disabled={!carga.slump_test.realizado || !selectedProject} className="h-8 text-sm" placeholder="Resultado" />
+                      disabled={!carga.slump_test?.realizado || !selectedProject} className="h-8 text-sm" placeholder="Resultado" />
                   </td>
                   <td className={`border border-border px-2 py-1 text-center text-xs ${selectedProject ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                    {carga.slump_test.limite || "N/A"}
+                    {carga.slump_test?.limite || "N/A"}
                   </td>
                   <td className="border border-border px-2 py-1 text-center">
-                    {carga.slump_test.realizado
+                    {carga.slump_test?.realizado
                       ? carga.slump_test.conforme === true ? <span className="text-green-600 font-bold text-xl">✓</span>
                         : carga.slump_test.conforme === false ? <span className="text-destructive font-bold text-xl">✗</span>
                         : <span className="text-muted-foreground">-</span>
@@ -115,31 +115,31 @@ export default function CargaConcretoCard({
                 <tr>
                   <td className="border border-border px-2 py-2 font-medium bg-muted/30">Espessura da Camada</td>
                   <td className="border border-border px-2 py-1 text-center">
-                    <input type="checkbox" checked={carga.espessura_camada.realizado}
+                    <input type="checkbox" checked={!!carga.espessura_camada?.realizado}
                       onChange={(e) => onCargaChange(index, "espessura_camada.realizado", e.target.checked)} className="w-4 h-4" />
                   </td>
                   <td className="border border-border px-1 py-1">
-                    <Input type="number" step="0.1" value={carga.espessura_camada.resultado || ""}
+                    <Input type="number" step="0.1" value={carga.espessura_camada?.resultado || ""}
                       onChange={(e) => onCargaChange(index, "espessura_camada.resultado", e.target.value)}
-                      disabled={!carga.espessura_camada.realizado} className="h-8 text-sm" placeholder="Resultado" />
+                      disabled={!carga.espessura_camada?.realizado} className="h-8 text-sm" placeholder="Resultado" />
                   </td>
                   <td className="border border-border px-1 py-1">
-                    <Input value={carga.espessura_camada.limite}
+                    <Input value={carga.espessura_camada?.limite ?? ""}
                       onChange={(e) => onCargaChange(index, "espessura_camada.limite", e.target.value)}
-                      disabled={!carga.espessura_camada.realizado} className="h-8 text-sm" placeholder="Limite manual" />
+                      disabled={!carga.espessura_camada?.realizado} className="h-8 text-sm" placeholder="Limite manual" />
                   </td>
                   <td className="border border-border px-2 py-1 text-center">
                     <div className="flex gap-2 justify-center">
                       <label className="flex items-center gap-1 cursor-pointer">
-                        <input type="checkbox" checked={carga.espessura_camada.conforme === true}
+                        <input type="checkbox" checked={carga.espessura_camada?.conforme === true}
                           onChange={(e) => onCargaChange(index, "espessura_camada.conforme", e.target.checked ? true : null)}
-                          disabled={!carga.espessura_camada.realizado} className="w-4 h-4 accent-green-500" />
+                          disabled={!carga.espessura_camada?.realizado} className="w-4 h-4 accent-green-500" />
                         <span className="text-xs text-green-600">✓</span>
                       </label>
                       <label className="flex items-center gap-1 cursor-pointer">
-                        <input type="checkbox" checked={carga.espessura_camada.conforme === false}
+                        <input type="checkbox" checked={carga.espessura_camada?.conforme === false}
                           onChange={(e) => onCargaChange(index, "espessura_camada.conforme", e.target.checked ? false : null)}
-                          disabled={!carga.espessura_camada.realizado} className="w-4 h-4 accent-red-500" />
+                          disabled={!carga.espessura_camada?.realizado} className="w-4 h-4 accent-red-500" />
                         <span className="text-xs text-destructive">✗</span>
                       </label>
                     </div>

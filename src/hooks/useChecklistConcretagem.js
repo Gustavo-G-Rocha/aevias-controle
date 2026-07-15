@@ -8,6 +8,39 @@ import { uploadArquivo } from "@/services/uploadService";
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
 
+const DEFAULT_TEST = { realizado: false, resultado: null, limite: "", conforme: null };
+const DEFAULT_PERIODO = (periodo) => ({ periodo, temperatura_ambiente: null, condicoes_climaticas: "bom" });
+
+function normalizeChecklistData(raw) {
+  const initial = getInitialFormData();
+  const periodos = (raw.periodos_clima && raw.periodos_clima.length > 0)
+    ? raw.periodos_clima.map(p => ({ ...DEFAULT_PERIODO(p.periodo || "manha"), ...p }))
+    : initial.periodos_clima;
+  const cargas = (Array.isArray(raw.cargas_concreto) ? raw.cargas_concreto : []).map((c, i) => ({
+    numero_carga: c.numero_carga || i + 1,
+    nota_fiscal: c.nota_fiscal ?? "",
+    placa_betoneira: c.placa_betoneira ?? "",
+    slump_test: { ...DEFAULT_TEST, ...(c.slump_test || {}) },
+    flow_test: { ...DEFAULT_TEST, ...(c.flow_test || {}) },
+    espessura_camada: { ...DEFAULT_TEST, ...(c.espessura_camada || {}) },
+    equipamento_lancamento: c.equipamento_lancamento ?? "",
+    superficie_tratada_limpa: c.superficie_tratada_limpa ?? null,
+    adensamento_realizado: c.adensamento_realizado ?? null,
+    observacoes_lancamento: c.observacoes_lancamento ?? "",
+    moldado_fiscalizacao: c.moldado_fiscalizacao ?? false,
+    corpos_prova: Array.isArray(c.corpos_prova) ? c.corpos_prova : [],
+  }));
+  return {
+    ...initial,
+    ...raw,
+    jornada: raw.jornada || initial.jornada,
+    periodos_clima: periodos,
+    cargas_concreto: cargas.length > 0 ? cargas : initial.cargas_concreto,
+    nao_conformidades: Array.isArray(raw.nao_conformidades) ? raw.nao_conformidades : [],
+    fotos: Array.isArray(raw.fotos) ? raw.fotos : [],
+  };
+}
+
 export const getInitialFormData = () => ({
   obra_id: "",
   project_id: "",
@@ -152,7 +185,7 @@ export function useChecklistConcretagem() {
           const userAccessLevel = user.access_level || (user.role === "admin" ? "admin" : "user");
           if (userAccessLevel === "admin" || (checklistToEdit.created_by === user.email && (checklistToEdit.status === "rascunho" || checklistToEdit.approved === false))) {
             setEditingChecklist(checklistToEdit);
-            setFormData(checklistToEdit);
+            setFormData(normalizeChecklistData(checklistToEdit));
           } else {
             toast({ title: "Você não tem permissão para editar este registro.", variant: "destructive" });
             navigate(createPageUrl("MeusEnsaios"));
