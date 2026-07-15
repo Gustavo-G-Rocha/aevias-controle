@@ -1,33 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
 import { LogIn } from 'lucide-react';
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const user = await base44.auth.me();
-        if (user) {
-          if (user.role === 'admin') {
-            navigate(createPageUrl('Dashboard'), { replace: true });
-          } else {
-            navigate(createPageUrl('MeusEnsaios'), { replace: true });
-          }
-        }
-      } catch (error) {
-        // Erro esperado quando usuário não está autenticado — sem log desnecessário
-        setLoading(false);
-      }
-    };
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-    checkUser();
-  }, [navigate]);
+    if (user.role === 'admin') {
+      navigate(createPageUrl('Dashboard'), { replace: true });
+    } else {
+      navigate(createPageUrl('MeusEnsaios'), { replace: true });
+    }
+  }, [navigate, user]);
 
   const handleLogin = async () => {
     base44.auth.redirectToLogin();
