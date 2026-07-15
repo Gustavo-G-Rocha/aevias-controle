@@ -9,6 +9,7 @@ import { listarRegionais } from "@/services/regionaisService";
 import { listarRegistros } from "@/services/recordsService";
 import { listarProjects } from "@/services/projectsService";
 import { getUserAccessLevel, filtrarRegionaisPorAcesso } from "@/utils/regionaisUtils";
+import { getDataCache } from "@/services/offlineStorageService";
 import { logger } from '@/utils/logger';
 
 export function useRegionaisData() {
@@ -23,6 +24,28 @@ export function useRegionaisData() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
+      // Offline: usa o cache preparado na última abertura com rede
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        const [cUser, cRegionais, cObras, cProjects] = await Promise.all([
+          getDataCache("currentUser"),
+          getDataCache("auxData:regionais"),
+          getDataCache("auxData:obras"),
+          getDataCache("auxData:projects"),
+        ]);
+        const cachedUser = cUser?.data;
+        if (cachedUser) {
+          setUser(cachedUser);
+          const accessLevel = getUserAccessLevel(cachedUser);
+          const regionaisData = cRegionais?.data ?? [];
+          setTodasRegionais(regionaisData);
+          setRegionais(filtrarRegionaisPorAcesso(regionaisData, cachedUser, accessLevel));
+          setObras(cObras?.data ?? []);
+          setUsers([]);
+          setProjects(cProjects?.data ?? []);
+        }
+        return;
+      }
+
       const userData = await obterUsuarioAtual();
       setUser(userData);
 

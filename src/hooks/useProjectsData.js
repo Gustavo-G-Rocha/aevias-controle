@@ -4,6 +4,7 @@ import { listarProjects } from "@/services/projectsService";
 import { listarFaixas } from "@/services/faixasService";
 import { listarRegionais } from "@/services/regionaisService";
 import { filterProjectsByUserAccess } from "@/utils/projectsUtils";
+import { getDataCache } from "@/services/offlineStorageService";
 
 export const useProjectsData = () => {
   const [projects, setProjects] = useState([]);
@@ -15,6 +16,33 @@ export const useProjectsData = () => {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
+      // Offline: usa o cache preparado na última abertura com rede
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        const [cUser, cProjects, cFaixas, cRegionais] = await Promise.all([
+          getDataCache("currentUser"),
+          getDataCache("auxData:projects"),
+          getDataCache("auxData:faixas"),
+          getDataCache("auxData:regionais"),
+        ]);
+        const userData = cUser?.data;
+        if (userData) {
+          setUser(userData);
+          setFaixas(cFaixas?.data ?? []);
+          setRegionais(cRegionais?.data ?? []);
+          const userAccessLevel =
+            userData.access_level || (userData.role === "admin" ? "admin" : "user");
+          setProjects(
+            filterProjectsByUserAccess(
+              cProjects?.data ?? [],
+              cRegionais?.data ?? [],
+              userData,
+              userAccessLevel
+            )
+          );
+        }
+        return;
+      }
+
       const [userData, projectsData, faixasData, regionaisData] =
         await Promise.all([
           obterUsuarioAtual(),
