@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
@@ -44,7 +44,6 @@ export default function RelatoriosUnificados() {
     clearFilters,
   } = useRelatoriosUnificadosFilters();
   const { handleGerarRelatorio } = useRelatoriosUnificadosActions();
-  const [generating] = useState(false);
 
   const obraSelecionadaObj = useMemo(
     () => obras.find((o) => o.id === obraSelecionada),
@@ -148,7 +147,6 @@ export default function RelatoriosUnificados() {
             onLimpar={clearFilters}
             onGerar={handleGerar}
             isFormValid={formIsValid}
-            generating={generating}
           />
         </CardContent>
       </Card>
