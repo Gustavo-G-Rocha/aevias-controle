@@ -41,7 +41,7 @@
       "$or": [
         {
           "user_condition": {
-            "data.access_level": "admin"
+            "role": "admin"
           }
         },
         {
@@ -54,7 +54,7 @@
       "$or": [
         {
           "user_condition": {
-            "data.access_level": "admin"
+            "role": "admin"
           }
         },
         {
@@ -64,7 +64,7 @@
     },
     "delete": {
       "user_condition": {
-        "data.access_level": "admin"
+        "role": "admin"
       }
     }
   }
