@@ -12,6 +12,7 @@ import { getLaboratoristaInfo, getResponsavelInfo, getRodoviaInfo, getTrechoInfo
 import { assinarEnsaio } from "@/services/ensaiosService";
 import { QUERY_KEYS } from "@/hooks/useQueryData";
 import { toast } from "@/components/ui/use-toast";
+import CriticalActionDialog from "@/components/ensaios/CriticalActionDialog";
 
 const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
   const queryClient = useQueryClient();
@@ -33,7 +34,6 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
   const jaAssinado = ensaio.client_signature?.signed_by === user?.email;
 
   const handleAssinar = useCallback(async () => {
-    if (!window.confirm(`Confirma a assinatura digital do registro "${ensaio.sample_id || ensaio.id}"?`)) return;
     try {
       await assinarEnsaio(ensaio, user);
       toast({ title: 'Registro assinado com sucesso!' });
@@ -147,9 +147,16 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
               </Button>
             )}
             {podeAssinar && (
-              <Button size="sm" className="hover:opacity-90" onClick={handleAssinar}>
-                <MessageSquare className="w-4 h-4 mr-1" /> Assinar Registro
-              </Button>
+              <CriticalActionDialog
+                title="Confirmar assinatura digital"
+                description={`Confirma a assinatura digital do registro "${ensaio.sample_id || ensaio.id}"?`}
+                confirmLabel="Assinar registro"
+                onConfirm={handleAssinar}
+              >
+                <Button size="sm" className="hover:opacity-90">
+                  <MessageSquare className="w-4 h-4 mr-1" /> Assinar Registro
+                </Button>
+              </CriticalActionDialog>
             )}
             {podeEditar && (
               <Button asChild size="sm">

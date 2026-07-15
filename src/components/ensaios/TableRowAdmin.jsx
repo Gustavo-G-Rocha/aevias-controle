@@ -9,6 +9,7 @@ import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components
 import { getLocalInfo, getLaboratoristaInfo, getEmpreiteiraInfo, getNaoConformidades, getStatusInfo } from "@/components/ensaios/utils";
 import { CopyIdButton } from "@/components/ensaios/TableFilters";
 import { canGestorPreencherResultado } from "@/utils/certificacaoUsinaAccess";
+import CriticalActionDialog from "@/components/ensaios/CriticalActionDialog";
 
 const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, allUsers, obras, user, regionais = [], onApprove, onReject, onDelete, onAssinar }) => {
   const status = getStatusInfo(ensaio);
@@ -73,9 +74,16 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
             </div>
           )}
           {podeAssinar && (
-            <Button size="sm" style={{ backgroundColor: '#566E3D' }} className="text-white hover:opacity-90 h-7 px-2" onClick={() => onAssinar(ensaio)} title="Assinar">
-              <MessageSquare className="w-3 h-3" />
-            </Button>
+            <CriticalActionDialog
+              title="Confirmar assinatura digital"
+              description={`Confirma a assinatura digital do registro "${ensaio.sample_id || ensaio.id}"?`}
+              confirmLabel="Assinar registro"
+              onConfirm={() => onAssinar(ensaio)}
+            >
+              <Button size="sm" style={{ backgroundColor: '#566E3D' }} className="text-white hover:opacity-90 h-7 px-2" title="Assinar" aria-label="Assinar registro">
+                <MessageSquare className="w-3 h-3" />
+              </Button>
+            </CriticalActionDialog>
           )}
           {canApprove && ensaio.status === 'rascunho' && <span className="text-xs italic text-muted-foreground ml-2">Em execução</span>}
           {podeEditarCertificacao && (

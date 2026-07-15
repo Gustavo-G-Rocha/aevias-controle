@@ -7,6 +7,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components/ensaios/ensaioMappers";
 import { getLocalInfo, getLaboratoristaInfo, getEmpreiteiraInfo, getNaoConformidades, getStatusInfo } from "@/components/ensaios/utils";
 import { CopyIdButton } from "@/components/ensaios/TableFilters";
+import CriticalActionDialog from "@/components/ensaios/CriticalActionDialog";
 
 const TableRowCliente = React.memo(({ ensaio, obra, projeto, index, allUsers, onAssinar }) => {
   const status = getStatusInfo(ensaio);
@@ -51,9 +52,16 @@ const TableRowCliente = React.memo(({ ensaio, obra, projeto, index, allUsers, on
             <RouterLink to={reportUrl} target="_blank"><FileText className="w-3 h-3" /></RouterLink>
           </Button>
           {podeAssinar && (
-            <Button size="sm" style={{ backgroundColor: '#566E3D' }} className="text-white hover:opacity-90 h-7 px-2" onClick={() => onAssinar(ensaio)} title="Assinar">
-              <MessageSquare className="w-3 h-3" />
-            </Button>
+            <CriticalActionDialog
+              title="Confirmar assinatura digital"
+              description={`Confirma a assinatura digital do registro "${ensaio.sample_id || ensaio.id}"?`}
+              confirmLabel="Assinar registro"
+              onConfirm={() => onAssinar(ensaio)}
+            >
+              <Button size="sm" style={{ backgroundColor: '#566E3D' }} className="text-white hover:opacity-90 h-7 px-2" title="Assinar" aria-label="Assinar registro">
+                <MessageSquare className="w-3 h-3" />
+              </Button>
+            </CriticalActionDialog>
           )}
         </div>
       </td>

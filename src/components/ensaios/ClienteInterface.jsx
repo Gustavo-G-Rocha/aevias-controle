@@ -46,7 +46,6 @@ const ClienteInterface = React.memo(({ ensaios, obras, projects, user, allUsers 
   } = useTableFilters(ensaios, obras, projects, allUsers, applyCustomFilters);
 
   const handleAssinar = useCallback(async (ensaio) => {
-    if (!window.confirm(`Confirma a assinatura digital do registro "${ensaio.sample_id || ensaio.id}"?`)) return;
     try {
       await assinarEnsaio(ensaio, user);
       toast({ title: 'Registro assinado com sucesso!' });

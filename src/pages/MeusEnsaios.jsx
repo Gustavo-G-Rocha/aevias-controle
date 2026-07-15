@@ -18,7 +18,6 @@ export default function MeusEnsaios() {
   const { handleApprove, handleReject, handleDelete } = useEnsaiosActions(user, obras, reload);
 
   const handleAssinar = useCallback(async (ensaio) => {
-    if (!window.confirm(`Confirma a assinatura digital do registro "${ensaio.sample_id || ensaio.id}"?`)) return;
     try {
       await assinarEnsaio(ensaio, user);
       toast({ title: 'Registro assinado com sucesso!' });

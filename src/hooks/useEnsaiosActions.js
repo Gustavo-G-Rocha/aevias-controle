@@ -22,7 +22,6 @@ export function useEnsaiosActions(user, obras, onSuccess) {
   const { updateRecord, removeRecord } = useRecordCacheUpdate();
 
   const handleApprove = useCallback(async (ensaio) => {
-    if (!window.confirm(`Confirma a aprovação do registro "${ensaio.sample_id || ensaio.id}"?`)) return;
     try {
       const updatedRecord = await aprovarEnsaio(ensaio, user, obras);
       if (updatedRecord?.id) {
