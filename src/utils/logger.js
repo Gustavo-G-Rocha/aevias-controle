@@ -4,21 +4,23 @@
  * Em produção (build) as chamadas são no-ops; em desenvolvimento repassam ao console,
  * evitando exposição de detalhes internos no console do navegador em produção.
  */
-const isDev = import.meta.env?.DEV ?? false;
+const isDev = import.meta.env?.DEV === true;
 
-export const logger = {
+export const createLogger = (enabled = false) => ({
   log: (...args) => {
-    if (isDev) console.log(...args);
+    if (enabled) console.log(...args);
   },
   error: (...args) => {
-    if (isDev) console.error(...args);
+    if (enabled) console.error(...args);
   },
   warn: (...args) => {
-    if (isDev) console.warn(...args);
+    if (enabled) console.warn(...args);
   },
   info: (...args) => {
-    if (isDev) console.info(...args);
+    if (enabled) console.info(...args);
   },
-};
+});
+
+export const logger = createLogger(isDev);
 
 export default logger;
