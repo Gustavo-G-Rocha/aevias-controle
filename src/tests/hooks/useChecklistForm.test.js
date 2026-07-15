@@ -30,7 +30,7 @@ const returnBlock = (() => {
 describe('useChecklistForm — contrato', () => {
   it('exporta useChecklistForm com canEditExtra opcional', () => {
     expect(src).toContain(
-      'export function useChecklistForm(getInitialFormData, entityName, storageName, canEditExtra = null)'
+      'export function useChecklistForm(getInitialFormData, entityName, storageName, canEditExtra = null, options = {})'
     );
   });
 
@@ -52,7 +52,15 @@ describe('useChecklistForm — contrato', () => {
   });
 
   it('delega a normalização de edição ao helper compartilhado', () => {
-    expect(src).toContain('normalizeChecklistEditData(initialForm, checklistToEdit)');
+    expect(src).toContain('normalizeLoadedData = normalizeChecklistEditData');
+    expect(src).toContain('normalizeLoadedData(initialForm, checklistToEdit)');
+  });
+
+  it('permite particularidades por opções sem duplicar o fluxo base', () => {
+    expect(src).toContain('filtroTipoObra = null');
+    expect(src).toContain('initializeNewData = null');
+    expect(src).toContain('canOwnerEditStatus = defaultCanOwnerEditStatus');
+    expect(src).toContain('isOwner = defaultIsOwner');
   });
 
   it('helper faz deep-merge de objetos, normaliza data e garante fotos como array', () => {
@@ -68,8 +76,8 @@ describe('useChecklistForm — contrato', () => {
   });
 
   it('novo registro preenche inspetor_campo e preseleciona obra_id', () => {
-    expect(src).toContain('initialNewFormData.inspetor_campo = user.laboratorista_name || user.full_name');
-    expect(src).toContain('initialNewFormData.obra_id = obras[0].id');
+    expect(src).toContain('inspetor_campo: user.laboratorista_name || user.full_name');
+    expect(src).toContain("obra_id: obras[0]?.id || initialNewFormData.obra_id");
   });
 
   it('carrega checklist via obterChecklistById', () => {
@@ -78,8 +86,10 @@ describe('useChecklistForm — contrato', () => {
 
   it('owner check considera created_by (email) e created_by_id', () => {
     expect(src).toContain('isOwnerCheck');
-    expect(src).toContain("checklistToEdit.created_by?.toLowerCase() === user.email?.toLowerCase()");
-    expect(src).toContain('checklistToEdit.created_by_id === user.id');
+    expect(src).toContain('const defaultIsOwner');
+    expect(src).toContain("checklist?.created_by?.toLowerCase() === user?.email?.toLowerCase()");
+    expect(src).toContain('checklist?.created_by_id === user?.id');
+    expect(src).toContain('const isOwnerCheck = isOwner(user, checklistToEdit)');
   });
 
   it('expõe contrato de retorno completo', () => {

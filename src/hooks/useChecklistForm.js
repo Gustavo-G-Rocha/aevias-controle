@@ -18,13 +18,26 @@ import { normalizeChecklistEditData } from '@/utils/checklistEditNormalization';
  * - Retorna `editingChecklist` em vez de `editingEnsaio`
  * - Usa `obterChecklistById` (não `obterEnsaioById`)
  * - Suporta `canEditExtra` (predicado para perfis autorizados editarem)
+ * - Aceita opções específicas sem duplicar carregamento, permissões ou persistência
  * - Faz deep-merge de campos objeto ao carregar edição
  * - Expõe `allUsers` (admin vê todos; demais veem apenas o próprio)
  *
  * Lógica de carregamento de dados (user, obras, regionais, projetos, faixas,
  * filtragem por acesso, editId, valores derivados) delegada a useFormDataLoader.
  */
-export function useChecklistForm(getInitialFormData, entityName, storageName, canEditExtra = null) {
+const defaultCanOwnerEditStatus = (checklist) =>
+  checklist.status === 'rascunho' || checklist.approved === false || checklist.approved === null;
+const defaultIsOwner = (user, checklist) =>
+  checklist?.created_by?.toLowerCase() === user?.email?.toLowerCase() || checklist?.created_by_id === user?.id;
+
+export function useChecklistForm(getInitialFormData, entityName, storageName, canEditExtra = null, options = {}) {
+  const {
+    filtroTipoObra = null,
+    normalizeLoadedData = normalizeChecklistEditData,
+    initializeNewData = null,
+    canOwnerEditStatus = defaultCanOwnerEditStatus,
+    isOwner = defaultIsOwner,
+  } = options;
   const [editingChecklist, setEditingChecklist] = useState(null);
   const [obraDoRegistro, setObraDoRegistro] = useState(null);
   const [editLoading, setEditLoading] = useState(false);
@@ -38,7 +51,12 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
     user, auxData, obras, regionais, projects, faixas, editId,
     loading: dataLoading,
     obraSelecionada, regionalSelecionada, projetosDisponiveis,
-  } = useFormDataLoader({ formData, needsUsers: true, useAccessLevel: false });
+  } = useFormDataLoader({
+    formData,
+    needsUsers: true,
+    filtroTipoObra,
+    useAccessLevel: false,
+  });
 
   const isAdmin = user?.role === 'admin';
   const allUsers = isAdmin ? (auxData?.users ?? []) : (user ? [user] : []);
@@ -52,16 +70,16 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
       obterChecklistById(entityName, editId)
         .then(checklistToEdit => {
           setEditingChecklist(checklistToEdit);
-          const isOwnerCheck = checklistToEdit.created_by?.toLowerCase() === user.email?.toLowerCase() || checklistToEdit.created_by_id === user.id;
+          const isOwnerCheck = isOwner(user, checklistToEdit);
           // Busca na lista completa (não filtrada) para encontrar a obra mesmo se não estiver em_andamento
           const obraRegistroAtual = (auxData?.obras || []).find(o => o.id === checklistToEdit.obra_id) || null;
           setObraDoRegistro(obraRegistroAtual);
           const extraCanEdit = typeof canEditExtra === 'function'
             ? canEditExtra(user, checklistToEdit, obraRegistroAtual, regionais)
             : false;
-          if (user.role === 'admin' || extraCanEdit || (isOwnerCheck && (checklistToEdit.status === 'rascunho' || checklistToEdit.approved === false || checklistToEdit.approved === null))) {
+          if (user.role === 'admin' || extraCanEdit || (isOwnerCheck && canOwnerEditStatus(checklistToEdit))) {
             const initialForm = getInitialFormData();
-            setFormData(normalizeChecklistEditData(initialForm, checklistToEdit));
+            setFormData(normalizeLoadedData(initialForm, checklistToEdit));
           } else {
             toast({ title: "Você não tem permissão para editar este registro.", variant: "destructive" });
             navigate(createPageUrl('MeusEnsaios'));
@@ -75,14 +93,17 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
         .finally(() => setEditLoading(false));
     } else {
       const initialNewFormData = getInitialFormData();
-      initialNewFormData.inspetor_campo = user.laboratorista_name || user.full_name;
-      if (obras.length > 0) {
-        initialNewFormData.obra_id = obras[0].id;
-      }
-      setFormData(initialNewFormData);
+      const initializedData = typeof initializeNewData === 'function'
+        ? initializeNewData(initialNewFormData, user, obras)
+        : {
+            ...initialNewFormData,
+            inspetor_campo: user.laboratorista_name || user.full_name,
+            obra_id: obras[0]?.id || initialNewFormData.obra_id,
+          };
+      setFormData(initializedData);
       setEditingChecklist(null);
     }
-  }, [editId, dataLoading, user?.id, obras, auxData, entityName, navigate, canEditExtra, regionais]);
+  }, [editId, dataLoading, user?.id, obras, auxData, entityName, navigate, canEditExtra, regionais, normalizeLoadedData, initializeNewData, canOwnerEditStatus, isOwner]);
 
   // Permissões — calculadas apenas quando user já foi carregado
   const loading = dataLoading || editLoading;
@@ -98,13 +119,8 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
     !editingChecklist?.id ||
     extraCanEdit ||
     (
-      (
-        formData.created_by?.toLowerCase() === user?.email?.toLowerCase() ||
-        formData.created_by_id === user?.id ||
-        editingChecklist?.created_by?.toLowerCase() === user?.email?.toLowerCase() ||
-        editingChecklist?.created_by_id === user?.id
-      ) &&
-      (formData.status === 'rascunho' || formData.approved === false || formData.approved === null)
+      (isOwner(user, formData) || isOwner(user, editingChecklist)) &&
+      canOwnerEditStatus(formData)
     )
   );
   const isEditable = userCanEdit;

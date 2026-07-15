@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { createPageUrl } from "@/utils";
-import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
-import { obterChecklistById, criarChecklist, atualizarChecklist } from "@/services/checklistsService";
+import { useChecklistForm } from "@/hooks/useChecklistForm";
+import { criarChecklist, atualizarChecklist } from "@/services/checklistsService";
 import { uploadArquivo } from "@/services/uploadService";
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
@@ -56,8 +54,8 @@ export const getInitialFormData = () => ({
   status: "rascunho",
 });
 
-const normalizeConcretagemData = (raw) => normalizeChecklistEditData(
-  getInitialFormData(),
+export const normalizeConcretagemData = (initialForm, raw) => normalizeChecklistEditData(
+  initialForm,
   raw,
   {
     periodos_clima: (periodos, defaults) => Array.isArray(periodos) && periodos.length > 0
@@ -83,49 +81,37 @@ const normalizeConcretagemData = (raw) => normalizeChecklistEditData(
   }
 );
 
-export function useChecklistConcretagem() {
-  const navigate = useNavigate();
-  const location = useLocation();
+const concretagemFormOptions = {
+  filtroTipoObra: ["supervisao"],
+  normalizeLoadedData: normalizeConcretagemData,
+  canOwnerEditStatus: (checklist) => checklist.status === "rascunho" || checklist.approved === false,
+  isOwner: (user, checklist) => checklist?.created_by === user?.email,
+  initializeNewData: (initialForm, user) => ({
+    ...initialForm,
+    inspetor_campo: user.laboratorista_name || user.full_name,
+    laboratorista_name: user.laboratorista_name || user.full_name,
+  }),
+};
 
+export function useChecklistConcretagem() {
+  const {
+    user, obras: loadedObras, regionais, projects: allProjects, editingChecklist,
+    loading, formData, setFormData, clearSavedData, navigate,
+  } = useChecklistForm(
+    getInitialFormData,
+    'ChecklistConcretagem',
+    'checklist_concretagem',
+    null,
+    concretagemFormOptions
+  );
+  const obras = useMemo(
+    () => loadedObras.filter(obra => obra.status === "em_andamento"),
+    [loadedObras]
+  );
   const [saving, setSaving] = useState(false);
   const [projects, setProjects] = useState([]);
-  const [editLoading, setEditLoading] = useState(false);
-
-  const { data: user, isLoading: loadingUser } = useCurrentUser();
-  const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true });
-
-  const regionais = auxData?.regionais ?? [];
-  const allProjects = auxData?.projects ?? [];
-
-  const obras = useMemo(() => {
-    if (!auxData?.obras || !user) return [];
-    const userAccessLevel = user.access_level || (user.role === "admin" ? "admin" : "user");
-    if (userAccessLevel === "user" || userAccessLevel === 'funcionarios_cliente') {
-      const emailLower = user.email.toLowerCase();
-      const regionaisIds = regionais
-        .filter(r =>
-          (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-          (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-        )
-        .map(r => r.id);
-      if (regionaisIds.length > 0) {
-        const regionaisSet = new Set(regionaisIds);
-        return auxData.obras.filter(o =>
-          regionaisSet.has(o.regional_id) && o.status === "em_andamento" && o.tipo_obra === "supervisao"
-        );
-      }
-      return [];
-    }
-    return auxData.obras.filter(o => o.status === "em_andamento" && o.tipo_obra === "supervisao");
-  }, [auxData?.obras, regionais, user]);
-
-  const loading = loadingUser || loadingAux || editLoading;
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [selectedFileNames, setSelectedFileNames] = useState("Nenhum ficheiro selecionado");
-  const [editingChecklist, setEditingChecklist] = useState(null);
-  const [formData, setFormData] = useState(getInitialFormData());
-
-  const { clearSavedData } = useFormPersistence("checklist_concretagem", formData, setFormData, !!editingChecklist);
 
   const projectsRef = useRef(projects);
   useEffect(() => { projectsRef.current = projects; }, [projects]);
@@ -168,40 +154,7 @@ export function useChecklistConcretagem() {
       const stillAvailable = projetosFiltrados.some(p => p.id === formData.project_id);
       if (!stillAvailable) setFormData(prev => ({ ...prev, project_id: "" }));
     }
-  }, [formData.obra_id]);
-
-  useEffect(() => {
-    if (loadingUser || loadingAux || !user) return;
-
-    const params = new URLSearchParams(location.search);
-    const editId = params.get("editId");
-
-    if (editId) {
-      setEditLoading(true);
-      obterChecklistById('ChecklistConcretagem', editId)
-        .then(checklistToEdit => {
-          const userAccessLevel = user.access_level || (user.role === "admin" ? "admin" : "user");
-          if (userAccessLevel === "admin" || (checklistToEdit.created_by === user.email && (checklistToEdit.status === "rascunho" || checklistToEdit.approved === false))) {
-            setEditingChecklist(checklistToEdit);
-            setFormData(normalizeConcretagemData(checklistToEdit));
-          } else {
-            toast({ title: "Você não tem permissão para editar este registro.", variant: "destructive" });
-            navigate(createPageUrl("MeusEnsaios"));
-          }
-        })
-        .catch(error => {
-          logger.error("Erro ao carregar dados:", error);
-          toast({ title: "Erro ao carregar dados iniciais.", variant: "destructive" });
-        })
-        .finally(() => setEditLoading(false));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        inspetor_campo: user.laboratorista_name || user.full_name,
-        laboratorista_name: user.laboratorista_name || user.full_name,
-      }));
-    }
-  }, [location.search, loadingUser, loadingAux, user?.id, navigate]);
+  }, [formData.obra_id, formData.project_id, obras, allProjects, regionais, editingChecklist, setFormData]);
 
   // --- Handlers de cargas ---
   const checkSlumpConformidade = useCallback((resultado, projectId) => {
