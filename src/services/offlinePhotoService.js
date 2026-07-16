@@ -11,6 +11,7 @@
 import { addOfflinePhoto, getOfflinePhoto, updateOfflinePhoto } from '@/services/offlineStorageService';
 import { compressImage } from '@/utils/imageUpload';
 import { logger } from '@/utils/logger';
+import { isEffectivelyOffline } from '@/utils/offlineSimulation';
 
 const PREFIX = 'local-photo:';
 
@@ -26,7 +27,7 @@ export function getPhotoIdFromRef(url) {
  * Verifica se o dispositivo está offline.
  */
 function isOffline() {
-  return typeof navigator !== 'undefined' && !navigator.onLine;
+  return isEffectivelyOffline();
 }
 
 /**

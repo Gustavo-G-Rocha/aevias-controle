@@ -1,10 +1,12 @@
 /**
  * useOfflineDetection.js
- * Hook para detectar online/offline usando navigator.onLine
+ * Hook para detectar online/offline usando navigator.onLine e
+ * simulação manual (offlineSimulation).
  */
 
 import { useState, useEffect } from 'react';
 import { logger } from '@/utils/logger';
+import { isEffectivelyOffline } from '@/utils/offlineSimulation';
 
 /**
  * Hook que monitora conexão online/offline
@@ -12,22 +14,22 @@ import { logger } from '@/utils/logger';
  */
 export function useOfflineDetection() {
   const [isOnline, setIsOnline] = useState(() => {
-    // Inicializar com estado real (pode ser false mesmo que typeof window === 'undefined')
     if (typeof window === 'undefined') return true; // SSR fallback
-    return navigator.onLine;
+    return !isEffectivelyOffline();
   });
 
   useEffect(() => {
-    const handleOnline = () => {
-      logger.log('[useOfflineDetection] Online');
-      setIsOnline(true);
+    const compute = () => {
+      const online = !isEffectivelyOffline();
+      logger.log(`[useOfflineDetection] ${online ? 'Online' : 'Offline'}`);
+      setIsOnline(online);
     };
 
-    const handleOffline = () => {
-      logger.log('[useOfflineDetection] Offline');
-      setIsOnline(false);
-    };
+    const handleOnline = () => compute();
+    const handleOffline = () => compute();
 
+    // Recalcula imediatamente para capturar mudanças de simulação
+    compute();
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 

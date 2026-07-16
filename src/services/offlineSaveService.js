@@ -13,12 +13,13 @@ import { createQueueItem } from '@/utils/offlineQueue';
 import { addOrUpdateQueueItem } from '@/services/syncService';
 import { saveDataCache, getDataCache } from '@/services/offlineStorageService';
 import { logger } from '@/utils/logger';
+import { isEffectivelyOffline } from '@/utils/offlineSimulation';
 
 /**
- * Verifica se o dispositivo está offline.
+ * Verifica se o dispositivo está offline (real ou simulado).
  */
 function isOffline() {
-  return typeof navigator !== 'undefined' && !navigator.onLine;
+  return isEffectivelyOffline();
 }
 
 function isNetworkError(error) {

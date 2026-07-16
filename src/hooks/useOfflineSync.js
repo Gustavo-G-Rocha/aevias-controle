@@ -15,6 +15,7 @@ import {
   countConflictsByStatus,
 } from '@/services/offlineStorageService';
 import { logger } from '@/utils/logger';
+import { isEffectivelyOffline } from '@/utils/offlineSimulation';
 
 /**
  * Hook que sincroniza items pendentes automaticamente quando online
@@ -56,7 +57,7 @@ export function useOfflineSync() {
 
   // Sincronizar items (identidade estável — não depende de isOnline/isSyncing)
   const performSync = useCallback(async () => {
-    if ((typeof navigator !== 'undefined' && !navigator.onLine) || isSyncingRef.current) return;
+    if (isEffectivelyOffline() || isSyncingRef.current) return;
 
     logger.log('[useOfflineSync] Iniciando sincronização');
     isSyncingRef.current = true;
