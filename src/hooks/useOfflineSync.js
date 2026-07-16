@@ -84,6 +84,11 @@ export function useOfflineSync() {
       }
 
       await refreshCounts();
+      // Avisa a UI (ex.: lista de MeusEnsaios) que a fila mudou, para remover
+      // os badges "Aguardando sincronização" dos itens já enviados.
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('offline-queue-updated'));
+      }
     } catch (e) {
       logger.error('[useOfflineSync] Erro durante sincronização:', e);
       setLastError(e?.message || String(e));

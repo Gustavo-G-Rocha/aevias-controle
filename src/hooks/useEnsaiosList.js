@@ -1,14 +1,50 @@
 // useEnsaiosList.js — Hook de MeusEnsaios migrado para React Query
 // Cache compartilhado com useDashboardData: mesma query key = zero recarregamentos ao navegar
 
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getUserAccessLevel, getAccessibleObraIds } from '@/utils/accessControl';
 import { useCurrentUser, useAuxData, useAllRecords, QUERY_KEYS } from '@/hooks/useQueryData';
 import { getDataEnsaio } from '@/components/ensaios/ensaioMappers';
 import { carregarRegistrosSupervisorService } from '@/services/supervisorRecordsService';
 import { useOfflineDetection } from '@/hooks/useOfflineDetection';
-import { saveDataCache, getDataCache } from '@/services/offlineStorageService';
+import { saveDataCache, getDataCache, getQueueItemsByStatus } from '@/services/offlineStorageService';
+
+// Itens da fila offline (pending/failed) transformados em registros para exibição.
+// Garante que registros salvos offline apareçam em MeusEnsaios enquanto aguardam
+// sincronização — confirma a persistência local para o usuário.
+const QUEUE_RECORDS_KEY = ['offlineQueueRecords'];
+function mapQueueItemToRecord(item) {
+  const iso = item.clientUpdatedAt || (item.timestamp ? new Date(item.timestamp).toISOString() : new Date().toISOString());
+  return {
+    id: item.entityId || `offline-${item.id}`,
+    ...item.payload,
+    entityType: item.entityType,
+    _offline: true,
+    _queueId: item.id,
+    created_date: item.payload?.created_date || iso,
+    updated_date: iso,
+  };
+}
+function useOfflineQueueRecords() {
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    const handler = () => queryClient.invalidateQueries({ queryKey: QUEUE_RECORDS_KEY });
+    window.addEventListener('offline-queue-updated', handler);
+    return () => window.removeEventListener('offline-queue-updated', handler);
+  }, [queryClient]);
+  return useQuery({
+    queryKey: QUEUE_RECORDS_KEY,
+    queryFn: async () => {
+      const [pending, failed] = await Promise.all([
+        getQueueItemsByStatus('pending'),
+        getQueueItemsByStatus('failed'),
+      ]);
+      return [...pending, ...failed].map(mapQueueItemToRecord);
+    },
+    staleTime: 5 * 1000,
+  });
+}
 
 export function sortByEnsaioDate(records) {
   return [...records].sort((a, b) => {
@@ -107,6 +143,9 @@ export function useEnsaiosList() {
 
   const { data: allRecords, isLoading: loadingRecords } = useAllRecords('list');
   const { data: supervisorRecords, isLoading: loadingSupervisorRecords } = useSupervisorRecords(user, useBackendRecords);
+  // Registros salvos offline (fila pendente/falha) — mesclados na lista para
+  // ficarem visíveis enquanto aguardam sincronização.
+  const { data: offlineQueueRecords = [] } = useOfflineQueueRecords();
 
   // Invalida ambos os caches para forçar recarregamento após ações (aprovar/excluir)
   const reload = useCallback(() => {
@@ -126,7 +165,8 @@ export function useEnsaiosList() {
   const ensaios = useMemo(() => {
     if (!user || !obras) return [];
 
-    const records = useBackendRecords ? (supervisorRecords ?? []) : (allRecords ?? []);
+    const baseRecords = useBackendRecords ? (supervisorRecords ?? []) : (allRecords ?? []);
+    const records = [...baseRecords, ...(offlineQueueRecords ?? [])];
     if (!records.length) return [];
 
     // Supervisor: registros vêm do backend (bypass RLS), mas ainda precisam
@@ -141,7 +181,7 @@ export function useEnsaiosList() {
       allUsers
     );
     return sortByEnsaioDate(filtered);
-  }, [user, currentUserAccessLevel, allRecords, supervisorRecords, obras, regionais, allUsers, useBackendRecords]);
+  }, [user, currentUserAccessLevel, allRecords, supervisorRecords, offlineQueueRecords, obras, regionais, allUsers, useBackendRecords]);
 
   return {
     ensaios,

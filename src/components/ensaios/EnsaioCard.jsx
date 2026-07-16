@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, Edit, MessageSquare, MapPin, User as UserIconSmall, Building, RotateCcw, PenLine } from "lucide-react";
+import { FileText, Edit, MessageSquare, MapPin, User as UserIconSmall, Building, RotateCcw, PenLine, CloudOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components/ensaios/ensaioMappers";
@@ -75,6 +75,11 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
                 <status.icon className="w-3 h-3" />
                 {status.text}
               </Badge>
+              {ensaio._offline && (
+                <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-300/50 text-xs gap-1" data-testid="offline-pending-badge">
+                  <CloudOff className="w-3 h-3" /> Aguardando sincronização
+                </Badge>
+              )}
               {status.wasRejected && <Badge className="bg-orange-100/80 text-orange-800 border border-border/50 text-xs gap-1"><RotateCcw className="w-3 h-3" /> Editado após reprovação</Badge>}
               {jaAssinado && <Badge className="bg-muted/50 border border-border text-xs gap-1"><PenLine className="w-3 h-3" /> Assinado por você</Badge>}
             </div>
