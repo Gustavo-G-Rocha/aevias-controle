@@ -20,7 +20,7 @@ export default function RelatoriosUnificadosBotoes({
       </Button>
       <Button
         onClick={onGerar}
-        disabled={!isFormValid || generating}
+        disabled={generating}
         className="bg-[#00233B] text-white hover:bg-[#00233B]/90 flex items-center gap-2"
       >
         {generating ? (

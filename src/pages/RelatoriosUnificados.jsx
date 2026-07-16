@@ -15,6 +15,28 @@ import RelatoriosUnificadosFiltrosAdicionais from "@/components/relatorios-unifi
 import RelatoriosUnificadosLaboratoristas from "@/components/relatorios-unificados/RelatoriosUnificadosLaboratoristas";
 import RelatoriosUnificadosBotoes from "@/components/relatorios-unificados/RelatoriosUnificadosBotoes";
 
+const parseDateValue = (text) => {
+  const value = (text || "").trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+  const match = value.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  if (!match) return null;
+  let first = Number(match[1]);
+  let second = Number(match[2]);
+  const year = Number(match[3]);
+  if (year < 2000 || year > 2100) return null;
+  const monthFirst = first <= 12 && second > 12;
+  const day = monthFirst ? second : first;
+  const month = monthFirst ? first : second;
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  )
+    return null;
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+};
+
 export default function RelatoriosUnificados() {
   const { loading, obras, regionais } = useRelatoriosUnificadosData();
   const {
@@ -66,11 +88,44 @@ export default function RelatoriosUnificados() {
   );
 
   const handleGerar = () => {
-    if (!obraSelecionada) return;
+    let obra = obraSelecionada;
+    let inicio = dataInicio;
+    let fim = dataFim;
+
+    // Fallback: leitura direta do DOM quando o estado React não foi
+    // atualizado (ex.: automação preencheu os campos sem disparar os
+    // eventos que React reconhece para text/select controlados).
+    if (!obra) {
+      const el = document.getElementById("relatorio-unificado-obra");
+      if (el && el.value) obra = el.value;
+    }
+    if (!inicio) {
+      const el = document.getElementById("relatorio-data-inicio");
+      if (el && el.value) {
+        const parsed = parseDateValue(el.value);
+        if (parsed) inicio = parsed;
+      }
+    }
+    if (!fim) {
+      const el = document.getElementById("relatorio-data-fim");
+      if (el && el.value) {
+        const parsed = parseDateValue(el.value);
+        if (parsed) fim = parsed;
+      }
+    }
+
+    if (!obra || !inicio || !fim) return;
+
+    // Sincroniza o estado para que hooks reativos (ex.: laboratoristas)
+    // e a URL do relatório recebam os valores lidos do DOM.
+    if (obra !== obraSelecionada) setObraSelecionada(obra);
+    if (inicio !== dataInicio) setDataInicio(inicio);
+    if (fim !== dataFim) setDataFim(fim);
+
     handleGerarRelatorio(
-      obraSelecionada,
-      dataInicio,
-      dataFim,
+      obra,
+      inicio,
+      fim,
       tipoRegistro,
       laboratoristasChecked,
       rodoviaSelecionada,
