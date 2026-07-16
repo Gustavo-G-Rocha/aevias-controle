@@ -41,6 +41,7 @@ export default function ChecklistFooter({
               variant="outline"
               disabled={loadingUpload}
               onClick={onSaveProgress}
+              data-testid="save-progress-btn"
             >
               <Save className="mr-2 h-4 w-4" /> Salvar Progresso
             </Button>
@@ -48,6 +49,7 @@ export default function ChecklistFooter({
               type="button"
               disabled={loadingUpload}
               onClick={handleFinalizeClick}
+              data-testid="finalize-btn"
             >
               <Save className="mr-2 h-4 w-4" /> Finalizar
             </Button>

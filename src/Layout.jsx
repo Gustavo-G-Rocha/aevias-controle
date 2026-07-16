@@ -60,8 +60,8 @@ const AppLayout = ({ children, currentPageName }) => {
               <PullToRefresh disabled={isFormPage(currentPageName)}>
                 <motion.div
                   key={location.pathname}
-                  initial={{ x: 24, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
                   transition={{ duration: 0.25, ease: "easeOut" }}
                   className="pb-16 lg:pb-0 overflow-x-hidden"
                   style={{ paddingTop: "env(safe-area-inset-top)" }}

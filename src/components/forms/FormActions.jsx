@@ -46,6 +46,7 @@ export default function FormActions({
               variant="outline"
               disabled={loading || saving}
               onClick={onSaveProgress}
+              data-testid="save-progress-btn"
             >
               <Save className="mr-2 h-4 w-4" />
               Salvar Progresso
@@ -55,6 +56,7 @@ export default function FormActions({
               type={onFinalize ? "button" : "submit"}
               disabled={loading || saving}
               onClick={onFinalize}
+              data-testid="finalize-btn"
             >
               {saving ? (
                 <>

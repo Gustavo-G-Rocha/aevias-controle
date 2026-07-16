@@ -132,10 +132,12 @@ export default function DiarioObraPage() {
                   <>
                     <Button type="button" variant="outline" disabled={loadingUpload || saving}
                       onClick={(e) => handleSubmit(e, "rascunho")}
+                      data-testid="save-progress-btn"
                       >
                       <Save className="mr-2 h-4 w-4" /> Salvar Progresso
                     </Button>
-                    <Button type="button" disabled={loadingUpload || saving} onClick={() => setShowTruthConfirm(true)}>
+                    <Button type="button" disabled={loadingUpload || saving} onClick={() => setShowTruthConfirm(true)}
+                      data-testid="finalize-btn">
                       <Save className="mr-2 h-4 w-4" /> Finalizar
                     </Button>
                   </>
