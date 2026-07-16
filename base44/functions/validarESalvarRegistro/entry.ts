@@ -428,8 +428,10 @@ Deno.serve(async (req) => {
         );
       }
       if (fetched.notFound) {
+        // Diagnóstico: registra o id exato que o cliente enviou e não existe.
+        console.error(`[validarESalvarRegistro] Registro não encontrado: ${entityName}/${recordId} (user: ${user.email})`);
         return Response.json(
-          { error: 'Registro não encontrado', errorCategory: 'permission' },
+          { error: `Registro não encontrado (${entityName} ${recordId}). Ele pode ter sido excluído — recarregue a lista.`, errorCategory: 'permission' },
           { status: 404 }
         );
       }
