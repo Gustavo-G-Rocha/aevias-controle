@@ -94,7 +94,9 @@ export default function SignatureReauthModal({
             </Label>
             <Input
               id="reauth-password"
-              type="password"
+              type="text"
+              style={{ WebkitTextSecurity: 'disc' }}
+              autoComplete="off"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !loading && password && handleConfirm()}
