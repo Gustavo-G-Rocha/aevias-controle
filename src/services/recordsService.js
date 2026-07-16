@@ -197,11 +197,15 @@ export async function loadRecordsByObra(obraId) {
  * @param {{ needsRegionais?: boolean, needsUsers?: boolean }} opts
  */
 export async function loadAuxData({ needsRegionais = true, needsUsers = false } = {}) {
+  // Retry único: sob carga (muitas requisições paralelas), uma falha transitória
+  // aqui deixava obras/regionais vazias — todas as linhas exibiam "N/A" e os
+  // formulários perdiam o dropdown de Obra. Uma nova tentativa resolve a maioria.
+  const withRetry = (fn) => fn().catch(() => new Promise(r => setTimeout(r, 800)).then(fn));
   const results = await Promise.allSettled([
-    base44.entities.Obra.list('-created_date', 500),
-    base44.entities.Project.list('-created_date', 500),
-    needsRegionais ? base44.entities.Regional.list() : Promise.resolve([]),
-    needsUsers ? base44.entities.User.list() : Promise.resolve([]),
+    withRetry(() => base44.entities.Obra.list('-created_date', 500)),
+    withRetry(() => base44.entities.Project.list('-created_date', 500)),
+    needsRegionais ? withRetry(() => base44.entities.Regional.list()) : Promise.resolve([]),
+    needsUsers ? withRetry(() => base44.entities.User.list()) : Promise.resolve([]),
   ]);
   
   const [obrasResult, projectsResult, regionaisResult, usersResult] = results;
