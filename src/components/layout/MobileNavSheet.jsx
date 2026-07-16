@@ -65,7 +65,7 @@ export default function MobileNavSheet({ open, onOpenChange, userAccessLevel, ca
           {(isGestorContrato || isAdmin) &&
             <NavRow to="/ImpressionEtiquetas" icon={Tags} label="Impressão de Etiquetas" isActive={isActive("/ImpressionEtiquetas")} onNavigate={close} />}
           {(isGestorContrato || isSalaTecnica || isAdmin) &&
-            <NavRow to="/RelatoriosUnificados" icon={FileText} label="Relatórios Unificados" isActive={isActive("/RelatoriosUnificados")} onNavigate={close} />}
+            <NavRow to="/RelatoriosUnificados" icon={FileText} label="Relatório Consolidado Regional" isActive={isActive("/RelatoriosUnificados")} onNavigate={close} />}
 
           {showNaoConformidades && (
             <>

@@ -30,6 +30,12 @@ export const MAIN_NAVIGATION = [
     icon: Grid,
     allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "user", "funcionarios_cliente", "cliente", "cliente_supervisor"],
   },
+  {
+    title: "Relatório Consolidado Regional",
+    url: createPageUrl("RelatoriosUnificados"),
+    icon: FileText,
+    allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias"],
+  },
 ];
 
 export const ADMIN_NAVIGATION = [
