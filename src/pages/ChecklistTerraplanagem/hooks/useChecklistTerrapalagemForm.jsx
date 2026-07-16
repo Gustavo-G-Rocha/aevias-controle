@@ -259,6 +259,11 @@ export function useChecklistTerrapalagemForm() {
         });
 
         await addOrUpdateQueueItem(queueItem);
+        // Notifica a UI (MeusEnsaios) para recarregar a fila offline e exibir
+        // o registro com badge "Aguardando sincronização" imediatamente.
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('offline-queue-updated'));
+        }
         toast({ title: `Registro salvo localmente. Será sincronizado quando a conexão voltar.${editingChecklist?.id ? '' : ''}` });
         clearSavedData();
         navigate(createPageUrl("MeusEnsaios"));
