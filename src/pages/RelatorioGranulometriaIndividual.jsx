@@ -7,7 +7,9 @@ import { obterObraById } from "@/services/obrasService";
 import { obterRegionalById } from "@/services/regionaisService";
 import { obterProjectById } from "@/services/projectsService";
 import RelatorioGranulometriaIndividual from "../components/relatorios/RelatorioGranulometriaIndividual";
-import { Loader2, Printer } from "lucide-react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { Loader2, Printer, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
 import { toast } from "@/components/ui/use-toast";
@@ -34,26 +36,25 @@ export default function RelatorioGranulometriaIndividualPage() {
           return;
         }
 
-        const [ensaioData, currentUser] = await Promise.all([
-          obterEnsaioById('EnsaioGranulometriaIndividual', ensaioId),
-          obterUsuarioAtual()
-        ]);
-
+        const ensaioData = await obterEnsaioById('EnsaioGranulometriaIndividual', ensaioId);
         setEnsaio(ensaioData);
+
+        // Dados secundários — falha isolada não bloqueia o relatório
+        const currentUser = await obterUsuarioAtual().catch(() => null);
         setUser(currentUser);
 
         if (ensaioData.obra_id) {
-          const obraData = await obterObraById(ensaioData.obra_id);
+          const obraData = await obterObraById(ensaioData.obra_id).catch(() => null);
           setObra(obraData);
 
-          if (obraData.regional_id) {
-            const regionalData = await obterRegionalById(obraData.regional_id);
+          if (obraData?.regional_id) {
+            const regionalData = await obterRegionalById(obraData.regional_id).catch(() => null);
             setRegional(regionalData);
           }
         }
 
         if (ensaioData.project_id) {
-          const projectData = await obterProjectById(ensaioData.project_id);
+          const projectData = await obterProjectById(ensaioData.project_id).catch(() => null);
           setProject(projectData);
         }
       } catch (error) {
@@ -75,12 +76,28 @@ export default function RelatorioGranulometriaIndividualPage() {
     );
   }
 
+  const isOwner = !!user && (
+    (user.email && ensaio?.created_by?.toLowerCase() === user.email.toLowerCase()) ||
+    (user.id && ensaio?.created_by_id === user.id)
+  );
+  const isCliente = user?.access_level === 'cliente' || user?.access_level === 'cliente_supervisor';
+  const podeEditar = !!ensaio && isOwner && !isCliente &&
+    (ensaio.status === 'rascunho' || ensaio.approved === false) &&
+    !ensaio.client_signature?.signed_by;
+
   return (
     <div className="bg-white min-h-screen">
       <div className="print:hidden sticky top-0 bg-white border-b border-slate-200 p-4 shadow-sm z-10">
         <div className="max-w-[210mm] mx-auto flex justify-between items-center">
           <h2 className="text-lg font-semibold text-slate-800">Relatório de Granulometria Individual</h2>
           <div className="flex items-center gap-2">
+            {podeEditar && (
+              <Button asChild variant="outline">
+                <Link to={createPageUrl(`EnsaioGranulometriaIndividual?editId=${ensaio.id}`)}>
+                  <Edit className="w-4 h-4 mr-2" /> Editar
+                </Link>
+              </Button>
+            )}
             {ensaio && <AprovacaoBar entityName="EnsaioGranulometriaIndividual" recordId={ensaio.id} />}
             <Button onClick={() => window.print()} className="bg-slate-800 text-white hover:bg-slate-700">
               <Printer className="w-4 h-4 mr-2" /> Gerar PDF
