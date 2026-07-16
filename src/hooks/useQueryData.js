@@ -58,18 +58,52 @@ export function useCurrentUser() {
 // ─── Dados auxiliares (Obras, Projetos, Regionais, Usuários) ──────────────────
 // Quando online: busca do servidor e salva no cache offline (IndexedDB).
 // Quando offline: lê do cache offline para visualização.
+
+// True se o cache auxiliar contém dados úteis (não vazio/poisoned).
+const hasAuxContent = (d) => !!(d && (d.obras?.length || d.regionais?.length));
+
+/**
+ * Lê dados auxiliares do IndexedDB com cadeia de fallback:
+ * 1. chave composta exata do consumidor (ex: 'auxData:R')
+ * 2. variantes compostas mais completas ('auxData:RU', 'auxData:R') — um
+ *    superset dos dados serve para qualquer consumidor
+ * 3. montagem a partir das chaves individuais ('auxData:obras', etc.)
+ * Evita que um formulário aberto offline fique sem obras só porque a SUA
+ * chave composta específica nunca foi gravada (ex: Dashboard grava
+ * 'auxData:' enquanto os formulários leem 'auxData:R').
+ */
+async function readAuxCacheWithFallback(cacheKey) {
+  const keys = [cacheKey, 'auxData:RU', 'auxData:R'];
+  for (const key of [...new Set(keys)]) {
+    const cached = await getDataCache(key).catch(() => null);
+    if (hasAuxContent(cached?.data)) return cached.data;
+  }
+  const [obras, regionais, projects] = await Promise.all([
+    getDataCache('auxData:obras').catch(() => null),
+    getDataCache('auxData:regionais').catch(() => null),
+    getDataCache('auxData:projects').catch(() => null),
+  ]);
+  const assembled = {
+    obras: obras?.data ?? [],
+    regionais: regionais?.data ?? [],
+    projects: projects?.data ?? [],
+    users: [],
+  };
+  return hasAuxContent(assembled) ? assembled : null;
+}
+
 export function useAuxData({ needsRegionais = true, needsUsers = false } = {}) {
   const { isOnline } = useOfflineDetection();
   return useQuery({
     queryKey: QUERY_KEYS.auxData({ needsRegionais, needsUsers }),
     queryFn: async () => {
       const cacheKey = `auxData:${needsRegionais ? 'R' : ''}${needsUsers ? 'U' : ''}`;
-      const readCache = () => getDataCache(cacheKey);
+      const readCache = () => readAuxCacheWithFallback(cacheKey);
       if (!isOnline) {
         const cached = await readCache();
         if (cached) {
           logger.log('[useQueryData] Offline — lendo dados auxiliares do cache');
-          return cached.data;
+          return cached;
         }
         return { obras: [], projects: [], regionais: [], users: [] };
       }
@@ -78,25 +112,27 @@ export function useAuxData({ needsRegionais = true, needsUsers = false } = {}) {
         const hasData = data.obras.length > 0 || data.regionais.length > 0 || data.projects.length > 0;
         if (hasData) {
           // Só sobrescreve o cache com dados reais — nunca com listas vazias
-          // vindas de uma rede instável (loadAuxData engole falhas por entidade).
+          // vindas de uma rede instável (loadAuxData engole falhas por entidade)
+          // ou de um consumidor que não pediu aquela entidade (ex: Dashboard
+          // com needsRegionais=false não pode zerar 'auxData:regionais').
           saveDataCache(cacheKey, data, 'auxData').catch(() => {});
-          saveDataCache('auxData:obras', data.obras, 'auxData').catch(() => {});
-          saveDataCache('auxData:regionais', data.regionais, 'auxData').catch(() => {});
-          saveDataCache('auxData:projects', data.projects, 'auxData').catch(() => {});
+          if (data.obras.length) saveDataCache('auxData:obras', data.obras, 'auxData').catch(() => {});
+          if (needsRegionais && data.regionais.length) saveDataCache('auxData:regionais', data.regionais, 'auxData').catch(() => {});
+          if (data.projects.length) saveDataCache('auxData:projects', data.projects, 'auxData').catch(() => {});
           return data;
         }
         // Tudo veio vazio (provável falha de rede silenciosa) — prefere o cache.
         const cached = await readCache();
-        if (cached?.data && (cached.data.obras?.length || cached.data.regionais?.length)) {
+        if (cached) {
           logger.warn('[useQueryData] Dados auxiliares vazios da rede — usando cache');
-          return cached.data;
+          return cached;
         }
         return data;
       } catch (e) {
         const cached = await readCache();
         if (cached) {
           logger.warn('[useQueryData] Rede falhou — dados auxiliares do cache');
-          return cached.data;
+          return cached;
         }
         throw e;
       }
