@@ -127,22 +127,20 @@ async function verifyTenantAccessForRecord(base44, user, record) {
     return { allowed: false, reason: 'Registro sem obra vinculada', status: 403 };
   }
 
-  let obra;
-  try {
-    obra = await base44.asServiceRole.entities.Obra.get(record.obra_id);
-  } catch {
-    return { allowed: false, reason: 'Obra não encontrada', status: 404 };
+  const obraFetch = await getWithRetry(() => base44.asServiceRole.entities.Obra.get(record.obra_id));
+  if (obraFetch.transient) {
+    return { allowed: false, reason: 'Falha temporária ao validar a obra. Tente novamente.', status: 503 };
   }
+  const obra = obraFetch.record;
   if (!obra || !obra.regional_id) {
-    return { allowed: false, reason: 'Obra sem regional vinculada', status: 403 };
+    return { allowed: false, reason: obra ? 'Obra sem regional vinculada' : 'Obra não encontrada', status: obra ? 403 : 404 };
   }
 
-  let regional;
-  try {
-    regional = await base44.asServiceRole.entities.Regional.get(obra.regional_id);
-  } catch {
-    return { allowed: false, reason: 'Regional não encontrada', status: 404 };
+  const regFetch = await getWithRetry(() => base44.asServiceRole.entities.Regional.get(obra.regional_id));
+  if (regFetch.transient) {
+    return { allowed: false, reason: 'Falha temporária ao validar a regional. Tente novamente.', status: 503 };
   }
+  const regional = regFetch.record;
   if (!regional) {
     return { allowed: false, reason: 'Regional não encontrada', status: 404 };
   }
@@ -172,22 +170,20 @@ async function verifyObraTenantAccess(base44, user, obraId) {
     return { allowed: true };
   }
 
-  let obra;
-  try {
-    obra = await base44.asServiceRole.entities.Obra.get(obraId);
-  } catch {
-    return { allowed: false, reason: 'Obra não encontrada', status: 404 };
+  const obraFetch = await getWithRetry(() => base44.asServiceRole.entities.Obra.get(obraId));
+  if (obraFetch.transient) {
+    return { allowed: false, reason: 'Falha temporária ao validar a obra. Tente novamente.', status: 503 };
   }
+  const obra = obraFetch.record;
   if (!obra || !obra.regional_id) {
-    return { allowed: false, reason: 'Obra sem regional vinculada', status: 403 };
+    return { allowed: false, reason: obra ? 'Obra sem regional vinculada' : 'Obra não encontrada', status: obra ? 403 : 404 };
   }
 
-  let regional;
-  try {
-    regional = await base44.asServiceRole.entities.Regional.get(obra.regional_id);
-  } catch {
-    return { allowed: false, reason: 'Regional não encontrada', status: 404 };
+  const regFetch = await getWithRetry(() => base44.asServiceRole.entities.Regional.get(obra.regional_id));
+  if (regFetch.transient) {
+    return { allowed: false, reason: 'Falha temporária ao validar a regional. Tente novamente.', status: 503 };
   }
+  const regional = regFetch.record;
   if (!regional) {
     return { allowed: false, reason: 'Regional não encontrada', status: 404 };
   }
@@ -207,6 +203,34 @@ async function verifyObraTenantAccess(base44, user, obraId) {
   }
 
   return { allowed: false, reason: 'Sem permissão sobre a obra (tenant)', status: 403 };
+}
+
+// ── GET resiliente ───────────────────────────────────────────────────
+// Distingue "registro realmente inexistente" (404) de falhas transitórias
+// (rate limit, rede, 5xx). Antes, qualquer erro no get() era reportado como
+// "Registro não encontrado", fazendo salvamentos falharem com mensagem
+// enganosa sob carga. Retenta uma vez antes de desistir.
+function isNotFoundError(e: any): boolean {
+  const status = e?.status ?? e?.response?.status;
+  if (status === 404) return true;
+  return /not\s*found|não\s*encontrad/i.test(String(e?.message || ''));
+}
+
+async function getWithRetry(fetcher: () => Promise<any>): Promise<{ record?: any; notFound?: boolean; transient?: boolean }> {
+  try {
+    const record = await fetcher();
+    return record ? { record } : { notFound: true };
+  } catch (e1) {
+    if (isNotFoundError(e1)) return { notFound: true };
+    await new Promise((r) => setTimeout(r, 500));
+    try {
+      const record = await fetcher();
+      return record ? { record } : { notFound: true };
+    } catch (e2) {
+      if (isNotFoundError(e2)) return { notFound: true };
+      return { transient: true };
+    }
+  }
 }
 
 // ── AUDIT TRAIL: Diff computation ──────────────────────────────────────
@@ -396,20 +420,20 @@ Deno.serve(async (req) => {
     // ── Buscar registro antigo (para audit + conflict detection + tenant) ──
     let oldRecord = null;
     if (operation === 'update') {
-      try {
-        oldRecord = await base44.asServiceRole.entities[entityName].get(recordId);
-      } catch {
+      const fetched = await getWithRetry(() => base44.asServiceRole.entities[entityName].get(recordId));
+      if (fetched.transient) {
+        return Response.json(
+          { error: 'Falha temporária ao acessar o registro. Tente salvar novamente.', errorCategory: 'network' },
+          { status: 503 }
+        );
+      }
+      if (fetched.notFound) {
         return Response.json(
           { error: 'Registro não encontrado', errorCategory: 'permission' },
           { status: 404 }
         );
       }
-      if (!oldRecord) {
-        return Response.json(
-          { error: 'Registro não encontrado', errorCategory: 'permission' },
-          { status: 404 }
-        );
-      }
+      oldRecord = fetched.record;
     }
 
     // ── DEFENSE-IN-DEPTH: validação funcional de tenant ───────────────
@@ -421,14 +445,14 @@ Deno.serve(async (req) => {
     // registros vinculados a obras inexistentes.
     const obraIdForCheck = sanitizedData.obra_id;
     if (obraIdForCheck) {
-      let obraExists = false;
-      try {
-        const obraCheck = await base44.asServiceRole.entities.Obra.get(obraIdForCheck);
-        obraExists = !!obraCheck;
-      } catch {
-        obraExists = false;
+      const obraFetch = await getWithRetry(() => base44.asServiceRole.entities.Obra.get(obraIdForCheck));
+      if (obraFetch.transient) {
+        return Response.json(
+          { error: 'Falha temporária ao validar a obra. Tente salvar novamente.', errorCategory: 'network' },
+          { status: 503 }
+        );
       }
-      if (!obraExists) {
+      if (obraFetch.notFound) {
         return Response.json(
           { error: 'Obra não encontrada. O registro não pode ser criado sem uma obra válida.', errorCategory: 'schema' },
           { status: 400 }
