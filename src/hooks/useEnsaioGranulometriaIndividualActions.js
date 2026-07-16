@@ -50,7 +50,12 @@ export function useEnsaioGranulometriaIndividualActions({
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
       logger.error("Erro ao salvar:", error);
-      toast({ title: "Erro ao salvar o ensaio.", variant: "destructive" });
+      // Exibe o motivo real retornado pelo servidor (validação, permissão,
+      // conflito) em vez de uma mensagem genérica que esconde a causa.
+      const serverMessage = error?.message && !/^Falha ao (criar|atualizar) ensaio$/.test(error.message)
+        ? error.message
+        : "Erro ao salvar o ensaio.";
+      toast({ title: serverMessage, variant: "destructive" });
     }
   };
 
