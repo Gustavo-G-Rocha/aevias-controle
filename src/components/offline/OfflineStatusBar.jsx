@@ -1,45 +1,27 @@
 /**
  * OfflineStatusBar.jsx
  * Barra discreta de status offline/sincronização com notificação de conflitos.
- * Inclui toggle de simulação de modo offline (sempre visível) para testes
- * e uso manual em campo.
+ * O modo offline é detectado automaticamente — não há mais toggle manual.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useOfflineSync } from '@/hooks/useOfflineSync';
 import { AlertCircle, WifiOff, Loader, AlertTriangle } from 'lucide-react';
 import { ConflictResolutionDialog } from '@/components/offline/ConflictResolutionDialog';
-import { setOfflineSimulation } from '@/utils/offlineSimulation';
+import { getOfflineSimulation, setOfflineSimulation } from '@/utils/offlineSimulation';
 
 export default function OfflineStatusBar() {
   const { isOnline, isSyncing, pendingCount, failedCount, conflictCount, conflicts, resolveConflict, retryFailed, failedError } = useOfflineSync();
   const [selectedConflict, setSelectedConflict] = useState(null);
 
-  // Deriva o estado de simulação: offline simulado = isOnline false mas rede real ativa
-  const realOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
-  const simulatedOffline = !isOnline && realOnline;
-
-  const handleToggleSimulation = () => {
-    setOfflineSimulation(!simulatedOffline);
-  };
+  // O toggle manual foi removido — limpa qualquer simulação residual que
+  // tenha ficado persistida no dispositivo para não prender o usuário offline.
+  useEffect(() => {
+    if (getOfflineSimulation()) setOfflineSimulation(false);
+  }, []);
 
   return (
     <div className="fixed top-4 right-4 z-40 max-w-xs">
-      {/* Toggle de modo offline — sempre visível */}
-      <button
-        onClick={handleToggleSimulation}
-        data-testid="offline-mode-toggle"
-        aria-label={simulatedOffline ? 'Desativar modo offline' : 'Ativar modo offline'}
-        className={`mb-2 w-full flex items-center gap-2 rounded-lg p-2 shadow-sm transition-colors text-sm font-medium ${
-          simulatedOffline
-            ? 'bg-yellow-500 text-white hover:bg-yellow-600'
-            : 'bg-white/90 border border-slate-200 text-slate-600 hover:bg-slate-50'
-        }`}
-      >
-        <WifiOff className="w-4 h-4 flex-shrink-0" />
-        <span>{simulatedOffline ? 'Modo Offline Ativo' : 'Modo Offline'}</span>
-      </button>
-
       {/* Status Offline */}
       {!isOnline && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-2 shadow-sm flex items-start gap-2">
