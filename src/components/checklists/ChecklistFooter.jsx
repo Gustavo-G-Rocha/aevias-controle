@@ -26,7 +26,11 @@ export default function ChecklistFooter({
 
   return (
     <>
-      <div className="flex justify-end gap-4 mt-6">
+      {/* Espaço para a barra de ações fixa não sobrepor o último conteúdo */}
+      <div className="h-28 lg:h-20" aria-hidden="true" />
+
+      {/* Barra fixa no rodapé para permanecer visível durante o preenchimento */}
+      <div className="fixed bottom-16 lg:bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] max-w-7xl z-30 flex justify-end gap-3 rounded-lg border border-border bg-card/95 p-3 shadow-lg backdrop-blur-sm">
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
         </Button>
