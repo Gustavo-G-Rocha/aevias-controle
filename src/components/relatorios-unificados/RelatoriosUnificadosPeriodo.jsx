@@ -1,6 +1,6 @@
 import React from "react";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import ReportDateInput from "@/components/relatorios-unificados/ReportDateInput";
 
 export default function RelatoriosUnificadosPeriodo({
   dataInicio,
@@ -8,8 +8,7 @@ export default function RelatoriosUnificadosPeriodo({
   dataFim,
   setDataFim,
 }) {
-  const handleDataInicio = (e) => {
-    const val = e.target.value;
+  const handleDataInicio = (val) => {
     setDataInicio(val);
     // Usa a mesma data como fim até o usuário escolher um período maior.
     if (val && (!dataFim || val > dataFim)) {
@@ -17,8 +16,7 @@ export default function RelatoriosUnificadosPeriodo({
     }
   };
 
-  const handleDataFim = (e) => {
-    const val = e.target.value;
+  const handleDataFim = (val) => {
     // Não permite data fim menor que data início
     if (dataInicio && val && val < dataInicio) return;
     setDataFim(val);
@@ -27,21 +25,23 @@ export default function RelatoriosUnificadosPeriodo({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
-        <Label>Data Início *</Label>
-        <Input
-          type="date"
+        <Label htmlFor="relatorio-data-inicio">Data Início *</Label>
+        <ReportDateInput
+          id="relatorio-data-inicio"
+          name="data_inicio"
+          aria-label="Data Início"
           value={dataInicio}
-          max={dataFim || undefined}
-          onChange={handleDataInicio}
+          onValueChange={handleDataInicio}
         />
       </div>
       <div className="space-y-2">
-        <Label>Data Fim *</Label>
-        <Input
-          type="date"
+        <Label htmlFor="relatorio-data-fim">Data Fim *</Label>
+        <ReportDateInput
+          id="relatorio-data-fim"
+          name="data_fim"
+          aria-label="Data Fim"
           value={dataFim}
-          min={dataInicio || undefined}
-          onChange={handleDataFim}
+          onValueChange={handleDataFim}
         />
       </div>
     </div>

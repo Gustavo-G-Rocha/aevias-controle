@@ -13,8 +13,12 @@ export default function RelatoriosUnificadosObra({
       <Label htmlFor="relatorio-unificado-obra">Obra *</Label>
       <select
         id="relatorio-unificado-obra"
+        name="obra_id"
+        aria-label="Obra"
+        data-testid="relatorio-unificado-obra"
         value={obraSelecionada || ""}
-        onChange={(e) => setObraSelecionada(e.target.value || undefined)}
+        onInput={(e) => setObraSelecionada(e.currentTarget.value)}
+        onChange={(e) => setObraSelecionada(e.currentTarget.value)}
         className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <option value="" disabled>
