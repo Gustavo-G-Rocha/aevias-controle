@@ -44,8 +44,15 @@ export default function RelatorioUnificado() {
 
   if (error) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex flex-col justify-center items-center h-screen gap-4 px-6 text-center">
         <p className="text-red-600">{error}</p>
+        <button
+          type="button"
+          onClick={handleGoBack}
+          className="px-4 py-2 rounded-md bg-slate-800 text-white text-sm hover:bg-slate-700 transition-colors"
+        >
+          Voltar aos Relatórios
+        </button>
       </div>
     );
   }

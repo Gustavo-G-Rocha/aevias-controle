@@ -3,7 +3,7 @@
  * Busca obra, regional, projetos e usuário atual.
  */
 import { useState, useEffect } from 'react';
-import { obterObraById } from '@/services/obrasService';
+import { obterObraById, listarObrasRecentes } from '@/services/obrasService';
 import { listarRegionais } from '@/services/regionaisService';
 import { listarProjects } from '@/services/projectsService';
 import { listarFaixas } from '@/services/faixasService';
@@ -32,10 +32,17 @@ export function useRelatorioUnificadoData() {
         }
 
         // Obra é obrigatória; os demais são independentes — falha isolada não bloqueia
-        const obraData = await obterObraById(obra_id).catch(() => null);
+        let obraData = await obterObraById(obra_id).catch(() => null);
 
         if (!obraData) {
-          setError(`Obra com ID ${obra_id} não encontrada`);
+          // O id pode vir de uma lista em cache desatualizada — tenta resolver
+          // na lista fresca do servidor antes de desistir.
+          const obrasFrescas = await listarObrasRecentes().catch(() => []);
+          obraData = obrasFrescas.find(o => o.id === obra_id) ?? null;
+        }
+
+        if (!obraData) {
+          setError('Obra não encontrada. A lista de obras pode estar desatualizada — volte e selecione a obra novamente.');
           setLoading(false);
           return;
         }
