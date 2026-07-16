@@ -1,6 +1,5 @@
 import React from "react";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { typeOptions } from "@/components/ensaios/ensaioMappers";
 
 const OPTIONS = typeOptions.filter((o) => o.value !== "all");
@@ -29,9 +28,11 @@ export default function RelatoriosUnificadosTipo({
             key={opt.value}
             className="flex items-center gap-2 cursor-pointer rounded-md border border-slate-200 px-3 py-2 hover:bg-slate-50 transition-colors"
           >
-            <Checkbox
+            <input
+              type="checkbox"
               checked={selected.includes(opt.value)}
-              onCheckedChange={() => toggle(opt.value)}
+              onChange={() => toggle(opt.value)}
+              className="rounded"
             />
             <span className="text-sm">{opt.label}</span>
           </label>

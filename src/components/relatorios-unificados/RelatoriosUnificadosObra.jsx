@@ -1,12 +1,5 @@
 import React from "react";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export default function RelatoriosUnificadosObra({
   obraSelecionada,
@@ -17,23 +10,26 @@ export default function RelatoriosUnificadosObra({
 }) {
   return (
     <div className="space-y-2">
-      <Label>Obra *</Label>
-      <Select value={obraSelecionada} onValueChange={setObraSelecionada}>
-        <SelectTrigger>
-          <SelectValue placeholder="Selecione uma obra" />
-        </SelectTrigger>
-        <SelectContent>
-          {obras.map((obra) => {
-            const regional = regionais.find((r) => r.id === obra.regional_id);
-            return (
-              <SelectItem key={obra.id} value={obra.id}>
-                {obra.name} - {obra.code}
-                {regional ? ` (${regional.nome})` : ""}
-              </SelectItem>
-            );
-          })}
-        </SelectContent>
-      </Select>
+      <Label htmlFor="relatorio-unificado-obra">Obra *</Label>
+      <select
+        id="relatorio-unificado-obra"
+        value={obraSelecionada || ""}
+        onChange={(e) => setObraSelecionada(e.target.value || undefined)}
+        className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <option value="" disabled>
+          Selecione uma obra
+        </option>
+        {obras.map((obra) => {
+          const regional = regionais.find((r) => r.id === obra.regional_id);
+          return (
+            <option key={obra.id} value={obra.id}>
+              {obra.name} - {obra.code}
+              {regional ? ` (${regional.nome})` : ""}
+            </option>
+          );
+        })}
+      </select>
       {regionalSelecionada && (
         <p className="text-xs text-slate-500">
           Regional: {regionalSelecionada.nome}
