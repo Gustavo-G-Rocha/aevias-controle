@@ -41,7 +41,7 @@ export default function DiarioObraPage() {
                 : "Preencha as informações abaixo para criar um novo registro."}
             </CardDescription>
           </CardHeader>
-          <CardContent className="overflow-hidden">
+          <CardContent>
             <form
               className="space-y-6"
               onKeyDown={(e) => { if (e.key === "Enter" && e.target.tagName !== "TEXTAREA" && e.target.type !== "submit") e.preventDefault(); }}
@@ -122,8 +122,11 @@ export default function DiarioObraPage() {
                 isApproved={isApproved}
               />
 
-              {/* Botões */}
-              <div className="flex justify-end gap-4 mt-6">
+              {/* Espaço para a barra de ações fixa não sobrepor o último conteúdo */}
+              <div className="h-28 lg:h-20" aria-hidden="true" />
+
+              {/* Botões — barra fixa no rodapé para permanecer visível durante o preenchimento */}
+              <div className="fixed bottom-16 lg:bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] max-w-4xl z-30 flex justify-end gap-3 rounded-lg border border-border bg-card/95 p-3 shadow-lg backdrop-blur-sm">
                 <Button type="button" variant="outline" onClick={handleCancel}>Cancelar</Button>
                 {isEditable && !isApproved && (
                   <>
