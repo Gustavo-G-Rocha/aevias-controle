@@ -52,9 +52,15 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
 
           if (hasPermission) {
             const initialForm = getInitialFormData();
+            // Campos null vindos do banco não devem sobrescrever a estrutura
+            // padrão do formulário (ex.: equivalente_areia: null quebraria
+            // componentes que acessam .medicoes).
+            const ensaioSemNulls = Object.fromEntries(
+              Object.entries(ensaioToEdit).filter(([, v]) => v !== null)
+            );
             setFormData({
               ...initialForm,
-              ...ensaioToEdit,
+              ...ensaioSemNulls,
               data_ensaio: ensaioToEdit.data_ensaio
                 ? new Date(ensaioToEdit.data_ensaio).toISOString().split('T')[0]
                 : new Date().toISOString().split('T')[0],
