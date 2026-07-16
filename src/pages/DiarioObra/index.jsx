@@ -52,7 +52,7 @@ export default function DiarioObraPage() {
                   <AlertTriangle className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                   <div>
                     <p className="font-semibold text-primary">Em Rascunho</p>
-                    <p className="text-sm text-muted-foreground">Este registro ainda está em edição e não será visível aos gestores até que você o finalize.</p>
+                    <p className="text-sm text-muted-foreground">Toque em "Salvar Progresso" para salvar como rascunho a qualquer momento (apenas a obra é obrigatória). Não será visível aos gestores até a finalização.</p>
                   </div>
                 </div>
               )}

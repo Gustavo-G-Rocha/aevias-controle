@@ -15,7 +15,7 @@ export default function StatusDraftBanner({ status, variant = "blue" }) {
         <div>
           <p className="font-semibold text-secondary">Registro em Rascunho</p>
           <p className="text-sm text-muted-foreground">
-            Este ensaio está salvo como rascunho. Clique em "Finalizar Registro" quando estiver completo.
+            Toque em "Salvar Progresso" para salvar como rascunho a qualquer momento (apenas a obra é obrigatória). Toque em "Finalizar" quando estiver completo.
           </p>
         </div>
       </div>
@@ -28,7 +28,7 @@ export default function StatusDraftBanner({ status, variant = "blue" }) {
       <div>
         <p className="font-semibold text-secondary">Em Rascunho</p>
         <p className="text-sm text-muted-foreground">
-          Este registro ainda está em edição e não será visível aos gestores até que você o finalize.
+          Toque em "Salvar Progresso" para salvar como rascunho a qualquer momento (apenas a obra é obrigatória). Não será visível aos gestores até a finalização.
         </p>
       </div>
     </div>
