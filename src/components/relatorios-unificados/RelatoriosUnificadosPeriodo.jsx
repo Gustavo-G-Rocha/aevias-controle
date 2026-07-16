@@ -11,8 +11,8 @@ export default function RelatoriosUnificadosPeriodo({
   const handleDataInicio = (e) => {
     const val = e.target.value;
     setDataInicio(val);
-    // Se data fim já foi preenchida e ficou menor que a nova data início, ajusta
-    if (dataFim && val && val > dataFim) {
+    // Usa a mesma data como fim até o usuário escolher um período maior.
+    if (val && (!dataFim || val > dataFim)) {
       setDataFim(val);
     }
   };

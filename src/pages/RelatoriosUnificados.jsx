@@ -95,7 +95,7 @@ export default function RelatoriosUnificados() {
         <CardHeader>
           <CardTitle className="text-base">Filtros</CardTitle>
           <CardDescription>
-            Todos os campos são obrigatórios para gerar o relatório.
+            Selecione a obra e o período. Todos os tipos e laboratoristas são incluídos por padrão.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">

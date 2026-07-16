@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import {
+  ALL_REPORT_TYPES,
   extractLaboratoristas,
   filterRecordsByDateRange,
 } from "@/utils/relatoriosUnificadosUtils";
@@ -12,7 +13,7 @@ export const useRelatoriosUnificadosFilters = () => {
   const [obraSelecionada, setObraSelecionada] = useState("");
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
-  const [tipoRegistro, setTipoRegistro] = useState([]); // array de tipos selecionados
+  const [tipoRegistro, setTipoRegistro] = useState(ALL_REPORT_TYPES); // todos selecionados por padrão
 
   const [laboratoristasDisponiveis, setLaboratoristasDisponiveis] = useState([]);
   const [laboratoristasChecked, setLaboratoristasChecked] = useState([]);
@@ -92,7 +93,7 @@ export const useRelatoriosUnificadosFilters = () => {
   const clearFilters = useCallback(() => {
     setDataInicio("");
     setDataFim("");
-    setTipoRegistro([]);
+    setTipoRegistro(ALL_REPORT_TYPES);
     setLaboratoristasDisponiveis([]);
     setLaboratoristasChecked([]);
     setRodoviasDisponiveis([]);

@@ -1,4 +1,8 @@
-import { getDataEnsaio } from "@/components/ensaios/ensaioMappers";
+import { getDataEnsaio, typeOptions } from "@/components/ensaios/ensaioMappers";
+
+export const ALL_REPORT_TYPES = typeOptions
+  .filter((option) => option.value !== "all")
+  .map((option) => option.value);
 
 /**
  * Filter obras by user access level.
@@ -90,7 +94,6 @@ export const isFormValid = (
     dataInicio &&
     dataFim &&
     obraSelecionada &&
-    laboratoristasChecked.length > 0 &&
     hasType
   );
 };

@@ -19,7 +19,7 @@ export default function RelatoriosUnificadosLaboratoristas({
 
   return (
     <div className="space-y-2">
-      <Label>Laboratoristas *</Label>
+      <Label>Laboratoristas <span className="text-xs text-slate-500 font-normal">(opcional — todos por padrão)</span></Label>
       {!obraSelecionada || !dataInicio || !dataFim ? (
         <p className="text-sm text-slate-400 italic">
           Selecione obra e período para carregar os laboratoristas.
