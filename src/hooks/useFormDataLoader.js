@@ -59,7 +59,9 @@ export function useFormDataLoader({
   const regionais = auxData?.regionais ?? [];
   const projects = auxData?.projects ?? [];
 
-  const obras = useMemo(() => {
+  const obraIdAtual = formData?.obra_id;
+
+  const obrasBase = useMemo(() => {
     if (!auxData?.obras || !user) return [];
 
     // Determina se o usuário deve ver apenas obras das suas regionais.
@@ -114,6 +116,20 @@ export function useFormDataLoader({
     }
     return auxData.obras;
   }, [auxData?.obras, regionais, user, filtroTipoObra, useAccessLevel]);
+
+  // Ao editar um registro existente, a obra já salva nele deve sempre aparecer
+  // nas opções — mesmo que o filtro (regional/status/tipo) a exclua para este
+  // usuário. Caso contrário o campo "Obra" renderiza vazio e o contexto
+  // (regional, projetos) some, bloqueando a finalização.
+  // Mantém a MESMA referência de obrasBase quando nada precisa ser adicionado,
+  // para não redisparar efeitos que dependem da identidade de `obras`.
+  const obras = useMemo(() => {
+    if (obraIdAtual && auxData?.obras && !obrasBase.some(o => o.id === obraIdAtual)) {
+      const atual = auxData.obras.find(o => o.id === obraIdAtual);
+      if (atual) return [...obrasBase, atual];
+    }
+    return obrasBase;
+  }, [obrasBase, obraIdAtual, auxData?.obras]);
 
   // editId derivado de location.search — estável enquanto o parâmetro não muda
   const editId = useMemo(() => {
