@@ -1,5 +1,4 @@
 import React, { useMemo, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { AlertTriangle, FileText, Grid } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ACCESS_LEVELS } from "@/lib/layoutConstants";
@@ -55,8 +54,6 @@ const CategoriaCard = ({ categoria, onSelect }) => (
 );
 
 const CreateEnsaioDialog = React.memo(({ onSelect, user, obrasDoUsuario }) => {
-  const navigate = useNavigate();
-
   const tiposObraDisponiveis = useMemo(() => {
     if (!obrasDoUsuario?.length) return new Set();
     return new Set(obrasDoUsuario.map(o => o.tipo_obra).filter(Boolean));
@@ -67,10 +64,14 @@ const CreateEnsaioDialog = React.memo(({ onSelect, user, obrasDoUsuario }) => {
     [tiposObraDisponiveis]
   );
 
+  // Não navega diretamente: entrega a URL ao Layout, que fecha o diálogo
+  // primeiro e só navega após o portal do Radix terminar de fechar.
+  // Navegar aqui desmontava o Layout inteiro (cada rota tem sua própria
+  // instância de Layout) com o diálogo ainda aberto, causando
+  // "Failed to execute 'removeChild' on 'Node'".
   const handleSelect = useCallback((url) => {
-    navigate(url);
-    onSelect();
-  }, [navigate, onSelect]);
+    onSelect(url);
+  }, [onSelect]);
 
   if ((user?.access_level === ACCESS_LEVELS.USER || user?.access_level === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE) && obrasDoUsuario?.length === 0) {
     return (

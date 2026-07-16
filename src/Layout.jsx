@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useRef, useCallback } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Dialog,
@@ -29,6 +29,26 @@ const AppLayout = ({ children, currentPageName }) => {
 
   const { user, obrasDoUsuario, loadingUser, pendingTransfers } = useLayoutData();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  // Navegação a partir do diálogo "Iniciar Novo Registro": fecha o diálogo
+  // primeiro e só navega quando o Radix termina o fechamento (onCloseAutoFocus).
+  // Navegar com o diálogo aberto desmonta este Layout (cada rota tem sua
+  // própria instância) na mesma commit em que o portal do Radix é destruído,
+  // causando "Failed to execute 'removeChild' on 'Node'".
+  const pendingUrlRef = useRef(null);
+  const handleEnsaioSelect = useCallback((url) => {
+    pendingUrlRef.current = url || null;
+    setIsCreateEnsaioOpen(false);
+  }, []);
+  const handleDialogCloseAutoFocus = useCallback((event) => {
+    if (pendingUrlRef.current) {
+      event.preventDefault();
+      const url = pendingUrlRef.current;
+      pendingUrlRef.current = null;
+      navigate(url);
+    }
+  }, [navigate]);
 
   const userAccessLevel = getUserAccessLevel(user);
   const isAdmin = userAccessLevel === ACCESS_LEVELS.ADMIN || user?.role === ACCESS_LEVELS.ADMIN;
@@ -88,13 +108,16 @@ const AppLayout = ({ children, currentPageName }) => {
           Agora o Diálogo é irmão da árvore do app, então o teardown do portal
           e a troca de rota operam em subárvores React independentes. */}
       <Dialog open={isCreateEnsaioOpen} onOpenChange={setIsCreateEnsaioOpen}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden">
+        <DialogContent
+          className="max-w-2xl max-h-[85vh] overflow-hidden"
+          onCloseAutoFocus={handleDialogCloseAutoFocus}
+        >
           <DialogHeader>
             <DialogTitle className="text-xl" style={{ color: 'var(--color-text)' }}>Iniciar Novo Registro</DialogTitle>
             <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Selecione o tipo de registro que deseja criar</p>
           </DialogHeader>
           <CreateEnsaioDialog
-            onSelect={() => setIsCreateEnsaioOpen(false)}
+            onSelect={handleEnsaioSelect}
             user={user}
             obrasDoUsuario={obrasDoUsuario}
           />
