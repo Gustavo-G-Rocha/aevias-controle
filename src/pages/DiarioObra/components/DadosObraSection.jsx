@@ -113,8 +113,20 @@ export default function DadosObraSection({ formData, handleChange, obras, region
                     </div>
                     <p className="text-xs text-muted-foreground">Máximo 2 rodovias</p>
                   </>
-                ) : <div className="border rounded-md p-2 text-sm text-muted-foreground">Nenhuma rodovia cadastrada</div>}
-                {formData.rodovia && <p className="text-xs text-muted-foreground">Selecionadas: {formData.rodovia}</p>}
+                ) : (
+                  // Fallback: quando a obra não possui rodovias cadastradas (comum offline
+                  // ou em obras de certificação), permite digitar livremente para não
+                  // bloquear a finalização do diário.
+                  <Input
+                    name="rodovia"
+                    value={formData.rodovia || ""}
+                    onChange={(e) => handleChange("rodovia", e.target.value)}
+                    placeholder="Digite a rodovia (ex: BR-153)"
+                    required
+                    disabled={disabled}
+                  />
+                )}
+                {formData.rodovia && obraSelecionada?.rodovias?.length > 0 && <p className="text-xs text-muted-foreground">Selecionadas: {formData.rodovia}</p>}
               </div>
               <div className="space-y-2">
                 <Label>Trecho *</Label>
