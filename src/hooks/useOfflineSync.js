@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { toast } from '@/components/ui/use-toast';
 import { useOfflineDetection } from './useOfflineDetection';
 import { syncPendingItems, retryFailedItems, resolveConflict as resolveConflictService } from '@/services/syncService';
 import {
@@ -75,6 +76,12 @@ export function useOfflineSync() {
         queryClient.invalidateQueries({ queryKey: ['auxData'] });
         queryClient.invalidateQueries({ queryKey: ['supervisorRecords'] });
         queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+        // Confirmação visível da sincronização — permite ao usuário (e à
+        // automação de testes) confirmar que os registros offline chegaram ao servidor.
+        toast({
+          title: `${result.synced} registro${result.synced > 1 ? 's' : ''} sincronizado${result.synced > 1 ? 's' : ''}`,
+          description: 'Sua conexão voltou e os dados offline foram enviados com sucesso.',
+        });
       }
 
       if (result.failed > 0) {
