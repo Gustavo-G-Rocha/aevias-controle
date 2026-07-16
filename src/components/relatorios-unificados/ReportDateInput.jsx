@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 
 const displayDate = (iso) => {
@@ -25,21 +25,45 @@ const parseDate = (text) => {
 };
 
 export default function ReportDateInput({ id, value, onValueChange, ...props }) {
+  const ref = useRef(null);
   const [text, setText] = useState(displayDate(value));
   useEffect(() => setText(displayDate(value)), [value]);
+
+  const commit = (raw) => {
+    const parsed = parseDate(raw);
+    if (parsed) {
+      onValueChange(parsed);
+      setText(displayDate(parsed));
+    }
+    return parsed;
+  };
+
+  const commitRef = useRef(commit);
+  commitRef.current = commit;
 
   const handleChange = (event) => {
     const next = event.currentTarget.value;
     setText(next);
-    const parsed = parseDate(next);
-    if (parsed) onValueChange(parsed);
+    commit(next);
   };
 
-  const handleBlur = () => {
-    const parsed = parseDate(text);
-    if (parsed) onValueChange(parsed);
-    setText(parsed ? displayDate(parsed) : displayDate(value));
+  const handleBlur = (event) => {
+    if (!commit(event.currentTarget.value)) {
+      setText(displayDate(value));
+    }
   };
 
-  return <Input id={id} type="text" inputMode="numeric" placeholder="DD/MM/AAAA" value={text} onInput={handleChange} onChange={handleChange} onBlur={handleBlur} {...props} />;
+  // Some automation frameworks set the value and dispatch only a native
+  // 'change' event (which React's onChange does NOT surface for text
+  // inputs), leaving the parent state empty and the form stuck. This
+  // listener commits the parsed value from the actual DOM value.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const handler = (e) => commitRef.current(e.target.value);
+    el.addEventListener("change", handler);
+    return () => el.removeEventListener("change", handler);
+  }, []);
+
+  return <Input ref={ref} id={id} type="text" inputMode="numeric" placeholder="DD/MM/AAAA" value={text} onInput={handleChange} onChange={handleChange} onBlur={handleBlur} {...props} />;
 }
