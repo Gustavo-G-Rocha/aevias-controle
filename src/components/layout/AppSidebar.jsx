@@ -16,7 +16,6 @@ import {
   SidebarFooter,
   useSidebar } from
 "@/components/ui/sidebar";
-import { DialogTrigger } from "@/components/ui/dialog";
 import { createPageUrl } from "@/utils";
 import { ACCESS_LEVELS } from "@/lib/layoutConstants";
 import { MAIN_NAVIGATION, ADMIN_NAVIGATION } from "./NavigationConfig";
@@ -69,7 +68,7 @@ const SubNavItem = ({ to, icon: Icon, label, badge, pendingTransfers, isActive }
 export default function AppSidebar({
   user, userAccessLevel, canCreateRecords, canManageSystem,
   pendingTransfers, minhasObrasOpen, setMinhasObrasOpen,
-  naoConformidadesOpen, setNaoConformidadesOpen,
+  naoConformidadesOpen, setNaoConformidadesOpen, onOpenCreateEnsaio,
 }) {
   const isAdmin = userAccessLevel === ACCESS_LEVELS.ADMIN || user?.role === ACCESS_LEVELS.ADMIN;
   const isSalaTecnica = userAccessLevel === ACCESS_LEVELS.SALA_TECNICA;
@@ -102,12 +101,15 @@ export default function AppSidebar({
 
       <SidebarContent className="p-3 pb-6">
         {canCreateRecords &&
-        <DialogTrigger asChild>
-            <Button className="w-full mb-4 hidden lg:flex font-semibold tracking-wide text-xs" style={{ backgroundColor: 'var(--color-secondary)', color: 'var(--color-primary)' }}>
-              <FilePlus className="w-5 h-5 mr-2" style={{ color: 'var(--color-primary)' }} />
-              Novo Registro
-            </Button>
-          </DialogTrigger>
+          <Button
+            type="button"
+            onClick={onOpenCreateEnsaio}
+            aria-haspopup="dialog"
+            className="w-full mb-4 hidden lg:flex font-semibold tracking-wide text-xs"
+            style={{ backgroundColor: 'var(--color-secondary)', color: 'var(--color-primary)' }}>
+            <FilePlus className="w-5 h-5 mr-2" style={{ color: 'var(--color-primary)' }} />
+            Novo Registro
+          </Button>
         }
 
         <SidebarGroup>
