@@ -42,7 +42,10 @@ export default function EnsaioGranIndividualDadosGerais({
             <Select
               value={formData.obra_id}
               onValueChange={(value) => handleChange('obra_id', value)}
-              disabled={!isEditable || isApproved || !!editingEnsaio?.id}
+              /* Obra fica travada ao editar apenas quando já tem valor;
+                 se estiver vazia, o usuário precisa poder selecionar para
+                 conseguir finalizar o registro. */
+              disabled={!isEditable || isApproved || (!!editingEnsaio?.id && !!formData.obra_id)}
             >
               <SelectTrigger><SelectValue placeholder="Selecione a obra" /></SelectTrigger>
               <SelectContent>
