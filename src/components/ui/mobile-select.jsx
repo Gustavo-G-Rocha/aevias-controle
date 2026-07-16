@@ -21,9 +21,14 @@ function collectItems(children, result = []) {
 function Select({ value, onValueChange, disabled, children, ...props }) {
   const mobile = useIsMobile()
   const [open, setOpen] = React.useState(false)
+  const [hasOpened, setHasOpened] = React.useState(false)
   const items = React.useMemo(() => collectItems(children), [children])
   if (!mobile) return <Desktop.Select value={value} onValueChange={onValueChange} disabled={disabled} {...props}>{children}</Desktop.Select>
-  return <MobileSelectContext.Provider value={{ value, onValueChange, disabled, items }}><Drawer open={open} onOpenChange={setOpen}>{children}</Drawer></MobileSelectContext.Provider>
+  const handleOpenChange = (next) => {
+    setOpen(next)
+    if (next) setHasOpened(true)
+  }
+  return <MobileSelectContext.Provider value={{ value, onValueChange, disabled, items, open, hasOpened }}><Drawer open={open} onOpenChange={handleOpenChange}>{children}</Drawer></MobileSelectContext.Provider>
 }
 
 function SelectTrigger({ className, children, ...props }) {
@@ -44,6 +49,13 @@ function SelectValue({ placeholder = "Selecione" }) {
 function SelectContent({ children, className, title = "Selecione uma opção", ...props }) {
   const context = React.useContext(MobileSelectContext)
   if (!context) return <Desktop.SelectContent className={className} {...props}>{children}</Desktop.SelectContent>
+  // Lazily mount the DrawerContent portal only after the first open.
+  // Without this, every closed Select on a page mounts a portal div in
+  // document.body on initial render. During framer-motion page transitions
+  // (key={pathname}), multiple portals mounting/unmounting simultaneously
+  // cause "removeChild" DOM exceptions. Deferring until first open avoids
+  // the conflict while preserving the open/close animation afterward.
+  if (!context.hasOpened) return null
   return <DrawerContent className="max-h-[75vh] pb-[env(safe-area-inset-bottom)]"><DrawerHeader><DrawerTitle>{title}</DrawerTitle></DrawerHeader><div className={cn("overflow-y-auto px-3 pb-4", className)}>{children}</div></DrawerContent>
 }
 
