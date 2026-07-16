@@ -9,6 +9,7 @@ import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components
 import { getLocalInfo, getLaboratoristaInfo, getEmpreiteiraInfo, getNaoConformidades, getStatusInfo } from "@/components/ensaios/utils";
 import { CopyIdButton } from "@/components/ensaios/TableFilters";
 import { canGestorPreencherResultado } from "@/utils/certificacaoUsinaAccess";
+import { canUserEditRecord } from "@/utils/recordEditPermission";
 import CriticalActionDialog from "@/components/ensaios/CriticalActionDialog";
 
 const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, allUsers, obras, user, regionais = [], onApprove, onReject, onDelete, onAssinar }) => {
@@ -26,12 +27,13 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
     ensaio.entityType === "CertificacaoUsina" &&
     canGestorPreencherResultado(user, ensaio, obra, regionais);
   const podeAssinar = ensaio.approved === true && !ensaio.client_signature?.signed_by && onAssinar;
-  // Admin ou autor podem abrir o formulário editável de registros em execução/reprovados
+  // Admin, autor ou responsável da regional (mesmas regras do servidor)
+  // podem abrir o formulário editável de registros em execução/reprovados
   const podeEditarRegistro =
     ensaio.entityType !== "CertificacaoUsina" &&
     (ensaio.status === 'rascunho' || ensaio.approved === false) &&
     !ensaio.client_signature?.signed_by &&
-    (user?.role === 'admin' || ensaio.created_by === user?.email);
+    canUserEditRecord(user, ensaio, obra, regionais);
 
   return (
     <tr className={`border-b border-border hover:bg-muted/50 ${index % 2 === 0 ? 'bg-transparent' : 'bg-muted/20'}`}>

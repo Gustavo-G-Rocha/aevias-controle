@@ -12,6 +12,7 @@ import { createPageUrl } from "@/utils";
 import { Loader2, Printer, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import { canUserEditRecord } from "@/utils/recordEditPermission";
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
 
@@ -76,14 +77,11 @@ export default function RelatorioGranulometriaIndividualPage() {
     );
   }
 
-  const isOwner = !!user && (
-    (user.email && ensaio?.created_by?.toLowerCase() === user.email.toLowerCase()) ||
-    (user.id && ensaio?.created_by_id === user.id)
-  );
   const isCliente = user?.access_level === 'cliente' || user?.access_level === 'cliente_supervisor';
-  const podeEditar = !!ensaio && (isOwner || user?.role === 'admin') && !isCliente &&
+  const podeEditar = !!ensaio && !isCliente &&
     (ensaio.status === 'rascunho' || ensaio.approved === false) &&
-    !ensaio.client_signature?.signed_by;
+    !ensaio.client_signature?.signed_by &&
+    canUserEditRecord(user, ensaio, obra, regional ? [regional] : []);
 
   return (
     <div className="bg-white min-h-screen">

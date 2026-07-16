@@ -7,6 +7,7 @@ import { useFormDataLoader } from "@/hooks/useFormDataLoader";
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
 import { validateEnsaioForm } from '@/utils/formValidationSchemas';
+import { canUserEditRecord, getEffectiveAccessLevel } from '@/utils/recordEditPermission';
 
 /**
  * Hook reutilizável para formulários de ensaios individuais
@@ -46,9 +47,12 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
       obterEnsaioById(entityName, editId)
         .then(ensaioToEdit => {
           setEditingEnsaio(ensaioToEdit);
-          const isCreator = ensaioToEdit.created_by === user.email;
           const canEditStatus = ensaioToEdit.status === 'rascunho' || ensaioToEdit.status === 'finalizado' || ensaioToEdit.approved === false;
-          const hasPermission = user.role === 'admin' || (isCreator && canEditStatus);
+          // Espelha as regras server-side: admin efetivo, autor, ou
+          // gestor/sala técnica da regional da obra do registro.
+          const obraDoRegistro = obras.find(o => o.id === ensaioToEdit.obra_id);
+          const hasPermission = getEffectiveAccessLevel(user) === 'admin' ||
+            (canEditStatus && canUserEditRecord(user, ensaioToEdit, obraDoRegistro, regionais));
 
           if (hasPermission) {
             const initialForm = getInitialFormData();
@@ -88,7 +92,9 @@ export function useEnsaioForm(getInitialFormData, entityName, storageName, { fil
 
   const loading = dataLoading || editLoading;
   const isApproved = formData.approved === true;
-  const userCanEdit = user?.role === 'admin' || (formData.created_by === user?.email && (formData.status === 'rascunho' || formData.status === 'finalizado' || formData.approved === false));
+  const userCanEdit = getEffectiveAccessLevel(user) === 'admin' ||
+    ((formData.status === 'rascunho' || formData.status === 'finalizado' || formData.approved === false) &&
+      canUserEditRecord(user, formData, obras.find(o => o.id === formData.obra_id), regionais));
   const isEditable = !editingEnsaio?.id || userCanEdit;
 
   const validateForm = (saveStatus = 'rascunho') => validateEnsaioForm(formData, saveStatus);
