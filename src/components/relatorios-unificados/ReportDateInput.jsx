@@ -29,11 +29,17 @@ export default function ReportDateInput({ id, value, onValueChange, ...props }) 
   useEffect(() => setText(displayDate(value)), [value]);
 
   const handleChange = (event) => {
-    const next = event.target.value;
+    const next = event.currentTarget.value;
     setText(next);
     const parsed = parseDate(next);
     if (parsed) onValueChange(parsed);
   };
 
-  return <Input id={id} type="text" inputMode="numeric" placeholder="DD/MM/AAAA" value={text} onChange={handleChange} onBlur={() => setText(displayDate(value))} {...props} />;
+  const handleBlur = () => {
+    const parsed = parseDate(text);
+    if (parsed) onValueChange(parsed);
+    setText(parsed ? displayDate(parsed) : displayDate(value));
+  };
+
+  return <Input id={id} type="text" inputMode="numeric" placeholder="DD/MM/AAAA" value={text} onInput={handleChange} onChange={handleChange} onBlur={handleBlur} {...props} />;
 }
