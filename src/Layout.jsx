@@ -16,6 +16,7 @@ import { useLayoutData } from "@/components/layout/useLayoutData";
 import AppSidebar from "@/components/layout/AppSidebar";
 import BottomNav from "@/components/layout/BottomNav";
 import CreateEnsaioDialog from "@/components/layout/CreateEnsaioDialog";
+import { CreateEnsaioDialogProvider } from "@/components/layout/CreateEnsaioDialogContext";
 import MobileBackHeader from "@/components/layout/MobileBackHeader";
 import OfflineStatusBar from "@/components/offline/OfflineStatusBar";
 import SidebarToggle from "@/components/layout/SidebarToggle";
@@ -39,6 +40,7 @@ const AppLayout = ({ children, currentPageName }) => {
 
   return (
     <SidebarProvider>
+      <CreateEnsaioDialogProvider onOpen={setIsCreateEnsaioOpen}>
       <div className="min-h-screen flex w-full overflow-x-hidden" style={{ backgroundColor: 'var(--color-background)' }}>
         <AppSidebar
           user={user}
@@ -50,7 +52,6 @@ const AppLayout = ({ children, currentPageName }) => {
           setMinhasObrasOpen={setMinhasObrasOpen}
           naoConformidadesOpen={naoConformidadesOpen}
           setNaoConformidadesOpen={setNaoConformidadesOpen}
-          onOpenCreateEnsaio={() => setIsCreateEnsaioOpen(true)}
         />
 
         <main className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
@@ -99,6 +100,7 @@ const AppLayout = ({ children, currentPageName }) => {
           />
         </DialogContent>
       </Dialog>
+      </CreateEnsaioDialogProvider>
     </SidebarProvider>
   );
 };

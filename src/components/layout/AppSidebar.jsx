@@ -20,6 +20,7 @@ import { createPageUrl } from "@/utils";
 import { ACCESS_LEVELS } from "@/lib/layoutConstants";
 import { MAIN_NAVIGATION, ADMIN_NAVIGATION } from "./NavigationConfig";
 import UserMenu from "./UserMenu";
+import { useCreateEnsaioDialog } from "./CreateEnsaioDialogContext";
 
 const NavLink = ({ to, children, className }) => {
   const { isMobile, setOpenMobile } = useSidebar();
@@ -68,8 +69,9 @@ const SubNavItem = ({ to, icon: Icon, label, badge, pendingTransfers, isActive }
 export default function AppSidebar({
   user, userAccessLevel, canCreateRecords, canManageSystem,
   pendingTransfers, minhasObrasOpen, setMinhasObrasOpen,
-  naoConformidadesOpen, setNaoConformidadesOpen, onOpenCreateEnsaio,
+  naoConformidadesOpen, setNaoConformidadesOpen,
 }) {
+  const { openCreateEnsaio } = useCreateEnsaioDialog();
   const isAdmin = userAccessLevel === ACCESS_LEVELS.ADMIN || user?.role === ACCESS_LEVELS.ADMIN;
   const isSalaTecnica = userAccessLevel === ACCESS_LEVELS.SALA_TECNICA;
   const isGestorContrato = userAccessLevel === ACCESS_LEVELS.GESTOR_CONTRATO;
@@ -103,7 +105,7 @@ export default function AppSidebar({
         {canCreateRecords &&
           <Button
             type="button"
-            onClick={onOpenCreateEnsaio}
+            onClick={openCreateEnsaio}
             aria-haspopup="dialog"
             className="w-full mb-4 hidden lg:flex font-semibold tracking-wide text-xs"
             style={{ backgroundColor: 'var(--color-secondary)', color: 'var(--color-primary)' }}>

@@ -10,12 +10,13 @@ import { isAdmin, isCliente as isClienteUser, isGestorContrato, isSalaTecnica, i
 import AdminInterface from "@/components/ensaios/AdminInterface";
 import ClienteInterface from "@/components/ensaios/ClienteInterface";
 import LaboratoristaInterface from "@/components/ensaios/LaboratoristaInterface";
-import { DialogTrigger } from "@/components/ui/dialog";
+import { useCreateEnsaioDialog } from "@/components/layout/CreateEnsaioDialogContext";
 
 export default function MeusEnsaios() {
   const queryClient = useQueryClient();
   const { ensaios, obras, projects, allUsers, regionais, user, loading, reload } = useEnsaiosList();
   const { handleApprove, handleReject, handleDelete } = useEnsaiosActions(user, obras, reload);
+  const { openCreateEnsaio } = useCreateEnsaioDialog();
 
   const handleAssinar = useCallback(async (ensaio) => {
     try {
@@ -65,15 +66,16 @@ export default function MeusEnsaios() {
 
         {/* FAB mobile para laboratoristas */}
         {canCreate && (
-          <DialogTrigger asChild>
-            <button
-              className="lg:hidden fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
-              style={{ backgroundColor: 'var(--color-primary)' }}
-              aria-label="Novo Registro"
-            >
-              <Plus className="w-7 h-7 text-white" />
-            </button>
-          </DialogTrigger>
+          <button
+            type="button"
+            onClick={openCreateEnsaio}
+            aria-haspopup="dialog"
+            className="lg:hidden fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
+            style={{ backgroundColor: 'var(--color-primary)' }}
+            aria-label="Novo Registro"
+          >
+            <Plus className="w-7 h-7 text-white" />
+          </button>
         )}
 
         {loading ? (

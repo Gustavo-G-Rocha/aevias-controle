@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { Loader2, Plus } from 'lucide-react';
 import { getUserAccessLevel, canSeeFilters, isAdmin, isSalaTecnica, isLaboratorista, isClienteSupervisor } from '@/utils/accessControl';
-import { DialogTrigger } from '@/components/ui/dialog';
+import { useCreateEnsaioDialog } from '@/components/layout/CreateEnsaioDialogContext';
 import { getChartVisibility } from '@/utils/dashboardUtils';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
@@ -12,6 +12,7 @@ import DashboardPage from '@/components/dashboard/DashboardPage';
 
 export default function Dashboard() {
   const { loading, user, filters, setFilters, clearFilters, hasActiveFilters, stats, charts, approvalPercentage, obras, isClienteUser, isEngenheiroUser } = useDashboardData();
+  const { openCreateEnsaio } = useCreateEnsaioDialog();
 
   const handleSliceClick = useCallback((data, chartType) => {
     setFilters(prev => {
@@ -52,15 +53,16 @@ export default function Dashboard() {
     <DashboardPage>
       {/* FAB mobile para criar novo registro (mesmo painel do "Ensaios Realizados") */}
       {canCreate && (
-        <DialogTrigger asChild>
-          <button
-            className="lg:hidden fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
-            style={{ backgroundColor: 'var(--color-primary)' }}
-            aria-label="Novo Registro"
-          >
-            <Plus className="w-7 h-7 text-white" />
-          </button>
-        </DialogTrigger>
+        <button
+          type="button"
+          onClick={openCreateEnsaio}
+          aria-haspopup="dialog"
+          className="lg:hidden fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
+          style={{ backgroundColor: 'var(--color-primary)' }}
+          aria-label="Novo Registro"
+        >
+          <Plus className="w-7 h-7 text-white" />
+        </button>
       )}
       <DashboardHeader user={user} isClienteUser={isClienteUser} />
 
