@@ -7,6 +7,16 @@ import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
+
+const DRAFT_STORAGE_KEY = "form_autosave_diario_obra";
+
+const readLocalDraft = () => {
+  try { return JSON.parse(sessionStorage.getItem(DRAFT_STORAGE_KEY) || "null"); } catch { return null; }
+};
+
+const clearLocalDraft = () => {
+  try { sessionStorage.removeItem(DRAFT_STORAGE_KEY); } catch { /* storage indisponível */ }
+};
 export const getInitialFormData = () => ({
   obra_id: "",
   data: new Date().toISOString().split("T")[0],
@@ -194,6 +204,7 @@ export function useDiarioObra() {
         await criarDiario({ ...dataToSave, created_by: user.email, laboratorista_name: user.laboratorista_name || user.full_name });
         toast({ title: saveStatus === "rascunho" ? "Progresso salvo!" : "Diário criado com sucesso!" });
       }
+      clearLocalDraft();
       navigate(createPageUrl("MeusEnsaios"));
     } catch (error) {
       logger.error("[DiarioObra] Erro:", error?.message || error);
@@ -204,6 +215,7 @@ export function useDiarioObra() {
   }, [formData, editingDiarioOriginal, obras, user, navigate]);
 
   const handleCancel = useCallback(() => {
+    clearLocalDraft();
     navigate(createPageUrl("MeusEnsaios"));
   }, [navigate]);
 
@@ -239,10 +251,26 @@ export function useDiarioObra() {
     } else {
       const initial = getInitialFormData();
       if (obras.length > 0) initial.obra_id = obras[0].id;
-      setFormData(initial);
+      // Restaura rascunho local (auto-save) se existir — protege trabalho em
+      // andamento contra fechamento acidental da página, inclusive offline.
+      const draft = readLocalDraft();
+      setFormData(draft ? { ...initial, ...draft, obra_id: draft.obra_id || initial.obra_id } : initial);
       setEditingDiarioOriginal(null);
     }
   }, [location.search, loadingUser, loadingAux, user?.id, obras, navigate]);
+
+  // Auto-save local do formulário (novo registro apenas) — persiste o
+  // progresso digitado em sessionStorage com debounce, garantindo que o
+  // preenchimento sobreviva a recargas/navegação mesmo sem clicar em salvar.
+  useEffect(() => {
+    if (loading) return;
+    const params = new URLSearchParams(location.search);
+    if (params.get("editId")) return;
+    const timeoutId = setTimeout(() => {
+      try { sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(formData)); } catch { /* storage indisponível */ }
+    }, 800);
+    return () => clearTimeout(timeoutId);
+  }, [formData, loading, location.search]);
 
   const isApproved = formData.approved === true;
   const userCanEdit = user?.role === "admin" || (formData.created_by === user?.email && formData.approved !== true);
