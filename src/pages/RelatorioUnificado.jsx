@@ -5,9 +5,12 @@ import { useRelatorioUnificadoData } from '@/hooks/useRelatorioUnificadoData';
 import { useRelatorioUnificadoFilters } from '@/hooks/useRelatorioUnificadoFilters';
 import { useRelatorioUnificadoRecords } from '@/hooks/useRelatorioUnificadoRecords';
 import { useRelatorioUnificadoActions } from '@/hooks/useRelatorioUnificadoActions';
+import { useRelatorioUnificadoSignature } from '@/hooks/useRelatorioUnificadoSignature';
 import RelatorioUnificadoToolbar from '@/components/relatorio-unificado/RelatorioUnificadoToolbar';
 import RelatorioUnificadoCapa from '@/components/relatorio-unificado/RelatorioUnificadoCapa';
 import RelatorioUnificadoRecordsList from '@/components/relatorio-unificado/RelatorioUnificadoRecordsList';
+import SignatureReauthModal from '@/components/relatorios/SignatureReauthModal';
+import SignatureSeal from '@/components/relatorios/SignatureSeal';
 
 export default function RelatorioUnificado() {
   useReportMode();
@@ -16,6 +19,16 @@ export default function RelatorioUnificado() {
   const { filters, hasValidFilters } = useRelatorioUnificadoFilters();
   const { records, loading: recordsLoading, error: recordsError } = useRelatorioUnificadoRecords({ filters, hasValidFilters });
   const { handleGoBack, handlePrint } = useRelatorioUnificadoActions();
+  const {
+    signature,
+    signing,
+    modalOpen,
+    signError,
+    canSign,
+    handleSign,
+    handleOpenModal,
+    handleCloseModal,
+  } = useRelatorioUnificadoSignature({ filters, recordCount: records.length, user });
 
   const loading = dataLoading || recordsLoading;
   const error = dataError || recordsError || (!hasValidFilters && 'Parâmetros insuficientes.');
@@ -45,6 +58,9 @@ export default function RelatorioUnificado() {
         recordCount={records.length}
         onGoBack={handleGoBack}
         onPrint={handlePrint}
+        onSign={handleOpenModal}
+        signature={signature}
+        canSign={canSign}
       />
 
       <RelatorioUnificadoCapa
@@ -53,6 +69,12 @@ export default function RelatorioUnificado() {
         filters={filters}
         recordCount={records.length}
       />
+
+      {signature && (
+        <div className="max-w-5xl mx-auto px-4 mt-4">
+          <SignatureSeal signature={signature} />
+        </div>
+      )}
 
       <RelatorioUnificadoRecordsList
         records={records}
@@ -70,6 +92,16 @@ export default function RelatorioUnificado() {
           aside, nav, [data-sidebar] { display: none !important; }
         }
       `}</style>
+
+      <SignatureReauthModal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleSign}
+        signerName={user?.laboratorista_name || user?.full_name || user?.email || ''}
+        documentDescription="Relatório Unificado Consolidado"
+        loading={signing}
+        error={signError}
+      />
     </div>
   );
 }

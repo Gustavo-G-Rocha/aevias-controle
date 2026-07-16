@@ -103,7 +103,7 @@ const ALLOWED_ENTITIES = [
   'BoletimSondagem', 'BoletimSondagemTrado', 'GranuMistura',
   'CertificacaoUsina', 'ChecklistUsina', 'ChecklistAplicacao',
   'ChecklistMRAF', 'ChecklistConcretagem', 'ChecklistTerraplanagem',
-  'ChecklistReciclagem', 'DiarioObra', 'RelatorioNC',
+  'ChecklistReciclagem', 'DiarioObra', 'RelatorioNC', 'RelatorioUnificado',
 ];
 
 const APPROVER_LEVELS = ['admin', 'sala_tecnica_afirmaevias', 'gestor_contrato', 'cliente_supervisor'];
@@ -253,6 +253,8 @@ Deno.serve(async (req) => {
       recordId,
       signatureType = 'approve',
       geolocation = null,
+      reportData = null,
+      reauthFactor = 'password',
     } = body;
 
     // ── VALIDAÇÃO DE ENTRADA ──
@@ -288,20 +290,33 @@ Deno.serve(async (req) => {
     }
 
     // ── BUSCAR REGISTRO ──
+    // RelatorioUnificado é um relatório virtual consolidado — não há
+    // registro de entidade individual. Usa reportData do payload como
+    // representação do documento para hash e verificação de tenant.
     let existingRecord: any;
-    try {
-      existingRecord = await base44.asServiceRole.entities[entityName].get(recordId);
-    } catch {
-      return Response.json(
-        { error: 'Registro não encontrado', errorCategory: 'permission' },
-        { status: 404 }
-      );
-    }
-    if (!existingRecord) {
-      return Response.json(
-        { error: 'Registro não encontrado', errorCategory: 'permission' },
-        { status: 404 }
-      );
+    if (entityName === 'RelatorioUnificado') {
+      existingRecord = reportData;
+      if (!existingRecord || !existingRecord.obra_id) {
+        return Response.json(
+          { error: 'Dados do relatório (reportData.obra_id) são obrigatórios', errorCategory: 'schema' },
+          { status: 400 }
+        );
+      }
+    } else {
+      try {
+        existingRecord = await base44.asServiceRole.entities[entityName].get(recordId);
+      } catch {
+        return Response.json(
+          { error: 'Registro não encontrado', errorCategory: 'permission' },
+          { status: 404 }
+        );
+      }
+      if (!existingRecord) {
+        return Response.json(
+          { error: 'Registro não encontrado', errorCategory: 'permission' },
+          { status: 404 }
+        );
+      }
     }
 
     // ── VERIFICAR TENANT ──
@@ -406,7 +421,13 @@ Deno.serve(async (req) => {
     }
 
     // ── ATUALIZAR REGISTRO ──
-    const result = await base44.asServiceRole.entities[entityName].update(recordId, updateData);
+    // RelatorioUnificado não tem entidade para atualizar — o documento
+    // é a composição dos registros. A assinatura fica registrada em
+    // AssinaturaEletronica + AuditTrail.
+    let result: any = existingRecord;
+    if (entityName !== 'RelatorioUnificado') {
+      result = await base44.asServiceRole.entities[entityName].update(recordId, updateData);
+    }
 
     // ── CRIAR REGISTRO DE ASSINATURA ELETRÔNICA ──
     // Entidade dedicada — centraliza todos os metadados da assinatura.
@@ -424,7 +445,7 @@ Deno.serve(async (req) => {
         ip_address: ipAddress,
         user_agent: deviceInfo,
         geolocation: geolocation || null,
-        reauth_factor: null,
+        reauth_factor: reauthFactor,
       },
       signed_by: user.email,
       signed_by_name: approverName,
@@ -451,7 +472,7 @@ Deno.serve(async (req) => {
             hash: integrityHash,
             signature_id: signatureRecord.id,
             signed_at: now,
-            reauth_factor: null,
+            reauth_factor: reauthFactor,
             ip_address: ipAddress,
           },
         }],
