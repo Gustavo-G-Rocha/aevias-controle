@@ -81,7 +81,7 @@ export default function RelatorioGranulometriaIndividualPage() {
     (user.id && ensaio?.created_by_id === user.id)
   );
   const isCliente = user?.access_level === 'cliente' || user?.access_level === 'cliente_supervisor';
-  const podeEditar = !!ensaio && isOwner && !isCliente &&
+  const podeEditar = !!ensaio && (isOwner || user?.role === 'admin') && !isCliente &&
     (ensaio.status === 'rascunho' || ensaio.approved === false) &&
     !ensaio.client_signature?.signed_by;
 

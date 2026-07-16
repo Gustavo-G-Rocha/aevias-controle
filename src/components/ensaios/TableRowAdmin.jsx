@@ -26,6 +26,12 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
     ensaio.entityType === "CertificacaoUsina" &&
     canGestorPreencherResultado(user, ensaio, obra, regionais);
   const podeAssinar = ensaio.approved === true && !ensaio.client_signature?.signed_by && onAssinar;
+  // Admin ou autor podem abrir o formulário editável de registros em execução/reprovados
+  const podeEditarRegistro =
+    ensaio.entityType !== "CertificacaoUsina" &&
+    (ensaio.status === 'rascunho' || ensaio.approved === false) &&
+    !ensaio.client_signature?.signed_by &&
+    (user?.role === 'admin' || ensaio.created_by === user?.email);
 
   return (
     <tr className={`border-b border-border hover:bg-muted/50 ${index % 2 === 0 ? 'bg-transparent' : 'bg-muted/20'}`}>
@@ -84,6 +90,11 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
                 <MessageSquare className="w-3 h-3" />
               </Button>
             </CriticalActionDialog>
+          )}
+          {podeEditarRegistro && (
+            <Button asChild size="sm" style={{ backgroundColor: '#00233B' }} className="text-white hover:opacity-90 h-7 px-2" title="Editar registro">
+              <RouterLink to={createPageUrl(`${ensaio.entityType}?editId=${ensaio.id}`)}><Pencil className="w-3 h-3" /></RouterLink>
+            </Button>
           )}
           {canApprove && ensaio.status === 'rascunho' && <span className="text-xs italic text-muted-foreground ml-2">Em execução</span>}
           {podeEditarCertificacao && (
