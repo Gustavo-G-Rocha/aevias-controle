@@ -25,6 +25,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [signature, setSignature] = useState(null);
+  const [actionError, setActionError] = useState('');
 
   useEffect(() => {
     const loadUser = async () => {
@@ -76,13 +77,27 @@ export default function AprovacaoBar({ entityName, recordId }) {
   const isRejected = record.approved === false;
 
   const handleApprove = async () => {
+    const previousRecord = record;
+    setActionError('');
     setSaving(true);
+    setRecord(prev => ({
+      ...prev,
+      approved: true,
+      approved_date: new Date().toISOString(),
+      approved_by: user?.email,
+    }));
+
     try {
-      const response = await gerenciarAprovacao({
-        action: 'approve',
-        entityName,
-        recordId,
-      });
+      const response = await Promise.race([
+        gerenciarAprovacao({
+          action: 'approve',
+          entityName,
+          recordId,
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('O servidor não respondeu. A aprovação foi desfeita.')), 15000)
+        ),
+      ]);
       const result = response.data.data;
       const updatedRecord = result.record || result;
       setRecord(prev => ({ ...prev, ...updatedRecord }));
@@ -90,6 +105,9 @@ export default function AprovacaoBar({ entityName, recordId }) {
       toast({ title: 'Documento assinado eletronicamente!' });
     } catch (err) {
       const errMsg = err?.response?.data?.error || err?.message || 'Erro ao assinar documento.';
+      setRecord(previousRecord);
+      setSignature(null);
+      setActionError(errMsg);
       logger.error('[AprovacaoBar] Erro ao assinar:', errMsg);
       toast({ title: errMsg, variant: "destructive" });
     } finally {
@@ -182,6 +200,12 @@ export default function AprovacaoBar({ entityName, recordId }) {
           </Button>
         )}
       </div>
+
+      {actionError && (
+        <p role="alert" className="mt-2 max-w-md text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+          {actionError}
+        </p>
+      )}
 
       <Dialog open={showRejectModal} onOpenChange={setShowRejectModal}>
         <DialogContent className="max-w-md">
