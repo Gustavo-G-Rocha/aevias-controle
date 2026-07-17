@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Save, CheckCircle } from "lucide-react";
 import TruthConfirmationDialog from "@/components/forms/TruthConfirmationDialog";
+import { useOptimisticSave } from "@/hooks/useOptimisticSave";
 
 export default function ChecklistFooter({
   isEditable,
@@ -13,6 +14,8 @@ export default function ChecklistFooter({
   onFinalize,
 }) {
   const [showTruthConfirm, setShowTruthConfirm] = useState(false);
+  // Feedback otimista no "Salvar Progresso": mostra sucesso na hora do clique
+  const { showSaved, handleClick: handleSaveProgress } = useOptimisticSave(onSaveProgress);
 
   const handleFinalizeClick = (e) => {
     e.preventDefault();
@@ -40,10 +43,15 @@ export default function ChecklistFooter({
               type="button"
               variant="outline"
               disabled={loadingUpload}
-              onClick={onSaveProgress}
+              onClick={handleSaveProgress}
               data-testid="save-progress-btn"
+              className={showSaved ? "border-green-600 text-green-600 hover:text-green-600" : ""}
             >
-              <Save className="mr-2 h-4 w-4" /> Salvar Progresso
+              {showSaved ? (
+                <><CheckCircle className="mr-2 h-4 w-4" /> Progresso salvo!</>
+              ) : (
+                <><Save className="mr-2 h-4 w-4" /> Salvar Progresso</>
+              )}
             </Button>
             <Button
               type="button"

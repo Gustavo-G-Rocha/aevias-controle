@@ -1,6 +1,7 @@
 import { Save, Loader2, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useOptimisticSave } from "@/hooks/useOptimisticSave";
 
 /**
  * Barra de ações padronizada para formulários de checklist/ensaio.
@@ -28,6 +29,9 @@ export default function FormActions({
   finalizeLabel = "Finalizar",
   savingLabel = "Salvando...",
 }) {
+  // Feedback otimista no "Salvar Progresso": mostra sucesso na hora do clique
+  const { showSaved, handleClick: handleSaveProgress } = useOptimisticSave(onSaveProgress);
+
   return (
     <>
       {/* Espaço para a barra de ações fixa não sobrepor o último conteúdo */}
@@ -45,11 +49,15 @@ export default function FormActions({
               type="button"
               variant="outline"
               disabled={loading || saving}
-              onClick={onSaveProgress}
+              onClick={handleSaveProgress}
               data-testid="save-progress-btn"
+              className={showSaved ? "border-green-600 text-green-600 hover:text-green-600" : ""}
             >
-              <Save className="mr-2 h-4 w-4" />
-              Salvar Progresso
+              {showSaved ? (
+                <><CheckCircle className="mr-2 h-4 w-4" /> Progresso salvo!</>
+              ) : (
+                <><Save className="mr-2 h-4 w-4" /> Salvar Progresso</>
+              )}
             </Button>
 
             <Button
