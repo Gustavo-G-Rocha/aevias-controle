@@ -15,6 +15,7 @@ import {
   TrendingUp,
   Factory,
   Bug,
+  ClipboardList,
 } from "lucide-react";
 
 export const MAIN_NAVIGATION = [
@@ -49,27 +50,36 @@ export const ADMIN_NAVIGATION = [
   { title: "Reportar Erros", url: createPageUrl("ReportarErro"), icon: Bug, allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "user", "funcionarios_cliente", "cliente", "cliente_supervisor"] },
 ];
 
+// Ensaios compartilhados entre Supervisão e Gerenciamento
+const ENSAIOS_SUPERVISAO = [
+  { title: "Checklist de Usina", url: createPageUrl("ChecklistUsina"), icon: FileText },
+  { title: "Checklist de Aplicação", url: createPageUrl("ChecklistAplicacao"), icon: FileText },
+  { title: "Checklist de MRAF", url: createPageUrl("ChecklistMRAF"), icon: FileText },
+  { title: "Checklist de Concretagem", url: createPageUrl("ChecklistConcretagem"), icon: FileText },
+  { title: "Checklist de Terraplanagem", url: createPageUrl("ChecklistTerraplanagem"), icon: FileText },
+  { title: "Checklist de Reciclagem", url: createPageUrl("ChecklistReciclagem"), icon: FileText },
+  { title: "Ensaio de CAUQ", url: createPageUrl("EnsaioCAUQ"), icon: FlaskConical },
+  { title: "Acompanhamento de Usinagem", url: createPageUrl("AcompanhamentoUsinagem"), icon: FlaskConical },
+  { title: "Taxa de Pintura/Imprimação", url: createPageUrl("EnsaioTaxaPinturaImprimacao"), icon: FlaskConical },
+  { title: "Rompimento Concreto", url: createPageUrl("EnsaioRompimentoConcreto"), icon: FlaskConical },
+  { title: "Mancha + Pêndulo", url: createPageUrl("EnsaioManchaPendulo"), icon: Gauge },
+  { title: "Sondagem", url: createPageUrl("EnsaioSondagem"), icon: Gauge },
+  { title: "Viga Benkelman", url: createPageUrl("EnsaioVigaBenkelman"), icon: Gauge },
+  { title: "Taxa MRAF", url: createPageUrl("EnsaioTaxaMRAF"), icon: FlaskConical },
+];
+
 export const ENSAIOS_POR_TIPO_OBRA = [
   {
     nome: "Supervisão",
     icon: HardHat,
     tipo_obra: "supervisao",
-    ensaios: [
-      { title: "Checklist de Usina", url: createPageUrl("ChecklistUsina"), icon: FileText },
-      { title: "Checklist de Aplicação", url: createPageUrl("ChecklistAplicacao"), icon: FileText },
-      { title: "Checklist de MRAF", url: createPageUrl("ChecklistMRAF"), icon: FileText },
-      { title: "Checklist de Concretagem", url: createPageUrl("ChecklistConcretagem"), icon: FileText },
-      { title: "Checklist de Terraplanagem", url: createPageUrl("ChecklistTerraplanagem"), icon: FileText },
-      { title: "Checklist de Reciclagem", url: createPageUrl("ChecklistReciclagem"), icon: FileText },
-      { title: "Ensaio de CAUQ", url: createPageUrl("EnsaioCAUQ"), icon: FlaskConical },
-      { title: "Acompanhamento de Usinagem", url: createPageUrl("AcompanhamentoUsinagem"), icon: FlaskConical },
-      { title: "Taxa de Pintura/Imprimação", url: createPageUrl("EnsaioTaxaPinturaImprimacao"), icon: FlaskConical },
-      { title: "Rompimento Concreto", url: createPageUrl("EnsaioRompimentoConcreto"), icon: FlaskConical },
-      { title: "Mancha + Pêndulo", url: createPageUrl("EnsaioManchaPendulo"), icon: Gauge },
-      { title: "Sondagem", url: createPageUrl("EnsaioSondagem"), icon: Gauge },
-      { title: "Viga Benkelman", url: createPageUrl("EnsaioVigaBenkelman"), icon: Gauge },
-      { title: "Taxa MRAF", url: createPageUrl("EnsaioTaxaMRAF"), icon: FlaskConical },
-    ],
+    ensaios: ENSAIOS_SUPERVISAO,
+  },
+  {
+    nome: "Gerenciamento",
+    icon: ClipboardList,
+    tipo_obra: "gerenciamento",
+    ensaios: ENSAIOS_SUPERVISAO,
   },
   {
     nome: "Implantação",

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, HardHat, Construction, Wrench, FileText, Factory } from "lucide-react";
+import { Plus, HardHat, Construction, Wrench, FileText, Factory, ClipboardList } from "lucide-react";
 
 const TagInput = ({ field, value, setValue, placeholder, badgeClass, items, onAdd, onRemove }) => (
   <div className="space-y-2">
@@ -47,12 +47,14 @@ const ObraForm = React.memo(({ obra, regional, onSave, onCancel }) => {
     clientes: obra?.clientes || [],
     usinas: obra?.usinas || [],
     rodovias: obra?.rodovias || [],
+    servicos: obra?.servicos || [],
   });
 
   const [novaEmpreiteira, setNovaEmpreiteira] = useState("");
   const [novoCliente, setNovoCliente] = useState("");
   const [novaUsina, setNovaUsina] = useState("");
   const [novaRodovia, setNovaRodovia] = useState("");
+  const [novoServico, setNovoServico] = useState("");
 
   const handleSubmit = useCallback((e) => {
     e.preventDefault();
@@ -88,6 +90,7 @@ const ObraForm = React.memo(({ obra, regional, onSave, onCancel }) => {
           <SelectTrigger className="bg-card border-border/20 text-foreground"><SelectValue placeholder="Selecione o tipo de obra" /></SelectTrigger>
           <SelectContent className="bg-card border-border/20 text-foreground">
             <SelectItem value="supervisao"><div className="flex items-center gap-2"><HardHat className="w-4 h-4 text-blue-600" />Supervisão</div></SelectItem>
+            <SelectItem value="gerenciamento"><div className="flex items-center gap-2"><ClipboardList className="w-4 h-4 text-cyan-600" />Gerenciamento</div></SelectItem>
             <SelectItem value="implantacao"><div className="flex items-center gap-2"><Construction className="w-4 h-4 text-green-600" />Implantação</div></SelectItem>
             <SelectItem value="conservacao"><div className="flex items-center gap-2"><Wrench className="w-4 h-4 text-amber-600" />Conservação</div></SelectItem>
             <SelectItem value="sondagem"><div className="flex items-center gap-2"><FileText className="w-4 h-4 text-purple-600" />Sondagem</div></SelectItem>
@@ -111,15 +114,19 @@ const ObraForm = React.memo(({ obra, regional, onSave, onCancel }) => {
         </Select>
       </div>
 
-      {formData.tipo_obra === "supervisao" && (
+      {(formData.tipo_obra === "supervisao" || formData.tipo_obra === "gerenciamento") && (
         <div><Label>Empreiteiras do Contrato</Label><TagInput field="empreiteiras" value={novaEmpreiteira} setValue={setNovaEmpreiteira} placeholder="Nome da empreiteira" badgeClass="bg-blue-100 text-secondary" items={formData.empreiteiras} onAdd={addItem} onRemove={removeItem} /></div>
+      )}
+
+      {formData.tipo_obra === "gerenciamento" && (
+        <div><Label>Serviços do Contrato</Label><TagInput field="servicos" value={novoServico} setValue={setNovoServico} placeholder="Nome do serviço" badgeClass="bg-cyan-100 text-cyan-800" items={formData.servicos} onAdd={addItem} onRemove={removeItem} /></div>
       )}
 
       {(formData.tipo_obra === "levantamentos" || formData.tipo_obra === "sondagem") && (
         <div><Label>Clientes da Obra</Label><TagInput field="clientes" value={novoCliente} setValue={setNovoCliente} placeholder="Nome do cliente" badgeClass="bg-teal-100 text-teal-800" items={formData.clientes} onAdd={addItem} onRemove={removeItem} /></div>
       )}
 
-      {(formData.tipo_obra === "supervisao" || formData.tipo_obra === "implantacao" || formData.tipo_obra === "conservacao" || formData.tipo_obra === "homologacao_usinas") && (
+      {(formData.tipo_obra === "supervisao" || formData.tipo_obra === "gerenciamento" || formData.tipo_obra === "implantacao" || formData.tipo_obra === "conservacao" || formData.tipo_obra === "homologacao_usinas") && (
         <div><Label>Usinas do Contrato</Label><TagInput field="usinas" value={novaUsina} setValue={setNovaUsina} placeholder="Nome da usina" badgeClass="bg-green-100 text-green-800" items={formData.usinas} onAdd={addItem} onRemove={removeItem} /></div>
       )}
 

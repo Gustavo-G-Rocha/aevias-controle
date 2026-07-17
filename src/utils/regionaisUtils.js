@@ -115,6 +115,7 @@ export const STATUS_COLORS_OBRA = {
 
 export const TIPO_OBRA_LABELS = {
   supervisao: "Supervisão",
+  gerenciamento: "Gerenciamento",
   implantacao: "Implantação",
   conservacao: "Conservação",
   homologacao_usinas: "Homologação de Usinas",

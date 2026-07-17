@@ -95,7 +95,7 @@ export default function DadosObraSection({ formData, handleChange, obras, region
       {/* Campos condicionais ao tipo_local */}
       {formData.tipo_local !== "escritorio" && (
         <>
-          {obraSelecionada?.tipo_obra === "supervisao" && (
+          {(obraSelecionada?.tipo_obra === "supervisao" || obraSelecionada?.tipo_obra === "gerenciamento") && (
             <div className="space-y-2">
               <Label>Empreiteira *</Label>
               <Select value={formData.empreiteira || ""} onValueChange={(v) => handleChange("empreiteira", v)} required disabled={disabled}>
