@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LOCAIS, getCategoriasByLocal, getParametrosByLocalCategoria } from "@/components/nc/ncData";
 
 export function ClassificacaoSection({ form, onFormChange }) {
@@ -17,49 +18,58 @@ export function ClassificacaoSection({ form, onFormChange }) {
           {/* LOCAL */}
           <div>
             <Label className="text-foreground">Local</Label>
-            <select
-              value={form.local_nc}
-              onChange={e => onFormChange({ ...form, local_nc: e.target.value, categoria_nc: "", parametro_nc: "" })}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+            <Select
+              value={form.local_nc || ""}
+              onValueChange={value => onFormChange({ ...form, local_nc: value, categoria_nc: "", parametro_nc: "" })}
             >
-              <option value="">Selecione o local</option>
-              {LOCAIS.map(l => (
-                <option key={l} value={l}>{l}</option>
-              ))}
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o local" />
+              </SelectTrigger>
+              <SelectContent title="Selecione o local">
+                {LOCAIS.map(l => (
+                  <SelectItem key={l} value={l}>{l}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* CATEGORIA */}
           <div>
             <Label className="text-foreground">Categoria</Label>
-            <select
-              value={form.categoria_nc}
-              onChange={e => onFormChange({ ...form, categoria_nc: e.target.value, parametro_nc: "" })}
+            <Select
+              value={form.categoria_nc || ""}
+              onValueChange={value => onFormChange({ ...form, categoria_nc: value, parametro_nc: "" })}
               disabled={!form.local_nc}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground disabled:opacity-50"
             >
-              <option value="">Selecione a categoria</option>
-              {getCategoriasByLocal(form.local_nc).map(c => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione a categoria" />
+              </SelectTrigger>
+              <SelectContent title="Selecione a categoria">
+                {getCategoriasByLocal(form.local_nc).map(c => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* PARÂMETRO */}
           <div>
             <Label className="text-foreground">Parâmetro</Label>
             {getParametrosByLocalCategoria(form.local_nc, form.categoria_nc).length > 0 ? (
-              <select
-                value={form.parametro_nc}
-                onChange={e => onFormChange({ ...form, parametro_nc: e.target.value })}
+              <Select
+                value={form.parametro_nc || ""}
+                onValueChange={value => onFormChange({ ...form, parametro_nc: value })}
                 disabled={!form.categoria_nc}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground disabled:opacity-50"
               >
-                <option value="">Selecione o parâmetro</option>
-                {getParametrosByLocalCategoria(form.local_nc, form.categoria_nc).map(p => (
-                  <option key={p} value={p}>{p}</option>
-                ))}
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o parâmetro" />
+                </SelectTrigger>
+                <SelectContent title="Selecione o parâmetro">
+                  {getParametrosByLocalCategoria(form.local_nc, form.categoria_nc).map(p => (
+                    <SelectItem key={p} value={p}>{p}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             ) : (
               <Input
                 value={form.parametro_nc}

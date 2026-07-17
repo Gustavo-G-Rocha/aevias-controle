@@ -1,6 +1,7 @@
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function EnsaioTaxaMRAFDadosGerais({
   formData,
@@ -14,15 +15,18 @@ export default function EnsaioTaxaMRAFDadosGerais({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <Label>Obra *</Label>
-          <select
-            value={formData.obra_id}
-            onChange={e => onFieldChange('obra_id', e.target.value)}
+          <Select
+            value={formData.obra_id || ""}
+            onValueChange={value => onFieldChange('obra_id', value)}
             disabled={!isEditable}
-            className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           >
-            <option value="">Selecione a obra</option>
-            {obras.map(o => <option key={o.id} value={o.id}>{o.name} - {o.code}</option>)}
-          </select>
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione a obra" />
+            </SelectTrigger>
+            <SelectContent title="Selecione a obra">
+              {obras.map(o => <SelectItem key={o.id} value={o.id}>{o.name} - {o.code}</SelectItem>)}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <Label>Data do Ensaio *</Label>
@@ -44,17 +48,20 @@ export default function EnsaioTaxaMRAFDadosGerais({
         </div>
         <div>
           <Label>Rodovia</Label>
-          <select
-            value={formData.rodovia}
-            onChange={e => onFieldChange('rodovia', e.target.value)}
+          <Select
+            value={formData.rodovia || ""}
+            onValueChange={value => onFieldChange('rodovia', value)}
             disabled={!isEditable}
-            className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           >
-            <option value="">Selecione a rodovia</option>
-            {obras.find(o => o.id === formData.obra_id)?.rodovias?.map((r, i) => (
-              <option key={i} value={r}>{r}</option>
-            ))}
-          </select>
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione a rodovia" />
+            </SelectTrigger>
+            <SelectContent title="Selecione a rodovia">
+              {obras.find(o => o.id === formData.obra_id)?.rodovias?.map((r, i) => (
+                <SelectItem key={i} value={r}>{r}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <Label>Trecho</Label>
@@ -115,16 +122,19 @@ export default function EnsaioTaxaMRAFDadosGerais({
         </div>
         <div>
           <Label>Ensaio Realizado Por</Label>
-          <select
-            value={formData.ensaio_realizado_por}
-            onChange={e => onFieldChange('ensaio_realizado_por', e.target.value)}
+          <Select
+            value={formData.ensaio_realizado_por || ""}
+            onValueChange={value => onFieldChange('ensaio_realizado_por', value)}
             disabled={!isEditable}
-            className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           >
-            <option value="">Selecione</option>
-            <option value="Afirma Evias">Afirma Evias</option>
-            <option value="Empreiteira">Empreiteira</option>
-          </select>
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione" />
+            </SelectTrigger>
+            <SelectContent title="Ensaio Realizado Por">
+              <SelectItem value="Afirma Evias">Afirma Evias</SelectItem>
+              <SelectItem value="Empreiteira">Empreiteira</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <Label>Taxa Mínima do Projeto (kg/m²)</Label>

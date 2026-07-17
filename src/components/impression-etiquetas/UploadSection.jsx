@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Upload, Loader } from 'lucide-react';
 import { getDescricaoColunas } from '@/utils/impressionEtiquetasUtils';
 
@@ -19,14 +20,15 @@ export default function UploadSection({
 
         <div className="bg-card rounded-lg shadow-lg border border-border p-6 mb-6">
           <span className="block text-sm font-semibold text-foreground mb-2">Tipo de Etiqueta</span>
-          <select
-            value={tipoEtiqueta}
-            onChange={(e) => onTipoChange(e.target.value)}
-            className="flex h-10 w-full max-w-xs rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-          >
-            <option value="coleta">Etiqueta de Coleta</option>
-            <option value="umidade">Etiqueta de Umidade</option>
-          </select>
+          <Select value={tipoEtiqueta} onValueChange={onTipoChange}>
+            <SelectTrigger className="max-w-xs">
+              <SelectValue placeholder="Tipo de Etiqueta" />
+            </SelectTrigger>
+            <SelectContent title="Tipo de Etiqueta">
+              <SelectItem value="coleta">Etiqueta de Coleta</SelectItem>
+              <SelectItem value="umidade">Etiqueta de Umidade</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="bg-card rounded-lg shadow-lg border border-border p-8">

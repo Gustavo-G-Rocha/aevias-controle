@@ -2,6 +2,7 @@ import React from "react";
 import { Search } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function GestaoNCFilters({
   filtroTexto,
@@ -25,29 +26,37 @@ export default function GestaoNCFilters({
               className="pl-9"
             />
           </div>
-          <select
-            value={filtroObra}
-            onChange={(e) => setFiltroObra(e.target.value)}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+          <Select
+            value={filtroObra || "__all__"}
+            onValueChange={(value) => setFiltroObra(value === "__all__" ? "" : value)}
           >
-            <option value="">Todas as Obras</option>
-            {obras.map((o) => (
-              <option key={o.id} value={o.id}>
-                {o.name}
-              </option>
-            ))}
-          </select>
-          <select
-            value={filtroStatus}
-            onChange={(e) => setFiltroStatus(e.target.value)}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+            <SelectTrigger>
+              <SelectValue placeholder="Todas as Obras" />
+            </SelectTrigger>
+            <SelectContent title="Filtrar por obra">
+              <SelectItem value="__all__">Todas as Obras</SelectItem>
+              {obras.map((o) => (
+                <SelectItem key={o.id} value={o.id}>
+                  {o.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={filtroStatus || "__all__"}
+            onValueChange={(value) => setFiltroStatus(value === "__all__" ? "" : value)}
           >
-            <option value="">Todos os Status</option>
-            <option value="aberta">Aberta</option>
-            <option value="em_tratativa">Em Tratativa</option>
-            <option value="encerrada">Finalizada</option>
-            <option value="cancelada">Cancelada</option>
-          </select>
+            <SelectTrigger>
+              <SelectValue placeholder="Todos os Status" />
+            </SelectTrigger>
+            <SelectContent title="Filtrar por status">
+              <SelectItem value="__all__">Todos os Status</SelectItem>
+              <SelectItem value="aberta">Aberta</SelectItem>
+              <SelectItem value="em_tratativa">Em Tratativa</SelectItem>
+              <SelectItem value="encerrada">Finalizada</SelectItem>
+              <SelectItem value="cancelada">Cancelada</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </CardContent>
     </Card>

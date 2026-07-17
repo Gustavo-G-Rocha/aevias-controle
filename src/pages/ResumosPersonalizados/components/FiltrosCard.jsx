@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Filter, Loader2 } from "lucide-react";
 import { TIPOS_ENSAIO } from "../constants/camposPorTipo";
 
@@ -25,38 +26,36 @@ export default function FiltrosCard({
         {/* Obra */}
         <div>
           <Label htmlFor="obra" className="text-foreground">Obra *</Label>
-          <select
-            id="obra"
-            value={obraId}
-            onChange={(e) => onObraChange(e.target.value)}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
-          >
-            <option value="">Selecione uma obra</option>
-            {obras.map(obra => {
-              const regional = regionais.find(r => r.id === obra.regional_id);
-              return (
-                <option key={obra.id} value={obra.id}>
-                  {obra.name} - {obra.code} {regional && `(${regional.nome})`}
-                </option>
-              );
-            })}
-          </select>
+          <Select value={obraId || ""} onValueChange={onObraChange}>
+            <SelectTrigger id="obra">
+              <SelectValue placeholder="Selecione uma obra" />
+            </SelectTrigger>
+            <SelectContent title="Selecione uma obra">
+              {obras.map(obra => {
+                const regional = regionais.find(r => r.id === obra.regional_id);
+                return (
+                  <SelectItem key={obra.id} value={obra.id}>
+                    {obra.name} - {obra.code} {regional && `(${regional.nome})`}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Tipo de Ensaio */}
         <div>
           <Label htmlFor="tipoEnsaio" className="text-foreground">Tipo de Ensaio *</Label>
-          <select
-            id="tipoEnsaio"
-            value={tipoEnsaioSelecionado}
-            onChange={(e) => onTipoChange(e.target.value)}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
-          >
-            <option value="">Selecione um tipo de ensaio</option>
-            {TIPOS_ENSAIO.map(tipo => (
-              <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
-            ))}
-          </select>
+          <Select value={tipoEnsaioSelecionado || ""} onValueChange={onTipoChange}>
+            <SelectTrigger id="tipoEnsaio">
+              <SelectValue placeholder="Selecione um tipo de ensaio" />
+            </SelectTrigger>
+            <SelectContent title="Tipo de Ensaio">
+              {TIPOS_ENSAIO.map(tipo => (
+                <SelectItem key={tipo.value} value={tipo.value}>{tipo.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Período */}
@@ -81,17 +80,20 @@ export default function FiltrosCard({
         {laboratoristas.length > 0 && (
           <div>
             <Label htmlFor="laboratorista" className="text-foreground">Laboratorista</Label>
-            <select
-              id="laboratorista"
-              value={laboratoristaFiltro}
-              onChange={(e) => onLaboratoristaChange(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+            <Select
+              value={laboratoristaFiltro || "__all__"}
+              onValueChange={(value) => onLaboratoristaChange(value === "__all__" ? "" : value)}
             >
-              <option value="">Todos</option>
-              {laboratoristas.map(lab => (
-                <option key={lab} value={lab}>{lab}</option>
-              ))}
-            </select>
+              <SelectTrigger id="laboratorista">
+                <SelectValue placeholder="Todos" />
+              </SelectTrigger>
+              <SelectContent title="Laboratorista">
+                <SelectItem value="__all__">Todos</SelectItem>
+                {laboratoristas.map(lab => (
+                  <SelectItem key={lab} value={lab}>{lab}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
 

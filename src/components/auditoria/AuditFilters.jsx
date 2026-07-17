@@ -3,6 +3,7 @@ import { Filter, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const EVENT_TYPE_OPTIONS = [
   { value: "", label: "Todos os eventos" },
@@ -47,15 +48,19 @@ export default function AuditFilters({ filters, onChange, onClear }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="space-y-1">
           <Label className="text-xs text-slate-500">Tipo de Evento</Label>
-          <select
-            value={filters.operation || ""}
-            onChange={(e) => update("operation", e.target.value)}
-            className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-300"
+          <Select
+            value={filters.operation || "__all__"}
+            onValueChange={(value) => update("operation", value === "__all__" ? "" : value)}
           >
-            {EVENT_TYPE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
+            <SelectTrigger className="h-9 min-h-9 bg-white text-slate-700">
+              <SelectValue placeholder="Todos os eventos" />
+            </SelectTrigger>
+            <SelectContent title="Tipo de Evento">
+              {EVENT_TYPE_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value || "__all__"} value={opt.value || "__all__"}>{opt.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-1">

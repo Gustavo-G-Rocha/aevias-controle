@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { CopyIdButton } from "./CopyIdButton";
 
@@ -29,16 +30,16 @@ export function DadosObraSection({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label className="text-foreground">Obra *</Label>
-            <select
-              value={obraId}
-              onChange={e => onObraChange(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
-            >
-              <option value="">Selecione a obra</option>
-              {obras.map(o => (
-                <option key={o.id} value={o.id}>{o.name} ({o.code})</option>
-              ))}
-            </select>
+            <Select value={obraId || ""} onValueChange={onObraChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione a obra" />
+              </SelectTrigger>
+              <SelectContent title="Selecione a obra">
+                {obras.map(o => (
+                  <SelectItem key={o.id} value={o.id}>{o.name} ({o.code})</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Label className="text-foreground">Cliente</Label>
@@ -76,20 +77,24 @@ export function DadosObraSection({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label className="text-foreground">Tipo de Registro (referência)</Label>
-              <select
-                value={tipoChecklist}
-                onChange={e => onTipoChecklistChange(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+              <Select
+                value={tipoChecklist || "__none__"}
+                onValueChange={(value) => onTipoChecklistChange(value === "__none__" ? "" : value)}
               >
-                <option value="">Nenhum</option>
-                <option value="DiarioObra">Diário de Obra</option>
-                <option value="ChecklistUsina">Checklist de Usina</option>
-                <option value="ChecklistAplicacao">Checklist de Aplicação</option>
-                <option value="ChecklistMRAF">Checklist MRAF</option>
-                <option value="ChecklistConcretagem">Checklist de Concretagem</option>
-                <option value="ChecklistTerraplanagem">Checklist de Terraplanagem</option>
-                <option value="ChecklistReciclagem">Checklist de Reciclagem</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Nenhum" />
+                </SelectTrigger>
+                <SelectContent title="Tipo de Registro">
+                  <SelectItem value="__none__">Nenhum</SelectItem>
+                  <SelectItem value="DiarioObra">Diário de Obra</SelectItem>
+                  <SelectItem value="ChecklistUsina">Checklist de Usina</SelectItem>
+                  <SelectItem value="ChecklistAplicacao">Checklist de Aplicação</SelectItem>
+                  <SelectItem value="ChecklistMRAF">Checklist MRAF</SelectItem>
+                  <SelectItem value="ChecklistConcretagem">Checklist de Concretagem</SelectItem>
+                  <SelectItem value="ChecklistTerraplanagem">Checklist de Terraplanagem</SelectItem>
+                  <SelectItem value="ChecklistReciclagem">Checklist de Reciclagem</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             {tipoChecklist && (
               <div>

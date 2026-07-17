@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, MapPin, Search, Loader2, ArrowLeftRight } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 import { useRegionaisData } from "@/hooks/useRegionaisData";
 import { useRegionaisFilters } from "@/hooks/useRegionaisFilters";
@@ -102,18 +103,18 @@ export default function RegionaisPage() {
                 />
               </div>
               <div className="w-full md:w-48">
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full h-10 px-3 py-2 rounded-md text-sm"
-                  style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}
-                >
-                  <option value="all">Todas as Obras</option>
-                  <option value="planejamento">Planejamento</option>
-                  <option value="em_andamento">Em Andamento</option>
-                  <option value="concluida">Concluída</option>
-                  <option value="pausada">Pausada</option>
-                </select>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}>
+                    <SelectValue placeholder="Todas as Obras" />
+                  </SelectTrigger>
+                  <SelectContent title="Filtrar por status">
+                    <SelectItem value="all">Todas as Obras</SelectItem>
+                    <SelectItem value="planejamento">Planejamento</SelectItem>
+                    <SelectItem value="em_andamento">Em Andamento</SelectItem>
+                    <SelectItem value="concluida">Concluída</SelectItem>
+                    <SelectItem value="pausada">Pausada</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </CardContent>

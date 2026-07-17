@@ -9,6 +9,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function DadosObraSection({
   formData,
@@ -40,32 +41,38 @@ export default function DadosObraSection({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <Label htmlFor="obra_id">Obra *</Label>
-            <select id="obra_id" value={formData.obra_id}
-              onChange={(e) => onObra(e.target.value)}
-              required disabled={!canEdit || !!editingEnsaio?.id}
-              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm">
-              <option value="">Selecione a obra</option>
-              {obras.map(obra => {
-                const regional = regionais.find(r => r.id === obra.regional_id);
-                return (
-                  <option key={obra.id} value={obra.id}>
-                    {obra.name} - {obra.code}{regional ? ` (${regional.nome})` : ''}
-                  </option>
-                );
-              })}
-            </select>
+            <Select value={formData.obra_id || ""}
+              onValueChange={onObra}
+              disabled={!canEdit || !!editingEnsaio?.id}>
+              <SelectTrigger id="obra_id">
+                <SelectValue placeholder="Selecione a obra" />
+              </SelectTrigger>
+              <SelectContent title="Selecione a obra">
+                {obras.map(obra => {
+                  const regional = regionais.find(r => r.id === obra.regional_id);
+                  return (
+                    <SelectItem key={obra.id} value={obra.id}>
+                      {obra.name} - {obra.code}{regional ? ` (${regional.nome})` : ''}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Label htmlFor="project_id">Projeto CAUQ</Label>
-            <select id="project_id" value={formData.project_id}
-              onChange={(e) => onProject(e.target.value)}
-              disabled={!canEdit || !formData.obra_id}
-              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm">
-              <option value="">Selecione um projeto</option>
-              {projetosCAUQ.map(proj => (
-                <option key={proj.id} value={proj.id}>{proj.name}</option>
-              ))}
-            </select>
+            <Select value={formData.project_id || ""}
+              onValueChange={onProject}
+              disabled={!canEdit || !formData.obra_id}>
+              <SelectTrigger id="project_id">
+                <SelectValue placeholder="Selecione um projeto" />
+              </SelectTrigger>
+              <SelectContent title="Projeto CAUQ">
+                {projetosCAUQ.map(proj => (
+                  <SelectItem key={proj.id} value={proj.id}>{proj.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -104,13 +111,16 @@ export default function DadosObraSection({
           <div>
             <Label htmlFor="rodovia">Rodovia</Label>
             {rodoviasDisponiveis.length > 0 ? (
-              <select id="rodovia" value={formData.rodovia}
-                onChange={(e) => onChange('rodovia', e.target.value)}
-                disabled={!canEdit}
-                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm">
-                <option value="">Selecione a rodovia</option>
-                {rodoviasDisponiveis.map((r, i) => <option key={i} value={r}>{r}</option>)}
-              </select>
+              <Select value={formData.rodovia || ""}
+                onValueChange={(value) => onChange('rodovia', value)}
+                disabled={!canEdit}>
+                <SelectTrigger id="rodovia">
+                  <SelectValue placeholder="Selecione a rodovia" />
+                </SelectTrigger>
+                <SelectContent title="Selecione a rodovia">
+                  {rodoviasDisponiveis.map((r, i) => <SelectItem key={i} value={r}>{r}</SelectItem>)}
+                </SelectContent>
+              </Select>
             ) : (
               <Input id="rodovia" value={formData.rodovia}
                 onChange={(e) => onChange('rodovia', e.target.value)}
@@ -135,13 +145,16 @@ export default function DadosObraSection({
           <div>
             <Label htmlFor="usina_fornecedora">Usina Fornecedora</Label>
             {usinasDisponiveis.length > 0 ? (
-              <select id="usina_fornecedora" value={formData.usina_fornecedora}
-                onChange={(e) => onChange('usina_fornecedora', e.target.value)}
-                disabled={!canEdit}
-                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm">
-                <option value="">Selecione a usina</option>
-                {usinasDisponiveis.map((u, i) => <option key={i} value={u}>{u}</option>)}
-              </select>
+              <Select value={formData.usina_fornecedora || ""}
+                onValueChange={(value) => onChange('usina_fornecedora', value)}
+                disabled={!canEdit}>
+                <SelectTrigger id="usina_fornecedora">
+                  <SelectValue placeholder="Selecione a usina" />
+                </SelectTrigger>
+                <SelectContent title="Usina Fornecedora">
+                  {usinasDisponiveis.map((u, i) => <SelectItem key={i} value={u}>{u}</SelectItem>)}
+                </SelectContent>
+              </Select>
             ) : (
               <Input id="usina_fornecedora" value={formData.usina_fornecedora}
                 onChange={(e) => onChange('usina_fornecedora', e.target.value)}
@@ -185,13 +198,17 @@ export default function DadosObraSection({
           </div>
           <div>
             <Label htmlFor="ensaio_realizado_por">Ensaio realizado por</Label>
-            <select id="ensaio_realizado_por" value={formData.ensaio_realizado_por}
-              onChange={(e) => onChange('ensaio_realizado_por', e.target.value)}
-              disabled={!canEdit}
-              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm">
-              <option value="Afirma Evias">Afirma Evias</option>
-              <option value="Empreiteira">Empreiteira</option>
-            </select>
+            <Select value={formData.ensaio_realizado_por || ""}
+              onValueChange={(value) => onChange('ensaio_realizado_por', value)}
+              disabled={!canEdit}>
+              <SelectTrigger id="ensaio_realizado_por">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent title="Ensaio realizado por">
+                <SelectItem value="Afirma Evias">Afirma Evias</SelectItem>
+                <SelectItem value="Empreiteira">Empreiteira</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 

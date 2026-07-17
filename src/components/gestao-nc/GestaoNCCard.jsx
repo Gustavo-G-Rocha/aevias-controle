@@ -4,6 +4,7 @@ import { Eye, CheckCircle, XCircle, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createPageUrl } from "@/utils";
 import {
   STATUS_COLORS,
@@ -115,16 +116,20 @@ const GestaoNCCard = React.memo(function GestaoNCCard({
               <div className="flex flex-col gap-1">
                 {canChangeStatus ? (
                   <>
-                    <select
+                    <Select
                       value={nc.status || "aberta"}
-                      onChange={(e) => onUpdateStatus(nc.id, e.target.value, false)}
-                      className="h-8 rounded-md border border-input bg-background px-2 text-xs text-foreground cursor-pointer"
+                      onValueChange={(value) => onUpdateStatus(nc.id, value, false)}
                     >
-                      <option value="aberta">Aberta</option>
-                      <option value="em_tratativa">Em Tratativa</option>
-                      <option value="encerrada">Finalizada</option>
-                      <option value="cancelada">Cancelada</option>
-                    </select>
+                      <SelectTrigger className="h-8 min-h-8 px-2 text-xs">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent title="Status da NC">
+                        <SelectItem value="aberta">Aberta</SelectItem>
+                        <SelectItem value="em_tratativa">Em Tratativa</SelectItem>
+                        <SelectItem value="encerrada">Finalizada</SelectItem>
+                        <SelectItem value="cancelada">Cancelada</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <Badge className="bg-green-100 text-green-700 text-center text-xs gap-1">
                       <CheckCircle className="w-3 h-3" />
                       Aprovada pelo Cliente

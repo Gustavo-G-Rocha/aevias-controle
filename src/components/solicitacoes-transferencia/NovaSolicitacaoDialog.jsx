@@ -2,6 +2,7 @@ import React, { useState, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DialogFooter } from "@/components/ui/dialog";
 import { getRegionaisDisponiveis, validateNovasolicitacao } from "@/utils/solicitacoesTransferenciaUtils";
@@ -51,20 +52,21 @@ export const NovaSolicitacaoDialog = React.memo(({ isOpen, onClose, onSubmit, re
 
           <div>
             <Label htmlFor="regional_destino">Regional de Destino *</Label>
-            <select
-              id="regional_destino"
-              value={formData.regional_destino_id}
-              onChange={(e) => setFormData(prev => ({ ...prev, regional_destino_id: e.target.value }))}
-              required
-              className="flex h-10 w-full rounded-md border border-border bg-card px-3 py-2 text-sm"
+            <Select
+              value={formData.regional_destino_id || ""}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, regional_destino_id: value }))}
             >
-              <option value="">Selecione a regional de destino</option>
-              {regionaisDisponiveis.map(regional => (
-                <option key={regional.id} value={regional.id}>
-                  {regional.nome} {regional.estado && `(${regional.estado})`}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger id="regional_destino">
+                <SelectValue placeholder="Selecione a regional de destino" />
+              </SelectTrigger>
+              <SelectContent title="Regional de Destino">
+                {regionaisDisponiveis.map(regional => (
+                  <SelectItem key={regional.id} value={regional.id}>
+                    {regional.nome} {regional.estado && `(${regional.estado})`}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>

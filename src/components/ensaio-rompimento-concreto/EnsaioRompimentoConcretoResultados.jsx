@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, X } from 'lucide-react';
 import { DIMENSOES_CP, IDADES_CP } from '@/utils/ensaioRompimentoConcretoUtils';
 
@@ -46,15 +47,24 @@ export default function EnsaioRompimentoConcretoResultados({
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4 p-3 bg-muted/20 rounded-lg border border-border">
                   <LabeledFieldSm id={`serie-${serieIdx}-idade`} label="Idade (dias)">
-                    <select value={serie.idade} onChange={(e) => onUpdateSerie(serieIdx, 'idade', e.target.value)} className="w-full px-2 py-1 border border-border rounded bg-input  text-sm h-8">
-                      <option value="">Selecionar...</option>
-                      {IDADES_CP.map(d => <option key={d} value={d}>{d} dias</option>)}
-                    </select>
+                    <Select value={serie.idade ? String(serie.idade) : ""} onValueChange={(value) => onUpdateSerie(serieIdx, 'idade', value)}>
+                      <SelectTrigger className="h-8 min-h-8 px-2 text-sm">
+                        <SelectValue placeholder="Selecionar..." />
+                      </SelectTrigger>
+                      <SelectContent title="Idade (dias)">
+                        {IDADES_CP.map(d => <SelectItem key={d} value={String(d)}>{d} dias</SelectItem>)}
+                      </SelectContent>
+                    </Select>
                   </LabeledFieldSm>
                   <LabeledFieldSm id={`serie-${serieIdx}-dimensao`} label="Dimensão">
-                    <select value={serie.dimensao} onChange={(e) => onUpdateSerie(serieIdx, 'dimensao', e.target.value)} className="w-full px-2 py-1 border border-border rounded bg-input  text-sm h-8">
-                      {DIMENSOES_CP.map(d => <option key={d} value={d}>{d}</option>)}
-                    </select>
+                    <Select value={serie.dimensao || ""} onValueChange={(value) => onUpdateSerie(serieIdx, 'dimensao', value)}>
+                      <SelectTrigger className="h-8 min-h-8 px-2 text-sm">
+                        <SelectValue placeholder="Selecionar..." />
+                      </SelectTrigger>
+                      <SelectContent title="Dimensão">
+                        {DIMENSOES_CP.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
                   </LabeledFieldSm>
                   <LabeledFieldSm id={`serie-${serieIdx}-data_ruptura`} label="Data Ruptura">
                     <Input value={serie.data_ruptura} readOnly className="bg-input border-border  h-8 text-sm opacity-70 cursor-not-allowed" title="Calculada automaticamente pela idade + data do ensaio" />
@@ -115,10 +125,14 @@ export default function EnsaioRompimentoConcretoResultados({
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4 p-3 bg-muted/20 rounded-lg border border-border">
                   <LabeledFieldSm id={`fx-${serieIdx}-idade`} label="Idade (dias)">
-                    <select value={serie.idade} onChange={(e) => onUpdateSerieFlexao(serieIdx, 'idade', e.target.value)} className="w-full px-2 py-1 border border-border rounded bg-input  text-sm h-8">
-                      <option value="">Selecionar...</option>
-                      {IDADES_CP.map(d => <option key={d} value={d}>{d} dias</option>)}
-                    </select>
+                    <Select value={serie.idade ? String(serie.idade) : ""} onValueChange={(value) => onUpdateSerieFlexao(serieIdx, 'idade', value)}>
+                      <SelectTrigger className="h-8 min-h-8 px-2 text-sm">
+                        <SelectValue placeholder="Selecionar..." />
+                      </SelectTrigger>
+                      <SelectContent title="Idade (dias)">
+                        {IDADES_CP.map(d => <SelectItem key={d} value={String(d)}>{d} dias</SelectItem>)}
+                      </SelectContent>
+                    </Select>
                   </LabeledFieldSm>
                   <LabeledFieldSm id={`fx-${serieIdx}-data_ruptura`} label="Data Ruptura">
                     <Input value={serie.data_ruptura} readOnly className="bg-input border-border  h-8 text-sm opacity-70 cursor-not-allowed" title="Calculada automaticamente" />
@@ -142,11 +156,15 @@ export default function EnsaioRompimentoConcretoResultados({
                           <Input value={cp.numero_cp} onChange={(e) => onUpdateSerieFlexaoCP(serieIdx, cpIdx, 'numero_cp', e.target.value)} className="bg-input border-border  h-8 text-sm" />
                         </LabeledFieldSm>
                         <LabeledFieldSm id={`fx-s${serieIdx}-cp${cpIdx}-ponto_ruptura`} label="Ponto de Ruptura">
-                          <select value={cp.ponto_ruptura || ''} onChange={(e) => onUpdateSerieFlexaoCP(serieIdx, cpIdx, 'ponto_ruptura', e.target.value)} className="w-full px-2 py-1 border border-border rounded bg-input  text-sm h-8">
-                            <option value="">Selecionar...</option>
-                            <option value="No terço médio">No terço médio</option>
-                            <option value="Fora do terço médio">Fora do terço médio</option>
-                          </select>
+                          <Select value={cp.ponto_ruptura || ""} onValueChange={(value) => onUpdateSerieFlexaoCP(serieIdx, cpIdx, 'ponto_ruptura', value)}>
+                            <SelectTrigger className="h-8 min-h-8 px-2 text-sm">
+                              <SelectValue placeholder="Selecionar..." />
+                            </SelectTrigger>
+                            <SelectContent title="Ponto de Ruptura">
+                              <SelectItem value="No terço médio">No terço médio</SelectItem>
+                              <SelectItem value="Fora do terço médio">Fora do terço médio</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </LabeledFieldSm>
                         <LabeledFieldSm id={`fx-s${serieIdx}-cp${cpIdx}-carga_ruptura`} label="Carga Ruptura (kgf)">
                           <Input type="number" step="0.01" value={cp.carga_ruptura} onChange={(e) => onUpdateSerieFlexaoCP(serieIdx, cpIdx, 'carga_ruptura', e.target.value)} className="bg-input border-border  h-8 text-sm" />

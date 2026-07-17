@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { listarUsuarios } from "@/services/usuariosService";
 
 export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obras, regionais, isEditable, handleGlobalDataChange, handleProctorChange, projects = [] }) {
@@ -56,36 +57,39 @@ export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obra
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <Label htmlFor="obra_id">Obra *</Label>
-            <select
-              id="obra_id"
-              value={formData.obra_id}
-              onChange={(e) => handleObraChange(e.target.value)}
+            <Select
+              value={formData.obra_id || ""}
+              onValueChange={handleObraChange}
               disabled={!isEditable}
-              required
-              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
             >
-              <option value="">Selecione a obra</option>
-              {obras.map(obra => (
-                <option key={obra.id} value={obra.id}>{obra.name} - {obra.code}</option>
-              ))}
-            </select>
+              <SelectTrigger id="obra_id">
+                <SelectValue placeholder="Selecione a obra" />
+              </SelectTrigger>
+              <SelectContent title="Selecione a obra">
+                {obras.map(obra => (
+                  <SelectItem key={obra.id} value={obra.id}>{obra.name} - {obra.code}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {projetosBGS.length > 0 && (
             <div>
               <Label htmlFor="project_id">Projeto BGS / Camadas Granulares (opcional)</Label>
-              <select
-                id="project_id"
-                value={formData.project_id || ''}
-                onChange={(e) => handleProjectChange(e.target.value)}
+              <Select
+                value={formData.project_id || ""}
+                onValueChange={handleProjectChange}
                 disabled={!isEditable}
-                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
               >
-                <option value="">Selecione o projeto</option>
-                {projetosBGS.map(p => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
+                <SelectTrigger id="project_id">
+                  <SelectValue placeholder="Selecione o projeto" />
+                </SelectTrigger>
+                <SelectContent title="Selecione o projeto">
+                  {projetosBGS.map(p => (
+                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <p className="text-xs text-muted-foreground mt-1">Preenche automaticamente a densidade seca máxima do Proctor</p>
             </div>
           )}
@@ -115,18 +119,20 @@ export default function EnsaioDensidadeDadosGerais({ formData, setFormData, obra
 
           <div>
             <Label htmlFor="rodovia">Rodovia</Label>
-            <select
-              id="rodovia"
-              value={formData.rodovia}
-              onChange={(e) => setFormData(prev => ({ ...prev, rodovia: e.target.value }))}
+            <Select
+              value={formData.rodovia || ""}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, rodovia: value }))}
               disabled={!isEditable || !formData.obra_id}
-              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
             >
-              <option value="">Selecione a rodovia</option>
-              {obras.find(o => o.id === formData.obra_id)?.rodovias?.map((rodovia, idx) => (
-                <option key={idx} value={rodovia}>{rodovia}</option>
-              ))}
-            </select>
+              <SelectTrigger id="rodovia">
+                <SelectValue placeholder="Selecione a rodovia" />
+              </SelectTrigger>
+              <SelectContent title="Selecione a rodovia">
+                {obras.find(o => o.id === formData.obra_id)?.rodovias?.map((rodovia, idx) => (
+                  <SelectItem key={idx} value={rodovia}>{rodovia}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>

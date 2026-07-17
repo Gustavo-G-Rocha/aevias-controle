@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
 
 export default function ProjectsFiltersBar({
@@ -22,18 +23,19 @@ export default function ProjectsFiltersBar({
               className="pl-10 bg-transparent border-white/20 placeholder:text-foreground/60 focus:border-secondary/30 focus:ring-[#BFCF99] text-foreground"
             />
           </div>
-          <select
-            value={tipoFilter}
-            onChange={(e) => onTipoChange(e.target.value)}
-            className="h-10 rounded-md border border-white/20 bg-card/30 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-[#BFCF99]"
-          >
-            <option value="all">Todos os tipos</option>
-            <option value="CAUQ">CAUQ</option>
-            <option value="MRAF">MRAF</option>
-            <option value="BGS">BGS</option>
-            <option value="CARTA_TRACO_CONCRETO">Carta Traço Concreto</option>
-            <option value="CAMADAS_GRANULARES">Camadas Granulares</option>
-          </select>
+          <Select value={tipoFilter} onValueChange={onTipoChange}>
+            <SelectTrigger className="md:w-56 border-white/20 bg-card/30 text-foreground">
+              <SelectValue placeholder="Todos os tipos" />
+            </SelectTrigger>
+            <SelectContent title="Filtrar por tipo">
+              <SelectItem value="all">Todos os tipos</SelectItem>
+              <SelectItem value="CAUQ">CAUQ</SelectItem>
+              <SelectItem value="MRAF">MRAF</SelectItem>
+              <SelectItem value="BGS">BGS</SelectItem>
+              <SelectItem value="CARTA_TRACO_CONCRETO">Carta Traço Concreto</SelectItem>
+              <SelectItem value="CAMADAS_GRANULARES">Camadas Granulares</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </CardContent>
     </Card>

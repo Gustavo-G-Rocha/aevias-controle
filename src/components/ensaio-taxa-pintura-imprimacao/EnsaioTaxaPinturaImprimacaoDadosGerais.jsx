@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function EnsaioTaxaPinturaImprimacaoDadosGerais({
   formData,
@@ -21,19 +22,20 @@ export default function EnsaioTaxaPinturaImprimacaoDadosGerais({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <Label htmlFor="obra_id">Obra *</Label>
-            <select
-              id="obra_id"
-              value={formData.obra_id}
-              onChange={(e) => onObraChange(e.target.value)}
+            <Select
+              value={formData.obra_id || ""}
+              onValueChange={onObraChange}
               disabled={!isEditable}
-              required
-              className="flex h-10 w-full rounded-md border border-border bg-input px-3 py-2 text-sm"
             >
-              <option value="">Selecione a obra</option>
-              {obras.map(obra => (
-                <option key={obra.id} value={obra.id}>{obra.name} - {obra.code}</option>
-              ))}
-            </select>
+              <SelectTrigger id="obra_id">
+                <SelectValue placeholder="Selecione a obra" />
+              </SelectTrigger>
+              <SelectContent title="Selecione a obra">
+                {obras.map(obra => (
+                  <SelectItem key={obra.id} value={obra.id}>{obra.name} - {obra.code}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
@@ -50,33 +52,37 @@ export default function EnsaioTaxaPinturaImprimacaoDadosGerais({
 
           <div>
             <Label htmlFor="tipo_servico">Tipo de Serviço *</Label>
-            <select
-              id="tipo_servico"
-              value={formData.tipo_servico}
-              onChange={(e) => onFieldChange('tipo_servico', e.target.value)}
+            <Select
+              value={formData.tipo_servico || ""}
+              onValueChange={(value) => onFieldChange('tipo_servico', value)}
               disabled={!isEditable}
-              required
-              className="flex h-10 w-full rounded-md border border-border bg-input px-3 py-2 text-sm"
             >
-              <option value="imprimacao">Imprimação</option>
-              <option value="ligacao">Ligação</option>
-            </select>
+              <SelectTrigger id="tipo_servico">
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+              <SelectContent title="Tipo de Serviço">
+                <SelectItem value="imprimacao">Imprimação</SelectItem>
+                <SelectItem value="ligacao">Ligação</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
             <Label htmlFor="rodovia">Rodovia</Label>
-            <select
-              id="rodovia"
-              value={formData.rodovia}
-              onChange={(e) => onFieldChange('rodovia', e.target.value)}
+            <Select
+              value={formData.rodovia || ""}
+              onValueChange={(value) => onFieldChange('rodovia', value)}
               disabled={!isEditable || !formData.obra_id}
-              className="flex h-10 w-full rounded-md border border-border bg-input px-3 py-2 text-sm"
             >
-              <option value="">Selecione a rodovia</option>
-              {rodoviasDaObra.map((rodovia, idx) => (
-                <option key={idx} value={rodovia}>{rodovia}</option>
-              ))}
-            </select>
+              <SelectTrigger id="rodovia">
+                <SelectValue placeholder="Selecione a rodovia" />
+              </SelectTrigger>
+              <SelectContent title="Selecione a rodovia">
+                {rodoviasDaObra.map((rodovia, idx) => (
+                  <SelectItem key={idx} value={rodovia}>{rodovia}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
@@ -114,16 +120,19 @@ export default function EnsaioTaxaPinturaImprimacaoDadosGerais({
 
           <div>
             <Label htmlFor="ensaio_realizado_por">Ensaio realizado por:</Label>
-            <select
-              id="ensaio_realizado_por"
-              value={formData.ensaio_realizado_por}
-              onChange={(e) => onFieldChange('ensaio_realizado_por', e.target.value)}
+            <Select
+              value={formData.ensaio_realizado_por || ""}
+              onValueChange={(value) => onFieldChange('ensaio_realizado_por', value)}
               disabled={!isEditable}
-              className="flex h-10 w-full rounded-md border border-border bg-input px-3 py-2 text-sm"
             >
-              <option value="Afirma Evias">Afirma Evias</option>
-              <option value="Empreiteira">Empreiteira</option>
-            </select>
+              <SelectTrigger id="ensaio_realizado_por">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent title="Ensaio realizado por">
+                <SelectItem value="Afirma Evias">Afirma Evias</SelectItem>
+                <SelectItem value="Empreiteira">Empreiteira</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
