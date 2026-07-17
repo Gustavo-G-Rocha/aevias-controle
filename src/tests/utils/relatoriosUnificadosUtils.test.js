@@ -150,8 +150,10 @@ describe("relatoriosUnificadosUtils", () => {
       expect(isFormValid("2026-05-01", "2026-05-31", "obra1", ["Lab1"], "")).toBe(false);
     });
 
-    it("deve falhar sem laboratoristas", () => {
-      expect(isFormValid("2026-05-01", "2026-05-31", "obra1", [], ["DiarioObra"])).toBe(false);
+    it("laboratoristas são opcionais (sem laboratoristas continua válido)", () => {
+      // Regra atual: isFormValid exige datas, obra e tipo — laboratoristas
+      // vazio significa "todos os laboratoristas".
+      expect(isFormValid("2026-05-01", "2026-05-31", "obra1", [], ["DiarioObra"])).toBe(true);
     });
 
     it("deve falhar sem obra", () => {

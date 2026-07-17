@@ -44,25 +44,25 @@ describe('filtrarPorAcesso — filtragem por nível de acesso', () => {
   });
 
   it('sala_tecnica filtra pelas regionais onde é responsável', () => {
-    const user = { email: 'tech@x.com' };
+    const user = { email: 'tech@x.com', access_level: 'sala_tecnica_afirmaevias' };
     const out = filtrarPorAcesso(ensaios, user, 'sala_tecnica_afirmaevias', obras, regionais);
     expect(out.map((e) => e.id)).toEqual(['e1']);
   });
 
   it('gestor_contrato casa por gestor_contrato_responsavel (campo único)', () => {
-    const user = { email: 'gc@x.com' };
+    const user = { email: 'gc@x.com', access_level: 'gestor_contrato' };
     const out = filtrarPorAcesso(ensaios, user, 'gestor_contrato', obras, regionais);
     expect(out.map((e) => e.id)).toEqual(['e1']);
   });
 
   it('gestor_contrato casa por gestores_contrato_responsaveis (array)', () => {
-    const user = { email: 'gc2@x.com' };
+    const user = { email: 'gc2@x.com', access_level: 'gestor_contrato' };
     const out = filtrarPorAcesso(ensaios, user, 'gestor_contrato', obras, regionais);
     expect(out.map((e) => e.id)).toEqual(['e2']);
   });
 
   it('cliente filtra por regional E exige aprovado ou assinado', () => {
-    const user = { email: 'cli@x.com' };
+    const user = { email: 'cli@x.com', access_level: 'cliente' };
     const clienteEnsaios = [
       { id: 'c1', obra_id: 'o1', approved: true },
       { id: 'c2', obra_id: 'o1', approved: null, client_signature: { signed_by: 'cli@x.com' } },

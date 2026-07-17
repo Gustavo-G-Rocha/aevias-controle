@@ -69,7 +69,8 @@ describe("validatePasswordComplexity", () => {
   it("aceita todos os caracteres especiais do conjunto", () => {
     const specials = ["!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "+", "=", "?"];
     for (const s of specials) {
-      const result = validatePasswordComplexity(`Senha1${s}`);
+      // "Senha01" (7 chars) + 1 especial = 8 chars (mínimo exigido)
+      const result = validatePasswordComplexity(`Senha01${s}`);
       expect(result.valid).toBe(true);
     }
   });

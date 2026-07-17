@@ -15,13 +15,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── Mocks de dependências ───────────────────────────────────────────
 // accessControl é importado diretamente pelo hook — mockamos as duas funções usadas.
-vi.mock('@/utils/accessControl', () => ({
-  getUserAccessLevel: vi.fn((user) => {
+vi.mock('@/utils/accessControl', async (importOriginal) => {
+  const actual = await importOriginal();
+  const levelImpl = vi.fn((user) => {
     if (!user) return 'user';
     return user.access_level || (user.role === 'admin' ? 'admin' : 'user');
-  }),
-  getAccessibleObraIds: vi.fn(() => new Set()),
-}));
+  });
+  return {
+    ...actual,
+    getUserAccessLevel: levelImpl,
+    getEffectiveAccessLevel: levelImpl,
+    getAccessibleObraIds: vi.fn(() => new Set()),
+  };
+});
 
 // recordsService — mockamos listarRegistros e filtrarRegistros
 const mockListarRegistros = vi.fn();
