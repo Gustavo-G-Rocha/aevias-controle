@@ -66,7 +66,8 @@ describe('useChecklistForm — contrato', () => {
   it('helper faz deep-merge de objetos, normaliza data e garante fotos como array', () => {
     expect(normalizationSrc).toContain('isPlainObject(initialForm[key])');
     expect(normalizationSrc).toContain('...initialForm[key]');
-    expect(normalizationSrc).toContain('...savedData[key]');
+    expect(normalizationSrc).toContain('isPlainObject(savedData[key])');
+    expect(normalizationSrc).toContain('? savedData[key]');
     expect(normalizationSrc).toContain("new Date(savedData.data).toISOString().split('T')[0]");
     expect(normalizationSrc).toContain('Array.isArray(savedData.fotos) ? savedData.fotos : []');
   });

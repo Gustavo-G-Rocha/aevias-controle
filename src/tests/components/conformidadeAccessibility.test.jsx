@@ -24,7 +24,7 @@ describe('indicadores acessíveis de conformidade', () => {
       const source = read(path);
       expect(source).toContain('role="img"');
       expect(source).toContain('aria-label=');
-      expect(source).toContain('Não conforme');
+      expect(source).toContain('não conforme');
     });
   });
 });

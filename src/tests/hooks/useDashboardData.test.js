@@ -41,8 +41,9 @@ describe('useDashboardData — contrato', () => {
   });
 
   it('para needsRegionais filtra obras/projects/ensaios pelas regionais do usuário', () => {
+    expect(src).toContain('getAccessibleObraIds(auxData.obras, auxData.regionais');
+    expect(src).toContain('obrasIds.has(o.id)');
     expect(src).toContain('filterRegionaisByUser(auxData.regionais');
-    expect(src).toContain('regionaisIds.has(o.regional_id)');
     expect(src).toContain('projectIdsPermitidos.has(p.id)');
     expect(src).toContain('obrasIds.has(e.obra_id)');
   });

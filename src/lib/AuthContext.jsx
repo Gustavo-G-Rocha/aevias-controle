@@ -7,6 +7,8 @@ import { logLogout } from '@/utils/auditEvents';
 import { getDataCache } from '@/services/offlineStorageService';
 import { prepararCacheOffline } from '@/services/offlineCacheService';
 import { prefetchFieldPages } from '@/lib/prefetchPages';
+import { useSessionTimeout } from '@/hooks/useSessionTimeout';
+import SessionTimeoutWarning from '@/components/auth/SessionTimeoutWarning';
 
 const AuthContext = createContext();
 
@@ -191,10 +193,20 @@ export const AuthProvider = ({ children }) => {
     base44.auth.redirectToLogin(window.location.href);
   };
 
+  // Logout automático por inatividade (15 min sem interação, aviso prévio de 60s).
+  const handleSessionTimeout = useCallback(() => {
+    logout(false, 'inactivity');
+  }, [logout]);
+
+  const { showWarning: sessionWarning, countdown: sessionCountdown, extendSession, logoutNow } = useSessionTimeout({
+    enabled: isAuthenticated,
+    onTimeout: handleSessionTimeout,
+  });
+
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isAuthenticated, 
+    <AuthContext.Provider value={{
+      user,
+      isAuthenticated,
       isLoadingAuth,
       isLoadingPublicSettings,
       authError,
@@ -204,6 +216,12 @@ export const AuthProvider = ({ children }) => {
       checkAppState
     }}>
       {children}
+      <SessionTimeoutWarning
+        open={sessionWarning}
+        countdown={sessionCountdown}
+        onExtend={extendSession}
+        onLogoutNow={logoutNow}
+      />
     </AuthContext.Provider>
   );
 };

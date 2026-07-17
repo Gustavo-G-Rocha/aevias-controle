@@ -60,9 +60,9 @@ describe('useEnsaioForm — contrato', () => {
     expect(src).toContain('initialNewFormData.obra_id = obras[0].id');
   });
 
-  it('regra de permissão: admin ou (criador com status editável)', () => {
-    expect(src).toContain("user.role === 'admin' || (isCreator && canEditStatus)");
-    expect(src).toContain('const isCreator = ensaioToEdit.created_by === user.email');
+  it('regra de permissão: admin efetivo ou (status editável e pode editar o registro)', () => {
+    expect(src).toContain("getEffectiveAccessLevel(user) === 'admin'");
+    expect(src).toContain('canUserEditRecord(user, ensaioToEdit, obraDoRegistro, regionais)');
     expect(src).toContain(
       "ensaioToEdit.status === 'rascunho' || ensaioToEdit.status === 'finalizado' || ensaioToEdit.approved === false"
     );
