@@ -2,6 +2,7 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { getPageTitle } from "@/lib/pageTitles";
+import { TAB_ZONES, getTabZone } from "@/lib/layoutConstants";
 
 // Rotas raiz (tabs do BottomNav) — não mostram botão voltar
 const ROOT_PATHS = ["/", "/Regionais", "/Projects", "/MeusEnsaios"];
@@ -15,11 +16,15 @@ export default function MobileBackHeader() {
   if (isRoot) return null;
 
   const handleBack = () => {
-    if (window.history.length > 1) {
+    // location.key === "default" indica a primeira entrada do histórico do app
+    // (ex.: deep link / recarregamento): voltar sairia do app. Nesse caso,
+    // vai para a raiz da zona de navegação atual (tab), preservando a pilha.
+    if (location.key && location.key !== "default") {
       navigate(-1);
-    } else {
-      navigate("/");
+      return;
     }
+    const zone = getTabZone(location.pathname);
+    navigate(zone ? TAB_ZONES[zone][0] : "/", { replace: true });
   };
 
   return (

@@ -2,12 +2,30 @@
 
 import * as React from "react"
 import { Check, ChevronDown } from "lucide-react"
-import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
 import * as Desktop from "@/components/ui/desktop-select"
 
 const MobileSelectContext = React.createContext(null)
+
+// Bottom sheet (vaul) em viewports < 1024px — alinhado ao breakpoint `lg`
+// usado pelo restante do layout mobile (BottomNav, MobileBackHeader, cards).
+// Estado inicial calculado sincronicamente para evitar "flip" pós-mount.
+const MOBILE_QUERY = "(max-width: 1023px)"
+
+function useIsMobileViewport() {
+  const [mobile, setMobile] = React.useState(() =>
+    typeof window !== "undefined" && window.matchMedia(MOBILE_QUERY).matches
+  )
+  React.useEffect(() => {
+    const mql = window.matchMedia(MOBILE_QUERY)
+    const onChange = () => setMobile(mql.matches)
+    mql.addEventListener("change", onChange)
+    setMobile(mql.matches)
+    return () => mql.removeEventListener("change", onChange)
+  }, [])
+  return mobile
+}
 
 function collectItems(children, result = []) {
   React.Children.forEach(children, child => {
@@ -19,7 +37,7 @@ function collectItems(children, result = []) {
 }
 
 function Select({ value, onValueChange, disabled, children, ...props }) {
-  const mobile = useIsMobile()
+  const mobile = useIsMobileViewport()
   const [open, setOpen] = React.useState(false)
   const [hasOpened, setHasOpened] = React.useState(false)
   const items = React.useMemo(() => collectItems(children), [children])
