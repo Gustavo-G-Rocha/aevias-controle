@@ -11,6 +11,7 @@ export function LimiteLiquidezSection({ data, llCalc, llFit, llPoints, llYAxisDo
   return (
     <div>
       <p className="text-[11px] font-bold text-foreground mb-1 text-center uppercase">Limite de Liquidez</p>
+      <div className="overflow-x-auto">
       <table className="w-full border-collapse text-[10px]">
         <thead>
           <tr className="bg-muted/8">
@@ -52,6 +53,7 @@ export function LimiteLiquidezSection({ data, llCalc, llFit, llPoints, llYAxisDo
           </tr>
         </tbody>
       </table>
+      </div>
       {llFit && (
         <div className="mt-1 text-center text-xs font-bold text-primary bg-primary/10 border border-primary/20 rounded px-2 py-1">
           LL (25 golpes) = {llFit.ll}%
@@ -94,6 +96,7 @@ export function LimitePlasticidadeSection({ data, lpTeors, lpMedia, onSetNested 
   return (
     <div>
       <p className="text-[11px] font-bold text-foreground mb-1 text-center uppercase">Limite de Plasticidade</p>
+      <div className="overflow-x-auto">
       <table className="w-full border-collapse text-[10px]">
         <thead>
           <tr className="bg-muted/8">
@@ -125,6 +128,7 @@ export function LimitePlasticidadeSection({ data, lpTeors, lpMedia, onSetNested 
           </tr>
         </tbody>
       </table>
+      </div>
       {lpMedia != null && (
         <div className="mt-1 text-center text-xs font-bold text-primary bg-primary/10 border border-primary/20 rounded px-2 py-1">
           LP (média) = {lpMedia}%

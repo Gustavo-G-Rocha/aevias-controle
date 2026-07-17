@@ -20,6 +20,7 @@ function EnsaioTable({ title, rows, onRowChange, disabled, showPeneira = false }
   return (
     <div>
       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">{title}</h4>
+      <div className="overflow-x-auto">
       <table className="w-full border border-border text-xs">
         <thead>
           <tr className="bg-muted">
@@ -68,6 +69,7 @@ function EnsaioTable({ title, rows, onRowChange, disabled, showPeneira = false }
           </tfoot>
         )}
       </table>
+      </div>
     </div>
   );
 }

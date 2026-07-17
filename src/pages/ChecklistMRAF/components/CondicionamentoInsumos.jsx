@@ -24,6 +24,7 @@ export default function CondicionamentoInsumos({ data, onChange, isEditable, isA
   return (
     <div>
       <h3 className="text-lg font-semibold text-foreground mb-4">Condicionamento dos Insumos</h3>
+      <div className="overflow-x-auto">
       <table className="w-full border-collapse border border-border text-base">
         <thead className="bg-muted">
           <tr>
@@ -101,6 +102,7 @@ export default function CondicionamentoInsumos({ data, onChange, isEditable, isA
           </tr>
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

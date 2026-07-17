@@ -12,6 +12,7 @@ export function HigroUmidadeSection({ data, higroTeor1, higroTeor2, higroTeorMed
   return (
     <div>
       <p className="text-[11px] font-bold text-foreground mb-1 text-center uppercase">Umidade Higroscópica</p>
+      <div className="overflow-x-auto">
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-muted/8">
@@ -46,6 +47,7 @@ export function HigroUmidadeSection({ data, higroTeor1, higroTeor2, higroTeorMed
           </tr>
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
@@ -54,6 +56,7 @@ export function PeneiramentoGrossoSection({ data, granGrossaCalc, onSetNested })
   return (
     <div>
       <p className="text-[11px] font-bold text-foreground mb-1 text-center uppercase">Peneiramento Grosso</p>
+      <div className="overflow-x-auto">
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-muted/8">
@@ -72,6 +75,7 @@ export function PeneiramentoGrossoSection({ data, granGrossaCalc, onSetNested })
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
@@ -90,6 +94,7 @@ export function PeneiramentoFinoSection({ data, granFinaCalc, sp10, amostraTotal
           <Input className={fieldCls} type="number" step="0.001" value={data.amostra_parcial_seca || ''} onChange={e => onSet('amostra_parcial_seca', e.target.value)} />
         </div>
       </div>
+      <div className="overflow-x-auto">
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-muted/8">
@@ -114,6 +119,7 @@ export function PeneiramentoFinoSection({ data, granFinaCalc, sp10, amostraTotal
           })}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

@@ -12,6 +12,7 @@ export default function AcompanhamentoAplicacaoSection({ data, onChange, isEdita
   return (
     <div>
       <h3 className="text-lg font-semibold text-foreground mb-4">Acompanhamento da Aplicação</h3>
+      <div className="overflow-x-auto">
       <table className="w-full border-collapse border border-border text-base">
         <thead className="bg-muted">
           <tr>
@@ -89,6 +90,7 @@ export default function AcompanhamentoAplicacaoSection({ data, onChange, isEdita
           })}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

@@ -9,6 +9,7 @@ export function ResumoSection({
   return (
     <div className="mt-4">
       <div className={sectionHeader}>RESUMO</div>
+      <div className="overflow-x-auto">
       <table className="w-full border-collapse text-[10px]">
         <tbody>
           {[
@@ -29,6 +30,7 @@ export function ResumoSection({
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

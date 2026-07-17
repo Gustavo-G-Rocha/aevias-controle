@@ -151,7 +151,7 @@ export default function FaixasGranulometricasPage() {
           </CardContent>
         </Card>
 
-        <div className="bg-card border border-border rounded-lg overflow-hidden">
+        <div className="bg-card border border-border rounded-lg overflow-x-auto">
           <table className="min-w-full divide-y divide-border">
             <thead className="bg-muted/50">
               <tr>

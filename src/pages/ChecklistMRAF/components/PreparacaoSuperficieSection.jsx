@@ -24,6 +24,7 @@ export default function PreparacaoSuperficieSection({ data, onChange, isEditable
   return (
     <div>
       <h3 className="text-lg font-semibold text-foreground mb-4">Acompanhamento da Condição e Preparação da Superfície</h3>
+      <div className="overflow-x-auto">
       <table className="w-full border-collapse border border-border text-base">
         <thead className="bg-muted">
           <tr>
@@ -86,6 +87,7 @@ export default function PreparacaoSuperficieSection({ data, onChange, isEditable
           </tr>
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
