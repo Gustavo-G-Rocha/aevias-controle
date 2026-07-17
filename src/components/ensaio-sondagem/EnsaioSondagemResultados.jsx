@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2 } from "lucide-react";
 
 function CorpoProvaCard({ cp, index, metodo, onUpdate, onRemove }) {
@@ -26,11 +27,13 @@ function CorpoProvaCard({ cp, index, metodo, onUpdate, onRemove }) {
           </div>
           <div>
             <Label>Lado</Label>
-            <select value={cp.lado} onChange={e => onUpdate(index, 'lado', e.target.value)}
-              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm">
-              <option value="direito">Direito</option>
-              <option value="esquerdo">Esquerdo</option>
-            </select>
+            <Select value={cp.lado} onValueChange={(v) => onUpdate(index, 'lado', v)}>
+              <SelectTrigger className="h-10 bg-background"><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent title="Lado">
+                <SelectItem value="direito">Direito</SelectItem>
+                <SelectItem value="esquerdo">Esquerdo</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Label>Média Espessura (cm)</Label>

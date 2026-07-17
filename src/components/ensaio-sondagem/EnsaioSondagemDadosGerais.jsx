@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function EnsaioSondagemDadosGerais({ formData, setFormData, obras, projects }) {
   const isFinalizado = formData.status === 'finalizado';
@@ -16,16 +17,13 @@ export default function EnsaioSondagemDadosGerais({ formData, setFormData, obras
         <CardContent>
           <div>
             <Label htmlFor="metodo_ensaio" className="text-base font-semibold">Método de Ensaio *</Label>
-            <select
-              id="metodo_ensaio"
-              value={formData.metodo_ensaio}
-              onChange={e => setFormData({ ...formData, metodo_ensaio: e.target.value })}
-              required
-              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm mt-2"
-            >
-              <option value="DNIT 428/2022">DNIT 428/2022 (usa peso saturado e imerso)</option>
-              <option value="DNER 117/94">DNER 117/94 (usa apenas peso imerso)</option>
-            </select>
+            <Select value={formData.metodo_ensaio} onValueChange={(v) => setFormData({ ...formData, metodo_ensaio: v })}>
+              <SelectTrigger className="h-10 bg-background mt-2"><SelectValue placeholder="Selecione o método" /></SelectTrigger>
+              <SelectContent title="Método de Ensaio">
+                <SelectItem value="DNIT 428/2022">DNIT 428/2022 (usa peso saturado e imerso)</SelectItem>
+                <SelectItem value="DNER 117/94">DNER 117/94 (usa apenas peso imerso)</SelectItem>
+              </SelectContent>
+            </Select>
             <p className="text-xs text-muted-foreground mt-2">
               {formData.metodo_ensaio === "DNIT 428/2022"
                 ? "Volume = Peso Saturado - Peso Imerso | Densidade = (Peso ao Ar / Volume) × Dens. Água"
@@ -44,33 +42,25 @@ export default function EnsaioSondagemDadosGerais({ formData, setFormData, obras
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="obra_id">Obra *</Label>
-              <select
-                id="obra_id"
-                value={formData.obra_id}
-                onChange={e => setFormData({ ...formData, obra_id: e.target.value, project_id: "" })}
-                required
-                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-              >
-                <option value="">Selecione a obra</option>
-                {obras.map(obra => (
-                  <option key={obra.id} value={obra.id}>{obra.name} - {obra.code}</option>
-                ))}
-              </select>
+              <Select value={formData.obra_id} onValueChange={(v) => setFormData({ ...formData, obra_id: v, project_id: "" })}>
+                <SelectTrigger className="h-10 bg-background"><SelectValue placeholder="Selecione a obra" /></SelectTrigger>
+                <SelectContent title="Obra">
+                  {obras.map(obra => (
+                    <SelectItem key={obra.id} value={obra.id}>{obra.name} - {obra.code}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="project_id">Projeto</Label>
-              <select
-                id="project_id"
-                value={formData.project_id}
-                onChange={e => setFormData({ ...formData, project_id: e.target.value })}
-                disabled={!formData.obra_id}
-                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm disabled:opacity-50"
-              >
-                <option value="">Selecione o projeto (opcional)</option>
-                {projects.map(p => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
+              <Select value={formData.project_id} onValueChange={(v) => setFormData({ ...formData, project_id: v })} disabled={!formData.obra_id}>
+                <SelectTrigger className="h-10 bg-background"><SelectValue placeholder="Selecione o projeto (opcional)" /></SelectTrigger>
+                <SelectContent title="Projeto">
+                  {projects.map(p => (
+                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -83,19 +73,14 @@ export default function EnsaioSondagemDadosGerais({ formData, setFormData, obras
             </div>
             <div>
               <Label htmlFor="rodovia">Rodovia {isFinalizado && '*'}</Label>
-              <select
-                id="rodovia"
-                value={formData.rodovia}
-                onChange={e => setFormData({ ...formData, rodovia: e.target.value })}
-                required={isFinalizado}
-                disabled={!formData.obra_id}
-                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-              >
-                <option value="">Selecione a rodovia</option>
-                {obras.find(o => o.id === formData.obra_id)?.rodovias?.map((r, i) => (
-                  <option key={i} value={r}>{r}</option>
-                ))}
-              </select>
+              <Select value={formData.rodovia} onValueChange={(v) => setFormData({ ...formData, rodovia: v })} disabled={!formData.obra_id}>
+                <SelectTrigger className="h-10 bg-background"><SelectValue placeholder="Selecione a rodovia" /></SelectTrigger>
+                <SelectContent title="Rodovia">
+                  {obras.find(o => o.id === formData.obra_id)?.rodovias?.map((r, i) => (
+                    <SelectItem key={i} value={r}>{r}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="trecho">Trecho {isFinalizado && '*'}</Label>
@@ -114,24 +99,23 @@ export default function EnsaioSondagemDadosGerais({ formData, setFormData, obras
             </div>
             <div>
               <Label htmlFor="servico">Serviço</Label>
-              <select id="servico" value={formData.servico}
-                onChange={e => setFormData({ ...formData, servico: e.target.value })}
-                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-              >
-                <option value="">Selecione o serviço</option>
-                <option value="Capa/Reperfilagem">Capa/Reperfilagem (GC: 97-101%)</option>
-                <option value="Remendos">Remendos (GC: 95-101%)</option>
-              </select>
+              <Select value={formData.servico} onValueChange={(v) => setFormData({ ...formData, servico: v })}>
+                <SelectTrigger className="h-10 bg-background"><SelectValue placeholder="Selecione o serviço" /></SelectTrigger>
+                <SelectContent title="Serviço">
+                  <SelectItem value="Capa/Reperfilagem">Capa/Reperfilagem (GC: 97-101%)</SelectItem>
+                  <SelectItem value="Remendos">Remendos (GC: 95-101%)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="ensaio_realizado_por">Ensaio realizado por:</Label>
-              <select id="ensaio_realizado_por" value={formData.ensaio_realizado_por}
-                onChange={e => setFormData({ ...formData, ensaio_realizado_por: e.target.value })}
-                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-              >
-                <option value="Afirma Evias">Afirma Evias</option>
-                <option value="Empreiteira">Empreiteira</option>
-              </select>
+              <Select value={formData.ensaio_realizado_por} onValueChange={(v) => setFormData({ ...formData, ensaio_realizado_por: v })}>
+                <SelectTrigger className="h-10 bg-background"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent title="Ensaio realizado por">
+                  <SelectItem value="Afirma Evias">Afirma Evias</SelectItem>
+                  <SelectItem value="Empreiteira">Empreiteira</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // ── Shared local primitives ───────────────────────────────────────────────────
 const LabeledField = ({ id, label, children, className = '' }) => (
@@ -24,26 +25,21 @@ export default function EnsaioRompimentoConcretoDadosGerais({
         <CardContent className="p-6 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <LabeledField id="obra_id" label="Obra*">
-              <select
-                value={formData.obra_id}
-                onChange={(e) => onObraChange(e.target.value)}
-                className="w-full px-3 py-2 border border-border rounded-lg bg-input "
-              >
-                <option value="">Selecionar obra...</option>
-                {obras.map(obra => <option key={obra.id} value={obra.id}>{obra.name}</option>)}
-              </select>
+              <Select value={formData.obra_id} onValueChange={onObraChange}>
+                <SelectTrigger className="bg-input"><SelectValue placeholder="Selecionar obra..." /></SelectTrigger>
+                <SelectContent title="Obra">
+                  {obras.map(obra => <SelectItem key={obra.id} value={obra.id}>{obra.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </LabeledField>
 
             <LabeledField id="rodovia" label="Rodovia">
-              <select
-                value={formData.rodovia}
-                onChange={(e) => onFieldChange('rodovia', e.target.value)}
-                disabled={!formData.obra_id}
-                className="w-full px-3 py-2 border border-border rounded-lg bg-input  disabled:opacity-50"
-              >
-                <option value="">Selecionar...</option>
-                {rodoviasDaObra.map(rod => <option key={rod} value={rod}>{rod}</option>)}
-              </select>
+              <Select value={formData.rodovia} onValueChange={(v) => onFieldChange('rodovia', v)} disabled={!formData.obra_id}>
+                <SelectTrigger className="bg-input"><SelectValue placeholder="Selecionar..." /></SelectTrigger>
+                <SelectContent title="Rodovia">
+                  {rodoviasDaObra.map(rod => <SelectItem key={rod} value={rod}>{rod}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </LabeledField>
 
             <LabeledField id="fornecedor" label="Fornecedor">
@@ -56,14 +52,12 @@ export default function EnsaioRompimentoConcretoDadosGerais({
             </LabeledField>
 
             <LabeledField id="project_id" label="Carta Traço*">
-              <select
-                value={formData.project_id}
-                onChange={(e) => onFieldChange('project_id', e.target.value)}
-                className="w-full px-3 py-2 border border-border rounded-lg bg-input "
-              >
-                <option value="">Selecionar...</option>
-                {projectsDaObra.map(proj => <option key={proj.id} value={proj.id}>{proj.name}</option>)}
-              </select>
+              <Select value={formData.project_id} onValueChange={(v) => onFieldChange('project_id', v)}>
+                <SelectTrigger className="bg-input"><SelectValue placeholder="Selecionar..." /></SelectTrigger>
+                <SelectContent title="Carta Traço">
+                  {projectsDaObra.map(proj => <SelectItem key={proj.id} value={proj.id}>{proj.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </LabeledField>
 
             <LabeledField id="cliente" label="Cliente">
@@ -103,14 +97,12 @@ export default function EnsaioRompimentoConcretoDadosGerais({
             </LabeledField>
             <LabeledField id="construtora" label="Construtora">
               {isSupervisao ? (
-                <select
-                  value={formData.construtora}
-                  onChange={(e) => onFieldChange('construtora', e.target.value)}
-                  className="w-full px-3 py-2 border border-border rounded-lg bg-input "
-                >
-                  <option value="">Selecionar empreiteira...</option>
-                  {empreiteirasObra.map((emp, idx) => <option key={idx} value={emp}>{emp}</option>)}
-                </select>
+                <Select value={formData.construtora} onValueChange={(v) => onFieldChange('construtora', v)}>
+                  <SelectTrigger className="bg-input"><SelectValue placeholder="Selecionar empreiteira..." /></SelectTrigger>
+                  <SelectContent title="Construtora">
+                    {empreiteirasObra.map((emp, idx) => <SelectItem key={idx} value={emp}>{emp}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               ) : (
                 <Input value={formData.construtora} readOnly className="bg-input border-border  opacity-70 cursor-not-allowed" />
               )}

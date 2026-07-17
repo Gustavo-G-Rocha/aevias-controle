@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function EnsaioVigaBenkelmanDadosGerais({
   formData,
@@ -24,31 +25,26 @@ export default function EnsaioVigaBenkelmanDadosGerais({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <span className="block text-sm font-medium text-foreground mb-2">Obra*</span>
-              <select
-                value={formData.obra_id}
-                onChange={(e) => onObraChange(e.target.value, obras)}
-                className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground"
-              >
-                <option value="">Selecionar obra...</option>
-                {obras.map(obra => (
-                  <option key={obra.id} value={obra.id}>{obra.name}</option>
-                ))}
-              </select>
+              <Select value={formData.obra_id} onValueChange={(v) => onObraChange(v, obras)}>
+                <SelectTrigger className="bg-background"><SelectValue placeholder="Selecionar obra..." /></SelectTrigger>
+                <SelectContent title="Obra">
+                  {obras.map(obra => (
+                    <SelectItem key={obra.id} value={obra.id}>{obra.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
               <span className="block text-sm font-medium text-foreground mb-2">Rodovia</span>
-              <select
-                value={formData.rodovia}
-                onChange={(e) => onInputChange('rodovia', e.target.value)}
-                disabled={!formData.obra_id}
-                className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <option value="">Selecionar rodovia...</option>
-                {rodoviasDaObra.map((rodovia, idx) => (
-                  <option key={idx} value={rodovia}>{rodovia}</option>
-                ))}
-              </select>
+              <Select value={formData.rodovia} onValueChange={(v) => onInputChange('rodovia', v)} disabled={!formData.obra_id}>
+                <SelectTrigger className="bg-background"><SelectValue placeholder="Selecionar rodovia..." /></SelectTrigger>
+                <SelectContent title="Rodovia">
+                  {rodoviasDaObra.map((rodovia, idx) => (
+                    <SelectItem key={idx} value={rodovia}>{rodovia}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
@@ -58,17 +54,14 @@ export default function EnsaioVigaBenkelmanDadosGerais({
 
             <div>
               <span className="block text-sm font-medium text-foreground mb-2">Empreiteira</span>
-              <select
-                value={formData.empreiteira || ''}
-                onChange={(e) => onInputChange('empreiteira', e.target.value)}
-                disabled={!formData.obra_id}
-                className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <option value="">Selecionar empreiteira...</option>
-                {(obraAtual?.empreiteiras || []).map((em, idx) => (
-                  <option key={idx} value={em}>{em}</option>
-                ))}
-              </select>
+              <Select value={formData.empreiteira || ''} onValueChange={(v) => onInputChange('empreiteira', v)} disabled={!formData.obra_id}>
+                <SelectTrigger className="bg-background"><SelectValue placeholder="Selecionar empreiteira..." /></SelectTrigger>
+                <SelectContent title="Empreiteira">
+                  {(obraAtual?.empreiteiras || []).map((em, idx) => (
+                    <SelectItem key={idx} value={em}>{em}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>

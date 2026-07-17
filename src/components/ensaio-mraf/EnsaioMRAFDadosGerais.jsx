@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function EnsaioMRAFDadosGerais({
   formData,
@@ -20,40 +21,31 @@ export default function EnsaioMRAFDadosGerais({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <Label htmlFor="obra_id">Obra *</Label>
-            <select
-              id="obra_id"
-              value={formData.obra_id}
-              onChange={(e) => handleChange('obra_id', e.target.value)}
-              required
-              disabled={!isEditable || isApproved || editingEnsaio?.id}
-              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            >
-              <option value="">Selecione a obra</option>
-              {obras.map(obra => {
-                const regional = regionais.find(r => r.id === obra.regional_id);
-                return (
-                  <option key={obra.id} value={obra.id}>
-                    {obra.name} - {obra.code} {regional && `(${regional.nome})`}
-                  </option>
-                );
-              })}
-            </select>
+            <Select value={formData.obra_id} onValueChange={(v) => handleChange('obra_id', v)} disabled={!isEditable || isApproved || !!editingEnsaio?.id}>
+              <SelectTrigger className="h-10 bg-background"><SelectValue placeholder="Selecione a obra" /></SelectTrigger>
+              <SelectContent title="Obra">
+                {obras.map(obra => {
+                  const regional = regionais.find(r => r.id === obra.regional_id);
+                  return (
+                    <SelectItem key={obra.id} value={obra.id}>
+                      {obra.name} - {obra.code} {regional && `(${regional.nome})`}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
             <Label htmlFor="project_id">Projeto MRAF</Label>
-            <select
-              id="project_id"
-              value={formData.project_id}
-              onChange={(e) => handleProjectChange(e.target.value)}
-              disabled={!isEditable || isApproved || !formData.obra_id}
-              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            >
-              <option value="">Selecione um projeto</option>
-              {projetosMRAF.map(proj => (
-                <option key={proj.id} value={proj.id}>{proj.name}</option>
-              ))}
-            </select>
+            <Select value={formData.project_id} onValueChange={handleProjectChange} disabled={!isEditable || isApproved || !formData.obra_id}>
+              <SelectTrigger className="h-10 bg-background"><SelectValue placeholder="Selecione um projeto" /></SelectTrigger>
+              <SelectContent title="Projeto MRAF">
+                {projetosMRAF.map(proj => (
+                  <SelectItem key={proj.id} value={proj.id}>{proj.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -105,18 +97,14 @@ export default function EnsaioMRAFDadosGerais({
           <div>
             <Label htmlFor="rodovia">Rodovia</Label>
             {rodoviasDisponiveis.length > 0 ? (
-              <select
-                id="rodovia"
-                value={formData.rodovia}
-                onChange={(e) => handleChange('rodovia', e.target.value)}
-                disabled={!isEditable || isApproved}
-                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-              >
-                <option value="">Selecione a rodovia</option>
-                {rodoviasDisponiveis.map((rodovia, idx) => (
-                  <option key={idx} value={rodovia}>{rodovia}</option>
-                ))}
-              </select>
+              <Select value={formData.rodovia} onValueChange={(v) => handleChange('rodovia', v)} disabled={!isEditable || isApproved}>
+                <SelectTrigger className="h-10 bg-background"><SelectValue placeholder="Selecione a rodovia" /></SelectTrigger>
+                <SelectContent title="Rodovia">
+                  {rodoviasDisponiveis.map((rodovia, idx) => (
+                    <SelectItem key={idx} value={rodovia}>{rodovia}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             ) : (
               <Input
                 id="rodovia"
@@ -185,16 +173,13 @@ export default function EnsaioMRAFDadosGerais({
           </div>
           <div>
             <Label htmlFor="ensaio_realizado_por">Ensaio realizado por:</Label>
-            <select
-              id="ensaio_realizado_por"
-              value={formData.ensaio_realizado_por}
-              onChange={(e) => handleChange('ensaio_realizado_por', e.target.value)}
-              disabled={!isEditable || isApproved}
-              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            >
-              <option value="Afirma Evias">Afirma Evias</option>
-              <option value="Empreiteira">Empreiteira</option>
-            </select>
+            <Select value={formData.ensaio_realizado_por} onValueChange={(v) => handleChange('ensaio_realizado_por', v)} disabled={!isEditable || isApproved}>
+              <SelectTrigger className="h-10 bg-background"><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent title="Ensaio realizado por">
+                <SelectItem value="Afirma Evias">Afirma Evias</SelectItem>
+                <SelectItem value="Empreiteira">Empreiteira</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </CardContent>

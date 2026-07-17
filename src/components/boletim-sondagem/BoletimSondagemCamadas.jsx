@@ -4,13 +4,37 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Trash2 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import CamadaMobileCard from "@/components/boletim-sondagem/CamadaMobileCard";
 
 export default function BoletimSondagemCamadas({
   formData, setFormData, isEditable,
   handleCamadaChange, adicionarCamada, removerCamada,
   adicionarCamada2, removerCamada2,
 }) {
+  const isMobile = useIsMobile();
   const temColuna2 = formData.camadas.some(c => c.classificacao_2 !== null);
+
+  // Handler unificado para camadas_2 (usado pela visão mobile) — replica a
+  // lógica dos handlers inline da tabela desktop.
+  const handleCamada2Change = (index, field, value) => {
+    setFormData(prev => {
+      const c2 = [...(prev.camadas_2 || [])];
+      c2[index] = { ...c2[index], [field]: value };
+      if (field === 'prof_de' && value !== null && c2[index].prof_ate !== null && c2[index].prof_ate !== undefined) {
+        c2[index].espessura = parseFloat((c2[index].prof_ate - value).toFixed(2));
+      }
+      if (field === 'prof_ate') {
+        if (value !== null && c2[index].prof_de !== null && c2[index].prof_de !== undefined) {
+          c2[index].espessura = parseFloat((value - c2[index].prof_de).toFixed(2));
+        }
+        if (index + 1 < c2.length && value !== null) {
+          c2[index + 1] = { ...c2[index + 1], prof_de: value };
+        }
+      }
+      return { ...prev, camadas_2: c2 };
+    });
+  };
 
   const addColuna2 = () => {
     setFormData(prev => ({
@@ -60,6 +84,22 @@ export default function BoletimSondagemCamadas({
               </div>
             </div>
             <div className="text-xs font-semibold text-muted-foreground mb-2">Classificação 1</div>
+            {isMobile ? (
+              <div className="space-y-3">
+                {formData.camadas.map((camada, index) => (
+                  <CamadaMobileCard
+                    key={index}
+                    camada={camada}
+                    classificacaoField="classificacao_1"
+                    isEditable={isEditable}
+                    profDeEditable={index === 0}
+                    onFieldChange={(field, value) => handleCamadaChange(index, field, value)}
+                    onRemove={() => removerCamada(index)}
+                    canRemove={formData.camadas.length > 1}
+                  />
+                ))}
+              </div>
+            ) : (
             <table className="w-full text-sm border-collapse">
               <colgroup>
                 <col className="w-12" />
@@ -127,6 +167,7 @@ export default function BoletimSondagemCamadas({
                 ))}
               </tbody>
             </table>
+            )}
           </div>
 
           {/* TABELA 2 - Classificação 2 (quando houver) */}
@@ -142,6 +183,22 @@ export default function BoletimSondagemCamadas({
                 </Button>
               </div>
               <div className="text-xs font-semibold text-muted-foreground mb-2">Classificação 2</div>
+              {isMobile ? (
+                <div className="space-y-3">
+                  {(formData.camadas_2 || []).map((camada, index) => (
+                    <CamadaMobileCard
+                      key={index}
+                      camada={camada}
+                      classificacaoField="classificacao_2"
+                      isEditable={isEditable}
+                      profDeEditable
+                      onFieldChange={(field, value) => handleCamada2Change(index, field, value)}
+                      onRemove={() => removerCamada2(index)}
+                      canRemove
+                    />
+                  ))}
+                </div>
+              ) : (
               <table className="w-full text-sm border-collapse">
                 <colgroup>
                   <col className="w-12" />
@@ -237,6 +294,7 @@ export default function BoletimSondagemCamadas({
                   ))}
                 </tbody>
               </table>
+              )}
             </div>
           )}
         </div>

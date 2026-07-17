@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function BoletimSondagemTradoDadosGerais({ formData, setFormData, obras, isEditable, editingBoletim, handleObraChange, regionais }) {
   return (
@@ -13,18 +14,14 @@ export default function BoletimSondagemTradoDadosGerais({ formData, setFormData,
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <Label>Obra *</Label>
-            <select
-              value={formData.obra_id}
-              onChange={(e) => handleObraChange(e.target.value, obras, regionais)}
-              disabled={!isEditable || !!editingBoletim}
-              required
-              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            >
-              <option value="">Selecione a obra</option>
-              {obras.map(obra => (
-                <option key={obra.id} value={obra.id}>{obra.name} — {obra.code}</option>
-              ))}
-            </select>
+            <Select value={formData.obra_id} onValueChange={(v) => handleObraChange(v, obras, regionais)} disabled={!isEditable || !!editingBoletim}>
+              <SelectTrigger className="h-10 bg-background"><SelectValue placeholder="Selecione a obra" /></SelectTrigger>
+              <SelectContent title="Obra">
+                {obras.map(obra => (
+                  <SelectItem key={obra.id} value={obra.id}>{obra.name} — {obra.code}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Label>Cliente</Label>
@@ -36,17 +33,14 @@ export default function BoletimSondagemTradoDadosGerais({ formData, setFormData,
           </div>
           <div>
             <Label>Rodovia</Label>
-            <select
-              value={formData.rodovia}
-              onChange={e => setFormData(p => ({ ...p, rodovia: e.target.value }))}
-              disabled={!isEditable || !formData.obra_id}
-              className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            >
-              <option value="">Selecione a rodovia</option>
-              {(obras.find(o => o.id === formData.obra_id)?.rodovias || []).map((r, i) => (
-                <option key={i} value={r}>{r}</option>
-              ))}
-            </select>
+            <Select value={formData.rodovia} onValueChange={(v) => setFormData(p => ({ ...p, rodovia: v }))} disabled={!isEditable || !formData.obra_id}>
+              <SelectTrigger className="h-10 bg-background"><SelectValue placeholder="Selecione a rodovia" /></SelectTrigger>
+              <SelectContent title="Rodovia">
+                {(obras.find(o => o.id === formData.obra_id)?.rodovias || []).map((r, i) => (
+                  <SelectItem key={i} value={r}>{r}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Label>KM</Label>

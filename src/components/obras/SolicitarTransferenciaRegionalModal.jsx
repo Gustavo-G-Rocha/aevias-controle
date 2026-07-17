@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowRightLeft, MapPin } from "lucide-react";
 import { criarSolicitacaoTransferenciaRegional } from "@/services/solicitacoesService";
 import { toast } from "@/components/ui/use-toast";
@@ -98,24 +99,20 @@ export default function SolicitarTransferenciaRegionalModal({
             <Label htmlFor="regional_destino" className="text-sm sm:text-base">
               Regional de Destino *
             </Label>
-            <select
-              id="regional_destino"
-              value={regionalDestinoId}
-              onChange={(e) => setRegionalDestinoId(e.target.value)}
-              required
-              className="flex h-10 w-full rounded-md border border-border bg-card px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value="">Selecione a nova regional</option>
-              {regionaisDisponiveis.length > 0 ? (
-                regionaisDisponiveis.map(regional => (
-                  <option key={regional.id} value={regional.id}>
-                    {regional.nome} - {regional.codigo} ({regional.estado})
-                  </option>
-                ))
-              ) : (
-                <option value="" disabled>Nenhuma regional disponível</option>
-              )}
-            </select>
+            <Select value={regionalDestinoId} onValueChange={setRegionalDestinoId}>
+              <SelectTrigger className="h-10 bg-card"><SelectValue placeholder="Selecione a nova regional" /></SelectTrigger>
+              <SelectContent title="Regional de Destino">
+                {regionaisDisponiveis.length > 0 ? (
+                  regionaisDisponiveis.map(regional => (
+                    <SelectItem key={regional.id} value={regional.id}>
+                      {regional.nome} - {regional.codigo} ({regional.estado})
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="__none__" disabled>Nenhuma regional disponível</SelectItem>
+                )}
+              </SelectContent>
+            </Select>
             <p className="text-xs text-muted-foreground">
               Selecione a regional para qual você deseja ser transferido
             </p>
