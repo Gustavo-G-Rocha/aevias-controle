@@ -14,6 +14,9 @@
  */
 import { describe, it, expect, afterAll, beforeEach, vi } from 'vitest';
 
+// Benchmarks com latência simulada × várias iterações — precisam de folga
+vi.setConfig({ testTimeout: 60000 });
+
 const API_LATENCY_MS = 150;
 
 const { entities, delay } = vi.hoisted(() => {
