@@ -1,33 +1,29 @@
 /**
  * tests/services/syncService.test.js
+ *
+ * O syncService roteia TODAS as operações através da backend function
+ * `validarESalvarRegistro` (validação server-side + detecção de conflitos LWW).
+ * Os testes mockam essa função e o storage offline em memória.
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { syncQueueItem, syncPendingItems, addOrUpdateQueueItem } from '@/services/syncService';
-import { createQueueItem } from '@/utils/offlineQueue';
-import { addQueueItem, getQueueItem, clearQueue } from '@/services/offlineStorageService';
-import { base44 } from '@/api/base44Client';
 
-// Mock base44
-vi.mock('@/api/base44Client', () => ({
-  base44: {
-    entities: {
-      ChecklistTerraplanagem: {
-        create: vi.fn(),
-        update: vi.fn(),
-      },
-      ChecklistMRAF: {
-        create: vi.fn(),
-      },
-      DiarioObra: {
-        create: vi.fn(),
-      },
-    },
-  },
+const { validarESalvarRegistroMock } = vi.hoisted(() => ({
+  validarESalvarRegistroMock: vi.fn(),
+}));
+
+vi.mock('@/functions/validarESalvarRegistro', () => ({
+  validarESalvarRegistro: validarESalvarRegistroMock,
+}));
+
+// Fotos offline: passthrough (sem placeholders locais nos payloads dos testes)
+vi.mock('@/services/offlinePhotoService', () => ({
+  resolverFotosOffline: vi.fn(async (payload) => payload),
 }));
 
 // Mock operações de fila com storage em memória
 const mockStorage = new Map();
+const mockConflicts = new Map();
 
 vi.mock('@/services/offlineStorageService', () => ({
   addQueueItem: vi.fn(async (item) => {
@@ -38,6 +34,9 @@ vi.mock('@/services/offlineStorageService', () => ({
   updateQueueItem: vi.fn(async (itemId, updates) => {
     const item = mockStorage.get(itemId);
     if (item) mockStorage.set(itemId, { ...item, ...updates });
+  }),
+  removeQueueItem: vi.fn(async (itemId) => {
+    mockStorage.delete(itemId);
   }),
   getQueueItemsByStatus: vi.fn(async (status) => {
     return Array.from(mockStorage.values()).filter(item => item.status === status);
@@ -51,13 +50,29 @@ vi.mock('@/services/offlineStorageService', () => ({
         item.status !== 'synced'
     ) || null;
   }),
+  addConflict: vi.fn(async (conflict) => {
+    const id = `conflict-${mockConflicts.size + 1}`;
+    mockConflicts.set(id, { id, ...conflict });
+    return id;
+  }),
+  removeConflict: vi.fn(async (id) => {
+    mockConflicts.delete(id);
+  }),
   clearQueue: vi.fn(async () => mockStorage.clear()),
 }));
+
+import { syncQueueItem, syncPendingItems, addOrUpdateQueueItem } from '@/services/syncService';
+import { createQueueItem } from '@/utils/offlineQueue';
+import { addQueueItem, getQueueItem } from '@/services/offlineStorageService';
+
+const okResponse = (data = { id: 'server-id' }) => ({ data: { data }, status: 200 });
 
 describe('syncService', () => {
   beforeEach(async () => {
     mockStorage.clear();
+    mockConflicts.clear();
     vi.clearAllMocks();
+    validarESalvarRegistroMock.mockResolvedValue(okResponse());
   });
 
   afterEach(async () => {
@@ -65,40 +80,56 @@ describe('syncService', () => {
   });
 
   describe('syncQueueItem', () => {
-    it('deve sincronizar create com sucesso', async () => {
-      const mockCreatedId = 'checklist-uuid-123';
-      base44.entities.ChecklistTerraplanagem.create.mockResolvedValue({ id: mockCreatedId });
+    it('deve sincronizar create com sucesso via validarESalvarRegistro', async () => {
+      validarESalvarRegistroMock.mockResolvedValue(okResponse({ id: 'checklist-uuid-123' }));
 
       const item = createQueueItem({
         operation: 'create',
         entityType: 'ChecklistTerraplanagem',
         payload: { obra_id: 'X', data: '2026-05-29' },
       });
+      await addQueueItem(item);
 
       const result = await syncQueueItem(item);
 
       expect(result.success).toBe(true);
-      expect(base44.entities.ChecklistTerraplanagem.create).toHaveBeenCalledWith(item.payload);
+      expect(validarESalvarRegistroMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          entityName: 'ChecklistTerraplanagem',
+          operation: 'create',
+          data: item.payload,
+        })
+      );
+      // entityId do registro criado é armazenado no item da fila
+      const stored = await getQueueItem(item.id);
+      expect(stored.status).toBe('synced');
+      expect(stored.entityId).toBe('checklist-uuid-123');
     });
 
-    it('deve sincronizar update com sucesso', async () => {
-      base44.entities.ChecklistTerraplanagem.update.mockResolvedValue({});
-
+    it('deve sincronizar update com sucesso passando recordId', async () => {
       const item = createQueueItem({
         operation: 'update',
         entityType: 'ChecklistTerraplanagem',
         entityId: 'existing-id',
         payload: { obra_id: 'X', data: '2026-05-29' },
       });
+      await addQueueItem(item);
 
       const result = await syncQueueItem(item);
 
       expect(result.success).toBe(true);
-      expect(base44.entities.ChecklistTerraplanagem.update).toHaveBeenCalledWith('existing-id', item.payload);
+      expect(validarESalvarRegistroMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          entityName: 'ChecklistTerraplanagem',
+          operation: 'update',
+          recordId: 'existing-id',
+          data: item.payload,
+        })
+      );
     });
 
     it('deve marcar como failed após múltiplas tentativas', async () => {
-      base44.entities.ChecklistTerraplanagem.create.mockRejectedValue(new Error('Network error'));
+      validarESalvarRegistroMock.mockRejectedValue(new Error('Network error'));
 
       const item = createQueueItem({
         operation: 'create',
@@ -110,34 +141,60 @@ describe('syncService', () => {
       const itemWithRetries = { ...item, id: 'item-retry', attempts: 5 };
       await addQueueItem(itemWithRetries);
 
-      // Sincronizar (deve falhar e ser marcado como failed)
       const result = await syncQueueItem(itemWithRetries);
 
-      // Item deve ser marcado como failed após atingir 5 tentativas
       expect(result.success).toBe(false);
       const lastItem = await getQueueItem('item-retry');
       expect(lastItem.status).toBe('failed');
     });
 
-    it('deve rejeitar operação desconhecida', async () => {
+    it('erro permanente (4xx) marca como failed imediatamente, sem retentar', async () => {
+      const err = new Error('Operação desconhecida');
+      err.response = { status: 400, data: { error: 'Operação desconhecida' } };
+      validarESalvarRegistroMock.mockRejectedValue(err);
+
       const item = createQueueItem({
         operation: 'unknown',
         entityType: 'ChecklistTerraplanagem',
         payload: { obra_id: 'X' },
       });
+      await addQueueItem(item);
 
       const result = await syncQueueItem(item);
 
       expect(result.success).toBe(false);
       expect(result.error).toContain('desconhecida');
+      const stored = await getQueueItem(item.id);
+      expect(stored.status).toBe('failed'); // 4xx = permanente, não volta a 'pending'
+    });
+
+    it('conflito (409) armazena conflito e marca item como conflict', async () => {
+      const err = new Error('Conflict');
+      err.response = {
+        status: 409,
+        data: { conflict: true, error: 'Conflito de sincronização', serverData: { id: 's1' } },
+      };
+      validarESalvarRegistroMock.mockRejectedValue(err);
+
+      const item = createQueueItem({
+        operation: 'update',
+        entityType: 'ChecklistTerraplanagem',
+        entityId: 's1',
+        payload: { obra_id: 'X' },
+      });
+      await addQueueItem(item);
+
+      const result = await syncQueueItem(item);
+
+      expect(result.success).toBe(false);
+      expect(result.conflict).toBe(true);
+      const stored = await getQueueItem(item.id);
+      expect(stored.status).toBe('conflict');
     });
   });
 
   describe('syncPendingItems', () => {
     it('deve sincronizar múltiplos items', async () => {
-      base44.entities.ChecklistTerraplanagem.create.mockResolvedValue({ id: 'id-1' });
-      base44.entities.ChecklistMRAF.create.mockResolvedValue({ id: 'id-2' });
-
       const item1 = createQueueItem({
         operation: 'create',
         entityType: 'ChecklistTerraplanagem',
@@ -167,8 +224,10 @@ describe('syncService', () => {
     });
 
     it('deve contar falhas corretamente', async () => {
-      base44.entities.ChecklistTerraplanagem.create.mockRejectedValue(new Error('Error 1'));
-      base44.entities.ChecklistMRAF.create.mockResolvedValue({ id: 'id-2' });
+      validarESalvarRegistroMock.mockImplementation(async ({ entityName }) => {
+        if (entityName === 'ChecklistTerraplanagem') throw new Error('Error 1');
+        return okResponse({ id: 'id-2' });
+      });
 
       const item1 = createQueueItem({
         operation: 'create',
@@ -224,20 +283,18 @@ describe('syncService', () => {
         payload: payload2,
       });
 
-      // Mesmo entityType, operation, payload hash similar
-      // (na verdade hashes diferentes, então não é duplicate)
-      const id2 = await addOrUpdateQueueItem(item2);
+      // Hashes diferentes → não é duplicate
+      await addOrUpdateQueueItem(item2);
 
-      // Quando payloads são EXATAMENTE iguais
+      // Payload EXATAMENTE igual ao item1 → duplicate
       const item3 = createQueueItem({
         operation: 'create',
         entityType: 'ChecklistTerraplanagem',
-        payload: payload1, // Mesmo payload
+        payload: payload1,
       });
 
       const id3 = await addOrUpdateQueueItem(item3);
 
-      // item3 deve ter mesmo ID que item1 (duplicate)
       expect(id3).toBe(id1);
 
       const stored = await getQueueItem(id1);

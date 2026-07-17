@@ -16,6 +16,9 @@ export default defineConfig({
     environment: 'node',
     globals: true,
     setupFiles: ['./src/tests/vitest.setup.js'],
+    // e2e/ contém specs do Playwright (test runner próprio) — não são
+    // compatíveis com o vitest e quebram a suíte se incluídos.
+    exclude: ['**/node_modules/**', 'e2e/**', 'test-results/**'],
   },
   resolve: {
     alias: [

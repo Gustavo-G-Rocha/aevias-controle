@@ -81,17 +81,17 @@ vi.mock('@/api/base44Client', () => {
   return { base44: { entities } };
 });
 
-vi.mock('@/functions/validarESalvarRegistro', () => ({
-  validarESalvarRegistro: vi.fn(async ({ entityName, data, operation, recordId }) => {
-    const { base44 } = await import('@/api/base44Client');
-    if (operation === 'create') {
-      const result = await base44.entities[entityName].create(data);
-      return { data: { success: true, data: result } };
-    }
-    const result = await base44.entities[entityName].update(recordId, data);
-    return { data: { success: true, data: result } };
-  }),
+// Ambiente node não tem navigator.onLine — força modo online para que os
+// services usem validarESalvarRegistro em vez da fila offline (IndexedDB).
+vi.mock('@/utils/offlineSimulation', () => ({
+  isEffectivelyOffline: () => false,
+  isOfflineSimulated: () => false,
 }));
+
+// IMPORTANTE: todos os módulos @/functions/* resolvem (via alias do vitest)
+// para o MESMO arquivo stub. Um segundo vi.mock para outro @/functions/<nome>
+// sobrescreveria este — por isso TODAS as funções backend usadas nos fluxos
+// são mockadas neste único factory (ver gerenciarAprovacao mais abaixo).
 
 // Usuários de teste definidos no escopo hoisted para que o mock de
 // gerenciarAprovacao possa referenciá-los (approve/reject → approver,
@@ -112,9 +112,26 @@ const { approver, cliente } = vi.hoisted(() => ({
   },
 }));
 
-// Mock de gerenciarAprovacao que opera contra o store em memória,
-// espelhando a lógica da backend function real (approve/reject/sign/delete).
+// Mock ÚNICO de todo o módulo @/functions/* (stub compartilhado):
+// - validarESalvarRegistro: opera create/update contra o store em memória
+// - gerenciarAprovacao: espelha a backend function real (approve/reject/sign/delete)
+// - demais funções: no-op de sucesso
 vi.mock('@/functions/gerenciarAprovacao', () => ({
+  validarESalvarRegistro: vi.fn(async ({ entityName, data, operation, recordId }) => {
+    const { base44 } = await import('@/api/base44Client');
+    if (operation === 'create') {
+      const result = await base44.entities[entityName].create(data);
+      return { data: { success: true, data: result } };
+    }
+    const result = await base44.entities[entityName].update(recordId, data);
+    return { data: { success: true, data: result } };
+  }),
+  assinarEletronicamente: vi.fn(async () => ({ data: { success: true } })),
+  carregarRegistrosSupervisor: vi.fn(async () => ({ data: { data: [] } })),
+  excluirMinhaConta: vi.fn(async () => ({ data: { success: true } })),
+  validarUploadArquivo: vi.fn(async () => ({ data: { success: true } })),
+  verificarAssinatura: vi.fn(async () => ({ data: { success: true } })),
+  registrarAuditoria: vi.fn(async () => ({ data: { success: true } })),
   gerenciarAprovacao: vi.fn(async ({ action, entityName, recordId, rejectionReason }) => {
     const { base44 } = await import('@/api/base44Client');
     const api = base44.entities[entityName];
@@ -126,10 +143,11 @@ vi.mock('@/functions/gerenciarAprovacao', () => ({
       return { data: { success: true, data: { id: recordId, deleted: true } } };
     }
     if (action === 'approve') {
+      // Espelha a backend function real: NÃO altera was_rejected
+      // (histórico de reprovação persiste) e limpa rejection_reason com null.
       const updated = await api.update(recordId, {
         approved: true,
-        was_rejected: false,
-        rejection_reason: undefined,
+        rejection_reason: null,
         approved_by: user.email,
         approved_date: new Date().toISOString(),
         approver_details: {
@@ -439,7 +457,7 @@ describe('Fluxo de re-aprovação após reprovação', () => {
     );
     expect(reaprovado.approved).toBe(true);
     expect(reaprovado.was_rejected).toBe(true); // permanece true
-    expect(reaprovado.rejection_reason).toBeUndefined(); // não persiste o motivo antigo
+    expect(reaprovado.rejection_reason).toBeNull(); // não persiste o motivo antigo
 
     // Persistido no store
     const persisted = await obterEnsaioById('EnsaioMRAF', criado.id);

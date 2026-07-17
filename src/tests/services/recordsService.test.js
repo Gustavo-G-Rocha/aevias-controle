@@ -54,7 +54,9 @@ import {
 } from '@/services/recordsService';
 
 beforeEach(() => {
-  vi.clearAllMocks();
+  // resetAllMocks (e não clearAllMocks) descarta filas de mockResolvedValueOnce
+  // não consumidas, evitando vazamento de valores entre testes.
+  vi.resetAllMocks();
   for (const n of Object.keys(entities)) {
     entities[n].list.mockResolvedValue([]);
     entities[n].filter.mockResolvedValue([]);
@@ -110,27 +112,27 @@ describe('recordsService — loadAllRecords', () => {
     }
   });
 
-  it('modo list (padrão) usa limite 1000 por entidade (2 × 500)', async () => {
+  it('modo list (padrão) pagina via filter com páginas de 500', async () => {
     await loadAllRecords();
     for (const n of ALL_RECORD_ENTITIES) {
-      expect(entities[n].list).toHaveBeenCalledWith('-created_date', 1000);
+      expect(entities[n].filter).toHaveBeenCalledWith({}, '-created_date', 500, 0);
     }
   });
 
   it('normaliza com entityType e aplica dedup por id (sem dedup semântico)', async () => {
-    entities.DiarioObra.list.mockResolvedValueOnce([
+    entities.DiarioObra.filter.mockResolvedValueOnce([
       { id: 'd1', obra_id: 'o1', data: '2026-01-01', laboratorista_name: 'A', tipo_local: 'x', trecho: 't' },
       { id: 'd2', obra_id: 'o1', data: '2026-01-01', laboratorista_name: 'A', tipo_local: 'x', trecho: 't' },
     ]);
-    entities.EnsaioCAUQ.list.mockResolvedValueOnce([{ id: 'd1', obra_id: 'o2' }]);
+    entities.EnsaioCAUQ.filter.mockResolvedValueOnce([{ id: 'd1', obra_id: 'o2' }]);
     const out = await loadAllRecords();
     // d1 aparece duas vezes (DiarioObra + EnsaioCAUQ) — dedup por id mantém apenas a primeira
     expect(out).toHaveLength(2);
     expect(out[0].entityType).toBe('DiarioObra');
   });
 
-  it('tolera entidade cujo list falha (retorna [] sem quebrar o lote)', async () => {
-    entities.EnsaioMRAF.list.mockRejectedValueOnce(new Error('boom'));
+  it('tolera entidade cujo carregamento falha (retorna [] sem quebrar o lote)', async () => {
+    entities.EnsaioMRAF.filter.mockRejectedValueOnce(new Error('boom'));
     const out = await loadAllRecords();
     expect(Array.isArray(out)).toBe(true);
     expect(out.some((r) => r.entityType === 'EnsaioMRAF')).toBe(false);

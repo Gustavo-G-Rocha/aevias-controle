@@ -24,6 +24,12 @@ const { validarUploadArquivo } = vi.hoisted(() => ({
 
 vi.mock('@/functions/validarUploadArquivo', () => ({ validarUploadArquivo }));
 
+// compressImage usa APIs de DOM (Image/canvas) indisponíveis no ambiente node —
+// passthrough devolve o arquivo original sem compressão.
+vi.mock('@/utils/imageUpload', () => ({
+  compressImage: vi.fn(async (file) => file),
+}));
+
 import {
   uploadImagem,
   uploadMultiplasImagens,
@@ -90,7 +96,8 @@ describe('uploadService — uploadImagem', () => {
   });
 
   it('usa mensagem de fallback quando server-side falha sem detalhe', async () => {
-    validarUploadArquivo.mockRejectedValueOnce(new Error('network'));
+    // Erro genérico (não de rede) — erros de rede caem no fallback offline.
+    validarUploadArquivo.mockRejectedValueOnce(new Error('boom'));
     const file = validImage('photo.jpg');
     await expect(uploadImagem(file)).rejects.toThrow('Falha ao enviar imagem');
   });
@@ -132,14 +139,15 @@ describe('uploadService — uploadMultiplasImagens', () => {
   it('registra erro quando um upload individual falha', async () => {
     validarUploadArquivo
       .mockResolvedValueOnce({ data: { success: true, file_url: 'https://cdn.test/ok.jpg' } })
-      .mockRejectedValueOnce(new Error('network'));
+      .mockRejectedValueOnce(new Error('boom'));
     const files = [validImage('ok.jpg'), validImage('fail.jpg')];
     const results = await uploadMultiplasImagens(files);
     expect(results).toHaveLength(2);
     expect(results[0].status).toBe('fulfilled');
     expect(results[1].status).toBe('rejected');
     expect(results[1].url).toBeNull();
-    expect(results[1].error).toBe('network');
+    // Erro sem detalhe do servidor usa a mensagem de fallback do serviço
+    expect(results[1].error).toBe('Falha ao enviar imagem');
   });
 });
 

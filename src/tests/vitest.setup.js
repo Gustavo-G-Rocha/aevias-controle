@@ -117,4 +117,12 @@ if (typeof globalThis.localStorage === 'undefined') {
 }
 if (typeof globalThis.navigator === 'undefined') {
   globalThis.navigator = { onLine: true, userAgent: 'vitest-node', language: 'pt-BR' };
+} else if (globalThis.navigator.onLine === undefined) {
+  // Node 21+ expõe um navigator global SEM onLine — sem este shim,
+  // isEffectivelyOffline() reportaria offline em todos os testes.
+  try {
+    Object.defineProperty(globalThis.navigator, 'onLine', { value: true, configurable: true });
+  } catch {
+    globalThis.navigator = { ...globalThis.navigator, onLine: true, userAgent: 'vitest-node', language: 'pt-BR' };
+  }
 }
