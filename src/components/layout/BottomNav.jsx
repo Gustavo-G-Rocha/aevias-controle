@@ -51,12 +51,17 @@ export default function BottomNav({ userAccessLevel, canManageSystem, pendingTra
     }
     const currentZone = getTabZone(location.pathname);
     if (currentZone === item.zone) {
-      navigate(item.path);
+      // Aba já ativa: reseta para a raiz da zona e limpa a pilha persistida,
+      // para que um retorno futuro à aba não restaure a sub-rota descartada.
+      saveSessionPath(`${SESSION_KEYS.TAB_STACK_PREFIX}${item.zone}`, item.path);
+      if (location.pathname + location.search !== item.path) {
+        navigate(item.path);
+      }
     } else {
       const saved = readSessionPath(`${SESSION_KEYS.TAB_STACK_PREFIX}${item.zone}`);
       navigate(saved || item.path);
     }
-  }, [location.pathname, navigate]);
+  }, [location.pathname, location.search, navigate]);
 
   return (
     <>
