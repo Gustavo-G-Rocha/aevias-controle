@@ -9,9 +9,10 @@ import * as Desktop from "@/components/ui/desktop-select"
 const MobileSelectContext = React.createContext(null)
 
 // Bottom sheet (vaul) em viewports < 1024px — alinhado ao breakpoint `lg`
-// usado pelo restante do layout mobile (BottomNav, MobileBackHeader, cards).
-// Estado inicial calculado sincronicamente para evitar "flip" pós-mount.
-const MOBILE_QUERY = "(max-width: 1023px)"
+// usado pelo restante do layout mobile (BottomNav, MobileBackHeader, cards) —
+// e também em dispositivos de toque (pointer coarse, sem hover), independente
+// da largura da tela. Estado inicial síncrono para evitar "flip" pós-mount.
+const MOBILE_QUERY = "(max-width: 1023px), ((hover: none) and (pointer: coarse))"
 
 function useIsMobileViewport() {
   const [mobile, setMobile] = React.useState(() =>

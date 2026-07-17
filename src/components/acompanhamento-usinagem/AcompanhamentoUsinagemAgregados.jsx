@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, X } from "lucide-react";
+import AgregadoMobileCard from "./AgregadoMobileCard";
 
 export default function AcompanhamentoUsinagemAgregados({
   formData, setFormData, isEditable,
@@ -49,7 +50,21 @@ export default function AcompanhamentoUsinagemAgregados({
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          {/* Cards empilhados em telas < 1024px (padrão CargaMobileCard) */}
+          <div className="lg:hidden space-y-3">
+            {formData.agregados.map((agregado, index) => (
+              <AgregadoMobileCard
+                key={`agregado-card-${index}`}
+                agregado={agregado}
+                index={index}
+                canEdit={isEditable}
+                onChange={handleAgregadoChange}
+                onRemove={() => removerAgregado(index)}
+              />
+            ))}
+          </div>
+          <div className="hidden lg:block overflow-x-auto">
             <table className="w-full border-collapse border border-border text-sm">
               <thead className="bg-muted/50">
                 <tr>
@@ -102,6 +117,7 @@ export default function AcompanhamentoUsinagemAgregados({
               </tbody>
             </table>
           </div>
+          </>
         )}
       </CardContent>
     </Card>

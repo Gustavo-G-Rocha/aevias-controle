@@ -66,8 +66,8 @@ export default function BottomNav({ userAccessLevel, canManageSystem, pendingTra
   return (
     <>
     <nav
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-col"
-      style={{ backgroundColor: 'var(--color-sidebar-bg)', paddingBottom: "max(env(safe-area-inset-bottom, 0px), 0.5rem)" }}>
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-col pb-[env(safe-area-inset-bottom,16px)]"
+      style={{ backgroundColor: 'var(--color-sidebar-bg)' }}>
 
       <div className="flex items-center justify-around"
         onTouchStart={handleTouchStart}
