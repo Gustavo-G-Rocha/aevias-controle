@@ -52,9 +52,11 @@ const DASHBOARD_PAGE_SIZE = 200; // dashboard — só registros recentes para st
 // 10 × 500 = 5000 por entidade — usado por loadRecordsByObra (escopo de obra única).
 export const MAX_PAGES = 10;
 // modo 'list' (loadAllRecords): paginação completa via filter+skip.
-// 20 × 500 = 10.000 por entidade — cobre o maior volume atual (DiarioObra: 5.500).
-// O loop para automaticamente quando uma página retorna menos que o limite.
-export const LIST_MAX_PAGES = 20;
+// 40 × 500 = 20.000 por entidade — folga de ~4× sobre o maior volume atual
+// (DiarioObra: ~5.500). O loop para automaticamente quando uma página retorna
+// menos que o limite, então o teto só custa rede para entidades que o atingem.
+// Se ainda assim o teto for atingido, o usuário é avisado (ver loadEntity).
+export const LIST_MAX_PAGES = 40;
 
 async function loadEntity(entityType, limit = RECORD_PAGE_SIZE, paginate = false, maxPages = MAX_PAGES) {
   try {
@@ -66,11 +68,25 @@ async function loadEntity(entityType, limit = RECORD_PAGE_SIZE, paginate = false
     // (list() limita a 5000 por chamada; filter com skip não tem esse teto.)
     const all = [];
     let skip = 0;
+    let capReached = true;
     for (let page = 0; page < maxPages; page++) {
       const batch = await base44.entities[entityType].filter({}, '-created_date', limit, skip);
       all.push(...batch);
-      if (batch.length < limit) break;
+      if (batch.length < limit) {
+        capReached = false;
+        break;
+      }
       skip += limit;
+    }
+    // Teto de paginação atingido — antes os registros mais antigos eram
+    // silenciosamente omitidos da lista. Agora o usuário é avisado.
+    if (capReached) {
+      logger.warn(`[recordsService] Teto de paginação atingido em ${entityType} (${all.length} registros carregados)`);
+      toast({
+        title: `Volume muito alto em ${entityType}`,
+        description: `Apenas os ${all.length} registros mais recentes foram carregados. Registros mais antigos podem não aparecer na lista.`,
+        variant: 'destructive',
+      });
     }
     return all;
   } catch (e) {

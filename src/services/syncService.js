@@ -190,6 +190,8 @@ export async function forceSyncQueueItem(item) {
  * Items com status 'conflict' não são sincronizados automaticamente.
  * @returns {Promise<{synced: number, failed: number, errors: string[]}>}
  */
+const SYNC_CONCURRENCY = 5; // registros distintos sincronizam em paralelo (lotes de 5)
+
 export async function syncPendingItems() {
   logger.log('[syncService] Iniciando sincronização de items pendentes');
 
@@ -205,17 +207,35 @@ export async function syncPendingItems() {
   let failed = 0;
   const errors = [];
 
+  // Agrupar por registro: itens do MESMO registro (ex.: create seguido de
+  // update) sincronizam em ordem; registros DIFERENTES sincronizam em
+  // paralelo em lotes de SYNC_CONCURRENCY. Antes a fila era 100% sequencial
+  // (tempo total = nº de itens × latência da rede).
+  const groups = new Map();
   for (const item of pendingItems) {
-    const result = await syncQueueItem(item);
-    if (result.success) {
-      synced++;
-    } else if (result.conflict) {
-      // Conflitos não contam como falha — aguardam resolução do usuário
-      logger.log(`[syncService] Conflito detectado para ${item.id}`);
-    } else {
-      failed++;
-      errors.push(`${item.id}: ${result.error}`);
+    const key = `${item.entityType}:${item.entityId || item.id}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(item);
+  }
+
+  const processGroup = async (items) => {
+    for (const item of items) {
+      const result = await syncQueueItem(item);
+      if (result.success) {
+        synced++;
+      } else if (result.conflict) {
+        // Conflitos não contam como falha — aguardam resolução do usuário
+        logger.log(`[syncService] Conflito detectado para ${item.id}`);
+      } else {
+        failed++;
+        errors.push(`${item.id}: ${result.error}`);
+      }
     }
+  };
+
+  const groupList = [...groups.values()];
+  for (let i = 0; i < groupList.length; i += SYNC_CONCURRENCY) {
+    await Promise.all(groupList.slice(i, i + SYNC_CONCURRENCY).map(processGroup));
   }
 
   logger.log(`[syncService] Sincronização concluída: ${synced} sucesso, ${failed} falha`);

@@ -4,12 +4,13 @@
  * Stress test de sincronização offline e paginação de dados com
  * latência simulada de 25ms por chamada de API.
  *
- * Objetivo: expor custos ARQUITETURAIS que crescem com o volume:
- * - syncPendingItems processa a fila SEQUENCIALMENTE (1 item por vez)
- *   → tempo total = nº de itens × RTT da rede.
- * - loadAllRecords pagina SEQUENCIALMENTE dentro de cada entidade
- *   (até 20 páginas de 500) → entidades com muitos registros dominam
- *   o tempo de carregamento da tela de listas.
+ * Objetivo: proteger as otimizações arquiteturais contra regressões:
+ * - syncPendingItems sincroniza registros distintos em PARALELO (lotes
+ *   de 5), mantendo ordem sequencial só entre itens do mesmo registro
+ *   → tempo total ≈ (nº de itens / 5) × RTT da rede.
+ * - loadAllRecords pagina sequencialmente dentro de cada entidade (até
+ *   40 páginas de 500, com parada antecipada) e AVISA o usuário quando
+ *   o teto é atingido em vez de omitir registros silenciosamente.
  */
 import { describe, it, expect, afterAll, beforeEach, vi } from 'vitest';
 import { createBenchSuite, generateRecords } from './benchUtils';
@@ -107,9 +108,9 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-describe('Stress — sincronização da fila offline (sequencial)', () => {
+describe('Stress — sincronização da fila offline (lotes paralelos de 5)', () => {
   it('fila com 10 itens pendentes', async () => {
-    await bench('SYNC', 'syncPendingItems — 10 itens (10 × RTT sequencial)', 3, 1500, async () => {
+    await bench('SYNC', 'syncPendingItems — 10 itens (2 rodadas de 5 em paralelo)', 3, 1000, async () => {
       fillQueue(10);
       const r = await syncPendingItems();
       expect(r.synced).toBe(10);
@@ -117,28 +118,23 @@ describe('Stress — sincronização da fila offline (sequencial)', () => {
   });
 
   it('fila com 50 itens pendentes (ex.: um dia de campo sem sinal)', async () => {
-    await bench('SYNC', 'syncPendingItems — 50 itens (50 × RTT sequencial)', 3, 4000, async () => {
+    await bench('SYNC', 'syncPendingItems — 50 itens (10 rodadas de 5 em paralelo)', 3, 2000, async () => {
       fillQueue(50);
       const r = await syncPendingItems();
       expect(r.synced).toBe(50);
     });
   });
 
-  it('confirma crescimento LINEAR do tempo com o tamanho da fila', async () => {
-    fillQueue(5);
-    const t5start = performance.now();
-    await syncPendingItems();
-    const t5 = performance.now() - t5start;
-
+  it('paralelização em lotes: 25 itens custam MUITO menos que 25 × RTT', async () => {
     fillQueue(25);
-    const t25start = performance.now();
-    await syncPendingItems();
-    const t25 = performance.now() - t25start;
+    const start = performance.now();
+    const r = await syncPendingItems();
+    const elapsed = performance.now() - start;
 
-    // 5× mais itens deve custar ~5× o tempo (sequencial) — se algum dia a
-    // fila for paralelizada em lotes, esta razão cai e o teste documenta isso.
-    expect(t25 / t5).toBeGreaterThan(2.5);
-    expect(t25 / t5).toBeLessThan(12);
+    expect(r.synced).toBe(25);
+    // Sequencial seria ≥ 25 × 25ms = 625ms. Com lotes de 5 em paralelo,
+    // esperado ~5 rodadas ≈ 125-250ms. Regressão para sequencial falha aqui.
+    expect(elapsed).toBeLessThan(500);
   });
 });
 
@@ -151,13 +147,13 @@ describe('Stress — paginação de telas com alto volume', () => {
     });
   });
 
-  it('lista completa com 10.000 registros/entidade — TETO de LIST_MAX_PAGES', async () => {
+  it('lista completa com 10.000 registros/entidade — abaixo do teto de 20.000', async () => {
     setupDatasets(10000);
-    await bench('PAGINAÇÃO', 'loadAllRecords — 10.000/entidade (teto: 20 pág. seq.)', 2, 8000, async () => {
+    await bench('PAGINAÇÃO', 'loadAllRecords — 10.000/entidade (21 pág. seq./entidade)', 2, 8000, async () => {
       const r = await loadAllRecords();
-      // 20 páginas × 500 = teto de 10.000 por entidade — registros além
-      // desse limite são silenciosamente omitidos da tela de listas.
-      expect(r.length).toBeLessThanOrEqual(29 * 10000);
+      // Teto agora é 40 páginas × 500 = 20.000/entidade — os 10.000 de cada
+      // entidade carregam integralmente (parada antecipada na página vazia).
+      expect(r.length).toBeGreaterThanOrEqual(25 * 10000);
     });
   });
 
