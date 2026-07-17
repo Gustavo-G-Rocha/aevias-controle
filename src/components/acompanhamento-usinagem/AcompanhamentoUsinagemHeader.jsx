@@ -8,7 +8,7 @@ import { createPageUrl } from "@/utils";
 export default function AcompanhamentoUsinagemHeader({ editingId, rejectionReason }) {
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="hidden lg:flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link to={createPageUrl("MeusEnsaios")}>
             <Button variant="outline" size="icon">

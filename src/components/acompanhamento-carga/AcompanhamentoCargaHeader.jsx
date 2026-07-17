@@ -9,7 +9,7 @@ export default function AcompanhamentoCargaHeader() {
   const { editMode } = useAcompanhamentoCargaCtx();
   const navigate = useNavigate();
   return (
-    <div className="mb-6 flex items-center justify-between">
+    <div className="mb-6 hidden lg:flex items-center justify-between">
       <div className="flex items-center gap-4">
         <Button
           variant="outline"

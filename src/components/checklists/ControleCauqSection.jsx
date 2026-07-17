@@ -1,42 +1,8 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-
-// Uncontrolled input — stores value locally, never resets from parent
-function ResultInput({ value, onCommit, disabled, placeholder, style }) {
-  const inputRef = useRef(null);
-
-  // Sync value when it changes externally (e.g. loading saved data)
-  useEffect(() => {
-    if (inputRef.current) {
-      const current = inputRef.current.value;
-      const incoming = value != null ? String(value) : '';
-      if (current !== incoming) {
-        inputRef.current.value = incoming;
-      }
-    }
-  }, [value]);  
-
-  return (
-    <input
-      ref={inputRef}
-      type="text"
-      inputMode="decimal"
-      defaultValue={value != null ? String(value) : ''}
-      onChange={(e) => {
-        // Allow only numbers, comma, dot, and minus
-        const raw = e.target.value;
-        const filtered = raw.replace(/[^0-9.,\-]/g, '');
-        if (raw !== filtered) e.target.value = filtered;
-        onCommit(filtered);
-      }}
-      disabled={disabled}
-      className="h-8 text-sm flex w-full rounded-md border border-input bg-background px-3 py-1 shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-      style={style}
-      placeholder={placeholder}
-    />
-  );
-}
+import ResultInput from "./ResultInput";
+import ControleCauqMobileCard from "./ControleCauqMobileCard";
 
 export default function ControleCauqSection({
   formData,
@@ -65,7 +31,22 @@ export default function ControleCauqSection({
         <CardTitle className="text-lg">Controle de CAUQ</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
+        {/* Mobile (<1024px): cards empilhados no padrão CamadaMobileCard */}
+        <div className="lg:hidden space-y-3">
+          {ensaios.map(ensaio => (
+            <ControleCauqMobileCard
+              key={`mobile-${ensaio.key}`}
+              ensaio={ensaio}
+              formData={formData}
+              onNestedChange={handleNestedChange}
+              isEditable={isEditable}
+              isApproved={isApproved}
+              selectedProject={selectedProject}
+            />
+          ))}
+        </div>
+        {/* Desktop (≥1024px): tabela completa */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-muted">

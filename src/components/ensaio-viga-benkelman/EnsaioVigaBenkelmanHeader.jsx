@@ -7,7 +7,7 @@ import { createPageUrl } from '@/utils';
 export default function EnsaioVigaBenkelmanHeader({ editId }) {
   const navigate = useNavigate();
   return (
-    <div className="mb-6">
+    <div className="mb-6 hidden lg:block">
       <Button
         variant="ghost"
         onClick={() => navigate(createPageUrl('MeusEnsaios'))}

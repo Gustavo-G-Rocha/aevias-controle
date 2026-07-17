@@ -50,8 +50,8 @@ export default function EnsaioManchaPendulo() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6 bg-transparent min-h-screen">
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
+      {/* Header — oculto no mobile: título e voltar ficam no MobileBackHeader */}
+      <div className="hidden lg:flex items-center gap-4 mb-6">
         <Button variant="ghost" onClick={() => navigate(createPageUrl('MeusEnsaios'))}>
           <ArrowLeft className="w-4 h-4 mr-2" />
           Voltar

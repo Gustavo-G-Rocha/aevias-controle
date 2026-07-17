@@ -3,6 +3,7 @@ import { useAcompanhamentoCargaCtx } from "./AcompanhamentoCargaContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Trash2 } from "lucide-react";
+import CargaMobileCard from "./CargaMobileCard";
 
 export default function AcompanhamentoCargaCargas() {
   const { formData, canEdit, handleAddCarga, handleRemoveCarga, handleCargaChange } = useAcompanhamentoCargaCtx();
@@ -28,7 +29,22 @@ export default function AcompanhamentoCargaCargas() {
           <p>Nenhuma carga adicionada. Clique em "Adicionar Carga" para começar.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto">
+        <>
+        {/* Mobile (<1024px): cards empilhados no padrão CamadaMobileCard */}
+        <div className="lg:hidden space-y-3">
+          {cargas.map((carga, index) => (
+            <CargaMobileCard
+              key={`mobile-carga-${index}`}
+              carga={carga}
+              index={index}
+              canEdit={canEdit}
+              onChange={handleCargaChange}
+              onRemove={() => handleRemoveCarga(index)}
+            />
+          ))}
+        </div>
+        {/* Desktop (≥1024px): tabela completa */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full border-collapse border border-border text-xs">
             <thead className="bg-muted">
               <tr>
@@ -108,6 +124,7 @@ export default function AcompanhamentoCargaCargas() {
             </tbody>
           </table>
         </div>
+        </>
       )}
     </div>
   );
