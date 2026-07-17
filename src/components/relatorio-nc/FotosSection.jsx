@@ -16,7 +16,7 @@ export default function FotosSection({
     if (nc.fotos?.length > 0) {
       onComprimir();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   if (!nc.fotos?.length) return null;

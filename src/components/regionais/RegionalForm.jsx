@@ -58,7 +58,7 @@ const MultiSelect = ({ options, selected, onSelectedChange, placeholder }) => {
     );
 };
 
-export default function RegionalForm({ regional, users, projects, onSave, onCancel, isAdmin }) {
+export default function RegionalForm({ regional, users, projects, onSave, onCancel, isAdmin: _isAdmin }) {
     const [formData, setFormData] = useState({
         nome: regional?.nome || "",
         codigo: regional?.codigo || "",

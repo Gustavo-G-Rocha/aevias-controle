@@ -13,8 +13,8 @@ import { createPageUrl } from "@/utils";
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
 
-const EnsaioForm = ({ ensaio, obras, projects, onSave, onCancel }) => {
-    const [formData, setFormData] = useState(ensaio || {});
+const EnsaioForm = ({ ensaio, obras: _obras, projects: _projects, onSave, onCancel }) => {
+    const [formData, _setFormData] = useState(ensaio || {});
     // Add logic for form state management
     const handleSubmit = (e) => {
         e.preventDefault();

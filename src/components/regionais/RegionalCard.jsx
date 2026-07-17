@@ -29,7 +29,7 @@ const tipoObraIcons = {
   levantamentos: <FileText className="w-3 h-3 text-teal-600" />,
 };
 
-const RegionalCard = React.memo(({ regional, obras, users, projects, onEdit, onDelete, onObraAdded, canManage, isAdmin, statusFilter, isLaboratorista, setSelectedRegional }) => {
+const RegionalCard = React.memo(({ regional, obras, users: _users, projects, onEdit, onDelete, onObraAdded, canManage, isAdmin, statusFilter, isLaboratorista, setSelectedRegional }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isObraDialogOpen, setIsObraDialogOpen] = useState(false);
   const [editingObra, setEditingObra] = useState(null);

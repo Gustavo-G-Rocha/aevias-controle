@@ -57,7 +57,7 @@ const getInitialFormData = () => ({
 
 export function useChecklistReciclagemForm() {
   const {
-    obras, projects, user, editingChecklist,
+    obras, projects, user: _user, editingChecklist,
     loading, formData, setFormData, obraSelecionada,
     isApproved, isEditable, clearSavedData, navigate,
   } = useChecklistForm(getInitialFormData, 'ChecklistReciclagem', 'checklist_reciclagem');

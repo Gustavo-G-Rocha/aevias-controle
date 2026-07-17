@@ -3,7 +3,7 @@ import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AprovacaoBar from "@/components/relatorios/AprovacaoBar";
 
-export default function RelatorioRompimentoHeader({ ensaio, regional, onPrint }) {
+export default function RelatorioRompimentoHeader({ ensaio, regional: _regional, onPrint }) {
   return (
     <div className="print:hidden sticky top-0 bg-white border-b border-slate-200 p-3 shadow-sm z-10">
       <div className="max-w-[210mm] mx-auto flex justify-between items-center">

@@ -128,7 +128,7 @@ const CargaContent = ({ carga }) => (
 );
 
 // ── Main component ─────────────────────────────────────────────────────────────
-export default function RelatorioChecklistConcretagem({ checklist, creatorUser, obra, regional, project }) {
+export default function RelatorioChecklistConcretagem({ checklist, creatorUser, obra, regional, project: _project }) {
   const [compressedPhotos, setCompressedPhotos] = useState([]);
   const [isCompressing, setIsCompressing] = useState(true);
 

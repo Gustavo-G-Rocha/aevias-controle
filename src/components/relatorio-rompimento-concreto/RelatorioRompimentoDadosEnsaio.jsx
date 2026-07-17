@@ -1,6 +1,6 @@
 import React from "react";
 
-const infoFieldsLabels = [
+const _infoFieldsLabels = [
   "ESTRUTURA",
   "CONSTRUTORA",
   "NOTA FISCAL",

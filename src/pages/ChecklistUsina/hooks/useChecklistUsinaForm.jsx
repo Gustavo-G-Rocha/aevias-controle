@@ -4,7 +4,7 @@ import { useCallback } from "react";
  * Hook de estado e handlers para o formulário de Checklist Usina.
  * Mantém toda lógica de manipulação de estado fora do JSX.
  */
-export function useChecklistUsinaForm({ formData, setFormData, projects, faixas, selectedProject }) {
+export function useChecklistUsinaForm({ formData: _formData, setFormData, projects, faixas, selectedProject }) {
 
   // ── handlers simples ────────────────────────────────────────────────────────
   const handleChange = useCallback((field, value) => {
@@ -150,7 +150,7 @@ export function useChecklistUsinaForm({ formData, setFormData, projects, faixas,
 
     const path = sectionOrPath;
     const value = fieldOrValue;
-    const decimals = valueOrDecimals;
+    const _decimals = valueOrDecimals;
 
     setFormData(prev => {
       const newData = JSON.parse(JSON.stringify(prev));

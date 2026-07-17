@@ -28,7 +28,7 @@ const FieldRow = ({ label, children }) => (
   </div>
 );
 
-export default function SecaoEstruturaUsina({ formData, onNestedChange, handleChange, disabled }) {
+export default function SecaoEstruturaUsina({ formData, onNestedChange, handleChange: _handleChange, disabled }) {
   const ef = formData.estrutura_fisica || {};
   const ua = formData.usina_asfalto || {};
 

@@ -12,7 +12,7 @@ import { canGestorPreencherResultado } from "@/utils/certificacaoUsinaAccess";
 import { canUserEditRecord } from "@/utils/recordEditPermission";
 import CriticalActionDialog from "@/components/ensaios/CriticalActionDialog";
 
-const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, allUsers, obras, user, regionais = [], onApprove, onReject, onDelete, onAssinar }) => {
+const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, allUsers, obras: _obras, user, regionais = [], onApprove: _onApprove, onReject, onDelete, onAssinar }) => {
   const status = getStatusInfo(ensaio);
   const { name, icon: TypeIcon } = getEnsaioTypeInfo(ensaio);
   const reportUrl = getReportLink(ensaio);

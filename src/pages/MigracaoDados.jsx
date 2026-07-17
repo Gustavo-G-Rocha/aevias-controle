@@ -101,7 +101,7 @@ export default function MigracaoDados() {
   const handleRunMigration = async () => {
     if (window.confirm("Você tem certeza que deseja executar a migração das peneiras para os projetos? Esta ação não pode ser desfeita.")) {
       try {
-        const { data } = await base44.functions.invoke('migrarPeneirasProjects');
+        const { data: _data } = await base44.functions.invoke('migrarPeneirasProjects');
         toast({ title: "Migração concluída com sucesso!" });
       } catch (error) {
         logger.error("Erro na migração:", error);
@@ -113,7 +113,7 @@ export default function MigracaoDados() {
   const handleCleanMigration = async () => {
     if (window.confirm("ATENÇÃO: Você tem certeza que deseja LIMPAR TODOS os dados de peneiras dos projetos? Esta ação é IRREVERSÍVEL.")) {
       try {
-        const { data } = await base44.functions.invoke('limparTodasPeneirasProjects');
+        const { data: _data } = await base44.functions.invoke('limparTodasPeneirasProjects');
         toast({ title: "Limpeza concluída com sucesso!" });
       } catch (error) {
         logger.error("Erro na limpeza:", error);

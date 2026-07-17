@@ -26,7 +26,7 @@ export function processarEnsaio(ensaio, tipo, campos, todosOsProjetos, peneirasR
 
   const criarLinha = (id, data) => ({ tipo: label, id, data });
 
-  const preencherCampos = (linha, origem, origemPrincipal) => {
+  const _preencherCampos = (linha, origem, origemPrincipal) => {
     campos.forEach(campoKey => {
       const campo = CAMPOS_POR_TIPO[tipo].find(c => c.key === campoKey);
       if (!campo) return;

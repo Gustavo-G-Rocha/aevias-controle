@@ -53,8 +53,8 @@ const AppLayout = ({ children, currentPageName }) => {
   const userAccessLevel = getUserAccessLevel(user);
   const isAdmin = userAccessLevel === ACCESS_LEVELS.ADMIN || user?.role === ACCESS_LEVELS.ADMIN;
   const isSalaTecnica = userAccessLevel === ACCESS_LEVELS.SALA_TECNICA;
-  const isGestorContrato = userAccessLevel === ACCESS_LEVELS.GESTOR_CONTRATO;
-  const isCliente = userAccessLevel === ACCESS_LEVELS.CLIENTE || userAccessLevel === ACCESS_LEVELS.CLIENTE_SUPERVISOR;
+  const _isGestorContrato = userAccessLevel === ACCESS_LEVELS.GESTOR_CONTRATO;
+  const _isCliente = userAccessLevel === ACCESS_LEVELS.CLIENTE || userAccessLevel === ACCESS_LEVELS.CLIENTE_SUPERVISOR;
   const canManageSystem = isAdmin;
   const canCreateRecords = !loadingUser && (isAdmin || isSalaTecnica || userAccessLevel === ACCESS_LEVELS.USER || userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE || userAccessLevel === ACCESS_LEVELS.CLIENTE_SUPERVISOR);
 

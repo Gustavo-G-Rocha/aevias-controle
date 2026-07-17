@@ -92,7 +92,7 @@ const ENSAIO_CONFIG = {
       if (def_admissivel > 0) {
         const levantamentos = ensaio.levantamentos || [];
         const pontosNC = [];
-        levantamentos.forEach((lev, idx) => {
+        levantamentos.forEach((lev, _idx) => {
           if (lev.bordo_esquerdo?.deflexao > def_admissivel ||
               lev.eixo?.deflexao > def_admissivel ||
               lev.bordo_direito?.deflexao > def_admissivel) {

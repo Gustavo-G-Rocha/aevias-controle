@@ -12,7 +12,7 @@ import TextSectionsGroup from "@/components/editar-nc/TextSectionsGroup";
 import AttachmentsSection from "@/components/editar-nc/AttachmentsSection";
 
 export default function EditarNCPage() {
-  const { user, obras, regionais, nc, loading, loadData } = useEditarNCData();
+  const { user: _user, obras, regionais: _regionais, nc, loading, loadData: _loadData } = useEditarNCData();
   const {
     form,
     updateForm,

@@ -5,7 +5,7 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
 };
 
-const formatDateBrasilia = (dateString) => {
+const _formatDateBrasilia = (dateString) => {
   if (!dateString) return 'N/A';
   let normalizedDate = dateString;
   if (!dateString.endsWith('Z') && !dateString.includes('+') && !dateString.includes('-', 10)) {

@@ -4,7 +4,7 @@ import { listarObrasRecentes } from "@/services/obrasService";
 import { listarRegionais } from "@/services/regionaisService";
 import { listarProjects } from "@/services/projectsService";
 import { filtrarRegistros } from "@/services/recordsService";
-import { CAMPOS_POR_TIPO, TIPOS_ENSAIO } from "../constants/camposPorTipo";
+import { CAMPOS_POR_TIPO } from "../constants/camposPorTipo";
 import { filtrarObrasPorAcesso } from "../utils/resumosUtils";
 import { processarEnsaio } from "../utils/processarEnsaio";
 import { toast } from "@/components/ui/use-toast";

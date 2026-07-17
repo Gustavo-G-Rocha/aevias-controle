@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-const SimNaoRow = ({ label, value, onChange, disabled, colSpan }) => (
+const _SimNaoRow = ({ label, value, onChange, disabled, colSpan }) => (
   <tr>
     <td className="border border-border px-4 py-3 text-foreground">{label}</td>
     <td className="border border-border px-4 py-3 text-center">

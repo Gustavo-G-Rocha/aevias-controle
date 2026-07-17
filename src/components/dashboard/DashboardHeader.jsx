@@ -2,7 +2,7 @@ import React from 'react';
 import NicknameEditor from './NicknameEditor';
 
 export default function DashboardHeader({ user, isClienteUser }) {
-  const displayName = user?.nickname?.trim() || user?.full_name || '';
+  const _displayName = user?.nickname?.trim() || user?.full_name || '';
 
   return (
     <div className="mb-8 rounded-xl overflow-hidden relative" style={{ backgroundColor: '#001f35' }}>

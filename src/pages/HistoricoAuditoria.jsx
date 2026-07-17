@@ -7,7 +7,7 @@ import ChangeEntry from "@/components/auditoria/ChangeEntry";
 import AuditFilters from "@/components/auditoria/AuditFilters";
 
 export default function HistoricoAuditoria() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, _setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const entityName = searchParams.get("entity_name");
   const entityId = searchParams.get("entity_id");
@@ -42,7 +42,7 @@ export default function HistoricoAuditoria() {
 
       const data = await base44.entities.AuditTrail.filter(query, "-created_date", 200);
       setEntries(data);
-    } catch (err) {
+    } catch {
       setError("Não foi possível carregar o histórico de auditoria.");
     } finally {
       setLoading(false);

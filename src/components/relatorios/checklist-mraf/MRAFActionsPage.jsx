@@ -6,7 +6,7 @@ const SectionTitle = ({ children }) => <ReportSectionTitle size="sm">{children}<
 
 const LOGO_DEFAULT = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png";
 
-export default function MRAFActionsPage({ checklist, obra, regional, project }) {
+export default function MRAFActionsPage({ checklist, obra: _obra, regional, project: _project }) {
   return (
     <div className="break-before-page relative p-3 print:p-3" style={{ minHeight: '297mm', height: '297mm' }}>
       <div className="w-full max-w-[190mm] mx-auto relative" style={{ height: '100%' }}>

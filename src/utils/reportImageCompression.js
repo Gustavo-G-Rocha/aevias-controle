@@ -98,7 +98,7 @@ export async function compressImages(fotos, opts = {}) {
   const results = [];
   for (const foto of valid) {
     const url = toUrl(foto);
-    // eslint-disable-next-line no-await-in-loop
+     
     const compressed = await compressImage(url, opts);
     if (typeof foto === 'string') {
       results.push(compressed);

@@ -47,7 +47,7 @@ export default function ProctorCBRExpansao({ form, setForm }) {
     }));
   }, [form.data_ensaio, setForm]);
 
-  const updateCBR = (idx, field, value) => {
+  const _updateCBR = (idx, field, value) => {
     setForm(prev => {
       const updated = prev.cbr_cilindros.map((c, i) => i === idx ? { ...c, [field]: value } : c);
       return { ...prev, cbr_cilindros: updated };

@@ -34,7 +34,7 @@ export default function RelatorioProctorISC({ ensaio }) {
             ))}
           </tr>
           {cbr.map((cil, cidx) => {
-            const { pressoes, isc254, isc508 } = calcISC(cil, fator);
+            const { pressoes: _pressoes, isc254, isc508 } = calcISC(cil, fator);
             return (
               <React.Fragment key={cil.cilindro_numero ?? cidx}>
                 <tr className="bg-white">

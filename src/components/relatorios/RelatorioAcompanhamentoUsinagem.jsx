@@ -2,7 +2,7 @@ import React from 'react';
 
 import SignatureFooter from './SignatureFooter';
 
-export default function RelatorioAcompanhamentoUsinagem({ ensaio, obra, project, user, regional }) {
+export default function RelatorioAcompanhamentoUsinagem({ ensaio, obra, project, user: _user, regional }) {
   if (!ensaio) {
     return (
       <div className="bg-white p-8 font-sans">
@@ -19,7 +19,7 @@ export default function RelatorioAcompanhamentoUsinagem({ ensaio, obra, project,
     return new Date(dateString).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
   };
 
-  const formatDateBrasilia = (dateString) => {
+  const _formatDateBrasilia = (dateString) => {
     if (!dateString) return 'N/A';
     let normalizedDate = dateString;
     if (!dateString.endsWith('Z') && !dateString.includes('+') && !dateString.includes('-', 10)) {

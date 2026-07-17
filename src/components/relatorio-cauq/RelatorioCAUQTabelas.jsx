@@ -16,10 +16,10 @@ export default function RelatorioCAUQTabelas({ ensaio, project, faixa, dadosGran
   const media = (campo) => calcularMedia(cpsValidos, campo);
 
   const numPeneiras  = dadosGranulometria.length;
-  const heightClass  = (idx) => getHeightClass(numPeneiras, ensaio.realizar_marshall);
+  const heightClass  = (_idx) => getHeightClass(numPeneiras, ensaio.realizar_marshall);
   const paddingClass = ensaio.realizar_marshall ? 'px-0' : 'px-1.5';
   const paddingExtracaoLigante = getPaddingClass(ensaio.realizar_marshall);
-  const fontSizeGranulometria = getTableFontSize(ensaio.realizar_marshall, 'granulometria_header');
+  const _fontSizeGranulometria = getTableFontSize(ensaio.realizar_marshall, 'granulometria_header');
   const fontSizeExtracao = getTableFontSize(ensaio.realizar_marshall, 'extracao_header');
 
   return (

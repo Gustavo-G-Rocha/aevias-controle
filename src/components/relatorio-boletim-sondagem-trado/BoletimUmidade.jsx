@@ -4,7 +4,7 @@
 import React from 'react';
 import { formatNumber, calcularUmidade, calcularMediaUmidade } from '@/utils/relatorioBoletimSondagemTradoUtils';
 
-function UmidadeTable({ uData, rows, umidMedia, subtitle }) {
+function UmidadeTable({ uData: _uData, rows, umidMedia, subtitle }) {
   return (
     <div>
       {subtitle && (

@@ -13,9 +13,9 @@ import ActionsPageAplicacao from '@/components/relatorio-checklist-aplicacao/Act
 import { temAcoesCorretivas, buildFooterPropsAplicacao } from '@/utils/relatorioChecklistAplicacaoUtils';
 import { compressImages } from '@/utils/reportImageCompression';
 
-export default function RelatorioChecklistAplicacao({ checklist, obra, regional, user, creatorUser }) {
+export default function RelatorioChecklistAplicacao({ checklist, obra, regional, user: _user, creatorUser }) {
   const [compressedPhotos, setCompressedPhotos] = React.useState([]);
-  const [compressedMedicoes, setCompressedMedicoes] = React.useState([]);
+  const [_compressedMedicoes, setCompressedMedicoes] = React.useState([]);
   const [isCompressing, setIsCompressing] = React.useState(true);
 
   React.useEffect(() => {

@@ -32,7 +32,7 @@ export default function DadosObraSection({ formData, handleChange, obras, region
       handleChange("cliente", regionalSelecionada.cliente || "");
     }
     handleChange("rodovia", "");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [obraSelecionada?.id]);
 
   const disabled = !isEditable || isApproved;

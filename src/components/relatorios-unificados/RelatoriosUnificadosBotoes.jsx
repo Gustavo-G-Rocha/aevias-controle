@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 export default function RelatoriosUnificadosBotoes({
   onLimpar,
   onGerar,
-  isFormValid,
+  isFormValid: _isFormValid,
   generating,
 }) {
   return (

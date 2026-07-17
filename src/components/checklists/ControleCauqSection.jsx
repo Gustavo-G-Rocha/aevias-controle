@@ -15,7 +15,7 @@ function ResultInput({ value, onCommit, disabled, placeholder, style }) {
         inputRef.current.value = incoming;
       }
     }
-  }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [value]);  
 
   return (
     <input
@@ -88,15 +88,6 @@ export default function ControleCauqSection({
                 const resultados = formData.controle_cauq[ensaio.key]?.resultados || [];
                 const conforme = formData.controle_cauq[ensaio.key]?.conforme;
                 const isAutoConformity = quantidade === 1 && ('conforme' in (formData.controle_cauq[ensaio.key] ?? {})) && ensaio.key !== 'granulometria' && !ensaio.noConformity;
-                
-                let stepValue;
-                switch (ensaio.decimals) {
-                  case 0: stepValue = '1'; break;
-                  case 1: stepValue = '0.1'; break;
-                  case 2: stepValue = '0.01'; break;
-                  case 3: stepValue = '0.001'; break;
-                  default: stepValue = 'any';
-                }
                 
                 return (
                   <tr key={ensaio.key}>

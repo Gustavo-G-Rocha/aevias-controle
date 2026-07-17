@@ -19,7 +19,7 @@ export default function UsersPage() {
 
   const {
     searchTerm, setSearchTerm, filteredUsers,
-    isAdmin, isSalaTecnica, isGestorContrato, isCliente, canManageUsers,
+    isAdmin, isSalaTecnica: _isSalaTecnica, isGestorContrato: _isGestorContrato, isCliente, canManageUsers,
   } = useUsersFilters(users, currentUser);
 
   const {

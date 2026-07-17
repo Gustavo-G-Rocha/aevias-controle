@@ -3,7 +3,7 @@ import SectionTitleTerra from './SectionTitleTerra';
 import EnsaioRow from './EnsaioRow';
 import EnsaioSimpleRow from './EnsaioSimpleRow';
 
-export default function EnsaiosTable({ ensaios_empreiteira, umidade, checklist }) {
+export default function EnsaiosTable({ ensaios_empreiteira, umidade, checklist: _checklist }) {
   if (!ensaios_empreiteira) return null;
 
   return (

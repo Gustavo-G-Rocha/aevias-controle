@@ -28,7 +28,7 @@ export default function RelatorioLimites({ limites, ensaio, obra, regional }) {
     higroT1, higroT2, higroMedia,
     penGrossas, granGrossaCalc, totalSeca,
     soloSecoRetido10, soloUmPassando10, sp10, amostraTotalSecaCalc,
-    penFinas, granFinaCalc, amostParcSeca,
+    penFinas, granFinaCalc, amostParcSeca: _amostParcSeca,
     llRows, llCalc, llPoints, llYAxisDomain, llFit,
     lpRows, lpTeors, lpMedia,
     IP, pct200, pct10, pct40, igCalc, hrb,

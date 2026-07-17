@@ -23,7 +23,7 @@ export default function RelatorioChecklistTerraplanagem({ checklist, creatorUser
 
   useEffect(() => {
     if (!obraProp) loadRelatedData();
-  }, [checklist, obraProp]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [checklist, obraProp]);  
 
   useEffect(() => {
     let cancelled = false;

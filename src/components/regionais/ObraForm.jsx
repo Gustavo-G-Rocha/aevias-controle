@@ -37,7 +37,7 @@ const TagInput = ({ field, value, setValue, placeholder, badgeClass, items, onAd
   </div>
 );
 
-const ObraForm = React.memo(({ obra, regional, onSave, onCancel }) => {
+const ObraForm = React.memo(({ obra, regional: _regional, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
     name: obra?.name || "",
     code: obra?.code || "",

@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, Loader2, AlertTriangle } from "lucide-react";
+import { Lock, Loader2 } from "lucide-react";
 import { validatePasswordComplexity } from "@/utils/passwordPolicy";
 import PasswordStrengthChecklist from "@/components/auth/PasswordStrengthChecklist";
 import { logPasswordReset } from "@/utils/auditEvents";

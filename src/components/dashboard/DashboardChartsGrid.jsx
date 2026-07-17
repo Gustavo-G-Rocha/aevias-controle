@@ -11,7 +11,7 @@ function DashboardChartsGrid({
   charts,
   filters,
   isClienteUser,
-  isEngenheiroUser,
+  isEngenheiroUser: _isEngenheiroUser,
   onSliceClick,
   showObraChart,
   showTypeChartSeparate,

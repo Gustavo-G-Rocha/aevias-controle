@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const SIM_NAO_NA = ["sim", "nao", "na"];
+const _SIM_NAO_NA = ["sim", "nao", "na"];
 
 const SimNaoNaSelect = ({ value, onChange, disabled }) => (
   <Select value={value || "sim"} onValueChange={onChange} disabled={disabled}>

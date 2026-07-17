@@ -18,7 +18,7 @@ import { logger } from '@/utils/logger';
 export default function SolicitarTransferenciaModal({ 
   isOpen, 
   onClose, 
-  user, 
+  user: _user, 
   regionalAtual, 
   todasRegionais,
   onSubmit 

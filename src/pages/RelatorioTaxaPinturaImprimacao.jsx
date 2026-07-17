@@ -39,14 +39,14 @@ export default function RelatorioTaxaPinturaImprimacaoPage() {
       if (ensaio.obra_id) {
         try {
           obra = await obterObraById(ensaio.obra_id);
-        } catch (err) {
+        } catch {
           logger.warn("Obra não encontrada:", ensaio.obra_id);
         }
         
         if (obra && obra.regional_id) {
           try {
             regional = await obterRegionalById(obra.regional_id);
-          } catch (err) {
+          } catch {
             logger.warn("Regional não encontrada:", obra.regional_id);
           }
         }

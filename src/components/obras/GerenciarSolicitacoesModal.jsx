@@ -41,7 +41,7 @@ export default function GerenciarSolicitacoesModal({ isOpen, onClose, user, onUp
   const loadSolicitacoesCallback = useCallback(() => {
     if (isOpen) loadSolicitacoes();
   // loadSolicitacoes is defined in this component without changing deps
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [isOpen]);
 
   useEffect(() => {

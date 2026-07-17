@@ -126,7 +126,7 @@ function RowResistenciaExemplar({ series }) {
 }
 
 // ── Tabela: Compressão Axial ─────────────────────────────────────────────────
-function CompressaoAxialTable({ series, ensaio }) {
+function CompressaoAxialTable({ series, ensaio: _ensaio }) {
   const totalCPs = series.reduce((acc, s) => acc + s.length, 0);
   const totalCpCols = Math.max(series.reduce((a, s) => a + s.length, 0), 1);
   const dimensao = series[0]?.[0]?.dimensao || "";

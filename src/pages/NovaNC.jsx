@@ -15,7 +15,7 @@ import { AnexosSection } from "@/components/nova-nc/AnexosSection";
 
 export default function NovaNcPage() {
   // Data
-  const { user, obras, regionais, loading } = useNovaNCData();
+  const { user, obras, regionais: _regionais, loading } = useNovaNCData();
 
   // Form state
   const {

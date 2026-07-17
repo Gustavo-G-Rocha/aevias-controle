@@ -12,7 +12,7 @@ const LabeledField = ({ id, label, children, className = '' }) => (
 );
 
 export default function EnsaioRompimentoConcretoDadosGerais({
-  formData, obras, projects, isSupervisao, rodoviasDaObra, empreiteirasObra, projectsDaObra,
+  formData, obras, projects: _projects, isSupervisao, rodoviasDaObra, empreiteirasObra, projectsDaObra,
   onFieldChange, onObraChange,
 }) {
   return (

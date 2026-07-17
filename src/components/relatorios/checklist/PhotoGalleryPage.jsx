@@ -2,7 +2,7 @@ import React from 'react';
 import ReportHeader from './ReportHeader';
 import { normalizarFoto, extrairLegenda } from '@/utils/photoLegendaUtils';
 
-const LOGO_DEFAULT = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png";
+const _LOGO_DEFAULT = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png";
 
 /**
  * Página de galeria fotográfica para relatório

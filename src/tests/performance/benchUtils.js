@@ -39,7 +39,7 @@ export function createBenchSuite(titulo) {
       ),
       '═'.repeat(120),
     ];
-    // eslint-disable-next-line no-console
+     
     console.log(lines.join('\n'));
   }
 

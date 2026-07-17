@@ -26,7 +26,7 @@ export default function ChecklistMRAFPage() {
     loadingUpload, selectedFileNames, uploadProgress,
     projetosDisponiveis, selectedProject,
     handleChange, handleObraChange, handleProjectChange,
-    handleNestedChange, handleAcompChange,
+    handleNestedChange, handleAcompChange: _handleAcompChange,
     handleFileChange, handleRemovePhoto, handleSubmit,
   } = useChecklistMRAFForm();
 

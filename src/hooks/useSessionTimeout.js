@@ -138,7 +138,6 @@ export function useSessionTimeout({
       events.forEach((evt) => window.removeEventListener(evt, handleActivity));
       clearTimers();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, timeoutMs, warningMs]);
 
   // Listener de visibilitychange — revalida ao retornar do segundo plano
@@ -164,7 +163,6 @@ export function useSessionTimeout({
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, timeoutMs, warningMs, executeLogout, startCountdown, resetTimers]);
 
   const extendSession = useCallback(() => {

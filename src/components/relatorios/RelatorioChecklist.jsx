@@ -117,7 +117,7 @@ const ReportFooter = ({ checklist, creatorUser }) => (
 );
 
 // ─── Componente Principal ─────────────────────────────────────────────────────
-export default function RelatorioChecklist({ checklist, obra, regional, project, user, creatorUser }) {
+export default function RelatorioChecklist({ checklist, obra, regional, project, user: _user, creatorUser }) {
   const [compressedPhotos, setCompressedPhotos] = useState([]);
   const [isCompressing, setIsCompressing] = useState(true);
 

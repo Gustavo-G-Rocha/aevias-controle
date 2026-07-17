@@ -10,7 +10,7 @@ import RelatorioMRAFGraficos from '@/components/relatorio-mraf/RelatorioMRAFGraf
 import RelatorioMRAFObservacoes from '@/components/relatorio-mraf/RelatorioMRAFObservacoes.jsx';
 import RelatorioMRAFActions from '@/components/relatorio-mraf/RelatorioMRAFActions.jsx';
 
-export default function RelatorioMRAF({ ensaio, obra, project, user, regional, faixaGranulometrica }) {
+export default function RelatorioMRAF({ ensaio, obra, project, user: _user, regional, faixaGranulometrica }) {
   const [hoveredPoint, setHoveredPoint] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 

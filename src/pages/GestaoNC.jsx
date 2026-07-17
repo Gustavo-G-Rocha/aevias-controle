@@ -36,7 +36,7 @@ export default function GestaoNCPage() {
     closeApprovalModal,
     showApprovalModal,
     setShowApprovalModal,
-    selectedNC,
+    selectedNC: _selectedNC,
     approvalAction,
     rejectionReason,
     setRejectionReason,
@@ -44,8 +44,8 @@ export default function GestaoNCPage() {
 
   const isGestor = isUserGestor(user);
   const isAdmin = isUserAdmin(user);
-  const isCliente = isUserCliente(user);
-  const canChangeStatus = canUserChangeStatus(user);
+  const _isCliente = isUserCliente(user);
+  const _canChangeStatus = canUserChangeStatus(user);
 
   if (loading) {
     return (

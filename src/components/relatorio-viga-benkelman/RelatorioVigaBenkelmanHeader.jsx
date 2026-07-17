@@ -1,7 +1,7 @@
 import React from 'react';
 import { formatDate } from '@/utils/relatorioVigaBenkelmanUtils';
 
-export default function RelatorioVigaBenkelmanHeader({ ensaio, regional, faixaNome }) {
+export default function RelatorioVigaBenkelmanHeader({ ensaio, regional, faixaNome: _faixaNome }) {
   return (
     <header className="grid grid-cols-3 items-center border-b-2 border-slate-900 pb-0 mb-0 mt-4 print:mt-0">
       <div className="flex justify-start">

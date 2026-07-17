@@ -4,16 +4,16 @@ import SubSectionTitle from "./SubSectionTitle";
 
 export default function SecaoSaudeSeguranca({ formData, onNestedChange, disabled }) {
   const ss = formData.saude_seguranca || {};
-  const t = ss.treinamentos || {};
-  const epis = ss.epis || {};
-  const ac = ss.acessos || {};
-  const em = ss.escadas_marinheiro || {};
-  const gp = ss.gaiolas_protecao || {};
-  const ie = ss.instalacoes_eletricas || {};
-  const sisSeg = ss.sistemas_seguranca || {};
-  const prot = ss.protecoes || {};
-  const nr35 = ss.nr35_trabalho_altura || {};
-  const nr10 = ss.nr10_eletricidade || {};
+  const _t = ss.treinamentos || {};
+  const _epis = ss.epis || {};
+  const _ac = ss.acessos || {};
+  const _em = ss.escadas_marinheiro || {};
+  const _gp = ss.gaiolas_protecao || {};
+  const _ie = ss.instalacoes_eletricas || {};
+  const _sisSeg = ss.sistemas_seguranca || {};
+  const _prot = ss.protecoes || {};
+  const _nr35 = ss.nr35_trabalho_altura || {};
+  const _nr10 = ss.nr10_eletricidade || {};
 
   const row = (label, section, key) => (
     <ChecklistRow

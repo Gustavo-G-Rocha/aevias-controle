@@ -5,7 +5,7 @@ import { formatDate, buildSignatureProps } from '@/utils/relatorioUtils';
 import SignatureFooter from './SignatureFooter';
 import PrintStyles from './PrintStyles';
 
-export default function RelatorioGranulometriaIndividual({ ensaio, obra, project, user, regional }) {
+export default function RelatorioGranulometriaIndividual({ ensaio, obra, project, user: _user, regional }) {
   if (!ensaio) {
     return (
       <div className="bg-white p-8 font-sans">
@@ -17,7 +17,7 @@ export default function RelatorioGranulometriaIndividual({ ensaio, obra, project
     );
   }
 
-  const handleDownloadPDF = () => {
+  const _handleDownloadPDF = () => {
     window.print();
   };
 

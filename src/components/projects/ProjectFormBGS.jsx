@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 
-export default function ProjectFormBGS({ formData, peneirasCarregadas, peneirasDisponiveis, onAgregadoAdd, onAgregadoRemove, onAgregadoChange, onInputChange, onNestedChange, onFaixaTrabalhoChange }) {
+export default function ProjectFormBGS({ formData, peneirasCarregadas, peneirasDisponiveis, onAgregadoAdd, onAgregadoRemove, onAgregadoChange, onInputChange, onNestedChange: _onNestedChange, onFaixaTrabalhoChange }) {
   return (
     <div className="space-y-6">
       {/* Densidade Seca Máxima */}

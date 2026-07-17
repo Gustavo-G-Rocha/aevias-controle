@@ -34,7 +34,7 @@ const statusConfig = {
   rejeitada: { icon: XCircle, color: "bg-red-100 text-destructive", label: "Rejeitada" }
 };
 
-export default function SolicitacaoCard({ solicitacao, onAprovar, onRejeitar, user }) {
+export default function SolicitacaoCard({ solicitacao, onAprovar, onRejeitar, user: _user }) {
   const [rejeitando, setRejeitando] = useState(false);
   const [motivoRejeicao, setMotivoRejeicao] = useState("");
   const [processando, setProcessando] = useState(false);
@@ -54,7 +54,7 @@ export default function SolicitacaoCard({ solicitacao, onAprovar, onRejeitar, us
       }
 
       await onAprovar(solicitacao);
-    } catch (error) {
+    } catch {
       toast({ title: "Erro ao processar aprovação.", variant: "destructive" });
     } finally {
       setProcessando(false);

@@ -2,7 +2,7 @@ import React from 'react';
 import { Separator } from "@/components/ui/separator";
 import SignatureFooter from './SignatureFooter';
 
-export default function RelatorioDensidade({ ensaio, obra, project, laboratorista, regional }) {
+export default function RelatorioDensidade({ ensaio, obra, project, laboratorista: _laboratorista, regional }) {
   
   const calcularResultados = () => {
     const { peso_cp_seco_ar, peso_cp_imerso_agua, peso_cp_sss, densidade_maxima_teorica, fator_correcao_prensa = 1.0 } = ensaio.pesos;
