@@ -1,6 +1,5 @@
 import React, { useState, useRef, useCallback } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +17,7 @@ import BottomNav from "@/components/layout/BottomNav";
 import CreateEnsaioDialog from "@/components/layout/CreateEnsaioDialog";
 import { CreateEnsaioDialogProvider } from "@/components/layout/CreateEnsaioDialogContext";
 import MobileBackHeader from "@/components/layout/MobileBackHeader";
+import PageTransition from "@/components/layout/PageTransition";
 import OfflineStatusBar from "@/components/offline/OfflineStatusBar";
 import SidebarToggle from "@/components/layout/SidebarToggle";
 import { REPORT_PAGES } from "@/lib/reportPages";
@@ -28,7 +28,6 @@ const AppLayout = ({ children, currentPageName }) => {
   const [minhasObrasOpen, setMinhasObrasOpen] = useState(false);
 
   const { user, obrasDoUsuario, loadingUser, pendingTransfers } = useLayoutData();
-  const location = useLocation();
   const navigate = useNavigate();
 
   // Navegação a partir do diálogo "Iniciar Novo Registro": fecha o diálogo
@@ -79,16 +78,12 @@ const AppLayout = ({ children, currentPageName }) => {
           <MobileBackHeader />
           <div className="flex-1 flex flex-col">
             <PullToRefresh disabled={isFormPage(currentPageName)}>
-              <motion.div
-                key={location.pathname}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.25, ease: "easeOut" }}
+              <PageTransition
                 className="pb-16 lg:pb-0 overflow-x-hidden"
                 style={{ paddingTop: "env(safe-area-inset-top)" }}
               >
                 {children}
-              </motion.div>
+              </PageTransition>
             </PullToRefresh>
           </div>
           <BottomNav
