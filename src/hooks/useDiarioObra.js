@@ -208,7 +208,8 @@ export function useDiarioObra() {
       navigate(createPageUrl("MeusEnsaios"));
     } catch (error) {
       logger.error("[DiarioObra] Erro:", error?.message || error);
-      toast({ title: "Ocorreu um erro ao salvar o diário.", variant: "destructive" });
+      const detalhe = error?.message && !/^Falha ao (criar|atualizar) diário$/.test(error.message) ? ` ${error.message}` : "";
+      toast({ title: `Ocorreu um erro ao salvar o diário.${detalhe}`, variant: "destructive" });
     } finally {
       setSaving(false);
     }
