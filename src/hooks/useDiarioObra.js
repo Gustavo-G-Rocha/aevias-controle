@@ -199,7 +199,20 @@ export function useDiarioObra() {
         if (editingDiarioOriginal.approved === false && saveStatus === "finalizado") {
           Object.assign(updateData, { approved: null, rejection_reason: null, approved_by: null, approved_date: null, was_rejected: true });
         }
-        await atualizarDiario(editingDiarioOriginal.id, updateData);
+        try {
+          await atualizarDiario(editingDiarioOriginal.id, updateData);
+        } catch (updateError) {
+          // Registro original excluído durante a edição — recupera o
+          // trabalho do usuário salvando como um novo registro.
+          if (/Registro não encontrado/i.test(updateError?.message || "")) {
+            await criarDiario({ ...dataToSave, created_by: user.email, laboratorista_name: user.laboratorista_name || user.full_name });
+            toast({ title: "O registro original havia sido excluído — seu trabalho foi salvo como um novo registro." });
+            clearLocalDraft();
+            navigate(createPageUrl("MeusEnsaios"));
+            return;
+          }
+          throw updateError;
+        }
         toast({ title: saveStatus === "rascunho" ? "Progresso salvo!" : "Diário atualizado com sucesso!" });
       } else {
         await criarDiario({ ...dataToSave, created_by: user.email, laboratorista_name: user.laboratorista_name || user.full_name });
