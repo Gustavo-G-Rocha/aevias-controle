@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { obterDiarioById, criarDiario, atualizarDiario } from "@/services/diarioObraService";
 import { uploadMultipleFiles } from "@/utils/imageUpload";
@@ -83,6 +83,7 @@ export function useDiarioObra() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const initializedSearchRef = useRef(null);
   const [editingDiarioOriginal, setEditingDiarioOriginal] = useState(null);
   const [editLoading, setEditLoading] = useState(false);
   const [formData, setFormData] = useState(getInitialFormData());
@@ -223,6 +224,12 @@ export function useDiarioObra() {
   useEffect(() => {
     if (loadingUser || loadingAux || !user) return;
 
+    // Inicializa apenas uma vez por navegação. Sem esta guarda, qualquer
+    // refetch dos dados auxiliares (nova referência de `obras`) re-executava
+    // este efeito e sobrescrevia as edições do usuário com o rascunho local.
+    if (initializedSearchRef.current === location.search) return;
+    initializedSearchRef.current = location.search;
+
     const params = new URLSearchParams(location.search);
     const editId = params.get("editId");
 
@@ -255,7 +262,10 @@ export function useDiarioObra() {
       // Restaura rascunho local (auto-save) se existir — protege trabalho em
       // andamento contra fechamento acidental da página, inclusive offline.
       const draft = readLocalDraft();
-      setFormData(draft ? { ...initial, ...draft, obra_id: draft.obra_id || initial.obra_id } : initial);
+      // Descarta obra_id do rascunho se a obra já não existe/não está
+      // disponível — evita "Obra não encontrada" ao salvar.
+      const draftObraValida = draft?.obra_id && obras.some(o => o.id === draft.obra_id);
+      setFormData(draft ? { ...initial, ...draft, obra_id: draftObraValida ? draft.obra_id : initial.obra_id } : initial);
       setEditingDiarioOriginal(null);
     }
   }, [location.search, loadingUser, loadingAux, user?.id, obras, navigate]);
