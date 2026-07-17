@@ -12,6 +12,7 @@ const DEFAULT_LOGO = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object
 
 const CONDICOES_CLIMATICAS = {
   ensolarado: "☀️ Ensolarado",
+  ceu_limpo: "🌙 Céu limpo",
   nublado: "☁️ Nublado",
   chuvoso: "🌧️ Chuvoso",
   garoa: "🌦️ Garoa",

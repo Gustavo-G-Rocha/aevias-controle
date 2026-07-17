@@ -3,6 +3,26 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useEffect } from "react";
 
+const CLIMA_LABELS = {
+  ensolarado: "Ensolarado",
+  ceu_limpo: "Céu limpo",
+  nublado: "Nublado",
+  chuvoso: "Chuvoso",
+  garoa: "Garoa",
+  vento_forte: "Vento forte",
+  neblina: "Neblina",
+};
+
+// Jornada noturna: início do turno a partir das 18h ou antes das 6h.
+// No período noturno não faz sentido "Ensolarado" — oferece "Céu limpo".
+function isJornadaNoturna(jornada) {
+  const inicio = jornada?.horario_inicio;
+  if (!inicio) return false;
+  const hora = parseInt(inicio.split(":")[0], 10);
+  if (Number.isNaN(hora)) return false;
+  return hora >= 18 || hora < 6;
+}
+
 export default function DadosObraSection({ formData, handleChange, obras, regionais, isEditable, isApproved }) {
   const obraSelecionada = obras.find(o => o.id === formData.obra_id);
   const regionalSelecionada = obraSelecionada ? regionais.find(r => r.id === obraSelecionada.regional_id) : null;
@@ -153,9 +173,17 @@ export default function DadosObraSection({ formData, handleChange, obras, region
               <Select value={formData.condicoes_climaticas} onValueChange={(v) => handleChange("condicoes_climaticas", v)} disabled={disabled}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {["ensolarado", "nublado", "chuvoso", "garoa", "vento_forte", "neblina"].map(v => (
-                    <SelectItem key={v} value={v}>{v.charAt(0).toUpperCase() + v.slice(1).replace("_", " ")}</SelectItem>
-                  ))}
+                  {(() => {
+                    const noturno = isJornadaNoturna(formData.jornada);
+                    const opcoes = [noturno ? "ceu_limpo" : "ensolarado", "nublado", "chuvoso", "garoa", "vento_forte", "neblina"];
+                    // Mantém visível o valor já salvo mesmo que não esteja na lista atual
+                    if (formData.condicoes_climaticas && !opcoes.includes(formData.condicoes_climaticas)) {
+                      opcoes.unshift(formData.condicoes_climaticas);
+                    }
+                    return opcoes.map(v => (
+                      <SelectItem key={v} value={v}>{CLIMA_LABELS[v] || v}</SelectItem>
+                    ));
+                  })()}
                 </SelectContent>
               </Select>
             </div>
