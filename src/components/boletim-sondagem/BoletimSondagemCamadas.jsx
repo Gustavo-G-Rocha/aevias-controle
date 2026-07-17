@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Trash2 } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
 import CamadaMobileCard from "@/components/boletim-sondagem/CamadaMobileCard";
 
 export default function BoletimSondagemCamadas({
@@ -12,7 +11,6 @@ export default function BoletimSondagemCamadas({
   handleCamadaChange, adicionarCamada, removerCamada,
   adicionarCamada2, removerCamada2,
 }) {
-  const isMobile = useIsMobile();
   const temColuna2 = formData.camadas.some(c => c.classificacao_2 !== null);
 
   // Handler unificado para camadas_2 (usado pela visão mobile) — replica a
@@ -84,8 +82,8 @@ export default function BoletimSondagemCamadas({
               </div>
             </div>
             <div className="text-xs font-semibold text-muted-foreground mb-2">Classificação 1</div>
-            {isMobile ? (
-              <div className="space-y-3">
+            {/* Mobile (<1024px): cards empilhados */}
+            <div className="lg:hidden space-y-3">
                 {formData.camadas.map((camada, index) => (
                   <CamadaMobileCard
                     key={index}
@@ -98,9 +96,9 @@ export default function BoletimSondagemCamadas({
                     canRemove={formData.camadas.length > 1}
                   />
                 ))}
-              </div>
-            ) : (
-            <table className="w-full text-sm border-collapse">
+            </div>
+            {/* Desktop (≥1024px): tabela */}
+            <table className="hidden lg:table w-full text-sm border-collapse">
               <colgroup>
                 <col className="w-12" />
                 <col className="w-[130px]" />
@@ -167,7 +165,6 @@ export default function BoletimSondagemCamadas({
                 ))}
               </tbody>
             </table>
-            )}
           </div>
 
           {/* TABELA 2 - Classificação 2 (quando houver) */}
@@ -183,8 +180,8 @@ export default function BoletimSondagemCamadas({
                 </Button>
               </div>
               <div className="text-xs font-semibold text-muted-foreground mb-2">Classificação 2</div>
-              {isMobile ? (
-                <div className="space-y-3">
+              {/* Mobile (<1024px): cards empilhados */}
+              <div className="lg:hidden space-y-3">
                   {(formData.camadas_2 || []).map((camada, index) => (
                     <CamadaMobileCard
                       key={index}
@@ -197,9 +194,9 @@ export default function BoletimSondagemCamadas({
                       canRemove
                     />
                   ))}
-                </div>
-              ) : (
-              <table className="w-full text-sm border-collapse">
+              </div>
+              {/* Desktop (≥1024px): tabela */}
+              <table className="hidden lg:table w-full text-sm border-collapse">
                 <colgroup>
                   <col className="w-12" />
                   <col className="w-[130px]" />
@@ -294,7 +291,6 @@ export default function BoletimSondagemCamadas({
                   ))}
                 </tbody>
               </table>
-              )}
             </div>
           )}
         </div>

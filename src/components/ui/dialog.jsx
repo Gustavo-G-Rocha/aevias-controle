@@ -5,8 +5,14 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { useHistoryControlledOpen } from "@/hooks/useModalHistory"
 
-const Dialog = DialogPrimitive.Root
+// Root com estado mapeado no history: "voltar" fecha o modal em vez de sair da rota.
+const Dialog = ({ open, defaultOpen, onOpenChange, ...props }) => {
+  const [isOpen, handleOpenChange] = useHistoryControlledOpen({ open, defaultOpen, onOpenChange });
+  return <DialogPrimitive.Root open={isOpen} onOpenChange={handleOpenChange} {...props} />;
+}
+Dialog.displayName = "Dialog"
 
 const DialogTrigger = DialogPrimitive.Trigger
 

@@ -5,8 +5,14 @@ import { cva } from "class-variance-authority";
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { useHistoryControlledOpen } from "@/hooks/useModalHistory"
 
-const Sheet = SheetPrimitive.Root
+// Root com estado mapeado no history: "voltar" fecha o sheet em vez de sair da rota.
+const Sheet = ({ open, defaultOpen, onOpenChange, ...props }) => {
+  const [isOpen, handleOpenChange] = useHistoryControlledOpen({ open, defaultOpen, onOpenChange });
+  return <SheetPrimitive.Root open={isOpen} onOpenChange={handleOpenChange} {...props} />;
+}
+Sheet.displayName = "Sheet"
 
 const SheetTrigger = SheetPrimitive.Trigger
 

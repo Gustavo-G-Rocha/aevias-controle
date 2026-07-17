@@ -64,8 +64,8 @@ export default function EnsaioVigaBenkelmanResultados({
                   )}
                 </div>
 
-                {/* Desktop: tabela */}
-                <div className="hidden md:block overflow-x-auto">
+                {/* Desktop (≥1024px): tabela */}
+                <div className="hidden lg:block overflow-x-auto">
                   <table className="w-full border-collapse text-sm">
                     <colgroup>
                       <col style={{ width: '120px' }} />
@@ -162,8 +162,8 @@ export default function EnsaioVigaBenkelmanResultados({
                   </table>
                 </div>
 
-                {/* Mobile: cards por estaca */}
-                <div className="md:hidden space-y-4">
+                {/* Mobile (<1024px): cards por estaca */}
+                <div className="lg:hidden space-y-4">
                   {faixa.levantamentos.map((lev, idx) => (
                     <div key={idx} className={`border border-border rounded-lg p-3 ${idx % 2 === 0 ? 'bg-muted/20' : 'bg-background'}`}>
                       <div className="mb-3">

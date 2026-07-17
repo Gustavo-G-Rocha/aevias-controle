@@ -4,13 +4,25 @@ import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
 
 import { cn } from "@/lib/utils"
+import { useHistoryControlledOpen } from "@/hooks/useModalHistory"
 
+// Root com estado mapeado no history: "voltar" fecha o drawer em vez de sair da rota.
 const Drawer = ({
   shouldScaleBackground = true,
+  open,
+  defaultOpen,
+  onOpenChange,
   ...props
-}) => (
-  <DrawerPrimitive.Root shouldScaleBackground={shouldScaleBackground} {...props} />
-)
+}) => {
+  const [isOpen, handleOpenChange] = useHistoryControlledOpen({ open, defaultOpen, onOpenChange });
+  return (
+    <DrawerPrimitive.Root
+      shouldScaleBackground={shouldScaleBackground}
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      {...props} />
+  );
+}
 Drawer.displayName = "Drawer"
 
 const DrawerTrigger = DrawerPrimitive.Trigger

@@ -3,8 +3,14 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+import { useHistoryControlledOpen } from "@/hooks/useModalHistory"
 
-const AlertDialog = AlertDialogPrimitive.Root
+// Root com estado mapeado no history: "voltar" fecha o diálogo em vez de sair da rota.
+const AlertDialog = ({ open, defaultOpen, onOpenChange, ...props }) => {
+  const [isOpen, handleOpenChange] = useHistoryControlledOpen({ open, defaultOpen, onOpenChange });
+  return <AlertDialogPrimitive.Root open={isOpen} onOpenChange={handleOpenChange} {...props} />;
+}
+AlertDialog.displayName = "AlertDialog"
 
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger
 

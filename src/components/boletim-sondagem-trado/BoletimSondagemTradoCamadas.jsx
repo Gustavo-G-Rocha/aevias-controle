@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Trash2 } from "lucide-react";
+import CamadaMobileCard from "@/components/boletim-sondagem/CamadaMobileCard";
 
 export default function BoletimSondagemTradoCamadas({ formData, setFormData, isEditable, handleCamadaChange, adicionarCamada, removerCamada }) {
   return (
@@ -35,7 +36,23 @@ export default function BoletimSondagemTradoCamadas({ formData, setFormData, isE
             className="h-9 text-sm mt-1"
           />
         </div>
-        <div className="overflow-x-auto">
+        {/* Mobile (<1024px): cards empilhados no padrão CamadaMobileCard */}
+        <div className="lg:hidden space-y-3">
+          {formData.camadas.map((camada, index) => (
+            <CamadaMobileCard
+              key={index}
+              camada={camada}
+              classificacaoField="classificacao_1"
+              isEditable={isEditable}
+              profDeEditable={index === 0}
+              onFieldChange={(field, value) => handleCamadaChange(index, field, value)}
+              onRemove={() => removerCamada(index)}
+              canRemove={formData.camadas.length > 1}
+            />
+          ))}
+        </div>
+        {/* Desktop (≥1024px): tabela completa */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <colgroup>
               <col className="w-12" />

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, X } from "lucide-react";
+import UsinagemCargaMobileCard from "./UsinagemCargaMobileCard";
 
 export default function AcompanhamentoUsinagemCargas({
   cargas, isEditable,
@@ -24,7 +25,22 @@ export default function AcompanhamentoUsinagemCargas({
         {cargas.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">Nenhuma carga adicionada</p>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          {/* Mobile (<1024px): cards empilhados no padrão CamadaMobileCard */}
+          <div className="lg:hidden space-y-3">
+            {cargas.map((carga, index) => (
+              <UsinagemCargaMobileCard
+                key={`mobile-carga-${index}`}
+                carga={carga}
+                index={index}
+                isEditable={isEditable}
+                onChange={handleCargaChange}
+                onRemove={() => removerCarga(index)}
+              />
+            ))}
+          </div>
+          {/* Desktop (≥1024px): tabela completa */}
+          <div className="hidden lg:block overflow-x-auto">
             <table className="w-full border-collapse border border-border text-sm">
               <thead className="bg-muted/50">
                 <tr>
@@ -83,6 +99,7 @@ export default function AcompanhamentoUsinagemCargas({
               </tbody>
             </table>
           </div>
+          </>
         )}
       </CardContent>
     </Card>
