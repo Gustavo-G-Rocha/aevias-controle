@@ -34,6 +34,15 @@ const { entities } = vi.hoisted(() => {
 
 vi.mock('@/api/base44Client', () => ({ base44: { entities } }));
 
+const { gerenciarAprovacao } = vi.hoisted(() => ({
+  gerenciarAprovacao: vi.fn(async (payload) => {
+    return { data: { success: true, data: { id: payload.recordId, ...payload } } };
+  }),
+}));
+
+// Todos os módulos @/functions/* resolvem para o MESMO stub compartilhado
+// (alias no vitest.config). Dois vi.mock em paths diferentes sobrescreveriam
+// um ao outro — por isso um único factory exporta ambas as functions.
 vi.mock('@/functions/validarESalvarRegistro', () => ({
   validarESalvarRegistro: vi.fn(async ({ entityName, data, operation, recordId }) => {
     const { base44 } = await import('@/api/base44Client');
@@ -44,15 +53,8 @@ vi.mock('@/functions/validarESalvarRegistro', () => ({
     const result = await base44.entities[entityName].update(recordId, data);
     return { data: { success: true, data: result } };
   }),
+  gerenciarAprovacao,
 }));
-
-const { gerenciarAprovacao } = vi.hoisted(() => ({
-  gerenciarAprovacao: vi.fn(async (payload) => {
-    return { data: { success: true, data: { id: payload.recordId, ...payload } } };
-  }),
-}));
-
-vi.mock('@/functions/gerenciarAprovacao', () => ({ gerenciarAprovacao }));
 
 import {
   listarEnsaios,

@@ -85,6 +85,60 @@ vi.mock('@/functions/validarESalvarRegistro', () => ({
     const result = await base44.entities[entityName].update(recordId, data);
     return { data: { success: true, data: result } };
   }),
+  // Espelha a backend function real gerenciarAprovacao (mesmo módulo stub
+  // compartilhado por todos os @/functions/*): approve NÃO altera was_rejected
+  // e limpa rejection_reason com null.
+  gerenciarAprovacao: vi.fn(async ({ action, entityName, recordId, rejectionReason }) => {
+    const { base44 } = await import('@/api/base44Client');
+    const api = base44.entities[entityName];
+    const user = action === 'sign' ? cliente : approver;
+
+    if (action === 'delete') {
+      await api.delete(recordId);
+      return { data: { success: true, data: { id: recordId, deleted: true } } };
+    }
+    if (action === 'approve') {
+      const updated = await api.update(recordId, {
+        approved: true,
+        rejection_reason: null,
+        approved_by: user.email,
+        approved_date: new Date().toISOString(),
+        approver_details: {
+          name: user.full_name,
+          position: user.access_level,
+          crea_number: user.crea_number,
+        },
+      });
+      return { data: { success: true, data: updated } };
+    }
+    if (action === 'reject') {
+      const updated = await api.update(recordId, {
+        approved: false,
+        was_rejected: true,
+        rejection_reason: rejectionReason,
+        approved_by: user.email,
+        approved_date: new Date().toISOString(),
+        approver_details: {
+          name: user.full_name,
+          position: user.access_level,
+          crea_number: user.crea_number,
+        },
+      });
+      return { data: { success: true, data: updated } };
+    }
+    if (action === 'sign') {
+      const updated = await api.update(recordId, {
+        client_signature: {
+          signed_by: user.email,
+          signed_date: new Date().toISOString(),
+          engineer_name: user.full_name,
+          crea_number: user.crea_number,
+        },
+      });
+      return { data: { success: true, data: updated } };
+    }
+    throw new Error(`Ação inválida: ${action}`);
+  }),
 }));
 
 beforeEach(() => {

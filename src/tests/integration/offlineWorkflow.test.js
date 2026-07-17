@@ -57,6 +57,21 @@ vi.mock('@/api/base44Client', () => ({
   },
 }));
 
+// syncQueueItem roteia através da backend function validarESalvarRegistro
+// (validação server-side + LWW). O mock delega para base44.entities para que
+// as asserções sobre os spies de create/update continuem válidas.
+vi.mock('@/functions/validarESalvarRegistro', () => ({
+  validarESalvarRegistro: vi.fn(async ({ entityName, data, operation, recordId }) => {
+    const { base44 } = await import('@/api/base44Client');
+    if (operation === 'create') {
+      const result = await base44.entities[entityName].create(data);
+      return { data: { success: true, data: result } };
+    }
+    const result = await base44.entities[entityName].update(recordId, data);
+    return { data: { success: true, data: result } };
+  }),
+}));
+
 describe('offlineWorkflow - Integração', () => {
   beforeEach(async () => {
     mockStorage.clear();

@@ -59,10 +59,20 @@ function generateRecords(count, entityType) {
   return records;
 }
 
+// loadAllRecords pagina via filter({}, sort, limit, skip) — o mock devolve a
+// fatia correspondente do dataset da entidade (uma página cheia + páginas vazias).
+function mockPaginatedFilter(entity, dataset) {
+  entity.filter.mockImplementation(async (_q, _sort, limit, skip = 0) =>
+    dataset.slice(skip, skip + limit)
+  );
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
   for (const n of ALL_RECORD_ENTITIES) {
-    entities[n].list.mockResolvedValue(generateRecords(RECORDS_PER_ENTITY, n));
+    const dataset = generateRecords(RECORDS_PER_ENTITY, n);
+    entities[n].list.mockResolvedValue(dataset);
+    mockPaginatedFilter(entities[n], dataset);
   }
 });
 
@@ -82,6 +92,7 @@ describe('recordsService — loadAllRecords performance', () => {
     const shared = generateRecords(RECORDS_PER_ENTITY, 'Shared');
     for (const n of ALL_RECORD_ENTITIES) {
       entities[n].list.mockResolvedValue(shared);
+      mockPaginatedFilter(entities[n], shared);
     }
 
     const start = performance.now();
