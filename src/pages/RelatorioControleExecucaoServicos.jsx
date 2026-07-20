@@ -146,6 +146,20 @@ export default function RelatorioControleExecucaoServicosPage() {
             table-layout: fixed !important;
           }
 
+          /* Hairlines de 1px podem desaparecer no rasterizador de impressão.
+             Usa medida física e cor sólida para preservar a grade no papel/PDF. */
+          .service-report-table {
+            border-collapse: collapse !important;
+            border: 0.3mm solid #64748b !important;
+          }
+          .service-report-table th,
+          .service-report-table td {
+            border: 0.3mm solid #64748b !important;
+          }
+          .service-report-observations {
+            border: 0.3mm solid #64748b !important;
+          }
+
           .print\\:hidden {
             display: none !important;
             visibility: hidden !important;

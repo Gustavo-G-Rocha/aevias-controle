@@ -60,7 +60,7 @@ export default function RelatorioControleExecucaoServicos({ data }) {
 
           {/* Serviços realizados */}
           <SectionBand>Serviços Realizados</SectionBand>
-          <table className="w-full border-collapse border border-slate-400" style={{ tableLayout: 'fixed' }}>
+          <table className="service-report-table w-full border-collapse border border-slate-400" style={{ tableLayout: 'fixed' }}>
             <thead>
               <tr>
                 <th className={th} style={{ ...thStyle, width: '30%' }}>SERVIÇOS</th>
@@ -92,7 +92,7 @@ export default function RelatorioControleExecucaoServicos({ data }) {
           {data.observacoes_gerais && data.observacoes_gerais !== '—' && (
             <div className="mt-2 break-inside-avoid">
               <SectionBand>Observações</SectionBand>
-              <div className="p-2 min-h-[40px] text-[10px] leading-tight" style={{ border: CELL_BORDER }}>
+              <div className="service-report-observations p-2 min-h-[40px] text-[10px] leading-tight" style={{ border: CELL_BORDER }}>
                 {data.observacoes_gerais}
               </div>
             </div>
