@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useReportMode } from "@/hooks/useReportMode";
 import { Button } from "@/components/ui/button";
 import { Loader2, Printer } from "lucide-react";
@@ -8,7 +8,6 @@ import { obterRegionalById } from '@/services/regionaisService';
 import AprovacaoBar from '@/components/relatorios/AprovacaoBar';
 import RelatorioControleExecucaoServicos from "@/components/relatorios/RelatorioControleExecucaoServicos";
 import { mapControleToPresentation } from "@/utils/relatorioControleExecucaoServicosMapper";
-import { downloadElementAsPdf } from "@/utils/downloadElementAsPdf";
 import { logger } from '@/utils/logger';
 
 export default function RelatorioControleExecucaoServicosPage() {
@@ -60,21 +59,8 @@ export default function RelatorioControleExecucaoServicosPage() {
     [registro, obra, regional]
   );
 
-  const reportRef = useRef(null);
-  const [generating, setGenerating] = useState(false);
-
-  // Gera o PDF rasterizando exatamente o que está na pré-visualização
-  const handlePrint = async () => {
-    if (!reportRef.current || generating) return;
-    setGenerating(true);
-    try {
-      await downloadElementAsPdf(reportRef.current, 'Controle de Execução de Serviços.pdf');
-    } catch (err) {
-      logger.error("Erro ao gerar PDF:", err);
-      window.print();
-    } finally {
-      setGenerating(false);
-    }
+  const handlePrint = () => {
+    window.print();
   };
 
   if (loading) {
@@ -102,15 +88,15 @@ export default function RelatorioControleExecucaoServicosPage() {
           </h2>
           <div className="flex items-center gap-2">
             {registro && <AprovacaoBar entityName="ControleExecucaoServicos" recordId={registro.id} />}
-            <Button onClick={handlePrint} disabled={generating} className="bg-[#00233B] text-white hover:bg-[#00233B]/90">
-              {generating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
-              {generating ? 'Gerando...' : 'Gerar PDF'}
+            <Button onClick={handlePrint} className="bg-[#00233B] text-white hover:bg-[#00233B]/90">
+              <Printer className="w-4 h-4 mr-2" />
+              Imprimir
             </Button>
           </div>
         </div>
       </div>
 
-      <div ref={reportRef} className="max-w-[210mm] mx-auto bg-white shadow-lg my-4 print:my-0 print:shadow-none">
+      <div className="max-w-[210mm] mx-auto bg-white shadow-lg my-4 print:my-0 print:shadow-none">
         <RelatorioControleExecucaoServicos data={data} />
       </div>
 
