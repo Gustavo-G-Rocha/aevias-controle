@@ -19,10 +19,13 @@ const Field = ({ label, value }) => (
   </div>
 );
 
+// Borda aplicada via inline style em cada célula — sobrevive ao rasterizador
+// de impressão (classes Tailwind podem ser descartadas no print).
 const CELL_BORDER = '1px solid #94a3b8';
-const th = "border border-slate-400 px-1 py-1 text-[8px] leading-tight font-bold";
-const td = "border border-slate-400 px-1 py-1 text-center text-[9px] h-6";
-const thStyle = { backgroundColor: '#f1f5f9' };
+const thBase = "px-1 py-1 text-[8px] leading-tight font-bold";
+const tdBase = "px-1 py-1 text-center text-[9px] h-6";
+const thStyle = { border: CELL_BORDER, backgroundColor: '#f1f5f9' };
+const tdStyle = { border: CELL_BORDER };
 
 export default function RelatorioControleExecucaoServicos({ data }) {
   if (!data) {
@@ -34,6 +37,15 @@ export default function RelatorioControleExecucaoServicos({ data }) {
 
   return (
     <div className="bg-white font-sans">
+      <style>{`
+        @media print {
+          .ces-table { border-collapse: collapse !important; }
+          .ces-table th, .ces-table td {
+            border: 1px solid #94a3b8 !important;
+          }
+          .ces-obs { border: 1px solid #94a3b8 !important; }
+        }
+      `}</style>
       <div data-report-root className="p-6 print:p-0 flex flex-col min-h-screen">
         <div className="w-full flex-1 flex flex-col">
 
@@ -60,30 +72,30 @@ export default function RelatorioControleExecucaoServicos({ data }) {
 
           {/* Serviços realizados */}
           <SectionBand>Serviços Realizados</SectionBand>
-          <table className="service-report-table w-full border-collapse border border-slate-400" style={{ tableLayout: 'fixed' }}>
+          <table className="ces-table w-full" style={{ tableLayout: 'fixed', borderCollapse: 'collapse', border: CELL_BORDER }}>
             <thead>
               <tr>
-                <th className={th} style={{ ...thStyle, width: '30%' }}>SERVIÇOS</th>
-                <th className={th} style={{ ...thStyle, width: '8%' }}>ESTACA INICIAL</th>
-                <th className={th} style={{ ...thStyle, width: '8%' }}>ESTACA FINAL</th>
-                <th className={th} style={{ ...thStyle, width: '9%' }}>COMPRIMENTO (m)</th>
-                <th className={th} style={{ ...thStyle, width: '8%' }}>ESPESSURA (cm)</th>
-                <th className={th} style={{ ...thStyle, width: '8%' }}>LARGURA (m)</th>
-                <th className={th} style={{ ...thStyle, width: '9%' }}>QUANTIDADE</th>
-                <th className={th} style={{ ...thStyle, width: '20%' }}>EXECUTORA</th>
+                <th className={thBase} style={{ ...thStyle, width: '30%' }}>SERVIÇOS</th>
+                <th className={thBase} style={{ ...thStyle, width: '8%' }}>ESTACA INICIAL</th>
+                <th className={thBase} style={{ ...thStyle, width: '8%' }}>ESTACA FINAL</th>
+                <th className={thBase} style={{ ...thStyle, width: '9%' }}>COMPRIMENTO (m)</th>
+                <th className={thBase} style={{ ...thStyle, width: '8%' }}>ESPESSURA (cm)</th>
+                <th className={thBase} style={{ ...thStyle, width: '8%' }}>LARGURA (m)</th>
+                <th className={thBase} style={{ ...thStyle, width: '9%' }}>QUANTIDADE</th>
+                <th className={thBase} style={{ ...thStyle, width: '20%' }}>EXECUTORA</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((servico, index) => (
                 <tr key={index}>
-                  <td className={`${td} text-left`}>{servico?.servico}</td>
-                  <td className={td}>{servico?.estaca_inicial}</td>
-                  <td className={td}>{servico?.estaca_final}</td>
-                  <td className={td}>{servico?.comprimento_m}</td>
-                  <td className={td}>{servico?.espessura_cm}</td>
-                  <td className={td}>{servico?.largura_m}</td>
-                  <td className={td}>{servico?.quantidade}</td>
-                  <td className={td}>{servico?.executora}</td>
+                  <td className={`${tdBase} text-left`} style={tdStyle}>{servico?.servico}</td>
+                  <td className={tdBase} style={tdStyle}>{servico?.estaca_inicial}</td>
+                  <td className={tdBase} style={tdStyle}>{servico?.estaca_final}</td>
+                  <td className={tdBase} style={tdStyle}>{servico?.comprimento_m}</td>
+                  <td className={tdBase} style={tdStyle}>{servico?.espessura_cm}</td>
+                  <td className={tdBase} style={tdStyle}>{servico?.largura_m}</td>
+                  <td className={tdBase} style={tdStyle}>{servico?.quantidade}</td>
+                  <td className={tdBase} style={tdStyle}>{servico?.executora}</td>
                 </tr>
               ))}
             </tbody>
@@ -92,7 +104,7 @@ export default function RelatorioControleExecucaoServicos({ data }) {
           {data.observacoes_gerais && data.observacoes_gerais !== '—' && (
             <div className="mt-2 break-inside-avoid">
               <SectionBand>Observações</SectionBand>
-              <div className="service-report-observations p-2 min-h-[40px] text-[10px] leading-tight" style={{ border: CELL_BORDER }}>
+              <div className="ces-obs p-2 min-h-[40px] text-[10px] leading-tight" style={{ border: CELL_BORDER }}>
                 {data.observacoes_gerais}
               </div>
             </div>

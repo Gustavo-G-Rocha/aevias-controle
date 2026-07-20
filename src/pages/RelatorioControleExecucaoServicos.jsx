@@ -114,7 +114,7 @@ export default function RelatorioControleExecucaoServicosPage() {
 
           @page {
             size: A4 portrait;
-            margin: 8mm 8mm;
+            margin: 12mm;
             orphans: 0;
             widows: 0;
           }
@@ -144,20 +144,6 @@ export default function RelatorioControleExecucaoServicosPage() {
             width: 100% !important;
             max-width: 100% !important;
             table-layout: fixed !important;
-          }
-
-          /* Hairlines de 1px podem desaparecer no rasterizador de impressão.
-             Usa medida física e cor sólida para preservar a grade no papel/PDF. */
-          .service-report-table {
-            border-collapse: collapse !important;
-            border: 0.3mm solid #64748b !important;
-          }
-          .service-report-table th,
-          .service-report-table td {
-            border: 0.3mm solid #64748b !important;
-          }
-          .service-report-observations {
-            border: 0.3mm solid #64748b !important;
           }
 
           .print\\:hidden {
