@@ -19,8 +19,11 @@ const Field = ({ label, value }) => (
   </div>
 );
 
-const th = "border border-slate-400 px-1 py-1 text-[8px] leading-tight font-bold bg-slate-200";
-const td = "border border-slate-400 px-1 py-1 text-center text-[9px] h-6";
+const CELL_BORDER = '1px solid #cbd5e1';
+const th = "px-1 py-1 text-[8px] leading-tight font-bold";
+const td = "px-1 py-1 text-center text-[9px] h-6";
+const thStyle = { border: CELL_BORDER, backgroundColor: '#f1f5f9' };
+const tdStyle = { border: CELL_BORDER };
 
 export default function RelatorioControleExecucaoServicos({ data }) {
   if (!data) {
@@ -58,30 +61,30 @@ export default function RelatorioControleExecucaoServicos({ data }) {
 
           {/* Serviços realizados */}
           <SectionBand>Serviços Realizados</SectionBand>
-          <table className="w-full border-collapse" style={{ tableLayout: 'fixed' }}>
+          <table className="w-full" style={{ tableLayout: 'fixed', borderCollapse: 'collapse', border: CELL_BORDER }}>
             <thead>
               <tr>
-                <th className={th} style={{ width: '30%' }}>SERVIÇOS</th>
-                <th className={th} style={{ width: '8%' }}>ESTACA INICIAL</th>
-                <th className={th} style={{ width: '8%' }}>ESTACA FINAL</th>
-                <th className={th} style={{ width: '9%' }}>COMPRIMENTO (m)</th>
-                <th className={th} style={{ width: '8%' }}>ESPESSURA (cm)</th>
-                <th className={th} style={{ width: '8%' }}>LARGURA (m)</th>
-                <th className={th} style={{ width: '9%' }}>QUANTIDADE</th>
-                <th className={th} style={{ width: '20%' }}>EXECUTORA</th>
+                <th className={th} style={{ ...thStyle, width: '30%' }}>SERVIÇOS</th>
+                <th className={th} style={{ ...thStyle, width: '8%' }}>ESTACA INICIAL</th>
+                <th className={th} style={{ ...thStyle, width: '8%' }}>ESTACA FINAL</th>
+                <th className={th} style={{ ...thStyle, width: '9%' }}>COMPRIMENTO (m)</th>
+                <th className={th} style={{ ...thStyle, width: '8%' }}>ESPESSURA (cm)</th>
+                <th className={th} style={{ ...thStyle, width: '8%' }}>LARGURA (m)</th>
+                <th className={th} style={{ ...thStyle, width: '9%' }}>QUANTIDADE</th>
+                <th className={th} style={{ ...thStyle, width: '20%' }}>EXECUTORA</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((servico, index) => (
                 <tr key={index}>
-                  <td className={`${td} text-left`}>{servico?.servico}</td>
-                  <td className={td}>{servico?.estaca_inicial}</td>
-                  <td className={td}>{servico?.estaca_final}</td>
-                  <td className={td}>{servico?.comprimento_m}</td>
-                  <td className={td}>{servico?.espessura_cm}</td>
-                  <td className={td}>{servico?.largura_m}</td>
-                  <td className={td}>{servico?.quantidade}</td>
-                  <td className={td}>{servico?.executora}</td>
+                  <td className={`${td} text-left`} style={tdStyle}>{servico?.servico}</td>
+                  <td className={td} style={tdStyle}>{servico?.estaca_inicial}</td>
+                  <td className={td} style={tdStyle}>{servico?.estaca_final}</td>
+                  <td className={td} style={tdStyle}>{servico?.comprimento_m}</td>
+                  <td className={td} style={tdStyle}>{servico?.espessura_cm}</td>
+                  <td className={td} style={tdStyle}>{servico?.largura_m}</td>
+                  <td className={td} style={tdStyle}>{servico?.quantidade}</td>
+                  <td className={td} style={tdStyle}>{servico?.executora}</td>
                 </tr>
               ))}
             </tbody>
@@ -90,7 +93,7 @@ export default function RelatorioControleExecucaoServicos({ data }) {
           {data.observacoes_gerais && data.observacoes_gerais !== '—' && (
             <div className="mt-2 break-inside-avoid">
               <SectionBand>Observações</SectionBand>
-              <div className="border border-slate-400 rounded p-2 min-h-[40px] text-[10px] leading-tight">
+              <div className="p-2 min-h-[40px] text-[10px] leading-tight" style={{ border: CELL_BORDER }}>
                 {data.observacoes_gerais}
               </div>
             </div>
