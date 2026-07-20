@@ -14,7 +14,7 @@ export default function ClimaSection({ periodos, onChange }) {
     <Card className="bg-muted/30">
       <CardHeader><CardTitle className="text-lg">Condições Climáticas</CardTitle></CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {periodos.map((periodo, index) => (
             <Card key={index}>
               <CardHeader className="pb-3">
