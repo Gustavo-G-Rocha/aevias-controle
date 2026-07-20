@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import { obterEnsaioById } from "@/services/ensaiosService";
 import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
@@ -12,6 +13,7 @@ export function useControleExecucaoServicosData() {
   const [editId, setEditId] = useState(null);
   const [editLoading, setEditLoading] = useState(false);
 
+  const location = useLocation();
   const { data: user, isLoading: loadingUser } = useCurrentUser();
   const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true });
 
@@ -29,10 +31,11 @@ export function useControleExecucaoServicosData() {
   useEffect(() => {
     if (loadingUser || loadingAux || !user) return;
 
-    const urlParams = new URLSearchParams(window.location.search);
+    const urlParams = new URLSearchParams(location.search);
     const editIdParam = urlParams.get('editId');
 
     if (editIdParam) {
+      if (editIdParam === editId) return; // já carregado (troca de URL pós-salvar)
       setEditLoading(true);
       obterEnsaioById('ControleExecucaoServicos', editIdParam)
         .then(registroData => {
@@ -51,7 +54,7 @@ export function useControleExecucaoServicosData() {
         laboratorista_name: user.laboratorista_name || user.full_name || "",
       });
     }
-  }, [loadingUser, loadingAux, user?.id]);
+  }, [loadingUser, loadingAux, user?.id, location.search]);
 
   const loading = loadingUser || loadingAux || editLoading;
 

@@ -76,7 +76,17 @@ export function useControleExecucaoServicosActions({
       if (editMode) {
         await atualizarEnsaio('ControleExecucaoServicos', editId, dataToSave);
       } else {
-        await criarEnsaio('ControleExecucaoServicos', dataToSave);
+        const created = await criarEnsaio('ControleExecucaoServicos', dataToSave);
+        // Ao salvar progresso de um registro NOVO, permanece no formulário já
+        // vinculado ao registro criado (?editId=...). Antes, cada "Salvar
+        // Progresso" criava um registro novo — causando relatórios duplicados,
+        // cada um com um serviço.
+        if (!finalizar && created?.id && !created._offline) {
+          clearSavedData();
+          toast({ title: "Progresso salvo!" });
+          navigate(`${createPageUrl("ControleExecucaoServicos")}?editId=${created.id}`, { replace: true });
+          return;
+        }
       }
 
       clearSavedData();

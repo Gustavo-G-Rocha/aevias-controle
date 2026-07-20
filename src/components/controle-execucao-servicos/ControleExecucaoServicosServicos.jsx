@@ -3,6 +3,8 @@ import { useControleExecucaoServicosCtx } from "./ControleExecucaoServicosContex
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SERVICOS_EXECUCAO } from "@/constants/servicosExecucao";
 import { Plus, Trash2 } from "lucide-react";
 
 const numOrNull = (v) => (v === "" ? null : parseFloat(v));
@@ -21,12 +23,28 @@ function ServicoCard({ servico, index, canEdit, onChange, onRemove }) {
 
       <div>
         <Label className="text-xs">Serviço *</Label>
-        <Input
+        <Select
           value={servico.servico || ""}
-          onChange={(e) => onChange(index, "servico", e.target.value)}
+          onValueChange={(value) => onChange(index, "servico", value)}
           disabled={!canEdit}
-          placeholder="Descrição do serviço realizado"
-        />
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Selecione o serviço" />
+          </SelectTrigger>
+          <SelectContent className="max-h-72">
+            {SERVICOS_EXECUCAO.map((s) => (
+              <SelectItem key={s} value={s} className="text-xs whitespace-normal">
+                {s}
+              </SelectItem>
+            ))}
+            {/* Valor legado (texto livre) que não está na lista — mantém visível ao editar */}
+            {servico.servico && !SERVICOS_EXECUCAO.includes(servico.servico) && (
+              <SelectItem value={servico.servico} className="text-xs whitespace-normal">
+                {servico.servico}
+              </SelectItem>
+            )}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
