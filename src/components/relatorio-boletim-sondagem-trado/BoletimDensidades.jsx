@@ -4,6 +4,12 @@
 import React from 'react';
 import { formatNumber } from '@/utils/relatorioBoletimSondagemTradoUtils';
 
+const SECTION_BAND =
+  'bg-[#BFCF99] text-[#00233B] border border-[#94a3b8] px-2 py-0.5 font-bold text-center text-[10px] uppercase tracking-wider mb-1';
+const TABLE = 'w-full border-collapse border border-[#94a3b8] text-[9px]';
+const TH = 'border border-[#94a3b8] bg-[#f1f5f9] px-2 py-0.5 font-bold text-[#00233B]';
+const TD = 'border border-[#94a3b8] px-2 py-0.5 text-[#00233B]';
+
 export default function BoletimDensidades({ boletim, densidades }) {
   if (!boletim.ensaio_insitu_realizado || !densidades || densidades.length === 0) {
     return null;
@@ -33,20 +39,13 @@ export default function BoletimDensidades({ boletim, densidades }) {
 
   return (
     <section>
-      <div className="bg-[#BFCF99] text-[#00233B] px-2 py-0.5 font-bold text-center text-[10px] mb-1">
-        MASSA ESPECÍFICA APARENTE IN SITU — DNER-ME 092/94
-      </div>
-      <table className="w-full border-collapse text-[9px]">
+      <div className={SECTION_BAND}>Massa Específica Aparente in Situ — DNER-ME 092/94</div>
+      <table className={TABLE}>
         <thead>
-          <tr className="bg-[#E8EDD5]">
-            <th className="px-2 py-0.5 text-left font-bold">
-              Campo
-            </th>
+          <tr>
+            <th className={TH + ' text-left'}>Campo</th>
             {densidades.map((_, i) => (
-              <th
-                key={i}
-                className="px-2 py-0.5 text-center font-bold"
-              >
+              <th key={i} className={TH + ' text-center'}>
                 Ensaio {i + 1}
               </th>
             ))}
@@ -59,7 +58,7 @@ export default function BoletimDensidades({ boletim, densidades }) {
                 <tr key={`section-${row.label}`} className="bg-[#BFCF99]">
                   <td
                     colSpan={densidades.length + 1}
-                    className="px-2 py-0.5 font-bold text-[8px] uppercase tracking-wider text-[#00233B]"
+                    className="border border-[#94a3b8] px-2 py-0.5 font-bold text-[8px] uppercase tracking-wider text-[#00233B]"
                   >
                     {row.label}
                   </td>
@@ -67,19 +66,12 @@ export default function BoletimDensidades({ boletim, densidades }) {
               );
             }
             return (
-              <tr
-                key={row.field}
-                className={row.result ? 'bg-[#E8EDD5] font-bold' : 'bg-white'}
-              >
-                <td className="px-2 py-0.5 text-gray-700">
-                  {row.label}
-                </td>
+              <tr key={row.field} className={row.result ? 'bg-[#f1f5f9]' : 'bg-white'}>
+                <td className={TD + ' text-left'}>{row.label}</td>
                 {densidades.map((d, di) => (
                   <td
                     key={di}
-                    className={`px-2 py-0.5 text-center font-semibold ${
-                      row.result ? 'text-[#00233B]' : ''
-                    }`}
+                    className={TD + ' text-center ' + (row.result ? 'font-bold text-[#00233B]' : '')}
                   >
                     {row.isNum
                       ? formatNumber(d[row.field], row.dec ?? 2)

@@ -1,6 +1,16 @@
 import React from "react";
 import { formatDate } from "@/utils/relatorioBoletimSondagemUtils";
 
+const SECTION_BAND =
+  "bg-[#BFCF99] text-[#00233B] border border-[#94a3b8] px-2 py-0.5 font-bold text-center text-[10px] uppercase tracking-wider mb-1";
+
+const Field = ({ label, value }) => (
+  <div className="flex items-end gap-1 text-[10px] leading-tight">
+    <span className="font-bold whitespace-nowrap text-[#00233B] pb-0.5">{label}:</span>
+    <span className="flex-1 border-b border-[#94a3b8] text-[#00233B] pb-0.5 min-w-0">{value}</span>
+  </div>
+);
+
 export default function BoletimSondagemDadosObra({ boletim, obra, regional }) {
   const fields = [
     ["OBRA", obra?.name || "-"],
@@ -16,15 +26,10 @@ export default function BoletimSondagemDadosObra({ boletim, obra, regional }) {
 
   return (
     <section className="mb-1">
-      <div className="bg-[#BFCF99] text-[#00233B] px-2 py-0.5 font-bold text-center text-[10px] mb-1">
-        DADOS DA OBRA
-      </div>
-      <div className="grid grid-cols-3 gap-x-4 gap-y-1 text-[10px]">
+      <div className={SECTION_BAND}>Dados da Obra</div>
+      <div className="grid grid-cols-3 gap-x-4 gap-y-1 px-2 py-1">
         {fields.map(([label, val]) => (
-          <div key={label}>
-            <span className="font-bold text-gray-700">{label}: </span>
-            <span className="text-gray-900">{val}</span>
-          </div>
+          <Field key={label} label={label} value={val} />
         ))}
       </div>
     </section>

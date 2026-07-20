@@ -1,6 +1,14 @@
 import React from "react";
 import { fmtNum, calcUmidadeNatural2, calcMediaUmidade } from "@/utils/relatorioBoletimSondagemUtils";
 
+const SECTION_BAND =
+  "bg-[#BFCF99] text-[#00233B] border border-[#94a3b8] px-2 py-0.5 font-bold text-center text-[10px] uppercase tracking-wider mb-1";
+const SUB_BAND =
+  "bg-[#f1f5f9] text-[#00233B] border border-[#94a3b8] px-1 py-0.5 font-bold text-center text-[9px] mb-0.5";
+const TABLE = "w-full border-collapse border border-[#94a3b8] text-[9px]";
+const TH = "border border-[#94a3b8] bg-[#f1f5f9] px-1 py-0.5 font-bold text-[#00233B]";
+const TD = "border border-[#94a3b8] px-1 py-0.5 text-[#00233B]";
+
 function UmidadeTable({ uData, umidMedia }) {
   const rows = [
     ["Nº cápsula", uData.no_capsula_1, uData.no_capsula_2, false],
@@ -10,25 +18,25 @@ function UmidadeTable({ uData, umidMedia }) {
   ];
 
   return (
-    <table className="w-full border-collapse text-[9px]">
+    <table className={TABLE}>
       <thead>
-        <tr className="bg-[#E8EDD5]">
-          <th className="px-1 py-0.5 text-left font-bold">Campo</th>
-          <th className="px-1 py-0.5 text-center font-bold">Am. 1</th>
-          <th className="px-1 py-0.5 text-center font-bold">Am. 2</th>
+        <tr>
+          <th className={TH + " text-left"}>Campo</th>
+          <th className={TH}>Am. 1</th>
+          <th className={TH}>Am. 2</th>
         </tr>
       </thead>
       <tbody>
         {rows.map(([label, v1, v2, isNum], ri) => (
-          <tr key={ri} className={"bg-white"}>
-            <td className="px-1 py-0.5 text-gray-700">{label}</td>
-            <td className="px-1 py-0.5 text-center">{isNum ? fmtNum(v1) : v1 || "-"}</td>
-            <td className="px-1 py-0.5 text-center">{isNum ? fmtNum(v2) : v2 || "-"}</td>
+          <tr key={ri} className="bg-white">
+            <td className={TD + " text-left"}>{label}</td>
+            <td className={TD + " text-center"}>{isNum ? fmtNum(v1) : v1 || "-"}</td>
+            <td className={TD + " text-center"}>{isNum ? fmtNum(v2) : v2 || "-"}</td>
           </tr>
         ))}
-        <tr className="bg-[#E8EDD5] font-bold">
-          <td className="px-1 py-0.5 font-bold">Umidade (%)</td>
-          <td className="px-1 py-0.5 text-center font-bold text-[#00233B]" colSpan={2}>
+        <tr className="bg-[#f1f5f9]">
+          <td className={TD + " text-left font-bold"}>Umidade (%)</td>
+          <td className={TD + " text-center font-bold text-[#00233B]"} colSpan={2}>
             {umidMedia}
           </td>
         </tr>
@@ -43,15 +51,13 @@ export default function BoletimSondagemUmidade({ boletim }) {
 
   return (
     <section>
-      <div className="bg-[#BFCF99] text-[#00233B] px-2 py-0.5 font-bold text-center text-[10px] mb-1">
-        UMIDADE NATURAL — DNER-ME 213/94
-      </div>
+      <div className={SECTION_BAND}>Umidade Natural — DNER-ME 213/94</div>
 
       {!boletim.umidade_natural_2 ? (
         <div>
-          <div className="bg-white font-bold text-[9px] px-1 py-0.5 mb-0.5">
-            <span className="font-bold text-gray-800">Camada ensaiada: </span>
-            <span className="text-gray-900">{un.camada_ensaiada_1 || "-"}</span>
+          <div className="bg-white border border-[#94a3b8] px-1 py-0.5 text-[9px] mb-0.5">
+            <span className="font-bold text-[#00233B]">Camada ensaiada: </span>
+            <span className="text-[#00233B]">{un.camada_ensaiada_1 || "-"}</span>
           </div>
           <UmidadeTable uData={un} umidMedia={umid1Media} />
         </div>
@@ -64,13 +70,13 @@ export default function BoletimSondagemUmidade({ boletim }) {
           return (
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <div className="bg-[#E8EDD5] text-[#00233B] px-1 py-0.5 font-bold text-center text-[9px] mb-0.5">
+                <div className={SUB_BAND}>
                   Camada ensaiada: {un.camada_ensaiada_1 || "-"}
                 </div>
                 <UmidadeTable uData={un} umidMedia={umid1Media} />
               </div>
               <div>
-                <div className="bg-[#E8EDD5] text-[#00233B] px-1 py-0.5 font-bold text-center text-[9px] mb-0.5">
+                <div className={SUB_BAND}>
                   Camada ensaiada: {un2.camada_ensaiada_1 || "-"}
                 </div>
                 <UmidadeTable uData={un2} umidMedia={umid2Media} />

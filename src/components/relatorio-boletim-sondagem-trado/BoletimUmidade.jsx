@@ -4,50 +4,37 @@
 import React from 'react';
 import { formatNumber, calcularUmidade, calcularMediaUmidade } from '@/utils/relatorioBoletimSondagemTradoUtils';
 
+const SECTION_BAND =
+  'bg-[#BFCF99] text-[#00233B] border border-[#94a3b8] px-2 py-0.5 font-bold text-center text-[10px] uppercase tracking-wider mb-1';
+const SUB_BAND =
+  'bg-[#f1f5f9] text-[#00233B] border border-[#94a3b8] px-1 py-0.5 font-bold text-center text-[9px] mb-0.5';
+const TABLE = 'w-full border-collapse border border-[#94a3b8] text-[9px]';
+const TH = 'border border-[#94a3b8] bg-[#f1f5f9] px-1 py-0.5 font-bold text-[#00233B]';
+const TD = 'border border-[#94a3b8] px-1 py-0.5 text-[#00233B]';
+
 function UmidadeTable({ uData: _uData, rows, umidMedia, subtitle }) {
   return (
     <div>
-      {subtitle && (
-        <div className="bg-[#E8EDD5] text-[#00233B] px-1 py-0.5 font-bold text-center text-[9px] mb-0.5">
-          {subtitle}
-        </div>
-      )}
-      <table className="w-full border-collapse text-[9px]">
+      {subtitle && <div className={SUB_BAND}>{subtitle}</div>}
+      <table className={TABLE}>
         <thead>
-          <tr className="bg-[#E8EDD5]">
-            <th className="px-1 py-0.5 text-left font-bold">
-              Campo
-            </th>
-            <th className="px-1 py-0.5 text-center font-bold">
-              Am. 1
-            </th>
-            <th className="px-1 py-0.5 text-center font-bold">
-              Am. 2
-            </th>
+          <tr>
+            <th className={TH + ' text-left'}>Campo</th>
+            <th className={TH}>Am. 1</th>
+            <th className={TH}>Am. 2</th>
           </tr>
         </thead>
         <tbody>
           {rows.map(([label, v1, v2, isNum], ri) => (
-            <tr key={ri} className={'bg-white'}>
-              <td className="px-1 py-0.5 text-gray-700">
-                {label}
-              </td>
-              <td className="px-1 py-0.5 text-center">
-                {isNum ? formatNumber(v1) : v1 || '-'}
-              </td>
-              <td className="px-1 py-0.5 text-center">
-                {isNum ? formatNumber(v2) : v2 || '-'}
-              </td>
+            <tr key={ri} className="bg-white">
+              <td className={TD + ' text-left'}>{label}</td>
+              <td className={TD + ' text-center'}>{isNum ? formatNumber(v1) : v1 || '-'}</td>
+              <td className={TD + ' text-center'}>{isNum ? formatNumber(v2) : v2 || '-'}</td>
             </tr>
           ))}
-          <tr className="bg-[#E8EDD5] font-bold">
-            <td className="px-1 py-0.5 font-bold">
-              Umidade (%)
-            </td>
-            <td
-              colSpan={2}
-              className="px-1 py-0.5 text-center font-bold text-[#00233B]"
-            >
+          <tr className="bg-[#f1f5f9]">
+            <td className={TD + ' text-left font-bold'}>Umidade (%)</td>
+            <td className={TD + ' text-center font-bold text-[#00233B]'} colSpan={2}>
               {umidMedia}
             </td>
           </tr>
@@ -93,9 +80,7 @@ export default function BoletimUmidade({ boletim }) {
 
   return (
     <section>
-      <div className="bg-[#BFCF99] text-[#00233B] px-2 py-0.5 font-bold text-center text-[10px] mb-1">
-        UMIDADE NATURAL — DNER-ME 213/94
-      </div>
+      <div className={SECTION_BAND}>Umidade Natural — DNER-ME 213/94</div>
 
       {hasSingleUmidade ? (
         <UmidadeTable

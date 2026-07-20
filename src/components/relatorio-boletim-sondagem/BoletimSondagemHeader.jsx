@@ -6,19 +6,16 @@ const DEFAULT_LOGO =
 export default function BoletimSondagemHeader({ regional }) {
   const logo = regional?.logo_url || DEFAULT_LOGO;
   return (
-    <header className="grid grid-cols-3 items-center pb-1 mb-2">
+    <header className="grid grid-cols-3 items-center p-2 border border-[#94a3b8] mb-2">
       <div>
         <picture>
           <source srcSet={logo} />
-          <img src={logo} alt="Logo" className="h-12 object-contain" width="auto" height="48" />
+          <img src={logo} alt="Logo" className="h-10 object-contain" width="auto" height="40" />
         </picture>
       </div>
-      <div className="text-center">
-        <h1 className="text-sm font-bold text-gray-800 leading-tight">
-          BOLETIM DE SONDAGEM
-        </h1>
+      <div className="text-center col-span-2 pr-24">
+        <h1 className="text-sm font-bold text-gray-800 uppercase">Boletim de Sondagem</h1>
       </div>
-      <div></div>
     </header>
   );
 }

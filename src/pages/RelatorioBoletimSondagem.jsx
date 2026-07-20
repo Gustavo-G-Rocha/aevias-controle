@@ -57,8 +57,8 @@ export default function RelatorioBoletimSondagem() {
 
           {boletim.observacoes && (
             <section className="mb-[50px]">
-              <div className="bg-[#BFCF99] text-[#00233B] px-2 py-0.5 font-bold text-[10px]">OBSERVAÇÕES</div>
-              <div className="bg-[#E8EDD5] p-1 text-[10px] min-h-[20px] break-words whitespace-pre-wrap">
+              <div className="bg-[#BFCF99] text-[#00233B] border border-[#94a3b8] px-2 py-0.5 font-bold text-center text-[10px] uppercase tracking-wider">Observações</div>
+              <div className="border border-[#94a3b8] bg-white p-1 text-[10px] text-[#00233B] min-h-[20px] break-words whitespace-pre-wrap">
                 {boletim.observacoes}
               </div>
             </section>
