@@ -5,8 +5,8 @@ const MIN_ROWS = 15;
 
 const SectionBand = ({ children }) => (
   <h2
-    className="text-[10px] font-bold text-center p-0.5 my-1 uppercase tracking-wider border border-slate-400"
-    style={{ backgroundColor: '#BFCF99', color: '#00233B' }}
+    className="text-[10px] font-bold text-center p-0.5 my-1 uppercase tracking-wider"
+    style={{ backgroundColor: '#BFCF99', color: '#00233B', border: '1px solid #94a3b8' }}
   >
     {children}
   </h2>
@@ -15,7 +15,7 @@ const SectionBand = ({ children }) => (
 const Field = ({ label, value }) => (
   <div className="flex items-baseline gap-1">
     <span className="font-bold whitespace-nowrap">{label}:</span>
-    <span className="flex-1 border-b border-slate-400">{value}</span>
+    <span className="flex-1" style={{ borderBottom: '1px solid #94a3b8' }}>{value}</span>
   </div>
 );
 
@@ -35,11 +35,11 @@ export default function RelatorioControleExecucaoServicos({ data }) {
 
   return (
     <div className="bg-white font-sans">
-      <div className="p-6 print:p-0 flex flex-col min-h-screen print:min-h-[277mm]">
+      <div data-report-root className="p-6 print:p-0 flex flex-col min-h-screen">
         <div className="w-full flex-1 flex flex-col">
 
           {/* Cabeçalho */}
-          <header className="grid grid-cols-3 items-center border border-slate-400 p-2">
+          <header className="grid grid-cols-3 items-center p-2" style={{ border: '1px solid #94a3b8' }}>
             <div className="flex justify-start">
               <picture><source srcSet={data.logo_url} /><img src={data.logo_url} alt="Logo Regional" className="h-10 object-contain" width="auto" height="40" /></picture>
             </div>

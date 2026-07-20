@@ -119,6 +119,15 @@ export default function RelatorioControleExecucaoServicosPage() {
             widows: 0;
           }
 
+          /* Uma única página: neutraliza min-h-screen (que estoura a folha)
+             e fixa a altura útil da folha A4 para a assinatura ir ao rodapé */
+          .min-h-screen {
+            min-height: 0 !important;
+          }
+          [data-report-root] {
+            min-height: 272mm !important;
+          }
+
           .max-w-\\[210mm\\], .max-w-\\[210mm\\] * {
             visibility: visible;
           }
