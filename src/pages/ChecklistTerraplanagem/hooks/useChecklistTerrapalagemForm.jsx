@@ -31,6 +31,7 @@ const getInitialFormData = () => ({
   periodos_clima: [
     { periodo: "manha", temperatura_ambiente: "", condicoes_climaticas: "bom" },
     { periodo: "tarde", temperatura_ambiente: "", condicoes_climaticas: "bom" },
+    { periodo: "noite", temperatura_ambiente: "", condicoes_climaticas: "bom" },
   ],
   acompanhamento_execucao: {
     remocao_material_existente: { sim: false, nao: false, na: false },

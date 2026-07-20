@@ -14,7 +14,7 @@ export default function ClimaTable({ periodos_clima }) {
             <tr>
               {periodos_clima.map((periodo, index) => (
                 <th key={`periodo-${index}`} className="border border-slate-300 px-1 py-1 text-center font-bold uppercase text-xs">
-                  {periodo.periodo === 'manha' ? 'MANHÃ' : 'TARDE'}
+                  {periodo.periodo === 'manha' ? 'MANHÃ' : periodo.periodo === 'noite' ? 'NOITE' : 'TARDE'}
                 </th>
               ))}
             </tr>
