@@ -16,7 +16,7 @@ export default function BoletimSondagemDadosObra({ boletim, obra, regional }) {
 
   return (
     <section className="mb-1">
-      <div className="bg-slate-700 text-white px-2 py-0.5 font-bold text-center text-[10px] mb-1">
+      <div className="bg-[#BFCF99] text-[#00233B] px-2 py-0.5 font-bold text-center text-[10px] mb-1">
         DADOS DA OBRA
       </div>
       <div className="grid grid-cols-3 gap-x-4 gap-y-1 text-[10px]">

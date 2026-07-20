@@ -8,45 +8,45 @@ function UmidadeTable({ uData: _uData, rows, umidMedia, subtitle }) {
   return (
     <div>
       {subtitle && (
-        <div className="bg-slate-500 text-white px-1 py-0.5 font-bold text-center text-[9px] mb-0.5">
+        <div className="bg-[#BFCF99] text-[#00233B] px-1 py-0.5 font-bold text-center text-[9px] mb-0.5">
           {subtitle}
         </div>
       )}
-      <table className="w-full border-collapse border border-slate-400 text-[9px]">
+      <table className="w-full border-collapse border border-[#A8BA7E] text-[9px]">
         <thead>
-          <tr className="bg-slate-200">
-            <th className="border border-slate-400 px-1 py-0.5 text-left font-bold">
+          <tr className="bg-[#E8EDD5]">
+            <th className="border border-[#A8BA7E] px-1 py-0.5 text-left font-bold">
               Campo
             </th>
-            <th className="border border-slate-400 px-1 py-0.5 text-center font-bold">
+            <th className="border border-[#A8BA7E] px-1 py-0.5 text-center font-bold">
               Am. 1
             </th>
-            <th className="border border-slate-400 px-1 py-0.5 text-center font-bold">
+            <th className="border border-[#A8BA7E] px-1 py-0.5 text-center font-bold">
               Am. 2
             </th>
           </tr>
         </thead>
         <tbody>
           {rows.map(([label, v1, v2, isNum], ri) => (
-            <tr key={ri} className={ri % 2 === 0 ? 'bg-slate-50' : 'bg-white'}>
-              <td className="border border-slate-400 px-1 py-0.5 text-gray-700">
+            <tr key={ri} className={ri % 2 === 0 ? 'bg-[#F5F8EF]' : 'bg-white'}>
+              <td className="border border-[#A8BA7E] px-1 py-0.5 text-gray-700">
                 {label}
               </td>
-              <td className="border border-slate-400 px-1 py-0.5 text-center">
+              <td className="border border-[#A8BA7E] px-1 py-0.5 text-center">
                 {isNum ? formatNumber(v1) : v1 || '-'}
               </td>
-              <td className="border border-slate-400 px-1 py-0.5 text-center">
+              <td className="border border-[#A8BA7E] px-1 py-0.5 text-center">
                 {isNum ? formatNumber(v2) : v2 || '-'}
               </td>
             </tr>
           ))}
-          <tr className="bg-slate-200 font-bold">
-            <td className="border border-slate-400 px-1 py-0.5 font-bold">
+          <tr className="bg-[#E8EDD5] font-bold">
+            <td className="border border-[#A8BA7E] px-1 py-0.5 font-bold">
               Umidade (%)
             </td>
             <td
               colSpan={2}
-              className="border border-slate-400 px-1 py-0.5 text-center font-bold text-[#BFCF99]"
+              className="border border-[#A8BA7E] px-1 py-0.5 text-center font-bold text-[#6B8A3F]"
             >
               {umidMedia}
             </td>
@@ -93,7 +93,7 @@ export default function BoletimUmidade({ boletim }) {
 
   return (
     <section>
-      <div className="bg-slate-700 text-white px-2 py-0.5 font-bold text-center text-[10px] mb-1">
+      <div className="bg-[#BFCF99] text-[#00233B] px-2 py-0.5 font-bold text-center text-[10px] mb-1">
         UMIDADE NATURAL — DNER-ME 213/94
       </div>
 
