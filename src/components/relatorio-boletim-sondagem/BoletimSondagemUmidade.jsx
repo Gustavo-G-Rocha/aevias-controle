@@ -28,7 +28,7 @@ function UmidadeTable({ uData, umidMedia }) {
         ))}
         <tr className="bg-slate-200 font-bold">
           <td className="border border-slate-400 px-1 py-0.5 font-bold">Umidade (%)</td>
-          <td className="border border-slate-400 px-1 py-0.5 text-center font-bold text-blue-700" colSpan={2}>
+          <td className="border border-slate-400 px-1 py-0.5 text-center font-bold text-[#BFCF99]" colSpan={2}>
             {umidMedia}
           </td>
         </tr>

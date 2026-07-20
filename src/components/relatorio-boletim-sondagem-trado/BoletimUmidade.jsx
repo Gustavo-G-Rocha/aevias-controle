@@ -46,7 +46,7 @@ function UmidadeTable({ uData: _uData, rows, umidMedia, subtitle }) {
             </td>
             <td
               colSpan={2}
-              className="border border-slate-400 px-1 py-0.5 text-center font-bold text-blue-700"
+              className="border border-slate-400 px-1 py-0.5 text-center font-bold text-[#BFCF99]"
             >
               {umidMedia}
             </td>

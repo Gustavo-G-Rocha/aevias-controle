@@ -48,7 +48,7 @@ export default function BoletimSondagemDensidade({ boletim }) {
                 {densidades.map((d, di) => (
                   <td
                     key={di}
-                    className={`border border-slate-400 px-2 py-0.5 text-center font-semibold ${row.result ? "text-blue-700" : ""}`}
+                    className={`border border-slate-400 px-2 py-0.5 text-center font-semibold ${row.result ? "text-[#BFCF99]" : ""}`}
                   >
                     {row.isNum ? fmtNum(d[row.field], row.dec ?? 2) : d[row.field] || "-"}
                   </td>

@@ -78,7 +78,7 @@ export default function BoletimDensidades({ boletim, densidades }) {
                   <td
                     key={di}
                     className={`border border-slate-400 px-2 py-0.5 text-center font-semibold ${
-                      row.result ? 'text-blue-700' : ''
+                      row.result ? 'text-[#BFCF99]' : ''
                     }`}
                   >
                     {row.isNum
