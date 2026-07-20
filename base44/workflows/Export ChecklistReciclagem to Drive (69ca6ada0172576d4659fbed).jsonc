@@ -1,0 +1,35 @@
+{
+  "name": "Export ChecklistReciclagem to Drive (69ca6ada0172576d4659fbed)",
+  "description": "",
+  "trigger": {
+    "condition": "${ (.trigger.data.status == \"finalizado\") }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create",
+        "update"
+      ],
+      "entity_name": "ChecklistReciclagem"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "export_checklistreciclagem_to_drive_69ca6ada0172576d4659fbed",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "exportToDrive",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

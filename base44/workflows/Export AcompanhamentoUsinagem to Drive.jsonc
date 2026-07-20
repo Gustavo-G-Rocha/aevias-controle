@@ -1,0 +1,34 @@
+{
+  "name": "Export AcompanhamentoUsinagem to Drive",
+  "description": "",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "AcompanhamentoUsinagem"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "export_acompanhamentousinagem_to_drive",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "triggerExportToDrive",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

@@ -28,6 +28,12 @@ export default defineConfig({
         find: /^@\/functions\/.*$/,
         replacement: resolve(__dirname, 'tests/stubs/base44FunctionsStub.js'),
       },
+      // O cliente real do SDK faz chamadas de rede na inicialização —
+      // inviável em Node/vitest ("Invalid URL" + timeouts). Stub inerte.
+      {
+        find: /^@\/api\/base44Client$/,
+        replacement: resolve(__dirname, 'tests/stubs/base44ClientStub.js'),
+      },
       // Este arquivo vive em src/, então __dirname JÁ É src/ — o alias '@'
       // deve apontar para o próprio diretório (antes apontava para src/src).
       { find: '@', replacement: resolve(__dirname, '.') },
