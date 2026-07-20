@@ -13,7 +13,27 @@ export default function MobileBackHeader() {
 
   const isRoot = ROOT_PATHS.includes(location.pathname);
   const title = getPageTitle(location.pathname);
-  if (isRoot) return null;
+
+  // Telas raiz (tabs): sem botão voltar — exibe o logo do app
+  if (isRoot) {
+    return (
+      <div
+        className="lg:hidden sticky top-0 z-30 flex items-center justify-center px-2 py-1.5"
+        style={{
+          backgroundColor: "var(--color-sidebar-bg)",
+          borderBottom: "1px solid var(--color-sidebar-border)",
+          paddingTop: "calc(env(safe-area-inset-top) + 0.375rem)",
+        }}
+      >
+        <img
+          src="https://media.base44.com/images/public/68a7599ee3fb9205cfb852ec/2754f7c59_AE_-_Logo_Hor_Negativo.png"
+          alt="Afirmaevias"
+          className="h-8 w-auto brightness-200 contrast-110"
+          loading="lazy"
+        />
+      </div>
+    );
+  }
 
   const handleBack = () => {
     // location.key === "default" indica a primeira entrada do histórico do app
