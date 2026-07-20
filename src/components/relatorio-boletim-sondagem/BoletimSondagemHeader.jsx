@@ -6,7 +6,7 @@ const DEFAULT_LOGO =
 export default function BoletimSondagemHeader({ regional }) {
   const logo = regional?.logo_url || DEFAULT_LOGO;
   return (
-    <header className="grid grid-cols-3 items-center border-b-2 border-[#BFCF99] pb-1 mb-2">
+    <header className="grid grid-cols-3 items-center pb-1 mb-2">
       <div>
         <picture>
           <source srcSet={logo} />

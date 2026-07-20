@@ -10,25 +10,25 @@ function UmidadeTable({ uData, umidMedia }) {
   ];
 
   return (
-    <table className="w-full border-collapse border border-[#BFCF99] text-[9px]">
+    <table className="w-full border-collapse text-[9px]">
       <thead>
         <tr className="bg-[#E8EDD5]">
-          <th className="border border-[#BFCF99] px-1 py-0.5 text-left font-bold">Campo</th>
-          <th className="border border-[#BFCF99] px-1 py-0.5 text-center font-bold">Am. 1</th>
-          <th className="border border-[#BFCF99] px-1 py-0.5 text-center font-bold">Am. 2</th>
+          <th className="px-1 py-0.5 text-left font-bold">Campo</th>
+          <th className="px-1 py-0.5 text-center font-bold">Am. 1</th>
+          <th className="px-1 py-0.5 text-center font-bold">Am. 2</th>
         </tr>
       </thead>
       <tbody>
         {rows.map(([label, v1, v2, isNum], ri) => (
           <tr key={ri} className={"bg-white"}>
-            <td className="border border-[#BFCF99] px-1 py-0.5 text-gray-700">{label}</td>
-            <td className="border border-[#BFCF99] px-1 py-0.5 text-center">{isNum ? fmtNum(v1) : v1 || "-"}</td>
-            <td className="border border-[#BFCF99] px-1 py-0.5 text-center">{isNum ? fmtNum(v2) : v2 || "-"}</td>
+            <td className="px-1 py-0.5 text-gray-700">{label}</td>
+            <td className="px-1 py-0.5 text-center">{isNum ? fmtNum(v1) : v1 || "-"}</td>
+            <td className="px-1 py-0.5 text-center">{isNum ? fmtNum(v2) : v2 || "-"}</td>
           </tr>
         ))}
         <tr className="bg-[#E8EDD5] font-bold">
-          <td className="border border-[#BFCF99] px-1 py-0.5 font-bold">Umidade (%)</td>
-          <td className="border border-[#BFCF99] px-1 py-0.5 text-center font-bold text-[#00233B]" colSpan={2}>
+          <td className="px-1 py-0.5 font-bold">Umidade (%)</td>
+          <td className="px-1 py-0.5 text-center font-bold text-[#00233B]" colSpan={2}>
             {umidMedia}
           </td>
         </tr>
@@ -49,7 +49,7 @@ export default function BoletimSondagemUmidade({ boletim }) {
 
       {!boletim.umidade_natural_2 ? (
         <div>
-          <div className="bg-white font-bold text-[9px] border border-[#BFCF99] px-1 py-0.5 mb-0.5">
+          <div className="bg-white font-bold text-[9px] px-1 py-0.5 mb-0.5">
             <span className="font-bold text-gray-800">Camada ensaiada: </span>
             <span className="text-gray-900">{un.camada_ensaiada_1 || "-"}</span>
           </div>
