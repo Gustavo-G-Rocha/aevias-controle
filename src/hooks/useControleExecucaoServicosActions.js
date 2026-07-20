@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { base44 } from "@/api/base44Client";
 import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 import { createPageUrl } from "@/utils";
 import {
@@ -51,6 +52,25 @@ export function useControleExecucaoServicosActions({
 
     setSaving(true);
     try {
+      // Validação pré-salvamento: confirma que a obra referenciada existe.
+      // Uma falha transitória de rede/lookup aqui impede a criação de um
+      // registro órfão (obra_id inválido) e orienta o usuário a tentar de novo.
+      try {
+        await base44.entities.Obra.get(formData.obra_id);
+      } catch (obraError) {
+        const msg = String(obraError?.message || '').toLowerCase();
+        const isTransient = !obraError?.response ||
+          obraError?.code === 'ERR_NETWORK' ||
+          obraError?.response?.status >= 500 ||
+          msg.includes('network') || msg.includes('fetch') || msg.includes('load failed');
+        if (isTransient) {
+          toast({ title: "Falha temporária ao validar a obra. Tente salvar novamente.", variant: "destructive" });
+        } else {
+          toast({ title: "Obra não encontrada. Selecione uma obra válida.", variant: "destructive" });
+        }
+        return;
+      }
+
       const dataToSave = buildDataToSave(formData, finalizar);
 
       if (editMode) {
