@@ -24,6 +24,7 @@ const ENSAIO_ENTITIES = {
   'EnsaioVigaBenkelman': 'EnsaioVigaBenkelman',
   'AcompanhamentoCarga': 'AcompanhamentoCarga',
   'AcompanhamentoUsinagem': 'AcompanhamentoUsinagem',
+  'ControleExecucaoServicos': 'ControleExecucaoServicos',
   'BoletimSondagem': 'BoletimSondagem',
   'BoletimSondagemTrado': 'BoletimSondagemTrado',
 };

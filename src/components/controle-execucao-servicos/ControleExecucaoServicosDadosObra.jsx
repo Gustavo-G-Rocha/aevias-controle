@@ -35,7 +35,7 @@ export default function ControleExecucaoServicosDadosObra() {
         </div>
 
         <div>
-          <Label>Cliente (Automático)</Label>
+          <Label>Cliente</Label>
           <Input value={regionalSelecionada?.cliente || ""} disabled className="bg-muted" />
         </div>
 
@@ -65,7 +65,7 @@ export default function ControleExecucaoServicosDadosObra() {
         </div>
 
         <div>
-          <Label>Inspetor (Automático)</Label>
+          <Label>Inspetor</Label>
           <Input value={formData.laboratorista_name} disabled className="bg-muted" />
         </div>
 
