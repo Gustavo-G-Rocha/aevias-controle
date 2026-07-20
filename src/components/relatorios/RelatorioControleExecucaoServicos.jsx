@@ -19,11 +19,10 @@ const Field = ({ label, value }) => (
   </div>
 );
 
-const CELL_BORDER = '1px solid #cbd5e1';
-const th = "px-1 py-1 text-[8px] leading-tight font-bold";
-const td = "px-1 py-1 text-center text-[9px] h-6";
-const thStyle = { border: CELL_BORDER, backgroundColor: '#f1f5f9' };
-const tdStyle = { border: CELL_BORDER };
+const CELL_BORDER = '1px solid #94a3b8';
+const th = "border border-slate-400 px-1 py-1 text-[8px] leading-tight font-bold";
+const td = "border border-slate-400 px-1 py-1 text-center text-[9px] h-6";
+const thStyle = { backgroundColor: '#f1f5f9' };
 
 export default function RelatorioControleExecucaoServicos({ data }) {
   if (!data) {
@@ -61,7 +60,7 @@ export default function RelatorioControleExecucaoServicos({ data }) {
 
           {/* Serviços realizados */}
           <SectionBand>Serviços Realizados</SectionBand>
-          <table className="w-full" style={{ tableLayout: 'fixed', borderCollapse: 'collapse', border: CELL_BORDER }}>
+          <table className="w-full border-collapse border border-slate-400" style={{ tableLayout: 'fixed' }}>
             <thead>
               <tr>
                 <th className={th} style={{ ...thStyle, width: '30%' }}>SERVIÇOS</th>
@@ -77,14 +76,14 @@ export default function RelatorioControleExecucaoServicos({ data }) {
             <tbody>
               {rows.map((servico, index) => (
                 <tr key={index}>
-                  <td className={`${td} text-left`} style={tdStyle}>{servico?.servico}</td>
-                  <td className={td} style={tdStyle}>{servico?.estaca_inicial}</td>
-                  <td className={td} style={tdStyle}>{servico?.estaca_final}</td>
-                  <td className={td} style={tdStyle}>{servico?.comprimento_m}</td>
-                  <td className={td} style={tdStyle}>{servico?.espessura_cm}</td>
-                  <td className={td} style={tdStyle}>{servico?.largura_m}</td>
-                  <td className={td} style={tdStyle}>{servico?.quantidade}</td>
-                  <td className={td} style={tdStyle}>{servico?.executora}</td>
+                  <td className={`${td} text-left`}>{servico?.servico}</td>
+                  <td className={td}>{servico?.estaca_inicial}</td>
+                  <td className={td}>{servico?.estaca_final}</td>
+                  <td className={td}>{servico?.comprimento_m}</td>
+                  <td className={td}>{servico?.espessura_cm}</td>
+                  <td className={td}>{servico?.largura_m}</td>
+                  <td className={td}>{servico?.quantidade}</td>
+                  <td className={td}>{servico?.executora}</td>
                 </tr>
               ))}
             </tbody>
