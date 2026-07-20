@@ -1,8 +1,26 @@
 import React, { useMemo, useCallback } from "react";
-import { AlertTriangle, FileText, Grid } from "lucide-react";
+import { AlertTriangle, FileText, Grid, ClipboardList } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ACCESS_LEVELS } from "@/lib/layoutConstants";
+import { createPageUrl } from "@/utils";
 import { ENSAIOS_POR_TIPO_OBRA, DIARIO_OBRA } from "./NavigationConfig";
+
+// "Controle de Execução de Serviços" fica disponível para quem cria registros
+// de gerenciamento (gestor/admin/sala técnica). Exibido no "Registro Geral"
+// para não ficar preso à categoria "Gerenciamento", que só aparece quando o
+// usuário possui obras daquele tipo — sem isso, gestores sem obra de
+// gerenciamento alocada não conseguem acessar o formulário.
+const CONTROLE_EXECUCAO = {
+  title: "Controle de Execução de Serviços",
+  url: createPageUrl("ControleExecucaoServicos"),
+  icon: ClipboardList,
+  description: "Controle de serviços executados",
+};
+const CONTROLE_EXECUCAO_LEVELS = [
+  ACCESS_LEVELS.ADMIN,
+  ACCESS_LEVELS.GESTOR_CONTRATO,
+  ACCESS_LEVELS.SALA_TECNICA,
+];
 
 const CARD_STYLE = "bg-card border-border";
 
@@ -83,6 +101,9 @@ const CreateEnsaioDialog = React.memo(({ onSelect, user, obrasDoUsuario }) => {
     );
   }
 
+  const userAccessLevel = user?.access_level;
+  const showControleExecucao = CONTROLE_EXECUCAO_LEVELS.includes(userAccessLevel);
+
   return (
     <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
       <div>
@@ -90,19 +111,37 @@ const CreateEnsaioDialog = React.memo(({ onSelect, user, obrasDoUsuario }) => {
           <FileText className="w-4 h-4 text-primary" />
           Registro Geral
         </h3>
-        <button
-          type="button"
-          onClick={() => handleSelect(DIARIO_OBRA.url)}
-          className="w-full flex items-center gap-4 p-4 border-2 rounded-lg bg-card hover:bg-muted transition-colors duration-200 text-left border-border hover:border-primary/50"
-        >
-          <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
-            <DIARIO_OBRA.icon className="w-6 h-6 text-primary" />
-          </div>
-          <div className="flex-1">
-            <p className="font-semibold text-foreground">{DIARIO_OBRA.title}</p>
-            <p className="text-sm text-muted-foreground">{DIARIO_OBRA.description}</p>
-          </div>
-        </button>
+        <div className="space-y-2">
+          <button
+            type="button"
+            onClick={() => handleSelect(DIARIO_OBRA.url)}
+            className="w-full flex items-center gap-4 p-4 border-2 rounded-lg bg-card hover:bg-muted transition-colors duration-200 text-left border-border hover:border-primary/50"
+          >
+            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+              <DIARIO_OBRA.icon className="w-6 h-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-foreground">{DIARIO_OBRA.title}</p>
+              <p className="text-sm text-muted-foreground">{DIARIO_OBRA.description}</p>
+            </div>
+          </button>
+
+          {showControleExecucao && (
+            <button
+              type="button"
+              onClick={() => handleSelect(CONTROLE_EXECUCAO.url)}
+              className="w-full flex items-center gap-4 p-4 border-2 rounded-lg bg-card hover:bg-muted transition-colors duration-200 text-left border-border hover:border-primary/50"
+            >
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                <CONTROLE_EXECUCAO.icon className="w-6 h-6 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-foreground">{CONTROLE_EXECUCAO.title}</p>
+                <p className="text-sm text-muted-foreground">{CONTROLE_EXECUCAO.description}</p>
+              </div>
+            </button>
+          )}
+        </div>
       </div>
 
       {categoriasDisponiveis.length > 0 && (
