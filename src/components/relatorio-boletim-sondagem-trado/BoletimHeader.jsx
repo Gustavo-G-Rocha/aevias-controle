@@ -8,7 +8,7 @@ export default function BoletimHeader({ regional }) {
   const logoUrl = getLogoUrl(regional);
 
   return (
-    <header className="grid grid-cols-3 items-center border-b-2 border-[#A8BA7E] pb-1 mb-2">
+    <header className="grid grid-cols-3 items-center border-b-2 border-[#BFCF99] pb-1 mb-2">
       <div>
         <picture>
           <source srcSet={logoUrl} />
