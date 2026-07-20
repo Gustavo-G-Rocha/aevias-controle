@@ -35,6 +35,7 @@ export const ALL_RECORD_ENTITIES = [
   'EnsaioRompimentoConcreto',
   'GranuMistura',
   'CertificacaoUsina',
+  'ControleExecucaoServicos',
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

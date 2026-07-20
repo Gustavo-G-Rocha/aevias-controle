@@ -110,6 +110,8 @@ const RelatorioGranuMistura = lazy(() => import('./pages/RelatorioGranuMistura')
 const RelatoriosUnificados = lazy(() => import('./pages/RelatoriosUnificados'));
 const RelatorioUnificado = lazy(() => import('./pages/RelatorioUnificado'));
 const Settings = lazy(() => import('./pages/Settings'));
+const ControleExecucaoServicos = lazy(() => import('./pages/ControleExecucaoServicos'));
+const RelatorioControleExecucaoServicos = lazy(() => import('./pages/RelatorioControleExecucaoServicos'));
 import __Layout from './Layout.jsx';
 
 
@@ -186,6 +188,8 @@ export const PAGES = {
     "RelatoriosUnificados": RelatoriosUnificados,
     "RelatorioUnificado": RelatorioUnificado,
     "Settings": Settings,
+    "ControleExecucaoServicos": ControleExecucaoServicos,
+    "RelatorioControleExecucaoServicos": RelatorioControleExecucaoServicos,
 }
 
 export const pagesConfig = {

@@ -73,7 +73,7 @@ const ALLOWED_ENTITIES = new Set([
   'EnsaioGranulometriaIndividual', 'EnsaioManchaPendulo', 'EnsaioProctor',
   'EnsaioRompimentoConcreto', 'EnsaioSondagem', 'EnsaioTaxaMRAF',
   'EnsaioTaxaPinturaImprimacao', 'EnsaioVigaBenkelman',
-  'AcompanhamentoCarga', 'AcompanhamentoUsinagem',
+  'AcompanhamentoCarga', 'AcompanhamentoUsinagem', 'ControleExecucaoServicos',
   'BoletimSondagem', 'BoletimSondagemTrado', 'GranuMistura',
   'CertificacaoUsina', 'ChecklistUsina', 'ChecklistAplicacao',
   'ChecklistMRAF', 'ChecklistConcretagem', 'ChecklistTerraplanagem',

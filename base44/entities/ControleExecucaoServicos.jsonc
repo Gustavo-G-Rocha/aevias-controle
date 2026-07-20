@@ -1,0 +1,226 @@
+{
+  "name": "ControleExecucaoServicos",
+  "type": "object",
+  "properties": {
+    "obra_id": {
+      "type": "string",
+      "description": "ID da obra"
+    },
+    "data": {
+      "type": "string",
+      "format": "date",
+      "description": "Data do controle"
+    },
+    "laboratorista_name": {
+      "type": "string",
+      "description": "Nome do inspetor que criou o registro"
+    },
+    "rodovia": {
+      "type": "string",
+      "description": "Nome da rodovia"
+    },
+    "trecho": {
+      "type": "string",
+      "description": "Trecho"
+    },
+    "servicos": {
+      "type": "array",
+      "description": "Servi\u00e7os realizados",
+      "items": {
+        "type": "object",
+        "properties": {
+          "servico": {
+            "type": "string",
+            "description": "Descri\u00e7\u00e3o do servi\u00e7o"
+          },
+          "estaca_inicial": {
+            "type": "string"
+          },
+          "estaca_final": {
+            "type": "string"
+          },
+          "comprimento_m": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Comprimento (m)"
+          },
+          "espessura_cm": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Espessura (cm)"
+          },
+          "largura_m": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Largura (m)"
+          },
+          "quantidade": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "executora": {
+            "type": "string",
+            "description": "Empresa executora"
+          }
+        }
+      }
+    },
+    "observacoes_gerais": {
+      "type": "string",
+      "description": "Observa\u00e7\u00f5es gerais"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "rascunho",
+        "finalizado"
+      ],
+      "default": "rascunho",
+      "description": "Status do registro"
+    },
+    "approved": {
+      "type": "boolean",
+      "default": null,
+      "description": "Status de aprova\u00e7\u00e3o"
+    },
+    "approved_by": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio que aprovou/reprovou"
+    },
+    "approved_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "approver_details": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "position": {
+          "type": "string"
+        },
+        "crea_number": {
+          "type": "string"
+        }
+      }
+    },
+    "rejection_reason": {
+      "type": "string"
+    },
+    "was_rejected": {
+      "type": "boolean",
+      "default": false,
+      "description": "Indica se o registro foi reprovado e editado novamente"
+    },
+    "client_signature": {
+      "type": "object",
+      "properties": {
+        "signed_by": {
+          "type": "string"
+        },
+        "signed_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "engineer_name": {
+          "type": "string"
+        },
+        "crea_number": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "obra_id",
+    "data"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "cliente"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "cliente_supervisor"
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    },
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
+          }
+        }
+      ]
+    }
+  }
+}

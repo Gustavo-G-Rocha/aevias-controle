@@ -5,6 +5,8 @@
  */
 const PAGE_TITLES = {
   AcompanhamentoCarga: "Acompanhamento de Aplicação",
+  ControleExecucaoServicos: "Controle de Execução de Serviços",
+  RelatorioControleExecucaoServicos: "Controle de Execução de Serviços",
   AcompanhamentoUsinagem: "Acompanhamento de Usinagem",
   BoletimSondagem: "Boletim de Sondagem",
   BoletimSondagemTrado: "Boletim de Sondagem a Trado",

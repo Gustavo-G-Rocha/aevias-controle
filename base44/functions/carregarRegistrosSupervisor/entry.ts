@@ -17,6 +17,7 @@ const ALL_RECORD_ENTITIES = [
   'EnsaioGranulometriaIndividual',
   'AcompanhamentoUsinagem',
   'AcompanhamentoCarga',
+  'ControleExecucaoServicos',
   'EnsaioManchaPendulo',
   'EnsaioVigaBenkelman',
   'EnsaioTaxaMRAF',

@@ -35,6 +35,7 @@ const ALLOWED_ENTITIES = [
   'EnsaioVigaBenkelman',
   'AcompanhamentoCarga',
   'AcompanhamentoUsinagem',
+  'ControleExecucaoServicos',
   'BoletimSondagem',
   'BoletimSondagemTrado',
   // Diário

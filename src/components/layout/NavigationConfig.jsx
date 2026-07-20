@@ -79,7 +79,10 @@ export const ENSAIOS_POR_TIPO_OBRA = [
     nome: "Gerenciamento",
     icon: ClipboardList,
     tipo_obra: "gerenciamento",
-    ensaios: ENSAIOS_SUPERVISAO,
+    ensaios: [
+      ...ENSAIOS_SUPERVISAO,
+      { title: "Controle de Execução de Serviços", url: createPageUrl("ControleExecucaoServicos"), icon: ClipboardList },
+    ],
   },
   {
     nome: "Implantação",
