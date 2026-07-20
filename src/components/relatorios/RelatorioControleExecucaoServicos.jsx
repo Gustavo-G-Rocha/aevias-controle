@@ -32,8 +32,8 @@ export default function RelatorioControleExecucaoServicos({ data }) {
 
   return (
     <div className="bg-white font-sans">
-      <div className="p-6 print:p-0 flex flex-col min-h-screen print:min-h-0">
-        <div className="w-full flex flex-col border-2 border-slate-800 p-2">
+      <div className="p-6 print:p-0 flex flex-col min-h-screen print:min-h-[277mm]">
+        <div className="w-full flex-1 flex flex-col">
 
           {/* Cabeçalho */}
           <header className="grid grid-cols-3 items-center border border-slate-400 p-2">
