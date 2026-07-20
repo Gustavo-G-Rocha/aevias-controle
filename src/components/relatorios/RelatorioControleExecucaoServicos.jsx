@@ -13,9 +13,9 @@ const SectionBand = ({ children }) => (
 );
 
 const Field = ({ label, value }) => (
-  <div className="flex items-baseline gap-1">
-    <span className="font-bold whitespace-nowrap">{label}:</span>
-    <span className="flex-1" style={{ borderBottom: '1px solid #94a3b8' }}>{value}</span>
+  <div style={{ display: 'flex', alignItems: 'flex-end', gap: '4px', lineHeight: '1.4' }}>
+    <span style={{ fontWeight: 'bold', whiteSpace: 'nowrap', paddingBottom: '2px' }}>{label}:</span>
+    <span style={{ flex: 1, borderBottom: '1px solid #94a3b8', paddingBottom: '2px', minWidth: 0 }}>{value}</span>
   </div>
 );
 

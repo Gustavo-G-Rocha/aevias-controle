@@ -32,8 +32,8 @@ const signatureAreaStyle = {
 const lineStyle = {
   borderTop: '2px solid #6b7280',
   width: '75%',
-  margin: '0 auto',
-  paddingTop: '2px',
+  margin: '4px auto 0',
+  paddingTop: '4px',
   textAlign: 'center',
 };
 
