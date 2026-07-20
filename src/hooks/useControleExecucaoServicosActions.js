@@ -84,7 +84,11 @@ export function useControleExecucaoServicosActions({
       navigate(createPageUrl("MeusEnsaios"));
     } catch (error) {
       logger.error("Erro ao salvar:", error);
-      toast({ title: "Erro ao salvar controle de execução.", variant: "destructive" });
+      // criarEnsaio propaga a mensagem do backend (validação/tenant/rede) em
+      // error.message; sem isso, o usuário (e os testes) só vê um toast genérico
+      // que esconde a causa real — ex.: "Sem permissão sobre a obra (tenant)".
+      const detail = error?.message || 'Erro ao salvar controle de execução.';
+      toast({ title: detail, variant: "destructive" });
     } finally {
       setSaving(false);
     }
