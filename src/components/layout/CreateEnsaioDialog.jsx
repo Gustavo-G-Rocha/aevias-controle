@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from "react";
 import { AlertTriangle, FileText, Grid, ClipboardList } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { ACCESS_LEVELS } from "@/lib/layoutConstants";
+import { ACCESS_LEVELS, getUserAccessLevel } from "@/lib/layoutConstants";
 import { createPageUrl } from "@/utils";
 import { ENSAIOS_POR_TIPO_OBRA, DIARIO_OBRA } from "./NavigationConfig";
 
@@ -101,8 +101,12 @@ const CreateEnsaioDialog = React.memo(({ onSelect, user, obrasDoUsuario }) => {
     );
   }
 
-  const userAccessLevel = user?.access_level;
-  const showControleExecucao = CONTROLE_EXECUCAO_LEVELS.includes(userAccessLevel);
+  // Verifica tanto o nível funcional (access_level) quanto o role, pois usuários
+  // criados apenas com role (sem access_level explícito) caem em 'user' no helper.
+  const userAccessLevel = getUserAccessLevel(user);
+  const showControleExecucao =
+    CONTROLE_EXECUCAO_LEVELS.includes(userAccessLevel) ||
+    CONTROLE_EXECUCAO_LEVELS.includes(user?.role);
 
   return (
     <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
