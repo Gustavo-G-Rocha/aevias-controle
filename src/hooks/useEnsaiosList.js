@@ -60,7 +60,7 @@ export function sortByEnsaioDate(records) {
   });
 }
 
-export function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccessLevel, obrasData, regionaisData, allUsers) {
+export function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccessLevel, obrasData, regionaisData, allUsers, backendSubordinateEmails = null) {
   if (currentUserAccessLevel === 'admin') return combinedEnsaios;
 
   // cliente_supervisor: vê TODOS os registros de suas obras (incl. pendentes)
@@ -68,10 +68,18 @@ export function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccess
   if (currentUserAccessLevel === 'cliente_supervisor') {
     const obrasIds = getAccessibleObraIds(obrasData, regionaisData, currentUser);
     const userEmail = (currentUser.email || '').toLowerCase();
+    // Emails dos subordinados: preferir a lista vinda do backend (asServiceRole),
+    // pois o RLS do User impede que um cliente_supervisor liste outros usuários
+    // no frontend — allUsers ficava só com o próprio usuário e os registros
+    // pendentes dos subordinados sumiam da lista.
     const subordinateEmails = new Set(
-      (allUsers || [])
-        .filter(u => u.access_level === 'funcionarios_cliente' && (u.supervisor_email || '').toLowerCase() === userEmail)
-        .map(u => (u.email || '').toLowerCase())
+      (backendSubordinateEmails && backendSubordinateEmails.length
+        ? backendSubordinateEmails
+        : (allUsers || [])
+            .filter(u => u.access_level === 'funcionarios_cliente' && (u.supervisor_email || '').toLowerCase() === userEmail)
+            .map(u => u.email)
+      )
+        .map(e => (e || '').toLowerCase())
         .filter(Boolean)
     );
     return combinedEnsaios.filter(e => {
@@ -119,8 +127,13 @@ function useSupervisorRecords(user, enabled) {
     queryFn: async () => {
       if (!isOnline) {
         const cached = await getDataCache(`supervisorRecords:${user?.email}`);
-        if (cached) return cached.data;
-        return [];
+        if (cached) {
+          // Compatibilidade com cache antigo (array simples de registros)
+          return Array.isArray(cached.data)
+            ? { records: cached.data, subordinateEmails: [] }
+            : cached.data;
+        }
+        return { records: [], subordinateEmails: [] };
       }
       const data = await carregarRegistrosSupervisorService();
       saveDataCache(`supervisorRecords:${user?.email}`, data, 'records').catch(() => {});
@@ -165,20 +178,22 @@ export function useEnsaiosList() {
   const ensaios = useMemo(() => {
     if (!user || !obras) return [];
 
-    const baseRecords = useBackendRecords ? (supervisorRecords ?? []) : (allRecords ?? []);
+    const baseRecords = useBackendRecords ? (supervisorRecords?.records ?? []) : (allRecords ?? []);
     const records = [...baseRecords, ...(offlineQueueRecords ?? [])];
     if (!records.length) return [];
 
     // Supervisor: registros vêm do backend (bypass RLS), mas ainda precisam
     // do filtro de aprovacao do filtrarPorAcesso (aprovados/assinados das obras
-    // + pendentes apenas de subordinados)
+    // + pendentes apenas de subordinados). Os emails dos subordinados também
+    // vêm do backend, pois o RLS do User impede listá-los no frontend.
     const filtered = filtrarPorAcesso(
       records,
       user,
       currentUserAccessLevel,
       obras,
       regionais ?? [],
-      allUsers
+      allUsers,
+      useBackendRecords ? (supervisorRecords?.subordinateEmails ?? []) : null
     );
     return sortByEnsaioDate(filtered);
   }, [user, currentUserAccessLevel, allRecords, supervisorRecords, offlineQueueRecords, obras, regionais, allUsers, useBackendRecords]);
