@@ -41,6 +41,7 @@ export function getUserAccessLevel(user) {
 /** Returns all synthetic "obra" stubs for non-laboratorist users (so all categories appear) */
 export const ALL_OBRA_TYPE_STUBS = [
   { tipo_obra: 'supervisao' },
+  { tipo_obra: 'gerenciamento' },
   { tipo_obra: 'implantacao' },
   { tipo_obra: 'conservacao' },
   { tipo_obra: 'sondagem' },
