@@ -608,3 +608,24 @@
   }
 
 }
+
+/* ─────────────────────────────────────────────────────────────
+   RELATÓRIOS — tema claro fixo, sem remaps de dark mode.
+   Os remaps .dark acima pintam textos dos relatórios (fundo branco)
+   em tons azulados de slate. Dentro de .report-scope restauramos as
+   cores originais do tema claro para o documento impresso.
+   (Regras fora de @layer para vencer as regras em @layer base.)
+   ───────────────────────────────────────────────────────────── */
+.dark .report-scope :is(.bg-slate-50, .bg-slate-100, .bg-white, .bg-gray-50, .bg-gray-100, .bg-orange-50, .bg-green-50, .bg-blue-50, .bg-red-50) {
+  color: inherit;
+}
+.dark .report-scope .text-gray-500 { color: #6b7280; }
+.dark .report-scope .text-gray-600 { color: #4b5563; }
+.dark .report-scope .text-gray-700 { color: #374151; }
+.dark .report-scope .text-gray-800 { color: #1f2937; }
+.dark .report-scope .text-slate-500 { color: #64748b; }
+.dark .report-scope .text-slate-600 { color: #475569; }
+.dark .report-scope .text-slate-700 { color: #334155; }
+.dark .report-scope .text-slate-800 { color: #1e293b; }
+.dark .report-scope .border-slate-200, .dark .report-scope .border-gray-200 { border-color: #e5e7eb; }
+.dark .report-scope .border-slate-300, .dark .report-scope .border-gray-300 { border-color: #d1d5db; }
