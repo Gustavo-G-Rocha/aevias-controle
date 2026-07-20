@@ -98,7 +98,7 @@ export async function criarEnsaio(entityName, data) {
     return await salvarRegistroOfflineAware({ entityName, data, operation: 'create' });
   } catch (error) {
     captureError(error, { entity: entityName, operation: 'create' });
-    const validationMessage = error?.response?.data?.error;
+    const validationMessage = error?.response?.data?.error || error?.message;
     if (validationMessage) throw new Error(validationMessage);
     logger.error('[Service] Falha ao criar ensaio', error);
     throw new Error('Falha ao criar ensaio');
@@ -113,7 +113,7 @@ export async function atualizarEnsaio(entityName, id, data) {
     return await salvarRegistroOfflineAware({ entityName, data, operation: 'update', recordId: id });
   } catch (error) {
     captureError(error, { entity: entityName, operation: 'update' });
-    const validationMessage = error?.response?.data?.error;
+    const validationMessage = error?.response?.data?.error || error?.message;
     if (validationMessage) throw new Error(validationMessage);
     logger.error('[Service] Falha ao atualizar ensaio', error);
     throw new Error('Falha ao atualizar ensaio');
