@@ -35,7 +35,7 @@ export function ControleExecucaoServicosProvider({ children }) {
 
   const obraSelecionada = obras.find(o => o.id === formData.obra_id);
   const regionalSelecionada = regionais.find(r => r.id === obraSelecionada?.regional_id);
-  const canEdit = calcCanEdit(editMode, formData, user?.email);
+  const canEdit = calcCanEdit(editMode, formData, user, obraSelecionada, regionais);
 
   const value = {
     formData, setFormData,

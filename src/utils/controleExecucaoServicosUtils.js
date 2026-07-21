@@ -4,6 +4,7 @@
  */
 
 import { todayISO } from "@/utils/formInitialData";
+import { canUserEditRecord } from "@/utils/recordEditPermission";
 
 // ── Estado inicial ────────────────────────────────────────────────────────────
 
@@ -41,8 +42,16 @@ export function filtrarObras(obras) {
 
 // ── Permissões ────────────────────────────────────────────────────────────────
 
-export function calcCanEdit(editMode, formData, userEmail) {
-  return !editMode || (!formData.approved && formData.created_by === userEmail);
+/**
+ * Espelha as regras da listagem (TableRowAdmin/canUserEditRecord): autor,
+ * admin e responsáveis da regional podem editar registros não aprovados
+ * e não assinados. Antes só o autor conseguia editar, deixando o form
+ * inteiro desabilitado para gestores que abriam via "Editar registro".
+ */
+export function calcCanEdit(editMode, formData, user, obra, regionais = []) {
+  if (!editMode) return true;
+  if (formData.approved || formData.client_signature?.signed_by) return false;
+  return canUserEditRecord(user, formData, obra, regionais);
 }
 
 // ── Manipulação de serviços ───────────────────────────────────────────────────
