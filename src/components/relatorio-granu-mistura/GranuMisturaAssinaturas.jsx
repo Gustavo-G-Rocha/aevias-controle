@@ -13,7 +13,7 @@ function AssinaturaCol({ cargoFixo, nome, email, data, crea, label }) {
             {label && (
               <p className="text-[7px] text-gray-400 italic">{label}</p>
             )}
-            <p className="font-bold text-slate-700">{nome}</p>
+            <p className="text-black">{nome}</p>
             {email && <p className="text-[7px]">{email}</p>}
             {crea && <p className="text-[7px]">CREA: {crea}</p>}
             {data && <p className="text-[7px]">em {formatDateTime(data)}</p>}

@@ -7,7 +7,7 @@ function SignatureCol({ title, name, email, crea, date }) {
       <div className="text-[8px] text-slate-500 mb-2 h-16 flex flex-col justify-end items-center">
         {name && (
           <>
-            <p className="font-bold text-slate-700">{name}</p>
+            <p className="text-black">{name}</p>
             {email && <p>{email}</p>}
             {crea && <p>CREA: {crea}</p>}
             {date && <p>em {fmtDateTime(date)}</p>}

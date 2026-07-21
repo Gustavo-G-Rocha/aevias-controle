@@ -57,8 +57,8 @@ const infoStyle = {
 const signatureStyle = {
   fontFamily: "'Freestyle Script', 'Great Vibes', 'Brush Script MT', cursive",
   fontSize: '20px',
-  fontWeight: 'bold',
-  color: '#475569',
+  fontWeight: 'normal',
+  color: '#000000',
   textAlign: 'center',
 };
 

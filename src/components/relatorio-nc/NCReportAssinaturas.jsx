@@ -13,7 +13,7 @@ export default function NCReportAssinaturas({ nc }) {
           {nc.manager_signature?.signed_by && (
             <>
               <p className="text-gray-500">Assinado digitalmente por</p>
-              <p className="font-bold text-gray-800 mt-0.5">
+              <p className="text-black mt-0.5">
                 {nc.manager_signature.manager_name || nc.relatorio_criador}
               </p>
               <p className="text-gray-500">{nc.manager_signature.signed_by}</p>
@@ -40,7 +40,7 @@ export default function NCReportAssinaturas({ nc }) {
           {nc.client_signature?.signed_by && (
             <>
               <p className="text-gray-500">Assinado digitalmente por</p>
-              <p className="font-bold text-gray-800 mt-0.5">
+              <p className="text-black mt-0.5">
                 {nc.client_signature.engineer_name}
               </p>
               <p className="text-gray-500">{nc.client_signature.signed_by}</p>
