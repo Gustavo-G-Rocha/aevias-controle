@@ -105,7 +105,16 @@ export default function EnsaioVigaBenkelmanDadosGerais({
             </div>
             <div>
               <span className="block text-sm font-medium text-foreground mb-2">CTE. VIGA</span>
-              <Input value={formData.cte_viga} onChange={(e) => onCteVigaChange(e.target.value)} placeholder="Digitar" className="bg-background border-border text-foreground" />
+              <Input
+                value={formData.cte_viga}
+                onChange={(e) => onCteVigaChange(e.target.value)}
+                onBlur={(e) => {
+                  const num = parseFloat(String(e.target.value).replace(',', '.'));
+                  if (!isNaN(num)) onCteVigaChange(num.toFixed(4));
+                }}
+                placeholder="Digitar"
+                className="bg-background border-border text-foreground"
+              />
             </div>
             <div>
               <label htmlFor="def_admissivel" className="block text-sm font-medium text-foreground mb-2">DEF. ADMISSÍVEL</label>
