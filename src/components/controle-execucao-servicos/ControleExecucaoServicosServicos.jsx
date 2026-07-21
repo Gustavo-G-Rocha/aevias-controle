@@ -9,7 +9,7 @@ import { Plus, Trash2 } from "lucide-react";
 
 const numOrNull = (v) => (v === "" ? null : parseFloat(v));
 
-function ServicoCard({ servico, index, canEdit, onChange, onRemove }) {
+function ServicoCard({ servico, index, canEdit, onChange, onRemove, empreiteiras }) {
   return (
     <div className="border border-border rounded-lg p-4 space-y-3 bg-muted/20">
       <div className="flex items-center justify-between">
@@ -104,12 +104,28 @@ function ServicoCard({ servico, index, canEdit, onChange, onRemove }) {
 
       <div>
         <Label className="text-xs">Executora</Label>
-        <Input
+        <Select
           value={servico.executora || ""}
-          onChange={(e) => onChange(index, "executora", e.target.value)}
+          onValueChange={(value) => onChange(index, "executora", value)}
           disabled={!canEdit}
-          placeholder="Empresa executora"
-        />
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Selecione a empreiteira" />
+          </SelectTrigger>
+          <SelectContent>
+            {empreiteiras.map((e) => (
+              <SelectItem key={e} value={e} className="text-xs">
+                {e}
+              </SelectItem>
+            ))}
+            {/* Valor legado (texto livre) que não está na lista — mantém visível ao editar */}
+            {servico.executora && !empreiteiras.includes(servico.executora) && (
+              <SelectItem value={servico.executora} className="text-xs">
+                {servico.executora}
+              </SelectItem>
+            )}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
@@ -117,9 +133,11 @@ function ServicoCard({ servico, index, canEdit, onChange, onRemove }) {
 
 export default function ControleExecucaoServicosServicos() {
   const {
-    formData, canEdit,
+    formData, canEdit, obraSelecionada,
     handleAddServico, handleRemoveServico, handleServicoChange,
   } = useControleExecucaoServicosCtx();
+
+  const empreiteiras = obraSelecionada?.empreiteiras || [];
 
   return (
     <div>
@@ -147,6 +165,7 @@ export default function ControleExecucaoServicosServicos() {
               canEdit={canEdit}
               onChange={handleServicoChange}
               onRemove={handleRemoveServico}
+              empreiteiras={empreiteiras}
             />
           ))}
         </div>
