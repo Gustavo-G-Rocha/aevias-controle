@@ -42,6 +42,8 @@ export const mapControleToPresentation = ({ registro, obra, regional }) => {
 
     observacoes_gerais: display(registro.observacoes_gerais, '—'),
 
+    fotos: registro.fotos || [],
+
     logo_url: regional?.logo_url ||
       'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png',
 

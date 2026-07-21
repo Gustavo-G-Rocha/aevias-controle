@@ -14,6 +14,7 @@ export const getInitialFormData = () => ({
   rodovia: "",
   trecho: "",
   servicos: [],
+  fotos: [],
   observacoes_gerais: "",
   status: "rascunho",
 });

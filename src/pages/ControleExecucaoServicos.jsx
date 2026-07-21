@@ -12,6 +12,7 @@ import ControleExecucaoServicosHeader from "@/components/controle-execucao-servi
 import ControleExecucaoServicosDadosObra from "@/components/controle-execucao-servicos/ControleExecucaoServicosDadosObra";
 import ControleExecucaoServicosServicos from "@/components/controle-execucao-servicos/ControleExecucaoServicosServicos";
 import ControleExecucaoServicosActions from "@/components/controle-execucao-servicos/ControleExecucaoServicosActions";
+import ControleExecucaoServicosFotos from "@/components/controle-execucao-servicos/ControleExecucaoServicosFotos";
 
 function ControleExecucaoServicosContent() {
   const { formData, setFormData, canEdit } = useControleExecucaoServicosCtx();
@@ -37,6 +38,8 @@ function ControleExecucaoServicosContent() {
                 className="text-xs mt-1"
               />
             </div>
+
+            <ControleExecucaoServicosFotos />
 
             <ControleExecucaoServicosActions />
           </CardContent>

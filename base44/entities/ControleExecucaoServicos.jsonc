@@ -73,6 +73,24 @@
         }
       }
     },
+    "fotos": {
+      "type": "array",
+      "description": "Registro fotogr\u00e1fico (URL ou objeto com legenda)",
+      "items": {
+        "type": [
+          "string",
+          "object"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "legenda": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "observacoes_gerais": {
       "type": "string",
       "description": "Observa\u00e7\u00f5es gerais"

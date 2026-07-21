@@ -1,5 +1,6 @@
 import React from 'react';
 import SignatureFooter from './SignatureFooter';
+import ControleExecucaoServicosFotoPages from './ControleExecucaoServicosFotoPages';
 
 const MIN_ROWS = 15;
 
@@ -117,6 +118,9 @@ export default function RelatorioControleExecucaoServicos({ data }) {
 
         </div>
       </div>
+
+      {/* Relatório Fotográfico — 6 fotos por folha (3x2) */}
+      <ControleExecucaoServicosFotoPages data={data} />
     </div>
   );
 }
