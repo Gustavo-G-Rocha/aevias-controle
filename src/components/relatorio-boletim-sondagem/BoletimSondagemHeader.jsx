@@ -13,9 +13,10 @@ export default function BoletimSondagemHeader({ regional }) {
           <img src={logo} alt="Logo" className="h-10 object-contain" width="auto" height="40" />
         </picture>
       </div>
-      <div className="text-center col-span-2 pr-24">
+      <div className="text-center">
         <h1 className="text-sm font-bold text-gray-800 uppercase">Boletim de Sondagem</h1>
       </div>
+      <div />
     </header>
   );
 }

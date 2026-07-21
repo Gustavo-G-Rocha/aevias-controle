@@ -108,7 +108,8 @@ const ENSAIO_CONFIG = {
       return result;
     } },
   EnsaioTaxaMRAF:               { name: "Taxa de MRAF", label: 'Ensaio Taxa MRAF',          icon: FlaskConical, dateField: "data_ensaio",      reportPage: "RelatorioTaxaMRAF",                 color: '#4682B4', description: 'Novo ensaio de taxa MRAF' },
-  BoletimSondagem:              { name: "Boletim de Sondagem (PI)", label: 'Boletim Sondagem', icon: FileText,     dateField: "data",             reportPage: "RelatorioBoletimSondagem",          color: '#6A5ACD', description: 'Novo boletim de sondagem' },
+  BoletimSondagem:              { name: "Boletim de Sondagem (PI)", label: 'Boletim Sondagem', icon: FileText,     dateField: "data",             reportPage: "RelatorioBoletimSondagem",          color: '#6A5ACD', description: 'Novo boletim de sondagem',
+    localInfo: (ensaio) => ({ tipo: "Furo", detalhes: ensaio.furo || "Não informado", icon: MapPin }) },
   BoletimSondagemTrado:         { name: "Boletim de Sondagem a Trado", label: 'Boletim Sondagem Trado', icon: FileText,     dateField: "data",             reportPage: "RelatorioBoletimSondagemTrado",     color: '#708090', description: 'Novo boletim de sondagem a trado' },
   EnsaioProctor:                { name: "Ensaio Proctor", label: 'Ensaio Proctor',          icon: FlaskConical, dateField: "data_ensaio",      reportPage: "RelatorioProctor",                   color: '#DAA520', description: 'Novo ensaio Proctor' },
   EnsaioRompimentoConcreto:     { name: "Rompimento Concreto", label: 'Rompimento Concreto', icon: FlaskConical, dateField: "data_ensaio",      reportPage: "RelatorioRompimentoConcreto",       color: '#B22222', description: 'Novo ensaio de rompimento de concreto' },

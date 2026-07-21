@@ -45,7 +45,7 @@ export default function BoletimSondagemDensidade({ boletim }) {
             }
             return (
               <tr key={ri} className={row.result ? "bg-[#f1f5f9]" : "bg-white"}>
-                <td className={TD + " text-left"}>{row.label}</td>
+                <td className={TD + " text-left" + (row.result ? " font-bold" : "")}>{row.label}</td>
                 {densidades.map((d, di) => (
                   <td
                     key={di}
