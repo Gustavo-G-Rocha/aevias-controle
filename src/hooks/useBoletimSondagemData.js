@@ -9,6 +9,7 @@ import { createPageUrl } from "@/utils";
 import { obterEnsaioById } from "@/services/ensaiosService";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { getInitialFormData, getDensidadeInicial, normalizarDensidades } from "@/utils/boletimSondagemUtils";
+import { canUserEditRecord } from "@/utils/recordEditPermission";
 
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
@@ -58,7 +59,14 @@ export function useBoletimSondagemData() {
       setEditLoading(true);
       obterEnsaioById('BoletimSondagem', editId)
         .then(boletimToEdit => {
-          if (user.role === 'admin' || (boletimToEdit.created_by === user.email && boletimToEdit.approved !== true)) {
+          const { obras: curObras, regionais: curReg } = auxRef.current;
+          const obraDoBoletim = curObras.find(o => o.id === boletimToEdit.obra_id) || null;
+          const isCreator = boletimToEdit.created_by === user.email;
+          // Admin sempre; criador enquanto não aprovado; gestor/sala técnica da regional da obra
+          const podeEditar = user.role === 'admin'
+            || (isCreator && boletimToEdit.approved !== true)
+            || (!isCreator && canUserEditRecord(user, boletimToEdit, obraDoBoletim, curReg));
+          if (podeEditar) {
             setEditingBoletim(boletimToEdit);
             const initial = getInitialFormData();
             setFormData({

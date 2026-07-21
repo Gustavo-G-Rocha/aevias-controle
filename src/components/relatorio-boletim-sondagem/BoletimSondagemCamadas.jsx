@@ -6,8 +6,8 @@ const SECTION_BAND =
 const SUB_BAND =
   "bg-[#f1f5f9] text-[#00233B] border border-[#94a3b8] px-1 py-0.5 font-bold text-center text-[9px] mb-0.5";
 const TABLE = "w-full border-collapse border border-[#94a3b8] text-[9px]";
-const TH = "border border-[#94a3b8] bg-[#f1f5f9] px-1 py-0.5 text-center font-bold text-[#00233B]";
-const TD = "border border-[#94a3b8] px-1 py-0.5 text-center text-[#00233B]";
+const TH = "border border-[#94a3b8] bg-[#f1f5f9] px-1 py-1.5 text-center font-bold text-[#00233B]";
+const TD = "border border-[#94a3b8] px-1 py-1.5 text-center text-[#00233B]";
 
 function CamadasTableHead() {
   return (

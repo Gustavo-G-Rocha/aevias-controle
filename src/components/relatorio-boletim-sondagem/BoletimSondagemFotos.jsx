@@ -1,5 +1,6 @@
 import React from "react";
 import { chunkArray, formatDate } from "@/utils/relatorioBoletimSondagemUtils";
+import BoletimSondagemDadosObra from "./BoletimSondagemDadosObra";
 
 const DEFAULT_LOGO =
   "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png";
@@ -37,13 +38,17 @@ export default function BoletimSondagemFotos({ boletim, obra, regional }) {
               </div>
             </header>
 
-            <main className="grid grid-cols-2 gap-4 mt-4">
+            <div className="mt-2">
+              <BoletimSondagemDadosObra boletim={boletim} obra={obra} regional={regional} />
+            </div>
+
+            <main className="grid grid-cols-2 gap-3 mt-2">
               {chunk.map((fotoUrl, fotoIndex) => (
                 <div
                   key={fotoIndex}
                   className="border p-2 rounded-lg flex flex-col"
                 >
-                  <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden" style={{ height: '280px' }}>
+                  <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden" style={{ height: '210px' }}>
                     <picture>
                       <source srcSet={fotoUrl} />
                       <img
@@ -55,7 +60,7 @@ export default function BoletimSondagemFotos({ boletim, obra, regional }) {
                       />
                     </picture>
                   </div>
-                  <p className="text-center text-sm mt-2 font-medium">
+                  <p className="text-center text-xs mt-1 font-medium">
                     Foto {pageIndex * 6 + fotoIndex + 1}
                   </p>
                 </div>

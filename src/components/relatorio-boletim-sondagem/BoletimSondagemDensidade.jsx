@@ -4,8 +4,8 @@ import { fmtNum, getDensidades, getDensidadeRows } from "@/utils/relatorioBoleti
 const SECTION_BAND =
   "bg-[#BFCF99] text-[#00233B] border border-[#94a3b8] px-2 py-0.5 font-bold text-center text-[10px] uppercase tracking-wider mb-1";
 const TABLE = "w-full border-collapse border border-[#94a3b8] text-[9px]";
-const TH = "border border-[#94a3b8] bg-[#f1f5f9] px-2 py-0.5 font-bold text-[#00233B]";
-const TD = "border border-[#94a3b8] px-2 py-0.5 text-[#00233B]";
+const TH = "border border-[#94a3b8] bg-[#f1f5f9] px-2 py-1.5 font-bold text-[#00233B]";
+const TD = "border border-[#94a3b8] px-2 py-1.5 text-[#00233B]";
 
 export default function BoletimSondagemDensidade({ boletim }) {
   if (boletim.ensaio_insitu_realizado === false) return null;
