@@ -37,15 +37,22 @@ export default function RelatorioControleExecucaoServicosPage() {
       const registroData = await obterEnsaioById('ControleExecucaoServicos', id);
       setRegistro(registroData);
 
+      // Dados relacionados (obra/regional) são complementares: falha ao
+      // carregá-los não deve bloquear o relatório — os campos exibem N/A.
       if (registroData.obra_id) {
-        const obraData = await obterObraById(registroData.obra_id);
-        setObra(obraData);
+        try {
+          const obraData = await obterObraById(registroData.obra_id);
+          setObra(obraData);
 
-        if (obraData.regional_id) {
-          const regionalData = await obterRegionalById(obraData.regional_id);
-          setRegional(regionalData);
+          if (obraData.regional_id) {
+            const regionalData = await obterRegionalById(obraData.regional_id);
+            setRegional(regionalData);
+          }
+        } catch (relErr) {
+          logger.error("Erro ao carregar obra/regional do relatório:", relErr);
         }
       }
+      setError(null);
     } catch (err) {
       logger.error("Erro ao carregar dados:", err);
       setError("Erro ao carregar dados do controle de execução");
@@ -73,8 +80,11 @@ export default function RelatorioControleExecucaoServicosPage() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center justify-center gap-4 min-h-screen">
         <p className="text-red-600">{error}</p>
+        <Button onClick={loadData} variant="outline">
+          Tentar novamente
+        </Button>
       </div>
     );
   }
