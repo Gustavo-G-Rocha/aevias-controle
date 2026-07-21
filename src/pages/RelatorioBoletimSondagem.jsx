@@ -44,7 +44,7 @@ export default function RelatorioBoletimSondagem() {
       <BoletimSondagemToolbar boletim={boletim} onPrint={handlePrint} />
 
       <div
-        className="w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none p-2 print:p-1 flex flex-col"
+        className="w-full max-w-[190mm] mx-auto bg-white shadow-xl print:shadow-none p-8 print:p-8 flex flex-col"
         style={{ fontSize: "95%", minHeight: "calc(297mm - 16mm)" }}
       >
         <BoletimSondagemHeader regional={regional} />
