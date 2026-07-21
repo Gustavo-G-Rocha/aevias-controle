@@ -52,13 +52,11 @@ export default function RelatorioControleExecucaoServicos({ data }) {
         <div className="w-full flex-1 flex flex-col">
 
           {/* Cabeçalho */}
-          <header className="grid grid-cols-3 items-center p-2" style={{ border: '1px solid #94a3b8' }}>
-            <div className="flex justify-start">
+          <header className="relative flex items-center justify-center p-2 min-h-[56px]" style={{ border: '1px solid #94a3b8' }}>
+            <div className="absolute left-2 top-1/2 -translate-y-1/2">
               <picture><source srcSet={data.logo_url} /><img src={data.logo_url} alt="Logo Regional" className="h-10 object-contain" width="auto" height="40" /></picture>
             </div>
-            <div className="text-center col-span-2 pr-24">
-              <h1 className="text-sm font-bold text-gray-800 uppercase">Controle de Execução de Serviços</h1>
-            </div>
+            <h1 className="text-sm font-bold text-gray-800 uppercase text-center">Controle de Execução de Serviços</h1>
           </header>
 
           {/* Dados da obra */}
