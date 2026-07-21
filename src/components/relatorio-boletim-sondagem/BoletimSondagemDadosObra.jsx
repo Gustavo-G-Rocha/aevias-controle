@@ -6,7 +6,7 @@ const SECTION_BAND =
 
 const Field = ({ label, value }) => (
   <div className="flex items-end gap-1 text-[10px] leading-tight">
-    <span className="font-bold whitespace-nowrap text-[#00233B] pb-0.5">{label}:</span>
+    <span className="font-bold whitespace-nowrap text-[#00233B] pb-0.5 w-16 flex-shrink-0">{label}:</span>
     <span className="flex-1 border-b border-[#94a3b8] text-[#00233B] pb-0.5 min-w-0">{value}</span>
   </div>
 );
