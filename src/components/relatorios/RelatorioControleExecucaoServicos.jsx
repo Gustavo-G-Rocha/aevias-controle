@@ -47,7 +47,8 @@ export default function RelatorioControleExecucaoServicos({ data }) {
           .ces-obs { border: 1px solid #94a3b8 !important; }
         }
       `}</style>
-      <div data-report-root className="p-6 print:p-0 flex flex-col min-h-screen">
+      {/* Mesma margem interna das páginas de fotos (pt-2 px-3 pb-3, mantida no print) */}
+      <div data-report-root className="w-full max-w-[210mm] mx-auto pt-2 px-3 pb-3 print:pt-2 print:px-3 print:pb-3 flex flex-col min-h-screen">
         <div className="w-full flex-1 flex flex-col">
 
           {/* Cabeçalho */}
