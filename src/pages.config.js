@@ -36,7 +36,7 @@
  * them is actually visited. App.jsx wraps routes in <Suspense>.
  * ────────────────────────────────────────────────────────────────────────
  */
-import { lazy } from 'react';
+import { lazyWithRetry as lazy } from '@/lib/lazyWithRetry';
 
 const CertificacaoUsina = lazy(() => import('./pages/CertificacaoUsina/index'));
 const RelatorioCertificacaoUsina = lazy(() => import('./pages/RelatorioCertificacaoUsina'));
