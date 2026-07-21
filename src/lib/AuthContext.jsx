@@ -193,13 +193,14 @@ export const AuthProvider = ({ children }) => {
     base44.auth.redirectToLogin(window.location.href);
   };
 
-  // Logout automático por inatividade (15 min sem interação, aviso prévio de 60s).
+  // Logout automático por inatividade (8 horas sem interação, aviso prévio de 60s).
   const handleSessionTimeout = useCallback(() => {
     logout(false, 'inactivity');
   }, [logout]);
 
   const { showWarning: sessionWarning, countdown: sessionCountdown, extendSession, logoutNow } = useSessionTimeout({
     enabled: isAuthenticated,
+    timeoutMs: 8 * 60 * 60 * 1000,
     onTimeout: handleSessionTimeout,
   });
 
