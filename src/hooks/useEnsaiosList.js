@@ -82,13 +82,27 @@ export function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccess
         .map(e => (e || '').toLowerCase())
         .filter(Boolean)
     );
+    // Obras de regionais onde o usuário é SUPERVISOR (supervisores_responsaveis):
+    // tem poder de aprovação, então precisa ver também os registros finalizados
+    // pendentes dos inspetores dessas obras — antes ficavam ocultos e ele não
+    // conseguia aprová-los.
+    const regionaisSupervisor = (regionaisData || []).filter(r =>
+      (r.supervisores_responsaveis || []).some(e => (e || '').toLowerCase() === userEmail)
+    );
+    const regionaisSupervisorIds = new Set(regionaisSupervisor.map(r => r.id));
+    const supervisorObraIds = new Set(
+      (obrasData || []).filter(o => regionaisSupervisorIds.has(o.regional_id)).map(o => o.id)
+    );
     return combinedEnsaios.filter(e => {
       const isFromObra = obrasIds.has(e.obra_id);
       const isFromSubordinate = e.created_by && subordinateEmails.has(e.created_by.toLowerCase());
       const isApprovedOrSigned = e.approved === true || e.client_signature?.signed_by;
+      // Finalizado (não-rascunho) de obra onde é supervisor → mostra (pode aprovar)
+      const isFinalizadoDeObraSupervisionada =
+        supervisorObraIds.has(e.obra_id) && e.status !== 'rascunho';
       // Aprovados/assinados das suas obras → mostra
-      // Pendentes/reprovados → mostra apenas se criados por subordinado
-      return (isFromObra && isApprovedOrSigned) || isFromSubordinate;
+      // Pendentes/reprovados → mostra se é supervisor da obra ou criado por subordinado
+      return (isFromObra && isApprovedOrSigned) || isFinalizadoDeObraSupervisionada || isFromSubordinate;
     });
   }
 
