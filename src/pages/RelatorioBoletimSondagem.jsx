@@ -38,6 +38,7 @@ export default function RelatorioBoletimSondagem() {
   }
 
   const temCol2 = temSegundaClassificacao(boletim.camadas);
+  const totalPaginas = 1 + Math.ceil((boletim.fotos?.length || 0) / 6);
 
   return (
     <div className="relatorio-page bg-white min-h-screen">
@@ -82,6 +83,11 @@ export default function RelatorioBoletimSondagem() {
             clientCREA={boletim.client_signature?.crea_number}
             clientDate={boletim.client_signature?.signed_date}
           />
+          {totalPaginas > 1 && (
+            <p className="text-center text-xs text-gray-500 pt-2">
+              Página 1 de {totalPaginas}
+            </p>
+          )}
         </footer>
       </div>
 
