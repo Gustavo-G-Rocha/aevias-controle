@@ -85,11 +85,6 @@ export default function EnsaioVigaBenkelmanDadosGerais({
             </div>
 
             <div>
-              <span className="block text-sm font-medium text-foreground mb-2">Data de Aplicação da Camada</span>
-              <Input type="date" value={formData.data_ensaio} onChange={(e) => onInputChange('data_ensaio', e.target.value)} className="bg-background border-border text-foreground" />
-            </div>
-
-            <div>
               <span className="block text-sm font-medium text-foreground mb-2">Data de Realização do Ensaio</span>
               <Input type="date" value={formData.data_realizacao} onChange={(e) => onInputChange('data_realizacao', e.target.value)} className="bg-background border-border text-foreground" />
             </div>

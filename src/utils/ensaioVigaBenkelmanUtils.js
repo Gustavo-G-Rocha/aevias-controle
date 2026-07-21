@@ -36,7 +36,7 @@ export const getInitialForm = () => ({
   material: '',
   procedencia: '',
   camada: '',
-  cte_viga: 0.01,
+  cte_viga: 2,
   def_admissivel: '',
   leitura_inicial_global: '',
   faixas: [getFaixaInicial(1)],
@@ -60,7 +60,7 @@ export function calcularLado(lado, field, numValue, cte_viga) {
   if (!CAMPOS_LEITURA_PERMITIDOS.includes(field)) return lado;
   const atualizado = { ...lado, [field]: numValue };
   atualizado.diferenca = (atualizado.leitura_inicial || 0) - (atualizado.leitura_final || 0);
-  atualizado.deflexao  = atualizado.diferenca * (parseFloat(cte_viga) || 0.01);
+  atualizado.deflexao  = atualizado.diferenca * (parseFloat(cte_viga) || 2);
   return atualizado;
 }
 
