@@ -116,10 +116,33 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // Determina o ator
-    const changedBy = user?.email || actor_email || '';
-    const changedByName = user?.laboratorista_name || user?.full_name || actor_name || '';
-    const resolvedActorRole = user?.access_level || user?.role || actor_role || '';
+    // Determina o ator.
+    // Quando não autenticado, os campos de identidade NUNCA vêm do payload
+    // (prevenção de log spoofing — um atacante anônimo não pode forjar um
+    // login_success de um administrador). Nome e papel são sempre estáticos;
+    // o email do ator só é aceito para eventos anônimos legítimos onde ele
+    // representa o ALVO da tentativa (login_failure, password_reset_request,
+    // password_reset, token_expired), nunca para login_success/logout que
+    // exigiriam sessão válida.
+    const ANON_EVENTS_WITH_TARGET_EMAIL = new Set([
+      'login_failure', 'password_reset_request', 'password_reset', 'token_expired',
+    ]);
+
+    let changedBy: string;
+    let changedByName: string;
+    let resolvedActorRole: string;
+
+    if (user) {
+      changedBy = user.email || '';
+      changedByName = user.laboratorista_name || user.full_name || '';
+      resolvedActorRole = user.access_level || user.role || '';
+    } else {
+      changedBy = ANON_EVENTS_WITH_TARGET_EMAIL.has(event_type) && actor_email
+        ? actor_email
+        : 'Anônimo';
+      changedByName = 'Anônimo';
+      resolvedActorRole = 'não_autenticado';
+    }
 
     const now = new Date().toISOString();
     const resolvedEntityName = entity_name || (AUTH_EVENT_TYPES.has(event_type) ? 'AuthSession' : 'Unknown');
