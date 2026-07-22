@@ -17,7 +17,7 @@
     },
     "horario": {
       "type": "string",
-      "description": "Horário do ensaio"
+      "description": "Hor\u00e1rio do ensaio"
     },
     "laboratorista_name": {
       "type": "string",
@@ -29,7 +29,7 @@
     },
     "contrato": {
       "type": "string",
-      "description": "Número do contrato"
+      "description": "N\u00famero do contrato"
     },
     "rodovia": {
       "type": "string",
@@ -37,7 +37,7 @@
     },
     "trecho": {
       "type": "string",
-      "description": "Descrição do trecho"
+      "description": "Descri\u00e7\u00e3o do trecho"
     },
     "local_coleta": {
       "type": "string",
@@ -45,7 +45,7 @@
     },
     "camada": {
       "type": "string",
-      "description": "Número/descrição da camada"
+      "description": "N\u00famero/descri\u00e7\u00e3o da camada"
     },
     "material": {
       "type": "string",
@@ -53,7 +53,7 @@
     },
     "procedencia": {
       "type": "string",
-      "description": "Procedência do material"
+      "description": "Proced\u00eancia do material"
     },
     "disco_especial": {
       "type": "string",
@@ -73,15 +73,15 @@
     },
     "num_golpes": {
       "type": "number",
-      "description": "Número de golpes"
+      "description": "N\u00famero de golpes"
     },
     "energia_compactacao": {
       "type": "string",
       "enum": [
-        "Intermediária",
+        "Intermedi\u00e1ria",
         "Modificada"
       ],
-      "description": "Energia de compactação"
+      "description": "Energia de compacta\u00e7\u00e3o"
     },
     "correcao_densidade": {
       "type": "string",
@@ -89,15 +89,15 @@
         "higroscopica",
         "ponto_a_ponto"
       ],
-      "description": "Tipo de correção de densidade"
+      "description": "Tipo de corre\u00e7\u00e3o de densidade"
     },
     "umidade_higroscopica": {
       "type": "number",
-      "description": "Umidade higroscópica (%)"
+      "description": "Umidade higrosc\u00f3pica (%)"
     },
     "umidades": {
       "type": "array",
-      "description": "Dados de umidade (máximo 5 pontos)",
+      "description": "Dados de umidade (m\u00e1ximo 5 pontos)",
       "items": {
         "type": "object",
         "properties": {
@@ -139,11 +139,11 @@
     },
     "umidade_media": {
       "type": "number",
-      "description": "Umidade média calculada (%)"
+      "description": "Umidade m\u00e9dia calculada (%)"
     },
     "densidades": {
       "type": "array",
-      "description": "Dados de densidade (máximo 5 pontos)",
+      "description": "Dados de densidade (m\u00e1ximo 5 pontos)",
       "items": {
         "type": "object",
         "properties": {
@@ -185,20 +185,20 @@
     },
     "densidade_maxima_seca": {
       "type": "number",
-      "description": "Densidade máxima seca identificada (g/cm³)"
+      "description": "Densidade m\u00e1xima seca identificada (g/cm\u00b3)"
     },
     "umidade_otima": {
       "type": "number",
-      "description": "Umidade ótima identificada (%)"
+      "description": "Umidade \u00f3tima identificada (%)"
     },
     "realizar_cbr_expansao": {
       "type": "boolean",
       "default": false,
-      "description": "Se deve realizar ensaio de CBR/ISC e Expansão"
+      "description": "Se deve realizar ensaio de CBR/ISC e Expans\u00e3o"
     },
     "cbr_fator_anel": {
       "type": "number",
-      "description": "Constante de calibração global do anel de carga (CBR)"
+      "description": "Constante de calibra\u00e7\u00e3o global do anel de carga (CBR)"
     },
     "cbr_cilindros": {
       "type": "array",
@@ -232,7 +232,7 @@
     },
     "expansao_cilindros": {
       "type": "array",
-      "description": "Dados de expansão por cilindro",
+      "description": "Dados de expans\u00e3o por cilindro",
       "items": {
         "type": "object",
         "properties": {
@@ -279,16 +279,16 @@
     },
     "expansao": {
       "type": "number",
-      "description": "Valor de expansão final (%)"
+      "description": "Valor de expans\u00e3o final (%)"
     },
     "realizar_limites": {
       "type": "boolean",
       "default": false,
-      "description": "Se deve realizar ensaios físicos de caracterização (LL, LP, granulometria)"
+      "description": "Se deve realizar ensaios f\u00edsicos de caracteriza\u00e7\u00e3o (LL, LP, granulometria)"
     },
     "limites": {
       "type": "object",
-      "description": "Dados dos ensaios físicos de caracterização (ABNT NBR 7181 | 6459 | 7180)",
+      "description": "Dados dos ensaios f\u00edsicos de caracteriza\u00e7\u00e3o (ABNT NBR 7181 | 6459 | 7180)",
       "properties": {
         "higro_solo_umido_capsula_1": {
           "type": "number"
@@ -348,7 +348,7 @@
     },
     "observacoes": {
       "type": "string",
-      "description": "Observações gerais"
+      "description": "Observa\u00e7\u00f5es gerais"
     },
     "status": {
       "type": "string",
@@ -407,7 +407,7 @@
     "data_ensaio"
   ],
   "rls": {
-    "read": {
+    "create": {
       "$or": [
         {
           "user_condition": {
@@ -415,21 +415,28 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         },
-        { "user_condition": { "data.access_level": "cliente" } },
-        { "user_condition": { "data.access_level": "cliente_supervisor" } },
         {
-          "created_by": "{{user.email}}"
+          "user_condition": {
+            "data.access_level": "user"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "funcionarios_cliente"
+          }
         }
       ]
     },
-    "create": {},
+    "read": null,
     "update": {
       "$or": [
         {
@@ -441,11 +448,13 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         }
       ]
@@ -461,11 +470,13 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         }
       ]

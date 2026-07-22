@@ -163,7 +163,7 @@
     "data"
   ],
   "rls": {
-    "read": {
+    "create": {
       "$or": [
         {
           "user_condition": {
@@ -182,20 +182,17 @@
         },
         {
           "user_condition": {
-            "data.access_level": "cliente"
+            "data.access_level": "user"
           }
         },
         {
           "user_condition": {
-            "data.access_level": "cliente_supervisor"
+            "data.access_level": "funcionarios_cliente"
           }
-        },
-        {
-          "created_by": "{{user.email}}"
         }
       ]
     },
-    "create": {},
+    "read": null,
     "update": {
       "$or": [
         {

@@ -21,7 +21,7 @@
     },
     "trecho": {
       "type": "string",
-      "description": "Descrição do trecho"
+      "description": "Descri\u00e7\u00e3o do trecho"
     },
     "pedreira": {
       "type": "string",
@@ -29,11 +29,11 @@
     },
     "numero_projeto": {
       "type": "string",
-      "description": "Número do projeto"
+      "description": "N\u00famero do projeto"
     },
     "faixa_especificada": {
       "type": "string",
-      "description": "Faixa granulométrica especificada"
+      "description": "Faixa granulom\u00e9trica especificada"
     },
     "rodovia": {
       "type": "string",
@@ -52,7 +52,7 @@
         "number",
         "null"
       ],
-      "description": "Temperatura do ligante (CAP) em °C"
+      "description": "Temperatura do ligante (CAP) em \u00b0C"
     },
     "agregados": {
       "type": "array",
@@ -69,7 +69,7 @@
               "number",
               "null"
             ],
-            "description": "Composição em %"
+            "description": "Composi\u00e7\u00e3o em %"
           },
           "umidade": {
             "type": [
@@ -83,14 +83,14 @@
               "number",
               "null"
             ],
-            "description": "Temperatura T1 em °C"
+            "description": "Temperatura T1 em \u00b0C"
           },
           "temperatura_t2": {
             "type": [
               "number",
               "null"
             ],
-            "description": "Temperatura T2 em °C"
+            "description": "Temperatura T2 em \u00b0C"
           }
         }
       }
@@ -119,14 +119,14 @@
               "number",
               "null"
             ],
-            "description": "Temperatura em °C"
+            "description": "Temperatura em \u00b0C"
           },
           "temperatura_2": {
             "type": [
               "number",
               "null"
             ],
-            "description": "Temperatura em °C"
+            "description": "Temperatura em \u00b0C"
           },
           "observacao": {
             "type": "string"
@@ -136,7 +136,7 @@
     },
     "observacoes_gerais": {
       "type": "string",
-      "description": "Observações gerais"
+      "description": "Observa\u00e7\u00f5es gerais"
     },
     "status": {
       "type": "string",
@@ -153,11 +153,11 @@
         "null"
       ],
       "default": null,
-      "description": "Status de aprovação"
+      "description": "Status de aprova\u00e7\u00e3o"
     },
     "approved_by": {
       "type": "string",
-      "description": "Email do usuário que aprovou/reprovou"
+      "description": "Email do usu\u00e1rio que aprovou/reprovou"
     },
     "approved_date": {
       "type": "string",
@@ -208,7 +208,7 @@
     "data"
   ],
   "rls": {
-    "read": {
+    "create": {
       "$or": [
         {
           "user_condition": {
@@ -216,21 +216,28 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         },
-        { "user_condition": { "data.access_level": "cliente" } },
-        { "user_condition": { "data.access_level": "cliente_supervisor" } },
         {
-          "created_by": "{{user.email}}"
+          "user_condition": {
+            "data.access_level": "user"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "funcionarios_cliente"
+          }
         }
       ]
     },
-    "create": {},
+    "read": null,
     "update": {
       "$or": [
         {
@@ -242,11 +249,13 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         }
       ]
@@ -262,11 +271,13 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         }
       ]

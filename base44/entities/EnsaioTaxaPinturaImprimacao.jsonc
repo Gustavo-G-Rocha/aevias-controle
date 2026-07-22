@@ -17,7 +17,7 @@
     },
     "engenheiro_responsavel": {
       "type": "string",
-      "description": "Nome do engenheiro responsável"
+      "description": "Nome do engenheiro respons\u00e1vel"
     },
     "rodovia": {
       "type": "string",
@@ -25,7 +25,7 @@
     },
     "trecho": {
       "type": "string",
-      "description": "Descrição do trecho"
+      "description": "Descri\u00e7\u00e3o do trecho"
     },
     "material": {
       "type": "string",
@@ -33,7 +33,7 @@
     },
     "placa_caminhao": {
       "type": "string",
-      "description": "Placa do caminhão"
+      "description": "Placa do caminh\u00e3o"
     },
     "tipo_servico": {
       "type": "string",
@@ -41,11 +41,11 @@
         "imprimacao",
         "ligacao"
       ],
-      "description": "Tipo de serviço: Imprimação ou Ligação"
+      "description": "Tipo de servi\u00e7o: Imprima\u00e7\u00e3o ou Liga\u00e7\u00e3o"
     },
     "dimensoes_bandeja": {
       "type": "object",
-      "description": "Dimensões globais da bandeja (aplicadas a todos os ensaios)",
+      "description": "Dimens\u00f5es globais da bandeja (aplicadas a todos os ensaios)",
       "properties": {
         "lado_1": {
           "type": "number",
@@ -57,27 +57,27 @@
         },
         "area": {
           "type": "number",
-          "description": "Área calculada (m²)"
+          "description": "\u00c1rea calculada (m\u00b2)"
         }
       }
     },
     "ensaios": {
       "type": "array",
-      "description": "Array de ensaios (até 4)",
+      "description": "Array de ensaios (at\u00e9 4)",
       "items": {
         "type": "object",
         "properties": {
           "numero": {
             "type": "number",
-            "description": "Número do ensaio"
+            "description": "N\u00famero do ensaio"
           },
           "hora": {
             "type": "string",
-            "description": "Hora de realização do ensaio"
+            "description": "Hora de realiza\u00e7\u00e3o do ensaio"
           },
           "camada": {
             "type": "string",
-            "description": "Camada de aplicação"
+            "description": "Camada de aplica\u00e7\u00e3o"
           },
           "material_camada": {
             "type": "string",
@@ -89,7 +89,7 @@
           },
           "temperatura_aplicacao": {
             "type": "number",
-            "description": "Temperatura de aplicação do ligante (°C)"
+            "description": "Temperatura de aplica\u00e7\u00e3o do ligante (\u00b0C)"
           },
           "peso_bandeja_amostra": {
             "type": "number",
@@ -101,28 +101,28 @@
           },
           "peso_emulsao": {
             "type": "number",
-            "description": "Peso da emulsão calculado (g)"
+            "description": "Peso da emuls\u00e3o calculado (g)"
           },
           "taxa_aplicada": {
             "type": "number",
-            "description": "Taxa aplicada calculada (l/m²)"
+            "description": "Taxa aplicada calculada (l/m\u00b2)"
           },
           "taxa_emulsao_aplicada": {
             "type": "number",
-            "description": "Taxa de emulsão aplicada calculada (l/m²)"
+            "description": "Taxa de emuls\u00e3o aplicada calculada (l/m\u00b2)"
           },
           "taxa_residual": {
             "type": "number",
-            "description": "Taxa residual calculada (l/m²)"
+            "description": "Taxa residual calculada (l/m\u00b2)"
           },
           "ensaio_residuo": {
             "type": "object",
-            "description": "Dados do ensaio de resíduo",
+            "description": "Dados do ensaio de res\u00edduo",
             "properties": {
               "data": {
                 "type": "string",
                 "format": "date",
-                "description": "Data do ensaio de resíduo"
+                "description": "Data do ensaio de res\u00edduo"
               },
               "tara": {
                 "type": "number",
@@ -138,7 +138,7 @@
               },
               "residuo": {
                 "type": "number",
-                "description": "Resíduo calculado (%)"
+                "description": "Res\u00edduo calculado (%)"
               }
             }
           }
@@ -147,7 +147,7 @@
     },
     "observacoes": {
       "type": "string",
-      "description": "Observações gerais"
+      "description": "Observa\u00e7\u00f5es gerais"
     },
     "status": {
       "type": "string",
@@ -156,16 +156,16 @@
         "finalizado"
       ],
       "default": "rascunho",
-      "description": "Status do registro: rascunho (em edição) ou finalizado (pronto para revisão)"
+      "description": "Status do registro: rascunho (em edi\u00e7\u00e3o) ou finalizado (pronto para revis\u00e3o)"
     },
     "approved": {
       "type": "boolean",
       "default": null,
-      "description": "Status de aprovação"
+      "description": "Status de aprova\u00e7\u00e3o"
     },
     "approved_by": {
       "type": "string",
-      "description": "Email do usuário que aprovou/reprovou"
+      "description": "Email do usu\u00e1rio que aprovou/reprovou"
     },
     "approved_date": {
       "type": "string",
@@ -212,7 +212,7 @@
     "data_ensaio"
   ],
   "rls": {
-    "read": {
+    "create": {
       "$or": [
         {
           "user_condition": {
@@ -220,21 +220,28 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         },
-        { "user_condition": { "data.access_level": "cliente" } },
-        { "user_condition": { "data.access_level": "cliente_supervisor" } },
         {
-          "created_by": "{{user.email}}"
+          "user_condition": {
+            "data.access_level": "user"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "funcionarios_cliente"
+          }
         }
       ]
     },
-    "create": {},
+    "read": null,
     "update": {
       "$or": [
         {
@@ -246,11 +253,13 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         }
       ]
@@ -266,11 +275,13 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         }
       ]

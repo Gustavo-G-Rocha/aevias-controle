@@ -373,9 +373,6 @@
   ],
   "rls": {
     "create": {
-      "created_by_id": "{{user.id}}"
-    },
-    "read": {
       "$or": [
         {
           "user_condition": {
@@ -391,22 +388,10 @@
           "user_condition": {
             "data.access_level": "gestor_contrato"
           }
-        },
-        {
-          "user_condition": {
-            "data.access_level": "cliente"
-          }
-        },
-        {
-          "user_condition": {
-            "data.access_level": "cliente_supervisor"
-          }
-        },
-        {
-          "created_by_id": "{{user.id}}"
         }
       ]
     },
+    "read": null,
     "update": {
       "$or": [
         {

@@ -21,11 +21,11 @@
     },
     "trecho": {
       "type": "string",
-      "description": "Descrição do trecho"
+      "description": "Descri\u00e7\u00e3o do trecho"
     },
     "empreiteira": {
       "type": "string",
-      "description": "Empreiteira responsável pela execução"
+      "description": "Empreiteira respons\u00e1vel pela execu\u00e7\u00e3o"
     },
     "camada": {
       "type": "string",
@@ -42,18 +42,18 @@
         "DNIT",
         "ECO-RODOVIAS"
       ],
-      "description": "Orgao de especificação"
+      "description": "Orgao de especifica\u00e7\u00e3o"
     },
     "ensaios_mancha": {
       "type": "array",
-      "description": "Ensaios de Mancha de Areia (até 15)",
+      "description": "Ensaios de Mancha de Areia (at\u00e9 15)",
       "items": {
         "type": "object"
       }
     },
     "ensaios_pendulo": {
       "type": "array",
-      "description": "Ensaios de Pêndulo Britânico (até 15)",
+      "description": "Ensaios de P\u00eandulo Brit\u00e2nico (at\u00e9 15)",
       "items": {
         "type": "object"
       }
@@ -61,24 +61,24 @@
     "limites_mancha": {
       "type": "string",
       "description": "Limites estabelecidos para Mancha de Areia",
-      "default": "0,6mm ≤ HS ≤ 1,2mm"
+      "default": "0,6mm \u2264 HS \u2264 1,2mm"
     },
     "limites_pendulo": {
       "type": "string",
-      "description": "Limites estabelecidos para Pêndulo Britânico",
-      "default": "VRD ≥ 47"
+      "description": "Limites estabelecidos para P\u00eandulo Brit\u00e2nico",
+      "default": "VRD \u2265 47"
     },
     "condicao_conformidade": {
       "type": "string",
       "enum": [
         "CONFORME",
-        "NÃO CONFORME"
+        "N\u00c3O CONFORME"
       ],
-      "description": "Condição de conformidade geral"
+      "description": "Condi\u00e7\u00e3o de conformidade geral"
     },
     "observacoes": {
       "type": "string",
-      "description": "Observações gerais"
+      "description": "Observa\u00e7\u00f5es gerais"
     },
     "status": {
       "type": "string",
@@ -92,11 +92,11 @@
     "approved": {
       "type": "boolean",
       "default": null,
-      "description": "Status de aprovação"
+      "description": "Status de aprova\u00e7\u00e3o"
     },
     "approved_by": {
       "type": "string",
-      "description": "Email do usuário que aprovou/reprovou"
+      "description": "Email do usu\u00e1rio que aprovou/reprovou"
     },
     "approved_date": {
       "type": "string",
@@ -148,7 +148,7 @@
     "data_ensaio"
   ],
   "rls": {
-    "read": {
+    "create": {
       "$or": [
         {
           "user_condition": {
@@ -156,21 +156,28 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         },
-        { "user_condition": { "data.access_level": "cliente" } },
-        { "user_condition": { "data.access_level": "cliente_supervisor" } },
         {
-          "created_by": "{{user.email}}"
+          "user_condition": {
+            "data.access_level": "user"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "funcionarios_cliente"
+          }
         }
       ]
     },
-    "create": {},
+    "read": null,
     "update": {
       "$or": [
         {
@@ -182,11 +189,13 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         }
       ]
@@ -202,11 +211,13 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         }
       ]

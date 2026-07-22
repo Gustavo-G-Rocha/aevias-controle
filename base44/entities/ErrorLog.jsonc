@@ -39,12 +39,12 @@
     "message"
   ],
   "rls": {
+    "create": false,
     "read": {
       "user_condition": {
         "role": "admin"
       }
     },
-    "create": {},
     "update": {
       "user_condition": {
         "role": "admin"

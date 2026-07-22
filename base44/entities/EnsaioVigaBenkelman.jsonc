@@ -13,12 +13,12 @@
     "data_ensaio": {
       "type": "string",
       "format": "date",
-      "description": "Data da aplicação do ensaio"
+      "description": "Data da aplica\u00e7\u00e3o do ensaio"
     },
     "data_realizacao": {
       "type": "string",
       "format": "date",
-      "description": "Data de realização do ensaio"
+      "description": "Data de realiza\u00e7\u00e3o do ensaio"
     },
     "laboratorista_name": {
       "type": "string",
@@ -34,7 +34,7 @@
     },
     "empreiteira": {
       "type": "string",
-      "description": "Empreiteira responsável pela execução"
+      "description": "Empreiteira respons\u00e1vel pela execu\u00e7\u00e3o"
     },
     "material": {
       "type": "string",
@@ -42,11 +42,11 @@
     },
     "procedencia": {
       "type": "string",
-      "description": "Procedência do material"
+      "description": "Proced\u00eancia do material"
     },
     "pista_faixa": {
       "type": "string",
-      "description": "Pista ou faixa de tráfego"
+      "description": "Pista ou faixa de tr\u00e1fego"
     },
     "camada": {
       "type": "string",
@@ -54,19 +54,19 @@
     },
     "cte_viga": {
       "type": "number",
-      "description": "Coeficiente da viga (automático)"
+      "description": "Coeficiente da viga (autom\u00e1tico)"
     },
     "def_admissivel": {
       "type": "number",
-      "description": "Deflexão admissível (x10⁻²mm)"
+      "description": "Deflex\u00e3o admiss\u00edvel (x10\u207b\u00b2mm)"
     },
     "leitura_inicial_global": {
       "type": "number",
-      "description": "Leitura inicial única que será replicada para todos os registros"
+      "description": "Leitura inicial \u00fanica que ser\u00e1 replicada para todos os registros"
     },
     "levantamentos": {
       "type": "array",
-      "description": "Array de levantamentos por estaca/km com medições dos 3 bordos",
+      "description": "Array de levantamentos por estaca/km com medi\u00e7\u00f5es dos 3 bordos",
       "items": {
         "type": "object",
         "properties": {
@@ -91,11 +91,11 @@
               },
               "diferenca": {
                 "type": "number",
-                "description": "Diferença (C = A - B)"
+                "description": "Diferen\u00e7a (C = A - B)"
               },
               "deflexao": {
                 "type": "number",
-                "description": "Deflexão (D = C × E em x10⁻²mm)"
+                "description": "Deflex\u00e3o (D = C \u00d7 E em x10\u207b\u00b2mm)"
               }
             }
           },
@@ -112,11 +112,11 @@
               },
               "diferenca": {
                 "type": "number",
-                "description": "Diferença (C = A - B)"
+                "description": "Diferen\u00e7a (C = A - B)"
               },
               "deflexao": {
                 "type": "number",
-                "description": "Deflexão (D = C × E em x10⁻²mm)"
+                "description": "Deflex\u00e3o (D = C \u00d7 E em x10\u207b\u00b2mm)"
               }
             }
           },
@@ -133,11 +133,11 @@
               },
               "diferenca": {
                 "type": "number",
-                "description": "Diferença (C = A - B)"
+                "description": "Diferen\u00e7a (C = A - B)"
               },
               "deflexao": {
                 "type": "number",
-                "description": "Deflexão (D = C × E em x10⁻²mm)"
+                "description": "Deflex\u00e3o (D = C \u00d7 E em x10\u207b\u00b2mm)"
               }
             }
           }
@@ -146,7 +146,7 @@
     },
     "controle_estatistico": {
       "type": "object",
-      "description": "Controle estatístico das medições",
+      "description": "Controle estat\u00edstico das medi\u00e7\u00f5es",
       "properties": {
         "qt_leituras": {
           "type": "number",
@@ -154,17 +154,17 @@
         },
         "media": {
           "type": "number",
-          "description": "Média das deflexões"
+          "description": "M\u00e9dia das deflex\u00f5es"
         },
         "desv_pad": {
           "type": "number",
-          "description": "Desvio padrão"
+          "description": "Desvio padr\u00e3o"
         }
       }
     },
     "observacoes": {
       "type": "string",
-      "description": "Observações gerais"
+      "description": "Observa\u00e7\u00f5es gerais"
     },
     "status": {
       "type": "string",
@@ -178,11 +178,11 @@
     "approved": {
       "type": "boolean",
       "default": null,
-      "description": "Status de aprovação"
+      "description": "Status de aprova\u00e7\u00e3o"
     },
     "approved_by": {
       "type": "string",
-      "description": "Email do usuário que aprovou"
+      "description": "Email do usu\u00e1rio que aprovou"
     },
     "approved_date": {
       "type": "string",
@@ -233,7 +233,7 @@
     "data_ensaio"
   ],
   "rls": {
-    "read": {
+    "create": {
       "$or": [
         {
           "user_condition": {
@@ -241,21 +241,28 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         },
-        { "user_condition": { "data.access_level": "cliente" } },
-        { "user_condition": { "data.access_level": "cliente_supervisor" } },
         {
-          "created_by": "{{user.email}}"
+          "user_condition": {
+            "data.access_level": "user"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "funcionarios_cliente"
+          }
         }
       ]
     },
-    "create": {},
+    "read": null,
     "update": {
       "$or": [
         {
@@ -267,11 +274,13 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         }
       ]
@@ -287,11 +296,13 @@
           }
         },
         {
-          "user_condition": { "data.access_level": "sala_tecnica_afirmaevias"
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
           }
         },
         {
-          "user_condition": { "data.access_level": "gestor_contrato"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         }
       ]
