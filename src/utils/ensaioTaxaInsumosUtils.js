@@ -51,7 +51,7 @@ export function calcularEnsaio(ensaio, areaBandeja) {
   }
 
   if (novo.peso_amostra != null && areaBandeja) {
-    novo.taxa_aplicada = parseFloat((novo.peso_amostra / (1000 * areaBandeja)).toFixed(4));
+    novo.taxa_aplicada = parseFloat((novo.peso_amostra / (1000 * areaBandeja)).toFixed(2));
   } else {
     novo.taxa_aplicada = null;
   }

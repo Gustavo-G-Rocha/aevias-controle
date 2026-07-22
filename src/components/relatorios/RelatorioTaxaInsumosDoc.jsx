@@ -15,14 +15,17 @@ export default function RelatorioTaxaInsumosDoc({ ensaio, obra, regional }) {
     : 'TAXA DE AGREGADO';
 
   return (
-    <div className="bg-white font-sans">
+    <div className="bg-slate-200/60 font-sans py-8">
       <style>{`
         @media print {
-          body, html { margin: 0; padding: 0; }
-          .print-page { width: 210mm; min-height: 297mm; margin: 0; padding: 10mm; box-sizing: border-box; }
+          body, html { margin: 0; padding: 0; background: white !important; }
+          .print-page { width: 210mm; min-height: 297mm; margin: 0; padding: 14mm 12mm; box-sizing: border-box; box-shadow: none !important; border-radius: 0 !important; }
+        }
+        @media screen {
+          .print-page { width: 210mm; min-height: 297mm; padding: 14mm 12mm; box-sizing: border-box; box-shadow: 0 4px 24px rgba(0,0,0,0.12); border-radius: 2px; }
         }
       `}</style>
-      <div className="print-page w-full max-w-[210mm] mx-auto bg-white min-h-[297mm]">
+      <div className="print-page w-full max-w-[210mm] mx-auto bg-white">
 
         {/* Header */}
         <div className="flex justify-between items-start mb-4 pb-3 border-b-2 border-slate-900">
@@ -197,7 +200,7 @@ export default function RelatorioTaxaInsumosDoc({ ensaio, obra, regional }) {
                 <td className="border border-slate-300 px-2 py-1 italic text-center text-[8px]">Tc = C / (1000 × A)</td>
                 <td className="border border-slate-300 px-2 py-1 text-center">kg/m²</td>
                 {ensaios.map((e, i) => (
-                  <td key={i} className="border border-slate-300 px-2 py-1 text-center font-bold">{e.taxa_aplicada?.toFixed(4) ?? ''}</td>
+                  <td key={i} className="border border-slate-300 px-2 py-1 text-center font-bold">{e.taxa_aplicada?.toFixed(2) ?? ''}</td>
                 ))}
               </tr>
             </tbody>

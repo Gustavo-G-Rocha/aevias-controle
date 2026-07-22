@@ -46,6 +46,7 @@ export const REPORT_PAGES = new Set([
   "RelatorioSondagem",
   "RelatorioTaxaMRAF",
   "RelatorioTaxaPinturaImprimacao",
+  "RelatorioTaxaInsumos",
   "RelatorioVigaBenkelman",
   "RelatorioBoletimSondagem",
   "RelatorioBoletimSondagemTrado",
