@@ -81,6 +81,7 @@ const ALLOWED_ENTITIES = [
   'EnsaioSondagem',
   'EnsaioTaxaMRAF',
   'EnsaioTaxaPinturaImprimacao',
+  'EnsaioTaxaInsumos',
   'EnsaioVigaBenkelman',
   'AcompanhamentoCarga',
   'AcompanhamentoUsinagem',

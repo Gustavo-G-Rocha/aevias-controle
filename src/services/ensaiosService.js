@@ -21,6 +21,7 @@ const ENSAIO_ENTITIES = {
   'EnsaioSondagem': 'EnsaioSondagem',
   'EnsaioTaxaMRAF': 'EnsaioTaxaMRAF',
   'EnsaioTaxaPinturaImprimacao': 'EnsaioTaxaPinturaImprimacao',
+  'EnsaioTaxaInsumos': 'EnsaioTaxaInsumos',
   'EnsaioVigaBenkelman': 'EnsaioVigaBenkelman',
   'AcompanhamentoCarga': 'AcompanhamentoCarga',
   'AcompanhamentoUsinagem': 'AcompanhamentoUsinagem',
