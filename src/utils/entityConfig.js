@@ -25,6 +25,7 @@ export const ENTITY_CONFIG = {
   EnsaioManchaPendulo:          { label: 'Mancha + Pêndulo',           color: '#E74C3C', description: 'Novo ensaio mancha + pêndulo' },
   EnsaioVigaBenkelman:          { label: 'Viga Benkelman',             color: '#3498DB', description: 'Novo ensaio viga Benkelman' },
   EnsaioTaxaMRAF:               { label: 'Ensaio Taxa MRAF',           color: '#4682B4', description: 'Novo ensaio de taxa MRAF' },
+  EnsaioTaxaInsumos:            { label: 'Taxa de Insumos',             color: '#0891B2', description: 'Novo ensaio de taxa de insumos' },
   BoletimSondagem:              { label: 'Boletim Sondagem',           color: '#6A5ACD', description: 'Novo boletim de sondagem' },
   BoletimSondagemTrado:         { label: 'Boletim Sondagem Trado',     color: '#708090', description: 'Novo boletim de sondagem a trado' },
   EnsaioProctor:                { label: 'Ensaio Proctor',             color: '#DAA520', description: 'Novo ensaio Proctor' },

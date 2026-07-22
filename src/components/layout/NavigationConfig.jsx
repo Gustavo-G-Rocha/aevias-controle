@@ -100,6 +100,7 @@ export const ENSAIOS_POR_TIPO_OBRA = [
       { title: "Viga Benkelman", url: createPageUrl("EnsaioVigaBenkelman"), icon: Gauge },
       { title: "Taxa MRAF", url: createPageUrl("EnsaioTaxaMRAF"), icon: FlaskConical },
       { title: "Ensaio Proctor", url: createPageUrl("EnsaioProctor"), icon: FlaskConical },
+      { title: "Taxa de Insumos", url: createPageUrl("EnsaioTaxaInsumos"), icon: FlaskConical },
     ],
   },
   {
@@ -133,6 +134,7 @@ export const ENSAIOS_POR_TIPO_OBRA = [
         ensaios: [
           { title: "Ensaio de CAUQ", url: createPageUrl("EnsaioCAUQ"), icon: FlaskConical },
           { title: "Taxa de Pintura/Imprimação", url: createPageUrl("EnsaioTaxaPinturaImprimacao"), icon: FlaskConical },
+          { title: "Taxa de Insumos", url: createPageUrl("EnsaioTaxaInsumos"), icon: FlaskConical },
           { title: "Acompanhamento de Cargas", url: createPageUrl("AcompanhamentoCarga"), icon: FlaskConical },
           { title: "Viga Benkelman", url: createPageUrl("EnsaioVigaBenkelman"), icon: Gauge },
           { title: "Densidade In Situ", url: createPageUrl("EnsaioDensidadeInSitu"), icon: Gauge },

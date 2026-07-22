@@ -108,6 +108,7 @@ const ENSAIO_CONFIG = {
       return result;
     } },
   EnsaioTaxaMRAF:               { name: "Taxa de MRAF", label: 'Ensaio Taxa MRAF',          icon: FlaskConical, dateField: "data_ensaio",      reportPage: "RelatorioTaxaMRAF",                 color: '#4682B4', description: 'Novo ensaio de taxa MRAF' },
+  EnsaioTaxaInsumos:            { name: "Taxa de Insumos", label: 'Taxa de Insumos',         icon: FlaskConical, dateField: "data_ensaio",      reportPage: "RelatorioTaxaInsumos",              color: '#0891B2', description: 'Novo ensaio de taxa de insumos', localInfo: campoLocalInfo },
   BoletimSondagem:              { name: "Boletim de Sondagem (PI)", label: 'Boletim Sondagem', icon: FileText,     dateField: "data",             reportPage: "RelatorioBoletimSondagem",          color: '#6A5ACD', description: 'Novo boletim de sondagem',
     localInfo: (ensaio) => ({ tipo: "Furo", detalhes: ensaio.furo || "Não informado", icon: MapPin }) },
   BoletimSondagemTrado:         { name: "Boletim de Sondagem a Trado", label: 'Boletim Sondagem Trado', icon: FileText,     dateField: "data",             reportPage: "RelatorioBoletimSondagemTrado",     color: '#708090', description: 'Novo boletim de sondagem a trado' },

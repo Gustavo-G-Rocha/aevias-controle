@@ -1,0 +1,219 @@
+{
+  "name": "EnsaioTaxaInsumos",
+  "type": "object",
+  "properties": {
+    "obra_id": {
+      "type": "string",
+      "description": "ID da obra"
+    },
+    "tipo_insumo": {
+      "type": "string",
+      "enum": [
+        "cimento",
+        "agregado"
+      ],
+      "description": "Tipo de insumo: cimento ou agregado complementar"
+    },
+    "data_ensaio": {
+      "type": "string",
+      "format": "date"
+    },
+    "rodovia": {
+      "type": "string"
+    },
+    "trecho": {
+      "type": "string"
+    },
+    "material": {
+      "type": "string"
+    },
+    "servico": {
+      "type": "string"
+    },
+    "placa_caminhao": {
+      "type": "string"
+    },
+    "laboratorista_name": {
+      "type": "string"
+    },
+    "dimensoes_bandeja": {
+      "type": "object",
+      "properties": {
+        "lado_1": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "lado_2": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "area": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    "ensaios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "numero": {
+            "type": "number"
+          },
+          "hora": {
+            "type": "string"
+          },
+          "camada": {
+            "type": "string"
+          },
+          "estaca": {
+            "type": "string"
+          },
+          "no_bandeja": {
+            "type": "string"
+          },
+          "peso_bandeja_amostra": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "peso_bandeja": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "peso_amostra": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "taxa_aplicada": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "rascunho",
+        "finalizado"
+      ],
+      "default": "rascunho"
+    },
+    "approved": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "default": null
+    },
+    "approved_by": {
+      "type": "string"
+    },
+    "approved_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "approver_details": {
+      "type": "object"
+    },
+    "rejection_reason": {
+      "type": "string"
+    },
+    "was_rejected": {
+      "type": "boolean",
+      "default": false
+    },
+    "client_signature": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "obra_id",
+    "data_ensaio",
+    "tipo_insumo"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "user"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "funcionarios_cliente"
+          }
+        }
+      ]
+    },
+    "read": null,
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
+          }
+        }
+      ]
+    }
+  }
+}

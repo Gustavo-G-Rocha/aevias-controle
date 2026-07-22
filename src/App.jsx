@@ -17,6 +17,8 @@ import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import HistoricoAuditoria from '@/pages/HistoricoAuditoria';
+import EnsaioTaxaInsumos from '@/pages/EnsaioTaxaInsumos';
+import RelatorioTaxaInsumos from '@/pages/RelatorioTaxaInsumos';
 import ReportarErro from '@/pages/ReportarErro';
 import VerificarAssinatura from '@/pages/VerificarAssinatura';
 
@@ -64,6 +66,16 @@ function AuthenticatedApp() {
             }
           />
         ))}
+        <Route path="/EnsaioTaxaInsumos" element={
+          <LayoutWrapper currentPageName="EnsaioTaxaInsumos">
+            <EnsaioTaxaInsumos />
+          </LayoutWrapper>
+        } />
+        <Route path="/RelatorioTaxaInsumos" element={
+          <LayoutWrapper currentPageName="RelatorioTaxaInsumos">
+            <RelatorioTaxaInsumos />
+          </LayoutWrapper>
+        } />
         <Route path="/historico-auditoria" element={
           <LayoutWrapper currentPageName="HistoricoAuditoria">
             <HistoricoAuditoria />

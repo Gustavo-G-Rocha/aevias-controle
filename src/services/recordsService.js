@@ -16,6 +16,7 @@ export const ALL_RECORD_ENTITIES = [
   'EnsaioDensidade',
   'EnsaioDensidadeInSitu',
   'EnsaioTaxaPinturaImprimacao',
+  'EnsaioTaxaInsumos',
   'ChecklistUsina',
   'ChecklistAplicacao',
   'ChecklistMRAF',
