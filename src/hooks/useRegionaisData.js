@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback } from "react";
 import { obterUsuarioAtual, listarUsuarios } from "@/services/usuariosService";
 import { listarRegionais } from "@/services/regionaisService";
 import { listarRegistros } from "@/services/recordsService";
+import { carregarObrasFuncionarioClienteService } from "@/services/obrasService";
 import { listarProjects } from "@/services/projectsService";
 import { getUserAccessLevel, filtrarRegionaisPorAcesso } from "@/utils/regionaisUtils";
 import { getDataCache } from "@/services/offlineStorageService";
@@ -50,6 +51,21 @@ export function useRegionaisData() {
       setUser(userData);
 
       const accessLevel = getUserAccessLevel(userData);
+
+      // funcionarios_cliente (inspetor): regionais e obras vêm de backend function
+      // com escopo server-side — o RLS do frontend não cobre este nível de acesso.
+      if (userData.access_level === 'funcionarios_cliente') {
+        const [{ regionais: minhasRegionais, obras: obrasFc }, projectsFc] = await Promise.all([
+          carregarObrasFuncionarioClienteService(),
+          listarProjects().catch(() => []),
+        ]);
+        setTodasRegionais(minhasRegionais);
+        setRegionais(minhasRegionais);
+        setObras(obrasFc);
+        setUsers([]);
+        setProjects(projectsFc);
+        return;
+      }
 
       const [regionaisData, obrasData, projectsData] = await Promise.all([
         listarRegionais("-created_date", 100),

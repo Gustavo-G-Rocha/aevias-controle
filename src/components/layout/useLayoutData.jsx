@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { obterUsuarioAtual, logout as encerrarSessao } from "@/services/usuariosService";
-import { listarObrasRecentes } from "@/services/obrasService";
+import { listarObrasRecentes, carregarObrasFuncionarioClienteService } from "@/services/obrasService";
 import { listarRegionais } from "@/services/regionaisService";
 import { logger } from '@/utils/logger';
 import {
@@ -107,42 +107,35 @@ export function useLayoutData() {
       setUser(userData);
       const userAccessLevel = getUserAccessLevel(userData);
 
-      if (userAccessLevel === ACCESS_LEVELS.USER || userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE) {
+      if (userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE) {
+        // funcionarios_cliente (inspetor): busca via backend function com escopo
+        // server-side (regionais do próprio email ou do supervisor) — o RLS do
+        // frontend não cobre este nível de acesso.
+        const { regionais: regionaisData, obras: obrasRegional } = await carregarObrasFuncionarioClienteService();
+        // Cachear para uso offline
+        saveDataCache('auxData:obras', obrasRegional, 'auxData').catch(() => {});
+        saveDataCache('auxData:regionais', regionaisData, 'auxData').catch(() => {});
+        setObrasDoUsuario(obrasRegional);
+      } else if (userAccessLevel === ACCESS_LEVELS.USER) {
         const [obrasData, regionaisData] = await Promise.all([listarObrasRecentes(), listarRegionais()]);
         // Cachear para uso offline
         saveDataCache('auxData:obras', obrasData, 'auxData').catch(() => {});
         saveDataCache('auxData:regionais', regionaisData, 'auxData').catch(() => {});
 
         const emailLower = userData.email.toLowerCase();
-        const supervisorEmailLower = userData.supervisor_email?.toLowerCase();
 
-        let regionaisIds;
-        if (userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE) {
-          // funcionarios_cliente: encontra regionais onde o supervisor OU o próprio email
-          // está em clientes_responsaveis
-          const emailsToCheck = new Set([emailLower]);
-          if (supervisorEmailLower) emailsToCheck.add(supervisorEmailLower);
-          regionaisIds = regionaisData
-            .filter(r => (r.clientes_responsaveis || []).some(e => emailsToCheck.has(e.toLowerCase())))
-            .map(r => r.id);
-        } else {
-          // user (laboratorista): regionais onde está alocado
-          regionaisIds = regionaisData
-            .filter(r =>
-              (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-              (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-            )
-            .map(r => r.id);
-        }
+        // user (laboratorista): regionais onde está alocado
+        const regionaisIds = regionaisData
+          .filter(r =>
+            (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
+            (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
+          )
+          .map(r => r.id);
 
         const regionaisSet = new Set(regionaisIds);
-        // funcionarios_cliente: vê todas as obras da regional do supervisor (independente de status);
         // user (laboratorista): apenas obras em andamento
-        const statusFilter = userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE
-          ? () => true
-          : (o) => o.status === "em_andamento";
         const obrasRegional = regionaisIds.length > 0
-          ? obrasData.filter(o => regionaisSet.has(o.regional_id) && statusFilter(o))
+          ? obrasData.filter(o => regionaisSet.has(o.regional_id) && o.status === "em_andamento")
           : [];
 
         setObrasDoUsuario(obrasRegional);

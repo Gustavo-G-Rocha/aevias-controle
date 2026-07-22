@@ -1,5 +1,20 @@
 import { base44 } from '@/api/base44Client';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
+import { carregarObrasFuncionarioCliente } from '@/functions/carregarObrasFuncionarioCliente';
+
+/**
+ * Busca regionais e obras via backend function para funcionarios_cliente
+ * (inspetor do cliente), contornando limitações de RLS no frontend.
+ * O escopo é aplicado server-side (regionais do próprio email ou do supervisor).
+ * @returns {Promise<{ regionais: object[], obras: object[] }>}
+ */
+export async function carregarObrasFuncionarioClienteService() {
+  const response = await carregarObrasFuncionarioCliente({});
+  return {
+    regionais: response.data?.regionais ?? [],
+    obras: response.data?.obras ?? [],
+  };
+}
 
 /**
  * Service centralizado para operações com Obras
