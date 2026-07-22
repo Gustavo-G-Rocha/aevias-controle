@@ -56,14 +56,18 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
         </div>
       </div>
 
-      {/* Grid: 2 colunas × 3 linhas = 6 fotos por página */}
+      {/* Grid: 2 colunas × 3 linhas = 6 fotos por página.
+          Altura total das 3 linhas (3×78mm + 2 gaps) ≈ 236mm cabe na área
+          útil de impressão (~257mm) junto ao cabeçalho, evitando quebra
+          entre linhas. breakInside no grid mantém as 6 fotos juntas. */}
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          gridTemplateRows: "repeat(3, 1fr)",
+          gridTemplateRows: "repeat(3, 78mm)",
           gap: "6px",
-          height: "255mm",
+          breakInside: "avoid",
+          pageBreakInside: "avoid",
         }}
       >
         {chunk.map((fotoUrl, fotoIndex) => (
