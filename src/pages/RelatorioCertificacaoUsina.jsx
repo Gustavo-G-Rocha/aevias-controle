@@ -275,7 +275,7 @@ export default function RelatorioCertificacaoUsina() {
       <td style={{ ...td, color: 'var(--color-text-muted)', width: "50%"}}>{item.label}</td>
       <td style={{ ...td, fontWeight: 700, textAlign: "center" }} colSpan={3}>
         <span style={{ color: item.val === "Sim" || item.val === true ? 'var(--color-success)' : 'var(--color-danger)' }}>
-          {item.val ? "Sim" : "Não"}
+          {item.val === "Sim" || item.val === true ? "Sim" : "Não"}
         </span>
       </td>
     </tr>
