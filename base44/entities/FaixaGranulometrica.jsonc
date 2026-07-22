@@ -87,20 +87,7 @@
         }
       ]
     },
-    "read": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "data.access_level": "sala_tecnica_afirmaevias"
-          }
-        }
-      ]
-    },
+    "read": null,
     "update": {
       "$or": [
         {
