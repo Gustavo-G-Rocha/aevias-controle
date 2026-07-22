@@ -62,6 +62,9 @@
     "motivo"
   ],
   "rls": {
+    "create": {
+      "data.laboratorista_email": "{{user.email}}"
+    },
     "read": {
       "$or": [
         {
@@ -84,7 +87,6 @@
         }
       ]
     },
-    "create": {},
     "update": {
       "$or": [
         {

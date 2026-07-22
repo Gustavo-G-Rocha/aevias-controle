@@ -81,25 +81,74 @@
     "tipo_obra"
   ],
   "rls": {
-    "read": {},
-    "write": {
-      "$or": [
-        {
-          "user_condition": {
+    "create": {
+      "user_condition": {
+        "$or": [
+          {
             "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
+          },
+          {
             "data.access_level": "sala_tecnica_afirmaevias"
-          }
-        },
-        {
-          "user_condition": {
+          },
+          {
             "data.access_level": "gestor_contrato"
           }
-        }
-      ]
+        ]
+      }
+    },
+    "read": {
+      "user_condition": {
+        "$or": [
+          {
+            "role": "admin"
+          },
+          {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          },
+          {
+            "data.access_level": "gestor_contrato"
+          },
+          {
+            "data.access_level": "cliente"
+          },
+          {
+            "data.access_level": "cliente_supervisor"
+          },
+          {
+            "data.access_level": "user"
+          }
+        ]
+      }
+    },
+    "update": {
+      "user_condition": {
+        "$or": [
+          {
+            "role": "admin"
+          },
+          {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          },
+          {
+            "data.access_level": "gestor_contrato"
+          }
+        ]
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "$or": [
+          {
+            "role": "admin"
+          },
+          {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          },
+          {
+            "data.access_level": "gestor_contrato"
+          }
+        ]
+      }
     }
   }
 }

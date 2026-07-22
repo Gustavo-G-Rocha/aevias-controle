@@ -126,7 +126,30 @@
         }
       ]
     },
-    "read": null,
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.laboratoristas_responsaveis": "{{user.email}}"
+        },
+        {
+          "data.gestores_contrato_responsaveis": "{{user.email}}"
+        },
+        {
+          "data.gestor_contrato_responsavel": "{{user.email}}"
+        },
+        {
+          "data.salas_tecnicas_responsaveis": "{{user.email}}"
+        },
+        {
+          "data.clientes_responsaveis": "{{user.email}}"
+        }
+      ]
+    },
     "update": {
       "$or": [
         {

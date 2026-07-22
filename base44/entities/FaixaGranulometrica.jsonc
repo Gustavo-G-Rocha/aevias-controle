@@ -14,15 +14,15 @@
     },
     "nome": {
       "type": "string",
-      "description": "Nome da faixa granulométrica"
+      "description": "Nome da faixa granulom\u00e9trica"
     },
     "especificacao": {
       "type": "string",
-      "description": "Especificação técnica"
+      "description": "Especifica\u00e7\u00e3o t\u00e9cnica"
     },
     "orgao": {
       "type": "string",
-      "description": "Órgão responsável pela especificação"
+      "description": "\u00d3rg\u00e3o respons\u00e1vel pela especifica\u00e7\u00e3o"
     },
     "peneiras": {
       "type": "array",
@@ -32,7 +32,7 @@
         "properties": {
           "astm": {
             "type": "string",
-            "description": "Referência ASTM da peneira (ex: 3/8\", Nº 4, etc.)"
+            "description": "Refer\u00eancia ASTM da peneira (ex: 3/8\", N\u00ba 4, etc.)"
           },
           "abertura": {
             "type": "string",
@@ -40,11 +40,11 @@
           },
           "min": {
             "type": "number",
-            "description": "Percentual mínimo passante"
+            "description": "Percentual m\u00ednimo passante"
           },
           "max": {
             "type": "number",
-            "description": "Percentual máximo passante"
+            "description": "Percentual m\u00e1ximo passante"
           }
         },
         "required": [
@@ -62,7 +62,7 @@
         "inativo"
       ],
       "default": "ativo",
-      "description": "Status da faixa granulométrica"
+      "description": "Status da faixa granulom\u00e9trica"
     }
   },
   "required": [
@@ -73,20 +73,53 @@
     "peneiras"
   ],
   "rls": {
-    "read": {},
-    "write": {
-      "$or": [
-        {
-          "user_condition": {
+    "create": {
+      "user_condition": {
+        "$or": [
+          {
             "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
+          },
+          {
             "data.access_level": "sala_tecnica_afirmaevias"
           }
-        }
-      ]
+        ]
+      }
+    },
+    "read": {
+      "user_condition": {
+        "$or": [
+          {
+            "role": "admin"
+          },
+          {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          }
+        ]
+      }
+    },
+    "update": {
+      "user_condition": {
+        "$or": [
+          {
+            "role": "admin"
+          },
+          {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          }
+        ]
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "$or": [
+          {
+            "role": "admin"
+          },
+          {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          }
+        ]
+      }
     }
   }
 }

@@ -26,6 +26,24 @@
     "status"
   ],
   "rls": {
+    "create": {
+      "user_condition": {
+        "$or": [
+          {
+            "role": "admin"
+          },
+          {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          },
+          {
+            "data.access_level": "gestor_contrato"
+          },
+          {
+            "laboratorista_email": "{{user.email}}"
+          }
+        ]
+      }
+    },
     "read": {
       "$or": [
         {
@@ -48,7 +66,6 @@
         }
       ]
     },
-    "create": {},
     "update": {
       "$or": [
         {
