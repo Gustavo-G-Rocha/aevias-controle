@@ -1,5 +1,4 @@
 import React from 'react';
-import { formatDate } from '@/utils/relatorioVigaBenkelmanUtils';
 
 export default function RelatorioVigaBenkelmanDadosObra({ ensaio, obra, regional, faixaNome }) {
   return (
@@ -19,10 +18,6 @@ export default function RelatorioVigaBenkelmanDadosObra({ ensaio, obra, regional
         <div>
           <p className="font-bold text-gray-700">CAMADA</p>
           <p className="text-gray-900">{ensaio.camada || '-'}</p>
-        </div>
-        <div>
-          <p className="font-bold text-gray-700">DATA DA APLICAÇÃO</p>
-          <p className="text-gray-900">{formatDate(ensaio.data_ensaio) || '-'}</p>
         </div>
         <div>
           <p className="font-bold text-gray-700">RODOVIA</p>
