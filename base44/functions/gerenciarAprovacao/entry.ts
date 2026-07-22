@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.36';
+import { getUserAccessLevel, verifyTenantAccess } from '../../shared/tenantAccess.ts';
 
 /**
  * Backend function: gerenciarAprovacao
@@ -103,18 +104,9 @@ const ALLOWED_ENTITIES = [
 
 const APPROVER_LEVELS = ['admin', 'sala_tecnica_afirmaevias', 'gestor_contrato', 'cliente_supervisor'];
 
-function getUserAccessLevel(user) {
-  if (!user) return 'user';
-  return user.access_level || (user.role === 'admin' ? 'admin' : 'user');
-}
-
-/** Normaliza para nível efetivo (cliente_supervisor→cliente, funcionarios_cliente→user) */
-function getEffectiveAccessLevel(user) {
-  const level = getUserAccessLevel(user);
-  if (level === 'cliente_supervisor') return 'cliente';
-  if (level === 'funcionarios_cliente') return 'user';
-  return level;
-}
+// getUserAccessLevel / getEffectiveAccessLevel / verifyTenantAccess
+// agora vivem em base44/shared/tenantAccess.ts (compartilhados com
+// exportarEnsaiosPDF).
 
 function canApprove(user) {
   const level = getUserAccessLevel(user);
@@ -140,83 +132,6 @@ function canDelete(user, record, isSupervisor) {
 
   // approver-level (sala_tecnica, gestor_contrato): podem excluir registros do seu tenant
   return APPROVER_LEVELS.includes(level);
-}
-
-// ── DEFENSE-IN-DEPTH: validação funcional de tenant ──────────────────
-// Segunda camada de proteção que não depende do RLS.
-// Verifica explicitamente o direito do usuário sobre o registro,
-// percorrendo a cadeia: registro → obra → regional → emails do usuário.
-//
-// Mesmo que o RLS esteja mal configurado ou ausente, esta função impede
-// acesso cross-tenant entre clientes/regionais diferentes.
-async function verifyTenantAccess(base44, user, entityName, record) {
-  const level = getUserAccessLevel(user);
-  const effectiveLevel = getEffectiveAccessLevel(user);
-
-  // admin: acesso irrestrito (não precisa verificar tenant)
-  if (level === 'admin') {
-    return { allowed: true };
-  }
-
-  if (!record) {
-    return { allowed: false, reason: 'Registro não encontrado', status: 404 };
-  }
-
-  // laboratorista / funcionarios_cliente: apenas registros que criou
-  if (effectiveLevel === 'user') {
-    if (record.created_by === user.email || record.created_by_id === user.id) {
-      return { allowed: true };
-    }
-    return { allowed: false, reason: 'Sem permissão sobre este registro', status: 403 };
-  }
-
-  // tenant-scoped users (cliente/cliente_supervisor, sala_tecnica, gestor_contrato):
-  // precisam da cadeia registro → obra → regional
-  if (!record.obra_id) {
-    return { allowed: false, reason: 'Registro sem obra vinculada', status: 403 };
-  }
-
-  let obra;
-  try {
-    obra = await base44.asServiceRole.entities.Obra.get(record.obra_id);
-  } catch {
-    return { allowed: false, reason: 'Obra não encontrada', status: 404 };
-  }
-  if (!obra || !obra.regional_id) {
-    return { allowed: false, reason: 'Obra sem regional vinculada', status: 403 };
-  }
-
-  let regional;
-  try {
-    regional = await base44.asServiceRole.entities.Regional.get(obra.regional_id);
-  } catch {
-    return { allowed: false, reason: 'Regional não encontrada', status: 404 };
-  }
-  if (!regional) {
-    return { allowed: false, reason: 'Regional não encontrada', status: 404 };
-  }
-
-  const userEmail = (user.email || '').toLowerCase();
-
-  // cliente e cliente_supervisor: mesmas regionais (clientes_responsaveis)
-  if (effectiveLevel === 'cliente') {
-    const emails = (regional.clientes_responsaveis || []).map((e) => e.toLowerCase());
-    const supervisores = (regional.supervisores_responsaveis || []).map((e) => e.toLowerCase());
-    // Estar em supervisores_responsaveis também conta como membro do tenant
-    if (emails.includes(userEmail) || supervisores.includes(userEmail)) {
-      const isSupervisor = level === 'cliente_supervisor' && supervisores.includes(userEmail);
-      return { allowed: true, isSupervisor };
-    }
-  } else if (effectiveLevel === 'sala_tecnica_afirmaevias') {
-    const emails = (regional.salas_tecnicas_responsaveis || []).map((e) => e.toLowerCase());
-    if (emails.includes(userEmail)) return { allowed: true };
-  } else if (effectiveLevel === 'gestor_contrato') {
-    const emails = (regional.gestores_contrato_responsaveis || []).map((e) => e.toLowerCase());
-    const legacy = (regional.gestor_contrato_responsavel || '').toLowerCase();
-    if (emails.includes(userEmail) || legacy === userEmail) return { allowed: true };
-  }
-
-  return { allowed: false, reason: 'Sem permissão sobre este registro (tenant)', status: 403 };
 }
 
 // ── AUDIT TRAIL: Diff computation ──────────────────────────────────────

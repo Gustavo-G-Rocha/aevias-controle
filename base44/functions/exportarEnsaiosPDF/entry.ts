@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import JSZip from 'npm:jszip@3.10.1';
+import { verifyTenantAccess } from '../../shared/tenantAccess.ts';
 
 // ─── Configuration (OCP: adicionar tipos sem alterar o handler) ───────────────
 
@@ -219,6 +220,30 @@ Deno.serve(async (req) => {
     }
 
     console.log(`📦 ${ensaioIds.length} ensaio(s) recebido(s)`);
+
+    // ── ANTI-IDOR: valida o direito do usuário sobre CADA registro ──────
+    // Busca cada registro (asServiceRole) e verifica a cadeia
+    // registro → obra → regional → emails do usuário antes de exportar.
+    // Falha fechada: qualquer registro fora do escopo bloqueia a exportação.
+    const tenantCaches = { obra: new Map(), regional: new Map() };
+    for (const e of ensaioIds) {
+      const tipo = String(e.tipo).trim();
+      const id = String(e.id).trim();
+      let record = null;
+      try {
+        record = await base44.asServiceRole.entities[tipo].get(id);
+      } catch {
+        record = null;
+      }
+      const check = await verifyTenantAccess(base44, user, tipo, record, tenantCaches);
+      if (!check.allowed) {
+        console.warn(`🚫 Acesso negado a ${tipo}:${id} para ${user.email} — ${check.reason}`);
+        return Response.json(
+          { error: `Sem permissão para exportar o registro ${tipo}:${id}` },
+          { status: check.status || 403 }
+        );
+      }
+    }
 
     const authHeader = req.headers.get('authorization') ?? '';
     const { zip, successCount, errors } = await buildZip(ensaioIds, authHeader);
