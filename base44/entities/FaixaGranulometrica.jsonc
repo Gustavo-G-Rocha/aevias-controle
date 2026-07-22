@@ -74,52 +74,60 @@
   ],
   "rls": {
     "create": {
-      "user_condition": {
-        "$or": [
-          {
+      "$or": [
+        {
+          "user_condition": {
             "role": "admin"
-          },
-          {
+          }
+        },
+        {
+          "user_condition": {
             "data.access_level": "sala_tecnica_afirmaevias"
           }
-        ]
-      }
+        }
+      ]
     },
     "read": {
-      "user_condition": {
-        "$or": [
-          {
+      "$or": [
+        {
+          "user_condition": {
             "role": "admin"
-          },
-          {
+          }
+        },
+        {
+          "user_condition": {
             "data.access_level": "sala_tecnica_afirmaevias"
           }
-        ]
-      }
+        }
+      ]
     },
     "update": {
-      "user_condition": {
-        "$or": [
-          {
+      "$or": [
+        {
+          "user_condition": {
             "role": "admin"
-          },
-          {
+          }
+        },
+        {
+          "user_condition": {
             "data.access_level": "sala_tecnica_afirmaevias"
           }
-        ]
-      }
+        }
+      ]
     },
     "delete": {
-      "user_condition": {
-        "$or": [
-          {
+      "$or": [
+        {
+          "user_condition": {
             "role": "admin"
-          },
-          {
+          }
+        },
+        {
+          "user_condition": {
             "data.access_level": "sala_tecnica_afirmaevias"
           }
-        ]
-      }
+        }
+      ]
     }
   }
 }

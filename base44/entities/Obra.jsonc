@@ -82,73 +82,95 @@
   ],
   "rls": {
     "create": {
-      "user_condition": {
-        "$or": [
-          {
+      "$or": [
+        {
+          "user_condition": {
             "role": "admin"
-          },
-          {
+          }
+        },
+        {
+          "user_condition": {
             "data.access_level": "sala_tecnica_afirmaevias"
-          },
-          {
+          }
+        },
+        {
+          "user_condition": {
             "data.access_level": "gestor_contrato"
           }
-        ]
-      }
+        }
+      ]
     },
     "read": {
-      "user_condition": {
-        "$or": [
-          {
+      "$or": [
+        {
+          "user_condition": {
             "role": "admin"
-          },
-          {
+          }
+        },
+        {
+          "user_condition": {
             "data.access_level": "sala_tecnica_afirmaevias"
-          },
-          {
+          }
+        },
+        {
+          "user_condition": {
             "data.access_level": "gestor_contrato"
-          },
-          {
+          }
+        },
+        {
+          "user_condition": {
             "data.access_level": "cliente"
-          },
-          {
+          }
+        },
+        {
+          "user_condition": {
             "data.access_level": "cliente_supervisor"
-          },
-          {
+          }
+        },
+        {
+          "user_condition": {
             "data.access_level": "user"
           }
-        ]
-      }
+        }
+      ]
     },
     "update": {
-      "user_condition": {
-        "$or": [
-          {
+      "$or": [
+        {
+          "user_condition": {
             "role": "admin"
-          },
-          {
+          }
+        },
+        {
+          "user_condition": {
             "data.access_level": "sala_tecnica_afirmaevias"
-          },
-          {
+          }
+        },
+        {
+          "user_condition": {
             "data.access_level": "gestor_contrato"
           }
-        ]
-      }
+        }
+      ]
     },
     "delete": {
-      "user_condition": {
-        "$or": [
-          {
+      "$or": [
+        {
+          "user_condition": {
             "role": "admin"
-          },
-          {
+          }
+        },
+        {
+          "user_condition": {
             "data.access_level": "sala_tecnica_afirmaevias"
-          },
-          {
+          }
+        },
+        {
+          "user_condition": {
             "data.access_level": "gestor_contrato"
           }
-        ]
-      }
+        }
+      ]
     }
   }
 }
