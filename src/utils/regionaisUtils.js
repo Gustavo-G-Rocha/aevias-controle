@@ -61,6 +61,19 @@ export function filtrarRegionaisPorAcesso(regionaisData, userData, accessLevel) 
   }
 
   if (accessLevel === 'user' || accessLevel === 'funcionarios_cliente') {
+    // funcionarios_cliente (ex.: inspetor do cliente): a regional dele é aquela
+    // onde o próprio email OU o do supervisor está em clientes_responsaveis.
+    // (accessLevel chega normalizado como 'user', então checamos o nível bruto.)
+    if (userData.access_level === 'funcionarios_cliente') {
+      const emailLower = userData.email.toLowerCase();
+      const supervisorLower = userData.supervisor_email?.toLowerCase();
+      return regionaisData.filter(regional =>
+        (regional.clientes_responsaveis || []).some(email => {
+          const e = email?.toLowerCase();
+          return e === emailLower || (supervisorLower && e === supervisorLower);
+        })
+      );
+    }
     return regionaisData.filter(regional => {
       const laboratoristas = regional.laboratoristas_responsaveis || [];
       return laboratoristas.some(email => email.toLowerCase() === userData.email.toLowerCase());
