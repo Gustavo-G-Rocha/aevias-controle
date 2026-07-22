@@ -46,7 +46,7 @@ export const ADMIN_NAVIGATION = [
   { title: "Faixas Granulométricas", url: createPageUrl("FaixasGranulometricas"), icon: Grid, allowedLevels: ["admin"] },
   { title: "Migração de Dados", url: createPageUrl("MigracaoDados"), icon: Grid, allowedLevels: ["admin"] },
   { title: "Monitor de Produtividade", url: createPageUrl("MonitorProdutividade"), icon: TrendingUp, allowedLevels: ["admin"] },
-  { title: "Configurações", url: createPageUrl("Settings"), icon: Settings, allowedLevels: ["admin"] },
+  { title: "Configurações", url: createPageUrl("Settings"), icon: Settings, allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "user", "funcionarios_cliente", "cliente", "cliente_supervisor"] },
   { title: "Reportar Erros", url: createPageUrl("ReportarErro"), icon: Bug, allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "user", "funcionarios_cliente", "cliente", "cliente_supervisor"] },
 ];
 
