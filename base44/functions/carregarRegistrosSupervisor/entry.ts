@@ -32,11 +32,12 @@ const ALL_RECORD_ENTITIES = [
 const PAGE_SIZE = 500;
 const MAX_PAGES = 20;
 
-async function loadEntityRecords(base44, entityType) {
+async function loadEntityRecords(base44, entityType, query) {
+  if (!query) return [];
   const all = [];
   let skip = 0;
   for (let page = 0; page < MAX_PAGES; page++) {
-    const batch = await base44.asServiceRole.entities[entityType].filter({}, '-created_date', PAGE_SIZE, skip);
+    const batch = await base44.entities[entityType].filter(query, '-created_date', PAGE_SIZE, skip);
     all.push(...batch);
     if (batch.length < PAGE_SIZE) break;
     skip += PAGE_SIZE;
@@ -58,15 +59,16 @@ Deno.serve(async (req) => {
     const userEmail = (user.email || '').toLowerCase();
 
     // Regionais onde o usuário está em clientes_responsaveis OU supervisores_responsaveis
-    const regionais = await base44.asServiceRole.entities.Regional.list();
+    // Usa o contexto do próprio usuário (RLS filtra apenas suas regionais)
+    const regionais = await base44.entities.Regional.list();
     const supervisorRegionais = regionais.filter(r =>
       [...(r.clientes_responsaveis || []), ...(r.supervisores_responsaveis || [])]
         .some(e => e?.toLowerCase() === userEmail)
     );
     const regionaisIds = new Set(supervisorRegionais.map(r => r.id));
 
-    // Obras das regionais do supervisor
-    const obras = await base44.asServiceRole.entities.Obra.list('-created_date', 500);
+    // Obras das regionais do supervisor (RLS aplicada sob o contexto do usuário)
+    const obras = await base44.entities.Obra.list('-created_date', 500);
     const obraIds = new Set(
       obras.filter(o => regionaisIds.has(o.regional_id)).map(o => o.id)
     );
@@ -80,14 +82,27 @@ Deno.serve(async (req) => {
         .filter(Boolean)
     );
 
-    // Buscar registros de todas as entidades via asServiceRole (bypass RLS)
+    // Construir query de escopo: obras do supervisor OU registros criados por subordinados.
+    // O filtro é aplicado na query do SDK (nível do banco) sob o contexto do próprio usuário,
+    // aplicando RLS nativa sem elevar privilégios com asServiceRole.
+    const obraIdsArray = [...obraIds];
+    const subordinateEmailsArray = [...subordinateEmails];
+    const orClauses = [];
+    if (obraIdsArray.length > 0) orClauses.push({ obra_id: { $in: obraIdsArray } });
+    if (subordinateEmailsArray.length > 0) orClauses.push({ created_by: { $in: subordinateEmailsArray } });
+    const entityQuery = orClauses.length === 0
+      ? null
+      : orClauses.length === 1
+        ? orClauses[0]
+        : { $or: orClauses };
+
     const BATCH = 10;
     const allRecords = [];
 
     for (let i = 0; i < ALL_RECORD_ENTITIES.length; i += BATCH) {
       const batch = ALL_RECORD_ENTITIES.slice(i, i + BATCH);
       const settled = await Promise.allSettled(
-        batch.map(type => loadEntityRecords(base44, type))
+        batch.map(type => loadEntityRecords(base44, type, entityQuery))
       );
       settled.forEach((r, idx) => {
         if (r.status === 'fulfilled') {
@@ -99,15 +114,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Filtrar: registros das obras do supervisor OU criados por subordinados
-    const filtered = allRecords.filter(r =>
-      (r.obra_id && obraIds.has(r.obra_id)) ||
-      (r.created_by && subordinateEmails.has(r.created_by.toLowerCase()))
-    );
-
-    // Dedup por ID
+    // Dedup por ID (filtro de escopo já aplicado na query)
     const seen = new Set();
-    const deduped = filtered.filter(r => {
+    const deduped = allRecords.filter(r => {
       if (seen.has(r.id)) return false;
       seen.add(r.id);
       return true;
