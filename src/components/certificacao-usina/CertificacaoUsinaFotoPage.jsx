@@ -63,7 +63,7 @@ export default function CertificacaoUsinaFotoPage({ chunk, pageIndex, data }) {
           gridTemplateColumns: "1fr 1fr",
           gridTemplateRows: "repeat(3, 1fr)",
           gap: "6px",
-          minHeight: "200mm",
+          height: "255mm",
         }}
       >
         {chunk.map((fotoUrl, fotoIndex) => (
