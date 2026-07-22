@@ -201,9 +201,9 @@ async function verifyTenantAccess(base44, user, entityName, record) {
   // cliente e cliente_supervisor: mesmas regionais (clientes_responsaveis)
   if (effectiveLevel === 'cliente') {
     const emails = (regional.clientes_responsaveis || []).map((e) => e.toLowerCase());
-    if (emails.includes(userEmail)) {
-      // cliente_supervisor: verifica se é supervisor nesta regional
-      const supervisores = (regional.supervisores_responsaveis || []).map((e) => e.toLowerCase());
+    const supervisores = (regional.supervisores_responsaveis || []).map((e) => e.toLowerCase());
+    // Estar em supervisores_responsaveis também conta como membro do tenant
+    if (emails.includes(userEmail) || supervisores.includes(userEmail)) {
       const isSupervisor = level === 'cliente_supervisor' && supervisores.includes(userEmail);
       return { allowed: true, isSupervisor };
     }

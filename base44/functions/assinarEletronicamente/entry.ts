@@ -152,8 +152,9 @@ async function verifyTenantAccess(base44: any, user: any, entityName: string, re
 
   if (effectiveLevel === 'cliente') {
     const emails = (regional.clientes_responsaveis || []).map((e: string) => e.toLowerCase());
-    if (emails.includes(userEmail)) {
-      const supervisores = (regional.supervisores_responsaveis || []).map((e: string) => e.toLowerCase());
+    const supervisores = (regional.supervisores_responsaveis || []).map((e: string) => e.toLowerCase());
+    // Estar em supervisores_responsaveis também conta como membro do tenant
+    if (emails.includes(userEmail) || supervisores.includes(userEmail)) {
       const isSupervisor = level === 'cliente_supervisor' && supervisores.includes(userEmail);
       return { allowed: true, isSupervisor };
     }
