@@ -107,8 +107,7 @@
     "codigo"
   ],
   "rls": {
-    "read": {},
-    "write": {
+    "create": {
       "$or": [
         {
           "user_condition": {
@@ -121,11 +120,50 @@
           }
         },
         {
-          "custom_condition": {
-            "field": "gestores_contrato_responsaveis",
-            "user_field": "email",
-            "condition": "contains"
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
+        }
+      ]
+    },
+    "read": null,
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "data.gestores_contrato_responsaveis": "{{user.email}}"
+        },
+        {
+          "data.gestor_contrato_responsavel": "{{user.email}}"
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "data.gestores_contrato_responsaveis": "{{user.email}}"
+        },
+        {
+          "data.gestor_contrato_responsavel": "{{user.email}}"
         }
       ]
     }
