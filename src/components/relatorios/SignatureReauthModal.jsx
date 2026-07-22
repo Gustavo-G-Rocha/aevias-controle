@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { gerenciarDoisFatores } from '@/functions/gerenciarDoisFatores';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ShieldCheck, Lock, Loader2, AlertTriangle } from "lucide-react";
+import { ShieldCheck, Lock, Loader2, AlertTriangle, KeyRound } from "lucide-react";
 
 /**
  * SignatureReauthModal — Modal de reautenticação para assinatura eletrônica.
@@ -31,14 +32,29 @@ export default function SignatureReauthModal({
   error = '',
 }) {
   const [password, setPassword] = useState('');
+  const [totpCode, setTotpCode] = useState('');
+  const [totpRequired, setTotpRequired] = useState(false);
+
+  // Step-up authentication: se o signatário tem 2FA ativo,
+  // o código do autenticador também é exigido no ato da assinatura.
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    gerenciarDoisFatores({ action: 'status' })
+      .then((res) => { if (!cancelled) setTotpRequired(!!res?.data?.enabled); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [open]);
 
   const handleConfirm = async () => {
     if (!password.trim()) return;
-    await onConfirm(password);
+    if (totpRequired && !totpCode.trim()) return;
+    await onConfirm(password, totpCode.trim() || undefined);
   };
 
   const handleClose = () => {
     setPassword('');
+    setTotpCode('');
     onClose();
   };
 
@@ -108,6 +124,25 @@ export default function SignatureReauthModal({
               <p className="text-xs text-red-600 font-medium">{error}</p>
             )}
           </div>
+
+          {totpRequired && (
+            <div className="space-y-2">
+              <Label htmlFor="reauth-totp" className="flex items-center gap-1.5">
+                <KeyRound className="w-3.5 h-3.5" />
+                Código do app autenticador (2FA)
+              </Label>
+              <Input
+                id="reauth-totp"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                value={totpCode}
+                onChange={(e) => setTotpCode(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && !loading && password && totpCode && handleConfirm()}
+                placeholder="Código de 6 dígitos ou de recuperação"
+                disabled={loading}
+              />
+            </div>
+          )}
         </div>
 
         <DialogFooter>
@@ -116,7 +151,7 @@ export default function SignatureReauthModal({
           </Button>
           <Button
             onClick={handleConfirm}
-            disabled={loading || !password.trim()}
+            disabled={loading || !password.trim() || (totpRequired && !totpCode.trim())}
             className="bg-blue-600 text-white hover:bg-blue-700 gap-1.5"
           >
             {loading ? (

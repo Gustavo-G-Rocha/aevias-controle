@@ -52,7 +52,7 @@ export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
     load();
   }, [compositeId]);
 
-  const handleSign = useCallback(async (password) => {
+  const handleSign = useCallback(async (password, totpCode) => {
     if (!user?.email) {
       setSignError('Usuário não carregado. Tente novamente.');
       return;
@@ -89,6 +89,7 @@ export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
         signatureType: 'approve',
         reportData,
         reauthFactor: 'password',
+        ...(totpCode ? { totpCode } : {}),
       });
 
       if (response?.data?.signature) {
@@ -97,7 +98,7 @@ export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
       }
     } catch (err) {
       logger.error('[RelatorioUnificado] Erro ao assinar:', err);
-      setSignError(err?.message || 'Erro ao assinar. Tente novamente.');
+      setSignError(err?.response?.data?.error || err?.message || 'Erro ao assinar. Tente novamente.');
     } finally {
       setSigning(false);
     }

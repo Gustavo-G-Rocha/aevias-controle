@@ -1,0 +1,79 @@
+{
+  "name": "TwoFactorConfig",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio (lowercase)"
+    },
+    "secret": {
+      "type": "string",
+      "description": "Segredo TOTP em base32 \u2014 NUNCA exposto ao cliente (acesso s\u00f3 via backend function)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "active"
+      ],
+      "default": "pending",
+      "description": "pending = aguardando confirma\u00e7\u00e3o do primeiro c\u00f3digo; active = 2FA ativo"
+    },
+    "recovery_codes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Hashes SHA-256 dos c\u00f3digos de recupera\u00e7\u00e3o de uso \u00fanico ainda v\u00e1lidos"
+    },
+    "failed_attempts": {
+      "type": "number",
+      "default": 0,
+      "description": "Tentativas incorretas consecutivas"
+    },
+    "locked_until": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Bloqueio tempor\u00e1rio por excesso de tentativas"
+    },
+    "last_verified_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u00daltima verifica\u00e7\u00e3o bem-sucedida"
+    },
+    "activated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Quando o 2FA foi ativado"
+    }
+  },
+  "required": [
+    "user_email",
+    "secret"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

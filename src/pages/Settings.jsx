@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sun, Trash2 } from "lucide-react";
+import { Sun, Trash2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ThemeSelector from "@/components/settings/ThemeSelector";
+import TwoFactorSection from "@/components/settings/TwoFactorSection";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,6 +54,19 @@ export default function Settings() {
         </CardHeader>
         <CardContent>
           <ThemeSelector />
+        </CardContent>
+      </Card>
+
+      <Card className="backdrop-blur-lg border" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
+            <ShieldCheck className="w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
+            Autenticação em Duas Etapas (2FA)
+          </CardTitle>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Proteja seu login e suas assinaturas eletrônicas com um app autenticador.</p>
+        </CardHeader>
+        <CardContent>
+          <TwoFactorSection />
         </CardContent>
       </Card>
 

@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
+import { getTwoFactorConfig, verifyTwoFactorForUser } from '../../shared/totp.ts';
 
 /**
  * Backend function: assinarEletronicamente
@@ -256,6 +257,7 @@ Deno.serve(async (req) => {
       geolocation = null,
       reportData = null,
       reauthFactor = 'password',
+      totpCode = null,
     } = body;
 
     // ── VALIDAÇÃO DE ENTRADA ──
@@ -348,6 +350,29 @@ Deno.serve(async (req) => {
           { status: 403 }
         );
       }
+    }
+
+    // ── STEP-UP AUTHENTICATION (2FA/TOTP) ─────────────────────────────
+    // Se o signatário tem 2FA ativo, o ato de assinatura exige um código
+    // TOTP (ou de recuperação) válido no momento do ato — reforço do
+    // não repúdio (Lei 14.063/2020).
+    let effectiveReauthFactor = reauthFactor;
+    const twoFactorConfig = await getTwoFactorConfig(base44, user.email);
+    if (twoFactorConfig?.status === 'active') {
+      if (!totpCode) {
+        return Response.json(
+          { error: 'Código de verificação em duas etapas (2FA) é obrigatório para assinar.', errorCategory: 'totp_required' },
+          { status: 403 }
+        );
+      }
+      const totpResult = await verifyTwoFactorForUser(base44, twoFactorConfig, String(totpCode));
+      if (!totpResult.ok) {
+        return Response.json(
+          { error: totpResult.reason, errorCategory: 'totp_invalid' },
+          { status: 403 }
+        );
+      }
+      effectiveReauthFactor = `${reauthFactor}+totp`;
     }
 
     // ── VERIFICAR SE JÁ ESTÁ ASSINADO ──
@@ -446,7 +471,7 @@ Deno.serve(async (req) => {
         ip_address: ipAddress,
         user_agent: deviceInfo,
         geolocation: geolocation || null,
-        reauth_factor: reauthFactor,
+        reauth_factor: effectiveReauthFactor,
       },
       signed_by: user.email,
       signed_by_name: approverName,
@@ -473,7 +498,7 @@ Deno.serve(async (req) => {
             hash: integrityHash,
             signature_id: signatureRecord.id,
             signed_at: now,
-            reauth_factor: reauthFactor,
+            reauth_factor: effectiveReauthFactor,
             ip_address: ipAddress,
           },
         }],

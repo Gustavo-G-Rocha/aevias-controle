@@ -11,6 +11,7 @@ import { gerenciarAprovacao } from "@/functions/gerenciarAprovacao";
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
 import IntegrityBanner from "@/components/relatorios/IntegrityBanner";
+import TotpPromptDialog from "@/components/relatorios/TotpPromptDialog";
 import SignatureSeal from "@/components/relatorios/SignatureSeal";
 import { isSupervisorInRegional } from "@/utils/accessControl";
 
@@ -26,6 +27,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
   const [rejectionReason, setRejectionReason] = useState('');
   const [signature, setSignature] = useState(null);
   const [actionError, setActionError] = useState('');
+  const [showTotpDialog, setShowTotpDialog] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -76,7 +78,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
   const isApproved = record.approved === true;
   const isRejected = record.approved === false;
 
-  const handleApprove = async () => {
+  const handleApprove = async (totpCode = null) => {
     const previousRecord = record;
     setActionError('');
     setSaving(true);
@@ -93,6 +95,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
           action: 'approve',
           entityName,
           recordId,
+          ...(totpCode ? { totpCode } : {}),
         }),
         new Promise((_, reject) =>
           setTimeout(() => reject(new Error('O servidor não respondeu. A aprovação foi desfeita.')), 15000)
@@ -104,9 +107,14 @@ export default function AprovacaoBar({ entityName, recordId }) {
       setSignature(result.signature || null);
       toast({ title: 'Documento assinado eletronicamente!' });
     } catch (err) {
-      const errMsg = err?.response?.data?.error || err?.message || 'Erro ao assinar documento.';
       setRecord(previousRecord);
       setSignature(null);
+      // Step-up 2FA: backend exige código do autenticador para assinar
+      if (err?.response?.data?.errorCategory === 'totp_required') {
+        setShowTotpDialog(true);
+        return;
+      }
+      const errMsg = err?.response?.data?.error || err?.message || 'Erro ao assinar documento.';
       setActionError(errMsg);
       logger.error('[AprovacaoBar] Erro ao assinar:', errMsg);
       toast({ title: errMsg, variant: "destructive" });
@@ -180,7 +188,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
 
         {canApprove && isPending && (
           <>
-            <Button size="sm" onClick={handleApprove} disabled={saving}
+            <Button size="sm" onClick={() => handleApprove()} disabled={saving}
               className="bg-green-700 text-white hover:bg-green-800 gap-1 h-8">
               {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
               Aprovar
@@ -193,7 +201,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
           </>
         )}
         {canApprove && isRejected && (
-          <Button size="sm" onClick={handleApprove} disabled={saving}
+          <Button size="sm" onClick={() => handleApprove()} disabled={saving}
             className="bg-green-700 text-white hover:bg-green-800 gap-1 h-8">
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
             Aprovar mesmo assim
@@ -245,6 +253,14 @@ export default function AprovacaoBar({ entityName, recordId }) {
         />
       )}
 
+      <TotpPromptDialog
+        open={showTotpDialog}
+        onClose={() => setShowTotpDialog(false)}
+        onConfirm={(code) => {
+          setShowTotpDialog(false);
+          handleApprove(code);
+        }}
+      />
     </>
   );
 }

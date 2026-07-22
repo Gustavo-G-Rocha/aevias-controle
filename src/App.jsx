@@ -10,6 +10,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider } from '@/lib/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import TwoFactorGate from '@/components/auth/TwoFactorGate';
 import { useTheme } from '@/hooks/useTheme';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
@@ -46,6 +47,7 @@ function AuthenticatedApp() {
 
       {/* Protected app routes */}
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        <Route element={<TwoFactorGate />}>
         <Route path="/" element={
           <LayoutWrapper currentPageName={mainPageKey}>
             <MainPage />
@@ -73,6 +75,7 @@ function AuthenticatedApp() {
           </LayoutWrapper>
         } />
         <Route path="*" element={<PageNotFound />} />
+        </Route>
       </Route>
     </Routes>
   );

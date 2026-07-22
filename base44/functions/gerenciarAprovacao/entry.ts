@@ -382,6 +382,7 @@ Deno.serve(async (req) => {
           recordId,
           signatureType: action,
           geolocation: body.geolocation || null,
+          totpCode: body.totpCode || null,
         });
         // base44.functions.invoke retorna o envelope HTTP completo (com request/response
         // que têm referências circulares). Extrai apenas o body JSON serializável.
