@@ -37,6 +37,7 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
     initializeNewData = null,
     canOwnerEditStatus = defaultCanOwnerEditStatus,
     isOwner = defaultIsOwner,
+    requireObraEmAndamentoForAdmin = false,
   } = options;
   const [editingChecklist, setEditingChecklist] = useState(null);
   const [obraDoRegistro, setObraDoRegistro] = useState(null);
@@ -77,7 +78,8 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
           const extraCanEdit = typeof canEditExtra === 'function'
             ? canEditExtra(user, checklistToEdit, obraRegistroAtual, regionais)
             : false;
-          if (user.role === 'admin' || extraCanEdit || (isOwnerCheck && canOwnerEditStatus(checklistToEdit))) {
+          const adminPodeEditar = user.role === 'admin' && (!requireObraEmAndamentoForAdmin || obraRegistroAtual?.status === 'em_andamento');
+          if (adminPodeEditar || extraCanEdit || (isOwnerCheck && canOwnerEditStatus(checklistToEdit))) {
             const initialForm = getInitialFormData();
             setFormData(normalizeLoadedData(initialForm, checklistToEdit));
           } else {
@@ -115,7 +117,7 @@ export function useChecklistForm(getInitialFormData, entityName, storageName, ca
   }, [loading, user, editingChecklist, obraDoRegistro, regionais, canEditExtra]);
 
   const userCanEdit = loading ? false : (
-    user?.role === 'admin' ||
+    (user?.role === 'admin' && (!requireObraEmAndamentoForAdmin || obraDoRegistro?.status === 'em_andamento')) ||
     !editingChecklist?.id ||
     extraCanEdit ||
     (

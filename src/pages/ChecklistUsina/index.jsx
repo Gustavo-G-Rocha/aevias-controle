@@ -27,7 +27,7 @@ export default function ChecklistUsinaPage() {
     obras, regionais, projects, faixas, user, editingChecklist,
     loading, formData, setFormData, obraSelecionada, regionalSelecionada,
     projetosDisponiveis, isApproved, isEditable, clearSavedData, navigate,
-  } = useChecklistForm(getInitialFormData, 'ChecklistUsina', 'checklist_usina');
+  } = useChecklistForm(getInitialFormData, 'ChecklistUsina', 'checklist_usina', null, { requireObraEmAndamentoForAdmin: true });
 
   const [loadingUpload, setLoadingUpload] = useState(false);
   const [selectedFileNames, setSelectedFileNames] = useState("Nenhum ficheiro selecionado");

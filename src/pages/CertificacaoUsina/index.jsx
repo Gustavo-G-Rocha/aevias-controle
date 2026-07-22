@@ -5,7 +5,7 @@ import { createPageUrl } from "@/utils";
 import { useChecklistForm } from "@/hooks/useChecklistForm";
 import { useCertificacaoUsinaForm } from "@/hooks/useCertificacaoUsinaForm";
 import { validarCertificacao } from "@/utils/certificacaoUsinaUtils";
-import { canGestorPreencherResultado, laboratoristaDeveOcultarResultado } from "@/utils/certificacaoUsinaAccess";
+import { laboratoristaDeveOcultarResultado } from "@/utils/certificacaoUsinaAccess";
 import { criarCertificacao, atualizarCertificacao } from "@/services/certificacaoUsinaService";
 import { uploadMultipleFiles } from "@/utils/imageUpload";
 import ChecklistFooter from "@/components/checklists/ChecklistFooter";
@@ -46,7 +46,8 @@ export default function CertificacaoUsinaPage() {
     getInitialFormData,
     "CertificacaoUsina",
     "certificacao_usina",
-    canGestorPreencherResultado,
+    null,
+    { requireObraEmAndamentoForAdmin: true },
   );
 
   // Laboratorista não preenche a etapa de Resultado — ela pertence ao Gestor de Contrato.

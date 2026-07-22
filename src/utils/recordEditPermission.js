@@ -48,3 +48,31 @@ export function canUserEditRecord(user, record, obra, regionais = []) {
 
   return false;
 }
+
+/**
+ * Entidades com regra restrita de edição: Boletins (Sondagem/Trado) e
+ * Usina (Checklist/Certificação). Para estas, somente o criador do
+ * registro e o admin podem editar — ninguém mais (sem sala técnica/gestor).
+ * O admin só pode editar quando a obra vinculada está em andamento.
+ */
+export const RESTRICTED_EDIT_ENTITIES = new Set([
+  'BoletimSondagem',
+  'BoletimSondagemTrado',
+  'ChecklistUsina',
+  'CertificacaoUsina',
+]);
+
+/**
+ * Permissão de edição para registros de entidades restritas.
+ * - Admin: só edita se a obra vinculada estiver em andamento.
+ * - Criador: edita até o registro ser aprovado (approved !== true).
+ */
+export function canEditRestrictedRecord(user, record, obra) {
+  if (!user || !record) return false;
+  const isAdmin = getEffectiveAccessLevel(user) === 'admin';
+  if (isAdmin) return obra?.status === 'em_andamento';
+  const isOwner =
+    (record.created_by || '').toLowerCase() === (user.email || '').toLowerCase() ||
+    (user.id && record.created_by_id === user.id);
+  return isOwner && record.approved !== true;
+}

@@ -8,7 +8,6 @@ import { createPageUrl } from "@/utils";
 import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components/ensaios/ensaioMappers";
 import { getLocalInfo, getLaboratoristaInfo, getEmpreiteiraInfo, getNaoConformidades, getStatusInfo } from "@/components/ensaios/utils";
 import { CopyIdButton } from "@/components/ensaios/TableFilters";
-import { canGestorPreencherResultado } from "@/utils/certificacaoUsinaAccess";
 import { canUserEditRecord } from "@/utils/recordEditPermission";
 import CriticalActionDialog from "@/components/ensaios/CriticalActionDialog";
 
@@ -22,15 +21,23 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
   const naoConformidades = getNaoConformidades(ensaio);
   const temAcoesCorretivas = ensaio.acoes_corretivas_realizado === true;
   const temDeflexaoExcessiva = ensaio.tem_deflexao_excessiva === true;
-  // Gestor da regional pode reabrir a Certificação de Usina para preencher o Resultado
-  const podeEditarCertificacao =
-    ensaio.entityType === "CertificacaoUsina" &&
-    canGestorPreencherResultado(user, ensaio, obra, regionais);
   const podeAssinar = ensaio.approved === true && !ensaio.client_signature?.signed_by && onAssinar;
-  // Admin, autor ou responsável da regional (mesmas regras do servidor)
+  // Registros restritos (Boletins e Usina): só criador (até ser aprovado) ou
+  // admin (apenas com a obra em andamento) podem editar.
+  const ENTIDADES_RESTRITAS = ["BoletimSondagem", "BoletimSondagemTrado", "ChecklistUsina", "CertificacaoUsina"];
+  const isRestrito = ENTIDADES_RESTRITAS.includes(ensaio.entityType);
+  const statusPermiteEdicao = ensaio.status === 'rascunho' || ensaio.approved === false || ensaio.approved === null;
+  const podeEditarRestrito =
+    isRestrito &&
+    !ensaio.client_signature?.signed_by &&
+    (
+      (user.role === 'admin' && obra?.status === 'em_andamento') ||
+      (ensaio.created_by === user.email && statusPermiteEdicao)
+    );
+  // Demais registros: admin, autor ou responsável da regional (mesmas regras do servidor)
   // podem abrir o formulário editável de registros em execução/reprovados
   const podeEditarRegistro =
-    ensaio.entityType !== "CertificacaoUsina" &&
+    !isRestrito &&
     (ensaio.status === 'rascunho' || ensaio.approved === false) &&
     !ensaio.client_signature?.signed_by &&
     canUserEditRecord(user, ensaio, obra, regionais);
@@ -99,9 +106,9 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
             </Button>
           )}
           {canApprove && ensaio.status === 'rascunho' && <span className="text-xs italic text-muted-foreground ml-2">Em execução</span>}
-          {podeEditarCertificacao && (
-            <Button asChild size="sm" style={{ backgroundColor: '#00233B' }} className="text-white hover:opacity-90 h-7 px-2" title="Editar / Preencher Resultado">
-              <RouterLink to={createPageUrl(`CertificacaoUsina?editId=${ensaio.id}`)}><Pencil className="w-3 h-3" /></RouterLink>
+          {podeEditarRestrito && (
+            <Button asChild size="sm" style={{ backgroundColor: '#00233B' }} className="text-white hover:opacity-90 h-7 px-2" title="Editar registro">
+              <RouterLink to={createPageUrl(`${ensaio.entityType}?editId=${ensaio.id}`)}><Pencil className="w-3 h-3" /></RouterLink>
             </Button>
           )}
           {canApprove && (

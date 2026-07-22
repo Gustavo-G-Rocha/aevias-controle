@@ -45,8 +45,9 @@ export function useBoletimSondagemTradoData() {
       setEditLoading(true);
       obterEnsaioById('BoletimSondagemTrado', editId)
         .then(boletimToEdit => {
+          const obraDoBoletim = obras.find(o => o.id === boletimToEdit.obra_id) || null;
           if (
-            user.role === 'admin' ||
+            (user.role === 'admin' && obraDoBoletim?.status === 'em_andamento') ||
             (boletimToEdit.created_by === user.email && boletimToEdit.approved !== true)
           ) {
             setEditingBoletim(boletimToEdit);
