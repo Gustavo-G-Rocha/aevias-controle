@@ -12,6 +12,7 @@ import { getLaboratoristaInfo, getResponsavelInfo, getRodoviaInfo, getTrechoInfo
 import { assinarEnsaio } from "@/services/ensaiosService";
 import { QUERY_KEYS } from "@/hooks/useQueryData";
 import { toast } from "@/components/ui/use-toast";
+import { SIGN_DIALOG, buildSignDescription, OFFLINE_BADGE_LABEL } from "@/constants/ensaioUi";
 import CriticalActionDialog from "@/components/ensaios/CriticalActionDialog";
 
 const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
@@ -77,7 +78,7 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
               </Badge>
               {ensaio._offline && (
                 <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-300/50 text-xs gap-1" data-testid="offline-pending-badge">
-                  <CloudOff className="w-3 h-3" /> Aguardando sincronização
+                  <CloudOff className="w-3 h-3" /> {OFFLINE_BADGE_LABEL}
                 </Badge>
               )}
               {status.wasRejected && <Badge className="bg-orange-100/80 text-orange-800 border border-border/50 text-xs gap-1"><RotateCcw className="w-3 h-3" /> Editado após reprovação</Badge>}
@@ -153,9 +154,9 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
             )}
             {podeAssinar && (
               <CriticalActionDialog
-                title="Confirmar assinatura digital"
-                description={`Confirma a assinatura digital do registro "${ensaio.sample_id || ensaio.id}"?`}
-                confirmLabel="Assinar registro"
+                title={SIGN_DIALOG.title}
+                description={buildSignDescription(ensaio)}
+                confirmLabel={SIGN_DIALOG.confirmLabel}
                 onConfirm={handleAssinar}
               >
                 <Button size="sm" className="hover:opacity-90">

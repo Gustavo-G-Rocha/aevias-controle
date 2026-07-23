@@ -8,7 +8,8 @@ import { createPageUrl } from "@/utils";
 import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components/ensaios/ensaioMappers";
 import { getLocalInfo, getLaboratoristaInfo, getEmpreiteiraInfo, getNaoConformidades, getStatusInfo } from "@/components/ensaios/utils";
 import { CopyIdButton } from "@/components/ensaios/TableFilters";
-import { canUserEditRecord } from "@/utils/recordEditPermission";
+import { canUserEditRecord, RESTRICTED_EDIT_ENTITIES } from "@/utils/recordEditPermission";
+import { ACTION_COLORS, SIGN_DIALOG, buildSignDescription } from "@/constants/ensaioUi";
 import CriticalActionDialog from "@/components/ensaios/CriticalActionDialog";
 
 const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, allUsers, obras: _obras, user, regionais = [], onApprove: _onApprove, onReject, onDelete, onAssinar }) => {
@@ -24,8 +25,7 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
   const podeAssinar = ensaio.approved === true && !ensaio.client_signature?.signed_by && onAssinar;
   // Registros restritos (Boletins e Usina): só criador (até ser aprovado) ou
   // admin (apenas com a obra em andamento) podem editar.
-  const ENTIDADES_RESTRITAS = ["BoletimSondagem", "BoletimSondagemTrado", "ChecklistUsina", "CertificacaoUsina"];
-  const isRestrito = ENTIDADES_RESTRITAS.includes(ensaio.entityType);
+  const isRestrito = RESTRICTED_EDIT_ENTITIES.has(ensaio.entityType);
   const statusPermiteEdicao = ensaio.status === 'rascunho' || ensaio.approved === false || ensaio.approved === null;
   const podeEditarRestrito =
     isRestrito &&
@@ -77,12 +77,12 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
           {canApprove && ensaio.status !== 'rascunho' && (
             <div className="flex gap-1">
               {(ensaio.approved === null || ensaio.approved === false) && (
-                <Button asChild size="sm" style={{ backgroundColor: '#566E3D' }} className="text-white hover:opacity-90 h-7 px-2" title="Aprovar (abre relatório para assinatura)">
+                <Button asChild size="sm" style={{ backgroundColor: ACTION_COLORS.APPROVE }} className="text-white hover:opacity-90 h-7 px-2" title="Aprovar (abre relatório para assinatura)">
                   <RouterLink to={reportUrl}><CheckCircle className="w-3 h-3" /></RouterLink>
                 </Button>
               )}
               {ensaio.approved === null && (
-                <Button size="sm" style={{ backgroundColor: '#800020' }} className="text-white hover:opacity-90 h-7 px-2" onClick={() => onReject(ensaio)} title="Reprovar">
+                <Button size="sm" style={{ backgroundColor: ACTION_COLORS.REJECT }} className="text-white hover:opacity-90 h-7 px-2" onClick={() => onReject(ensaio)} title="Reprovar">
                   <XCircle className="w-3 h-3" />
                 </Button>
               )}
@@ -90,24 +90,24 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
           )}
           {podeAssinar && (
             <CriticalActionDialog
-              title="Confirmar assinatura digital"
-              description={`Confirma a assinatura digital do registro "${ensaio.sample_id || ensaio.id}"?`}
-              confirmLabel="Assinar registro"
+              title={SIGN_DIALOG.title}
+              description={buildSignDescription(ensaio)}
+              confirmLabel={SIGN_DIALOG.confirmLabel}
               onConfirm={() => onAssinar(ensaio)}
             >
-              <Button size="sm" style={{ backgroundColor: '#566E3D' }} className="text-white hover:opacity-90 h-7 px-2" title="Assinar" aria-label="Assinar registro">
+              <Button size="sm" style={{ backgroundColor: ACTION_COLORS.APPROVE }} className="text-white hover:opacity-90 h-7 px-2" title="Assinar" aria-label="Assinar registro">
                 <MessageSquare className="w-3 h-3" />
               </Button>
             </CriticalActionDialog>
           )}
           {podeEditarRegistro && (
-            <Button asChild size="sm" style={{ backgroundColor: '#00233B' }} className="text-white hover:opacity-90 h-7 px-2" title="Editar registro">
+            <Button asChild size="sm" style={{ backgroundColor: ACTION_COLORS.EDIT }} className="text-white hover:opacity-90 h-7 px-2" title="Editar registro">
               <RouterLink to={createPageUrl(`${ensaio.entityType}?editId=${ensaio.id}`)}><Pencil className="w-3 h-3" /></RouterLink>
             </Button>
           )}
           {canApprove && ensaio.status === 'rascunho' && <span className="text-xs italic text-muted-foreground ml-2">Em execução</span>}
           {podeEditarRestrito && (
-            <Button asChild size="sm" style={{ backgroundColor: '#00233B' }} className="text-white hover:opacity-90 h-7 px-2" title="Editar registro">
+            <Button asChild size="sm" style={{ backgroundColor: ACTION_COLORS.EDIT }} className="text-white hover:opacity-90 h-7 px-2" title="Editar registro">
               <RouterLink to={createPageUrl(`${ensaio.entityType}?editId=${ensaio.id}`)}><Pencil className="w-3 h-3" /></RouterLink>
             </Button>
           )}

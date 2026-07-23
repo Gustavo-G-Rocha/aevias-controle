@@ -1,5 +1,6 @@
 import { MapPin, Clock, CheckCircle, XCircle } from "lucide-react";
 import { ENSAIO_CONFIG } from "@/components/ensaios/ensaioMappers";
+import { STATUS_BADGE_CLASSES, STATUS_LABELS } from "@/constants/ensaioUi";
 
 // ── Helpers de fallback ──────────────────────────────────────────────────────
 const defaultLocalInfo = (ensaio) => ({
@@ -54,19 +55,19 @@ export const getNaoConformidades = (ensaio) => {
 export const getStatusInfo = (ensaio) => {
   // Se status foi revertido para rascunho, tem prioridade sobre approved
   if (ensaio.status === 'rascunho' && !ensaio.client_signature?.signed_by) {
-    return { text: "Execução", icon: Clock, className: "bg-blue-100/80 text-secondary border border-blue-300/50 hover:bg-blue-200/80 hover:border-blue-400/50 transition-colors" };
+    return { text: STATUS_LABELS.EXECUCAO, icon: Clock, className: STATUS_BADGE_CLASSES.EXECUCAO };
   }
   if (ensaio.client_signature?.signed_by) {
-    return { text: "Assinado", icon: CheckCircle, className: "bg-muted/10 text-foreground border border-border/30 hover:bg-muted/20 hover:border-border/40 transition-colors" };
+    return { text: STATUS_LABELS.ASSINADO, icon: CheckCircle, className: STATUS_BADGE_CLASSES.ASSINADO };
   }
   if (ensaio.approved === true) {
-    return { text: "Aprovado", icon: CheckCircle, className: "bg-green-100 text-green-700 border border-green-300/50 hover:bg-green-200 hover:border-green-400/50 transition-colors" };
+    return { text: STATUS_LABELS.APROVADO, icon: CheckCircle, className: STATUS_BADGE_CLASSES.APROVADO };
   }
   if (ensaio.approved === false) {
-    return { text: "Reprovado", icon: XCircle, className: "bg-red-100 text-destructive border border-red-300/50 hover:bg-red-200 hover:border-red-400/50 transition-colors" };
+    return { text: STATUS_LABELS.REPROVADO, icon: XCircle, className: STATUS_BADGE_CLASSES.REPROVADO };
   }
   if (ensaio.was_rejected === true) {
-    return { text: "Pendente", icon: Clock, className: "bg-orange-100/80 text-orange-800 border border-border/50 hover:bg-orange-200/80 hover:border-orange-400/50 transition-colors", wasRejected: true };
+    return { text: STATUS_LABELS.PENDENTE, icon: Clock, className: STATUS_BADGE_CLASSES.PENDENTE_REJEITADO, wasRejected: true };
   }
-  return { text: "Pendente", icon: Clock, className: "bg-yellow-100 text-yellow-700 border border-yellow-300/50 hover:bg-yellow-200 hover:border-yellow-400/50 transition-colors" };
+  return { text: STATUS_LABELS.PENDENTE, icon: Clock, className: STATUS_BADGE_CLASSES.PENDENTE };
 };
