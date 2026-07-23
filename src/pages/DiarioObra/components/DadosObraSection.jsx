@@ -1,6 +1,8 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 import { useEffect } from "react";
 
 const CLIMA_LABELS = {
@@ -23,7 +25,7 @@ function isJornadaNoturna(jornada) {
   return hora >= 18 || hora < 6;
 }
 
-export default function DadosObraSection({ formData, handleChange, obras, regionais, isEditable, isApproved }) {
+export default function DadosObraSection({ formData, handleChange, obras, regionais, isEditable, isApproved, onReloadObras, reloadingObras }) {
   const obraSelecionada = obras.find(o => o.id === formData.obra_id);
   const regionalSelecionada = obraSelecionada ? regionais.find(r => r.id === obraSelecionada.regional_id) : null;
 
@@ -52,6 +54,23 @@ export default function DadosObraSection({ formData, handleChange, obras, region
               })}
             </SelectContent>
           </Select>
+          {obras.length === 0 && (
+            <div className="flex items-start gap-2 p-3 bg-orange-50 border border-orange-300/60 rounded-lg" role="alert">
+              <AlertTriangle className="w-4 h-4 text-orange-600 mt-0.5 shrink-0" />
+              <div className="text-sm space-y-2 min-w-0">
+                <p className="text-orange-800">
+                  Nenhuma obra disponível. Isso pode ser uma falha temporária de conexão — toque em recarregar.
+                  Se persistir, verifique com o gestor se você está vinculado a uma regional com obras em andamento.
+                </p>
+                {onReloadObras && (
+                  <Button type="button" size="sm" variant="outline" onClick={() => onReloadObras()} disabled={reloadingObras}>
+                    <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${reloadingObras ? "animate-spin" : ""}`} />
+                    {reloadingObras ? "Recarregando..." : "Recarregar obras"}
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
         {regionalSelecionada && (
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">

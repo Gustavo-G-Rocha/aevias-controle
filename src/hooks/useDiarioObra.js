@@ -89,7 +89,7 @@ export function useDiarioObra() {
   const [formData, setFormData] = useState(getInitialFormData());
 
   const { data: user, isLoading: loadingUser } = useCurrentUser();
-  const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true });
+  const { data: auxData, isLoading: loadingAux, refetch: refetchAuxData, isFetching: fetchingAux } = useAuxData({ needsRegionais: true });
 
   const regionais = auxData?.regionais ?? [];
 
@@ -302,7 +302,7 @@ export function useDiarioObra() {
   const isCreatingNew = !editingDiarioOriginal?.id;
 
   return {
-    loading, user, obras, regionais, editingDiarioOriginal,
+    loading, user, obras, regionais, refetchAuxData, fetchingAux, editingDiarioOriginal,
     formData, setFormData, handleChange,
     loadingUpload, selectedFileNames, uploadProgress,
     handleFileChange, handleRemovePhoto, handleSubmit, handleCancel,

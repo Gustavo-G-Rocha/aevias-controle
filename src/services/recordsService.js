@@ -233,11 +233,21 @@ export async function loadAuxData({ needsRegionais = true, needsUsers = false } 
   if (regionaisResult.status === 'rejected') logger.warn('[recordsService] loadAuxData: Regional falhou:', regionaisResult.reason?.message);
   if (usersResult.status    === 'rejected') logger.warn('[recordsService] loadAuxData: User falhou:',     usersResult.reason?.message);
   
+  // Sinaliza quais entidades FALHARAM (rejeição de rede) — diferente de lista
+  // legitimamente vazia. Permite ao consumidor completar com cache/re-tentar
+  // em vez de exibir dropdowns vazios (ex: "Obra" no Diário de Obra).
+  const failures = [];
+  if (obrasResult.status === 'rejected') failures.push('obras');
+  if (projectsResult.status === 'rejected') failures.push('projects');
+  if (needsRegionais && regionaisResult.status === 'rejected') failures.push('regionais');
+  if (needsUsers && usersResult.status === 'rejected') failures.push('users');
+
   return {
     obras:     obrasResult.status    === 'fulfilled' ? obrasResult.value    : [],
     projects:  projectsResult.status === 'fulfilled' ? projectsResult.value : [],
     regionais: regionaisResult.status === 'fulfilled' ? regionaisResult.value : [],
     users:     usersResult.status    === 'fulfilled' ? usersResult.value    : [],
+    _failures: failures,
   };
 }
 

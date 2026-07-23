@@ -108,24 +108,45 @@ export function useAuxData({ needsRegionais = true, needsUsers = false } = {}) {
         return { obras: [], projects: [], regionais: [], users: [] };
       }
       try {
-        const data = await loadAuxData({ needsRegionais, needsUsers });
+        const { _failures = [], ...data } = await loadAuxData({ needsRegionais, needsUsers });
+        // Falha essencial: Obra ou Regional (quando pedida) rejeitou na rede.
+        // Sem regionais, usuários não-admin ficam sem NENHUMA obra nos
+        // formulários (ex: Diário de Obra) — não pode passar silenciosamente.
+        const essentialFailed = _failures.includes('obras') || _failures.includes('regionais');
         const hasData = data.obras.length > 0 || data.regionais.length > 0 || data.projects.length > 0;
-        if (hasData) {
-          // Só sobrescreve o cache com dados reais — nunca com listas vazias
-          // vindas de uma rede instável (loadAuxData engole falhas por entidade)
-          // ou de um consumidor que não pediu aquela entidade (ex: Dashboard
-          // com needsRegionais=false não pode zerar 'auxData:regionais').
+
+        // Salva no cache apenas as partes que vieram frescas — nunca listas
+        // vazias de uma rede instável, e nunca a chave composta com dados
+        // incompletos (poisoning do fallback offline).
+        if (data.obras.length) saveDataCache('auxData:obras', data.obras, 'auxData').catch(() => {});
+        if (needsRegionais && data.regionais.length) saveDataCache('auxData:regionais', data.regionais, 'auxData').catch(() => {});
+        if (data.projects.length) saveDataCache('auxData:projects', data.projects, 'auxData').catch(() => {});
+
+        if (hasData && !essentialFailed) {
           saveDataCache(cacheKey, data, 'auxData').catch(() => {});
-          if (data.obras.length) saveDataCache('auxData:obras', data.obras, 'auxData').catch(() => {});
-          if (needsRegionais && data.regionais.length) saveDataCache('auxData:regionais', data.regionais, 'auxData').catch(() => {});
-          if (data.projects.length) saveDataCache('auxData:projects', data.projects, 'auxData').catch(() => {});
           return data;
         }
-        // Tudo veio vazio (provável falha de rede silenciosa) — prefere o cache.
+
+        // Dados incompletos (falha parcial) ou tudo vazio — completa com cache.
         const cached = await readCache();
         if (cached) {
-          logger.warn('[useQueryData] Dados auxiliares vazios da rede — usando cache');
-          return cached;
+          if (!essentialFailed) {
+            logger.warn('[useQueryData] Dados auxiliares vazios da rede — usando cache');
+            return cached;
+          }
+          logger.warn(`[useQueryData] Falha parcial (${_failures.join(', ')}) — completando com cache`);
+          return {
+            ...data,
+            obras: _failures.includes('obras') ? (cached.obras ?? []) : data.obras,
+            regionais: _failures.includes('regionais') ? (cached.regionais ?? []) : data.regionais,
+            projects: _failures.includes('projects') ? (cached.projects ?? []) : data.projects,
+            users: _failures.includes('users') ? (cached.users ?? []) : data.users,
+          };
+        }
+        // Falha essencial e sem cache — lança para o React Query re-tentar
+        // automaticamente em vez de manter dropdowns vazios por 10 minutos.
+        if (essentialFailed) {
+          throw new Error('Falha ao carregar obras/regionais — tentando novamente');
         }
         return data;
       } catch (e) {

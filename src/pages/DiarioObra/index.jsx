@@ -17,7 +17,7 @@ import FotosSection from "./components/FotosSection";
 
 export default function DiarioObraPage() {
   const {
-    loading, obras, regionais, editingDiarioOriginal,
+    loading, obras, regionais, refetchAuxData, fetchingAux, editingDiarioOriginal,
     formData, handleChange, loadingUpload, selectedFileNames, uploadProgress,
     handleFileChange, handleRemovePhoto, handleSubmit, handleCancel,
     isApproved, isEditable, saving,
@@ -70,6 +70,7 @@ export default function DiarioObraPage() {
                 formData={formData} handleChange={handleChange}
                 obras={obras} regionais={regionais}
                 isEditable={isEditable} isApproved={isApproved}
+                onReloadObras={refetchAuxData} reloadingObras={fetchingAux}
               />
 
               {/* Atividades + Observações */}
