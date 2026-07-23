@@ -128,14 +128,21 @@ function CompactacaoPontoAPonto({ ensaio }) {
     { label: "Dens. Apar. Seca (g/cm³)",  sym: "L=E/(100+K)", field: "dens_ap_seca",     calc: true, dec: 3 },
   ];
 
+  // Ponto/cilindro "não realizado": a entrada principal está vazia/zero.
+  // Nesse caso exibimos "-" em vez de 0.0/0.000 nas células derivadas.
+  const cilRealizado = (d) => d && d.cilindro_solo_umido != null && Number(d.cilindro_solo_umido) > 0;
+  const umRealizado  = (u) => u && u.capsula_solo_umido_1 != null && Number(u.capsula_solo_umido_1) > 0;
+
   const getCilVal = (d, row) => {
     if (row.str) return d[row.field] || '-';
+    if (!cilRealizado(d)) return '-';
     const v = d[row.field];
     return (v != null && !isNaN(v)) ? fmtN(v, row.dec ?? 1) : '-';
   };
 
   const getUmVal = (u, d, row) => {
     if (row.str) return u[row.field] || '-';
+    if (!umRealizado(u)) return '-';
     if (row.field === 'dens_ap_seca') {
       return (d?.dens_ap_seca != null && !isNaN(d.dens_ap_seca)) ? fmtN(d.dens_ap_seca, row.dec ?? 3) : '-';
     }
