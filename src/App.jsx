@@ -12,15 +12,20 @@ import { AuthProvider } from '@/lib/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import TwoFactorGate from '@/components/auth/TwoFactorGate';
 import { useTheme } from '@/hooks/useTheme';
-import Login from '@/pages/Login';
-import Register from '@/pages/Register';
-import ForgotPassword from '@/pages/ForgotPassword';
-import ResetPassword from '@/pages/ResetPassword';
-import HistoricoAuditoria from '@/pages/HistoricoAuditoria';
-import EnsaioTaxaInsumos from '@/pages/EnsaioTaxaInsumos';
-import RelatorioTaxaInsumos from '@/pages/RelatorioTaxaInsumos';
-import ReportarErro from '@/pages/ReportarErro';
-import VerificarAssinatura from '@/pages/VerificarAssinatura';
+import { lazyWithRetry as lazy } from '@/lib/lazyWithRetry';
+
+// Páginas importadas de forma lazy para não entrar no bundle inicial.
+// Usuários autenticados nunca acessam as rotas de auth, e os relatórios/
+// páginas auxiliares só são baixados quando navegados.
+const Login = lazy(() => import('@/pages/Login'));
+const Register = lazy(() => import('@/pages/Register'));
+const ForgotPassword = lazy(() => import('@/pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
+const HistoricoAuditoria = lazy(() => import('@/pages/HistoricoAuditoria'));
+const EnsaioTaxaInsumos = lazy(() => import('@/pages/EnsaioTaxaInsumos'));
+const RelatorioTaxaInsumos = lazy(() => import('@/pages/RelatorioTaxaInsumos'));
+const ReportarErro = lazy(() => import('@/pages/ReportarErro'));
+const VerificarAssinatura = lazy(() => import('@/pages/VerificarAssinatura'));
 
 // Fallback leve exibido enquanto o chunk da página lazy é baixado.
 // O Layout (sidebar/header/bottom-nav) já está renderizado — só o conteúdo suspende.
@@ -40,12 +45,12 @@ const LayoutWrapper = ({ children, currentPageName }) => {
 function AuthenticatedApp() {
   return (
     <Routes>
-      {/* Public auth routes */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/verificar-assinatura" element={<VerificarAssinatura />} />
+      {/* Public auth routes (lazy — envolvidas em Suspense próprio) */}
+      <Route path="/login" element={<Suspense fallback={<PageLoadingFallback />}><Login /></Suspense>} />
+      <Route path="/register" element={<Suspense fallback={<PageLoadingFallback />}><Register /></Suspense>} />
+      <Route path="/forgot-password" element={<Suspense fallback={<PageLoadingFallback />}><ForgotPassword /></Suspense>} />
+      <Route path="/reset-password" element={<Suspense fallback={<PageLoadingFallback />}><ResetPassword /></Suspense>} />
+      <Route path="/verificar-assinatura" element={<Suspense fallback={<PageLoadingFallback />}><VerificarAssinatura /></Suspense>} />
 
       {/* Protected app routes */}
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
