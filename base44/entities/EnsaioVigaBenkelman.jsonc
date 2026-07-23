@@ -13,12 +13,12 @@
     "data_ensaio": {
       "type": "string",
       "format": "date",
-      "description": "Data da aplica\u00e7\u00e3o do ensaio"
+      "description": "Data da aplicação do ensaio"
     },
     "data_realizacao": {
       "type": "string",
       "format": "date",
-      "description": "Data de realiza\u00e7\u00e3o do ensaio"
+      "description": "Data de realização do ensaio"
     },
     "laboratorista_name": {
       "type": "string",
@@ -34,7 +34,7 @@
     },
     "empreiteira": {
       "type": "string",
-      "description": "Empreiteira respons\u00e1vel pela execu\u00e7\u00e3o"
+      "description": "Empreiteira responsável pela execução"
     },
     "material": {
       "type": "string",
@@ -42,11 +42,11 @@
     },
     "procedencia": {
       "type": "string",
-      "description": "Proced\u00eancia do material"
+      "description": "Procedência do material"
     },
     "pista_faixa": {
       "type": "string",
-      "description": "Pista ou faixa de tr\u00e1fego"
+      "description": "Pista ou faixa de tráfego"
     },
     "camada": {
       "type": "string",
@@ -54,19 +54,19 @@
     },
     "cte_viga": {
       "type": "number",
-      "description": "Coeficiente da viga (autom\u00e1tico)"
+      "description": "Coeficiente da viga (automático)"
     },
     "def_admissivel": {
       "type": "number",
-      "description": "Deflex\u00e3o admiss\u00edvel (x10\u207b\u00b2mm)"
+      "description": "Deflexão admissível (x10⁻²mm)"
     },
     "leitura_inicial_global": {
       "type": "number",
-      "description": "Leitura inicial \u00fanica que ser\u00e1 replicada para todos os registros"
+      "description": "Leitura inicial única que será replicada para todos os registros"
     },
     "levantamentos": {
       "type": "array",
-      "description": "Array de levantamentos por estaca/km com medi\u00e7\u00f5es dos 3 bordos",
+      "description": "Array de levantamentos por estaca/km com medições dos 3 bordos",
       "items": {
         "type": "object",
         "properties": {
@@ -91,11 +91,11 @@
               },
               "diferenca": {
                 "type": "number",
-                "description": "Diferen\u00e7a (C = A - B)"
+                "description": "Diferença (C = A - B)"
               },
               "deflexao": {
                 "type": "number",
-                "description": "Deflex\u00e3o (D = C \u00d7 E em x10\u207b\u00b2mm)"
+                "description": "Deflexão (D = C × E em x10⁻²mm)"
               }
             }
           },
@@ -112,11 +112,11 @@
               },
               "diferenca": {
                 "type": "number",
-                "description": "Diferen\u00e7a (C = A - B)"
+                "description": "Diferença (C = A - B)"
               },
               "deflexao": {
                 "type": "number",
-                "description": "Deflex\u00e3o (D = C \u00d7 E em x10\u207b\u00b2mm)"
+                "description": "Deflexão (D = C × E em x10⁻²mm)"
               }
             }
           },
@@ -133,11 +133,11 @@
               },
               "diferenca": {
                 "type": "number",
-                "description": "Diferen\u00e7a (C = A - B)"
+                "description": "Diferença (C = A - B)"
               },
               "deflexao": {
                 "type": "number",
-                "description": "Deflex\u00e3o (D = C \u00d7 E em x10\u207b\u00b2mm)"
+                "description": "Deflexão (D = C × E em x10⁻²mm)"
               }
             }
           }
@@ -146,7 +146,7 @@
     },
     "controle_estatistico": {
       "type": "object",
-      "description": "Controle estat\u00edstico das medi\u00e7\u00f5es",
+      "description": "Controle estatístico das medições",
       "properties": {
         "qt_leituras": {
           "type": "number",
@@ -154,17 +154,17 @@
         },
         "media": {
           "type": "number",
-          "description": "M\u00e9dia das deflex\u00f5es"
+          "description": "Média das deflexões"
         },
         "desv_pad": {
           "type": "number",
-          "description": "Desvio padr\u00e3o"
+          "description": "Desvio padrão"
         }
       }
     },
     "observacoes": {
       "type": "string",
-      "description": "Observa\u00e7\u00f5es gerais"
+      "description": "Observações gerais"
     },
     "status": {
       "type": "string",
@@ -178,11 +178,11 @@
     "approved": {
       "type": "boolean",
       "default": null,
-      "description": "Status de aprova\u00e7\u00e3o"
+      "description": "Status de aprovação"
     },
     "approved_by": {
       "type": "string",
-      "description": "Email do usu\u00e1rio que aprovou"
+      "description": "Email do usuário que aprovou"
     },
     "approved_date": {
       "type": "string",

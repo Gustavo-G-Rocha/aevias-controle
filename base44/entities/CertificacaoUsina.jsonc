@@ -61,8 +61,8 @@
     "tipo_dosagem": {
       "type": "string",
       "enum": [
-        "Descont\u00ednua",
-        "Cont\u00ednua"
+        "Descontínua",
+        "Contínua"
       ]
     },
     "tipo_secagem": {
@@ -79,53 +79,53 @@
           "type": "string",
           "enum": [
             "Sim",
-            "N\u00e3o"
+            "Não"
           ]
         },
         "licenca_previa": {
           "type": "string",
           "enum": [
             "Sim",
-            "N\u00e3o"
+            "Não"
           ]
         },
         "licenca_instalacao": {
           "type": "string",
           "enum": [
             "Sim",
-            "N\u00e3o"
+            "Não"
           ]
         },
         "licenca_operacao": {
           "type": "string",
           "enum": [
             "Sim",
-            "N\u00e3o"
+            "Não"
           ]
         },
         "usina_em_pedreira": {
           "type": "string",
           "enum": [
             "Sim",
-            "N\u00e3o"
+            "Não"
           ]
         },
         "licenciamento_pedreira": {
           "type": "string",
           "enum": [
             "Sim",
-            "N\u00e3o"
+            "Não"
           ]
         }
       }
     },
     "saude_seguranca": {
       "type": "object",
-      "description": "Se\u00e7\u00e3o 5 - Aspectos de sa\u00fade e seguran\u00e7a"
+      "description": "Seção 5 - Aspectos de saúde e segurança"
     },
     "meio_ambiente": {
       "type": "object",
-      "description": "Se\u00e7\u00e3o 6 - Meio Ambiente",
+      "description": "Seção 6 - Meio Ambiente",
       "properties": {
         "ruidos": {
           "type": "object"
@@ -137,35 +137,35 @@
               "type": "string",
               "enum": [
                 "Sim",
-                "N\u00e3o"
+                "Não"
               ]
             },
             "resolucao_sema_016_2014": {
               "type": "string",
               "enum": [
                 "Sim",
-                "N\u00e3o"
+                "Não"
               ]
             },
             "monitoramento_fumaca_preta": {
               "type": "string",
               "enum": [
                 "Sim",
-                "N\u00e3o"
+                "Não"
               ]
             },
             "filtro_material_particulado": {
               "type": "string",
               "enum": [
                 "Sim",
-                "N\u00e3o"
+                "Não"
               ]
             },
             "meta_reducao_carbono": {
               "type": "string",
               "enum": [
                 "Sim",
-                "N\u00e3o"
+                "Não"
               ]
             }
           }
@@ -186,56 +186,56 @@
               "type": "string",
               "enum": [
                 "Sim",
-                "N\u00e3o"
+                "Não"
               ]
             },
             "vegetacao_remanescente": {
               "type": "string",
               "enum": [
                 "Sim",
-                "N\u00e3o"
+                "Não"
               ]
             },
             "estruturas_contencao": {
               "type": "string",
               "enum": [
                 "Sim",
-                "N\u00e3o"
+                "Não"
               ]
             },
             "outorga_captacao": {
               "type": "string",
               "enum": [
                 "Sim",
-                "N\u00e3o"
+                "Não"
               ]
             },
             "ddsma": {
               "type": "string",
               "enum": [
                 "Sim",
-                "N\u00e3o"
+                "Não"
               ]
             },
             "apr_aspectos_ambientais": {
               "type": "string",
               "enum": [
                 "Sim",
-                "N\u00e3o"
+                "Não"
               ]
             },
             "captacao_chuvas": {
               "type": "string",
               "enum": [
                 "Sim",
-                "N\u00e3o"
+                "Não"
               ]
             },
             "plano_gerenciamento_residuos": {
               "type": "string",
               "enum": [
                 "Sim",
-                "N\u00e3o"
+                "Não"
               ]
             }
           }
@@ -244,19 +244,19 @@
     },
     "laboratorio": {
       "type": "object",
-      "description": "Se\u00e7\u00e3o 7.1 - Laborat\u00f3rio"
+      "description": "Seção 7.1 - Laboratório"
     },
     "afeicao": {
       "type": "object",
-      "description": "Se\u00e7\u00e3o 7.2 - Aferi\u00e7\u00e3o, repetibilidade e reprodutibilidade"
+      "description": "Seção 7.2 - Aferição, repetibilidade e reprodutibilidade"
     },
     "estrutura_fisica": {
       "type": "object",
-      "description": "Se\u00e7\u00e3o 7.3 - Estrutura e espa\u00e7o f\u00edsico"
+      "description": "Seção 7.3 - Estrutura e espaço físico"
     },
     "usina_asfalto": {
       "type": "object",
-      "description": "Se\u00e7\u00e3o 7.4 - Usina de asfalto",
+      "description": "Seção 7.4 - Usina de asfalto",
       "properties": {
         "tipo": {
           "type": "string"
@@ -298,7 +298,7 @@
           "type": "string",
           "enum": [
             "Sim",
-            "N\u00e3o"
+            "Não"
           ]
         },
         "dosagem_mistura": {
@@ -311,21 +311,21 @@
           "type": "string",
           "enum": [
             "Sim",
-            "N\u00e3o"
+            "Não"
           ]
         },
         "filtro_conforme": {
           "type": "string",
           "enum": [
             "Sim",
-            "N\u00e3o"
+            "Não"
           ]
         },
         "dosador_finos_retornados": {
           "type": "string",
           "enum": [
             "Sim",
-            "N\u00e3o"
+            "Não"
           ]
         },
         "dosador_filler": {
@@ -335,14 +335,14 @@
           "type": "string",
           "enum": [
             "Sim",
-            "N\u00e3o"
+            "Não"
           ]
         },
         "classificacao_rap_fracoes": {
           "type": "string",
           "enum": [
             "Sim",
-            "N\u00e3o"
+            "Não"
           ]
         },
         "operacao": {
@@ -352,35 +352,35 @@
           "type": "string",
           "enum": [
             "Sim",
-            "N\u00e3o"
+            "Não"
           ]
         },
         "utiliza_cal": {
           "type": "string",
           "enum": [
             "Sim",
-            "N\u00e3o"
+            "Não"
           ]
         },
         "utiliza_rap": {
           "type": "string",
           "enum": [
             "Sim",
-            "N\u00e3o"
+            "Não"
           ]
         },
         "silo_especifico_rap": {
           "type": "string",
           "enum": [
             "Sim",
-            "N\u00e3o"
+            "Não"
           ]
         },
         "sistema_dosagem_rap": {
           "type": "string",
           "enum": [
             "Sim",
-            "N\u00e3o"
+            "Não"
           ]
         },
         "percentual_rap": {
@@ -390,7 +390,7 @@
     },
     "ensaios_validacao": {
       "type": "object",
-      "description": "Se\u00e7\u00e3o 7.2 - Ensaios para valida\u00e7\u00e3o"
+      "description": "Seção 7.2 - Ensaios para validação"
     },
     "resultado_classe": {
       "type": "string",

@@ -130,7 +130,7 @@
     },
     "densidades_in_situ": {
       "type": "array",
-      "description": "Array de ensaios de massa espec\u00edfica aparente in situ - DNER-ME 092/94",
+      "description": "Array de ensaios de massa específica aparente in situ - DNER-ME 092/94",
       "items": {
         "type": "object",
         "properties": {

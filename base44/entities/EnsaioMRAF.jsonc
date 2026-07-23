@@ -17,7 +17,7 @@
     },
     "horario": {
       "type": "string",
-      "description": "Hor\u00e1rio do ensaio"
+      "description": "Horário do ensaio"
     },
     "laboratorista_name": {
       "type": "string",
@@ -25,7 +25,7 @@
     },
     "placa_caminhao": {
       "type": "string",
-      "description": "Placa do caminh\u00e3o"
+      "description": "Placa do caminhão"
     },
     "local_coleta": {
       "type": "string",
@@ -41,15 +41,15 @@
     },
     "trecho": {
       "type": "string",
-      "description": "Descri\u00e7\u00e3o do trecho"
+      "description": "Descrição do trecho"
     },
     "tipo_ligante": {
       "type": "string",
-      "description": "Tipo de ligante asf\u00e1ltico"
+      "description": "Tipo de ligante asfáltico"
     },
     "faixa_especificada": {
       "type": "string",
-      "description": "Faixa granulom\u00e9trica especificada"
+      "description": "Faixa granulométrica especificada"
     },
     "ensaio_realizado_por": {
       "type": "string",
@@ -62,7 +62,7 @@
     },
     "extracao_ligante": {
       "type": "object",
-      "description": "Dados da extra\u00e7\u00e3o de ligante (Rotarex)",
+      "description": "Dados da extração de ligante (Rotarex)",
       "properties": {
         "peso_amostra": {
           "type": "number",
@@ -70,7 +70,7 @@
         },
         "amostra_umida": {
           "type": "number",
-          "description": "Amostra \u00famida (g)"
+          "description": "Amostra úmida (g)"
         },
         "amostra_seca": {
           "type": "number",
@@ -90,7 +90,7 @@
         },
         "fator_correcao": {
           "type": "number",
-          "description": "Fator de corre\u00e7\u00e3o",
+          "description": "Fator de correção",
           "default": 1
         },
         "peso_ligante": {
@@ -103,11 +103,11 @@
         },
         "residuo_emulsao": {
           "type": "number",
-          "description": "Res\u00edduo da emuls\u00e3o (%)"
+          "description": "Resíduo da emulsão (%)"
         },
         "percentual_emulsao": {
           "type": "number",
-          "description": "Percentual de emuls\u00e3o calculado (%)"
+          "description": "Percentual de emulsão calculado (%)"
         }
       }
     },
@@ -182,7 +182,7 @@
     },
     "observacoes": {
       "type": "string",
-      "description": "Observa\u00e7\u00f5es gerais"
+      "description": "Observações gerais"
     },
     "status": {
       "type": "string",
@@ -191,16 +191,16 @@
         "finalizado"
       ],
       "default": "rascunho",
-      "description": "Status do registro: rascunho (em edi\u00e7\u00e3o) ou finalizado (pronto para revis\u00e3o)"
+      "description": "Status do registro: rascunho (em edição) ou finalizado (pronto para revisão)"
     },
     "approved": {
       "type": "boolean",
       "default": null,
-      "description": "Status de aprova\u00e7\u00e3o"
+      "description": "Status de aprovação"
     },
     "approved_by": {
       "type": "string",
-      "description": "Email do usu\u00e1rio que aprovou/reprovou"
+      "description": "Email do usuário que aprovou/reprovou"
     },
     "approved_date": {
       "type": "string",

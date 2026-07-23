@@ -17,7 +17,7 @@
     },
     "horario": {
       "type": "string",
-      "description": "Hor\u00e1rio do ensaio"
+      "description": "Horário do ensaio"
     },
     "laboratorista_name": {
       "type": "string",
@@ -25,7 +25,7 @@
     },
     "engenheiro_responsavel": {
       "type": "string",
-      "description": "Nome do engenheiro respons\u00e1vel (Gestor de Contrato)"
+      "description": "Nome do engenheiro responsável (Gestor de Contrato)"
     },
     "rodovia": {
       "type": "string",
@@ -33,7 +33,7 @@
     },
     "trecho": {
       "type": "string",
-      "description": "Descri\u00e7\u00e3o do trecho"
+      "description": "Descrição do trecho"
     },
     "sub_trecho": {
       "type": "string",
@@ -49,20 +49,20 @@
     },
     "procedencia": {
       "type": "string",
-      "description": "Proced\u00eancia do material"
+      "description": "Procedência do material"
     },
     "substituicao_retido_3_4": {
       "type": "boolean",
       "default": false,
-      "description": "Ensaio com substitui\u00e7\u00e3o do material retido na 3/4\""
+      "description": "Ensaio com substituição do material retido na 3/4\""
     },
     "densidade_real_retida_3_4": {
       "type": "number",
-      "description": "Densidade real retida 3/4\" (g/cm\u00b3) - se aplic\u00e1vel"
+      "description": "Densidade real retida 3/4\" (g/cm³) - se aplicável"
     },
     "densidade_areia": {
       "type": "number",
-      "description": "Densidade da areia (g/cm\u00b3) - valor global para todos os furos"
+      "description": "Densidade da areia (g/cm³) - valor global para todos os furos"
     },
     "peso_areia_funil": {
       "type": "number",
@@ -74,11 +74,11 @@
       "properties": {
         "densidade_seca_max": {
           "type": "number",
-          "description": "Densidade seca m\u00e1xima (g/cm\u00b3)"
+          "description": "Densidade seca máxima (g/cm³)"
         },
         "umidade_otima": {
           "type": "number",
-          "description": "Umidade \u00f3tima (%)"
+          "description": "Umidade ótima (%)"
         }
       }
     },
@@ -90,7 +90,7 @@
         "properties": {
           "numero": {
             "type": "number",
-            "description": "N\u00famero do furo"
+            "description": "Número do furo"
           },
           "estaca": {
             "type": "string",
@@ -110,15 +110,15 @@
           },
           "peso_areia_garrafa_apos": {
             "type": "number",
-            "description": "Peso da areia + garrafa ap\u00f3s o ensaio (g)"
+            "description": "Peso da areia + garrafa após o ensaio (g)"
           },
           "peso_material_umido_furo": {
             "type": "number",
-            "description": "Peso do material \u00famido no furo (g)"
+            "description": "Peso do material úmido no furo (g)"
           },
           "peso_solo_retido_3_4_umido": {
             "type": "number",
-            "description": "Peso do solo retido 3/4\" \u00famido no furo (g) - se aplic\u00e1vel"
+            "description": "Peso do solo retido 3/4\" úmido no furo (g) - se aplicável"
           },
           "tara_frigideira": {
             "type": "number",
@@ -126,7 +126,7 @@
           },
           "material_umido_frigideira": {
             "type": "number",
-            "description": "Material \u00famido + frigideira (g)"
+            "description": "Material úmido + frigideira (g)"
           },
           "material_seco_frigideira": {
             "type": "number",
@@ -134,11 +134,11 @@
           },
           "densidade_umida_furo": {
             "type": "number",
-            "description": "Densidade \u00famida do furo (g/cm\u00b3) - calculado"
+            "description": "Densidade úmida do furo (g/cm³) - calculado"
           },
           "densidade_seca_solo": {
             "type": "number",
-            "description": "Densidade seca do solo (g/cm\u00b3) - calculado"
+            "description": "Densidade seca do solo (g/cm³) - calculado"
           },
           "umidade": {
             "type": "number",
@@ -150,14 +150,14 @@
           },
           "grau_compactacao": {
             "type": "number",
-            "description": "Grau de compacta\u00e7\u00e3o (%) - calculado"
+            "description": "Grau de compactação (%) - calculado"
           }
         }
       }
     },
     "observacoes": {
       "type": "string",
-      "description": "Observa\u00e7\u00f5es gerais"
+      "description": "Observações gerais"
     },
     "fotos": {
       "type": "array",
@@ -173,16 +173,16 @@
         "finalizado"
       ],
       "default": "rascunho",
-      "description": "Status do registro: rascunho (em edi\u00e7\u00e3o) ou finalizado (pronto para revis\u00e3o)"
+      "description": "Status do registro: rascunho (em edição) ou finalizado (pronto para revisão)"
     },
     "approved": {
       "type": "boolean",
       "default": null,
-      "description": "Status de aprova\u00e7\u00e3o"
+      "description": "Status de aprovação"
     },
     "approved_by": {
       "type": "string",
-      "description": "Email do usu\u00e1rio que aprovou/reprovou"
+      "description": "Email do usuário que aprovou/reprovou"
     },
     "approved_date": {
       "type": "string",

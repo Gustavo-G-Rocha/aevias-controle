@@ -25,13 +25,13 @@
     },
     "servicos": {
       "type": "array",
-      "description": "Servi\u00e7os realizados",
+      "description": "Serviços realizados",
       "items": {
         "type": "object",
         "properties": {
           "servico": {
             "type": "string",
-            "description": "Descri\u00e7\u00e3o do servi\u00e7o"
+            "description": "Descrição do serviço"
           },
           "estaca_inicial": {
             "type": "string"
@@ -75,7 +75,7 @@
     },
     "fotos": {
       "type": "array",
-      "description": "Registro fotogr\u00e1fico (URL ou objeto com legenda)",
+      "description": "Registro fotográfico (URL ou objeto com legenda)",
       "items": {
         "type": [
           "string",
@@ -93,7 +93,7 @@
     },
     "observacoes_gerais": {
       "type": "string",
-      "description": "Observa\u00e7\u00f5es gerais"
+      "description": "Observações gerais"
     },
     "status": {
       "type": "string",
@@ -107,11 +107,11 @@
     "approved": {
       "type": "boolean",
       "default": null,
-      "description": "Status de aprova\u00e7\u00e3o"
+      "description": "Status de aprovação"
     },
     "approved_by": {
       "type": "string",
-      "description": "Email do usu\u00e1rio que aprovou/reprovou"
+      "description": "Email do usuário que aprovou/reprovou"
     },
     "approved_date": {
       "type": "string",

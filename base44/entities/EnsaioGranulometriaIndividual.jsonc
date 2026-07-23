@@ -27,7 +27,7 @@
     },
     "horario": {
       "type": "string",
-      "description": "Hor\u00e1rio do ensaio"
+      "description": "Horário do ensaio"
     },
     "laboratorista_name": {
       "type": "string"
@@ -49,7 +49,7 @@
     },
     "agregados": {
       "type": "array",
-      "description": "At\u00e9 4 agregados",
+      "description": "Até 4 agregados",
       "items": {
         "type": "object",
         "properties": {

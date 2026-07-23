@@ -539,7 +539,34 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Service role bypassa RLS — permissões já verificadas server-side acima
+    // ── DEFENSE-IN-DEPTH: field whitelist ──────────────────────────────
+    // updateData é construído server-side, mas este check explícito garante
+    // que apenas campos de aprovação/assinatura sejam persistidos — nenhum
+    // campo arbitrário (ex: 'role', 'email', 'created_by') pode chegar ao
+    // asServiceRole.update(). Isto previne escalação de privilégios mesmo se
+    // a lógica de construção do updateData for estendida no futuro.
+    const ALLOWED_UPDATE_FIELDS = new Set([
+      'approved', 'approved_by', 'approved_date', 'approver_details',
+      'rejection_reason', 'was_rejected', 'client_signature',
+      'pendente_aprovacao_cliente', 'cliente_aprovacao', 'cliente_aprovacao_data',
+      'cliente_aprovacao_responsavel', 'cliente_reprovacao_motivo',
+      'status', 'fotos', 'integrity_hash', 'integrity_hash_date',
+      'manager_signature',
+    ]);
+    for (const key of Object.keys(updateData)) {
+      if (!ALLOWED_UPDATE_FIELDS.has(key)) {
+        delete updateData[key];
+      }
+    }
+
+    // asServiceRole é necessário pois o RLS update das entidades só permite
+    // created_by ou admin — approvers (sala_tecnica, gestor_contrato,
+    // cliente_supervisor) não podem atualizar via base44.entities.
+    // A autorização é enforceada server-side por:
+    //   1. ALLOWED_ENTITIES whitelist (entityName validado)
+    //   2. verifyTenantAccess (registro → obra → regional → email do usuário)
+    //   3. canApprove / canDelete (nível de acesso + per-regional para supervisor)
+    //   4. ALLOWED_UPDATE_FIELDS (nenhum campo fora do whitelist é persistido)
     const result = await base44.asServiceRole.entities[entityName].update(recordId, updateData);
 
     // ── AUDIT TRAIL ──────────────────────────────────────────────────

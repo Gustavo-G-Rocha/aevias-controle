@@ -36,11 +36,11 @@
     },
     "face_classificacao_1": {
       "type": "string",
-      "description": "Face da sondagem para classifica\u00e7\u00e3o 1"
+      "description": "Face da sondagem para classificação 1"
     },
     "face_classificacao_2": {
       "type": "string",
-      "description": "Face da sondagem para classifica\u00e7\u00e3o 2"
+      "description": "Face da sondagem para classificação 2"
     },
     "camadas": {
       "type": "array",
@@ -86,7 +86,7 @@
     },
     "camadas_2": {
       "type": "array",
-      "description": "Camadas separadas para classifica\u00e7\u00e3o 2",
+      "description": "Camadas separadas para classificação 2",
       "items": {
         "type": "object",
         "properties": {
@@ -218,7 +218,7 @@
     },
     "densidade_in_situ": {
       "type": "object",
-      "description": "Massa espec\u00edfica aparente in situ - DNER-ME 092/94 (campo legado)",
+      "description": "Massa específica aparente in situ - DNER-ME 092/94 (campo legado)",
       "properties": {
         "camada_ensaiada": {
           "type": "string"
@@ -275,7 +275,7 @@
     },
     "densidades_in_situ": {
       "type": "array",
-      "description": "Array de ensaios de massa espec\u00edfica aparente in situ - DNER-ME 092/94",
+      "description": "Array de ensaios de massa específica aparente in situ - DNER-ME 092/94",
       "items": {
         "type": "object",
         "properties": {

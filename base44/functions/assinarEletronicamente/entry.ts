@@ -450,8 +450,26 @@ Deno.serve(async (req) => {
     // RelatorioUnificado não tem entidade para atualizar — o documento
     // é a composição dos registros. A assinatura fica registrada em
     // AssinaturaEletronica + AuditTrail.
+    // Defense-in-depth: field whitelist — apenas campos de assinatura/aprovação
+    // são persistidos, previne injeção de campos arbitrários via asServiceRole.
+    const ALLOWED_UPDATE_FIELDS = new Set([
+      'approved', 'approved_by', 'approved_date', 'approver_details',
+      'rejection_reason', 'was_rejected', 'client_signature',
+      'pendente_aprovacao_cliente', 'cliente_aprovacao', 'cliente_aprovacao_data',
+      'cliente_aprovacao_responsavel', 'cliente_reprovacao_motivo',
+      'status', 'fotos', 'integrity_hash', 'integrity_hash_date',
+      'manager_signature',
+    ]);
+    for (const key of Object.keys(updateData)) {
+      if (!ALLOWED_UPDATE_FIELDS.has(key)) {
+        delete updateData[key];
+      }
+    }
     let result: any = existingRecord;
     if (entityName !== 'RelatorioUnificado') {
+      // asServiceRole é necessário pois RLS não permite approvers atualizar
+      // registros que não criaram. Autorização enforceada por verifyTenantAccess
+      // + canApprove + ALLOWED_UPDATE_FIELDS acima.
       result = await base44.asServiceRole.entities[entityName].update(recordId, updateData);
     }
 

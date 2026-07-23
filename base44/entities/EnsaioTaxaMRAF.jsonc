@@ -25,7 +25,7 @@
     },
     "placa_caminhao": {
       "type": "string",
-      "description": "Placa do caminh\u00e3o espargidor"
+      "description": "Placa do caminhão espargidor"
     },
     "material": {
       "type": "string",
@@ -33,11 +33,11 @@
     },
     "numero_projeto": {
       "type": "string",
-      "description": "N\u00famero do projeto"
+      "description": "Número do projeto"
     },
     "dimensoes_bandeja": {
       "type": "object",
-      "description": "Dimens\u00f5es globais da bandeja",
+      "description": "Dimensões globais da bandeja",
       "properties": {
         "lado_1": {
           "type": "number",
@@ -49,13 +49,13 @@
         },
         "area": {
           "type": "number",
-          "description": "\u00c1rea calculada (m\u00b2)"
+          "description": "Área calculada (m²)"
         }
       }
     },
     "ensaios": {
       "type": "array",
-      "description": "Ensaios individuais (at\u00e9 4)",
+      "description": "Ensaios individuais (até 4)",
       "items": {
         "type": "object",
         "properties": {
@@ -68,7 +68,7 @@
           },
           "posicao": {
             "type": "string",
-            "description": "Posi\u00e7\u00e3o"
+            "description": "Posição"
           },
           "peso_bandeja_amostra": {
             "type": "number",
@@ -84,42 +84,42 @@
           },
           "taxa_mraf_aplicada": {
             "type": "number",
-            "description": "Taxa de MRAF aplicada Tx (kg/m\u00b2)"
+            "description": "Taxa de MRAF aplicada Tx (kg/m²)"
           },
           "teor_ligante": {
             "type": "number",
-            "description": "Teor de ligante L do ensaio de extra\u00e7\u00e3o (%)"
+            "description": "Teor de ligante L do ensaio de extração (%)"
           },
           "taxa_ligante": {
             "type": "number",
-            "description": "Taxa de ligante TL (L/m\u00b2)"
+            "description": "Taxa de ligante TL (L/m²)"
           },
           "residuo_emulsao": {
             "type": "number",
-            "description": "Res\u00edduo da emuls\u00e3o R (%)"
+            "description": "Resíduo da emulsão R (%)"
           },
           "taxa_emulsao": {
             "type": "number",
-            "description": "Taxa de emuls\u00e3o TE=TL/R (L/m\u00b2)"
+            "description": "Taxa de emulsão TE=TL/R (L/m²)"
           },
           "taxa_agregado": {
             "type": "number",
-            "description": "Taxa de agregado TA=Tx-TL (kg/m\u00b2)"
+            "description": "Taxa de agregado TA=Tx-TL (kg/m²)"
           }
         }
       }
     },
     "media_taxa_emulsao": {
       "type": "number",
-      "description": "M\u00e9dia da taxa de emuls\u00e3o (L/m\u00b2)"
+      "description": "Média da taxa de emulsão (L/m²)"
     },
     "media_taxa_agregado": {
       "type": "number",
-      "description": "M\u00e9dia da taxa de agregado (kg/m\u00b2)"
+      "description": "Média da taxa de agregado (kg/m²)"
     },
     "media_taxa_mraf": {
       "type": "number",
-      "description": "M\u00e9dia da taxa de MRAF aplicada (kg/m\u00b2)"
+      "description": "Média da taxa de MRAF aplicada (kg/m²)"
     },
     "observacoes": {
       "type": "string"
