@@ -238,8 +238,27 @@ export function sanitizeFormForSave(form) {
     expansao_pct: sanitizeNum(e.expansao_pct),
   }));
 
+  // Limites (caracterização LL/LP/granulometria): campos numéricos digitados
+  // como texto chegam vazios ("") quando o laboratorista preenche só parte do
+  // ensaio — o schema rejeita string vazia em campo number e o salvamento
+  // inteiro falhava. Converte vazios para null, como nas demais seções.
+  const numFieldsLimites = [
+    'higro_solo_umido_capsula_1', 'higro_solo_umido_capsula_2',
+    'higro_solo_seco_capsula_1', 'higro_solo_seco_capsula_2',
+    'higro_peso_capsula_1', 'higro_peso_capsula_2',
+    'amostra_total_umida', 'amostra_total_seca',
+    'amostra_parcial_umida', 'amostra_parcial_seca',
+  ];
+  const cleanLimites = form.limites
+    ? {
+        ...form.limites,
+        ...Object.fromEntries(numFieldsLimites.map(f => [f, sanitizeNum(form.limites[f])])),
+      }
+    : form.limites;
+
   return {
     ...form,
+    limites: cleanLimites,
     umidades: cleanUmidades,
     densidades: cleanDensidades,
     cbr_cilindros: cleanCBR,
