@@ -76,19 +76,15 @@ export function useControleExecucaoServicosActions({
       if (editMode) {
         await atualizarEnsaio('ControleExecucaoServicos', editId, dataToSave);
       } else {
-        const created = await criarEnsaio('ControleExecucaoServicos', dataToSave);
-        // Ao salvar progresso de um registro NOVO, permanece no formulário já
-        // vinculado ao registro criado (?editId=...). Antes, cada "Salvar
-        // Progresso" criava um registro novo — causando relatórios duplicados,
-        // cada um com um serviço.
-        if (!finalizar && created?.id && !created._offline) {
-          clearSavedData();
-          toast({ title: "Progresso salvo!" });
-          navigate(`${createPageUrl("ControleExecucaoServicos")}?editId=${created.id}`, { replace: true });
-          return;
-        }
+        await criarEnsaio('ControleExecucaoServicos', dataToSave);
       }
 
+      // Após salvar (rascunho ou finalizado), retorna à lista de registros para
+      // o usuário confirmar o registro salvo — padrão de todos os ensaios
+      // (useEnsaioActionsBase). A navegação para a lista já impede o problema
+      // de "Salvar Progresso" repetido criar registros duplicados: o usuário
+      // sai do formulário novo e, para editar de novo, reabre o registro
+      // (modo edição), o que atualiza o mesmo registro.
       clearSavedData();
       toast({ title: finalizar ? "Controle finalizado com sucesso!" : "Progresso salvo!" });
       navigate(createPageUrl("MeusEnsaios"));
