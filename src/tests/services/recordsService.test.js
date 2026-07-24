@@ -19,14 +19,16 @@ const { entities } = vi.hoisted(() => {
   });
   const names = [
     'DiarioObra', 'EnsaioCAUQ', 'EnsaioMRAF', 'EnsaioDensidade',
-    'EnsaioDensidadeInSitu', 'EnsaioTaxaPinturaImprimacao', 'ChecklistUsina',
+    'EnsaioDensidadeInSitu', 'EnsaioTaxaPinturaImprimacao', 'EnsaioTaxaInsumos',
+    'ChecklistUsina',
     'ChecklistAplicacao', 'ChecklistMRAF', 'ChecklistConcretagem',
     'ChecklistTerraplanagem', 'ChecklistReciclagem', 'EnsaioSondagem',
     'EnsaioGranulometriaIndividual', 'AcompanhamentoUsinagem',
     'AcompanhamentoCarga', 'EnsaioManchaPendulo', 'EnsaioVigaBenkelman',
     'EnsaioTaxaMRAF', 'BoletimSondagem', 'BoletimSondagemTrado',
     'EnsaioProctor', 'EnsaioRompimentoConcreto', 'GranuMistura',
-    'CertificacaoUsina', 'Obra', 'Project', 'Regional', 'User',
+    'CertificacaoUsina', 'ControleExecucaoServicos',
+    'Obra', 'Project', 'Regional', 'User',
   ];
   const entities = {};
   for (const n of names) entities[n] = make();

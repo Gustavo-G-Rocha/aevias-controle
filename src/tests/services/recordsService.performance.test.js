@@ -25,14 +25,16 @@ const { entities } = vi.hoisted(() => {
   });
   const names = [
     'DiarioObra', 'EnsaioCAUQ', 'EnsaioMRAF', 'EnsaioDensidade',
-    'EnsaioDensidadeInSitu', 'EnsaioTaxaPinturaImprimacao', 'ChecklistUsina',
+    'EnsaioDensidadeInSitu', 'EnsaioTaxaPinturaImprimacao', 'EnsaioTaxaInsumos',
+    'ChecklistUsina',
     'ChecklistAplicacao', 'ChecklistMRAF', 'ChecklistConcretagem',
     'ChecklistTerraplanagem', 'ChecklistReciclagem', 'EnsaioSondagem',
     'EnsaioGranulometriaIndividual', 'AcompanhamentoUsinagem',
     'AcompanhamentoCarga', 'EnsaioManchaPendulo', 'EnsaioVigaBenkelman',
     'EnsaioTaxaMRAF', 'BoletimSondagem', 'BoletimSondagemTrado',
     'EnsaioProctor', 'EnsaioRompimentoConcreto', 'GranuMistura',
-    'CertificacaoUsina', 'Obra', 'Project', 'Regional', 'User',
+    'CertificacaoUsina', 'ControleExecucaoServicos',
+    'Obra', 'Project', 'Regional', 'User',
   ];
   const entities = {};
   for (const n of names) entities[n] = make();
@@ -77,7 +79,7 @@ beforeEach(() => {
 });
 
 describe('recordsService — loadAllRecords performance', () => {
-  it('processa 25 entidades × 500 registros em tempo aceitável (< 2s)', async () => {
+  it('processa todas as entidades × 500 registros em tempo aceitável (< 2s)', async () => {
     const start = performance.now();
     const result = await loadAllRecords();
     const elapsed = performance.now() - start;

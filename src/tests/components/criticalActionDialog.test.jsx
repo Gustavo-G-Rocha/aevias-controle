@@ -27,7 +27,10 @@ describe('confirmações acessíveis de ações críticas', () => {
   });
 
   it('mantém o texto de confirmação legal da assinatura', () => {
+    // O texto de confirmação foi centralizado em constants/ensaioUi.js
+    // (buildSignDescription) — os consumidores importam a partir de lá.
+    expect(read('constants/ensaioUi.js')).toContain('Confirma a assinatura digital do registro');
     ['components/ensaios/EnsaioCard.jsx', 'components/ensaios/TableRowCliente.jsx', 'components/ensaios/TableRowAdmin.jsx']
-      .forEach((path) => expect(read(path)).toContain('Confirma a assinatura digital do registro'));
+      .forEach((path) => expect(read(path)).toContain('buildSignDescription'));
   });
 });

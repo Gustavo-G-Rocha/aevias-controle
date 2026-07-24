@@ -100,15 +100,16 @@ describe('supervisorRecordsService', () => {
     const r = await carregarRegistrosSupervisorService();
 
     expect(carregarRegistrosSupervisor).toHaveBeenCalledWith({});
-    expect(r).toEqual([{ id: 'e1', entityType: 'EnsaioCAUQ' }]);
+    expect(r).toEqual({ records: [{ id: 'e1', entityType: 'EnsaioCAUQ' }], subordinateEmails: [] });
   });
 
-  it('retorna lista vazia quando a resposta vem sem records', async () => {
+  it('retorna listas vazias quando a resposta vem sem records', async () => {
+    const empty = { records: [], subordinateEmails: [] };
     carregarRegistrosSupervisor.mockResolvedValue({ data: {} });
-    expect(await carregarRegistrosSupervisorService()).toEqual([]);
+    expect(await carregarRegistrosSupervisorService()).toEqual(empty);
 
     carregarRegistrosSupervisor.mockResolvedValue({});
-    expect(await carregarRegistrosSupervisorService()).toEqual([]);
+    expect(await carregarRegistrosSupervisorService()).toEqual(empty);
   });
 
   it('propaga erros da backend function (sem engolir)', async () => {

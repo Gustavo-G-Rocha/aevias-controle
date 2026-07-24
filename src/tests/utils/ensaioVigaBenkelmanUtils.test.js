@@ -24,8 +24,8 @@ describe('getInitialForm', () => {
     expect(getInitialForm().nextFaixaId).toBe(2);
   });
 
-  it('cte_viga padrão é 0.01', () => {
-    expect(getInitialForm().cte_viga).toBe(0.01);
+  it('cte_viga padrão é 2.0000 (constante da viga)', () => {
+    expect(getInitialForm().cte_viga).toBe('2.0000');
   });
 
   it('status padrão é rascunho', () => {
@@ -85,9 +85,9 @@ describe('calcularLado', () => {
     expect(result).toEqual(ladoBase);
   });
 
-  it('cte_viga inválido usa 0.01 como fallback', () => {
+  it('cte_viga inválido usa 2 como fallback', () => {
     const result = calcularLado(ladoBase, 'leitura_final', 3, 'abc');
-    expect(result.deflexao).toBeCloseTo(0.02);
+    expect(result.deflexao).toBeCloseTo(4); // diferença=2, fallback cte=2
   });
 
   it('não muta o objeto original', () => {
@@ -96,9 +96,9 @@ describe('calcularLado', () => {
     expect(original.diferenca).toBe(0);
   });
 
-  it('cte_viga zero usa fallback 0.01', () => {
+  it('cte_viga zero usa fallback 2', () => {
     const result = calcularLado(ladoBase, 'leitura_final', 3, 0);
-    expect(result.deflexao).toBeCloseTo(0.02); // diferença=2, fallback cte=0.01
+    expect(result.deflexao).toBeCloseTo(4); // diferença=2, fallback cte=2
   });
 });
 
