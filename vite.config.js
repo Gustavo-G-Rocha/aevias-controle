@@ -5,6 +5,9 @@ import { defineConfig } from 'vite'
 // https://vite.dev/config/
 export default defineConfig({
   logLevel: 'error', // Suppress warnings, only show errors
+  // Trata arquivos .md como assets (URL) — usados pela tela de Documentação
+  // do Sistema para download dos docs de src/docs sem parse como JS.
+  assetsInclude: ['**/*.md'],
   // Pré-empacota dependências para evitar 504 "Outdated Optimize Dep" em testes E2E.
   // Sem isso, páginas lazy-loaded (ex: EnsaioCAUQ) causam re-otimização sob demanda,
   // invalidando o cache anterior e quebrando o import dinâmico.

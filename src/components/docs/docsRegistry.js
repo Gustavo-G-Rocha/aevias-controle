@@ -1,5 +1,18 @@
-// Registro dos documentos de src/docs via Vite glob (conteúdo raw, lazy).
-const modules = import.meta.glob('/src/docs/**/*.md', { as: 'raw' });
+// Registro dos documentos de src/docs via Vite glob.
+// Com assetsInclude (**/*.md) no vite.config.js, cada import resolve para a
+// URL do asset; o conteúdo é obtido via fetch — funciona em dev e em produção.
+const assetModules = import.meta.glob('/src/docs/**/*.md');
+
+const modules = Object.fromEntries(
+  Object.entries(assetModules).map(([path, load]) => [
+    path,
+    async () => {
+      const mod = await load();
+      const res = await fetch(mod.default);
+      return res.text();
+    },
+  ])
+);
 
 export const FOLDER_ORDER = ['raiz', 'arquitetura', 'governanca', 'negocio', 'testes'];
 
