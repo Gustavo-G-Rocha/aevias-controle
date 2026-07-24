@@ -28,12 +28,12 @@ export function useBoletimSondagemData() {
 
   const obras = useMemo(() => {
     if (!auxData?.obras || !user) return [];
-    const accessLevel = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
-    const exigeEmAndamento = accessLevel === 'user' || accessLevel === 'funcionarios_cliente';
+    // Sondagem é atividade de investigação pré-construção: a obra pode estar
+    // em planejamento ou em andamento quando o trabalho de campo ocorre.
+    // Por isso não restringimos por status — apenas pelo acesso regional
+    // (filtrarObrasPorAcessoRegional) e pelo tipo_obra === 'sondagem'.
     const porAcesso = filtrarObrasPorAcessoRegional(auxData.obras, regionais, user);
-    return porAcesso.filter(
-      o => o.tipo_obra === 'sondagem' && (!exigeEmAndamento || o.status === 'em_andamento')
-    );
+    return porAcesso.filter(o => o.tipo_obra === 'sondagem');
   }, [auxData?.obras, regionais, user]);
 
   // Ref para acessar valores atualizados dentro do callback sem re-disparar o effect

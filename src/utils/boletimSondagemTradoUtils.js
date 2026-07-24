@@ -183,10 +183,9 @@ export function calcularDensidade(d) {
  * @returns {Array}
  */
 export function filtrarObrasParaTrado(obrasData, regionaisData, currentUser) {
-  const accessLevel = currentUser.access_level || (currentUser.role === 'admin' ? 'admin' : 'user');
-  const exigeEmAndamento = accessLevel === 'user' || accessLevel === 'funcionarios_cliente';
+  // Sondagem é atividade de investigação pré-construção: a obra pode estar
+  // em planejamento ou em andamento quando o trabalho de campo ocorre.
+  // Não restringimos por status — apenas pelo acesso regional e tipo_obra.
   const porAcesso = filtrarObrasPorAcessoRegional(obrasData, regionaisData, currentUser);
-  return porAcesso.filter(
-    o => o.tipo_obra === 'sondagem' && (!exigeEmAndamento || o.status === 'em_andamento')
-  );
+  return porAcesso.filter(o => o.tipo_obra === 'sondagem');
 }
