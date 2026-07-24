@@ -9,6 +9,7 @@ import { createPageUrl } from "@/utils";
 import { obterEnsaioById } from "@/services/ensaiosService";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { getInitialFormData, getDensidadeInicial, normalizarDensidades } from "@/utils/boletimSondagemUtils";
+import { filtrarObrasPorAcessoRegional } from "@/utils/regionalFilter";
 
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
@@ -28,20 +29,11 @@ export function useBoletimSondagemData() {
   const obras = useMemo(() => {
     if (!auxData?.obras || !user) return [];
     const accessLevel = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
-    if (accessLevel === 'user' || accessLevel === 'funcionarios_cliente') {
-      const emailLower = user.email.toLowerCase();
-      const regionaisIds = regionais
-        .filter(r =>
-          (r.laboratoristas_responsaveis || []).some(e => e.toLowerCase() === emailLower) ||
-          (r.salas_tecnicas_responsaveis || []).some(e => e.toLowerCase() === emailLower)
-        )
-        .map(r => r.id);
-      const regionaisSet = new Set(regionaisIds);
-      return regionaisIds.length > 0
-        ? auxData.obras.filter(o => regionaisSet.has(o.regional_id) && o.status === 'em_andamento' && o.tipo_obra === 'sondagem')
-        : [];
-    }
-    return auxData.obras.filter(o => o.tipo_obra === 'sondagem');
+    const exigeEmAndamento = accessLevel === 'user' || accessLevel === 'funcionarios_cliente';
+    const porAcesso = filtrarObrasPorAcessoRegional(auxData.obras, regionais, user);
+    return porAcesso.filter(
+      o => o.tipo_obra === 'sondagem' && (!exigeEmAndamento || o.status === 'em_andamento')
+    );
   }, [auxData?.obras, regionais, user]);
 
   // Ref para acessar valores atualizados dentro do callback sem re-disparar o effect
