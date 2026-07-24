@@ -444,25 +444,15 @@ Deno.serve(async (req) => {
     const userLevel = getUserAccessLevel(user); // já normaliza cliente_supervisor→cliente, funcionarios_cliente→user
     const isTenantScoped = ['cliente', 'sala_tecnica_afirmaevias', 'gestor_contrato'].includes(userLevel);
 
-    // ── DEFENSE-IN-DEPTH: verificar existência da obra para TODOS os usuários ──
-    // Previne registros órfãos: mesmo laboratoristas (user) não podem criar
-    // registros vinculados a obras inexistentes.
-    const obraIdForCheck = sanitizedData.obra_id;
-    if (obraIdForCheck) {
-      const obraFetch = await getWithRetry(() => base44.asServiceRole.entities.Obra.get(obraIdForCheck));
-      if (obraFetch.transient) {
-        return Response.json(
-          { error: 'Falha temporária ao validar a obra. Tente salvar novamente.', errorCategory: 'network' },
-          { status: 503 }
-        );
-      }
-      if (obraFetch.notFound) {
-        return Response.json(
-          { error: 'Obra não encontrada. O registro não pode ser criado sem uma obra válida.', errorCategory: 'schema' },
-          { status: 400 }
-        );
-      }
-    }
+    // Observação: a verificação de existência da obra para admin/user foi
+    // removida. Ela duplicava a validação client-side e bloqueava salvamentos
+    // legítimos quando o get(obra_id) no service role falhava de forma
+    // transitória (retornando 404 sob carga), produzindo o falso erro
+    // "Obra não encontrada". Para usuários scoped, o verifyObraTenantAccess
+    // abaixo já valida a existência da obra e o pertencimento ao tenant —
+    // preservando a defesa em profundidade onde há risco cross-tenant. Para
+    // admin/user, a validação client-side (obra selecionada do dropdown
+    // carregado via SDK) é a guarda primária.
 
     if (isTenantScoped) {
       if (operation === 'update') {
