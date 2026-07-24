@@ -26,6 +26,7 @@ const EnsaioTaxaInsumos = lazy(() => import('@/pages/EnsaioTaxaInsumos'));
 const RelatorioTaxaInsumos = lazy(() => import('@/pages/RelatorioTaxaInsumos'));
 const ReportarErro = lazy(() => import('@/pages/ReportarErro'));
 const VerificarAssinatura = lazy(() => import('@/pages/VerificarAssinatura'));
+const DocumentacaoSistema = lazy(() => import('@/pages/DocumentacaoSistema'));
 
 // Fallback leve exibido enquanto o chunk da página lazy é baixado.
 // O Layout (sidebar/header/bottom-nav) já está renderizado — só o conteúdo suspende.
@@ -84,6 +85,11 @@ function AuthenticatedApp() {
         <Route path="/historico-auditoria" element={
           <LayoutWrapper currentPageName="HistoricoAuditoria">
             <HistoricoAuditoria />
+          </LayoutWrapper>
+        } />
+        <Route path="/DocumentacaoSistema" element={
+          <LayoutWrapper currentPageName="DocumentacaoSistema">
+            <DocumentacaoSistema />
           </LayoutWrapper>
         } />
         <Route path="/ReportarErro" element={
