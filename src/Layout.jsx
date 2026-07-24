@@ -37,15 +37,21 @@ const AppLayout = ({ children, currentPageName }) => {
   // causando "Failed to execute 'removeChild' on 'Node'".
   const pendingUrlRef = useRef(null);
   const handleEnsaioSelect = useCallback((url) => {
-    pendingUrlRef.current = url || null;
+    // Fecha o diálogo e navega em seguida. A navegação é adiada para depois
+    // do commit que fecha o portal do Radix (evita "removeChild" durante o
+    // teardown). Antes dependia do onCloseAutoFocus do Radix, que é frágil
+    // em automação headless (pode não disparar) — o diálogo fechava sem
+    // navegar. setTimeout(0) roda de forma confiável após o commit, sem
+    // depender de eventos de foco do Radix.
     setIsCreateEnsaioOpen(false);
-  }, []);
-  const handleDialogCloseAutoFocus = useCallback((event) => {
-    if (pendingUrlRef.current) {
-      event.preventDefault();
-      const url = pendingUrlRef.current;
-      pendingUrlRef.current = null;
-      navigate(url);
+    if (url) {
+      pendingUrlRef.current = url;
+      setTimeout(() => {
+        if (pendingUrlRef.current) {
+          pendingUrlRef.current = null;
+          navigate(url);
+        }
+      }, 0);
     }
   }, [navigate]);
 
@@ -105,7 +111,6 @@ const AppLayout = ({ children, currentPageName }) => {
       <Dialog open={isCreateEnsaioOpen} onOpenChange={setIsCreateEnsaioOpen}>
         <DialogContent
           className="max-w-2xl max-h-[85vh] overflow-hidden"
-          onCloseAutoFocus={handleDialogCloseAutoFocus}
         >
           <DialogHeader>
             <DialogTitle className="text-xl" style={{ color: 'var(--color-text)' }}>Iniciar Novo Registro</DialogTitle>
