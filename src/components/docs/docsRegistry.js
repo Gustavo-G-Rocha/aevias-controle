@@ -1,5 +1,5 @@
 // Registro dos documentos de src/docs via Vite glob (conteúdo raw, lazy).
-const modules = import.meta.glob('/src/docs/**/*.md', { query: '?raw', import: 'default' });
+const modules = import.meta.glob('/src/docs/**/*.md', { as: 'raw' });
 
 export const FOLDER_ORDER = ['raiz', 'arquitetura', 'governanca', 'negocio', 'testes'];
 
