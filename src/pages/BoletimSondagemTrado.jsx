@@ -47,7 +47,10 @@ export default function BoletimSondagemTradoPage() {
             <form
               onSubmit={handleSubmit}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.type !== 'submit')
+                // Previne Enter de submeter o formulário apenas em campos de texto.
+                // Botões (incluindo o trigger do seletor de Obra) e textareas
+                // não são afetados — assim o seletor abre normalmente pelo teclado.
+                if (e.key === 'Enter' && e.target.tagName === 'INPUT')
                   e.preventDefault();
               }}
               className="space-y-6"
