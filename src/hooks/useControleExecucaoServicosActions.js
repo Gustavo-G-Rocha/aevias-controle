@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
+import { QUERY_KEYS } from "@/hooks/useQueryData";
 import { createPageUrl } from "@/utils";
 import {
   addServico,
@@ -19,6 +21,7 @@ export function useControleExecucaoServicosActions({
   editMode, editId, clearSavedData,
 }) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
 
   const handleObraChange = (obraId) => {
@@ -78,6 +81,11 @@ export function useControleExecucaoServicosActions({
       } else {
         await criarEnsaio('ControleExecucaoServicos', dataToSave);
       }
+
+      // Invalida o cache de registros compartilhado (Dashboard + MeusEnsaios).
+      // Sem isso, o staleTime de 10min do allRecords reutiliza o cache antigo e
+      // o registro recém-salvo não aparece na lista após a navegação.
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords });
 
       // Após salvar (rascunho ou finalizado), retorna à lista de registros para
       // o usuário confirmar o registro salvo — padrão de todos os ensaios
