@@ -435,3 +435,122 @@ Padrões arquiteturais documentados em `src/docs/governanca/` (ADRs): páginas o
 4. **Relatórios**: 1 documento A4 imprimível por registro + consolidado regional virtual; assinatura com QR de verificação pública.
 5. **Segurança**: aprovações/assinaturas SEMPRE no backend, com reautenticação (senha/TOTP), evidências (IP, device, geo) e entidades append-only.
 6. **Offline**: fila de sincronização com resolução de conflitos e auditoria da origem offline.
+
+---
+
+## 13. REGISTRO CENTRAL DE TIPOS (`src/components/ensaios/ensaioMappers.jsx`) — fonte única de verdade
+
+O nome do app é **"AEVIAS CONTROLE"** (`base44/config.jsonc`).
+
+Cada tipo de registro tem UMA entrada no objeto `ENSAIO_CONFIG` com: nome exibido, label curto, ícone, **cor de identidade** (usada em badges/cards/gráficos), **campo de data** do registro, **página de relatório** e funções opcionais (`localInfo`, `responsavel`, `hasEmpreiteira`, `ncExtractor`). Adicionar um tipo novo = adicionar uma entrada aqui (+ entidade + formulário + relatório + registro em pages.config).
+
+| Entidade | Campo de data | Relatório | Cor |
+|---|---|---|---|
+| DiarioObra | data | RelatorioDiario | #BFCF99 |
+| EnsaioCAUQ | data_ensaio | RelatorioCAUQ | #00233B |
+| EnsaioMRAF | data_ensaio | RelatorioEnsaio?tipo=mraf | #4B5563 |
+| EnsaioDensidade | extraction_date | RelatorioEnsaio?tipo=densidade | #566E3D |
+| EnsaioDensidadeInSitu | data_ensaio | RelatorioDensidadeInSitu | #6B8E23 |
+| EnsaioTaxaPinturaImprimacao | data_ensaio | RelatorioTaxaPinturaImprimacao | #4682B4 |
+| ChecklistUsina | data | RelatorioChecklist | #FBBF24 |
+| ChecklistAplicacao | data | RelatorioChecklistAplicacao | #800020 |
+| ChecklistMRAF | data | RelatorioChecklistMRAF | #4A90E2 |
+| ChecklistConcretagem | data | RelatorioChecklistConcretagem | #8B4513 |
+| ChecklistTerraplanagem | data | RelatorioChecklistTerraplanagem | #228B22 |
+| ChecklistReciclagem | data | RelatorioChecklistReciclagem | #854d0e |
+| EnsaioSondagem | data | RelatorioSondagem | #4682B4 |
+| EnsaioGranulometriaIndividual | data_ensaio | RelatorioGranulometriaIndividual | #9B59B6 |
+| AcompanhamentoUsinagem | data | RelatorioAcompanhamentoUsinagem | #1ABC9C |
+| AcompanhamentoCarga | data | RelatorioAcompanhamentoCarga | #E67E22 |
+| EnsaioManchaPendulo | data_ensaio | RelatorioManchaPendulo | #E74C3C |
+| EnsaioVigaBenkelman | data_realizacao | RelatorioVigaBenkelman | #3498DB |
+| EnsaioTaxaMRAF | data_ensaio | RelatorioTaxaMRAF | #4682B4 |
+| EnsaioTaxaInsumos | data_ensaio | RelatorioTaxaInsumos | #0891B2 |
+| BoletimSondagem | data | RelatorioBoletimSondagem | #6A5ACD |
+| BoletimSondagemTrado | data | RelatorioBoletimSondagemTrado | #708090 |
+| EnsaioProctor | data_ensaio | RelatorioProctor | #DAA520 |
+| EnsaioRompimentoConcreto | data_ensaio | RelatorioRompimentoConcreto | #B22222 |
+| GranuMistura | data_ensaio | RelatorioGranuMistura | #9932CC |
+| ControleExecucaoServicos | data | RelatorioControleExecucaoServicos | #2E8B57 |
+| CertificacaoUsina | data_vistoria | RelatorioCertificacaoUsina | #7C3AED |
+
+### 13.1 NCs AUTOMÁTICAS por não-conformidade (regra de negócio importante)
+
+Além das NCs digitadas manualmente, o sistema **extrai NCs automaticamente** dos campos de conformidade (`ncExtractor`):
+- **ChecklistUsina** (controle CAUQ): Granulometria, Volume de Vazios, RBV, RTCD 25°C, Estabilidade, Fluência, Extração de Ligante (Rotarex/Soxhlet) — cada item `conforme === false` vira NC.
+- **ChecklistAplicacao**: Taxa de Pintura e Taxa de Pintura Residual não conformes.
+- **ChecklistMRAF**: Taxa de Aplicação, Resíduo da Emulsão, Espessura da Camada.
+- **ChecklistConcretagem**: Slump Test e Espessura da Camada **por carga** (identifica o nº da carga).
+- **EnsaioManchaPendulo**: `condicao_conformidade === "NÃO CONFORME"`.
+- **EnsaioVigaBenkelman**: qualquer deflexão (bordo esq./eixo/bordo dir.) acima da `def_admissivel` — lista as estacas afetadas.
+
+---
+
+## 14. ROTEAMENTO — DETALHES DE IMPLEMENTAÇÃO
+
+- `src/pages.config.js` é **manual** (não auto-gerado): lazy import + entrada no objeto `PAGES` + (se relatório) entrada em `REPORT_PAGES`. `mainPage: "Dashboard"` define a rota `/`.
+- Rotas **explícitas fora do loop** em `App.jsx`: `/EnsaioTaxaInsumos`, `/RelatorioTaxaInsumos`, `/historico-auditoria`, `/ReportarErro` e a pública `/verificar-assinatura`.
+- Rotas protegidas são aninhadas em `ProtectedRoute` **e** `TwoFactorGate` (usuário com TOTP ativo precisa validar o código a cada sessão antes de acessar qualquer tela).
+- `src/lib/reportPages.js`: `REPORT_PAGES` (29 páginas que renderizam com `.report-scope`, sem sidebar) e `FORM_PAGE_PREFIXES` (Checklist/Ensaio/Diario/Boletim/Acompanhamento/ControleExecucao — páginas onde o pull-to-refresh é desabilitado para não atrapalhar a digitação).
+- Code-splitting: todas as páginas são `React.lazy` com **retry automático** (`lazyWithRetry` — recarrega chunk que falhou após deploy) + `prefetchFieldPages` pré-carrega as páginas de campo após o login.
+- Zonas de abas mobile (`TAB_ZONES`): home, regionais, projects, registros — cada aba do BottomNav mantém sua própria pilha de navegação (comportamento de app nativo, com tratamento do botão voltar do Android).
+
+---
+
+## 15. AUTENTICAÇÃO E SESSÃO — DETALHES (`src/lib/AuthContext.jsx`)
+
+- Boot do app: consulta public settings → valida token → `auth.me()` → dispara em background a **preparação do cache offline** e o prefetch das páginas de campo.
+- **Modo offline "WhatsApp"**: sem rede + token presente → o app abre usando o **usuário em cache** (`getDataCache('currentUser')`), sem validar com o servidor. Falha de rede sem status HTTP (sinal fraco no mobile) também cai no cache. 401/403 real → exige login.
+- **Timeout de sessão**: logout automático após **8 horas de inatividade**, com modal de aviso e contagem regressiva de 60s (botões "continuar conectado" / "sair agora"). Logout audita o motivo (`manual` | `inactivity`).
+- Erros de app-level tratados: `auth_required`, `user_not_registered` (tela própria `UserNotRegisteredError`).
+
+---
+
+## 16. OBSERVABILIDADE, QUALIDADE E TESTES
+
+- **Pipeline de erros**: `ErrorBoundary` (React) + `window.onerror` + `unhandledrejection` → categorização (`errorCategorizer`) → gravação em `ErrorLog` com página, user-agent e contexto. `logger` com gate de produção (não loga em prod).
+- **Analytics de navegação**: `NavigationTracker` registra trocas de rota.
+- **Testes** (vitest + Playwright):
+  - `src/tests/security/`: sanitização XSS/SSTI, hash de integridade e tamper, assinatura eletrônica, RLS/permissões de edição, tenant, força de senha, 2FA, append-only.
+  - `src/tests/integration/`: fluxos críticos, ciclo de vida do ensaio, aprovação+assinatura, workflow offline, resolução de conflitos, integridade referencial.
+  - `src/tests/utils|hooks|services|components/`: unitários por módulo (cálculos de cada ensaio, mappers, validações).
+  - `src/tests/performance/`: benchmarks de sincronização e escalabilidade.
+  - `e2e/`: Playwright com mock de API (fluxo crítico de ensaio).
+- **Governança** (`src/docs/governanca/`): ADR-001 páginas orquestradoras, ADR-002 lógica em hooks, ADR-003 camada de services, ADR-004 arquitetura offline, ADR-005 testes obrigatórios em refatorações; políticas de sanitização XSS e auditoria; convenções de código; roadmap arquitetural.
+- Script `scripts/check-pages-registration.js` valida que toda página está registrada no roteamento.
+
+---
+
+## 17. DESIGN SYSTEM (resumo de `src/index.css` + `tailwind.config.js`)
+
+- **Identidade**: navy `#00233B` (primária), verde-oliva `#BFCF99` (secundária/destaques), fundo off-white `#F0F2F5`. Fontes: **Exo** (títulos) e **Poppins** (corpo).
+- Tokens CSS semânticos (`--color-*`, `--radius-*`, `--shadow-*`, `--space-*`) em `:root` e `.dark`; tokens shadcn em HSL; sidebar escura fixa.
+- **Dark mode** por classe, com camada de "remap" para superfícies claras fixas (formulários usam bg-white/slate-50 e recebem texto escuro restaurado).
+- **`.report-scope`**: relatórios SEMPRE claros (fundo branco), mesmo em dark mode — reset completo dos tokens + neutralização dos remaps.
+- **Impressão**: `@page` A4 com margem 10mm, `print-color-adjust: exact`, `[data-print-container]` sem padding, classe `print:hidden` para toolbars.
+- **Mobile**: fonte global 14px, área de toque mínima 44px (WCAG 2.1 AA, exceto icon-buttons compactos), scrollbars ocultas, containers de formulário esticados à viewport, safe-areas (notch) tratadas por componente.
+- Acessibilidade: focus-visible global com outline do token `--ring`.
+
+---
+
+## 18. CHECKLIST DE PARIDADE PARA A REESCRITA
+
+Funcionalidades fáceis de esquecer que o sistema atual possui:
+1. NCs automáticas por conformidade (§13.1) + sincronização de NCs via workflows.
+2. Verificação pública de assinatura por QR Code (rota sem login).
+3. Step-up 2FA na aprovação/assinatura (não só no login).
+4. Hash de integridade que EXCLUI campos administrativos (permite aprovar sem invalidar assinatura anterior).
+5. Auditoria com hash encadeado (tamper-evident) incluindo eventos de login/logout/exportação.
+6. Modo offline completo: abrir o app sem rede (usuário em cache), criar/editar registros, fotos pendentes, fila de sync com resolução de conflitos server-authoritative.
+7. Diálogo de confirmação de veracidade ao finalizar registro.
+8. Registro reprovado volta a ser editável e marca `was_rejected` (histórico visível).
+9. Transferência de laboratorista entre obras/regionais com fluxo de aprovação.
+10. Produtividade cruzando registros criados × marcações manuais (OK/N.A.).
+11. Extração de dados de PDF de projeto via LLM.
+12. Exportação automática de registros para Google Drive (workflows).
+13. Etiquetas de coleta/umidade e resumos personalizados tabulares.
+14. Timeout de sessão de 8h com aviso; auditoria de inatividade.
+15. Pull-to-refresh desabilitado em formulários; pilhas de navegação por aba no mobile.
+16. Lazy loading com retry de chunk pós-deploy + prefetch de páginas de campo.
+17. Logo da regional impressa no cabeçalho dos relatórios.
+18. Relatório unificado é virtual — hash server-side reconstruído do banco (nunca confiar no cliente).
