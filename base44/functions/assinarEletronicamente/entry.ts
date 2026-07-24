@@ -1,5 +1,10 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
 import { getTwoFactorConfig, verifyTwoFactorForUser } from '../../shared/totp.ts';
+import {
+  extractFilters,
+  buildCompositeId,
+  reconstructRecords,
+} from '../../shared/relatorioUnificadoRecon.ts';
 
 /**
  * Backend function: assinarEletronicamente
@@ -294,17 +299,39 @@ Deno.serve(async (req) => {
 
     // ── BUSCAR REGISTRO ──
     // RelatorioUnificado é um relatório virtual consolidado — não há
-    // registro de entidade individual. Usa reportData do payload como
-    // representação do documento para hash e verificação de tenant.
+    // registro de entidade individual. O conteúdo assinado NUNCA vem do
+    // cliente: o backend reconstrói o relatório a partir dos filtros
+    // (obra_id + período + tipos) consultando os registros reais do
+    // banco, e calcula o hash de integridade sobre esse conteúdo.
+    // Isso impede falsificação de dados (CWE-345 / OWASP A01).
     let existingRecord: any;
+    let reconRecords: any[] | null = null;
     if (entityName === 'RelatorioUnificado') {
-      existingRecord = reportData;
-      if (!existingRecord || !existingRecord.obra_id) {
+      const filters = extractFilters(reportData);
+      if (!filters) {
         return Response.json(
-          { error: 'Dados do relatório (reportData.obra_id) são obrigatórios', errorCategory: 'schema' },
+          { error: 'Filtros do relatório (obra_id, data_inicio, data_fim, tipos) são obrigatórios e válidos', errorCategory: 'schema' },
           { status: 400 }
         );
       }
+      // O recordId (compositeId) deve corresponder exatamente aos filtros
+      // informados — previne assinar um escopo diferente do declarado.
+      if (buildCompositeId(filters) !== recordId) {
+        return Response.json(
+          { error: 'Identificador do relatório não corresponde aos filtros informados', errorCategory: 'schema' },
+          { status: 400 }
+        );
+      }
+      try {
+        reconRecords = await reconstructRecords(base44, filters);
+      } catch {
+        return Response.json(
+          { error: 'Falha ao reconstruir o conteúdo do relatório', errorCategory: 'unknown' },
+          { status: 500 }
+        );
+      }
+      // Record sintético para verificação de tenant (apenas obra_id é usado).
+      existingRecord = { obra_id: filters.obra_id };
     } else {
       try {
         existingRecord = await base44.asServiceRole.entities[entityName].get(recordId);
@@ -398,7 +425,12 @@ Deno.serve(async (req) => {
     }
 
     // ── COMPUTAR HASH DE INTEGRIDADE ──
-    const integrityHash = await computeIntegrityHash(existingRecord);
+    // Para RelatorioUnificado, o hash é calculado sobre os registros reais
+    // reconstruídos do banco (conteúdo do relatório), nunca sobre dados do
+    // cliente. Para entidades persistentes, sobre o registro buscado.
+    const integrityHash = entityName === 'RelatorioUnificado'
+      ? await computeIntegrityHash(reconRecords)
+      : await computeIntegrityHash(existingRecord);
     const now = new Date().toISOString();
     const ipAddress = extractIpAddress(req);
     const deviceInfo = extractDeviceInfo(req);
