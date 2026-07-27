@@ -55,7 +55,7 @@ function SelectTrigger({ className, children, ...props }) {
   // garante que o trigger sempre combine com o modo em que o Select renderizou.
   const context = React.useContext(MobileSelectContext)
   if (!context) return <Desktop.SelectTrigger className={className} {...props}>{children}</Desktop.SelectTrigger>
-  return <DrawerTrigger asChild disabled={context?.disabled}><button type="button" className={cn("flex min-h-11 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-left text-sm shadow-sm disabled:cursor-not-allowed disabled:opacity-50", className)} {...props}>{children}<ChevronDown className="h-4 w-4 opacity-50" /></button></DrawerTrigger>
+  return <DrawerTrigger asChild disabled={context?.disabled}><button type="button" aria-haspopup="listbox" aria-expanded={context?.open} className={cn("flex min-h-11 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-left text-sm shadow-sm disabled:cursor-not-allowed disabled:opacity-50", className)} {...props}>{children}<ChevronDown className="h-4 w-4 opacity-50" /></button></DrawerTrigger>
 }
 
 function SelectValue({ placeholder = "Selecione" }) {
@@ -75,14 +75,14 @@ function SelectContent({ children, className, title = "Selecione uma opção", .
   // cause "removeChild" DOM exceptions. Deferring until first open avoids
   // the conflict while preserving the open/close animation afterward.
   if (!context.hasOpened) return null
-  return <DrawerContent className="max-h-[75vh] pb-[env(safe-area-inset-bottom)]"><DrawerHeader><DrawerTitle>{title}</DrawerTitle></DrawerHeader><div className={cn("overflow-y-auto px-3 pb-4", className)}>{children}</div></DrawerContent>
+  return <DrawerContent className="max-h-[75vh] pb-[env(safe-area-inset-bottom)]"><DrawerHeader><DrawerTitle>{title}</DrawerTitle></DrawerHeader><div role="listbox" aria-label={title} className={cn("overflow-y-auto px-3 pb-4", className)}>{children}</div></DrawerContent>
 }
 
 function SelectItem({ value, children, disabled, className, ...props }) {
   const context = React.useContext(MobileSelectContext)
   if (!context) return <Desktop.SelectItem value={value} disabled={disabled} className={className} {...props}>{children}</Desktop.SelectItem>
   const selected = context?.value === value
-  return <DrawerClose asChild><button type="button" disabled={disabled} onClick={() => context?.onValueChange?.(value)} className={cn("flex min-h-12 w-full items-center justify-between rounded-lg px-3 py-3 text-left text-sm hover:bg-accent disabled:opacity-50", selected && "bg-accent font-medium", className)} {...props}><span>{children}</span>{selected && <Check className="h-5 w-5" />}</button></DrawerClose>
+  return <DrawerClose asChild><button type="button" role="option" aria-selected={selected} disabled={disabled} onClick={() => context?.onValueChange?.(value)} className={cn("flex min-h-12 w-full items-center justify-between rounded-lg px-3 py-3 text-left text-sm hover:bg-accent disabled:opacity-50", selected && "bg-accent font-medium", className)} {...props}><span>{children}</span>{selected && <Check className="h-5 w-5" />}</button></DrawerClose>
 }
 SelectItem.mobileSelectItem = true
 
