@@ -24,7 +24,9 @@ export function useRelatorioDiarioActions() {
       toast({ title: 'PDF baixado com sucesso!' });
     } catch (e) {
       toast({ title: 'Falha ao gerar PDF. Abrindo impressão.', variant: 'destructive' });
-      window.print();
+      // Atrasa o window.print() para o React renderizar o toast de erro
+      // antes que o diálogo de impressão (síncrono/bloqueante) abra.
+      setTimeout(() => window.print(), 300);
     } finally {
       setDownloading(false);
     }
