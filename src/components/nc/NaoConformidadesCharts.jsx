@@ -9,6 +9,8 @@ const AXIS = 'var(--color-text-muted)';
 const tooltipStyle = { backgroundColor: 'var(--color-surface)', color: 'var(--color-text)', borderRadius: '8px', border: '1px solid var(--color-border)' };
 const legendFmt = (v) => <span style={{ color: 'var(--color-text)', fontSize: 12 }}>{v}</span>;
 const smallLegendFmt = (v) => <span style={{ color: 'var(--color-text)', fontSize: 11 }}>{v}</span>;
+// Altura adaptativa: ~24px por item de legenda + 250px fixos para a pizza.
+const pieHeight = (n) => Math.max(280, 250 + n * 24);
 
 const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
   if (percent < 0.04) return null;
@@ -79,7 +81,7 @@ export default function NaoConformidadesCharts({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard title="Status dos RNCs" icon={FileText} subtitle="clique para filtrar">
           {dadosStatusRNC.length > 0 ? (
-            <ResponsiveContainer width="100%" height={380}>
+            <ResponsiveContainer width="100%" height={pieHeight(dadosStatusRNC.length)}>
               <PieChart>
                 <Pie data={dadosStatusRNC} cx="50%" cy="42%" innerRadius={60} outerRadius={100} dataKey="value" labelLine={false} label={<CustomLabel />} onClick={onStatusClick} style={{ cursor: 'pointer' }}>
                   {dadosStatusRNC.map((e, i) => <Cell key={i} fill={e.color} opacity={filtroStatus && filtroStatus !== e.statusKey ? 0.3 : 1} />)}
@@ -88,12 +90,12 @@ export default function NaoConformidadesCharts({
                 <Legend formatter={legendFmt} />
               </PieChart>
             </ResponsiveContainer>
-          ) : <EmptyChart text="Nenhum RNC para os filtros selecionados" height={380} />}
+          ) : <EmptyChart text="Nenhum RNC para os filtros selecionados" height={pieHeight(dadosStatusRNC.length)} />}
         </ChartCard>
 
         <ChartCard title="Parâmetros Não Conformes" icon={ClipboardList} subtitle="checklists • clique para filtrar">
           {dadosParametros.length > 0 ? (
-            <ResponsiveContainer width="100%" height={400}>
+            <ResponsiveContainer width="100%" height={pieHeight(dadosParametros.length)}>
               <PieChart>
                 <Pie data={dadosParametros} cx="50%" cy="42%" innerRadius={60} outerRadius={100} dataKey="value" labelLine={false} label={<CustomLabel />} onClick={onParametroClick} style={{ cursor: 'pointer' }}>
                   {dadosParametros.map((e, i) => <Cell key={i} fill={e.color} opacity={filtroParametro && filtroParametro !== e.name ? 0.3 : 1} />)}
@@ -102,7 +104,7 @@ export default function NaoConformidadesCharts({
                 <Legend formatter={smallLegendFmt} />
               </PieChart>
             </ResponsiveContainer>
-          ) : <EmptyChart text="Nenhuma NC de checklist para os filtros" height={400} />}
+          ) : <EmptyChart text="Nenhuma NC de checklist para os filtros" height={pieHeight(dadosParametros.length)} />}
         </ChartCard>
       </div>
 
@@ -110,7 +112,7 @@ export default function NaoConformidadesCharts({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard title="NCs por Obra" icon={AlertTriangle} subtitle="RNCs + Checklists • clique para filtrar">
           {dadosPorObra.length > 0 ? (
-            <ResponsiveContainer width="100%" height={460}>
+            <ResponsiveContainer width="100%" height={pieHeight(dadosPorObra.length)}>
               <PieChart>
                 <Pie data={dadosPorObra} cx="50%" cy="40%" innerRadius={65} outerRadius={110} dataKey="value" labelLine={false} label={<CustomLabel />} onClick={onObraClick} style={{ cursor: 'pointer' }}>
                   {dadosPorObra.map((e, i) => <Cell key={i} fill={e.color} opacity={filtroObraId && filtroObraId !== e.obraId ? 0.3 : 1} />)}
@@ -119,12 +121,12 @@ export default function NaoConformidadesCharts({
                 <Legend formatter={smallLegendFmt} />
               </PieChart>
             </ResponsiveContainer>
-          ) : <EmptyChart text="Nenhuma NC para os filtros selecionados" height={460} />}
+          ) : <EmptyChart text="Nenhuma NC para os filtros selecionados" height={pieHeight(dadosPorObra.length)} />}
         </ChartCard>
 
         <ChartCard title="NCs por Empreiteira" icon={HardHat} subtitle="obras de supervisão • clique para filtrar">
           {dadosPorEmpreiteira.length > 0 ? (
-            <ResponsiveContainer width="100%" height={460}>
+            <ResponsiveContainer width="100%" height={pieHeight(dadosPorEmpreiteira.length)}>
               <PieChart>
                 <Pie data={dadosPorEmpreiteira} cx="50%" cy="40%" innerRadius={65} outerRadius={110} dataKey="value" labelLine={false} label={<CustomLabel />} onClick={onEmpreiteiraClick} style={{ cursor: 'pointer' }}>
                   {dadosPorEmpreiteira.map((e, i) => <Cell key={i} fill={e.color} opacity={filtroEmpreiteira && filtroEmpreiteira !== e.name ? 0.3 : 1} />)}
@@ -133,7 +135,7 @@ export default function NaoConformidadesCharts({
                 <Legend formatter={smallLegendFmt} />
               </PieChart>
             </ResponsiveContainer>
-          ) : <EmptyChart text="Nenhuma NC por empreiteira para os filtros" height={460} />}
+          ) : <EmptyChart text="Nenhuma NC por empreiteira para os filtros" height={pieHeight(dadosPorEmpreiteira.length)} />}
         </ChartCard>
       </div>
 
@@ -141,7 +143,7 @@ export default function NaoConformidadesCharts({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard title="NCs por Rodovia" icon={MapPin} subtitle="todos os tipos • clique para filtrar">
           {dadosPorRodovia.length > 0 ? (
-            <ResponsiveContainer width="100%" height={420}>
+            <ResponsiveContainer width="100%" height={pieHeight(dadosPorRodovia.length)}>
               <PieChart>
                 <Pie data={dadosPorRodovia} cx="50%" cy="42%" innerRadius={65} outerRadius={110} dataKey="value" labelLine={false} label={<CustomLabel />} onClick={onRodoviaClick} style={{ cursor: 'pointer' }}>
                   {dadosPorRodovia.map((e, i) => <Cell key={i} fill={e.color} opacity={filtroRodovia && filtroRodovia !== e.name ? 0.3 : 1} />)}
@@ -150,12 +152,12 @@ export default function NaoConformidadesCharts({
                 <Legend formatter={smallLegendFmt} />
               </PieChart>
             </ResponsiveContainer>
-          ) : <EmptyChart text="Nenhuma NC com rodovia para os filtros" height={420} />}
+          ) : <EmptyChart text="Nenhuma NC com rodovia para os filtros" height={pieHeight(dadosPorRodovia.length)} />}
         </ChartCard>
 
         <ChartCard title="NCs por Usina" icon={Building2} subtitle="todos os tipos • clique para filtrar">
           {dadosPorUsina.length > 0 ? (
-            <ResponsiveContainer width="100%" height={420}>
+            <ResponsiveContainer width="100%" height={pieHeight(dadosPorUsina.length)}>
               <PieChart>
                 <Pie data={dadosPorUsina} cx="50%" cy="42%" innerRadius={65} outerRadius={110} dataKey="value" labelLine={false} label={<CustomLabel />} onClick={onUsinaClick} style={{ cursor: 'pointer' }}>
                   {dadosPorUsina.map((e, i) => <Cell key={i} fill={e.color} opacity={filtroUsina && filtroUsina !== e.name ? 0.3 : 1} />)}
@@ -164,7 +166,7 @@ export default function NaoConformidadesCharts({
                 <Legend formatter={smallLegendFmt} />
               </PieChart>
             </ResponsiveContainer>
-          ) : <EmptyChart text="Nenhuma NC com usina para os filtros" height={420} />}
+          ) : <EmptyChart text="Nenhuma NC com usina para os filtros" height={pieHeight(dadosPorUsina.length)} />}
         </ChartCard>
       </div>
     </>
