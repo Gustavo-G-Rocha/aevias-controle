@@ -1,25 +1,16 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, ClipboardList, AlertTriangle, HardHat, MapPin, Building2, Calendar as CalendarIcon } from "lucide-react";
-import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
+import { Legend, Tooltip, ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
 import ChartCard from "./ChartCard";
 import EmptyChart from "./EmptyChart";
+import PieWithLegend from "./PieWithLegend";
 
 const AXIS = 'var(--color-text-muted)';
 const tooltipStyle = { backgroundColor: 'var(--color-surface)', color: 'var(--color-text)', borderRadius: '8px', border: '1px solid var(--color-border)' };
 const legendFmt = (v) => <span style={{ color: 'var(--color-text)', fontSize: 12 }}>{v}</span>;
-const smallLegendFmt = (v) => <span style={{ color: 'var(--color-text)', fontSize: 11 }}>{v}</span>;
-// Altura adaptativa: ~24px por item de legenda + 250px fixos para a pizza.
-const pieHeight = (n) => Math.max(280, 250 + n * 24);
 
-const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
-  if (percent < 0.04) return null;
-  const RADIAN = Math.PI / 180;
-  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-  const y = cy + radius * Math.sin(-midAngle * RADIAN);
-  return <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={11} fontWeight="bold">{`${(percent * 100).toFixed(0)}%`}</text>;
-};
+const PIE_HEIGHT = 300;
 
 export default function NaoConformidadesCharts({
   dadosStatusRNC, dadosParametros, dadosPorObra,
@@ -81,30 +72,25 @@ export default function NaoConformidadesCharts({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard title="Status dos RNCs" icon={FileText} subtitle="clique para filtrar">
           {dadosStatusRNC.length > 0 ? (
-            <ResponsiveContainer width="100%" height={pieHeight(dadosStatusRNC.length)}>
-              <PieChart>
-                <Pie data={dadosStatusRNC} cx="50%" cy="42%" innerRadius={60} outerRadius={100} dataKey="value" labelLine={false} label={<CustomLabel />} onClick={onStatusClick} style={{ cursor: 'pointer' }}>
-                  {dadosStatusRNC.map((e, i) => <Cell key={i} fill={e.color} opacity={filtroStatus && filtroStatus !== e.statusKey ? 0.3 : 1} />)}
-                </Pie>
-                <Tooltip formatter={(v, n) => [v, n]} contentStyle={tooltipStyle} />
-                <Legend formatter={legendFmt} />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : <EmptyChart text="Nenhum RNC para os filtros selecionados" height={pieHeight(dadosStatusRNC.length)} />}
+            <PieWithLegend
+              data={dadosStatusRNC}
+              height={PIE_HEIGHT}
+              isDimmed={(e) => filtroStatus && filtroStatus !== e.statusKey}
+              onItemClick={onStatusClick}
+            />
+          ) : <EmptyChart text="Nenhum RNC para os filtros selecionados" height={PIE_HEIGHT} />}
         </ChartCard>
 
         <ChartCard title="Parâmetros Não Conformes" icon={ClipboardList} subtitle="checklists • clique para filtrar">
           {dadosParametros.length > 0 ? (
-            <ResponsiveContainer width="100%" height={pieHeight(dadosParametros.length)}>
-              <PieChart>
-                <Pie data={dadosParametros} cx="50%" cy="42%" innerRadius={60} outerRadius={100} dataKey="value" labelLine={false} label={<CustomLabel />} onClick={onParametroClick} style={{ cursor: 'pointer' }}>
-                  {dadosParametros.map((e, i) => <Cell key={i} fill={e.color} opacity={filtroParametro && filtroParametro !== e.name ? 0.3 : 1} />)}
-                </Pie>
-                <Tooltip formatter={(v, n) => [v + ' ocorrência(s)', n]} contentStyle={tooltipStyle} />
-                <Legend formatter={smallLegendFmt} />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : <EmptyChart text="Nenhuma NC de checklist para os filtros" height={pieHeight(dadosParametros.length)} />}
+            <PieWithLegend
+              data={dadosParametros}
+              valueSuffix=" ocorrência(s)"
+              height={PIE_HEIGHT}
+              isDimmed={(e) => filtroParametro && filtroParametro !== e.name}
+              onItemClick={onParametroClick}
+            />
+          ) : <EmptyChart text="Nenhuma NC de checklist para os filtros" height={PIE_HEIGHT} />}
         </ChartCard>
       </div>
 
@@ -112,30 +98,26 @@ export default function NaoConformidadesCharts({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard title="NCs por Obra" icon={AlertTriangle} subtitle="RNCs + Checklists • clique para filtrar">
           {dadosPorObra.length > 0 ? (
-            <ResponsiveContainer width="100%" height={pieHeight(dadosPorObra.length)}>
-              <PieChart>
-                <Pie data={dadosPorObra} cx="50%" cy="40%" innerRadius={65} outerRadius={110} dataKey="value" labelLine={false} label={<CustomLabel />} onClick={onObraClick} style={{ cursor: 'pointer' }}>
-                  {dadosPorObra.map((e, i) => <Cell key={i} fill={e.color} opacity={filtroObraId && filtroObraId !== e.obraId ? 0.3 : 1} />)}
-                </Pie>
-                <Tooltip formatter={(v, n) => [v + ' NC(s)', n]} contentStyle={tooltipStyle} />
-                <Legend formatter={smallLegendFmt} />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : <EmptyChart text="Nenhuma NC para os filtros selecionados" height={pieHeight(dadosPorObra.length)} />}
+            <PieWithLegend
+              data={dadosPorObra}
+              valueSuffix=" NC(s)"
+              height={PIE_HEIGHT}
+              isDimmed={(e) => filtroObraId && filtroObraId !== e.obraId}
+              onItemClick={onObraClick}
+            />
+          ) : <EmptyChart text="Nenhuma NC para os filtros selecionados" height={PIE_HEIGHT} />}
         </ChartCard>
 
         <ChartCard title="NCs por Empreiteira" icon={HardHat} subtitle="obras de supervisão • clique para filtrar">
           {dadosPorEmpreiteira.length > 0 ? (
-            <ResponsiveContainer width="100%" height={pieHeight(dadosPorEmpreiteira.length)}>
-              <PieChart>
-                <Pie data={dadosPorEmpreiteira} cx="50%" cy="40%" innerRadius={65} outerRadius={110} dataKey="value" labelLine={false} label={<CustomLabel />} onClick={onEmpreiteiraClick} style={{ cursor: 'pointer' }}>
-                  {dadosPorEmpreiteira.map((e, i) => <Cell key={i} fill={e.color} opacity={filtroEmpreiteira && filtroEmpreiteira !== e.name ? 0.3 : 1} />)}
-                </Pie>
-                <Tooltip formatter={(v, n) => [v + ' NC(s)', n]} contentStyle={tooltipStyle} />
-                <Legend formatter={smallLegendFmt} />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : <EmptyChart text="Nenhuma NC por empreiteira para os filtros" height={pieHeight(dadosPorEmpreiteira.length)} />}
+            <PieWithLegend
+              data={dadosPorEmpreiteira}
+              valueSuffix=" NC(s)"
+              height={PIE_HEIGHT}
+              isDimmed={(e) => filtroEmpreiteira && filtroEmpreiteira !== e.name}
+              onItemClick={onEmpreiteiraClick}
+            />
+          ) : <EmptyChart text="Nenhuma NC por empreiteira para os filtros" height={PIE_HEIGHT} />}
         </ChartCard>
       </div>
 
@@ -143,30 +125,26 @@ export default function NaoConformidadesCharts({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard title="NCs por Rodovia" icon={MapPin} subtitle="todos os tipos • clique para filtrar">
           {dadosPorRodovia.length > 0 ? (
-            <ResponsiveContainer width="100%" height={pieHeight(dadosPorRodovia.length)}>
-              <PieChart>
-                <Pie data={dadosPorRodovia} cx="50%" cy="42%" innerRadius={65} outerRadius={110} dataKey="value" labelLine={false} label={<CustomLabel />} onClick={onRodoviaClick} style={{ cursor: 'pointer' }}>
-                  {dadosPorRodovia.map((e, i) => <Cell key={i} fill={e.color} opacity={filtroRodovia && filtroRodovia !== e.name ? 0.3 : 1} />)}
-                </Pie>
-                <Tooltip formatter={(v, n) => [v + ' NC(s)', n]} contentStyle={tooltipStyle} />
-                <Legend formatter={smallLegendFmt} />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : <EmptyChart text="Nenhuma NC com rodovia para os filtros" height={pieHeight(dadosPorRodovia.length)} />}
+            <PieWithLegend
+              data={dadosPorRodovia}
+              valueSuffix=" NC(s)"
+              height={PIE_HEIGHT}
+              isDimmed={(e) => filtroRodovia && filtroRodovia !== e.name}
+              onItemClick={onRodoviaClick}
+            />
+          ) : <EmptyChart text="Nenhuma NC com rodovia para os filtros" height={PIE_HEIGHT} />}
         </ChartCard>
 
         <ChartCard title="NCs por Usina" icon={Building2} subtitle="todos os tipos • clique para filtrar">
           {dadosPorUsina.length > 0 ? (
-            <ResponsiveContainer width="100%" height={pieHeight(dadosPorUsina.length)}>
-              <PieChart>
-                <Pie data={dadosPorUsina} cx="50%" cy="42%" innerRadius={65} outerRadius={110} dataKey="value" labelLine={false} label={<CustomLabel />} onClick={onUsinaClick} style={{ cursor: 'pointer' }}>
-                  {dadosPorUsina.map((e, i) => <Cell key={i} fill={e.color} opacity={filtroUsina && filtroUsina !== e.name ? 0.3 : 1} />)}
-                </Pie>
-                <Tooltip formatter={(v, n) => [v + ' NC(s)', n]} contentStyle={tooltipStyle} />
-                <Legend formatter={smallLegendFmt} />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : <EmptyChart text="Nenhuma NC com usina para os filtros" height={pieHeight(dadosPorUsina.length)} />}
+            <PieWithLegend
+              data={dadosPorUsina}
+              valueSuffix=" NC(s)"
+              height={PIE_HEIGHT}
+              isDimmed={(e) => filtroUsina && filtroUsina !== e.name}
+              onItemClick={onUsinaClick}
+            />
+          ) : <EmptyChart text="Nenhuma NC com usina para os filtros" height={PIE_HEIGHT} />}
         </ChartCard>
       </div>
     </>
