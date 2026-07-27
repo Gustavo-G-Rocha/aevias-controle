@@ -142,7 +142,7 @@ export default function FaixasGranulometricasPage() {
                   </SelectItem>
                   <SelectItem value="CAMADAS_GRANULARES">
                     <div className="flex items-center gap-2">
-                      <Badge className="bg-card0">CAMADAS GRANULARES</Badge>
+                      <Badge className="bg-amber-500 text-white">CAMADAS GRANULARES</Badge>
                     </div>
                   </SelectItem>
                 </SelectContent>

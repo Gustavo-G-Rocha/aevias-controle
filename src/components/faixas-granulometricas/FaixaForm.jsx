@@ -87,7 +87,7 @@ const FaixaForm = React.memo(({ faixa: editingFaixa, onSave, onCancel }) => {
               </SelectItem>
               <SelectItem value="CAMADAS_GRANULARES">
                 <div className="flex items-center gap-2">
-                  <Badge className="bg-card0">CAMADAS GRANULARES</Badge>
+                  <Badge className="bg-amber-500 text-white">CAMADAS GRANULARES</Badge>
                   <span>Camadas Granulares</span>
                 </div>
               </SelectItem>
