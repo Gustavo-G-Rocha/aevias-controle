@@ -81,20 +81,16 @@ export function useBoletimSondagemData() {
         })
         .finally(() => setEditLoading(false));
     } else {
-      const { obras: curObras, regionais: curReg } = auxRef.current;
-      setFormData(prev => {
-        const novo = {
-          ...prev,
-          operador: user.laboratorista_name || user.full_name,
-          obra_id: curObras.length > 0 ? curObras[0].id : "",
-        };
-        if (curObras.length > 0) {
-          const obra = curObras[0];
-          const regional = curReg.find(r => r.id === obra.regional_id);
-          if (regional?.cliente) novo.cliente = regional.cliente;
-        }
-        return novo;
-      });
+      // Novo boletim: NÃO pré-seleciona a obra. O usuário deve escolher
+      // explicitamente. Isso mantém o placeholder "Selecione a obra"
+      // como nome acessível do combobox — essencial para leitores de tela
+      // e para automações de teste localizarem o campo pelo rótulo.
+      // cliente e obra_id são preenchidos por handleObraChange ao selecionar.
+      setFormData(prev => ({
+        ...prev,
+        operador: user.laboratorista_name || user.full_name,
+        obra_id: "",
+      }));
     }
   }, [location.search, loadingUser, loadingAux, user?.id, navigate]);
 
