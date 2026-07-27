@@ -569,6 +569,24 @@ Deno.serve(async (req) => {
     //   4. ALLOWED_UPDATE_FIELDS (nenhum campo fora do whitelist é persistido)
     const result = await base44.asServiceRole.entities[entityName].update(recordId, updateData);
 
+    // ── NOTIFICAÇÃO DE REPROVAÇÃO ────────────────────────────────────
+    // Cria um alerta para o criador do registro quando ele é reprovado.
+    // Falhas de notificação NÃO bloqueiam a operação.
+    if ((action === 'reject' || action === 'reject_nc') && existingRecord.created_by && existingRecord.created_by !== user.email) {
+      try {
+        await base44.asServiceRole.entities.Notificacao.create({
+          user_email: existingRecord.created_by,
+          entity_name: entityName,
+          entity_id: recordId,
+          tipo: 'reprovacao',
+          message: rejectionReason || '',
+          status: 'pendente',
+        });
+      } catch (notifError) {
+        console.error('[gerenciarAprovacao] Notificação error:', notifError?.message);
+      }
+    }
+
     // ── AUDIT TRAIL ──────────────────────────────────────────────────
     // Registra diff campo-a-campo. Falhas de auditoria NÃO bloqueiam a operação.
     try {

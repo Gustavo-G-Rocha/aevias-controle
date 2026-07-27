@@ -1,0 +1,83 @@
+{
+  "name": "Notificacao",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio destinat\u00e1rio da notifica\u00e7\u00e3o"
+    },
+    "entity_name": {
+      "type": "string",
+      "description": "Nome da entidade do registro relacionado (ex: EnsaioCAUQ)"
+    },
+    "entity_id": {
+      "type": "string",
+      "description": "ID do registro relacionado"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "reprovacao"
+      ],
+      "default": "reprovacao",
+      "description": "Tipo da notifica\u00e7\u00e3o"
+    },
+    "message": {
+      "type": "string",
+      "description": "Mensagem/motivo da notifica\u00e7\u00e3o"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pendente",
+        "lida"
+      ],
+      "default": "pendente",
+      "description": "pendente = vis\u00edvel no widget; lida = removida"
+    }
+  },
+  "required": [
+    "user_email",
+    "entity_name",
+    "entity_id"
+  ],
+  "rls": {
+    "create": false,
+    "read": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -19,6 +19,7 @@ import { CreateEnsaioDialogProvider } from "@/components/layout/CreateEnsaioDial
 import MobileBackHeader from "@/components/layout/MobileBackHeader";
 import PageTransition from "@/components/layout/PageTransition";
 import OfflineStatusBar from "@/components/offline/OfflineStatusBar";
+import NotificationAgent from "@/components/notifications/NotificationAgent";
 import SidebarToggle from "@/components/layout/SidebarToggle";
 import { REPORT_PAGES } from "@/lib/reportPages";
 
@@ -97,6 +98,7 @@ const AppLayout = ({ children, currentPageName }) => {
             canManageSystem={canManageSystem}
             pendingTransfers={pendingTransfers} />
           <OfflineStatusBar />
+          <NotificationAgent />
         </main>
       </div>
 
