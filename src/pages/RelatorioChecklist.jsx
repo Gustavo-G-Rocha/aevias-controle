@@ -11,7 +11,7 @@ export default function RelatorioChecklistPage() {
   useReportMode();
 
   const { checklist, obra, regional, project, user, creatorUser, loading, error } = useRelatorioChecklistData();
-  const { handlePrint } = useRelatorioChecklistActions();
+  const { handlePrint, downloading } = useRelatorioChecklistActions();
 
   if (loading) {
     return (
@@ -34,7 +34,7 @@ export default function RelatorioChecklistPage() {
 
   return (
     <div className="bg-white min-h-screen">
-      <RelatorioChecklistHeader checklist={checklist} onPrint={handlePrint} />
+      <RelatorioChecklistHeader checklist={checklist} onPrint={handlePrint} downloading={downloading} />
       
       <RelatorioChecklistContainer>
         <RelatorioChecklistComponent 

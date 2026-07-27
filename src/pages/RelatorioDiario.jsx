@@ -11,7 +11,7 @@ export default function RelatorioDiarioPage() {
   useReportMode();
 
   const { diario, obra, project, user, regional, creatorUser, loading, error } = useRelatorioDiarioData();
-  const { handlePrint } = useRelatorioDiarioActions();
+  const { handlePrint, downloading } = useRelatorioDiarioActions();
 
   if (loading) {
     return (
@@ -31,7 +31,7 @@ export default function RelatorioDiarioPage() {
 
   return (
     <div className="bg-white min-h-screen">
-      <RelatorioDiarioHeader diario={diario} onPrint={handlePrint} />
+      <RelatorioDiarioHeader diario={diario} onPrint={handlePrint} downloading={downloading} />
       
       <RelatorioDiarioContainer>
         <RelatorioDiarioComponent 
