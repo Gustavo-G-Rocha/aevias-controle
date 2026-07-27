@@ -57,7 +57,7 @@ export function useEnsaioVigaBenkelmanForm(setFormData) {
               ...lado,
               leitura_inicial: value,
               diferenca: dif,
-              deflexao: dif * (parseFloat(prev.cte_viga) || 0.01),
+              deflexao: dif * (parseFloat(prev.cte_viga) || 2),
             };
           };
           return {
