@@ -11,7 +11,7 @@ export default function RelatorioChecklistConcretagemPage() {
   useReportMode();
 
   const { checklist, creatorUser, obra, regional, project, loading, error } = useRelatorioChecklistConcretagemData();
-  const { handlePrint } = useRelatorioChecklistConcretagemActions();
+  const { handlePrint, downloading } = useRelatorioChecklistConcretagemActions();
 
   if (loading) {
     return (
@@ -31,7 +31,7 @@ export default function RelatorioChecklistConcretagemPage() {
 
   return (
     <RelatorioChecklistConcretagemContainer>
-      <RelatorioChecklistConcretagemHeader checklist={checklist} onPrint={handlePrint} />
+      <RelatorioChecklistConcretagemHeader checklist={checklist} onPrint={handlePrint} downloading={downloading} />
       <RelatorioChecklistConcretagemComponent checklist={checklist} creatorUser={creatorUser} obra={obra} regional={regional} project={project} />
     </RelatorioChecklistConcretagemContainer>
   );

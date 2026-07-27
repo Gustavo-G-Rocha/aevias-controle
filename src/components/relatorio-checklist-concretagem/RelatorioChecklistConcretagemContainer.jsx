@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function RelatorioChecklistConcretagemContainer({ children }) {
   return (
-    <div className="bg-white min-h-screen">
+    <div className="report-content-container w-full bg-white min-h-screen print:bg-white">
       {children}
       <style>{`
         @media print {
