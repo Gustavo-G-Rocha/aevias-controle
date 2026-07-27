@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import RelatorioChecklistReciclagem from "../components/relatorios/RelatorioChecklistReciclagem";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 import { logger } from '@/utils/logger';
 
 export default function RelatorioChecklistReciclagemPage() {
@@ -64,9 +65,7 @@ export default function RelatorioChecklistReciclagemPage() {
     loadData();
   }, []);
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const { handlePrint, downloading } = useReportPdfActions('relatorio-checklist-reciclagem.pdf');
 
   if (loading) {
     return (
@@ -93,16 +92,16 @@ export default function RelatorioChecklistReciclagemPage() {
           </h2>
           <div className="flex items-center gap-2">
             {checklist && <AprovacaoBar entityName="ChecklistReciclagem" recordId={checklist.id} />}
-            <Button onClick={handlePrint} className="bg-slate-800 text-white hover:bg-slate-700">
-              <Download className="w-4 h-4 mr-2" />
-              Gerar PDF
+            <Button onClick={handlePrint} disabled={downloading} className="bg-slate-800 text-white hover:bg-slate-700">
+              {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+              {downloading ? 'Gerando...' : 'Gerar PDF'}
             </Button>
           </div>
         </div>
       </div>
 
       <div className="print:pt-0 print:pb-0">
-        <div className="w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none p-6 print:p-1 print:px-2">
+        <div className="report-content-container w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none p-6 print:p-1 print:px-2">
           <RelatorioChecklistReciclagem 
             checklist={checklist} 
             obra={obra} 

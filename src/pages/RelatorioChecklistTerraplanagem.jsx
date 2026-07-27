@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import RelatorioChecklistTerraplanagem from "../components/relatorios/RelatorioChecklistTerraplanagem";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 import { logger } from '@/utils/logger';
 
 export default function RelatorioChecklistTerraplanamemPage() {
@@ -48,9 +49,7 @@ export default function RelatorioChecklistTerraplanamemPage() {
 
   useEffect(() => { loadReportData(); }, [loadReportData]);
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const { handlePrint, downloading } = useReportPdfActions('relatorio-checklist-terraplanagem.pdf');
 
   if (loading) {
     return (
@@ -77,9 +76,9 @@ export default function RelatorioChecklistTerraplanamemPage() {
           </h2>
           <div className="flex items-center gap-2">
             {reportData && <AprovacaoBar entityName="ChecklistTerraplanagem" recordId={reportData.checklist?.id} />}
-            <Button onClick={handlePrint} className="bg-slate-800 text-white hover:bg-slate-700">
-              <Download className="w-4 h-4 mr-2" />
-              Gerar PDF
+            <Button onClick={handlePrint} disabled={downloading} className="bg-slate-800 text-white hover:bg-slate-700">
+              {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+              {downloading ? 'Gerando...' : 'Gerar PDF'}
             </Button>
           </div>
         </div>
@@ -108,7 +107,9 @@ export default function RelatorioChecklistTerraplanamemPage() {
         }
       `}</style>
       
-      <RelatorioChecklistTerraplanagem checklist={reportData.checklist} creatorUser={reportData.creatorUser} />
+      <div className="report-content-container">
+        <RelatorioChecklistTerraplanagem checklist={reportData.checklist} creatorUser={reportData.creatorUser} />
+      </div>
     </div>
   );
 }

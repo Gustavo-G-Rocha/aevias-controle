@@ -9,6 +9,7 @@ import { listarRegionais } from '@/services/regionaisService';
 import { listarProjects } from '@/services/projectsService';
 import RelatorioChecklistMRAFComponent from '../components/relatorios/RelatorioChecklistMRAF';
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 import { logger } from '@/utils/logger';
 
 export default function RelatorioChecklistMRAFPage() {
@@ -66,9 +67,7 @@ export default function RelatorioChecklistMRAFPage() {
     loadReportData();
   }, []);
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const { handlePrint, downloading } = useReportPdfActions('relatorio-checklist-mraf.pdf');
 
   if (state.loading) {
     return (
@@ -94,9 +93,9 @@ export default function RelatorioChecklistMRAFPage() {
           </h2>
           <div className="flex items-center gap-2">
             {state.data && <AprovacaoBar entityName="ChecklistMRAF" recordId={state.data.checklist?.id} />}
-            <Button onClick={handlePrint} className="bg-slate-800 text-white hover:bg-slate-700">
-              <Download className="w-4 h-4 mr-2" />
-              Gerar PDF
+            <Button onClick={handlePrint} disabled={downloading} className="bg-slate-800 text-white hover:bg-slate-700">
+              {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+              {downloading ? 'Gerando...' : 'Gerar PDF'}
             </Button>
           </div>
         </div>
