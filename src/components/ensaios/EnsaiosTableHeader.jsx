@@ -32,6 +32,12 @@ export default function EnsaiosTableHeader({
             <SelectColumnFilter value={typeFilter} onChange={setTypeFilter} options={typeOptions} placeholder="Filtrar por tipo" />
           </div>
         </th>
+        <th className="text-center px-2 py-2 font-medium text-foreground text-xs" style={{ width: '90px' }}>
+          <div className="flex items-center justify-center gap-1">
+            <span>Status</span>
+            <SelectColumnFilter value={statusFilter} onChange={setStatusFilter} options={statusOptions} placeholder="Filtrar por status" />
+          </div>
+        </th>
         <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '100px' }}>
           <div className="flex items-center gap-1">
             <button type="button" onClick={toggleSortOrder} className="flex items-center gap-1 hover:text-secondary transition-colors">
@@ -57,12 +63,6 @@ export default function EnsaiosTableHeader({
         </th>
         <th className="text-left px-2 py-2 font-medium text-foreground text-xs">
           <div className="flex items-center gap-1"><span>Projeto</span><TextColumnFilter value={projetoFilter} onChange={setProjetoFilter} placeholder="Filtrar por projeto..." /></div>
-        </th>
-        <th className="text-center px-2 py-2 font-medium text-foreground text-xs" style={{ width: '100px' }}>
-          <div className="flex items-center justify-center gap-1">
-            <span>Status</span>
-            <SelectColumnFilter value={statusFilter} onChange={setStatusFilter} options={statusOptions} placeholder="Filtrar por status" />
-          </div>
         </th>
         <th className="text-center px-2 py-2 font-medium text-foreground text-xs" style={{ width: acoesWidth }}>{acoesLabel}</th>
       </tr>

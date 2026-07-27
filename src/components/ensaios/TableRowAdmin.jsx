@@ -54,6 +54,9 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
           {!naoConformidades.length && !temDeflexaoExcessiva && temAcoesCorretivas && <span role="img" aria-label="Ações corretivas realizadas" className="text-orange-500 cursor-help" title="Ações corretivas realizadas">⚠️</span>}
         </div>
       </td>
+      <td className="px-2 py-2 text-center">
+        <Badge className={`${status.className} text-xs px-2 py-0.5 gap-1`}><status.icon className="w-3 h-3" />{status.text}</Badge>
+      </td>
       <td className="px-2 py-2 text-muted-foreground text-xs whitespace-nowrap">{dataFormatted}</td>
       <td className="px-2 py-2">
         <div className="font-medium text-foreground text-xs truncate max-w-[140px]" title={obra?.name}>{obra?.name || 'N/A'}</div>
@@ -66,9 +69,6 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
       </td>
       <td className="px-2 py-2">{getEmpreiteiraInfo(ensaio) ? <div className="text-muted-foreground text-xs truncate max-w-[100px]">{getEmpreiteiraInfo(ensaio)}</div> : <div className="text-muted-foreground/60 text-center text-xs">-</div>}</td>
       <td className="px-2 py-2">{projeto ? <div className="text-muted-foreground text-xs truncate max-w-[100px]" title={projeto.name}>{projeto.name}</div> : <div className="text-muted-foreground/60 text-center text-xs">-</div>}</td>
-      <td className="px-2 py-2 text-center">
-        <Badge className={`${status.className} text-xs px-2 py-0.5 gap-1`}><status.icon className="w-3 h-3" />{status.text}</Badge>
-      </td>
       <td className="px-2 py-2">
         <div className="flex items-center gap-1">
           <Button asChild variant="outline" size="sm" className="text-foreground hover:bg-muted h-7 px-2">

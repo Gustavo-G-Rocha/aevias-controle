@@ -32,6 +32,9 @@ const TableRowCliente = React.memo(({ ensaio, obra, projeto, index, allUsers, on
           {!naoConformidades.length && temAcoesCorretivas && <span role="img" aria-label="Ações corretivas realizadas" className="text-orange-500 cursor-help" title="Ações corretivas realizadas">⚠️</span>}
         </div>
       </td>
+      <td className="px-2 py-2 text-center">
+        <Badge className={`${status.className} gap-1 text-[10px] px-2 py-0.5`}><status.icon className="w-3 h-3" />{status.text}</Badge>
+      </td>
       <td className="px-2 py-2 text-foreground/90 text-xs whitespace-nowrap">{dataFormatted}</td>
       <td className="px-2 py-2">
         <div className="font-medium text-foreground text-xs truncate max-w-[140px]" title={obra?.name}>{obra?.name || 'N/A'}</div>
@@ -44,9 +47,6 @@ const TableRowCliente = React.memo(({ ensaio, obra, projeto, index, allUsers, on
       </td>
       <td className="px-2 py-2">{getEmpreiteiraInfo(ensaio) ? <div className="text-foreground/90 text-xs truncate max-w-[100px]">{getEmpreiteiraInfo(ensaio)}</div> : <div className="text-foreground/50 text-center text-xs">-</div>}</td>
       <td className="px-2 py-2">{projeto ? <div className="text-foreground/90 text-xs truncate max-w-[100px]" title={projeto.name}>{projeto.name}</div> : <div className="text-foreground/50 text-center text-xs">-</div>}</td>
-      <td className="px-2 py-2 text-center">
-        <Badge className={`${status.className} gap-1 text-[10px] px-2 py-0.5`}><status.icon className="w-3 h-3" />{status.text}</Badge>
-      </td>
       <td className="px-2 py-2">
         <div className="flex items-center gap-1">
           <Button asChild variant="outline" size="sm" className="text-foreground hover:bg-muted/10 border-white/20 h-7 px-2">
