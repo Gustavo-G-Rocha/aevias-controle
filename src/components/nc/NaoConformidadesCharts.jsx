@@ -10,7 +10,7 @@ const AXIS = 'var(--color-text-muted)';
 const tooltipStyle = { backgroundColor: 'var(--color-surface)', color: 'var(--color-text)', borderRadius: '8px', border: '1px solid var(--color-border)' };
 const legendFmt = (v) => <span style={{ color: 'var(--color-text)', fontSize: 12 }}>{v}</span>;
 
-const PIE_HEIGHT = 300;
+const PIE_HEIGHT = 330;
 
 export default function NaoConformidadesCharts({
   dadosStatusRNC, dadosParametros, dadosPorObra,

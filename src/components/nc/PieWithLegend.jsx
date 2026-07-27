@@ -19,13 +19,13 @@ const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) =>
  * isDimmed(entry): true quando o filtro ativo não corresponde ao item
  * onItemClick(entry): clique na fatia ou no item da legenda
  */
-export default function PieWithLegend({ data, valueSuffix = "", isDimmed, onItemClick, height = 300 }) {
+export default function PieWithLegend({ data, valueSuffix = "", isDimmed, onItemClick, height = 330 }) {
   return (
     <div className="flex flex-col sm:flex-row items-center gap-2" style={{ height }}>
       <div className="w-full sm:w-1/2 h-1/2 sm:h-full min-w-0">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie data={data} cx="50%" cy="50%" innerRadius="45%" outerRadius="80%" dataKey="value" labelLine={false} label={<CustomLabel />} onClick={onItemClick} style={{ cursor: 'pointer' }}>
+            <Pie data={data} cx="50%" cy="50%" innerRadius="52%" outerRadius="95%" dataKey="value" labelLine={false} label={<CustomLabel />} onClick={onItemClick} style={{ cursor: 'pointer' }}>
               {data.map((e, i) => <Cell key={i} fill={e.color} opacity={isDimmed?.(e) ? 0.3 : 1} />)}
             </Pie>
             <Tooltip formatter={(v, n) => [v + valueSuffix, n]} contentStyle={tooltipStyle} />
@@ -42,7 +42,7 @@ export default function PieWithLegend({ data, valueSuffix = "", isDimmed, onItem
             style={{ opacity: isDimmed?.(e) ? 0.4 : 1 }}
           >
             <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ backgroundColor: e.color }} />
-            <span className="text-[11px] truncate flex-1" style={{ color: 'var(--color-text)' }} title={e.name}>{e.name}</span>
+            <span className="text-[11px] truncate" style={{ color: 'var(--color-text)' }} title={e.name}>{e.name}</span>
             <span className="text-[11px] font-semibold flex-shrink-0" style={{ color: 'var(--color-text-muted)' }}>{e.value}</span>
           </button>
         ))}
