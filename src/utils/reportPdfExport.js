@@ -19,6 +19,34 @@ import { jsPDF } from 'jspdf';
 const PAGE_WIDTH = 210;   // A4 retrato (mm)
 const PAGE_HEIGHT = 297;
 
+/**
+ * No desktop (PC), abre o diálogo "Salvar como" para o usuário escolher o
+ * local do arquivo (File System Access API). No celular mantém o download
+ * direto — não há API equivalente e o fluxo direto é o esperado.
+ * AbortError = usuário cancelou; nada a fazer.
+ */
+async function savePdf(pdf, fileName) {
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile|BlackBerry|Opera Mini|IEMobile/i.test(navigator.userAgent);
+  if (!isMobile && typeof window.showSaveFilePicker === 'function') {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: fileName,
+        types: [{ description: 'PDF', accept: { 'application/pdf': ['.pdf'] } }],
+      });
+      const blob = pdf.output('blob');
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      return 'saved';
+    } catch (e) {
+      if (e && e.name === 'AbortError') return 'cancelled';
+      // Falha no picker — cai para download direto.
+    }
+  }
+  pdf.save(fileName);
+  return 'saved';
+}
+
 const captureOptions = (el) => ({
   scale: 2,
   useCORS: true,
@@ -49,7 +77,7 @@ async function renderPagedPdf(pageElements, fileName) {
     pdf.addImage(imgData, 'JPEG', offsetX, offsetY, imgWidth, imgHeight);
   }
 
-  pdf.save(fileName);
+  return await savePdf(pdf, fileName);
 }
 
 /** Comportamento legado: imagem única fatiada em folhas de 297 mm. */
@@ -73,7 +101,7 @@ async function renderContinuousPdf(element, fileName) {
     heightLeft -= PAGE_HEIGHT;
   }
 
-  pdf.save(fileName);
+  return await savePdf(pdf, fileName);
 }
 
 /**
@@ -84,8 +112,7 @@ async function renderContinuousPdf(element, fileName) {
 export async function generateReportPdf(element, fileName = 'relatorio.pdf') {
   const pages = Array.from(element.querySelectorAll('[data-report-page]'));
   if (pages.length > 0) {
-    await renderPagedPdf(pages, fileName);
-    return;
+    return await renderPagedPdf(pages, fileName);
   }
-  await renderContinuousPdf(element, fileName);
+  return await renderContinuousPdf(element, fileName);
 }
