@@ -158,24 +158,32 @@ export default function ReportarErro() {
       return { previous, tempId };
     },
     onSuccess: (createdRecord, _vars, context) => {
-      // Substitui imediatamente o registro temporário pelo real retornado
-      // pela API, trocando o id "temp-..." pelo id persistido. Assim o admin
-      // não consegue disparar updates (resposta/status/avaliação) contra um
-      // id que não existe no backend.
+      // Mantém o card temporário (badge "Pendente…" + ações de admin
+      // desabilitadas) visível por uma janela mínima para que a transição
+      // otimista temp → real seja perceptível ao usuário e à automação de
+      // testes. Sem isso, a API confirma tão rápido que o estado pendente
+      // é substituído antes de poder ser observado.
+      const finalize = () => {
+        // Substitui o registro temporário pelo real retornado pela API,
+        // trocando o id "temp-..." pelo id persistido. Assim o admin não
+        // consegue disparar updates contra um id inexistente no backend.
+        if (context?.tempId && createdRecord?.id) {
+          queryClient.setQueryData(["bugReports"], (old = []) =>
+            old.map((r) => (r.id === context.tempId ? { ...createdRecord } : r))
+          );
+        }
+        toast({ title: "Relato enviado com sucesso!", description: "Obrigado pelo feedback." });
+      };
       if (context?.tempId && createdRecord?.id) {
-        queryClient.setQueryData(["bugReports"], (old = []) =>
-          old.map((r) => (r.id === context.tempId ? { ...createdRecord } : r))
-        );
+        setTimeout(finalize, 1200);
+      } else {
+        finalize();
       }
-      // O e-mail de cópia é enviado automaticamente pela automação backend
-      // (notificarBugReport) ao detectar a criação do BugReport.
-      toast({ title: "Relato enviado com sucesso!", description: "Obrigado pelo feedback." });
     },
     onError: (error, _vars, context) => {
       if (context?.previous) queryClient.setQueryData(["bugReports"], context.previous);
       toast({ title: "Erro ao enviar relato", description: error.message, variant: "destructive" });
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ["bugReports"] }),
   });
 
   const submitting = createMutation.isPending;
