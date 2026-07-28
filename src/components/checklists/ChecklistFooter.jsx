@@ -29,11 +29,9 @@ export default function ChecklistFooter({
 
   return (
     <>
-      {/* Espaço para a barra de ações fixa não sobrepor o último conteúdo */}
-      <div className="h-28 lg:h-20" aria-hidden="true" />
-
-      {/* Barra fixa no rodapé para permanecer visível durante o preenchimento */}
-      <div className="fixed bottom-16 lg:bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] max-w-7xl z-30 flex justify-end gap-3 rounded-lg border border-border bg-card/95 p-3 pb-[env(safe-area-inset-bottom,16px)] shadow-lg backdrop-blur-sm">
+      {/* Barra de ações no fluxo normal do formulário (não fixa) — a barra
+          flutuante anterior cobria a largura da tela e sobrepunha o conteúdo. */}
+      <div className="flex flex-wrap justify-end gap-3 border-t border-border pt-6">
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
         </Button>

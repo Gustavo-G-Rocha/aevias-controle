@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { listarFaixas } from "@/services/faixasService";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { saveDataCache, getDataCache } from "@/services/offlineStorageService";
+import { ACCESS_LEVELS, USER_LIKE_LEVELS, getUserAccessLevel } from "@/lib/layoutConstants";
 
 /**
  * Hook base compartilhado que encapsula a lógica comum de carregamento de
@@ -21,7 +22,9 @@ import { saveDataCache, getDataCache } from "@/services/offlineStorageService";
  * @param {Object}   options.formData       — estado do formulário (para derivar obraSelecionada)
  * @param {boolean}  [options.needsUsers]   — se deve carregar lista de usuários (checklist)
  * @param {string[]|null} [options.filtroTipoObra] — filtra obras por tipo_obra
- * @param {boolean}  [options.useAccessLevel] — true: usa access_level (ensaio); false: usa role === 'admin' (checklist)
+ * @param {boolean}  [options.useAccessLevel] — DEPRECADO/ignorado. O nível de
+ *   acesso é sempre derivado de access_level (fallback para role), igual ao
+ *   restante do app. Mantido apenas por compatibilidade com os call sites.
  */
 export function useFormDataLoader({
   formData,
@@ -65,15 +68,19 @@ export function useFormDataLoader({
     if (!auxData?.obras || !user) return [];
 
     // Determina se o usuário deve ver apenas obras das suas regionais.
-    // useAccessLevel=true (ensaio): access_level 'user' é laboratorista.
-    // useAccessLevel=false (checklist): role !== 'admin' é laboratorista.
-    const userAccessLevel = useAccessLevel
-      ? (user.access_level || (user.role === 'admin' ? 'admin' : 'user'))
-      : (user.role === 'admin' ? 'admin' : 'user');
-    const isFuncionarioCliente = userAccessLevel === 'funcionarios_cliente';
-    const isLaboratorista = useAccessLevel
-      ? ['user', 'funcionarios_cliente'].includes(userAccessLevel)
-      : user.role !== 'admin';
+    // O nível efetivo vem SEMPRE de access_level (com fallback para role),
+    // igual ao resto do app (getUserAccessLevel / useLayoutData).
+    //
+    // Antes, os checklists (useAccessLevel=false) derivavam o nível apenas de
+    // `role`: como gestor_contrato, sala_tecnica_afirmaevias,
+    // cliente_supervisor e funcionarios_cliente têm role 'user' na
+    // plataforma, todos eram tratados como laboratorista e filtrados por
+    // `laboratoristas_responsaveis` — lista onde não constam. O resultado era
+    // uma lista de obras vazia e a impossibilidade de usar as telas de novo
+    // registro de checklist.
+    const userAccessLevel = getUserAccessLevel(user);
+    const isFuncionarioCliente = userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE;
+    const isLaboratorista = USER_LIKE_LEVELS.includes(userAccessLevel);
 
     if (isLaboratorista) {
       const emailLower = user.email.toLowerCase();
@@ -115,7 +122,7 @@ export function useFormDataLoader({
       return auxData.obras.filter(obra => filtroTipoObra.includes(obra.tipo_obra));
     }
     return auxData.obras;
-  }, [auxData?.obras, regionais, user, filtroTipoObra, useAccessLevel]);
+  }, [auxData?.obras, regionais, user, filtroTipoObra]);
 
   // Ao editar um registro existente, a obra já salva nele deve sempre aparecer
   // nas opções — mesmo que o filtro (regional/status/tipo) a exclua para este
