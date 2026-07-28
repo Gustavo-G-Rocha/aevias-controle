@@ -12,6 +12,8 @@ import { ExclusaoModal } from "@/components/ensaios/ExclusaoModal";
 import { useTableFilters } from "@/hooks/useTableFilters";
 import TableRowAdmin from "@/components/ensaios/TableRowAdmin";
 import EnsaiosTableHeader from "@/components/ensaios/EnsaiosTableHeader";
+import { getStatusInfo } from "@/components/ensaios/utils";
+import { STATUS_LABELS } from "@/constants/ensaioUi";
 
 const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReject, onDelete, onAssinar, user, canApprove, canApproveRecord, canCreate, allUsers, regionais = [] }) => {
   const [statusFilter, setStatusFilter] = useState('all');
@@ -22,12 +24,20 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
   const obrasMap = useMemo(() => new Map(obras.map((o) => [o.id, o])), [obras]);
   const projectsMap = useMemo(() => new Map(projects.map((p) => [p.id, p])), [projects]);
 
+  // Filtra pelo mesmo status exibido no badge (getStatusInfo), garantindo que
+  // registros com status='rascunho' (badge "Execução") nunca apareçam em
+  // "Aprovados"/"Reprovados"/"Assinados", mesmo que approved esteja inconsistente.
   const applyCustomFilters = useCallback((filtered) => {
-    if (statusFilter === 'approved') return filtered.filter((e) => e.approved === true && !e.client_signature?.signed_by);
-    if (statusFilter === 'pending') return filtered.filter((e) => e.approved === null);
-    if (statusFilter === 'rejected') return filtered.filter((e) => e.approved === false);
-    if (statusFilter === 'signed') return filtered.filter((e) => e.client_signature?.signed_by);
-    return filtered;
+    if (statusFilter === 'all') return filtered;
+    const labelByValue = {
+      approved: STATUS_LABELS.APROVADO,
+      pending: STATUS_LABELS.PENDENTE,
+      rejected: STATUS_LABELS.REPROVADO,
+      signed: STATUS_LABELS.ASSINADO,
+    };
+    const target = labelByValue[statusFilter];
+    if (!target) return filtered;
+    return filtered.filter((e) => getStatusInfo(e).text === target);
   }, [statusFilter]);
 
   const {
