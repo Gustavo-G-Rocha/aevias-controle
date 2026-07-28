@@ -8,7 +8,7 @@ import { validarCertificacao } from "@/utils/certificacaoUsinaUtils";
 import { laboratoristaDeveOcultarResultado } from "@/utils/certificacaoUsinaAccess";
 import { criarCertificacao, atualizarCertificacao } from "@/services/certificacaoUsinaService";
 import { uploadMultipleFiles } from "@/utils/imageUpload";
-import ChecklistFooter from "@/components/checklists/ChecklistFooter";
+import CertificacaoUsinaActions from "@/components/certificacao-usina/CertificacaoUsinaActions";
 import StatusDraftBanner from "@/components/forms/StatusDraftBanner";
 import RejectionBanner from "@/components/forms/RejectionBanner";
 import CertificacaoUsinaHeader from "@/components/certificacao-usina/CertificacaoUsinaHeader";
@@ -321,10 +321,10 @@ export default function CertificacaoUsinaPage() {
                 </Button>
               </div>
 
-              <ChecklistFooter
+              <CertificacaoUsinaActions
                 isEditable={isEditable}
                 isApproved={isApproved}
-                loadingUpload={false}
+                loadingUpload={loadingUpload}
                 onCancel={() => { clearSavedData(); navigate(createPageUrl("MeusEnsaios")); }}
                 onSaveProgress={async (e) => { e.preventDefault(); await handleSubmit(e, "rascunho"); }}
                 onFinalize={async (e) => { e.preventDefault(); await handleSubmit(e, "finalizado"); }}
