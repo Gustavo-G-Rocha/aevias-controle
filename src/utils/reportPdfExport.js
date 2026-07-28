@@ -44,6 +44,8 @@ async function acquireSaveTarget(fileName) {
   if (isMobileUA() || typeof window.showSaveFilePicker !== 'function') {
     return null;
   }
+  // Em iframe (ex.: preview) a API é bloqueada por política de permissões.
+  if (window.self !== window.top) return null;
   try {
     return await window.showSaveFilePicker({
       suggestedName: fileName,
@@ -134,8 +136,22 @@ export async function generateReportPdf(element, fileName = 'relatorio.pdf') {
   // 3) Salva no destino escolhido (desktop) ou por download direto (mobile/fallback).
   if (target) {
     await writeToHandle(pdf, target);
-  } else {
-    pdf.save(fileName);
+    return 'saved';
   }
+
+  // Sem diálogo nativo disponível (iframe, Firefox/Safari): no PC abre o PDF
+  // em nova aba, onde o usuário escolhe local e nome ao salvar. No celular
+  // mantém o download direto.
+  if (!isMobileUA()) {
+    const url = URL.createObjectURL(pdf.output('blob'));
+    const aba = window.open(url, '_blank');
+    if (aba) {
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      return 'opened';
+    }
+    URL.revokeObjectURL(url);
+  }
+
+  pdf.save(fileName);
   return 'saved';
 }

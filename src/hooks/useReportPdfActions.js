@@ -27,7 +27,11 @@ export function useReportPdfActions(filename) {
     setDownloading(true);
     try {
       const result = await generateReportPdf(element, filename);
-      if (result !== 'cancelled') toast({ title: 'PDF baixado com sucesso!' });
+      if (result === 'opened') {
+        toast({ title: 'PDF aberto em nova aba — use "Salvar" para escolher o local.' });
+      } else if (result !== 'cancelled') {
+        toast({ title: 'PDF gerado com sucesso!' });
+      }
     } catch (e) {
       toast({ title: 'Falha ao gerar PDF. Abrindo impressão.', variant: 'destructive' });
       // Atrasa o window.print() para o React renderizar o toast de erro
