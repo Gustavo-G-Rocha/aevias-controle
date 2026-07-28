@@ -2,11 +2,16 @@
  * reportPdfExport.js — Geração de PDF real (arquivo .pdf) a partir do
  * container do relatório, usando html2canvas + jsPDF.
  *
- * Substitui o window.print() que depende do diálogo de impressão do
- * navegador (problemático em mobile, onde nem sempre permite "Salvar
- * como PDF"). Aqui o PDF é gerado e baixado diretamente.
+ * No desktop (PC) abre o diálogo "Salvar como" (File System Access API)
+ * para o usuário escolher o local do arquivo; no celular mantém o
+ * download direto.
  *
- * Duas estratégias:
+ * IMPORTANTE: showSaveFilePicker exige "transient activation" (gesto do
+ * usuário recente). Como html2canvas leva segundos, o seletor DEVE ser
+ * aberto ANTES da renderização — por isso acquireSaveTarget() roda no
+ * início de generateReportPdf, ainda dentro do clique que disparou o botão.
+ *
+ * Duas estratégias de renderização:
  *  1) Se o relatório marcar suas páginas lógicas com [data-report-page],
  *     cada página é capturada separadamente e ocupa exatamente uma folha
  *     A4 — nada fica cortado no meio nem espalhado entre duas folhas.
@@ -19,33 +24,8 @@ import { jsPDF } from 'jspdf';
 const PAGE_WIDTH = 210;   // A4 retrato (mm)
 const PAGE_HEIGHT = 297;
 
-/**
- * No desktop (PC), abre o diálogo "Salvar como" para o usuário escolher o
- * local do arquivo (File System Access API). No celular mantém o download
- * direto — não há API equivalente e o fluxo direto é o esperado.
- * AbortError = usuário cancelou; nada a fazer.
- */
-async function savePdf(pdf, fileName) {
-  const isMobile = /Android|iPhone|iPad|iPod|Mobile|BlackBerry|Opera Mini|IEMobile/i.test(navigator.userAgent);
-  if (!isMobile && typeof window.showSaveFilePicker === 'function') {
-    try {
-      const handle = await window.showSaveFilePicker({
-        suggestedName: fileName,
-        types: [{ description: 'PDF', accept: { 'application/pdf': ['.pdf'] } }],
-      });
-      const blob = pdf.output('blob');
-      const writable = await handle.createWritable();
-      await writable.write(blob);
-      await writable.close();
-      return 'saved';
-    } catch (e) {
-      if (e && e.name === 'AbortError') return 'cancelled';
-      // Falha no picker — cai para download direto.
-    }
-  }
-  pdf.save(fileName);
-  return 'saved';
-}
+const isMobileUA = () =>
+  /Android|iPhone|iPad|iPod|Mobile|BlackBerry|Opera Mini|IEMobile/i.test(navigator.userAgent);
 
 const captureOptions = (el) => ({
   scale: 2,
@@ -56,10 +36,38 @@ const captureOptions = (el) => ({
 });
 
 /**
+ * Abre o "Salvar como" no desktop (ainda com ativação do clique) e devolve
+ * o handle do arquivo, ou null para download direto, ou 'cancelled'.
+ * Deve ser chamado ANTES de qualquer await longo.
+ */
+async function acquireSaveTarget(fileName) {
+  if (isMobileUA() || typeof window.showSaveFilePicker !== 'function') {
+    return null;
+  }
+  try {
+    return await window.showSaveFilePicker({
+      suggestedName: fileName,
+      types: [{ description: 'PDF', accept: { 'application/pdf': ['.pdf'] } }],
+    });
+  } catch (e) {
+    if (e && e.name === 'AbortError') return 'cancelled';
+    // Falha no picker — cai para download direto.
+    return null;
+  }
+}
+
+async function writeToHandle(pdf, handle) {
+  const blob = pdf.output('blob');
+  const writable = await handle.createWritable();
+  await writable.write(blob);
+  await writable.close();
+}
+
+/**
  * Uma página lógica por folha: encaixa a captura dentro da A4 preservando
  * a proporção (sem cortar) e centraliza o que sobrar.
  */
-async function renderPagedPdf(pageElements, fileName) {
+async function renderPagedPdf(pageElements) {
   const pdf = new jsPDF('p', 'mm', 'a4');
 
   for (let i = 0; i < pageElements.length; i++) {
@@ -77,11 +85,11 @@ async function renderPagedPdf(pageElements, fileName) {
     pdf.addImage(imgData, 'JPEG', offsetX, offsetY, imgWidth, imgHeight);
   }
 
-  return await savePdf(pdf, fileName);
+  return pdf;
 }
 
 /** Comportamento legado: imagem única fatiada em folhas de 297 mm. */
-async function renderContinuousPdf(element, fileName) {
+async function renderContinuousPdf(element) {
   const canvas = await html2canvas(element, captureOptions(element));
   const pdf = new jsPDF('p', 'mm', 'a4');
   const imgWidth = PAGE_WIDTH;
@@ -101,18 +109,33 @@ async function renderContinuousPdf(element, fileName) {
     heightLeft -= PAGE_HEIGHT;
   }
 
-  return await savePdf(pdf, fileName);
+  return pdf;
 }
 
 /**
- * Captura o elemento do relatório e baixa um PDF A4 multi-página.
+ * Captura o elemento do relatório e gera um PDF A4 multi-página.
+ * No PC abre "Salvar como"; no celular faz download direto.
  * @param {HTMLElement} element Container do relatório (.report-content-container)
- * @param {string} fileName Nome do arquivo a baixar
+ * @param {string} fileName Nome sugerido do arquivo
+ * @returns {'saved'|'cancelled'}
  */
 export async function generateReportPdf(element, fileName = 'relatorio.pdf') {
+  // 1) Adquire o destino do arquivo ANTES de qualquer await longo — a
+  //    ativação do clique que disparou o botão expira após await's.
+  const target = await acquireSaveTarget(fileName);
+  if (target === 'cancelled') return 'cancelled';
+
+  // 2) Gera o PDF (html2canvas + jsPDF).
   const pages = Array.from(element.querySelectorAll('[data-report-page]'));
-  if (pages.length > 0) {
-    return await renderPagedPdf(pages, fileName);
+  const pdf = pages.length > 0
+    ? await renderPagedPdf(pages)
+    : await renderContinuousPdf(element);
+
+  // 3) Salva no destino escolhido (desktop) ou por download direto (mobile/fallback).
+  if (target) {
+    await writeToHandle(pdf, target);
+  } else {
+    pdf.save(fileName);
   }
-  return await renderContinuousPdf(element, fileName);
+  return 'saved';
 }
