@@ -30,6 +30,24 @@
     "resposta_admin": {
       "type": "string",
       "description": "Resposta/coment\u00e1rio do admin sobre o relato"
+    },
+    "resposta_admin_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Data em que o admin respondeu ao relato"
+    },
+    "avaliacao": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "default": null,
+      "description": "Avalia\u00e7\u00e3o do suporte (1 a 5 estrelas) dada pelo solicitante"
+    },
+    "avaliacao_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Data em que o solicitante avaliou o suporte"
     }
   },
   "required": [

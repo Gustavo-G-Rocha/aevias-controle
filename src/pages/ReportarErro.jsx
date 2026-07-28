@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Bug, Send, Loader2, Image as ImageIcon, X, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { Bug, Send, Loader2, Image as ImageIcon, X, CheckCircle2, Clock, AlertCircle, Star, MessageSquare } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/components/ui/use-toast";
@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import RespostaAvaliacao from "@/components/bug-report/RespostaAvaliacao";
 
 const PAGINAS_CONHECIDAS = [
   "Dashboard",
@@ -191,6 +192,79 @@ export default function ReportarErro() {
 
   const handleStatusChange = (reportId, newStatus) =>
     statusMutation.mutate({ reportId, newStatus });
+
+  // Resposta do admin OTIMISTA
+  const respostaMutation = useMutation({
+    mutationFn: ({ reportId, resposta_admin }) =>
+      base44.entities.BugReport.update(reportId, {
+        resposta_admin,
+        resposta_admin_date: new Date().toISOString(),
+      }),
+    onMutate: async ({ reportId, resposta_admin }) => {
+      await queryClient.cancelQueries({ queryKey: ["bugReports"] });
+      const previous = queryClient.getQueryData(["bugReports"]);
+      queryClient.setQueryData(["bugReports"], (old = []) =>
+        old.map((r) =>
+          r.id === reportId
+            ? { ...r, resposta_admin, resposta_admin_date: new Date().toISOString() }
+            : r
+        )
+      );
+      return { previous };
+    },
+    onSuccess: () => toast({ title: "Resposta enviada ao solicitante" }),
+    onError: (error, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(["bugReports"], context.previous);
+      toast({ title: "Erro ao enviar resposta", description: error.message, variant: "destructive" });
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["bugReports"] }),
+  });
+
+  // Avaliação do solicitante OTIMISTA
+  const avaliacaoMutation = useMutation({
+    mutationFn: ({ reportId, avaliacao }) =>
+      base44.entities.BugReport.update(reportId, {
+        avaliacao,
+        avaliacao_date: new Date().toISOString(),
+      }),
+    onMutate: async ({ reportId, avaliacao }) => {
+      await queryClient.cancelQueries({ queryKey: ["bugReports"] });
+      const previous = queryClient.getQueryData(["bugReports"]);
+      queryClient.setQueryData(["bugReports"], (old = []) =>
+        old.map((r) =>
+          r.id === reportId
+            ? { ...r, avaliacao, avaliacao_date: new Date().toISOString() }
+            : r
+        )
+      );
+      return { previous };
+    },
+    onSuccess: () => toast({ title: "Avaliação registrada. Obrigado!" }),
+    onError: (error, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(["bugReports"], context.previous);
+      toast({ title: "Erro ao registrar avaliação", description: error.message, variant: "destructive" });
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["bugReports"] }),
+  });
+
+  const StarRating = ({ value, onChange, readOnly, size = "w-5 h-5" }) => (
+    <div className="flex items-center gap-1">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <button
+          key={n}
+          type="button"
+          disabled={readOnly}
+          onClick={() => !readOnly && onChange(n)}
+          className={`transition-transform ${readOnly ? "cursor-default" : "hover:scale-110"}`}
+          aria-label={`${n} estrela${n > 1 ? "s" : ""}`}
+        >
+          <Star
+            className={`${size} ${n <= (value || 0) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/40"}`}
+          />
+        </button>
+      ))}
+    </div>
+  );
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
@@ -423,6 +497,17 @@ export default function ReportarErro() {
                           </div>
                         )}
                       </div>
+
+                      {/* Caixa de resposta do admin + avaliação do solicitante */}
+                      <RespostaAvaliacao
+                        report={report}
+                        isAdmin={isAdmin}
+                        currentUserEmail={user?.email}
+                        respostaMutation={respostaMutation}
+                        avaliacaoMutation={avaliacaoMutation}
+                        formatDate={formatDate}
+                        StarRating={StarRating}
+                      />
                     </CardContent>
                   </Card>
                 );
