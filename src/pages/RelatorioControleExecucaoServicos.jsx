@@ -100,7 +100,7 @@ export default function RelatorioControleExecucaoServicosPage() {
             {registro && <AprovacaoBar entityName="ControleExecucaoServicos" recordId={registro.id} />}
             <Button onClick={handlePrint} disabled={downloading} className="bg-[#00233B] text-white hover:bg-[#00233B]/90">
               {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
-              {downloading ? 'Gerando...' : 'Gerar PDF'}
+              {downloading ? 'Gerando...' : 'Imprimir'}
             </Button>
           </div>
         </div>

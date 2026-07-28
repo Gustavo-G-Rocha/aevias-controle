@@ -86,7 +86,7 @@ export default function RelatorioChecklistPage() {
       <div className="no-print fixed top-6 right-8 z-50">
         <Button onClick={handlePrint} disabled={downloading} variant="default" className="shadow-lg bg-blue-600 hover:bg-blue-700">
           {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
-          {downloading ? 'Gerando...' : 'Gerar PDF'}
+          {downloading ? 'Gerando...' : 'Imprimir'}
         </Button>
       </div>
       

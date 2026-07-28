@@ -45,7 +45,7 @@ export default function RelatorioDensidadeInSituPage() {
             {ensaio && <AprovacaoBar entityName="EnsaioDensidadeInSitu" recordId={ensaio.id} />}
             <Button onClick={handlePrint} className="bg-slate-800 text-white hover:bg-slate-700">
               <Download className="w-4 h-4 mr-2" />
-              Gerar PDF
+              Imprimir
             </Button>
           </div>
         </div>

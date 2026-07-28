@@ -1,46 +1,18 @@
 /**
- * Hook compartilhado para geração de PDF de relatórios.
- * Gera e baixa um PDF real (html2canvas + jsPDF) com estado de loading
- * (downloading) e toast de sucesso, em vez de depender do window.print().
- * O elemento capturado é o primeiro `.report-content-container` do DOM.
+ * Hook compartilhado das ações de impressão dos relatórios.
  *
- * Uso: const { handlePrint, downloading } = useReportPdfActions('nome.pdf');
+ * Usa a impressão nativa do navegador (window.print()): o usuário escolhe
+ * a impressora ou "Salvar como PDF", com opção de local e nome do arquivo.
+ *
+ * Uso: const { handlePrint, downloading } = useReportPdfActions();
+ * (`downloading` é mantido por compatibilidade com os botões existentes.)
  */
-import { useCallback, useState } from 'react';
-import { generateReportPdf } from '@/utils/reportPdfExport';
-import { toast } from '@/components/ui/use-toast';
+import { useCallback } from 'react';
 
-export function useReportPdfActions(filename) {
-  const [downloading, setDownloading] = useState(false);
+export function useReportPdfActions() {
+  const handlePrint = useCallback(() => {
+    window.print();
+  }, []);
 
-  const handlePrint = useCallback(async () => {
-    // Alguns relatórios marcam o container com [data-print-container]
-    // em vez de .report-content-container — aceita os dois.
-    const element =
-      document.querySelector('.report-content-container') ||
-      document.querySelector('[data-print-container]');
-    if (!element) {
-      window.print();
-      return;
-    }
-    if (downloading) return;
-    setDownloading(true);
-    try {
-      const result = await generateReportPdf(element, filename);
-      if (result === 'opened') {
-        toast({ title: 'PDF aberto em nova aba — use "Salvar" para escolher o local.' });
-      } else if (result !== 'cancelled') {
-        toast({ title: 'PDF gerado com sucesso!' });
-      }
-    } catch (e) {
-      toast({ title: 'Falha ao gerar PDF. Abrindo impressão.', variant: 'destructive' });
-      // Atrasa o window.print() para o React renderizar o toast de erro
-      // antes que o diálogo de impressão (síncrono/bloqueante) abra.
-      setTimeout(() => window.print(), 300);
-    } finally {
-      setDownloading(false);
-    }
-  }, [downloading, filename]);
-
-  return { handlePrint, downloading };
+  return { handlePrint, downloading: false };
 }

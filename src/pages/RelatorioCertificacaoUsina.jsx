@@ -92,7 +92,7 @@ export default function RelatorioCertificacaoUsina() {
       {/* Toolbar */}
       <div className="print:hidden flex justify-center mb-4">
         <Button onClick={handlePrint} disabled={downloading} className="gap-2 text-white" style={{ backgroundColor: 'var(--color-primary)' }}>
-          <Printer className="w-4 h-4" /> {downloading ? 'Gerando...' : 'Gerar PDF'}
+          <Printer className="w-4 h-4" /> {downloading ? 'Gerando...' : 'Imprimir'}
         </Button>
       </div>
 

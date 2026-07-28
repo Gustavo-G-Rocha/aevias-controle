@@ -87,7 +87,7 @@ export default function RelatorioAcompanhamentoUsinagemPage() {
             {ensaio && <AprovacaoBar entityName="AcompanhamentoUsinagem" recordId={ensaio.id} />}
             <Button onClick={handlePrint} disabled={downloading} className="bg-slate-800 text-white hover:bg-slate-700">
               {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
-              {downloading ? 'Gerando...' : 'Gerar PDF'}
+              {downloading ? 'Gerando...' : 'Imprimir'}
             </Button>
           </div>
         </div>

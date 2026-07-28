@@ -14,7 +14,7 @@ export default function RelatorioCAUQActions({ ensaio, onPrint }) {
           {ensaio && <AprovacaoBar entityName="EnsaioCAUQ" recordId={ensaio.id} />}
           <Button onClick={onPrint} className="bg-slate-800 text-white hover:bg-slate-700">
             <Download className="w-4 h-4 mr-2" />
-            Gerar PDF
+            Imprimir
           </Button>
         </div>
       </div>

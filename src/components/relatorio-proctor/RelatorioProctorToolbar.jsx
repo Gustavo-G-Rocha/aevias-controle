@@ -13,7 +13,7 @@ export default function RelatorioProctorToolbar({ ensaio, isHigro, onPrint }) {
         <div className="flex items-center gap-2">
           {ensaio && <AprovacaoBar entityName="EnsaioProctor" recordId={ensaio.id} />}
           <Button onClick={onPrint} className="bg-slate-800 text-white hover:bg-slate-700">
-            <Download className="w-4 h-4 mr-2" /> Gerar PDF
+            <Download className="w-4 h-4 mr-2" /> Imprimir
           </Button>
         </div>
       </div>

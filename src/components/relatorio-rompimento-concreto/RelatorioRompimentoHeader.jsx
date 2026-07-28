@@ -21,7 +21,7 @@ export default function RelatorioRompimentoHeader({ ensaio, regional: _regional,
             onClick={onPrint}
             className="bg-slate-800 text-white hover:bg-slate-700"
           >
-            <Download className="w-4 h-4 mr-2" /> Gerar PDF
+            <Download className="w-4 h-4 mr-2" /> Imprimir
           </Button>
         </div>
       </div>

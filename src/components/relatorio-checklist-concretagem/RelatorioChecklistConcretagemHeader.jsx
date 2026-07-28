@@ -14,7 +14,7 @@ export default function RelatorioChecklistConcretagemHeader({ checklist, onPrint
           {checklist && <AprovacaoBar entityName="ChecklistConcretagem" recordId={checklist?.id} />}
           <Button onClick={onPrint} disabled={downloading} className="bg-slate-800 text-white hover:bg-slate-700">
             {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
-            {downloading ? 'Gerando...' : 'Gerar PDF'}
+            {downloading ? 'Gerando...' : 'Imprimir'}
           </Button>
         </div>
       </div>
