@@ -28,17 +28,18 @@ export default function DiarioFotoPage({ chunk, pageIndex, diario, obra, regiona
       <main className="grid grid-cols-2 gap-3 mt-4">
         {chunk.map((fotoUrl, fotoIndex) => (
           <div key={fotoIndex} className="border p-2 rounded-lg break-inside-avoid flex flex-col">
+            {/* Container de altura fixa (280px). A imagem é filha direta do flex
+                para que max-h-full/max-w-full resolvam contra o container (que tem
+                altura definida). object-contain mantém a proporção sem cortar nem
+                esticar — a foto ocupa toda a largura OU toda a altura disponível,
+                preservando o rodapé (timestamp) da foto. */}
             <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden" style={{ height: '280px' }}>
-              <picture>
-                <source srcSet={fotoUrl} />
-                <img
-                  src={fotoUrl}
-                  alt={`Foto ${pageIndex * 6 + fotoIndex + 1}`}
-                  className="w-full h-full object-contain"
-                  width="auto"
-                  height="auto"
-                />
-              </picture>
+              <img
+                src={fotoUrl}
+                alt={`Foto ${pageIndex * 6 + fotoIndex + 1}`}
+                className="max-w-full max-h-full object-contain"
+                style={{ width: 'auto', height: 'auto' }}
+              />
             </div>
             <p className="text-center text-sm mt-2 font-medium">
               Foto {pageIndex * 6 + fotoIndex + 1}
