@@ -1,5 +1,5 @@
 import React from "react";
-import { Loader2 } from "lucide-react";
+import { CardsPageSkeleton } from "@/components/skeletons/PageSkeletons";
 import {
   Dialog,
   DialogContent,
@@ -46,14 +46,7 @@ export default function Projects() {
   const canManage = canManageProjects(userAccessLevel);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-transparent">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-secondary" />
-          <p className="text-muted-foreground mt-2">Carregando projetos...</p>
-        </div>
-      </div>
-    );
+    return <CardsPageSkeleton />;
   }
 
   return (

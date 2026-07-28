@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
-import { Loader2, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
+import { DashboardSkeleton } from '@/components/skeletons/PageSkeletons';
 import { getUserAccessLevel, canSeeFilters, isAdmin, isSalaTecnica, isLaboratorista, isClienteSupervisor } from '@/utils/accessControl';
 import { useCreateEnsaioDialog } from '@/components/layout/CreateEnsaioDialogContext';
 import { getChartVisibility } from '@/utils/dashboardUtils';
@@ -35,14 +36,7 @@ export default function Dashboard() {
   }, [setFilters]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-transparent">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto" style={{ color: 'var(--color-text-subtle)' }} />
-          <p className="mt-2" style={{ color: 'var(--color-text-muted)' }}>Carregando dashboard...</p>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   const userAccessLevel = getUserAccessLevel(user);

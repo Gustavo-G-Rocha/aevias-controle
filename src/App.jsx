@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import LoadingState from '@/components/LoadingState';
+import { TablePageSkeleton } from '@/components/skeletons/PageSkeletons';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -31,7 +31,7 @@ const AuditorTecnico = lazy(() => import('@/pages/AuditorTecnico'));
 
 // Fallback leve exibido enquanto o chunk da página lazy é baixado.
 // O Layout (sidebar/header/bottom-nav) já está renderizado — só o conteúdo suspende.
-const PageLoadingFallback = () => <LoadingState />;
+const PageLoadingFallback = () => <TablePageSkeleton />;
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];

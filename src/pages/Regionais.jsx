@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, MapPin, Search, Loader2, ArrowLeftRight } from "lucide-react";
+import { Plus, MapPin, Search, ArrowLeftRight } from "lucide-react";
+import { CardsPageSkeleton } from "@/components/skeletons/PageSkeletons";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -28,14 +29,7 @@ export default function RegionaisPage() {
   const { isAdmin, isLaboratorista, canManage } = calcularPermissoes(accessLevel);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-transparent">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto" style={{ color: 'var(--color-text-subtle)' }} />
-          <p className="mt-2" style={{ color: 'var(--color-text-muted)' }}>Carregando regionais...</p>
-        </div>
-      </div>
-    );
+    return <CardsPageSkeleton />;
   }
 
   return (

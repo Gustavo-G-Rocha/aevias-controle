@@ -1,5 +1,5 @@
 import React from "react";
-import { Loader2 } from "lucide-react";
+import { CardsPageSkeleton } from "@/components/skeletons/PageSkeletons";
 
 import { useGestaoNCData } from "@/hooks/useGestaoNCData";
 import { useGestaoNCFilters } from "@/hooks/useGestaoNCFilters";
@@ -48,11 +48,7 @@ export default function GestaoNCPage() {
   const _canChangeStatus = canUserChangeStatus(user);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <CardsPageSkeleton withStats />;
   }
 
   const handleApprovalWrapper = (approve) => {

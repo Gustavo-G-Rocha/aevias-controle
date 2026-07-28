@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { AlertTriangle, X } from "lucide-react";
-import LoadingState from "@/components/LoadingState";
+import { DashboardSkeleton } from "@/components/skeletons/PageSkeletons";
 import { Button } from "@/components/ui/button";
 
 import { useNaoConformidadesData } from "@/hooks/useNaoConformidadesData";
@@ -44,7 +44,7 @@ export default function NaoConformidadesPage() {
   const handleUsinaClick = useCallback((d) => setFiltroUsina(p => p === d.name ? null : d.name), [setFiltroUsina]);
 
   if (loading) {
-    return <LoadingState />;
+    return <DashboardSkeleton />;
   }
 
   return (

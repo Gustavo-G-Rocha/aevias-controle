@@ -2,7 +2,8 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, Users as UsersIcon, Loader2 } from "lucide-react";
+import { Plus, Search, Users as UsersIcon } from "lucide-react";
+import { TablePageSkeleton } from "@/components/skeletons/PageSkeletons";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
@@ -28,17 +29,7 @@ export default function UsersPage() {
   } = useUsersActions({ currentUser, regionais, loadData });
 
   if (loading) {
-    return (
-      <div className="p-6 space-y-6 bg-transparent min-h-screen">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center py-12">
-            <Loader2 className="w-16 h-16 mx-auto mb-4 animate-spin" style={{ color: 'var(--color-text-subtle)' }} />
-            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text)' }}>Carregando usuários...</h3>
-            <p style={{ color: 'var(--color-text-muted)' }}>Aguarde enquanto carregamos os dados.</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <TablePageSkeleton />;
   }
 
   return (

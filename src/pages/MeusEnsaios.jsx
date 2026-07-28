@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
-import { Loader2, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
+import { FilterBarSkeleton, TableSkeleton } from "@/components/skeletons/SkeletonBlocks";
 import { useEnsaiosList } from "@/hooks/useEnsaiosList";
 import { useEnsaiosActions } from "@/hooks/useEnsaiosActions";
 import { assinarEnsaio } from "@/services/ensaiosService";
@@ -79,9 +80,9 @@ export default function MeusEnsaios() {
         )}
 
         {loading ? (
-          <div className="text-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
-            <p className="text-muted-foreground mt-2">Carregando registros...</p>
+          <div className="space-y-6">
+            <FilterBarSkeleton />
+            <TableSkeleton />
           </div>
         ) : canApprove ? (
           <AdminInterface
