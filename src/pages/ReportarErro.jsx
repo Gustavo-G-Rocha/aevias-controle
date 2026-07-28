@@ -505,6 +505,12 @@ export default function ReportarErro() {
                               <StatusIcon className="w-3 h-3 mr-1" />
                               {STATUS_CONFIG[report.status]?.label}
                             </Badge>
+                            {isOptimistic && (
+                              <Badge className="bg-yellow-100 text-yellow-700" data-temp-id={report.id}>
+                                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                Pendente…
+                              </Badge>
+                            )}
                             <Badge variant="outline" className="font-mono text-xs">
                               {report.pagina}
                             </Badge>
