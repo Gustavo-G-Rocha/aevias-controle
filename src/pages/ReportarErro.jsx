@@ -69,6 +69,24 @@ const STATUS_CONFIG = {
   resolvido: { label: "Resolvido", icon: CheckCircle2, color: "bg-green-100 text-green-700" },
 };
 
+// Detecta erros de "registro não encontrado" (404) vindos do SDK —
+// acontecem quando o BugReport foi removido no servidor mas o card ainda
+// existe no cache do react-query (ex.: outro admin apagou o relato enquanto
+// este admin estava visualizando a lista).
+const isNotFound = (error) => {
+  const msg = String(error?.message || "");
+  return /not found|não encontrado/i.test(msg) || error?.response?.status === 404;
+};
+
+// Remove imediatamente do cache o registro obsoleto e dispara uma
+// refetch para sincronizar a lista com o estado real do servidor.
+const purgeStaleReport = (reportId, queryClient) => {
+  queryClient.setQueryData(["bugReports"], (old = []) =>
+    old.filter((r) => r.id !== reportId)
+  );
+  queryClient.invalidateQueries({ queryKey: ["bugReports"] });
+};
+
 export default function ReportarErro() {
   const [user, setUser] = useState(null);
   const [descricao, setDescricao] = useState("");
@@ -122,11 +140,13 @@ export default function ReportarErro() {
     onMutate: async (payload) => {
       await queryClient.cancelQueries({ queryKey: ["bugReports"] });
       const previous = queryClient.getQueryData(["bugReports"]);
+      const tempId = `temp-${Date.now()}`;
       const tempReport = {
-        id: `temp-${Date.now()}`,
+        id: tempId,
         ...payload,
         created_by: user?.email,
         created_date: new Date().toISOString(),
+        _optimistic: true,
       };
       queryClient.setQueryData(["bugReports"], (old = []) => [tempReport, ...old]);
       // Limpa o formulário imediatamente — UI responsiva
@@ -135,9 +155,18 @@ export default function ReportarErro() {
       setPaginaOutra("");
       setPrints([]);
       setShowForm(false);
-      return { previous };
+      return { previous, tempId };
     },
-    onSuccess: () => {
+    onSuccess: (createdRecord, _vars, context) => {
+      // Substitui imediatamente o registro temporário pelo real retornado
+      // pela API, trocando o id "temp-..." pelo id persistido. Assim o admin
+      // não consegue disparar updates (resposta/status/avaliação) contra um
+      // id que não existe no backend.
+      if (context?.tempId && createdRecord?.id) {
+        queryClient.setQueryData(["bugReports"], (old = []) =>
+          old.map((r) => (r.id === context.tempId ? { ...createdRecord } : r))
+        );
+      }
       // O e-mail de cópia é enviado automaticamente pela automação backend
       // (notificarBugReport) ao detectar a criação do BugReport.
       toast({ title: "Relato enviado com sucesso!", description: "Obrigado pelo feedback." });
@@ -183,8 +212,13 @@ export default function ReportarErro() {
       return { previous };
     },
     onSuccess: () => toast({ title: "Status atualizado" }),
-    onError: (error, _vars, context) => {
+    onError: (error, vars, context) => {
       if (context?.previous) queryClient.setQueryData(["bugReports"], context.previous);
+      if (isNotFound(error)) {
+        purgeStaleReport(vars.reportId, queryClient);
+        toast({ title: "Relato não existe mais", description: "Ele pode ter sido removido por outro administrador. A lista foi atualizada.", variant: "destructive" });
+        return;
+      }
       toast({ title: "Erro ao atualizar status", description: error.message, variant: "destructive" });
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ["bugReports"] }),
@@ -213,8 +247,13 @@ export default function ReportarErro() {
       return { previous };
     },
     onSuccess: () => toast({ title: "Resposta enviada ao solicitante" }),
-    onError: (error, _vars, context) => {
+    onError: (error, vars, context) => {
       if (context?.previous) queryClient.setQueryData(["bugReports"], context.previous);
+      if (isNotFound(error)) {
+        purgeStaleReport(vars.reportId, queryClient);
+        toast({ title: "Relato não existe mais", description: "Ele pode ter sido removido por outro administrador. A lista foi atualizada.", variant: "destructive" });
+        return;
+      }
       toast({ title: "Erro ao enviar resposta", description: error.message, variant: "destructive" });
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ["bugReports"] }),
@@ -240,8 +279,13 @@ export default function ReportarErro() {
       return { previous };
     },
     onSuccess: () => toast({ title: "Avaliação registrada. Obrigado!" }),
-    onError: (error, _vars, context) => {
+    onError: (error, vars, context) => {
       if (context?.previous) queryClient.setQueryData(["bugReports"], context.previous);
+      if (isNotFound(error)) {
+        purgeStaleReport(vars.reportId, queryClient);
+        toast({ title: "Relato não existe mais", description: "Ele pode ter sido removido. A lista foi atualizada.", variant: "destructive" });
+        return;
+      }
       toast({ title: "Erro ao registrar avaliação", description: error.message, variant: "destructive" });
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ["bugReports"] }),
@@ -441,6 +485,10 @@ export default function ReportarErro() {
             <div className="space-y-4">
               {bugReports.map((report) => {
                 const StatusIcon = STATUS_CONFIG[report.status]?.icon || AlertCircle;
+                // Registro ainda em estado otimista (id temporário): a criação
+                // ainda não foi confirmada no backend. Desabilita ações de admin
+                // para evitar updates contra um id inexistente.
+                const isOptimistic = String(report.id).startsWith("temp-");
                 return (
                   <Card key={report.id}>
                     <CardContent className="py-4">
@@ -484,6 +532,7 @@ export default function ReportarErro() {
                             <Select
                               value={report.status}
                               onValueChange={(val) => handleStatusChange(report.id, val)}
+                              disabled={isOptimistic}
                             >
                               <SelectTrigger className="w-36 h-8 text-xs">
                                 <SelectValue />
@@ -501,7 +550,7 @@ export default function ReportarErro() {
                       {/* Caixa de resposta do admin + avaliação do solicitante */}
                       <RespostaAvaliacao
                         report={report}
-                        isAdmin={isAdmin}
+                        isAdmin={isAdmin && !isOptimistic}
                         currentUserEmail={user?.email}
                         respostaMutation={respostaMutation}
                         avaliacaoMutation={avaliacaoMutation}
