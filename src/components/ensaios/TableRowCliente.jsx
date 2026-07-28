@@ -50,7 +50,7 @@ const TableRowCliente = React.memo(({ ensaio, obra, projeto, index, allUsers, on
       <td className="px-2 py-2">
         <div className="flex items-center gap-1">
           <Button asChild variant="outline" size="sm" className="text-foreground hover:bg-muted/10 border-white/20 h-7 px-2" title={`Ver relatório de ${name}`} aria-label={`Ver relatório de ${name}`}>
-            <RouterLink to={reportUrl}><FileText className="w-3 h-3" /></RouterLink>
+            <RouterLink to={reportUrl} target="_blank" rel="noopener noreferrer"><FileText className="w-3 h-3" /></RouterLink>
           </Button>
           {podeAssinar && (
             <CriticalActionDialog

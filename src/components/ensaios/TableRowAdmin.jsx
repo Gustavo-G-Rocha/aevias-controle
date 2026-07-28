@@ -47,7 +47,7 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
       <td className="px-2 py-2">
         <div className="font-medium text-foreground flex items-center gap-1 text-xs">
           <TypeIcon className="w-3 h-3 text-secondary" />
-          <RouterLink to={reportUrl} className="truncate max-w-[120px] hover:underline underline-offset-2" title={`Ver relatório de ${name}`} aria-label={`Ver relatório de ${name}`}>{name}</RouterLink>
+          <RouterLink to={reportUrl} target="_blank" rel="noopener noreferrer" className="truncate max-w-[120px] hover:underline underline-offset-2" title={`Ver relatório de ${name}`} aria-label={`Ver relatório de ${name}`}>{name}</RouterLink>
           <CopyIdButton id={ensaio.id} />
           {naoConformidades.length > 0 && <span role="img" aria-label={`Não conformidades: ${naoConformidades.join(', ')}`} className="text-destructive cursor-help" title={`Não conformidades:\n${naoConformidades.join('\n')}`}>⚠️</span>}
           {!naoConformidades.length && temDeflexaoExcessiva && <span role="img" aria-label="Pontos com deflexão acima do limite admissível" className="cursor-help" title="Pontos com deflexão acima do limite admissível">🟡</span>}
@@ -72,13 +72,13 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
       <td className="px-2 py-2">
         <div className="flex items-center gap-1">
           <Button asChild variant="outline" size="sm" className="text-foreground hover:bg-muted h-7 px-2" title={`Ver relatório de ${name}`} aria-label={`Ver relatório de ${name}`}>
-            <RouterLink to={reportUrl}><FileText className="w-3 h-3" /></RouterLink>
+            <RouterLink to={reportUrl} target="_blank" rel="noopener noreferrer"><FileText className="w-3 h-3" /></RouterLink>
           </Button>
           {canApprove && ensaio.status !== 'rascunho' && (
             <div className="flex gap-1">
               {(ensaio.approved === null || ensaio.approved === false) && (
                 <Button asChild size="sm" style={{ backgroundColor: ACTION_COLORS.APPROVE }} className="text-white hover:opacity-90 h-7 px-2" title="Aprovar (abre relatório para assinatura)">
-                  <RouterLink to={reportUrl}><CheckCircle className="w-3 h-3" /></RouterLink>
+                  <RouterLink to={reportUrl} target="_blank" rel="noopener noreferrer"><CheckCircle className="w-3 h-3" /></RouterLink>
                 </Button>
               )}
               {ensaio.approved === null && (
