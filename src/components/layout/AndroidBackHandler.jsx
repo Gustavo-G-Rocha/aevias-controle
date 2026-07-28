@@ -25,8 +25,12 @@ export default function AndroidBackHandler() {
     if (location.state?.[BACKSTOP]) {
       // Aterrissou no backstop (back nativo no fim da pilha):
       // re-empilha a rota apropriada para o app não "esvaziar" o histórico.
+      // Rotas fora das TAB_ZONES (ex.: /CertificacaoUsina e demais
+      // formulários de ensaio/checklist) permanecem na própria rota —
+      // antes eram forçadas para "/", o que fazia um cold start / deep
+      // link no Android "abrir e voltar pra tela inicial".
       const zone = getTabZone(location.pathname);
-      const zoneRoot = zone ? TAB_ZONES[zone][0] : "/";
+      const zoneRoot = zone ? TAB_ZONES[zone][0] : location.pathname;
       navigate(location.pathname === zoneRoot ? here : zoneRoot, { state: null });
     } else if (location.key === "default") {
       // Primeira entrada do histórico (boot/deep link): marca como backstop.
