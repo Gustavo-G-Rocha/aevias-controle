@@ -37,6 +37,12 @@ export const MAIN_NAVIGATION = [
     icon: FileText,
     allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias"],
   },
+  {
+    title: "Reportar Erros",
+    url: createPageUrl("ReportarErro"),
+    icon: Bug,
+    allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "user", "funcionarios_cliente", "cliente", "cliente_supervisor"],
+  },
 ];
 
 export const ADMIN_NAVIGATION = [
@@ -47,7 +53,6 @@ export const ADMIN_NAVIGATION = [
   { title: "Migração de Dados", url: createPageUrl("MigracaoDados"), icon: Grid, allowedLevels: ["admin"] },
   { title: "Monitor de Produtividade", url: createPageUrl("MonitorProdutividade"), icon: TrendingUp, allowedLevels: ["admin"] },
   { title: "Configurações", url: createPageUrl("Settings"), icon: Settings, allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "user", "funcionarios_cliente", "cliente", "cliente_supervisor"] },
-  { title: "Reportar Erros", url: createPageUrl("ReportarErro"), icon: Bug, allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "user", "funcionarios_cliente", "cliente", "cliente_supervisor"] },
 ];
 
 // Ensaios compartilhados entre Supervisão e Gerenciamento
