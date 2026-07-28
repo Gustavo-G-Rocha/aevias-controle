@@ -78,13 +78,13 @@ const isNotFound = (error) => {
   return /not found|não encontrado/i.test(msg) || error?.response?.status === 404;
 };
 
-// Remove imediatamente do cache o registro obsoleto e dispara uma
-// refetch para sincronizar a lista com o estado real do servidor.
+// Remove imediatamente do cache o registro obsoleto. NÃO dispara
+// refetch: o backend pode ter consistência eventual e a lista poderia
+// trazer o registro removido de volta, anulando a purgação.
 const purgeStaleReport = (reportId, queryClient) => {
   queryClient.setQueryData(["bugReports"], (old = []) =>
     old.filter((r) => r.id !== reportId)
   );
-  queryClient.invalidateQueries({ queryKey: ["bugReports"] });
 };
 
 export default function ReportarErro() {
@@ -221,7 +221,9 @@ export default function ReportarErro() {
       }
       toast({ title: "Erro ao atualizar status", description: error.message, variant: "destructive" });
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ["bugReports"] }),
+    onSettled: (_data, error) => {
+      if (!isNotFound(error)) queryClient.invalidateQueries({ queryKey: ["bugReports"] });
+    },
   });
 
   const handleStatusChange = (reportId, newStatus) =>
@@ -256,7 +258,9 @@ export default function ReportarErro() {
       }
       toast({ title: "Erro ao enviar resposta", description: error.message, variant: "destructive" });
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ["bugReports"] }),
+    onSettled: (_data, error) => {
+      if (!isNotFound(error)) queryClient.invalidateQueries({ queryKey: ["bugReports"] });
+    },
   });
 
   // Avaliação do solicitante OTIMISTA
@@ -288,7 +292,9 @@ export default function ReportarErro() {
       }
       toast({ title: "Erro ao registrar avaliação", description: error.message, variant: "destructive" });
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ["bugReports"] }),
+    onSettled: (_data, error) => {
+      if (!isNotFound(error)) queryClient.invalidateQueries({ queryKey: ["bugReports"] });
+    },
   });
 
   const StarRating = ({ value, onChange, readOnly, size = "w-5 h-5" }) => (
