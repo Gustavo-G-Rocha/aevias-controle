@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle, Loader2, Clock, History } from "lucide-react";
+import LoadingButton from "@/components/ui/loading-button";
+import { CheckCircle, XCircle, Clock, History } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -188,11 +189,12 @@ export default function AprovacaoBar({ entityName, recordId }) {
 
         {canApprove && isPending && (
           <>
-            <Button size="sm" onClick={() => handleApprove()} disabled={saving}
+            <LoadingButton size="sm" onClick={() => handleApprove()} loading={saving}
+              loadingText="Registrando assinatura..."
+              icon={<CheckCircle className="w-3.5 h-3.5" />}
               className="bg-green-700 text-white hover:bg-green-800 gap-1 h-8">
-              {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
               Aprovar
-            </Button>
+            </LoadingButton>
             <Button size="sm" variant="destructive" onClick={() => setShowRejectModal(true)} disabled={saving}
               className="gap-1 h-8">
               <XCircle className="w-3.5 h-3.5" />
@@ -201,11 +203,12 @@ export default function AprovacaoBar({ entityName, recordId }) {
           </>
         )}
         {canApprove && isRejected && (
-          <Button size="sm" onClick={() => handleApprove()} disabled={saving}
+          <LoadingButton size="sm" onClick={() => handleApprove()} loading={saving}
+            loadingText="Registrando assinatura..."
+            icon={<CheckCircle className="w-3.5 h-3.5" />}
             className="bg-green-700 text-white hover:bg-green-800 gap-1 h-8">
-            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
             Aprovar mesmo assim
-          </Button>
+          </LoadingButton>
         )}
       </div>
 
@@ -231,10 +234,10 @@ export default function AprovacaoBar({ entityName, recordId }) {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowRejectModal(false)}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleReject} disabled={saving}>
-              {saving && <Loader2 className="w-4 h-4 animate-spin mr-1" />}
+            <LoadingButton variant="destructive" onClick={handleReject} loading={saving}
+              loadingText="Reprovando...">
               Confirmar Reprovação
-            </Button>
+            </LoadingButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -338,6 +338,19 @@
     outline-offset: 2px;
   }
 
+  /* ── Respeitar prefers-reduced-motion ──
+     Skeletons e spinners não devem pulsar/girar freneticamente para
+     usuários que pediram menos animação: mantemos o feedback visual
+     (opacidade/ícone) com animação lenta e suave. */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-pulse {
+      animation-duration: 3s !important;
+    }
+    .animate-spin {
+      animation-duration: 2.5s !important;
+    }
+  }
+
   /* Hide scrollbars on mobile */
   @media (max-width: 1023px) {
     * {
