@@ -68,7 +68,7 @@ export default function RelatorioChecklistTerraplanagem({ checklist, creatorUser
     <div className="bg-white font-sans min-h-screen print:bg-white">
       {/* PÁGINA PRINCIPAL */}
       <div className="print:pt-2 print:pb-3">
-        <div className="w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none pt-2 px-3 pb-3 print:pt-2 print:px-3 print:pb-3">
+        <div className="w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none pt-2 px-3 pb-3 print:pt-2 print:px-3 print:pb-3" data-report-page>
           <HeaderTerra regional={regional} checklist={checklist} />
 
           <main className="text-xs print:text-xs mt-0.5 mb-3">

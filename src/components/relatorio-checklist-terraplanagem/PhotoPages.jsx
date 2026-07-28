@@ -13,7 +13,7 @@ export default function PhotoPages({ photos, regional, checklist, obra }) {
     <>
       {photoChunks.map((chunk, pageIndex) => (
         <div key={`page-${pageIndex}`} className="print:pt-2 print:pb-3 break-before-page">
-          <div className="w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none pt-2 px-3 pb-3 print:pt-2 print:px-3 print:pb-3 flex flex-col">
+          <div className="w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none pt-2 px-3 pb-3 print:pt-2 print:px-3 print:pb-3 flex flex-col" data-report-page>
             {/* Photo header */}
             <header className="grid grid-cols-3 items-center border-b-2 border-slate-900 pb-1 mb-2">
               <div className="flex justify-start">

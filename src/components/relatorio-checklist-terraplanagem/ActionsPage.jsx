@@ -10,7 +10,7 @@ export default function ActionsPage({ checklist, regional, obra, temAcoes, temNC
 
   return (
     <div className="break-before-page">
-      <div className="w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none py-2 px-3 print:py-2 print:px-3">
+      <div className="w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none py-2 px-3 print:py-2 print:px-3" data-report-page>
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '270mm' }}>
           <HeaderTerra regional={regional} checklist={checklist} />
           <DadosObraTerra regional={regional} obra={obra} checklist={checklist} />
