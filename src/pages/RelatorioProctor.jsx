@@ -50,6 +50,7 @@ export default function RelatorioProctor() {
     <div className="relatorio-page bg-white min-h-screen">
       <RelatorioProctorToolbar ensaio={ensaio} isHigro={isHigro} onPrint={handlePrint} />
 
+      <div className="report-content-container">
       <div className="w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none p-2 print:p-1 flex flex-col">
         <RelatorioProctorHeader regional={regional} />
 
@@ -107,6 +108,7 @@ export default function RelatorioProctor() {
           <RelatorioLimites limites={ensaio.limites} ensaio={ensaio} obra={obra} regional={regional} />
         </div>
       )}
+      </div>
 
       <style>{`
         @media print {

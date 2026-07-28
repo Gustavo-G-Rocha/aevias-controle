@@ -7,6 +7,7 @@ import { listarObrasRecentes } from '@/services/obrasService';
 import { listarRegionais } from '@/services/regionaisService';
 import { listarProjects } from '@/services/projectsService';
 import RelatorioChecklistComponent from '../components/relatorios/RelatorioChecklist';
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 import { logger } from '@/utils/logger';
 
 export default function RelatorioChecklistPage() {
@@ -62,9 +63,8 @@ export default function RelatorioChecklistPage() {
     loadReportData();
   }, []);
 
-  const handlePrint = () => {
-    window.print();
-  };
+  // No PC abre "Salvar como"; no celular baixa direto.
+  const { handlePrint, downloading } = useReportPdfActions('relatorio-checklist-usina.pdf');
 
   if (state.loading) {
     return (
@@ -84,9 +84,9 @@ export default function RelatorioChecklistPage() {
   return (
     <div className="print:p-0 bg-slate-50 print:bg-white">
       <div className="no-print fixed top-6 right-8 z-50">
-        <Button onClick={handlePrint} variant="default" className="shadow-lg bg-blue-600 hover:bg-blue-700">
-          <Printer className="w-4 h-4 mr-2" />
-          Imprimir / Salvar PDF
+        <Button onClick={handlePrint} disabled={downloading} variant="default" className="shadow-lg bg-blue-600 hover:bg-blue-700">
+          {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
+          {downloading ? 'Gerando...' : 'Gerar PDF'}
         </Button>
       </div>
       

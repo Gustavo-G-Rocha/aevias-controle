@@ -70,6 +70,7 @@ export default function RelatorioUnificado() {
         canSign={canSign}
       />
 
+      <div className="report-content-container">
       <RelatorioUnificadoCapa
         obra={obra}
         regional={regional}
@@ -91,6 +92,7 @@ export default function RelatorioUnificado() {
         faixasGranulometricas={faixasGranulometricas}
         user={user}
       />
+      </div>
 
       <style>{`
         @media print {

@@ -54,6 +54,7 @@ export default function RelatorioSondagem() {
         </div>
       </div>
 
+      <div className="report-content-container">
       <div className="print:pt-0 print:pb-0">
         <div className="w-full max-w-[297mm] mx-auto bg-white shadow-xl print:shadow-none pt-2 px-4 pb-2 print:pt-0 print:px-1 print:pb-2">
           <RelatorioSondagemHeader regional={regional} ensaio={ensaio} />
@@ -119,6 +120,7 @@ export default function RelatorioSondagem() {
             </div>
             </div>
             )}
+      </div>
 
       {/* Estilos para impressão */}
       <style>{`

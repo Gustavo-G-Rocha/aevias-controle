@@ -43,7 +43,7 @@ export default function RelatorioRompimentoConcreto() {
         onPrint={handlePrint}
       />
 
-      <div className="w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none p-2 print:p-1 flex flex-col">
+      <div className="report-content-container w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none p-2 print:p-1 flex flex-col">
         <RelatorioRompimentoDadosGerais
           ensaio={ensaio}
           obra={obra}

@@ -10,10 +10,14 @@ import {
 } from "@/components/relatorio-certificacao-usina/RelatorioCertificacaoPrimitives";
 import SecaoSaudeSegurancaReport from "@/components/relatorio-certificacao-usina/SecaoSaudeSegurancaReport";
 import SecaoMeioAmbienteReport from "@/components/relatorio-certificacao-usina/SecaoMeioAmbienteReport";
+import { useReportPdfActions } from "@/hooks/useReportPdfActions";
 
 export default function RelatorioCertificacaoUsina() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // No PC abre "Salvar como"; no celular baixa direto.
+  const { handlePrint, downloading } = useReportPdfActions("certificacao-usina.pdf");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -87,8 +91,8 @@ export default function RelatorioCertificacaoUsina() {
     <div style={{ backgroundColor: 'var(--color-surface-muted)', minHeight: "100vh", padding: "24px 0" }}>
       {/* Toolbar */}
       <div className="print:hidden flex justify-center mb-4">
-        <Button onClick={() => window.print()} className="gap-2 text-white" style={{ backgroundColor: 'var(--color-primary)' }}>
-          <Printer className="w-4 h-4" /> Imprimir / Salvar PDF
+        <Button onClick={handlePrint} disabled={downloading} className="gap-2 text-white" style={{ backgroundColor: 'var(--color-primary)' }}>
+          <Printer className="w-4 h-4" /> {downloading ? 'Gerando...' : 'Gerar PDF'}
         </Button>
       </div>
 

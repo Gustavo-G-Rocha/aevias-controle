@@ -1,10 +1,9 @@
 /**
- * Hook para ações do relatório de sondagem
+ * Hook de ações para RelatorioSondagem.
+ * Delega para o hook compartilhado de PDF (html2canvas + jsPDF).
  */
-export function useRelatorioSondagemActions() {
-  const handlePrint = () => {
-    window.print();
-  };
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 
-  return { handlePrint };
+export function useRelatorioSondagemActions() {
+  return useReportPdfActions('relatorio-sondagem.pdf');
 }

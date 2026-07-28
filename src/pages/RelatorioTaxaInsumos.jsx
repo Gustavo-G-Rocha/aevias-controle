@@ -4,12 +4,16 @@ import { Loader2, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AprovacaoBar from '@/components/relatorios/AprovacaoBar';
 import RelatorioTaxaInsumosDoc from '@/components/relatorios/RelatorioTaxaInsumosDoc';
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 
 export default function RelatorioTaxaInsumos() {
   const [ensaio, setEnsaio] = useState(null);
   const [obra, setObra] = useState(null);
   const [regional, setRegional] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // No PC abre "Salvar como"; no celular baixa direto.
+  const { handlePrint, downloading } = useReportPdfActions('relatorio-taxa-insumos.pdf');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -52,14 +56,16 @@ export default function RelatorioTaxaInsumos() {
           </h2>
           <div className="flex flex-wrap items-center gap-2">
             <AprovacaoBar entityName="EnsaioTaxaInsumos" recordId={ensaio.id} />
-            <Button onClick={() => window.print()} className="bg-slate-800 text-white hover:bg-slate-700">
-              <Download className="w-4 h-4 mr-2" />
-              Gerar PDF
+            <Button onClick={handlePrint} disabled={downloading} className="bg-slate-800 text-white hover:bg-slate-700">
+              {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+              {downloading ? 'Gerando...' : 'Gerar PDF'}
             </Button>
           </div>
         </div>
       </div>
-      <RelatorioTaxaInsumosDoc ensaio={ensaio} obra={obra} regional={regional} />
+      <div className="report-content-container">
+        <RelatorioTaxaInsumosDoc ensaio={ensaio} obra={obra} regional={regional} />
+      </div>
     </div>
   );
 }

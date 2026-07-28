@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 import RelatorioManchaPenduloComponent from '@/components/relatorios/RelatorioManchaPendulo';
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 import { logger } from '@/utils/logger';
 
 export default function RelatorioManchaPenduloPage() {
@@ -45,9 +46,8 @@ export default function RelatorioManchaPenduloPage() {
     loadData();
   }, [id]);
 
-  const handlePrint = () => {
-    window.print();
-  };
+  // No PC abre "Salvar como"; no celular baixa direto.
+  const { handlePrint, downloading } = useReportPdfActions('relatorio-mancha-pendulo.pdf');
 
   if (loading) {
     return (
@@ -103,15 +103,17 @@ export default function RelatorioManchaPenduloPage() {
           </h2>
           <div className="flex items-center gap-2">
             {ensaio && <AprovacaoBar entityName="EnsaioManchaPendulo" recordId={ensaio.id} />}
-            <Button onClick={handlePrint} className="bg-slate-800 text-white hover:bg-slate-700">
-              <Download className="w-4 h-4 mr-2" />
-              Gerar PDF
+            <Button onClick={handlePrint} disabled={downloading} className="bg-slate-800 text-white hover:bg-slate-700">
+              {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+              {downloading ? 'Gerando...' : 'Gerar PDF'}
             </Button>
           </div>
         </div>
       </div>
 
-      <RelatorioManchaPenduloComponent ensaio={ensaio} obra={obra} regional={regional} />
+      <div className="report-content-container">
+        <RelatorioManchaPenduloComponent ensaio={ensaio} obra={obra} regional={regional} />
+      </div>
     </div>
   );
 }

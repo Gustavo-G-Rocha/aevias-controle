@@ -12,6 +12,7 @@ import { listarRegionais } from '@/services/regionaisService';
 import { listarFaixas } from '@/services/faixasService';
 import RelatorioDensidade from '../components/relatorios/RelatorioDensidade';
 import RelatorioMRAF from '../components/relatorios/RelatorioMRAF';
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 import { logger } from '@/utils/logger';
 
 export default function RelatorioEnsaio() {
@@ -84,9 +85,8 @@ export default function RelatorioEnsaio() {
     loadReportData();
   }, [loadReportData]);
 
-  const handlePrint = () => {
-    window.print();
-  };
+  // No PC abre "Salvar como"; no celular baixa direto.
+  const { handlePrint, downloading } = useReportPdfActions('relatorio-ensaio.pdf');
 
   if (state.loading) {
     return (
@@ -135,9 +135,9 @@ export default function RelatorioEnsaio() {
               const en = entityMap[state.data.tipo];
               return en ? <AprovacaoBar entityName={en} recordId={state.data.record?.id} /> : null;
             })()}
-            <Button onClick={handlePrint} className="bg-slate-800 text-white hover:bg-slate-700">
-              <Download className="w-4 h-4 mr-2" />
-              Gerar PDF
+            <Button onClick={handlePrint} disabled={downloading} className="bg-slate-800 text-white hover:bg-slate-700">
+              {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+              {downloading ? 'Gerando...' : 'Gerar PDF'}
             </Button>
           </div>
         </div>

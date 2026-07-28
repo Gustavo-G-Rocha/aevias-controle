@@ -70,7 +70,7 @@ export default function RelatorioTaxaMRAF() {
         }
       `}</style>
 
-      <div className="w-full max-w-[210mm] mx-auto bg-white py-4 px-4 print:py-3 print:px-3">
+      <div className="report-content-container w-full max-w-[210mm] mx-auto bg-white py-4 px-4 print:py-3 print:px-3">
         <RelatorioTaxaMRAFHeader ensaio={ensaio} regional={regional} />
         <RelatorioTaxaMRAFDadosObra ensaio={ensaio} obra={obra} regional={regional} />
         <RelatorioTaxaMRAFTabelas ensaio={ensaio} />

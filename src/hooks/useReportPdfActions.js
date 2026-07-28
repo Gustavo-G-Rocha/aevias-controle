@@ -14,7 +14,11 @@ export function useReportPdfActions(filename) {
   const [downloading, setDownloading] = useState(false);
 
   const handlePrint = useCallback(async () => {
-    const element = document.querySelector('.report-content-container');
+    // Alguns relatórios marcam o container com [data-print-container]
+    // em vez de .report-content-container — aceita os dois.
+    const element =
+      document.querySelector('.report-content-container') ||
+      document.querySelector('[data-print-container]');
     if (!element) {
       window.print();
       return;

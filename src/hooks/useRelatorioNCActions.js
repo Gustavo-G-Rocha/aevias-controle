@@ -3,6 +3,7 @@
  * Gerencia compressão de imagens e impressão.
  */
 import { useState } from 'react';
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 
 /**
  * Comprime uma imagem via canvas e retorna data URL.
@@ -47,14 +48,14 @@ export const useRelatorioNCActions = (fotos = []) => {
     }
   };
 
-  const imprimirPDF = () => {
-    window.print();
-  };
+  // PDF: no PC abre "Salvar como"; no celular baixa direto.
+  const { handlePrint, downloading } = useReportPdfActions('relatorio-nc.pdf');
 
   return {
     compressedFotos,
     compressingFotos,
     comprimirFotos,
-    imprimirPDF,
+    imprimirPDF: handlePrint,
+    downloading,
   };
 };

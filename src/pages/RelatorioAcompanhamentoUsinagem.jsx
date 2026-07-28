@@ -8,6 +8,7 @@ import { Loader2, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import RelatorioAcompanhamentoUsinagem from "../components/relatorios/RelatorioAcompanhamentoUsinagem";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 import { logger } from '@/utils/logger';
 
 export default function RelatorioAcompanhamentoUsinagemPage() {
@@ -58,6 +59,9 @@ export default function RelatorioAcompanhamentoUsinagemPage() {
     loadData();
   }, []);
 
+  // No PC abre "Salvar como"; no celular baixa direto.
+  const { handlePrint, downloading } = useReportPdfActions('relatorio-acompanhamento-usinagem.pdf');
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -81,13 +85,16 @@ export default function RelatorioAcompanhamentoUsinagemPage() {
           <h2 className="text-lg font-semibold text-slate-800">Relatório de Acompanhamento de Usinagem</h2>
           <div className="flex items-center gap-2">
             {ensaio && <AprovacaoBar entityName="AcompanhamentoUsinagem" recordId={ensaio.id} />}
-            <Button onClick={() => window.print()} className="bg-slate-800 text-white hover:bg-slate-700">
-              <Printer className="w-4 h-4 mr-2" /> Gerar PDF
+            <Button onClick={handlePrint} disabled={downloading} className="bg-slate-800 text-white hover:bg-slate-700">
+              {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
+              {downloading ? 'Gerando...' : 'Gerar PDF'}
             </Button>
           </div>
         </div>
       </div>
-      <RelatorioAcompanhamentoUsinagem ensaio={ensaio} obra={obra} regional={regional} project={project} />
+      <div className="report-content-container">
+        <RelatorioAcompanhamentoUsinagem ensaio={ensaio} obra={obra} regional={regional} project={project} />
+      </div>
     </div>
   );
 }

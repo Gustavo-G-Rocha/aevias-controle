@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
 import { canUserEditRecord } from "@/utils/recordEditPermission";
 import { toast } from "@/components/ui/use-toast";
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 import { logger } from '@/utils/logger';
 
 export default function RelatorioGranulometriaIndividualPage() {
@@ -69,6 +70,9 @@ export default function RelatorioGranulometriaIndividualPage() {
     loadData();
   }, [location.search]);
 
+  // No PC abre "Salvar como"; no celular baixa direto.
+  const { handlePrint, downloading } = useReportPdfActions('relatorio-granulometria-individual.pdf');
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -97,19 +101,22 @@ export default function RelatorioGranulometriaIndividualPage() {
               </Button>
             )}
             {ensaio && <AprovacaoBar entityName="EnsaioGranulometriaIndividual" recordId={ensaio.id} />}
-            <Button onClick={() => window.print()} className="bg-slate-800 text-white hover:bg-slate-700">
-              <Printer className="w-4 h-4 mr-2" /> Gerar PDF
+            <Button onClick={handlePrint} disabled={downloading} className="bg-slate-800 text-white hover:bg-slate-700">
+              {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
+              {downloading ? 'Gerando...' : 'Gerar PDF'}
             </Button>
           </div>
         </div>
       </div>
-      <RelatorioGranulometriaIndividual
-        ensaio={ensaio}
-        obra={obra}
-        project={project}
-        user={user}
-        regional={regional}
-      />
+      <div className="report-content-container">
+        <RelatorioGranulometriaIndividual
+          ensaio={ensaio}
+          obra={obra}
+          project={project}
+          user={user}
+          regional={regional}
+        />
+      </div>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { obterObraById } from '@/services/obrasService';
 import { obterRegionalById } from '@/services/regionaisService';
 import { isAuthenticated } from '@/services/usuariosService';
 import RelatorioTaxaPinturaImprimacaoComponent from '../components/relatorios/RelatorioTaxaPinturaImprimacao';
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 import { logger } from '@/utils/logger';
 
 export default function RelatorioTaxaPinturaImprimacaoPage() {
@@ -67,9 +68,8 @@ export default function RelatorioTaxaPinturaImprimacaoPage() {
     loadReportData();
   }, []);
 
-  const handlePrint = () => {
-    window.print();
-  };
+  // No PC abre "Salvar como"; no celular baixa direto.
+  const { handlePrint, downloading } = useReportPdfActions('relatorio-taxa-pintura-imprimacao.pdf');
 
   if (state.loading) {
     return (
@@ -95,9 +95,9 @@ export default function RelatorioTaxaPinturaImprimacaoPage() {
           </h2>
           <div className="flex items-center gap-2">
             {state.data && <AprovacaoBar entityName="EnsaioTaxaPinturaImprimacao" recordId={state.data.ensaio?.id} />}
-            <Button onClick={handlePrint} className="bg-slate-800 text-white hover:bg-slate-700">
-              <Download className="w-4 h-4 mr-2" />
-              Gerar PDF
+            <Button onClick={handlePrint} disabled={downloading} className="bg-slate-800 text-white hover:bg-slate-700">
+              {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+              {downloading ? 'Gerando...' : 'Gerar PDF'}
             </Button>
           </div>
         </div>

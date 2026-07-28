@@ -11,6 +11,7 @@ import AprovacaoBar from '../components/relatorios/AprovacaoBar';
 
 import RelatorioAcompanhamentoCarga from "@/components/relatorios/RelatorioAcompanhamentoCarga";
 import { RelatorioAcompanhamentoCargaProvider } from "@/components/relatorios/acompanhamento-carga/RelatorioAcompanhamentoCargaContext";
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 import { logger } from '@/utils/logger';
 
 export default function RelatorioAcompanhamentoCargaPage() {
@@ -74,9 +75,8 @@ export default function RelatorioAcompanhamentoCargaPage() {
     }
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
+  // No PC abre "Salvar como"; no celular baixa direto.
+  const { handlePrint, downloading } = useReportPdfActions('relatorio-acompanhamento-carga.pdf');
 
   if (loading) {
     return (
@@ -103,15 +103,15 @@ export default function RelatorioAcompanhamentoCargaPage() {
           </h2>
           <div className="flex items-center gap-2">
             {acompanhamento && <AprovacaoBar entityName="AcompanhamentoCarga" recordId={acompanhamento.id} />}
-            <Button onClick={handlePrint} className="bg-[#00233B] text-white hover:bg-[#00233B]/90">
-              <Printer className="w-4 h-4 mr-2" />
-              Gerar PDF
+            <Button onClick={handlePrint} disabled={downloading} className="bg-[#00233B] text-white hover:bg-[#00233B]/90">
+              {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
+              {downloading ? 'Gerando...' : 'Gerar PDF'}
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-[297mm] mx-auto bg-white shadow-lg my-4 print:my-0 print:shadow-none">
+      <div className="report-content-container max-w-[297mm] mx-auto bg-white shadow-lg my-4 print:my-0 print:shadow-none">
         <RelatorioAcompanhamentoCargaProvider
           acompanhamento={acompanhamento}
           obra={obra}

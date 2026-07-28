@@ -69,7 +69,7 @@ export default function RelatorioVigaBenkelman() {
         </div>
       </div>
 
-      <div id="report-content" className="w-full max-w-[210mm] mx-auto bg-white p-1 print:p-1">
+      <div id="report-content" className="report-content-container w-full max-w-[210mm] mx-auto bg-white p-1 print:p-1">
         {faixasArray.map((faixa, faixaIdx) => {
           const chartData = prepararChartData(faixa.levantamentos, ensaio.def_admissivel);
 

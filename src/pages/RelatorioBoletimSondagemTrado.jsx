@@ -64,6 +64,7 @@ export default function RelatorioBoletimSondagemTrado() {
         </div>
       </div>
 
+      <div className="report-content-container">
       <div
         className="w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none p-2 print:p-1 flex flex-col"
         style={{ fontSize: '95%', minHeight: 'calc(297mm - 16mm)' }}
@@ -118,6 +119,7 @@ export default function RelatorioBoletimSondagemTrado() {
       </div>
 
       <BoletimFotos boletim={boletim} obra={obra} regional={regional} />
+      </div>
 
       <style>{`
         table tr { line-height: 1.075; }

@@ -44,6 +44,7 @@ export default function RelatorioBoletimSondagem() {
     <div className="relatorio-page bg-white min-h-screen">
       <BoletimSondagemToolbar boletim={boletim} onPrint={handlePrint} />
 
+      <div className="report-content-container">
       <div
         className="w-full max-w-[190mm] mx-auto bg-white shadow-xl print:shadow-none p-8 print:p-8 flex flex-col"
         style={{ fontSize: "95%", minHeight: "calc(297mm - 16mm)" }}
@@ -92,6 +93,7 @@ export default function RelatorioBoletimSondagem() {
       </div>
 
       <BoletimSondagemFotos boletim={boletim} obra={obra} regional={regional} />
+      </div>
 
       <style>{`
         table tr { line-height: 1.075; }

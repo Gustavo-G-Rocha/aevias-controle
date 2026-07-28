@@ -1,7 +1,9 @@
-export function useRelatorioDensidadeInSituActions() {
-  const handlePrint = () => {
-    window.print();
-  };
+/**
+ * Hook de ações para RelatorioDensidadeInSitu.
+ * Delega para o hook compartilhado de PDF (html2canvas + jsPDF).
+ */
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 
-  return { handlePrint };
+export function useRelatorioDensidadeInSituActions() {
+  return useReportPdfActions('relatorio-densidade-in-situ.pdf');
 }

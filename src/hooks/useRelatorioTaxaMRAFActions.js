@@ -1,11 +1,9 @@
 /**
- * Hook para ações (print, etc.) em RelatorioTaxaMRAF
- * Mantém a implementação centralizada
+ * Hook de ações para RelatorioTaxaMRAF.
+ * Delega para o hook compartilhado de PDF (html2canvas + jsPDF).
  */
-export function useRelatorioTaxaMRAFActions() {
-  const handlePrint = () => {
-    window.print();
-  };
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 
-  return { handlePrint };
+export function useRelatorioTaxaMRAFActions() {
+  return useReportPdfActions('relatorio-taxa-mraf.pdf');
 }

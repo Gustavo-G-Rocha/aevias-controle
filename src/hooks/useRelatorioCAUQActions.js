@@ -1,13 +1,9 @@
 /**
  * Hook de ações para RelatorioCAUQ.
- * Exporta o handler de impressão/PDF.
+ * Delega para o hook compartilhado de PDF (html2canvas + jsPDF).
  */
-import { useCallback } from 'react';
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 
 export function useRelatorioCAUQActions() {
-  const handlePrint = useCallback(() => {
-    window.print();
-  }, []);
-
-  return { handlePrint };
+  return useReportPdfActions('relatorio-cauq.pdf');
 }

@@ -69,7 +69,7 @@ export default function RelatorioGranuMistura() {
         </div>
       </div>
 
-      <div className="w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none p-2 print:p-1 flex flex-col">
+      <div className="report-content-container w-full max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none p-2 print:p-1 flex flex-col">
         <GranuMistraHeader record={record} regional={regional} />
 
         <GranuMistraDadosObra

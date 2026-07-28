@@ -1,12 +1,10 @@
 /**
  * Hook de ações para RelatorioGranuMistura.
- * Gerencia ações de impressão e navegação.
+ * Delega para o hook compartilhado de PDF (html2canvas + jsPDF).
  */
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 
 export const useRelatorioGranuMisturaActions = () => {
-  const imprimirPDF = () => {
-    window.print();
-  };
-
-  return { imprimirPDF };
+  const { handlePrint, downloading } = useReportPdfActions('relatorio-granulometria-mistura.pdf');
+  return { imprimirPDF: handlePrint, downloading };
 };

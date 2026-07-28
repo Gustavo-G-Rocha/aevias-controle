@@ -8,6 +8,7 @@ import { obterRegionalById } from '@/services/regionaisService';
 import AprovacaoBar from '@/components/relatorios/AprovacaoBar';
 import RelatorioControleExecucaoServicos from "@/components/relatorios/RelatorioControleExecucaoServicos";
 import { mapControleToPresentation } from "@/utils/relatorioControleExecucaoServicosMapper";
+import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 import { logger } from '@/utils/logger';
 
 export default function RelatorioControleExecucaoServicosPage() {
@@ -66,9 +67,8 @@ export default function RelatorioControleExecucaoServicosPage() {
     [registro, obra, regional]
   );
 
-  const handlePrint = () => {
-    window.print();
-  };
+  // No PC abre "Salvar como"; no celular baixa direto.
+  const { handlePrint, downloading } = useReportPdfActions('controle-execucao-servicos.pdf');
 
   if (loading) {
     return (
@@ -98,15 +98,15 @@ export default function RelatorioControleExecucaoServicosPage() {
           </h2>
           <div className="flex items-center gap-2">
             {registro && <AprovacaoBar entityName="ControleExecucaoServicos" recordId={registro.id} />}
-            <Button onClick={handlePrint} className="bg-[#00233B] text-white hover:bg-[#00233B]/90">
-              <Printer className="w-4 h-4 mr-2" />
-              Imprimir
+            <Button onClick={handlePrint} disabled={downloading} className="bg-[#00233B] text-white hover:bg-[#00233B]/90">
+              {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
+              {downloading ? 'Gerando...' : 'Gerar PDF'}
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-[210mm] mx-auto bg-white shadow-lg my-4 print:my-0 print:shadow-none">
+      <div className="report-content-container max-w-[210mm] mx-auto bg-white shadow-lg my-4 print:my-0 print:shadow-none">
         <RelatorioControleExecucaoServicos data={data} />
       </div>
 
