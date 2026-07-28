@@ -24,16 +24,24 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
 
-    // Automação de entidade envia: { event, data, old_data, payload_too_large }
-    const report = body?.data || null;
-    const reportId = body?.event?.entity_id || body?.entity_id || report?.id;
+    // O ID do BugReport vem exclusivamente do envelope do evento de
+    // automação da entidade (event.entity_id / entity_id). Nunca
+    // confiamos no objeto `data` do corpo — um chamador anônimo poderia
+    // forjar um payload com conteúdo/assunto arbitrários e disparar
+    // e-mails de phishing. Buscamos sempre o registro real no banco;
+    // o e-mail reflete somente dados que passaram pelo fluxo de
+    // criação protegido por RLS.
+    const reportId = body?.event?.entity_id || body?.entity_id;
 
-    let bugReport = report;
-    if (!bugReport && reportId) {
-      bugReport = await base44.asServiceRole.entities.BugReport.get(reportId);
+    if (!reportId) {
+      return Response.json({ error: 'ID do bug report ausente' }, { status: 400 });
     }
-    if (!bugReport) {
-      return Response.json({ error: 'Sem dados do bug report' }, { status: 400 });
+
+    let bugReport;
+    try {
+      bugReport = await base44.asServiceRole.entities.BugReport.get(reportId);
+    } catch {
+      return Response.json({ error: 'Bug report não encontrado' }, { status: 404 });
     }
 
     const solicitante = escapeHtml(bugReport.created_by || 'Usuário não identificado');

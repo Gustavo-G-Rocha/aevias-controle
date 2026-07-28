@@ -60,6 +60,16 @@ function extractDeviceInfo(req: Request): string {
 }
 
 /**
+ * Valida formato básico de e-mail para eventos anônimos.
+ * Impede forjamento de identidade com strings arbitrárias.
+ */
+function isValidEmail(value: unknown): boolean {
+  if (typeof value !== 'string') return false;
+  if (value.length > 254) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+/**
  * Computa hash SHA-256 do conteúdo da entrada + hash anterior (cadeia).
  * Usa Web Crypto API (disponível em Deno Deploy).
  */
@@ -131,21 +141,41 @@ Deno.serve(async (req: Request) => {
     let changedBy: string;
     let changedByName: string;
     let resolvedActorRole: string;
+    // Para chamadas anônimas, travamos os campos controláveis pelo
+    // cliente para evitar forjamento/polução da trilha de auditoria:
+    // entity_name, entity_id e changes são ignorados do payload, e
+    // actor_email só é aceito se for um e-mail bem formado.
+    let forcedEntityName: string | null = null;
+    let forcedEntityId: unknown = undefined;
+    let resolvedChanges: unknown[] | null = null;
 
     if (user) {
       changedBy = user.email || '';
       changedByName = user.laboratorista_name || user.full_name || '';
       resolvedActorRole = user.access_level || user.role || '';
     } else {
-      changedBy = ANON_EVENTS_WITH_TARGET_EMAIL.has(event_type) && actor_email
-        ? actor_email
+      // actor_email só é aceito para eventos anônimos legítimos onde
+      // representa o ALVO da tentativa (login_failure, password_reset_*,
+      // token_expired) — e somente se for um e-mail bem formado.
+      changedBy = ANON_EVENTS_WITH_TARGET_EMAIL.has(event_type) && isValidEmail(actor_email)
+        ? String(actor_email).toLowerCase()
         : 'Anônimo';
       changedByName = 'Anônimo';
       resolvedActorRole = 'não_autenticado';
+      // Eventos anônimos são sempre de auth: fixamos entity_name em
+      // AuthSession e descartamos changes/entity_id do payload para
+      // impedir injeção de conteúdo arbitrário na trilha.
+      forcedEntityName = 'AuthSession';
+      forcedEntityId = null;
+      resolvedChanges = [];
     }
 
     const now = new Date().toISOString();
-    const resolvedEntityName = entity_name || (AUTH_EVENT_TYPES.has(event_type) ? 'AuthSession' : 'Unknown');
+    const resolvedEntityName = forcedEntityName || entity_name || (AUTH_EVENT_TYPES.has(event_type) ? 'AuthSession' : 'Unknown');
+    const resolvedEntityId = forcedEntityId !== undefined ? forcedEntityId : (entity_id || null);
+    const resolvedResult = result === 'failure' ? 'failure' : 'success';
+    const resolvedFailureReason = failure_reason ? String(failure_reason).slice(0, 1000) : null;
+    const finalChanges = resolvedChanges !== null ? resolvedChanges : (changes || []);
 
     // ── CHAIN HASH — busca última entrada e computa hash encadeado ──
     let previousHash: string | null = null;
@@ -160,15 +190,15 @@ Deno.serve(async (req: Request) => {
 
     const entryData = {
       entity_name: resolvedEntityName,
-      entity_id: entity_id || null,
+      entity_id: resolvedEntityId,
       operation: event_type,
       changed_by: changedBy,
       changed_by_name: changedByName,
       actor_role: resolvedActorRole,
       ip_address: ipAddress,
       device_info: deviceInfo,
-      result,
-      failure_reason: failure_reason || null,
+      result: resolvedResult,
+      failure_reason: resolvedFailureReason,
       timestamp: now,
     };
 
@@ -177,7 +207,7 @@ Deno.serve(async (req: Request) => {
     // Cria a entrada (asServiceRole bypassa RLS — create é permitido)
     const auditEntry = await base44?.asServiceRole.entities.AuditTrail.create({
       ...entryData,
-      changes: changes || [],
+      changes: finalChanges,
       client_timestamp: null,
       is_offline_sync: false,
       chain_hash: chainHash,
