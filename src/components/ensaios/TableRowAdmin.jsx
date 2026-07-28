@@ -9,6 +9,7 @@ import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components
 import { getLocalInfo, getLaboratoristaInfo, getEmpreiteiraInfo, getNaoConformidades, getStatusInfo } from "@/components/ensaios/utils";
 import { CopyIdButton } from "@/components/ensaios/TableFilters";
 import { canUserEditRecord, RESTRICTED_EDIT_ENTITIES } from "@/utils/recordEditPermission";
+import { canGestorPreencherResultado } from "@/utils/certificacaoUsinaAccess";
 import { ACTION_COLORS, SIGN_DIALOG, buildSignDescription } from "@/constants/ensaioUi";
 import CriticalActionDialog from "@/components/ensaios/CriticalActionDialog";
 
@@ -27,12 +28,16 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
   // admin (apenas com a obra em andamento) podem editar.
   const isRestrito = RESTRICTED_EDIT_ENTITIES.has(ensaio.entityType);
   const statusPermiteEdicao = ensaio.status === 'rascunho' || ensaio.approved === false || ensaio.approved === null;
+  const gestorPodeEditarResultado =
+    ensaio.entityType === 'CertificacaoUsina' &&
+    canGestorPreencherResultado(user, ensaio, obra, regionais);
   const podeEditarRestrito =
     isRestrito &&
     !ensaio.client_signature?.signed_by &&
     (
       (user.role === 'admin' && obra?.status === 'em_andamento') ||
-      (ensaio.created_by === user.email && statusPermiteEdicao)
+      (ensaio.created_by === user.email && statusPermiteEdicao) ||
+      gestorPodeEditarResultado
     );
   // Demais registros: admin, autor ou responsável da regional (mesmas regras do servidor)
   // podem abrir o formulário editável de registros em execução/reprovados
@@ -41,13 +46,16 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
     (ensaio.status === 'rascunho' || ensaio.approved === false) &&
     !ensaio.client_signature?.signed_by &&
     canUserEditRecord(user, ensaio, obra, regionais);
+  // Rascunhos que o usuário pode editar abrem o formulário (não o relatório).
+  const canEditDraft = podeEditarRegistro || podeEditarRestrito;
+  const primaryUrl = canEditDraft ? createPageUrl(`${ensaio.entityType}?editId=${ensaio.id}`) : reportUrl;
 
   return (
     <tr className={`border-b border-border hover:bg-muted/50 ${index % 2 === 0 ? 'bg-transparent' : 'bg-muted/20'}`}>
       <td className="px-2 py-2">
         <div className="font-medium text-foreground flex items-center gap-1 text-xs">
           <TypeIcon className="w-3 h-3 text-secondary" />
-          <RouterLink to={reportUrl} target="_blank" rel="noopener noreferrer" className="truncate max-w-[120px] hover:underline underline-offset-2" title={`Ver relatório de ${name}`} aria-label={`Ver relatório de ${name}`}>{name}</RouterLink>
+          <RouterLink to={primaryUrl} {...(canEditDraft ? {} : { target: "_blank", rel: "noopener noreferrer" })} className="truncate max-w-[120px] hover:underline underline-offset-2" title={canEditDraft ? `Editar ${name}` : `Ver relatório de ${name}`} aria-label={canEditDraft ? `Editar ${name}` : `Ver relatório de ${name}`}>{name}</RouterLink>
           <CopyIdButton id={ensaio.id} />
           {naoConformidades.length > 0 && <span role="img" aria-label={`Não conformidades: ${naoConformidades.join(', ')}`} className="text-destructive cursor-help" title={`Não conformidades:\n${naoConformidades.join('\n')}`}>⚠️</span>}
           {!naoConformidades.length && temDeflexaoExcessiva && <span role="img" aria-label="Pontos com deflexão acima do limite admissível" className="cursor-help" title="Pontos com deflexão acima do limite admissível">🟡</span>}

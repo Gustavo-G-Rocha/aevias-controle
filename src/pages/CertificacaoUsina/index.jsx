@@ -5,7 +5,7 @@ import { createPageUrl } from "@/utils";
 import { useChecklistForm } from "@/hooks/useChecklistForm";
 import { useCertificacaoUsinaForm } from "@/hooks/useCertificacaoUsinaForm";
 import { validarCertificacao } from "@/utils/certificacaoUsinaUtils";
-import { laboratoristaDeveOcultarResultado } from "@/utils/certificacaoUsinaAccess";
+import { laboratoristaDeveOcultarResultado, canGestorPreencherResultado } from "@/utils/certificacaoUsinaAccess";
 import { criarCertificacao, atualizarCertificacao } from "@/services/certificacaoUsinaService";
 import { uploadMultipleFiles } from "@/utils/imageUpload";
 import CertificacaoUsinaActions from "@/components/certificacao-usina/CertificacaoUsinaActions";
@@ -46,7 +46,7 @@ export default function CertificacaoUsinaPage() {
     getInitialFormData,
     "CertificacaoUsina",
     "certificacao_usina",
-    null,
+    canGestorPreencherResultado,
     { requireObraEmAndamentoForAdmin: true },
   );
 
