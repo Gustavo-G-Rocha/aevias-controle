@@ -73,7 +73,7 @@ ref)
         
         <div
           data-sidebar="sidebar"
-          className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow rounded-[20px]">
+          className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-r-lg group-data-[variant=floating]:rounded-l-none group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow rounded-r-[20px] rounded-l-none">
           
           {children}
         </div>
