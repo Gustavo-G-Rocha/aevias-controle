@@ -53,6 +53,7 @@ function AuthenticatedApp() {
       <Route path="/forgot-password" element={<Suspense fallback={<PageLoadingFallback />}><ForgotPassword /></Suspense>} />
       <Route path="/reset-password" element={<Suspense fallback={<PageLoadingFallback />}><ResetPassword /></Suspense>} />
       <Route path="/verificar-assinatura" element={<Suspense fallback={<PageLoadingFallback />}><VerificarAssinatura /></Suspense>} />
+      <Route path="/VerificarAssinatura" element={<Navigate to="/verificar-assinatura" replace />} />
 
       {/* Protected app routes */}
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
