@@ -15,7 +15,7 @@ import { AnexosSection } from "@/components/nova-nc/AnexosSection";
 
 export default function NovaNcPage() {
   // Data
-  const { user, obras, regionais: _regionais, loading } = useNovaNCData();
+  const { user, obras, regionais, loading } = useNovaNCData();
 
   // Form state
   const {
@@ -57,7 +57,7 @@ export default function NovaNcPage() {
         <DadosObraSection
           obras={obras}
           obraId={obraId}
-          onObraChange={handleObraChange}
+          onObraChange={(id) => handleObraChange(obras, regionais, id)}
           form={form}
           onFormChange={setForm}
           tipoChecklist={tipoChecklist}
