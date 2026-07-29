@@ -22,7 +22,9 @@ export default function ProjectForm({ project, faixas, regionais, user, onSave, 
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractionError, setExtractionError] = useState(null);
 
-  const [formData, setFormData] = useState({ ...INITIAL_FORM_DATA });
+  const [formData, setFormData] = useState(() =>
+    project ? mapProjectToFormData(project) : { ...INITIAL_FORM_DATA }
+  );
 
   const [peneirasDisponiveis, setPeneirasDisponiveis] = useState([]);
   
