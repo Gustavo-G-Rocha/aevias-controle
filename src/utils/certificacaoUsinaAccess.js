@@ -31,10 +31,17 @@ export function getGestoresDaRegional(regional) {
 
 /**
  * Indica se o usuário é gestor de contrato alocado na regional informada.
+ *
+ * Aceita tanto usuários com access_level='gestor_contrato' quanto admins
+ * (role='admin') que estejam explicitamente alocados na lista de gestores da
+ * regional — assim a permissão de preencher resultado funciona independentemente
+ * de a forma como o usuário foi cadastrado (access_level explícito vs role admin).
  */
 export function isGestorDaRegional(user, regional) {
   if (!user || !regional) return false;
-  if (getUserAccessLevel(user) !== 'gestor_contrato') return false;
+  const level = getUserAccessLevel(user);
+  const isGestorLevel = level === 'gestor_contrato' || user.role === 'admin';
+  if (!isGestorLevel) return false;
   return getGestoresDaRegional(regional).includes(norm(user.email));
 }
 
