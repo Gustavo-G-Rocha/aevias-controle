@@ -58,9 +58,7 @@ export default function ProjectFormUpload({
   };
 
   const shouldShow = formData.tipo_projeto !== 'CARTA_TRACO_CONCRETO' && 
-                     formData.tipo_projeto && 
-                     formData.faixa_granulometrica_id && 
-                     formData.regional_id;
+                     !!formData.tipo_projeto;
 
   if (!shouldShow) return null;
 
