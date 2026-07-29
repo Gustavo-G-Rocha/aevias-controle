@@ -63,7 +63,7 @@ export default function ProjectFormUpload({
   if (!shouldShow) return null;
 
   return (
-    <div className="p-4 border-2 border-dashed border-secondary/30 rounded-lg bg-secondary/5">
+    <div data-testid="ai-upload-section" className="p-4 border-2 border-dashed border-secondary/30 rounded-lg bg-secondary/5">
       <div className="flex items-start gap-3 mb-3">
         <Sparkles className="w-5 h-5 text-foreground mt-1" />
         <div className="flex-1">
@@ -75,16 +75,17 @@ export default function ProjectFormUpload({
           </p>
 
           {isExtracting ? (
-            <div className="flex items-center gap-2 text-foreground">
+            <div data-testid="extraction-spinner" className="flex items-center gap-2 text-foreground">
               <Loader2 className="w-4 h-4 animate-spin" />
               <span className="text-sm">Analisando arquivo e extraindo dados...</span>
             </div>
           ) : (
-            <label className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-primary-foreground rounded-lg cursor-pointer hover:bg-muted/90 transition-colors">
+            <label data-testid="file-upload-label" className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-primary-foreground rounded-lg cursor-pointer hover:bg-muted/90 transition-colors">
               <FileUp className="w-4 h-4" />
               <span className="text-sm font-medium">Escolher Arquivo do Projeto</span>
               <input
                 type="file"
+                data-testid="project-file-input"
                 className="hidden"
                 accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                 onChange={handleFileUpload}
@@ -95,14 +96,14 @@ export default function ProjectFormUpload({
           )}
 
           {uploadedFile && !isExtracting && (
-            <div className="mt-2 flex items-center gap-2 text-sm text-green-700">
+            <div data-testid="extraction-success" className="mt-2 flex items-center gap-2 text-sm text-green-700">
               <span className="w-2 h-2 bg-green-500 rounded-full"></span>
               Arquivo processado com sucesso
             </div>
           )}
 
           {extractionError && (
-            <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-destructive">
+            <div data-testid="extraction-error" className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-destructive">
               {extractionError}
             </div>
           )}
