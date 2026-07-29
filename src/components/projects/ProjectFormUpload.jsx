@@ -63,7 +63,7 @@ export default function ProjectFormUpload({
   if (!shouldShow) return null;
 
   return (
-    <div className="p-4 border-2 border-dashed border-secondary/30 rounded-lg bg-secondary/20/5">
+    <div className="p-4 border-2 border-dashed border-secondary/30 rounded-lg bg-secondary/5">
       <div className="flex items-start gap-3 mb-3">
         <Sparkles className="w-5 h-5 text-foreground mt-1" />
         <div className="flex-1">
@@ -89,6 +89,7 @@ export default function ProjectFormUpload({
                 accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                 onChange={handleFileUpload}
                 disabled={isExtracting}
+                aria-label="Upload de arquivo do projeto para extração de dados por IA"
               />
             </label>
           )}
