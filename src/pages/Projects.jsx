@@ -54,7 +54,10 @@ export default function Projects() {
       <div className="max-w-7xl mx-auto">
         <ProjectsHeader
           canManage={canManage}
-          onNewProject={() => setIsFormOpen(true)}
+          onNewProject={() => {
+            setEditingProject(null);
+            setIsFormOpen(true);
+          }}
         />
 
         <ProjectsFiltersBar
@@ -77,7 +80,13 @@ export default function Projects() {
         />
 
         {/* Form Dialog */}
-        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <Dialog
+          open={isFormOpen}
+          onOpenChange={(open) => {
+            setIsFormOpen(open);
+            if (!open) setEditingProject(null);
+          }}
+        >
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-foreground">

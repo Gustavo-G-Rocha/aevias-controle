@@ -86,9 +86,15 @@ export const useProjectsActions = (regionais, loadData) => {
     [editingProject, loadData, regionais]
   );
 
+  // Fecha o diálogo primeiro e só reabre no próximo tick para evitar
+  // "Failed to execute 'removeChild' on 'Node'" quando o portal do Radix
+  // ainda está em transição (fechando) e o conteúdo muda (ex.: CAUQ → BGS).
   const handleEdit = useCallback((project) => {
-    setEditingProject(project);
-    setIsFormOpen(true);
+    setIsFormOpen(false);
+    setTimeout(() => {
+      setEditingProject(project);
+      setIsFormOpen(true);
+    }, 0);
   }, []);
 
   const handleDelete = useCallback(
