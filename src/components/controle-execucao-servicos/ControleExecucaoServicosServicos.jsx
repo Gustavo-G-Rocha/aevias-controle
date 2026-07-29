@@ -9,7 +9,7 @@ import { Plus, Trash2 } from "lucide-react";
 
 const numOrNull = (v) => (v === "" ? null : parseFloat(v));
 
-function ServicoCard({ servico, index, canEdit, onChange, onRemove, empreiteiras }) {
+function ServicoCard({ servico, index, canEdit, onChange, onRemove, empreiteiras, todosServicos }) {
   return (
     <div className="border border-border rounded-lg p-4 space-y-3 bg-muted/20">
       <div className="flex items-center justify-between">
@@ -32,13 +32,13 @@ function ServicoCard({ servico, index, canEdit, onChange, onRemove, empreiteiras
             <SelectValue placeholder="Selecione o serviço" />
           </SelectTrigger>
           <SelectContent className="max-h-72">
-            {SERVICOS_EXECUCAO.map((s) => (
+            {todosServicos.map((s) => (
               <SelectItem key={s} value={s} className="text-xs whitespace-normal">
                 {s}
               </SelectItem>
             ))}
             {/* Valor legado (texto livre) que não está na lista — mantém visível ao editar */}
-            {servico.servico && !SERVICOS_EXECUCAO.includes(servico.servico) && (
+            {servico.servico && !todosServicos.includes(servico.servico) && (
               <SelectItem value={servico.servico} className="text-xs whitespace-normal">
                 {servico.servico}
               </SelectItem>
@@ -139,6 +139,10 @@ export default function ControleExecucaoServicosServicos() {
 
   const empreiteiras = obraSelecionada?.empreiteiras || [];
 
+  // Lista de serviços: fixa (SERVICOS_EXECUCAO) + serviços cadastrados na obra (Regionais)
+  const servicosObra = obraSelecionada?.servicos || [];
+  const todosServicos = Array.from(new Set([...SERVICOS_EXECUCAO, ...servicosObra]));
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4 border-b pb-2">
@@ -166,6 +170,7 @@ export default function ControleExecucaoServicosServicos() {
               onChange={handleServicoChange}
               onRemove={handleRemoveServico}
               empreiteiras={empreiteiras}
+              todosServicos={todosServicos}
             />
           ))}
         </div>

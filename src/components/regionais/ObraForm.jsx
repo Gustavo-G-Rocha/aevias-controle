@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, HardHat, Construction, Wrench, FileText, Factory, ClipboardList } from "lucide-react";
+import { SERVICOS_EXECUCAO } from "@/constants/servicosExecucao";
 
-const TagInput = ({ field, value, setValue, placeholder, badgeClass, items, onAdd, onRemove }) => (
+const TagInput = ({ field, value, setValue, placeholder, badgeClass, items, onAdd, onRemove, suggestions = [] }) => (
   <div className="space-y-2">
     <div className="flex gap-2">
       <Input
@@ -18,6 +19,7 @@ const TagInput = ({ field, value, setValue, placeholder, badgeClass, items, onAd
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
         className="bg-card border-border/20 text-foreground"
+        list={suggestions.length > 0 ? `suggestions-${field}` : undefined}
         onKeyPress={(e) => {
           if (e.key === 'Enter') { e.preventDefault(); onAdd(field, value, setValue); }
         }}
@@ -26,6 +28,11 @@ const TagInput = ({ field, value, setValue, placeholder, badgeClass, items, onAd
         <Plus className="w-4 h-4" />
       </Button>
     </div>
+    {suggestions.length > 0 && (
+      <datalist id={`suggestions-${field}`}>
+        {suggestions.map((s) => <option key={s} value={s} />)}
+      </datalist>
+    )}
     <div className="flex flex-wrap gap-2 mt-2">
       {items.map((item, index) => (
         <Badge key={index} variant="secondary" className={`${badgeClass} flex items-center gap-1`}>
@@ -119,7 +126,7 @@ const ObraForm = React.memo(({ obra, regional: _regional, onSave, onCancel }) =>
       )}
 
       {formData.tipo_obra === "gerenciamento" && (
-        <div><Label>Serviços do Contrato</Label><TagInput field="servicos" value={novoServico} setValue={setNovoServico} placeholder="Nome do serviço" badgeClass="bg-cyan-100 text-cyan-800" items={formData.servicos} onAdd={addItem} onRemove={removeItem} /></div>
+        <div><Label>Serviços do Contrato</Label><TagInput field="servicos" value={novoServico} setValue={setNovoServico} placeholder="Nome do serviço" badgeClass="bg-cyan-100 text-cyan-800" items={formData.servicos} onAdd={addItem} onRemove={removeItem} suggestions={SERVICOS_EXECUCAO} /></div>
       )}
 
       {(formData.tipo_obra === "levantamentos" || formData.tipo_obra === "sondagem") && (
