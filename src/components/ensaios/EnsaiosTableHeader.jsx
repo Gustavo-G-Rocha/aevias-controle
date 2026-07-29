@@ -22,10 +22,26 @@ export default function EnsaiosTableHeader({
   // coluna de ações
   acoesLabel = "Ações",
   acoesWidth = "140px",
+  showSelection = false,
+  allSelected = false,
+  someSelected = false,
+  onToggleAll = null,
 }) {
   return (
     <thead className="bg-muted/40 border-b border-border">
       <tr>
+        {showSelection && (
+          <th className="text-center px-2 py-2" style={{ width: '40px' }}>
+            <input
+              type="checkbox"
+              checked={allSelected}
+              ref={(el) => { if (el) el.indeterminate = !allSelected && someSelected; }}
+              onChange={onToggleAll}
+              className="w-4 h-4 cursor-pointer"
+              aria-label="Selecionar todos"
+            />
+          </th>
+        )}
         <th className="text-left px-2 py-2 font-medium text-foreground text-xs">
           <div className="flex items-center gap-1">
             <span>Tipo</span>

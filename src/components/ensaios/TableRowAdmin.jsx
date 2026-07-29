@@ -13,7 +13,7 @@ import { canGestorPreencherResultado } from "@/utils/certificacaoUsinaAccess";
 import { ACTION_COLORS, SIGN_DIALOG, buildSignDescription } from "@/constants/ensaioUi";
 import CriticalActionDialog from "@/components/ensaios/CriticalActionDialog";
 
-const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, allUsers, obras: _obras, user, regionais = [], onApprove: _onApprove, onReject, onDelete, onAssinar }) => {
+const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, allUsers, obras: _obras, user, regionais = [], onApprove: _onApprove, onReject, onDelete, onAssinar, showSelection = false, isSelected = false, onToggleSelect = null }) => {
   const status = getStatusInfo(ensaio);
   const { name, icon: TypeIcon } = getEnsaioTypeInfo(ensaio);
   const reportUrl = getReportLink(ensaio);
@@ -52,6 +52,17 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
 
   return (
     <tr className={`border-b border-border hover:bg-muted/50 ${index % 2 === 0 ? 'bg-transparent' : 'bg-muted/20'}`}>
+      {showSelection && (
+        <td className="px-2 py-2 text-center">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => onToggleSelect?.(ensaio.id)}
+            className="w-4 h-4 cursor-pointer"
+            aria-label="Selecionar registro"
+          />
+        </td>
+      )}
       <td className="px-2 py-2">
         <div className="font-medium text-foreground flex items-center gap-1 text-xs">
           <TypeIcon className="w-3 h-3 text-secondary" />
