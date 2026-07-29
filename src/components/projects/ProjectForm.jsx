@@ -71,9 +71,15 @@ export default function ProjectForm({ project, faixas, regionais, user, onSave, 
 
 
 
-  // Limpa a faixa SOMENTE quando o usuário muda manualmente o tipo do projeto
+  // Limpa a faixa SOMENTE quando o usuário muda manualmente o tipo do projeto.
+  // O setTimeout(0) adia a atualização de estado para depois de o Radix Select
+  // fechar seu portal e restaurar o foco — sem isso, a re-renderização condicional
+  // (troca de sub-formulários) colide com a limpeza do portal do Select,
+  // causando "Failed to execute 'removeChild' on 'Node'".
   const handleTipoProjeto = (value) => {
-    setFormData(prev => ({ ...prev, tipo_projeto: value, faixa_granulometrica_id: "" }));
+    setTimeout(() => {
+      setFormData(prev => ({ ...prev, tipo_projeto: value, faixa_granulometrica_id: "" }));
+    }, 0);
   };
 
   const handleInputChange = (field, value) => {
