@@ -59,7 +59,12 @@ export default function ProjectForm({ project, faixas, regionais, user, onSave, 
   useEffect(() => {
     if (project) {
       setFormData(mapProjectToFormData(project));
+    } else {
+      setFormData({ ...INITIAL_FORM_DATA });
     }
+    setUploadedFile(null);
+    setIsExtracting(false);
+    setExtractionError(null);
   }, [project]);
 
 
