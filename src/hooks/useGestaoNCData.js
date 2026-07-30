@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { listarRegistros } from "@/services/recordsService";
-import { filterObrasByUserAccess } from "@/utils/relatoriosUnificadosUtils";
+import { filterRegionaisByAccessLevel } from "@/utils/regionalFilter";
 
 const NCS_QUERY_KEY = ["relatorioNC", "gestao"];
 
@@ -22,11 +22,19 @@ export const useGestaoNCData = () => {
   const regionais = auxData.data?.regionais ?? [];
   const loading = userQuery.isLoading || auxData.isLoading || ncsQuery.isLoading;
 
+  // Obras visíveis na Gestão de NCs: apenas as obras das regionais em que o
+  // usuário está efetivamente vinculado ao seu nível de acesso. Admin vê tudo.
   const obras = useMemo(() => {
     if (!user) return [];
-    const userAccessLevel =
+    const accessLevel =
       user.access_level || (user.role === "admin" ? "admin" : "user");
-    return filterObrasByUserAccess(obrasRaw, regionais, user, userAccessLevel);
+    if (accessLevel === "admin") return obrasRaw;
+
+    const regionaisIds = new Set(
+      filterRegionaisByAccessLevel(regionais, user).map((r) => r.id)
+    );
+    if (regionaisIds.size === 0) return [];
+    return obrasRaw.filter((o) => regionaisIds.has(o.regional_id));
   }, [user, obrasRaw, regionais]);
 
   const ncs = useMemo(() => {
