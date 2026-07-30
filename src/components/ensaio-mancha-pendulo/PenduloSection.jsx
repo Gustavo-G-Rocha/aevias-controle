@@ -59,22 +59,22 @@ export default function PenduloSection({ formData, onPenduloChange }) {
                       </Select>
                     </td>
                     <td className="border border-border p-1">
-                      <Input type="number" value={ensaio.temp_pavimento || ''} onChange={(e) => onPenduloChange(index, 'temp_pavimento', parseFloat(e.target.value))} className="h-8 text-xs min-w-[70px]" />
+                      <Input type="number" value={ensaio.temp_pavimento ?? ''} onChange={(e) => onPenduloChange(index, 'temp_pavimento', e.target.value === '' ? null : parseFloat(e.target.value))} className="h-8 text-xs min-w-[70px]" />
                     </td>
                     <td className="border border-border p-1">
-                      <Input type="number" value={ensaio.leitura_1 || ''} onChange={(e) => onPenduloChange(index, 'leitura_1', parseFloat(e.target.value))} className="h-8 text-xs min-w-[60px]" />
+                      <Input type="number" value={ensaio.leitura_1 ?? ''} onChange={(e) => onPenduloChange(index, 'leitura_1', e.target.value === '' ? null : parseFloat(e.target.value))} className="h-8 text-xs min-w-[60px]" />
                     </td>
                     <td className="border border-border p-1">
-                      <Input type="number" value={ensaio.leitura_2 || ''} onChange={(e) => onPenduloChange(index, 'leitura_2', parseFloat(e.target.value))} className="h-8 text-xs min-w-[60px]" />
+                      <Input type="number" value={ensaio.leitura_2 ?? ''} onChange={(e) => onPenduloChange(index, 'leitura_2', e.target.value === '' ? null : parseFloat(e.target.value))} className="h-8 text-xs min-w-[60px]" />
                     </td>
                     <td className="border border-border p-1">
-                      <Input type="number" value={ensaio.leitura_3 || ''} onChange={(e) => onPenduloChange(index, 'leitura_3', parseFloat(e.target.value))} className="h-8 text-xs min-w-[60px]" />
+                      <Input type="number" value={ensaio.leitura_3 ?? ''} onChange={(e) => onPenduloChange(index, 'leitura_3', e.target.value === '' ? null : parseFloat(e.target.value))} className="h-8 text-xs min-w-[60px]" />
                     </td>
                     <td className="border border-border p-1">
-                      <Input type="number" value={ensaio.leitura_4 || ''} onChange={(e) => onPenduloChange(index, 'leitura_4', parseFloat(e.target.value))} className="h-8 text-xs min-w-[60px]" />
+                      <Input type="number" value={ensaio.leitura_4 ?? ''} onChange={(e) => onPenduloChange(index, 'leitura_4', e.target.value === '' ? null : parseFloat(e.target.value))} className="h-8 text-xs min-w-[60px]" />
                     </td>
                     <td className="border border-border p-1">
-                      <Input type="number" value={ensaio.leitura_5 || ''} onChange={(e) => onPenduloChange(index, 'leitura_5', parseFloat(e.target.value))} className="h-8 text-xs min-w-[60px]" />
+                      <Input type="number" value={ensaio.leitura_5 ?? ''} onChange={(e) => onPenduloChange(index, 'leitura_5', e.target.value === '' ? null : parseFloat(e.target.value))} className="h-8 text-xs min-w-[60px]" />
                     </td>
                     <td className="border border-border p-1 text-center bg-muted/30">{ensaio.maxima || ''}</td>
                     <td className="border border-border p-1 text-center bg-muted/30">{ensaio.minima || ''}</td>

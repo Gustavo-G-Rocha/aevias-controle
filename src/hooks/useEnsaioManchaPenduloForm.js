@@ -42,37 +42,41 @@ export const useEnsaioManchaPenduloForm = (formData, setFormData) => {
 
   const handleManchaChange = useCallback((index, field, value) => {
     if (!CAMPOS_MANCHA_PERMITIDOS.includes(field)) return;
-    const newEnsaios = [...formData.ensaios_mancha];
-    if (!newEnsaios[index]) {
-      newEnsaios[index] = { numero: index + 1, volume_areia: 25000 };
-    }
-    newEnsaios[index] = { ...newEnsaios[index], [field]: value };
-    newEnsaios[index] = calcularManchaValores(newEnsaios[index]);
-    
-    const novaConformidade = avaliarConformidade(newEnsaios, formData.ensaios_pendulo, formData.orgao);
-    setFormData(prev => ({ 
-      ...prev, 
-      ensaios_mancha: newEnsaios,
-      condicao_conformidade: novaConformidade
-    }));
-  }, [formData.ensaios_pendulo, formData.orgao, setFormData]);
+    setFormData(prev => {
+      const newEnsaios = [...(prev.ensaios_mancha || [])];
+      if (!newEnsaios[index]) {
+        newEnsaios[index] = { numero: index + 1, volume_areia: 25000 };
+      }
+      newEnsaios[index] = { ...newEnsaios[index], [field]: value };
+      newEnsaios[index] = calcularManchaValores(newEnsaios[index]);
+
+      const novaConformidade = avaliarConformidade(newEnsaios, prev.ensaios_pendulo, prev.orgao);
+      return {
+        ...prev,
+        ensaios_mancha: newEnsaios,
+        condicao_conformidade: novaConformidade
+      };
+    });
+  }, [setFormData]);
 
   const handlePenduloChange = useCallback((index, field, value) => {
     if (!CAMPOS_PENDULO_PERMITIDOS.includes(field)) return;
-    const newEnsaios = [...formData.ensaios_pendulo];
-    if (!newEnsaios[index]) {
-      newEnsaios[index] = { numero: index + 1 };
-    }
-    newEnsaios[index] = { ...newEnsaios[index], [field]: value };
-    newEnsaios[index] = calcularPenduloValores(newEnsaios[index]);
-    
-    const novaConformidade = avaliarConformidade(formData.ensaios_mancha, newEnsaios, formData.orgao);
-    setFormData(prev => ({ 
-      ...prev, 
-      ensaios_pendulo: newEnsaios,
-      condicao_conformidade: novaConformidade
-    }));
-  }, [formData.ensaios_mancha, formData.orgao, setFormData]);
+    setFormData(prev => {
+      const newEnsaios = [...(prev.ensaios_pendulo || [])];
+      if (!newEnsaios[index]) {
+        newEnsaios[index] = { numero: index + 1 };
+      }
+      newEnsaios[index] = { ...newEnsaios[index], [field]: value };
+      newEnsaios[index] = calcularPenduloValores(newEnsaios[index]);
+
+      const novaConformidade = avaliarConformidade(prev.ensaios_mancha, newEnsaios, prev.orgao);
+      return {
+        ...prev,
+        ensaios_pendulo: newEnsaios,
+        condicao_conformidade: novaConformidade
+      };
+    });
+  }, [setFormData]);
 
   return {
     handleInputChange,

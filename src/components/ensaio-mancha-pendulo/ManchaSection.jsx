@@ -58,16 +58,16 @@ export default function ManchaSection({ formData, onManchaChange }) {
                       </Select>
                     </td>
                     <td className="border border-border p-1">
-                      <Input type="number" step="0.1" value={ensaio.d1 || ''} onChange={(e) => onManchaChange(index, 'd1', parseFloat(e.target.value))} className="h-8 text-xs min-w-[70px]" />
+                      <Input type="number" step="0.1" value={ensaio.d1 ?? ''} onChange={(e) => onManchaChange(index, 'd1', e.target.value === '' ? null : parseFloat(e.target.value))} className="h-8 text-xs min-w-[70px]" />
                     </td>
                     <td className="border border-border p-1">
-                      <Input type="number" step="0.1" value={ensaio.d2 || ''} onChange={(e) => onManchaChange(index, 'd2', parseFloat(e.target.value))} className="h-8 text-xs min-w-[70px]" />
+                      <Input type="number" step="0.1" value={ensaio.d2 ?? ''} onChange={(e) => onManchaChange(index, 'd2', e.target.value === '' ? null : parseFloat(e.target.value))} className="h-8 text-xs min-w-[70px]" />
                     </td>
                     <td className="border border-border p-1">
-                      <Input type="number" step="0.1" value={ensaio.d3 || ''} onChange={(e) => onManchaChange(index, 'd3', parseFloat(e.target.value))} className="h-8 text-xs min-w-[70px]" />
+                      <Input type="number" step="0.1" value={ensaio.d3 ?? ''} onChange={(e) => onManchaChange(index, 'd3', e.target.value === '' ? null : parseFloat(e.target.value))} className="h-8 text-xs min-w-[70px]" />
                     </td>
                     <td className="border border-border p-1">
-                      <Input type="number" step="0.1" value={ensaio.d4 || ''} onChange={(e) => onManchaChange(index, 'd4', parseFloat(e.target.value))} className="h-8 text-xs min-w-[70px]" />
+                      <Input type="number" step="0.1" value={ensaio.d4 ?? ''} onChange={(e) => onManchaChange(index, 'd4', e.target.value === '' ? null : parseFloat(e.target.value))} className="h-8 text-xs min-w-[70px]" />
                     </td>
                     <td className="border border-border p-1 text-center bg-muted/30">{ensaio.d_media?.toFixed(1) || ''}</td>
                     <td className="border border-border p-1 text-center bg-muted/30">{ensaio.area?.toFixed(2) || ''}</td>
