@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
@@ -36,25 +36,25 @@ const AppLayout = ({ children, currentPageName }) => {
   // Navegar com o diálogo aberto desmonta este Layout (cada rota tem sua
   // própria instância) na mesma commit em que o portal do Radix é destruído,
   // causando "Failed to execute 'removeChild' on 'Node'".
-  const pendingUrlRef = useRef(null);
-  const handleEnsaioSelect = useCallback((url) => {
-    // Fecha o diálogo e navega em seguida. A navegação é adiada para depois
-    // do commit que fecha o portal do Radix (evita "removeChild" durante o
-    // teardown). Antes dependia do onCloseAutoFocus do Radix, que é frágil
-    // em automação headless (pode não disparar) — o diálogo fechava sem
-    // navegar. setTimeout(0) roda de forma confiável após o commit, sem
-    // depender de eventos de foco do Radix.
-    setIsCreateEnsaioOpen(false);
-    if (url) {
-      pendingUrlRef.current = url;
-      setTimeout(() => {
-        if (pendingUrlRef.current) {
-          pendingUrlRef.current = null;
-          navigate(url);
-        }
-      }, 0);
+  const [pendingUrl, setPendingUrl] = useState(null);
+
+  // Assim que o diálogo fecha (commit concluído), navega. Usar um efeito em vez
+  // de setTimeout/onCloseAutoFocus torna a navegação determinística: no Safari
+  // o timer podia ser descartado quando o diálogo era aberto pelo FAB flutuante,
+  // e o clique na opção não fazia nada.
+  React.useEffect(() => {
+    if (!isCreateEnsaioOpen && pendingUrl) {
+      setPendingUrl(null);
+      navigate(pendingUrl);
     }
-  }, [navigate]);
+  }, [isCreateEnsaioOpen, pendingUrl, navigate]);
+
+  const handleEnsaioSelect = useCallback((url) => {
+    // Guarda a URL e fecha o diálogo; o efeito acima navega depois que o
+    // portal do Radix terminou de fechar (evita "removeChild" no teardown).
+    if (url) setPendingUrl(url);
+    setIsCreateEnsaioOpen(false);
+  }, []);
 
   const userAccessLevel = getUserAccessLevel(user);
   const isAdmin = userAccessLevel === ACCESS_LEVELS.ADMIN || user?.role === ACCESS_LEVELS.ADMIN;
