@@ -145,8 +145,9 @@ export default function RelatorioFresagemCBUQPage() {
           .min-h-screen {
             min-height: 0 !important;
           }
+          /* Sem min-height extra: qualquer sobra empurrava uma folha em branco. */
           [data-report-root] {
-            min-height: 185mm !important;
+            min-height: 0 !important;
           }
 
           .max-w-\\[297mm\\], .max-w-\\[297mm\\] * {

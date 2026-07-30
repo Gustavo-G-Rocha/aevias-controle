@@ -75,6 +75,11 @@ export const mapFresagemToPresentation = ({ registro, obra, regional, projeto, c
       'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png',
 
     // Cargo do criador quando disponível; senão, o papel padrão do formulário.
-    signatureProps: buildSignatureProps(registro, creatorUser?.position || 'Inspetor'),
+    signatureProps: {
+      ...buildSignatureProps(registro, creatorUser?.position || 'Inspetor'),
+      // Cargos fixos das colunas de aprovação/assinatura deste registro.
+      approverPosition: registro?.approver_details?.position || 'Gestor',
+      clientPosition: registro?.client_signature?.position || 'Cliente',
+    },
   };
 };

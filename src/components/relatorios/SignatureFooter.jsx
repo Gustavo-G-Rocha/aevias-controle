@@ -69,12 +69,12 @@ export default function SignatureFooter({
   labCreatedDate,
   approverName,
   approverEmail,
-  approverPosition: _approverPosition,
+  approverPosition,
   approverCREA,
   approverDate,
   clientName,
   clientEmail,
-  clientPosition: _clientPosition,
+  clientPosition,
   clientCREA,
   clientDate,
   entityName,
@@ -116,7 +116,7 @@ export default function SignatureFooter({
             ) : null}
           </div>
           <div style={lineStyle}>
-            <span style={labelStyle}>Responsável</span>
+            <span style={labelStyle}>{approverPosition || 'Responsável'}</span>
           </div>
         </div>
 
@@ -133,7 +133,7 @@ export default function SignatureFooter({
             ) : null}
           </div>
           <div style={lineStyle}>
-            <span style={labelStyle}>Cliente</span>
+            <span style={labelStyle}>{clientPosition || 'Cliente'}</span>
           </div>
         </div>
 
