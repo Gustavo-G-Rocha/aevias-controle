@@ -13,9 +13,10 @@ const SectionBand = ({ children }) => (
   </h2>
 );
 
+/* Rótulo com largura fixa: todas as respostas começam no mesmo ponto. */
 const Field = ({ label, value }) => (
   <div style={{ display: 'flex', alignItems: 'flex-end', gap: '4px', lineHeight: '1.4' }}>
-    <span style={{ fontWeight: 'bold', whiteSpace: 'nowrap', paddingBottom: '2px' }}>{label}:</span>
+    <span style={{ fontWeight: 'bold', whiteSpace: 'nowrap', paddingBottom: '2px', width: '132px', flexShrink: 0 }}>{label}:</span>
     <span style={{ flex: 1, borderBottom: '1px solid #94a3b8', paddingBottom: '2px', minWidth: 0 }}>{value}</span>
   </div>
 );
@@ -37,9 +38,12 @@ export default function RelatorioFresagemCBUQ({ data }) {
   return (
     <div className="bg-white font-sans">
       <style>{`
-        /* Folha A4 na horizontal — a parte principal cabe em uma única página. */
-        @page { size: A4 landscape; margin: 6mm; }
+        /* Parte principal na horizontal; relatório fotográfico na vertical. */
+        @page principal { size: A4 landscape; margin: 6mm; }
+        @page fotos { size: A4 portrait; margin: 8mm; }
         @media print {
+          .rfc-main { page: principal; }
+          .rfc-foto-page { page: fotos; }
           .rfc-table { border-collapse: collapse !important; }
           .rfc-table th, .rfc-table td { border: 1px solid #94a3b8 !important; }
           .rfc-obs { border: 1px solid #94a3b8 !important; }
@@ -53,8 +57,8 @@ export default function RelatorioFresagemCBUQ({ data }) {
             max-width: none !important;
           }
           .rfc-foto-page {
-            height: 190mm;
-            max-height: 190mm;
+            height: 281mm;
+            max-height: 281mm;
             overflow: hidden;
             padding: 0 !important;
             max-width: none !important;
@@ -72,7 +76,7 @@ export default function RelatorioFresagemCBUQ({ data }) {
               <picture><source srcSet={data.logo_url} /><img src={data.logo_url} alt="Logo Regional" className="h-10 object-contain" width="auto" height="40" /></picture>
             </div>
             <h1 className="text-sm font-bold text-gray-800 uppercase text-center">Registro de Fresagem e Lançamento de CBUQ</h1>
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-right">
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 text-[12px] leading-snug text-right">
               <p><span className="font-bold">Início:</span> {data.data_inicio}</p>
               <p><span className="font-bold">Fim:</span> {data.data_fim}</p>
             </div>

@@ -6,6 +6,7 @@ import { obterEnsaioById } from '@/services/ensaiosService';
 import { obterObraById } from '@/services/obrasService';
 import { obterRegionalById } from '@/services/regionaisService';
 import { obterRegistro } from '@/services/recordsService';
+import { carregarCreatorUser } from '@/services/relatorioContextService';
 import AprovacaoBar from '@/components/relatorios/AprovacaoBar';
 import RelatorioFresagemCBUQ from "@/components/relatorios/RelatorioFresagemCBUQ";
 import { mapFresagemToPresentation } from "@/utils/relatorioFresagemCBUQMapper";
@@ -18,6 +19,7 @@ export default function RelatorioFresagemCBUQPage() {
   const [obra, setObra] = useState(null);
   const [regional, setRegional] = useState(null);
   const [projeto, setProjeto] = useState(null);
+  const [creatorUser, setCreatorUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -39,6 +41,7 @@ export default function RelatorioFresagemCBUQPage() {
 
       const registroData = await obterEnsaioById('RegistroFresagemCBUQ', id);
       setRegistro(registroData);
+      setCreatorUser(await carregarCreatorUser(registroData.created_by));
 
       // Dados relacionados são complementares: falha ao carregá-los não
       // bloqueia o relatório — os campos exibem N/A.
@@ -74,8 +77,8 @@ export default function RelatorioFresagemCBUQPage() {
   };
 
   const data = useMemo(
-    () => mapFresagemToPresentation({ registro, obra, regional, projeto }),
-    [registro, obra, regional, projeto]
+    () => mapFresagemToPresentation({ registro, obra, regional, projeto, creatorUser }),
+    [registro, obra, regional, projeto, creatorUser]
   );
 
   const { handlePrint, downloading } = useReportPdfActions('registro-fresagem-cbuq.pdf');

@@ -32,9 +32,9 @@ export const mapLinhaToRow = (linha) => ({
 });
 
 /**
- * @param {Object} params - { registro, obra, regional, projeto }
+ * @param {Object} params - { registro, obra, regional, projeto, creatorUser }
  */
-export const mapFresagemToPresentation = ({ registro, obra, regional, projeto }) => {
+export const mapFresagemToPresentation = ({ registro, obra, regional, projeto, creatorUser }) => {
   if (!registro) return null;
 
   const tempo = registro.condicoes_tempo || {};
@@ -74,6 +74,7 @@ export const mapFresagemToPresentation = ({ registro, obra, regional, projeto })
     logo_url: regional?.logo_url ||
       'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a58d6328b_AE-LogoVerPrincipal_1.png',
 
-    signatureProps: buildSignatureProps(registro, 'Inspetor'),
+    // Cargo do criador quando disponível; senão, o papel padrão do formulário.
+    signatureProps: buildSignatureProps(registro, creatorUser?.position || 'Inspetor'),
   };
 };
