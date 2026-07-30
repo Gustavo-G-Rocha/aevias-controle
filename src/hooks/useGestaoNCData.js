@@ -20,7 +20,6 @@ export const useGestaoNCData = () => {
   const user = userQuery.data ?? null;
   const obrasRaw = auxData.data?.obras ?? [];
   const regionais = auxData.data?.regionais ?? [];
-  const ncs = ncsQuery.data ?? [];
   const loading = userQuery.isLoading || auxData.isLoading || ncsQuery.isLoading;
 
   const obras = useMemo(() => {
@@ -29,6 +28,12 @@ export const useGestaoNCData = () => {
       user.access_level || (user.role === "admin" ? "admin" : "user");
     return filterObrasByUserAccess(obrasRaw, regionais, user, userAccessLevel);
   }, [user, obrasRaw, regionais]);
+
+  const ncs = useMemo(() => {
+    const all = ncsQuery.data ?? [];
+    const obrasIds = new Set(obras.map((o) => o.id));
+    return all.filter((nc) => nc.obra_id && obrasIds.has(nc.obra_id));
+  }, [ncsQuery.data, obras]);
 
   // Wrapper compatível com useGestaoNCActions(setNcs) — atualiza o cache do React Query
   const setNcs = useCallback((updater) => {
