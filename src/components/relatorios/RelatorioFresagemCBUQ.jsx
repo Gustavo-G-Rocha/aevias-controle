@@ -47,19 +47,14 @@ export default function RelatorioFresagemCBUQ({ data }) {
           .rfc-table { border-collapse: collapse !important; }
           .rfc-table th, .rfc-table td { border: 1px solid #94a3b8 !important; }
           .rfc-obs { border: 1px solid #94a3b8 !important; }
-          /* Sem page-break-after: o quebra-página fica nas páginas de fotos
-             (break-before-page). Forçar aqui gerava folhas em branco. */
-          /* min-height preenche a folha (assinaturas no rodapé via mt-auto)
-             sem cortar conteúdo que ultrapasse a altura. break-after garante
-             que as fotos comecem sempre na próxima folha. */
+          /* Sem break-after nem min-height: ambos geravam folhas em branco.
+             A quebra entre conteúdo e fotos é feita pelo break-before-page
+             no wrapper das páginas de fotos. */
           .rfc-main {
-            min-height: 178mm;
             padding: 0 !important;
             max-width: none !important;
-            break-after: page;
           }
           .rfc-foto-page {
-            min-height: 178mm;
             padding: 0 !important;
             max-width: none !important;
           }
