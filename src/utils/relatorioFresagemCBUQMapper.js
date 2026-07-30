@@ -76,7 +76,7 @@ export const mapFresagemToPresentation = ({ registro, obra, regional, projeto, c
 
     // Cargo do criador quando disponível; senão, o papel padrão do formulário.
     signatureProps: {
-      ...buildSignatureProps(registro, creatorUser?.position || 'Inspetor'),
+      ...buildSignatureProps(registro, creatorUser?.position || 'Laboratorista'),
       // Cargos fixos das colunas de aprovação/assinatura deste registro.
       approverPosition: registro?.approver_details?.position || 'Gestor',
       clientPosition: registro?.client_signature?.position || 'Cliente',
