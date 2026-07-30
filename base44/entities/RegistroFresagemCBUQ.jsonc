@@ -46,14 +46,17 @@
       "type": "string"
     },
     "sentido_pista": {
-      "type": "string",
-      "enum": [
-        "norte",
-        "sul",
-        "leste",
-        "oeste"
-      ],
-      "description": "Sentido da pista"
+      "type": "array",
+      "description": "Sentidos da pista marcados (at\u00e9 2)",
+      "items": {
+        "type": "string",
+        "enum": [
+          "norte",
+          "sul",
+          "leste",
+          "oeste"
+        ]
+      }
     },
     "condicoes_tempo": {
       "type": "object",
@@ -192,13 +195,6 @@
           }
         }
       }
-    },
-    "dmt": {
-      "type": [
-        "number",
-        "null"
-      ],
-      "description": "DMT"
     },
     "observacoes": {
       "type": "string"

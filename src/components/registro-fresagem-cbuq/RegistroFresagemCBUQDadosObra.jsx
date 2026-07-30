@@ -3,8 +3,7 @@ import { useRegistroFresagemCBUQCtx } from "./RegistroFresagemCBUQContext";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-const numOrNull = (v) => (v === "" ? null : parseFloat(v));
+import SentidoPistaCheckboxes from "./SentidoPistaCheckboxes";
 
 export default function RegistroFresagemCBUQDadosObra() {
   const {
@@ -126,36 +125,15 @@ export default function RegistroFresagemCBUQDadosObra() {
           </Select>
         </div>
 
-        <div>
-          <Label>Sentido da Pista</Label>
-          <Select
-            value={formData.sentido_pista}
-            onValueChange={(value) => set("sentido_pista", value)}
-            disabled={!canEdit}
-          >
-            <SelectTrigger><SelectValue placeholder="Selecione o sentido" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="norte">Norte</SelectItem>
-              <SelectItem value="sul">Sul</SelectItem>
-              <SelectItem value="leste">Leste</SelectItem>
-              <SelectItem value="oeste">Oeste</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <SentidoPistaCheckboxes
+          value={formData.sentido_pista}
+          onChange={(value) => set("sentido_pista", value)}
+          disabled={!canEdit}
+        />
 
         <div>
           <Label>Inspetor</Label>
           <Input value={formData.laboratorista_name} disabled className="bg-muted" />
-        </div>
-
-        <div>
-          <Label>DMT</Label>
-          <Input
-            type="number"
-            value={formData.dmt ?? ""}
-            onChange={(e) => set("dmt", numOrNull(e.target.value))}
-            disabled={!canEdit}
-          />
         </div>
 
         <div>

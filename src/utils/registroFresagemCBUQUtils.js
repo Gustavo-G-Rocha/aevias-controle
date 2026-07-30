@@ -20,11 +20,10 @@ export const getInitialFormData = () => ({
   material: "",
   camada: "",
   rodovia: "",
-  sentido_pista: "",
+  sentido_pista: [],
   condicoes_tempo: { manha: "", tarde: "", noite: "" },
   tipo_localizacao: "km",
   registros: [],
-  dmt: null,
   fotos: [],
   observacoes: "",
   status: "rascunho",
@@ -63,6 +62,24 @@ export function calcCanEdit(editMode, formData, user, obra, regionais = []) {
   if (!editMode) return true;
   if (formData.approved || formData.client_signature?.signed_by) return false;
   return canUserEditRecord(user, formData, obra, regionais);
+}
+
+// ── Sentido da pista (marcação, até 2) ───────────────────────────────────────
+
+export const MAX_SENTIDOS = 2;
+
+/** Normaliza o valor salvo (string legada ou array) para array. */
+export function normalizarSentidos(valor) {
+  if (Array.isArray(valor)) return valor;
+  return valor ? [valor] : [];
+}
+
+/** Alterna um sentido respeitando o limite de 2 marcações. */
+export function toggleSentido(sentidos, sentido) {
+  const atuais = normalizarSentidos(sentidos);
+  if (atuais.includes(sentido)) return atuais.filter(s => s !== sentido);
+  if (atuais.length >= MAX_SENTIDOS) return atuais;
+  return [...atuais, sentido];
 }
 
 // ── Manipulação de linhas ─────────────────────────────────────────────────────

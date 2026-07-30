@@ -4,10 +4,12 @@ import { normalizarFoto, extrairLegenda } from '@/utils/photoLegendaUtils';
 
 /**
  * Páginas de Relatório Fotográfico do Registro de Fresagem e Lançamento de CBUQ.
- * 6 fotos por folha (grade 3x2), no mesmo padrão dos demais relatórios.
+ * 4 fotos por folha (grade 2x2) — folha na horizontal, como a página principal.
  */
+const FOTOS_POR_PAGINA = 4;
+
 export default function FresagemCBUQFotoPages({ data }) {
-  const photoChunks = chunk(data?.fotos || [], 6);
+  const photoChunks = chunk(data?.fotos || [], FOTOS_POR_PAGINA);
 
   if (!photoChunks.length) return null;
 
@@ -38,10 +40,10 @@ export default function FresagemCBUQFotoPages({ data }) {
             <main className="grid grid-cols-2 gap-3">
               {pageChunk.map((foto, fotoIndex) => {
                 const fotoNormalizada = normalizarFoto(foto);
-                const legenda = extrairLegenda(foto, pageIndex * 6 + fotoIndex);
+                const legenda = extrairLegenda(foto, pageIndex * FOTOS_POR_PAGINA + fotoIndex);
                 return (
                   <div key={`foto-${fotoIndex}`} className="border p-2 rounded-lg break-inside-avoid flex flex-col">
-                    <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden" style={{ height: '280px' }}>
+                    <div className="bg-gray-100 flex items-center justify-center rounded overflow-hidden" style={{ height: '240px' }}>
                       <picture>
                         <source srcSet={fotoNormalizada.url} />
                         <img src={fotoNormalizada.url} alt={legenda} className="w-full h-full object-contain" width="auto" height="auto" />

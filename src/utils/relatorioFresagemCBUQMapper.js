@@ -5,6 +5,7 @@
  */
 
 import { formatDate, buildSignatureProps } from './relatorioUtils';
+import { normalizarSentidos } from './registroFresagemCBUQUtils';
 
 const display = (value, fallback = 'N/A') =>
   value === null || value === undefined || value === '' ? fallback : value;
@@ -48,7 +49,10 @@ export const mapFresagemToPresentation = ({ registro, obra, regional, projeto })
     material: display(registro.material),
     camada: display(registro.camada),
     rodovia: display(registro.rodovia),
-    sentido_pista: display(SENTIDO_LABELS[registro.sentido_pista], 'N/A'),
+    sentido_pista: display(
+      normalizarSentidos(registro.sentido_pista).map(s => SENTIDO_LABELS[s] || s).join(' / '),
+      'N/A'
+    ),
     inspetor: display(registro.laboratorista_name),
 
     data_inicio: formatDate(registro.data),
@@ -63,7 +67,6 @@ export const mapFresagemToPresentation = ({ registro, obra, regional, projeto })
     tipo_localizacao: registro.tipo_localizacao === 'estaca' ? 'ESTACA' : 'KM',
     registros: (registro.registros || []).map(mapLinhaToRow),
 
-    dmt: display(registro.dmt, '—'),
     observacoes: display(registro.observacoes, '—'),
 
     fotos: registro.fotos || [],

@@ -2,7 +2,7 @@ import React from 'react';
 import SignatureFooter from './SignatureFooter';
 import FresagemCBUQFotoPages from './FresagemCBUQFotoPages';
 
-const MIN_ROWS = 15;
+const MIN_ROWS = 11;
 
 const SectionBand = ({ children }) => (
   <h2
@@ -22,7 +22,7 @@ const Field = ({ label, value }) => (
 
 const CELL_BORDER = '1px solid #94a3b8';
 const thBase = "px-1 py-1 text-[8px] leading-tight font-bold";
-const tdBase = "px-1 py-1 text-center text-[9px] h-6";
+const tdBase = "px-1 py-0.5 text-center text-[9px] h-5";
 const thStyle = { border: CELL_BORDER, backgroundColor: '#f1f5f9' };
 const tdStyle = { border: CELL_BORDER };
 
@@ -37,14 +37,26 @@ export default function RelatorioFresagemCBUQ({ data }) {
   return (
     <div className="bg-white font-sans">
       <style>{`
+        /* Folha A4 na horizontal — a parte principal cabe em uma única página. */
+        @page { size: A4 landscape; margin: 6mm; }
         @media print {
           .rfc-table { border-collapse: collapse !important; }
           .rfc-table th, .rfc-table td { border: 1px solid #94a3b8 !important; }
           .rfc-obs { border: 1px solid #94a3b8 !important; }
+          .rfc-main {
+            height: 189mm;
+            max-height: 189mm;
+            overflow: hidden;
+            padding: 0 !important;
+            max-width: none !important;
+            page-break-after: always;
+            break-after: page;
+          }
+          .rfc-main, .rfc-main * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
       `}</style>
 
-      <div data-report-root className="w-full max-w-[297mm] mx-auto pt-2 px-3 pb-3 print:pt-2 print:px-3 print:pb-3 flex flex-col min-h-screen">
+      <div data-report-root className="rfc-main w-full max-w-[297mm] mx-auto pt-2 px-3 pb-3 print:pt-2 print:px-3 print:pb-3 flex flex-col min-h-screen print:min-h-0">
         <div className="w-full flex-1 flex flex-col">
 
           {/* Cabeçalho */}
@@ -73,7 +85,7 @@ export default function RelatorioFresagemCBUQ({ data }) {
             <Field label="RODOVIA" value={data.rodovia} />
             <Field label="SENTIDO DA PISTA" value={data.sentido_pista} />
             <Field label="INSPETOR" value={data.inspetor} />
-            <Field label="DMT" value={data.dmt} />
+            <Field label="PERÍODO" value={`${data.data_inicio} a ${data.data_fim}`} />
           </div>
 
           {/* Condições do tempo */}
