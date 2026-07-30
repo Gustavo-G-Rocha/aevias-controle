@@ -31,30 +31,14 @@ const AppLayout = ({ children, currentPageName }) => {
   const { user, obrasDoUsuario, loadingUser, pendingTransfers } = useLayoutData();
   const navigate = useNavigate();
 
-  // Navegação a partir do diálogo "Iniciar Novo Registro": fecha o diálogo
-  // primeiro e só navega quando o Radix termina o fechamento (onCloseAutoFocus).
-  // Navegar com o diálogo aberto desmonta este Layout (cada rota tem sua
-  // própria instância) na mesma commit em que o portal do Radix é destruído,
-  // causando "Failed to execute 'removeChild' on 'Node'".
-  const [pendingUrl, setPendingUrl] = useState(null);
-
-  // Assim que o diálogo fecha (commit concluído), navega. Usar um efeito em vez
-  // de setTimeout/onCloseAutoFocus torna a navegação determinística: no Safari
-  // o timer podia ser descartado quando o diálogo era aberto pelo FAB flutuante,
-  // e o clique na opção não fazia nada.
-  React.useEffect(() => {
-    if (!isCreateEnsaioOpen && pendingUrl) {
-      setPendingUrl(null);
-      navigate(pendingUrl);
-    }
-  }, [isCreateEnsaioOpen, pendingUrl, navigate]);
-
   const handleEnsaioSelect = useCallback((url) => {
-    // Guarda a URL e fecha o diálogo; o efeito acima navega depois que o
-    // portal do Radix terminou de fechar (evita "removeChild" no teardown).
-    if (url) setPendingUrl(url);
+    if (!url) return;
+    // Navega imediatamente. O Dialog é irmão da árvore do app (não envolve
+    // os children), então o teardown do portal Radix e a troca de rota
+    // operam em subárvores independentes — sem conflito de "removeChild".
+    navigate(url);
     setIsCreateEnsaioOpen(false);
-  }, []);
+  }, [navigate]);
 
   const userAccessLevel = getUserAccessLevel(user);
   const isAdmin = userAccessLevel === ACCESS_LEVELS.ADMIN || user?.role === ACCESS_LEVELS.ADMIN;
