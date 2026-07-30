@@ -38,9 +38,9 @@ export default function RelatorioFresagemCBUQ({ data }) {
   return (
     <div className="bg-white font-sans">
       <style>{`
-        /* Parte principal na horizontal; relatório fotográfico na vertical. */
-        @page principal { size: A4 landscape; margin: 6mm; }
-        @page fotos { size: A4 portrait; margin: 8mm; }
+        /* Tudo na horizontal, com margem folgada para nada ser cortado. */
+        @page principal { size: A4 landscape; margin: 10mm; }
+        @page fotos { size: A4 landscape; margin: 10mm; }
         @media print {
           .rfc-main { page: principal; }
           .rfc-foto-page { page: fotos; }
@@ -50,15 +50,15 @@ export default function RelatorioFresagemCBUQ({ data }) {
           /* Sem page-break-after: o quebra-página fica nas páginas de fotos
              (break-before-page). Forçar aqui gerava folhas em branco. */
           .rfc-main {
-            height: 190mm;
-            max-height: 190mm;
+            height: 185mm;
+            max-height: 185mm;
             overflow: hidden;
             padding: 0 !important;
             max-width: none !important;
           }
           .rfc-foto-page {
-            height: 281mm;
-            max-height: 281mm;
+            height: 185mm;
+            max-height: 185mm;
             overflow: hidden;
             padding: 0 !important;
             max-width: none !important;
