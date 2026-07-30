@@ -37,6 +37,7 @@ const ALLOWED_ENTITIES = [
   'AcompanhamentoCarga',
   'AcompanhamentoUsinagem',
   'ControleExecucaoServicos',
+  'RegistroFresagemCBUQ',
   'BoletimSondagem',
   'BoletimSondagemTrado',
   // Diário

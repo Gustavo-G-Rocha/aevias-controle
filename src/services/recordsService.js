@@ -37,6 +37,7 @@ export const ALL_RECORD_ENTITIES = [
   'GranuMistura',
   'CertificacaoUsina',
   'ControleExecucaoServicos',
+  'RegistroFresagemCBUQ',
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

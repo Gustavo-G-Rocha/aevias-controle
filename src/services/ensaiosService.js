@@ -26,6 +26,7 @@ const ENSAIO_ENTITIES = {
   'AcompanhamentoCarga': 'AcompanhamentoCarga',
   'AcompanhamentoUsinagem': 'AcompanhamentoUsinagem',
   'ControleExecucaoServicos': 'ControleExecucaoServicos',
+  'RegistroFresagemCBUQ': 'RegistroFresagemCBUQ',
   'BoletimSondagem': 'BoletimSondagem',
   'BoletimSondagemTrado': 'BoletimSondagemTrado',
 };

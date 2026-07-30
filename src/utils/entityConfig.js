@@ -33,6 +33,7 @@ export const ENTITY_CONFIG = {
   GranuMistura:                 { label: 'GranuMistura',              color: '#9932CC', description: 'Novo ensaio de granulometria da mistura' },
   CertificacaoUsina:            { label: 'Certificação de Usina',      color: '#7C3AED', description: 'Nova certificação de usina' },
   ControleExecucaoServicos:     { label: 'Controle Exec. Serviços',    color: '#2E8B57', description: 'Novo controle de execução de serviços' },
+  RegistroFresagemCBUQ:         { label: 'Fresagem e CBUQ',            color: '#C2410C', description: 'Novo registro de fresagem e lançamento de CBUQ' },
   Obra:                         { label: 'Obra',                       color: '#00233B', description: 'Nova obra cadastrada' },
   Project:                      { label: 'Projeto',                    color: '#566E3D', description: 'Novo projeto cadastrado' },
 };

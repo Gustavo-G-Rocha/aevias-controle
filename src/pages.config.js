@@ -112,6 +112,8 @@ const RelatorioUnificado = lazy(() => import('./pages/RelatorioUnificado'));
 const Settings = lazy(() => import('./pages/Settings'));
 const ControleExecucaoServicos = lazy(() => import('./pages/ControleExecucaoServicos'));
 const RelatorioControleExecucaoServicos = lazy(() => import('./pages/RelatorioControleExecucaoServicos'));
+const RegistroFresagemCBUQ = lazy(() => import('./pages/RegistroFresagemCBUQ'));
+const RelatorioFresagemCBUQ = lazy(() => import('./pages/RelatorioFresagemCBUQ'));
 import __Layout from './Layout.jsx';
 
 
@@ -190,6 +192,8 @@ export const PAGES = {
     "Settings": Settings,
     "ControleExecucaoServicos": ControleExecucaoServicos,
     "RelatorioControleExecucaoServicos": RelatorioControleExecucaoServicos,
+    "RegistroFresagemCBUQ": RegistroFresagemCBUQ,
+    "RelatorioFresagemCBUQ": RelatorioFresagemCBUQ,
 }
 
 export const pagesConfig = {

@@ -106,6 +106,7 @@ const ALLOWED_ENTITIES = [
   'EnsaioRompimentoConcreto', 'EnsaioSondagem', 'EnsaioTaxaMRAF',
   'EnsaioTaxaPinturaImprimacao', 'EnsaioTaxaInsumos', 'EnsaioVigaBenkelman',
   'AcompanhamentoCarga', 'AcompanhamentoUsinagem', 'ControleExecucaoServicos',
+  'RegistroFresagemCBUQ',
   'BoletimSondagem', 'BoletimSondagemTrado', 'GranuMistura',
   'CertificacaoUsina', 'ChecklistUsina', 'ChecklistAplicacao',
   'ChecklistMRAF', 'ChecklistConcretagem', 'ChecklistTerraplanagem',

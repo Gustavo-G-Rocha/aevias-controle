@@ -20,6 +20,7 @@ export const FORM_PAGE_PREFIXES = [
   "Boletim",
   "Acompanhamento",
   "ControleExecucao",
+  "RegistroFresagem",
 ];
 
 export const isFormPage = (pageName) =>
@@ -55,4 +56,5 @@ export const REPORT_PAGES = new Set([
   "RelatorioGranuMistura",
   "RelatorioUnificado",
   "RelatorioControleExecucaoServicos",
+  "RelatorioFresagemCBUQ",
 ]);

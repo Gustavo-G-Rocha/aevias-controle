@@ -1,0 +1,340 @@
+{
+  "name": "RegistroFresagemCBUQ",
+  "type": "object",
+  "properties": {
+    "obra_id": {
+      "type": "string",
+      "description": "ID da obra"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "ID do Projeto vinculado"
+    },
+    "data": {
+      "type": "string",
+      "format": "date",
+      "description": "In\u00edcio da atividade"
+    },
+    "data_fim": {
+      "type": "string",
+      "format": "date",
+      "description": "Fim da atividade"
+    },
+    "laboratorista_name": {
+      "type": "string",
+      "description": "Nome do inspetor que criou o registro"
+    },
+    "contratada": {
+      "type": "string",
+      "description": "Empreiteira contratada"
+    },
+    "numero_contrato": {
+      "type": "string",
+      "description": "N\u00ba do contrato"
+    },
+    "especificacao_granulometrica": {
+      "type": "string",
+      "description": "Especifica\u00e7\u00e3o granulom\u00e9trica"
+    },
+    "material": {
+      "type": "string"
+    },
+    "camada": {
+      "type": "string"
+    },
+    "rodovia": {
+      "type": "string"
+    },
+    "sentido_pista": {
+      "type": "string",
+      "enum": [
+        "norte",
+        "sul",
+        "leste",
+        "oeste"
+      ],
+      "description": "Sentido da pista"
+    },
+    "condicoes_tempo": {
+      "type": "object",
+      "description": "Condi\u00e7\u00f5es do tempo por per\u00edodo",
+      "properties": {
+        "manha": {
+          "type": "string",
+          "enum": [
+            "bom",
+            "chuva",
+            "instavel"
+          ]
+        },
+        "tarde": {
+          "type": "string",
+          "enum": [
+            "bom",
+            "chuva",
+            "instavel"
+          ]
+        },
+        "noite": {
+          "type": "string",
+          "enum": [
+            "bom",
+            "chuva",
+            "instavel"
+          ]
+        }
+      }
+    },
+    "tipo_localizacao": {
+      "type": "string",
+      "enum": [
+        "km",
+        "estaca"
+      ],
+      "default": "km",
+      "description": "Refer\u00eancia de localiza\u00e7\u00e3o: Km ou Estaca"
+    },
+    "registros": {
+      "type": "array",
+      "description": "Linhas de fresagem e recomposi\u00e7\u00e3o",
+      "items": {
+        "type": "object",
+        "properties": {
+          "localizacao_inicial": {
+            "type": "string"
+          },
+          "localizacao_final": {
+            "type": "string"
+          },
+          "faixa": {
+            "type": "string"
+          },
+          "largura_m": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "extensao_m": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "espessura_m": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "pintura_bd_be_mts": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Pintura horizontal BD/BE (mts lineares)"
+          },
+          "pintura_4x12_qtde": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Pintura horizontal 4x12 (qtde bast\u00f5es)"
+          },
+          "pintura_2x2_qtde": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Pintura horizontal 2x2 (qtde bast\u00f5es)"
+          },
+          "pintura_zebrado_mts": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Pintura horizontal zebrado (mts lineares)"
+          },
+          "tacha_bd_be_unid": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Tacha refletiva BD/BE (unid.)"
+          },
+          "tacha_4x12_unid": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Tacha refletiva 4x12 (unid.)"
+          },
+          "tacha_2x2_unid": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Tacha refletiva 2x2 (unid.)"
+          },
+          "tacha_zebrado_unid": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Tacha refletiva zebrado (unid.)"
+          },
+          "dreno_m": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Dreno (m)"
+          }
+        }
+      }
+    },
+    "dmt": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "DMT"
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "fotos": {
+      "type": "array",
+      "description": "Registro fotogr\u00e1fico (URL ou objeto com legenda)",
+      "items": {
+        "type": [
+          "string",
+          "object"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "legenda": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "rascunho",
+        "finalizado"
+      ],
+      "default": "rascunho"
+    },
+    "approved": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "default": null
+    },
+    "approved_by": {
+      "type": "string"
+    },
+    "approved_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "approver_details": {
+      "type": "object"
+    },
+    "rejection_reason": {
+      "type": "string"
+    },
+    "was_rejected": {
+      "type": "boolean",
+      "default": false
+    },
+    "client_signature": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "obra_id",
+    "data"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "user"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "funcionarios_cliente"
+          }
+        }
+      ]
+    },
+    "read": null,
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
+          }
+        }
+      ]
+    }
+  }
+}
