@@ -53,7 +53,7 @@ export default function RespostaAvaliacao({
               </span>
             )}
           </div>
-          <p className="text-sm text-foreground whitespace-pre-wrap">
+          <p className="text-sm text-slate-800 whitespace-pre-wrap">
             {report.resposta_admin}
           </p>
         </div>
