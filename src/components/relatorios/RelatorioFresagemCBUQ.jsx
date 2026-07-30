@@ -43,14 +43,21 @@ export default function RelatorioFresagemCBUQ({ data }) {
           .rfc-table { border-collapse: collapse !important; }
           .rfc-table th, .rfc-table td { border: 1px solid #94a3b8 !important; }
           .rfc-obs { border: 1px solid #94a3b8 !important; }
+          /* Sem page-break-after: o quebra-página fica nas páginas de fotos
+             (break-before-page). Forçar aqui gerava folhas em branco. */
           .rfc-main {
-            height: 189mm;
-            max-height: 189mm;
+            height: 190mm;
+            max-height: 190mm;
             overflow: hidden;
             padding: 0 !important;
             max-width: none !important;
-            page-break-after: always;
-            break-after: page;
+          }
+          .rfc-foto-page {
+            height: 190mm;
+            max-height: 190mm;
+            overflow: hidden;
+            padding: 0 !important;
+            max-width: none !important;
           }
           .rfc-main, .rfc-main * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
