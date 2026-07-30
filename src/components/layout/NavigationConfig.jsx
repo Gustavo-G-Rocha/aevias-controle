@@ -71,7 +71,6 @@ const ENSAIOS_SUPERVISAO = [
   { title: "Sondagem", url: createPageUrl("EnsaioSondagem"), icon: Gauge },
   { title: "Viga Benkelman", url: createPageUrl("EnsaioVigaBenkelman"), icon: Gauge },
   { title: "Taxa MRAF", url: createPageUrl("EnsaioTaxaMRAF"), icon: FlaskConical },
-  { title: "Fresagem e Lançamento de CBUQ", url: createPageUrl("RegistroFresagemCBUQ"), icon: ClipboardList },
 ];
 
 export const ENSAIOS_POR_TIPO_OBRA = [
@@ -87,6 +86,7 @@ export const ENSAIOS_POR_TIPO_OBRA = [
     tipo_obra: "gerenciamento",
     ensaios: [
       { title: "Controle de Execução de Serviços", url: createPageUrl("ControleExecucaoServicos"), icon: ClipboardList },
+      { title: "Fresagem e Lançamento de CBUQ", url: createPageUrl("RegistroFresagemCBUQ"), icon: ClipboardList },
     ],
   },
   {
