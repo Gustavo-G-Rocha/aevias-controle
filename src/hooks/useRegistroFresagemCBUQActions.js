@@ -77,12 +77,14 @@ export function useRegistroFresagemCBUQActions({
     } catch (error) {
       logger.error("Erro ao salvar:", error);
       const detail = error?.message || 'Erro ao salvar o registro de fresagem.';
-      // Quando o registro alvo foi excluído por outro processo entre o
-      // carregamento do formulário e o salvamento, a lista ainda exibe a
-      // entrada obsoleta e o usuário fica preso no formulário. Invalida o
-      // cache de registros e volta para a lista com mensagem clara.
-      const isNotFound = /n[ãa]o\s*encontrad|not\s*found/i.test(detail);
-      if (editMode && isNotFound) {
+      // Only treat as "record was deleted by another user" when the backend
+      // explicitly reports the RECORD itself as not found. Errors like
+      // "Obra não encontrada" or "Regional não encontrada" are tenant/config
+      // issues (defense-in-depth verification) — NOT deletions — and must not
+      // trigger the "excluído por outro usuário" flow, which would discard
+      // the user's edits and navigate away from a still-valid draft.
+      const isRecordDeleted = /registro\s+n[ãa]o\s*encontrad/i.test(detail);
+      if (editMode && isRecordDeleted) {
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords });
         toast({
           title: "O registro foi excluído por outro usuário. A lista foi atualizada.",
