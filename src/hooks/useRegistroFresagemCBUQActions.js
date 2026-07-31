@@ -77,7 +77,22 @@ export function useRegistroFresagemCBUQActions({
     } catch (error) {
       logger.error("Erro ao salvar:", error);
       const detail = error?.message || 'Erro ao salvar o registro de fresagem.';
-      toast({ title: detail, variant: "destructive" });
+      // Quando o registro alvo foi excluído por outro processo entre o
+      // carregamento do formulário e o salvamento, a lista ainda exibe a
+      // entrada obsoleta e o usuário fica preso no formulário. Invalida o
+      // cache de registros e volta para a lista com mensagem clara.
+      const isNotFound = /n[ãa]o\s*encontrad|not\s*found/i.test(detail);
+      if (editMode && isNotFound) {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords });
+        toast({
+          title: "O registro foi excluído por outro usuário. A lista foi atualizada.",
+          variant: "destructive",
+        });
+        clearSavedData();
+        navigate(createPageUrl("MeusEnsaios"));
+      } else {
+        toast({ title: detail, variant: "destructive" });
+      }
     } finally {
       setSaving(false);
     }
