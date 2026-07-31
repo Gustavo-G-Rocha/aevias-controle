@@ -61,10 +61,12 @@ export const MAX_PAGES = 10;
 // Se ainda assim o teto for atingido, o usuário é avisado (ver loadEntity).
 export const LIST_MAX_PAGES = 40;
 
-async function loadEntity(entityType, limit = RECORD_PAGE_SIZE, paginate = false, maxPages = MAX_PAGES) {
+async function loadEntity(entityType, limit = RECORD_PAGE_SIZE, paginate = false, maxPages = MAX_PAGES, filtro = null) {
   try {
     if (!paginate) {
-      return await base44.entities[entityType].list('-created_date', limit);
+      return filtro
+        ? await base44.entities[entityType].filter(filtro, '-created_date', limit)
+        : await base44.entities[entityType].list('-created_date', limit);
     }
 
     // Paginação via filter + skip — carrega TODOS os registros da entidade.
@@ -73,7 +75,7 @@ async function loadEntity(entityType, limit = RECORD_PAGE_SIZE, paginate = false
     let skip = 0;
     let capReached = true;
     for (let page = 0; page < maxPages; page++) {
-      const batch = await base44.entities[entityType].filter({}, '-created_date', limit, skip);
+      const batch = await base44.entities[entityType].filter(filtro || {}, '-created_date', limit, skip);
       all.push(...batch);
       if (batch.length < limit) {
         capReached = false;
@@ -143,11 +145,11 @@ export function deduplicateRecords(records) {
  */
 const BATCH_SIZE = 10; // máximo de requests simultâneos — 3 lotes para 25+ entidades
 
-async function loadEntitiesInBatches(entityList, limit, paginate = false, maxPages = MAX_PAGES) {
+async function loadEntitiesInBatches(entityList, limit, paginate = false, maxPages = MAX_PAGES, filtro = null) {
   const allResults = [];
   for (let i = 0; i < entityList.length; i += BATCH_SIZE) {
     const batch = entityList.slice(i, i + BATCH_SIZE);
-    const settled = await Promise.allSettled(batch.map(type => loadEntity(type, limit, paginate, maxPages)));
+    const settled = await Promise.allSettled(batch.map(type => loadEntity(type, limit, paginate, maxPages, filtro)));
     settled.forEach((r, idx) => {
       if (r.status === 'rejected') {
         logger.warn(`[recordsService] loadAllRecords: ${batch[idx]} rejeitou:`, r.reason?.message || r.reason);
@@ -160,10 +162,20 @@ async function loadEntitiesInBatches(entityList, limit, paginate = false, maxPag
   return allResults;
 }
 
-export async function loadAllRecords(mode = 'list', maxPages = mode === 'list' ? LIST_MAX_PAGES : MAX_PAGES) {
+/**
+ * @param {'dashboard'|'list'} mode
+ * @param {number} maxPages
+ * @param {{ createdBy?: string|null }} opts - createdBy filtra no servidor pelos
+ *   registros do próprio usuário. Usado por quem só pode ver os seus (inspetor/
+ *   laboratorista): sem isso o app baixava TODAS as entidades inteiras (dezenas de
+ *   milhares de registros) para descartar quase tudo no cliente — no celular as
+ *   requisições falhavam/expiravam e a lista aparecia vazia.
+ */
+export async function loadAllRecords(mode = 'list', maxPages = mode === 'list' ? LIST_MAX_PAGES : MAX_PAGES, { createdBy = null } = {}) {
   const limit = mode === 'dashboard' ? DASHBOARD_PAGE_SIZE : RECORD_PAGE_SIZE;
   const paginate = mode === 'list';
-  const results = await loadEntitiesInBatches(ALL_RECORD_ENTITIES, limit, paginate, maxPages);
+  const filtro = createdBy ? { created_by: createdBy } : null;
+  const results = await loadEntitiesInBatches(ALL_RECORD_ENTITIES, limit, paginate, maxPages, filtro);
   const normalized = normalizeRecords(results, ALL_RECORD_ENTITIES);
   return deduplicateRecords(normalized);
 }

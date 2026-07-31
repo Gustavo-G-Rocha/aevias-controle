@@ -166,13 +166,17 @@ export function useAuxData({ needsRegionais = true, needsUsers = false } = {}) {
 // ─── Todos os registros — cache único compartilhado ───────────────────────────
 // Quando online: busca do servidor e salva no cache offline (IndexedDB).
 // Quando offline: lê do cache offline para visualização.
-export function useAllRecords(mode = 'list') {
+export function useAllRecords(mode = 'list', { createdBy = null, enabled = true } = {}) {
   const { isOnline } = useOfflineDetection();
+  // Cache separado por autor: o conjunto filtrado (registros do próprio usuário)
+  // não pode sobrescrever o cache global usado por admin/gestor.
+  const cacheKey = createdBy ? `records:${mode}:${createdBy}` : `records:${mode}`;
   return useQuery({
-    queryKey: QUERY_KEYS.allRecordsFor(mode),
+    queryKey: createdBy ? [...QUERY_KEYS.allRecordsFor(mode), createdBy] : QUERY_KEYS.allRecordsFor(mode),
+    enabled,
     queryFn: async () => {
       if (!isOnline) {
-        const cached = await getDataCache(`records:${mode}`);
+        const cached = await getDataCache(cacheKey);
         if (cached) {
           logger.log(`[useQueryData] Offline — lendo registros do cache (${mode})`);
           return cached.data;
@@ -180,20 +184,20 @@ export function useAllRecords(mode = 'list') {
         return [];
       }
       try {
-        const data = await loadAllRecords(mode);
+        const data = await loadAllRecords(mode, undefined, { createdBy });
         if (data.length > 0) {
-          saveDataCache(`records:${mode}`, data, 'records').catch(() => {});
+          saveDataCache(cacheKey, data, 'records').catch(() => {});
           return data;
         }
         // Zero registros pode ser falha de rede silenciosa — prefere o cache.
-        const cached = await getDataCache(`records:${mode}`);
+        const cached = await getDataCache(cacheKey);
         if (cached?.data?.length) {
           logger.warn(`[useQueryData] Registros vazios da rede — usando cache (${mode})`);
           return cached.data;
         }
         return data;
       } catch (e) {
-        const cached = await getDataCache(`records:${mode}`);
+        const cached = await getDataCache(cacheKey);
         if (cached) {
           logger.warn(`[useQueryData] Rede falhou — registros do cache (${mode})`);
           return cached.data;

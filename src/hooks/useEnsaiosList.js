@@ -168,7 +168,15 @@ export function useEnsaiosList() {
   // cliente e cliente_supervisor: usa backend function (asServiceRole) para contornar RLS
   const useBackendRecords = currentUserAccessLevel === 'cliente_supervisor' || currentUserAccessLevel === 'cliente';
 
-  const { data: allRecords, isLoading: loadingRecords } = useAllRecords('list');
+  // Inspetor/laboratorista e funcionário do cliente só veem os PRÓPRIOS registros:
+  // busca já filtrada no servidor por created_by. Antes o app baixava todas as
+  // entidades por inteiro para descartar quase tudo no cliente — no celular isso
+  // estourava/falhava e a lista ficava vazia mesmo com registros salvos.
+  const ownRecordsOnly = currentUserAccessLevel === 'user' || currentUserAccessLevel === 'funcionarios_cliente';
+  const { data: allRecords, isLoading: loadingRecords } = useAllRecords('list', {
+    createdBy: ownRecordsOnly ? user?.email : null,
+    enabled: !!user,
+  });
   const { data: supervisorRecords, isLoading: loadingSupervisorRecords } = useSupervisorRecords(user, useBackendRecords);
   // Registros salvos offline (fila pendente/falha) — mesclados na lista para
   // ficarem visíveis enquanto aguardam sincronização.
