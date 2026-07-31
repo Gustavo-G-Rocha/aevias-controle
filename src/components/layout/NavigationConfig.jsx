@@ -71,6 +71,15 @@ const ENSAIOS_SUPERVISAO = [
   { title: "Sondagem", url: createPageUrl("EnsaioSondagem"), icon: Gauge },
   { title: "Viga Benkelman", url: createPageUrl("EnsaioVigaBenkelman"), icon: Gauge },
   { title: "Taxa MRAF", url: createPageUrl("EnsaioTaxaMRAF"), icon: FlaskConical },
+  // Itens únicos da aba Conservação (sem repetir os já listados acima).
+  { title: "Ensaio MRAF", url: createPageUrl("EnsaioMRAF"), icon: FlaskConical },
+  { title: "Granulometria Individual", url: createPageUrl("EnsaioGranulometriaIndividual"), icon: FlaskConical },
+  { title: "Granulometria da Mistura", url: createPageUrl("GranuMistura"), icon: FlaskConical },
+  { title: "Taxa de Insumos", url: createPageUrl("EnsaioTaxaInsumos"), icon: FlaskConical },
+  { title: "Acompanhamento de Cargas", url: createPageUrl("AcompanhamentoCarga"), icon: FlaskConical },
+  { title: "Densidade In Situ", url: createPageUrl("EnsaioDensidadeInSitu"), icon: Gauge },
+  { title: "Ensaio Proctor", url: createPageUrl("EnsaioProctor"), icon: FlaskConical },
+  { title: "Fresagem e Lançamento de CBUQ", url: createPageUrl("RegistroFresagemCBUQ"), icon: ClipboardList },
 ];
 
 export const ENSAIOS_POR_TIPO_OBRA = [
