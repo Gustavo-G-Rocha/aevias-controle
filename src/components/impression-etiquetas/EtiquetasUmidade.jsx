@@ -90,8 +90,15 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
           html, body { overflow: visible !important; margin: 0 !important; padding: 0 !important; -ms-overflow-style: none !important; scrollbar-width: none !important; }
-          /* Medidas físicas da folha de etiquetas — NÃO alterar. */
-          .page-container { width: 210mm !important; height: 297mm !important; overflow: hidden !important; }
+          /* Medidas físicas das etiquetas (grade 3x7 em mm) — NÃO alterar.
+             A folha NÃO recebe width/height fixos nem overflow:hidden: em
+             impressoras físicas a área imprimível é menor que 210x297mm, e a
+             combinação altura fixa + overflow hidden cortava a maior parte das
+             etiquetas (só as primeiras saíam). Sem isso, a folha tem a altura
+             natural da grade e o @page cuida do tamanho A4. */
+          .page-container { width: auto !important; height: auto !important; overflow: visible !important; break-inside: avoid !important; page-break-inside: avoid !important; }
+          .umidade-grid { break-inside: avoid !important; page-break-inside: avoid !important; }
+          .umidade-label { break-inside: avoid !important; page-break-inside: avoid !important; }
           .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
           .print\\:hidden { display: none !important; }
         }
