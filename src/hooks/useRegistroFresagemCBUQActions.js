@@ -18,6 +18,7 @@ import { logger } from '@/utils/logger';
 export function useRegistroFresagemCBUQActions({
   formData, setFormData,
   editMode, editId, clearSavedData,
+  obras,
 }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -55,7 +56,12 @@ export function useRegistroFresagemCBUQActions({
 
     setSaving(true);
     try {
-      const dataToSave = buildDataToSave(formData, finalizar);
+      const obraSel = obras?.find(o => o.id === formData.obra_id);
+      const dataToSave = {
+        ...buildDataToSave(formData, finalizar),
+        obra_name: obraSel?.name || "",
+        obra_code: obraSel?.code || "",
+      };
 
       if (editMode) {
         await atualizarEnsaio('RegistroFresagemCBUQ', editId, dataToSave);

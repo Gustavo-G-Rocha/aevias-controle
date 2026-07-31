@@ -31,6 +31,7 @@ export function RegistroFresagemCBUQProvider({ children }) {
   } = useRegistroFresagemCBUQActions({
     formData, setFormData,
     editMode, editId, clearSavedData,
+    obras,
   });
 
   const obraSelecionada = obras.find(o => o.id === formData.obra_id);

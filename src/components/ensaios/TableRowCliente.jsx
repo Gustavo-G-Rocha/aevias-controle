@@ -37,8 +37,8 @@ const TableRowCliente = React.memo(({ ensaio, obra, projeto, index, allUsers, on
       </td>
       <td className="px-2 py-2 text-foreground/90 text-xs whitespace-nowrap">{dataFormatted}</td>
       <td className="px-2 py-2">
-        <div className="font-medium text-foreground text-xs truncate max-w-[140px]" title={obra?.name}>{obra?.name || 'N/A'}</div>
-        <div className="text-[10px] text-foreground/70">{obra?.code}</div>
+        <div className="font-medium text-foreground text-xs truncate max-w-[140px]" title={obra?.name || ensaio.obra_name}>{obra?.name || ensaio.obra_name || 'N/A'}</div>
+        <div className="text-[10px] text-foreground/70">{obra?.code || ensaio.obra_code}</div>
       </td>
       <td className="px-2 py-2 text-foreground/90 text-xs truncate max-w-[100px]" title={laboratorista}>{laboratorista}</td>
       <td className="px-2 py-2">
