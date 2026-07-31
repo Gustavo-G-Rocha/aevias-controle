@@ -96,7 +96,12 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
              combinação altura fixa + overflow hidden cortava a maior parte das
              etiquetas (só as primeiras saíam). Sem isso, a folha tem a altura
              natural da grade e o @page cuida do tamanho A4. */
-          .page-container { width: auto !important; height: auto !important; overflow: visible !important; break-inside: avoid !important; page-break-inside: avoid !important; }
+          /* padding-bottom = 0: com 15mm embaixo a folha somava 297,18mm
+             (15 + 266,78 da grade + 15) e passava 1 A4, gerando uma página em
+             branco entre as folhas. O padding de topo/laterais — que define o
+             alinhamento das etiquetas — permanece igual. */
+          .page-container { width: auto !important; height: auto !important; padding-bottom: 0 !important; overflow: visible !important; break-inside: avoid !important; page-break-inside: avoid !important; }
+          .page-container:last-child { page-break-after: avoid !important; break-after: avoid !important; }
           .umidade-grid { break-inside: avoid !important; page-break-inside: avoid !important; }
           .umidade-label { break-inside: avoid !important; page-break-inside: avoid !important; }
           .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
