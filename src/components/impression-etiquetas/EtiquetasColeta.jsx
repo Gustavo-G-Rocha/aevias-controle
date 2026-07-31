@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { calcularPaginasColeta, getEtiquetasPageColeta } from '@/utils/impressionEtiquetasUtils';
 
@@ -13,8 +14,10 @@ const CELL_STYLES = {
 export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
   const numPages = calcularPaginasColeta(etiquetas.length);
 
-  return (
-    <div className="etiquetas-print-root bg-white min-h-screen p-4 print:p-0 print:min-h-0">
+  // Renderizado direto no <body> (fora do shell do app): sem sidebar, sem
+  // ancestrais com overflow/transform que quebravam a paginação na impressão.
+  return createPortal(
+    <div className="etiquetas-print-root fixed inset-0 z-50 overflow-auto bg-white p-4">
       <div className="mb-4 print:hidden flex gap-2 sticky top-0 bg-white z-10 py-2">
         <Button onClick={onPrint}>
           🖨️ Imprimir
@@ -42,29 +45,21 @@ export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
         @page { size: A4 portrait; margin: 6mm; }
         @media screen { .page-container { min-height: 100vh; margin-bottom: 20px; border: 1px solid #e5e7eb; } }
         @media print {
-          /* Isola as etiquetas do shell do app (sidebar, header, bottom-nav).
-             Esconde tudo e revela apenas a árvore das etiquetas, que é
-             reposicionada no canto superior esquerdo da folha para não
-             herdar o deslocamento da sidebar. */
-          /* Remove a sidebar/header/bottom-nav do fluxo, para que o conteúdo
-             não fique deslocado nem apareça na folha. */
-          aside, nav, header, [data-sidebar], [data-sidebar="sidebar"],
-          [data-sidebar="rail"], [data-sidebar="trigger"] { display: none !important; }
-          /* motion.div do PageTransition cria containing block por transform,
-             o que quebraria o position:absolute abaixo. */
-          [style*="transform"] { transform: none !important; }
-
-          body * { visibility: hidden !important; }
-          .etiquetas-print-root, .etiquetas-print-root * { visibility: visible !important; }
+          /* O container das etiquetas é filho direto do <body> (portal), então
+             basta esconder os irmãos: sidebar, header e bottom-nav do app
+             desaparecem por completo, sem deixar espaço em branco. */
+          body > *:not(.etiquetas-print-root) { display: none !important; }
           .etiquetas-print-root {
-            position: absolute !important;
-            left: 0 !important; top: 0 !important;
+            position: static !important;
+            inset: auto !important;
+            z-index: auto !important;
+            overflow: visible !important;
             width: 100% !important;
+            min-height: 0 !important;
             margin: 0 !important; padding: 0 !important;
             background: #fff !important;
           }
-          .etiquetas-print-root .print\\:hidden,
-          .etiquetas-print-root .print\\:hidden * { display: none !important; visibility: hidden !important; }
+          .etiquetas-print-root .print\\:hidden { display: none !important; }
 
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
@@ -96,7 +91,8 @@ export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
           .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
         }
       `}</style>
-    </div>);
+    </div>,
+    document.body);
 
 }
 
