@@ -15,12 +15,17 @@ import IntegrityBanner from "@/components/relatorios/IntegrityBanner";
 import TotpPromptDialog from "@/components/relatorios/TotpPromptDialog";
 import SignatureSeal from "@/components/relatorios/SignatureSeal";
 import { isSupervisorInRegional } from "@/utils/accessControl";
+import { useAuth } from "@/lib/AuthContext";
 
 // Props:
 //   entityName: string (e.g. "ChecklistConcretagem")
 //   recordId: string
 export default function AprovacaoBar({ entityName, recordId }) {
-  const [user, setUser] = useState(null);
+  // Usa o usuário do AuthContext (mesma fonte usada por toda a app) em vez de
+  // uma chamada base44.auth.me() separada, que podia retornar um objeto sem
+  // access_level em algumas condições, fazendo com que os botões de
+  // aprovar/reprovar nunca aparecessem para gestores/admins.
+  const { user } = useAuth();
   const [record, setRecord] = useState(null);
   const [regional, setRegional] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -29,18 +34,6 @@ export default function AprovacaoBar({ entityName, recordId }) {
   const [signature, setSignature] = useState(null);
   const [actionError, setActionError] = useState('');
   const [showTotpDialog, setShowTotpDialog] = useState(false);
-
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const userData = await base44.auth.me();
-        setUser(userData);
-      } catch (err) {
-        logger.error('AprovacaoBar: erro ao carregar usuário', err);
-      }
-    };
-    loadUser();
-  }, []);
 
   useEffect(() => {
     if (!entityName || !recordId) return;
