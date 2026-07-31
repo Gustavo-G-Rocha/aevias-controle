@@ -22,7 +22,13 @@ export default function LancamentoCard({ linha, index, canEdit, tipoLocalizacao,
       <div className="flex items-center justify-between">
         <p className="font-semibold text-sm text-foreground">Lançamento {index + 1}</p>
         {canEdit && (
-          <Button variant="ghost" size="sm" className="h-8 text-destructive" onClick={() => onRemove(index)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 text-destructive"
+            aria-label={`Remover Lançamento ${index + 1}`}
+            onClick={() => onRemove(index)}
+          >
             <Trash2 className="w-4 h-4" />
           </Button>
         )}
