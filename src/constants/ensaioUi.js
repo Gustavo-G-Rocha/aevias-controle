@@ -39,6 +39,7 @@ export const STATUS_BADGE_CLASSES = {
 
 // ── Textos de status ────────────────────────────────────────────────────────
 export const STATUS_LABELS = {
+  RASCUNHO: 'Rascunho',
   EXECUCAO: 'Execução',
   ASSINADO: 'Assinado',
   APROVADO: 'Aprovado',

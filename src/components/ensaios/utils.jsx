@@ -55,7 +55,7 @@ export const getNaoConformidades = (ensaio) => {
 export const getStatusInfo = (ensaio) => {
   // Se status foi revertido para rascunho, tem prioridade sobre approved
   if (ensaio.status === 'rascunho' && !ensaio.client_signature?.signed_by) {
-    return { text: STATUS_LABELS.EXECUCAO, icon: Clock, className: STATUS_BADGE_CLASSES.EXECUCAO };
+    return { text: STATUS_LABELS.RASCUNHO, icon: Clock, className: STATUS_BADGE_CLASSES.EXECUCAO };
   }
   if (ensaio.client_signature?.signed_by) {
     return { text: STATUS_LABELS.ASSINADO, icon: CheckCircle, className: STATUS_BADGE_CLASSES.ASSINADO };

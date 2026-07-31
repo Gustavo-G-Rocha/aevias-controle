@@ -90,8 +90,8 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-muted-foreground">
               <div className="flex items-center gap-1.5" title="Obra">
                 <Building className="w-4 h-4 text-secondary shrink-0" />
-                <span className="font-medium ">{obra?.name || 'N/A'}</span>
-                <span className="text-xs">({obra?.code || 'N/A'})</span>
+                <span className="font-medium ">{obra?.name || ensaio.obra_name || 'N/A'}</span>
+                <span className="text-xs">({obra?.code || ensaio.obra_code || 'N/A'})</span>
               </div>
               <div className="flex items-center gap-1.5" title="Laboratorista">
                 <UserIconSmall className="w-4 h-4 text-secondary shrink-0" />
