@@ -14,7 +14,7 @@ export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
   const numPages = calcularPaginasColeta(etiquetas.length);
 
   return (
-    <div className="bg-white min-h-screen p-4 print:p-0 print:min-h-0">
+    <div className="etiquetas-print-root bg-white min-h-screen p-4 print:p-0 print:min-h-0">
       <div className="mb-4 print:hidden flex gap-2 sticky top-0 bg-white z-10 py-2">
         <Button onClick={onPrint}>
           🖨️ Imprimir
@@ -27,7 +27,7 @@ export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
       <div>
         {Array.from({ length: numPages }).map((_, pageIdx) =>
         <div key={pageIdx} className="page-container">
-            <div className="grid grid-cols-2 gap-x-2 gap-y-4 print:gap-x-1.5 print:gap-y-2">
+            <div className="etiquetas-grid grid grid-cols-2 gap-x-2 gap-y-4 print:gap-x-1.5 print:gap-y-2">
               {getEtiquetasPageColeta(etiquetas, pageIdx).map((etiqueta, idx) =>
             <EtiquetaColetaItem key={pageIdx * 6 + idx} etiqueta={etiqueta} />
             )}
@@ -39,18 +39,55 @@ export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
       <style>{`
         .page-container { padding: 8px; display: block !important; }
         .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
-        @page { size: A4; margin: 6mm 3mm; }
+        @page { size: A4 portrait; margin: 6mm; }
         @media screen { .page-container { min-height: 100vh; margin-bottom: 20px; border: 1px solid #e5e7eb; } }
         @media print {
-          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; overflow: visible !important; }
+          /* Isola as etiquetas do shell do app (sidebar, header, bottom-nav).
+             Esconde tudo e revela apenas a árvore das etiquetas, que é
+             reposicionada no canto superior esquerdo da folha para não
+             herdar o deslocamento da sidebar. */
+          /* Remove a sidebar/header/bottom-nav do fluxo, para que o conteúdo
+             não fique deslocado nem apareça na folha. */
+          aside, nav, header, [data-sidebar], [data-sidebar="sidebar"],
+          [data-sidebar="rail"], [data-sidebar="trigger"] { display: none !important; }
+          /* motion.div do PageTransition cria containing block por transform,
+             o que quebraria o position:absolute abaixo. */
+          [style*="transform"] { transform: none !important; }
+
+          body * { visibility: hidden !important; }
+          .etiquetas-print-root, .etiquetas-print-root * { visibility: visible !important; }
+          .etiquetas-print-root {
+            position: absolute !important;
+            left: 0 !important; top: 0 !important;
+            width: 100% !important;
+            margin: 0 !important; padding: 0 !important;
+            background: #fff !important;
+          }
+          .etiquetas-print-root .print\\:hidden,
+          .etiquetas-print-root .print\\:hidden * { display: none !important; visibility: hidden !important; }
+
+          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
-          html, body, div, section, main { overflow: visible !important; -ms-overflow-style: none !important; scrollbar-width: none !important; }
+          html, body { overflow: visible !important; margin: 0 !important; padding: 0 !important; -ms-overflow-style: none !important; scrollbar-width: none !important; }
           .min-h-screen { min-height: 0 !important; }
-          .page-container { padding: 4px; max-height: 272mm; overflow: hidden !important; }
+
+          /* 6 etiquetas por folha: 2 colunas x 3 linhas de altura fixa,
+             cabendo em A4 (285mm úteis) sem cortar nenhuma etiqueta. */
+          .page-container { padding: 0 !important; overflow: hidden !important; }
+          .etiquetas-grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            grid-template-rows: repeat(3, 92mm) !important;
+            gap: 2mm !important;
+            height: 280mm !important;
+          }
+          .etiquetas-grid > * {
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+            overflow: hidden !important;
+            height: 100% !important;
+          }
           .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
-          .print\\:hidden { display: none !important; }
-          header, nav, aside, .no-print, [data-sidebar], [data-sidebar="sidebar"], [data-sidebar="provider"] { display: none !important; }
-          main { padding-left: 0 !important; margin-left: 0 !important; }
         }
       `}</style>
     </div>);
