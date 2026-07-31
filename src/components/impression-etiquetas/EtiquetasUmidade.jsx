@@ -1,12 +1,15 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { calcularPaginasUmidade, getEtiquetasPageUmidade } from '@/utils/impressionEtiquetasUtils';
 
 export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
   const numPages = calcularPaginasUmidade(etiquetas.length);
 
-  return (
-    <div className="bg-white min-h-screen p-4 print:p-0 print:min-h-0">
+  // Renderizado direto no <body> (fora do shell do app): sem header, sem botão
+  // de recolher menu e sem ancestrais que deslocariam a folha de 210x297mm.
+  return createPortal(
+    <div className="etiquetas-print-root fixed inset-0 z-50 overflow-auto bg-white p-4">
       <div className="mb-4 print:hidden flex gap-2 sticky top-0 bg-white z-10 py-2">
         <Button onClick={onPrint}>
           🖨️ Imprimir
@@ -71,18 +74,29 @@ export default function EtiquetasUmidade({ etiquetas, onPrint, onVoltar }) {
         @page { size: A4; margin: 0 !important; }
         @media screen { .page-container { min-height: 100vh; margin-bottom: 20px; border: 1px solid #e5e7eb; } .umidade-grid { grid-template-columns: repeat(3, 1fr) !important; grid-template-rows: repeat(7, auto) !important; } }
         @media print {
-          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; overflow: visible !important; }
+          /* O container é filho direto do <body>: esconder os irmãos remove
+             header, sidebar e o botão de recolher menu por completo. */
+          body > *:not(.etiquetas-print-root) { display: none !important; }
+          .etiquetas-print-root {
+            position: static !important;
+            inset: auto !important;
+            z-index: auto !important;
+            overflow: visible !important;
+            width: auto !important;
+            min-height: 0 !important;
+            margin: 0 !important; padding: 0 !important;
+            background: #fff !important;
+          }
+          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
-          html, body, div, section, main { overflow: visible !important; -ms-overflow-style: none !important; scrollbar-width: none !important; }
+          html, body { overflow: visible !important; margin: 0 !important; padding: 0 !important; -ms-overflow-style: none !important; scrollbar-width: none !important; }
+          /* Medidas físicas da folha de etiquetas — NÃO alterar. */
           .page-container { width: 210mm !important; height: 297mm !important; overflow: hidden !important; }
           .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
           .print\\:hidden { display: none !important; }
-          header, nav, aside, .no-print, [data-sidebar], [data-sidebar="sidebar"], [data-sidebar="provider"], [data-side] { display: none !important; }
-          main { padding: 0 !important; margin: 0 !important; }
-          main .pb-16 { padding: 0 !important; }
-          .min-h-screen { background: #FFFFFF !important; }
         }
       `}</style>
-    </div>);
+    </div>,
+    document.body);
 
 }
