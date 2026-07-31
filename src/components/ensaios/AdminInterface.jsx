@@ -6,7 +6,7 @@ import { FileText, PlusCircle, FlaskConical, Gauge, ClipboardList, Download } fr
 import { bulkExportReports } from "@/utils/bulkExportZip";
 import { useToast } from "@/components/ui/use-toast";
 import { getEnsaioTypeInfo, getReportLink } from "@/components/ensaios/ensaioMappers";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Pagination } from "@/components/ensaios/Pagination";
@@ -26,6 +26,12 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
   const [exporting, setExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState('');
   const { toast } = useToast();
+
+  // Permite chegar à lista já filtrada por tipo via URL (ex: sidebar →
+  // /MeusEnsaios?tipo=RegistroFresagemCBUQ), dando acesso direto aos
+  // rascunhos de um módulo específico sem precisar achar o filtro na tabela.
+  const [searchParams] = useSearchParams();
+  const initialType = searchParams.get('tipo') || 'all';
 
   // O(1) lookup — evita obras.find() dentro de loops
   const obrasMap = useMemo(() => new Map(obras.map((o) => [o.id, o])), [obras]);
@@ -65,7 +71,7 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
     isAnyFilterActive,
     toggleSortOrder,
     clearFilters,
-  } = useTableFilters(ensaios, obras, projects, allUsers, applyCustomFilters);
+  } = useTableFilters(ensaios, obras, projects, allUsers, applyCustomFilters, initialType);
 
   const handleReject = useCallback(async (ensaio, motivo) => {
     await onReject(ensaio, motivo);

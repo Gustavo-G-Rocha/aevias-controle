@@ -4,7 +4,7 @@ import { getDataEnsaio } from '@/components/ensaios/ensaioMappers';
 import { getLocalInfo, getLaboratoristaInfo, getEmpreiteiraInfo } from '@/components/ensaios/utils';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
-export function useTableFilters(ensaios, obras, projects, allUsers, applyCustomFilters = null) {
+export function useTableFilters(ensaios, obras, projects, allUsers, applyCustomFilters = null, initialType = 'all') {
   const [nomeFilter, setNomeFilter] = useState('');
   const [obraFilter, setObraFilter] = useState('');
   const [projetoFilter, setProjetoFilter] = useState('');
@@ -20,7 +20,7 @@ export function useTableFilters(ensaios, obras, projects, allUsers, applyCustomF
   const [dataInicioFilter, setDataInicioFilter] = useState('');
   const [dataFimFilter, setDataFimFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [typeFilter, setTypeFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState(initialType);
   const [sortOrder, setSortOrder] = useState('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
