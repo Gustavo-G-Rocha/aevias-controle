@@ -37,6 +37,7 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
   const applyCustomFilters = useCallback((filtered) => {
     if (statusFilter === 'all') return filtered;
     const labelByValue = {
+      rascunho: STATUS_LABELS.EXECUCAO,
       approved: STATUS_LABELS.APROVADO,
       pending: STATUS_LABELS.PENDENTE,
       rejected: STATUS_LABELS.REPROVADO,
@@ -145,6 +146,7 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
 
   const statusOptions = [
     { value: 'all', label: 'Todos os status' },
+    { value: 'rascunho', label: 'Rascunho' },
     { value: 'pending', label: 'Pendentes' },
     { value: 'approved', label: 'Aprovados' },
     { value: 'rejected', label: 'Reprovados' },
