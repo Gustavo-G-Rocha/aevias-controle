@@ -104,7 +104,7 @@ function EtiquetaColetaItem({ etiqueta }) {
         <div className="flex items-center justify-center" style={{ borderRight: '0.5mm solid #000' }}>
           <picture>
             <source srcSet={LOGO_URL} />
-            <img src={LOGO_URL} alt="AfirmaEvias" className="h-6 print:h-5 w-auto object-contain" width="auto" height="24" />
+            <img src={LOGO_URL} alt="AfirmaEvias" className="h-12 print:h-9 w-auto object-contain" width="auto" height="48" />
           </picture>
         </div>
         <div className="flex items-center justify-center px-1" style={{ borderRight: '0.5mm solid #000' }}>
