@@ -79,7 +79,6 @@ const ENSAIOS_SUPERVISAO = [
   { title: "Acompanhamento de Cargas", url: createPageUrl("AcompanhamentoCarga"), icon: FlaskConical },
   { title: "Densidade In Situ", url: createPageUrl("EnsaioDensidadeInSitu"), icon: Gauge },
   { title: "Ensaio Proctor", url: createPageUrl("EnsaioProctor"), icon: FlaskConical },
-  { title: "Fresagem e Lançamento de CBUQ", url: createPageUrl("RegistroFresagemCBUQ"), icon: ClipboardList },
 ];
 
 export const ENSAIOS_POR_TIPO_OBRA = [
@@ -155,7 +154,6 @@ export const ENSAIOS_POR_TIPO_OBRA = [
           { title: "Densidade In Situ", url: createPageUrl("EnsaioDensidadeInSitu"), icon: Gauge },
           { title: "Ensaio Proctor", url: createPageUrl("EnsaioProctor"), icon: FlaskConical },
           { title: "Mancha + Pêndulo", url: createPageUrl("EnsaioManchaPendulo"), icon: Gauge },
-          { title: "Fresagem e Lançamento de CBUQ", url: createPageUrl("RegistroFresagemCBUQ"), icon: ClipboardList },
         ],
       },
     ],
