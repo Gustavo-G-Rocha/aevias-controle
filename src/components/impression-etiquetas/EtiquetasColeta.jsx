@@ -71,22 +71,28 @@ export default function EtiquetasColeta({ etiquetas, onPrint, onVoltar }) {
           html, body { overflow: visible !important; margin: 0 !important; padding: 0 !important; -ms-overflow-style: none !important; scrollbar-width: none !important; }
           .min-h-screen { min-height: 0 !important; }
 
-          /* 6 etiquetas por folha: 2 colunas x 3 linhas de altura fixa,
-             cabendo em A4 (285mm úteis) sem cortar nenhuma etiqueta. */
-          .page-container { padding: 0 !important; overflow: hidden !important; }
+          /* 6 etiquetas por folha: 2 colunas x 3 linhas, ocupando toda a
+             largura útil da A4 (198mm) e caindo dentro dos 285mm de altura. */
+          .page-container { padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: none !important; overflow: hidden !important; }
           .etiquetas-grid {
             display: grid !important;
             grid-template-columns: repeat(2, 1fr) !important;
-            grid-template-rows: repeat(3, 92mm) !important;
-            gap: 2mm !important;
-            height: 280mm !important;
+            grid-template-rows: repeat(3, 89mm) !important;
+            gap: 1.5mm 2mm !important;
+            width: 100% !important;
+            height: 270mm !important;
           }
           .etiquetas-grid > * {
             break-inside: avoid !important;
             page-break-inside: avoid !important;
             overflow: hidden !important;
             height: 100% !important;
+            padding: 2mm !important;
           }
+          /* Compacta as células: o conteúdo natural mede ~100mm, o que estourava
+             a linha de 92mm e cortava a última fileira. */
+          .etiquetas-grid td { height: 15px !important; padding-top: 0.3mm !important; padding-bottom: 0.3mm !important; }
+          .etiquetas-grid .etiqueta-footer-row { height: 19px !important; }
           .page-container + .page-container { page-break-before: always !important; break-before: page !important; }
         }
       `}</style>
@@ -187,8 +193,8 @@ function EtiquetaColetaItem({ etiqueta }) {
 
       {/* Rodapé */}
       <div className="bg-white text-xs print:text-[10px]" style={{ border: '0.5mm solid #000' }}>
-        <div className="font-bold" style={{ height: '24px', display: 'flex', alignItems: 'center', paddingLeft: '4mm', paddingRight: '4mm' }}>RESPONSÁVEL COLETA:</div>
-        <div className="font-bold" style={{ height: '24px', display: 'flex', alignItems: 'center', paddingLeft: '4mm', paddingRight: '4mm' }}>DATA:</div>
+        <div className="etiqueta-footer-row font-bold" style={{ height: '24px', display: 'flex', alignItems: 'center', paddingLeft: '4mm', paddingRight: '4mm' }}>RESPONSÁVEL COLETA:</div>
+        <div className="etiqueta-footer-row font-bold" style={{ height: '24px', display: 'flex', alignItems: 'center', paddingLeft: '4mm', paddingRight: '4mm' }}>DATA:</div>
       </div>
     </div>);
 
