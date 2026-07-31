@@ -111,21 +111,30 @@ export default function RegistroFresagemCBUQDadosObra() {
 
         <div>
           <Label>Rodovia *</Label>
-          <Select
-            value={formData.rodovia}
-            onValueChange={(value) => set("rodovia", value)}
-            disabled={!canEdit || !formData.obra_id}
-          >
-            <SelectTrigger><SelectValue placeholder="Selecione a rodovia" /></SelectTrigger>
-            <SelectContent>
-              {(obraSelecionada?.rodovias || []).map((rodovia) => (
-                <SelectItem key={rodovia} value={rodovia}>{rodovia}</SelectItem>
-              ))}
-              {formData.rodovia && !(obraSelecionada?.rodovias || []).includes(formData.rodovia) && (
-                <SelectItem value={formData.rodovia}>{formData.rodovia}</SelectItem>
-              )}
-            </SelectContent>
-          </Select>
+          {(obraSelecionada?.rodovias || []).length > 0 ? (
+            <Select
+              value={formData.rodovia}
+              onValueChange={(value) => set("rodovia", value)}
+              disabled={!canEdit || !formData.obra_id}
+            >
+              <SelectTrigger><SelectValue placeholder="Selecione a rodovia" /></SelectTrigger>
+              <SelectContent>
+                {obraSelecionada.rodovias.map((rodovia) => (
+                  <SelectItem key={rodovia} value={rodovia}>{rodovia}</SelectItem>
+                ))}
+                {formData.rodovia && !obraSelecionada.rodovias.includes(formData.rodovia) && (
+                  <SelectItem value={formData.rodovia}>{formData.rodovia}</SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          ) : (
+            <Input
+              value={formData.rodovia}
+              onChange={(e) => set("rodovia", e.target.value)}
+              disabled={!canEdit || !formData.obra_id}
+              placeholder="Digite a rodovia"
+            />
+          )}
         </div>
 
         <SentidoPistaCheckboxes
