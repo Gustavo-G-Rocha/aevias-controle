@@ -94,6 +94,7 @@ export default function Projects() {
               </DialogTitle>
             </DialogHeader>
             <ProjectForm
+              key={editingProject?.id || "new"}
               project={editingProject}
               faixas={faixas}
               regionais={regionais}
