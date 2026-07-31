@@ -121,6 +121,9 @@ export default function RegistroFresagemCBUQDadosObra() {
               {(obraSelecionada?.rodovias || []).map((rodovia) => (
                 <SelectItem key={rodovia} value={rodovia}>{rodovia}</SelectItem>
               ))}
+              {formData.rodovia && !(obraSelecionada?.rodovias || []).includes(formData.rodovia) && (
+                <SelectItem value={formData.rodovia}>{formData.rodovia}</SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>

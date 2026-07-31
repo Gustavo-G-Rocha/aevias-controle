@@ -23,8 +23,29 @@ export function useRegistroFresagemCBUQData() {
 
   const obras = useMemo(() => {
     if (!auxData?.obras) return [];
-    return filtrarObras(auxData.obras);
-  }, [auxData?.obras]);
+    const filtered = filtrarObras(auxData.obras);
+    // Em modo de edição, garante que a obra selecionada apareça no dropdown
+    // mesmo se não passar pelo filtro (ex: obra de gerenciamento, ou obra
+    // deletada cujos dados denormalizados ainda estão no registro).
+    if (formData.obra_id) {
+      const inFiltered = filtered.find(o => o.id === formData.obra_id);
+      if (inFiltered) return filtered;
+      const inFull = auxData.obras.find(o => o.id === formData.obra_id);
+      if (inFull) return [inFull, ...filtered];
+      // Obra deletada: cria entrada sintética a partir dos campos denormalizados
+      // para que o select mostre o nome e a rodovia não fique vazia.
+      if (formData.obra_name || formData.obra_code) {
+        return [{
+          id: formData.obra_id,
+          name: formData.obra_name || "(Obra excluída)",
+          code: formData.obra_code || "",
+          rodovias: [],
+          empreiteiras: formData.contratada ? [formData.contratada] : [],
+        }, ...filtered];
+      }
+    }
+    return filtered;
+  }, [auxData?.obras, formData?.obra_id, formData?.obra_name, formData?.obra_code, formData?.contratada]);
 
   const regionais = useMemo(() => auxData?.regionais ?? [], [auxData?.regionais]);
   const projects = useMemo(() => auxData?.projects ?? [], [auxData?.projects]);
