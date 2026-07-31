@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { base44 } from "@/api/base44Client";
 import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
 import { QUERY_KEYS } from "@/hooks/useQueryData";
 import { createPageUrl } from "@/utils";
@@ -56,24 +55,6 @@ export function useRegistroFresagemCBUQActions({
 
     setSaving(true);
     try {
-      // Confirma que a obra referenciada existe antes de criar o registro,
-      // evitando registros órfãos por falha transitória de rede/lookup.
-      try {
-        await base44.entities.Obra.get(formData.obra_id);
-      } catch (obraError) {
-        const msg = String(obraError?.message || '').toLowerCase();
-        const isTransient = !obraError?.response ||
-          obraError?.code === 'ERR_NETWORK' ||
-          obraError?.response?.status >= 500 ||
-          msg.includes('network') || msg.includes('fetch') || msg.includes('load failed');
-        if (isTransient) {
-          toast({ title: "Falha temporária ao validar a obra. Tente salvar novamente.", variant: "destructive" });
-        } else {
-          toast({ title: "Obra não encontrada. Selecione uma obra válida.", variant: "destructive" });
-        }
-        return;
-      }
-
       const dataToSave = buildDataToSave(formData, finalizar);
 
       if (editMode) {
