@@ -14,7 +14,7 @@ import { logger } from '@/utils/logger';
 import IntegrityBanner from "@/components/relatorios/IntegrityBanner";
 import TotpPromptDialog from "@/components/relatorios/TotpPromptDialog";
 import SignatureSeal from "@/components/relatorios/SignatureSeal";
-import { isSupervisorInRegional } from "@/utils/accessControl";
+import { canApproveRecord } from "@/utils/accessControl";
 import { useAuth } from "@/lib/AuthContext";
 
 // Props:
@@ -63,8 +63,9 @@ export default function AprovacaoBar({ entityName, recordId }) {
   if (!user || !record) return null;
 
   // Verifica se pode aprovar/reprovar neste registro específico.
-  // Para cliente_supervisor: só se for supervisor na regional do registro.
-  const canApprove = isSupervisorInRegional(user, regional);
+  // cliente_supervisor: só aprova registros criados por funcionários do cliente
+  // em regionais onde é supervisor. Approvers globais aprovam qualquer registro.
+  const canApprove = canApproveRecord(user, record, regional);
 
 
 

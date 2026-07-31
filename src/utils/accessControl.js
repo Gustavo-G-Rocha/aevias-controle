@@ -78,6 +78,42 @@ export function isSupervisorInRegional(user, regional) {
   return false;
 }
 
+/**
+ * Verifica se um usuário pode aprovar/reprovar um registro ESPECÍFICO.
+ *
+ * - Approvers globais (admin, sala_tecnica, gestor_contrato): podem aprovar
+ *   qualquer registro finalizado, independente de quem o criou.
+ * - cliente_supervisor: só pode aprovar se:
+ *   (a) seu email estiver em supervisores_responsaveis da regional do registro; E
+ *   (b) o registro foi criado por um funcionário do cliente (created_by presente
+ *       em clientes_responsaveis da regional), não por staff da Afirma Evias.
+ * - Outros níveis: não podem aprovar.
+ */
+export function canApproveRecord(user, record, regional) {
+  if (!user) return false;
+  const level = getUserAccessLevel(user);
+
+  // Approvers globais
+  if (level === 'admin' || level === 'sala_tecnica_afirmaevias' || level === 'gestor_contrato') {
+    return true;
+  }
+
+  // cliente_supervisor: checa regional + criador do registro
+  if (level === 'cliente_supervisor') {
+    const userEmail = (user.email || '').toLowerCase();
+    const supervisores = (regional?.supervisores_responsaveis || []).map(e => e.toLowerCase());
+    if (!supervisores.includes(userEmail)) return false;
+
+    // Só aprova registros criados por funcionários do cliente (não staff Afirma Evias)
+    const createdBy = (record?.created_by || '').toLowerCase();
+    if (!createdBy) return false;
+    const clientes = (regional?.clientes_responsaveis || []).map(e => e.toLowerCase());
+    return clientes.includes(createdBy);
+  }
+
+  return false;
+}
+
 export function isEngenheiroCliente(user) {
   return isCliente(user) && Boolean(user?.position?.toLowerCase().includes('engenheiro'));
 }

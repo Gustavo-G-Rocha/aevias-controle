@@ -7,7 +7,7 @@ import { assinarEnsaio } from "@/services/ensaiosService";
 import { QUERY_KEYS } from "@/hooks/useQueryData";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/components/ui/use-toast";
-import { isAdmin, isCliente as isClienteUser, isGestorContrato, isSalaTecnica, isLaboratorista, isClienteSupervisor, isSupervisorInRegional } from "@/utils/accessControl";
+import { isAdmin, isCliente as isClienteUser, isGestorContrato, isSalaTecnica, isLaboratorista, isClienteSupervisor, canApproveRecord as canApproveRecordCheck } from "@/utils/accessControl";
 import AdminInterface from "@/components/ensaios/AdminInterface";
 import ClienteInterface from "@/components/ensaios/ClienteInterface";
 import LaboratoristaInterface from "@/components/ensaios/LaboratoristaInterface";
@@ -46,7 +46,7 @@ export default function MeusEnsaios() {
     if (!canApprove) return false;
     const obra = obrasMap.get(ensaio.obra_id);
     const regional = obra ? regionaisMap.get(obra.regional_id) : null;
-    return isSupervisorInRegional(user, regional);
+    return canApproveRecordCheck(user, ensaio, regional);
   }, [canApprove, obrasMap, regionaisMap, user]);
 
   const subtitle = userIsAdmin || userIsSalaTecnica || userIsGestorContrato
