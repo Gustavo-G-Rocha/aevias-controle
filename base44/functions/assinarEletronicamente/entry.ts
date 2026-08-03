@@ -138,10 +138,12 @@ Deno.serve(async (req) => {
       }
       try {
         reconRecords = await reconstructRecords(base44, filters);
-      } catch {
+      } catch (reconErr: any) {
+        const msg = reconErr?.message || 'Falha ao reconstruir o conteúdo do relatório';
+        const isTransient = /temporária|transient|network|timeout|503/i.test(msg);
         return Response.json(
-          { error: 'Falha ao reconstruir o conteúdo do relatório', errorCategory: 'unknown' },
-          { status: 500 }
+          { error: isTransient ? 'Falha temporária ao acessar o registro. Tente novamente.' : msg, errorCategory: isTransient ? 'network' : 'unknown' },
+          { status: isTransient ? 503 : 500 }
         );
       }
       // Record sintético para verificação de tenant (apenas obra_id é usado).

@@ -31,8 +31,18 @@ export function useRelatorioUnificadoData() {
           return;
         }
 
-        // Obra é obrigatória; os demais são independentes — falha isolada não bloqueia
-        let obraData = await obterObraById(obra_id).catch(() => null);
+        // Obra é obrigatória; os demais são independentes — falha isolada não bloqueia.
+        // Retry one-time com 500ms para resistir a falhas transitórias de rede/backend.
+        const fetchObraWithRetry = async (id) => {
+          try {
+            return await obterObraById(id);
+          } catch {
+            await new Promise(r => setTimeout(r, 500));
+            return await obterObraById(id).catch(() => null);
+          }
+        };
+
+        let obraData = await fetchObraWithRetry(obra_id);
 
         if (!obraData) {
           // O id pode vir de uma lista em cache desatualizada — tenta resolver

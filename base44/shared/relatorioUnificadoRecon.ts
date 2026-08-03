@@ -38,6 +38,8 @@ export const UNIFIED_ENTITY_TYPES = [
   'GranuMistura',
   'CertificacaoUsina',
   'ControleExecucaoServicos',
+  'RegistroFresagemCBUQ',
+  'EnsaioTaxaInsumos',
 ];
 
 const UNIFIED_ENTITY_SET = new Set(UNIFIED_ENTITY_TYPES);
@@ -72,6 +74,8 @@ const DATE_FIELDS: Record<string, string> = {
   GranuMistura: 'data_ensaio',
   CertificacaoUsina: 'data_vistoria',
   ControleExecucaoServicos: 'data',
+  RegistroFresagemCBUQ: 'data',
+  EnsaioTaxaInsumos: 'data_ensaio',
 };
 
 // Espelha getDataEnsaio (ensaioMappers.jsx): dateField ?? data_ensaio ?? created_date
@@ -141,15 +145,27 @@ export async function reconstructRecords(
   const inicio = new Date(filters.data_inicio + 'T00:00:00');
   const fim = new Date(filters.data_fim + 'T23:59:59');
 
+  // Cada fetch captura erros individualmente para que uma entidade com falha
+  // não aborte todo o relatório. Mas se TODAS as fetches falharem, é uma
+  // falha transitória de rede/backend — propagamos o erro para que o caller
+  // retorne 503 em vez de assinar silenciosamente um relatório vazio.
   const fetchByType = filters.tipos.map((tipo) =>
     base44.asServiceRole.entities[tipo]
       .filter({ obra_id: filters.obra_id }, '-created_date', 2000)
       .then((rows: any[]) => (Array.isArray(rows) ? rows : []).map((r) => ({ ...r, entityType: tipo })))
-      .catch(() => [] as any[])
+      .then(
+        (rows: any[]) => ({ ok: true, rows }),
+        (err: any) => ({ ok: false, err, tipo }),
+      )
   );
 
-  const rawByType = await Promise.all(fetchByType);
-  const allRecords = rawByType.flat() as any[];
+  const results = await Promise.all(fetchByType);
+  const allFailures = results.every((r: any) => !r.ok);
+  if (allFailures) {
+    throw new Error('Falha temporária ao acessar os registros do relatório');
+  }
+  const rawByType = results.filter((r: any) => r.ok).flatMap((r: any) => r.rows);
+  const allRecords = rawByType as any[];
 
   const inRange = allRecords.filter((r) => {
     const d = getRecordDate(r.entityType, r);

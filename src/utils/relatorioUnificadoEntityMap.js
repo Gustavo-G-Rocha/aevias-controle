@@ -30,6 +30,9 @@ export const UNIFIED_ENTITY_TYPES = [
   'EnsaioRompimentoConcreto',
   'GranuMistura',
   'CertificacaoUsina',
+  'ControleExecucaoServicos',
+  'RegistroFresagemCBUQ',
+  'EnsaioTaxaInsumos',
 ];
 
 const UNIFIED_ENTITY_SET = new Set(UNIFIED_ENTITY_TYPES);
