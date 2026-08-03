@@ -18,7 +18,11 @@ import RelatoriosUnificadosBotoes from "@/components/relatorios-unificados/Relat
 const parseDateValue = (text) => {
   const value = (text || "").trim();
   if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
-  const match = value.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  let match = value.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  if (!match) {
+    const compact = value.match(/^(\d{2})(\d{2})(\d{4})$/);
+    if (compact) match = compact;
+  }
   if (!match) return null;
   let first = Number(match[1]);
   let second = Number(match[2]);

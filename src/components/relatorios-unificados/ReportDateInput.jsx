@@ -10,7 +10,12 @@ const displayDate = (iso) => {
 const parseDate = (text) => {
   const value = (text || "").trim();
   if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
-  const match = value.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  let match = value.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  if (!match) {
+    // Aceita DDMMYYYY sem separadores (ex: 01012026 → 01/01/2026)
+    const compact = value.match(/^(\d{2})(\d{2})(\d{4})$/);
+    if (compact) match = compact;
+  }
   if (!match) return null;
   let first = Number(match[1]);
   let second = Number(match[2]);

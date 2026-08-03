@@ -98,7 +98,8 @@ export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
       }
     } catch (err) {
       logger.error('[RelatorioUnificado] Erro ao assinar:', err);
-      setSignError(err?.response?.data?.error || err?.message || 'Erro ao assinar. Tente novamente.');
+      const errorMsg = err?.response?.data?.error || err?.data?.error || err?.error || err?.message || 'Erro ao assinar. Tente novamente.';
+      setSignError(errorMsg);
     } finally {
       setSigning(false);
     }

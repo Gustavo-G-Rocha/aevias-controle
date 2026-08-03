@@ -109,7 +109,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
         setShowTotpDialog(true);
         return;
       }
-      const errMsg = err?.response?.data?.error || err?.message || 'Erro ao assinar documento.';
+      const errMsg = err?.response?.data?.error || err?.data?.error || err?.error || err?.message || 'Erro ao assinar documento.';
       setActionError(errMsg);
       logger.error('[AprovacaoBar] Erro ao assinar:', errMsg);
       toast({ title: errMsg, variant: "destructive" });
