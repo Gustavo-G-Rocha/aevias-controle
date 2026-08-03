@@ -95,7 +95,9 @@ Deno.serve(async (req) => {
     }
 
     // Validar ID contra regex (prevenção de injeção — espelha exportarEnsaiosPDF.ts)
-    const VALID_ID_REGEX = /^[a-zA-Z0-9\-_]{1,128}$/;
+    // RelatorioUnificado usa compositeId (obra_id + período + tipos concatenados)
+    // que pode chegar a ~600 chars com todos os 28+ tipos selecionados.
+    const VALID_ID_REGEX = /^[a-zA-Z0-9\-_]{1,1024}$/;
     if (!VALID_ID_REGEX.test(recordId)) {
       return Response.json(
         { error: 'ID inválido', errorCategory: 'schema' },

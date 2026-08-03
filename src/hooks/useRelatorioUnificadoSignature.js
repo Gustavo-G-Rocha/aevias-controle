@@ -97,7 +97,15 @@ export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
       }
     } catch (err) {
       logger.error('[RelatorioUnificado] Erro ao assinar:', err);
-      const errorMsg = err?.response?.data?.error || err?.data?.error || err?.error || err?.message || 'Erro ao assinar. Tente novamente.';
+      const errorCategory = err?.response?.data?.errorCategory || err?.data?.errorCategory;
+      let errorMsg;
+      if (errorCategory === 'network') {
+        errorMsg = 'Falha temporária ao acessar o registro. Tente novamente.';
+      } else if (errorCategory === 'schema') {
+        errorMsg = 'Dados do relatório inválidos. Verifique os filtros e tente novamente.';
+      } else {
+        errorMsg = err?.response?.data?.error || err?.data?.error || err?.error || err?.message || 'Erro ao assinar. Tente novamente.';
+      }
       toast({
         title: 'Erro ao assinar',
         description: errorMsg,
