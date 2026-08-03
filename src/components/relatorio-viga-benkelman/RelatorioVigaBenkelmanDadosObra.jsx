@@ -13,7 +13,7 @@ export default function RelatorioVigaBenkelmanDadosObra({ ensaio, obra, regional
         </div>
         <div>
           <p className="font-bold text-gray-700">OBRA</p>
-          <p className="text-gray-900">{obra?.name || '-'}</p>
+          <p className="text-gray-900">{obra?.name || ensaio.obra_name || '-'}</p>
         </div>
         <div>
           <p className="font-bold text-gray-700">CAMADA</p>

@@ -13,7 +13,7 @@ const Field = ({ label, value }) => (
 
 export default function BoletimSondagemDadosObra({ boletim, obra, regional }) {
   const fields = [
-    ["OBRA", obra?.name || "-"],
+    ["OBRA", obra?.name || boletim.obra_name || "-"],
     ["CLIENTE", boletim.cliente || regional?.cliente || "-"],
     ["DATA", formatDate(boletim.data)],
     ["RODOVIA", boletim.rodovia || "-"],

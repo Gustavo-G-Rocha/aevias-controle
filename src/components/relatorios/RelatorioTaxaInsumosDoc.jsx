@@ -60,7 +60,7 @@ export default function RelatorioTaxaInsumosDoc({ ensaio, obra, regional }) {
               </tr>
               <tr>
                 <td className="px-2 py-0.5 font-bold text-gray-700">OBRA:</td>
-                <td className="px-2 py-0.5 border-b border-slate-200">{obra?.name || ''}</td>
+                <td className="px-2 py-0.5 border-b border-slate-200">{obra?.name || ensaio.obra_name || ''}</td>
                 <td className="px-2 py-0.5 font-bold text-gray-700">SERVIÇO:</td>
                 <td className="px-2 py-0.5 border-b border-slate-200">{ensaio.servico || ''}</td>
               </tr>

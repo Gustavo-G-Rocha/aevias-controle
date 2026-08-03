@@ -12,7 +12,7 @@ export default function RelatorioTaxaMRAFDadosObra({ ensaio, obra, regional }) {
           </div>
           <div>
             <p className="font-bold text-gray-700">OBRA:</p>
-            <p className="text-gray-900">{obra?.name || 'N/A'}{obra?.code ? ` (${obra.code})` : ''}</p>
+            <p className="text-gray-900">{obra?.name || ensaio.obra_name || 'N/A'}{obra?.code ? ` (${obra.code})` : (ensaio.obra_code ? ` (${ensaio.obra_code})` : '')}</p>
           </div>
         </div>
         <div className="space-y-2">

@@ -33,7 +33,7 @@ export default function DadosObraTerra({ regional, obra, checklist }) {
         </div>
         <div>
           <p className="font-bold">OBRA:</p>
-          <p>{obra?.name || 'N/A'}</p>
+          <p>{obra?.name || checklist.obra_name || 'N/A'}</p>
         </div>
         <div>
           <p className="font-bold">CAMADA:</p>

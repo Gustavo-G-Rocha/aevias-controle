@@ -27,7 +27,7 @@ export default function RelatorioMRAFDadosObra({ ensaio, obra, project, regional
 
         <div className="col-span-1">
           <p className="font-bold text-gray-700 mb-1">OBRA:</p>
-          <p className="text-gray-900">{obra?.name || 'N/A'}</p>
+          <p className="text-gray-900">{obra?.name || ensaio.obra_name || 'N/A'}</p>
         </div>
         <div className="col-span-1">
           <p className="font-bold text-gray-700 mb-1">LOCAL DE COLETA:</p>

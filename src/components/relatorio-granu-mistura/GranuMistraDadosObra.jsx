@@ -28,7 +28,7 @@ export default function GranuMistraDadosObra({
           <div className="px-2 py-1 bg-white">
             {regional?.cliente || '—'}
           </div>
-          <div className="px-2 py-1 bg-white">{obra?.name || '—'}</div>
+          <div className="px-2 py-1 bg-white">{obra?.name || record.obra_name || '—'}</div>
           <div className="px-2 py-1 bg-white">{record.rodovia || '—'}</div>
           <div className="px-2 py-1 bg-white">{record.trecho || '—'}</div>
 

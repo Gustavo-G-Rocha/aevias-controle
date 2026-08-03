@@ -32,7 +32,7 @@ export default function RelatorioSondagemDadosObra({ ensaio, obra, regional, pro
 
         <div className="col-span-1">
           <p className="font-bold text-gray-700">OBRA:</p>
-          <p className="text-gray-900">{obra?.name || 'N/A'}</p>
+          <p className="text-gray-900">{obra?.name || ensaio.obra_name || 'N/A'}</p>
         </div>
         <div className="col-span-1">
           <p className="font-bold text-gray-700">FAIXA ESPECIFICADA:</p>

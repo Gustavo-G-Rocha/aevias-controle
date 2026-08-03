@@ -122,7 +122,7 @@ export default function RelatorioAcompanhamentoUsinagem({ ensaio, obra, project,
 
               <div className="col-span-1 mb-1 print:mb-0.5">
                 <p className="font-bold text-gray-700 mb-0.5 print:mb-0">OBRA:</p>
-                <p className="text-gray-900">{obra?.name || 'N/A'}</p>
+                <p className="text-gray-900">{obra?.name || ensaio.obra_name || 'N/A'}</p>
               </div>
 
               <div className="col-span-1 mb-1 print:mb-0.5">

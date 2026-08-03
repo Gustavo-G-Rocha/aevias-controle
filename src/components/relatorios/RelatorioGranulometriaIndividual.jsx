@@ -75,7 +75,7 @@ export default function RelatorioGranulometriaIndividual({ ensaio, obra, project
         </div>
         <div className="w-1/2 text-center">
           <h1 className="text-lg font-bold text-gray-800 uppercase">Granulometria Individual</h1>
-          <h2 className="text-sm text-gray-700">{obra?.name}</h2>
+          <h2 className="text-sm text-gray-700">{obra?.name || ensaio.obra_name}</h2>
           <p className="text-xs text-slate-600">Ensaio de Granulometria do Agregado</p>
         </div>
         <div className="w-1/4 flex justify-end">
@@ -89,7 +89,7 @@ export default function RelatorioGranulometriaIndividual({ ensaio, obra, project
       <section className="mt-6 grid grid-cols-3 gap-6 text-sm mb-4">
         <div className="space-y-1">
           <p className="font-semibold">Obra:</p>
-          <p>{obra?.name} - {obra?.code}</p>
+          <p>{obra?.name || ensaio.obra_name} - {obra?.code || ensaio.obra_code}</p>
         </div>
         <div className="space-y-1">
           <p className="font-semibold">Projeto:</p>

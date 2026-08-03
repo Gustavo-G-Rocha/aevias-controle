@@ -21,6 +21,7 @@ import PageTransition from "@/components/layout/PageTransition";
 import OfflineStatusBar from "@/components/offline/OfflineStatusBar";
 import NotificationAgent from "@/components/notifications/NotificationAgent";
 import SidebarToggle from "@/components/layout/SidebarToggle";
+import ReportBackBar from "@/components/layout/ReportBackBar";
 import { REPORT_PAGES } from "@/lib/reportPages";
 
 const AppLayout = ({ children, currentPageName }) => {
@@ -116,7 +117,7 @@ const AppLayout = ({ children, currentPageName }) => {
 
 export default function Layout({ children, currentPageName }) {
   if (currentPageName && REPORT_PAGES.has(currentPageName)) {
-    return <div className="report-scope">{children}</div>;
+    return <div className="report-scope"><ReportBackBar />{children}</div>;
   }
   return <AppLayout currentPageName={currentPageName}>{children}</AppLayout>;
 }

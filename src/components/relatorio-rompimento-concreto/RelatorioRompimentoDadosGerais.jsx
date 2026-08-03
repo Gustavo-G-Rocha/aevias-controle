@@ -51,7 +51,7 @@ export default function RelatorioRompimentoDadosGerais({
           </div>
           {/* Linha 1: Valores */}
           <div className="px-2 py-1 min-h-[40px] bg-white">
-            {obra?.name || ""}
+            {obra?.name || ensaio.obra_name || ""}
           </div>
           <div className="px-2 py-1 bg-white">{ensaio.rodovia || ""}</div>
           <div className="px-2 py-1 bg-white">{ensaio.fornecedor || ""}</div>
