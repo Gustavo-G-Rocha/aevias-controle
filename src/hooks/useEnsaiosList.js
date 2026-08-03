@@ -144,10 +144,10 @@ function useSupervisorRecords(user, enabled) {
         if (cached) {
           // Compatibilidade com cache antigo (array simples de registros)
           return Array.isArray(cached.data)
-            ? { records: cached.data, subordinateEmails: [] }
-            : cached.data;
+            ? { records: cached.data, subordinateEmails: [], truncated: false }
+            : { ...cached.data, truncated: cached.data?.truncated ?? false };
         }
-        return { records: [], subordinateEmails: [] };
+        return { records: [], subordinateEmails: [], truncated: false };
       }
         const data = await carregarRegistrosSupervisorService();
       saveDataCache(`supervisorRecords:${user?.email}`, data, 'records').catch(() => {});

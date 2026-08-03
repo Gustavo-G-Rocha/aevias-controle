@@ -91,7 +91,7 @@ export default function MeusEnsaios() {
               </p>
               <p className="text-amber-700 mt-1">
                 O sistema retornou apenas parte dos registros encontrados devido a limites de consulta.
-                Use filtros mais específicos para narrowing os resultados ou contate o suporte se precisar
+                Use filtros mais específicos para restringir os resultados ou contate o suporte se precisar
                 de registros mais antigos.
               </p>
             </div>
@@ -118,6 +118,7 @@ export default function MeusEnsaios() {
             canCreate={canCreate}
             allUsers={allUsers}
             regionais={regionais}
+            truncated={truncated}
           />
         ) : userIsCliente ? (
           <ClienteInterface

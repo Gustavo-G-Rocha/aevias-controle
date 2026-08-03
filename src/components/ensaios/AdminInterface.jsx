@@ -2,7 +2,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, PlusCircle, FlaskConical, Gauge, ClipboardList, Download } from "lucide-react";
+import { FileText, PlusCircle, FlaskConical, Gauge, ClipboardList, Download, AlertTriangle } from "lucide-react";
 import { bulkExportReports } from "@/utils/bulkExportZip";
 import { useToast } from "@/components/ui/use-toast";
 import { getEnsaioTypeInfo, getReportLink } from "@/components/ensaios/ensaioMappers";
@@ -18,7 +18,7 @@ import EnsaiosTableHeader from "@/components/ensaios/EnsaiosTableHeader";
 import { getStatusInfo } from "@/components/ensaios/utils";
 import { STATUS_LABELS } from "@/constants/ensaioUi";
 
-const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReject, onDelete, onAssinar, user, canApprove, canApproveRecord, canCreate, allUsers, regionais = [] }) => {
+const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReject, onDelete, onAssinar, user, canApprove, canApproveRecord, canCreate, allUsers, regionais = [], truncated = false }) => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [reprovingEnsaio, setReprovingEnsaio] = useState(null);
   const [deletingEnsaio, setDeletingEnsaio] = useState(null);
@@ -161,6 +161,22 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
 
   return (
     <div className="space-y-6">
+      {truncated && (
+        <div
+          className="flex items-start gap-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm"
+          role="alert"
+        >
+          <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600 mt-0.5" />
+          <div>
+            <p className="font-semibold text-amber-900">Resultados limitados</p>
+            <p className="text-amber-700 mt-1">
+              O sistema retornou apenas parte dos registros encontrados devido a limites de consulta.
+              Use filtros mais específicos para restringir os resultados ou contate o suporte se precisar
+              de registros mais antigos.
+            </p>
+          </div>
+        </div>
+      )}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>
           <span>{filteredEnsaios.length} registro(s) encontrado(s)</span>
