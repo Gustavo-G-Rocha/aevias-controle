@@ -1,11 +1,27 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { obterEnsaioById } from "@/services/ensaiosService";
 import { useFormPersistence } from "@/components/hooks/useFormPersistence";
-import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
+import { useCurrentUser, useAuxData, QUERY_KEYS } from "@/hooks/useQueryData";
 import { getInitialFormData, filtrarObras } from "@/utils/registroFresagemCBUQUtils";
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
+
+/**
+ * Procura um registro no cache do React Query (allRecords) por ID.
+ * Evita uma chamada .get(id) extra que pode falhar para usuários
+ * com tokens restritos, usando os dados já carregados pela lista.
+ */
+function findRecordInCache(queryClient, recordId) {
+  const entries = queryClient.getQueriesData({ queryKey: QUERY_KEYS.allRecords });
+  for (const [, data] of entries) {
+    if (!Array.isArray(data)) continue;
+    const found = data.find(r => r?.id === recordId);
+    if (found) return found;
+  }
+  return null;
+}
 
 export function useRegistroFresagemCBUQData() {
   const [formData, setFormData] = useState(getInitialFormData());
@@ -14,6 +30,7 @@ export function useRegistroFresagemCBUQData() {
   const [editLoading, setEditLoading] = useState(false);
 
   const location = useLocation();
+  const queryClient = useQueryClient();
   const { data: user, isLoading: loadingUser } = useCurrentUser();
   const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true });
 
@@ -58,6 +75,19 @@ export function useRegistroFresagemCBUQData() {
 
     if (editIdParam) {
       if (editIdParam === editId) return; // já carregado (troca de URL pós-salvar)
+
+      // Primeiro tenta usar os dados do cache do React Query (já carregados
+      // pela lista de ensaios). Isto evita uma chamada .get(id) que pode
+      // falhar para usuários com tokens/RLS restritos, e é mais rápido.
+      const cached = findRecordInCache(queryClient, editIdParam);
+      if (cached) {
+        setFormData({ ...getInitialFormData(), ...cached });
+        setEditMode(true);
+        setEditId(editIdParam);
+        return;
+      }
+
+      // Fallback: busca direto na API se o registro não estiver no cache.
       setEditLoading(true);
       obterEnsaioById('RegistroFresagemCBUQ', editIdParam)
         .then(registroData => {
@@ -76,7 +106,7 @@ export function useRegistroFresagemCBUQData() {
         laboratorista_name: user.laboratorista_name || user.full_name || "",
       });
     }
-  }, [loadingUser, loadingAux, user?.id, location.search]);
+  }, [loadingUser, loadingAux, user?.id, location.search, queryClient]);
 
   const loading = loadingUser || loadingAux || editLoading;
 
