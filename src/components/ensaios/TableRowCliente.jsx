@@ -26,7 +26,7 @@ const TableRowCliente = React.memo(({ ensaio, obra, projeto, index, allUsers, on
       <td className="px-2 py-2">
         <div className="font-medium text-foreground flex items-center gap-1 text-xs">
           <TypeIcon className="w-3 h-3 text-secondary" />
-          <span className="truncate max-w-[120px]" title={name}>{name}</span>
+          <RouterLink to={reportUrl} className="truncate max-w-[120px] hover:underline underline-offset-2" title={`Ver relatório de ${name}`} aria-label={`Ver relatório de ${name}`}>{name}</RouterLink>
           <CopyIdButton id={ensaio.id} />
           {naoConformidades.length > 0 && <span role="img" aria-label={`Não conformidades: ${naoConformidades.join(', ')}`} className="text-destructive cursor-help" title={`Não conformidades:\n${naoConformidades.join('\n')}`}>⚠️</span>}
           {!naoConformidades.length && temAcoesCorretivas && <span role="img" aria-label="Ações corretivas realizadas" className="text-orange-500 cursor-help" title="Ações corretivas realizadas">⚠️</span>}
