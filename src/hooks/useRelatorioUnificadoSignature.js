@@ -92,6 +92,15 @@ export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
         ...(totpCode ? { totpCode } : {}),
       });
 
+      // Se o backend retornou um erro (status não-2xx), o SDK pode não
+      // lançar exceção em todos os cenários — verifica o corpo da resposta.
+      if (response?.data?.error) {
+        throw { response: { data: response.data } };
+      }
+      if (response?.error) {
+        throw { response: { data: response } };
+      }
+
       if (response?.data?.signature) {
         setSignature(response.data.signature);
         setModalOpen(false);

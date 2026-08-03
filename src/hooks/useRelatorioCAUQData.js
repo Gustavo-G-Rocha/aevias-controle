@@ -32,27 +32,32 @@ export function useRelatorioCAUQData() {
         }
 
         const ensaioData = await obterEnsaioById('EnsaioCAUQ', ensaioId);
-        if (!ensaioData) { setError('Ensaio não encontrado'); return; }
+        if (!ensaioData) { setError('Ensaio não encontrado'); setLoading(false); return; }
+
         setEnsaio(ensaioData);
 
-        // Dados relacionados em paralelo — falha isolada não quebra o relatório
-        const [obraRegional, projectData] = await Promise.all([
+        // Renderiza imediatamente com os dados do ensaio.
+        // Dados relacionados carregam em segundo plano — não bloqueiam.
+        setLoading(false);
+
+        // Contexto relacionado (obra → regional, project, faixa) em paralelo.
+        // Falha isolada não quebra o relatório — o ensaio já está renderizado.
+        Promise.all([
           carregarObraRegional(ensaioData.obra_id),
           carregarProject(ensaioData.project_id),
-        ]);
-
-        setObra(obraRegional.obra);
-        setRegional(obraRegional.regional);
-        setProject(projectData);
-
-        if (projectData) {
-          const faixaData = await carregarFaixaDoProject(projectData);
-          setFaixa(faixaData);
-        }
+        ]).then(([obraRegional, projectData]) => {
+          setObra(obraRegional.obra);
+          setRegional(obraRegional.regional);
+          setProject(projectData);
+          if (projectData) {
+            carregarFaixaDoProject(projectData).then(setFaixa).catch(() => {});
+          }
+        }).catch(err => {
+          logger.warn('[RelatorioCAUQ] Contexto não carregado:', err);
+        });
       } catch (err) {
-        logger.error('[RelatorioCAUQ] Erro ao carregar dados:', err);
-        setError('Erro ao carregar dados do relatório');
-      } finally {
+        logger.error('[RelatorioCAUQ] Erro ao carregar ensaio:', err);
+        setError(err.message || 'Erro ao carregar ensaio');
         setLoading(false);
       }
     };

@@ -96,6 +96,14 @@ export default function AprovacaoBar({ entityName, recordId }) {
           setTimeout(() => reject(new Error('O servidor não respondeu. A aprovação foi desfeita.')), 15000)
         ),
       ]);
+
+      // Se o backend retornou um erro (status não-2xx que o SDK não
+      // lançou como exceção), extrai a mensagem e vai para o catch.
+      const errBody = response?.data?.error ? response.data : (response?.error ? response : null);
+      if (errBody) {
+        throw { response: { data: errBody } };
+      }
+
       const result = response.data.data;
       const updatedRecord = result.record || result;
       setRecord(prev => ({ ...prev, ...updatedRecord }));
@@ -105,7 +113,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
       setRecord(previousRecord);
       setSignature(null);
       // Step-up 2FA: backend exige código do autenticador para assinar
-      if (err?.response?.data?.errorCategory === 'totp_required') {
+      if (err?.response?.data?.errorCategory === 'totp_required' || err?.data?.errorCategory === 'totp_required') {
         setShowTotpDialog(true);
         return;
       }

@@ -31,13 +31,21 @@ export function useRelatorioVigaBenkelmanData() {
 
         setEnsaio(data);
 
-        const { obra: obraData, regional: regionalData } = await carregarObraRegional(data.obra_id);
-        setObra(obraData);
-        setRegional(regionalData);
+        // Renderiza imediatamente com os dados do ensaio.
+        // Obra/regional carregam em segundo plano — não bloqueiam.
+        setLoading(false);
+
+        carregarObraRegional(data.obra_id)
+          .then(({ obra: obraData, regional: regionalData }) => {
+            setObra(obraData);
+            setRegional(regionalData);
+          })
+          .catch(err => {
+            logger.warn('[RelatorioVigaBenkelman] Contexto não carregado:', err);
+          });
       } catch (err) {
         logger.error('Erro ao carregar ensaio:', err);
-        setError('Erro ao carregar ensaio');
-      } finally {
+        setError(err.message || 'Erro ao carregar ensaio');
         setLoading(false);
       }
     };

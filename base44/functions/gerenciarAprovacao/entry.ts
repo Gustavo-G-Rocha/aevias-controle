@@ -132,9 +132,14 @@ Deno.serve(async (req) => {
         // que têm referências circulares). Extrai apenas o body JSON serializável.
         const signData = signResult?.data ?? signResult;
         return Response.json(signData);
-      } catch (signError) {
-        const errData = signError?.response?.data || signError?.data || { error: signError?.message || 'Erro na assinatura eletrônica' };
-        const errStatus = signError?.response?.status || signError?.status || 500;
+      } catch (signError: any) {
+        // Extrai o corpo do erro de assinarEletronicamente que pode estar
+        // em diferentes níveis do erro lançado pelo SDK (response.data,
+        // data, ou apenas message). Preserva errorCategory para que o
+        // frontend possa distinguir erros transitórios de permissão.
+        const rawErr = signError?.response?.data || signError?.data || null;
+        const errData = rawErr || { error: signError?.message || 'Erro na assinatura eletrônica' };
+        const errStatus = signError?.response?.status || signError?.status || (rawErr ? 500 : 500);
         return Response.json(errData, { status: errStatus });
       }
     }
