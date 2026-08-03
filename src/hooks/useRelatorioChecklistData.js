@@ -45,14 +45,36 @@ export function useRelatorioChecklistData() {
         setChecklist(checklistData);
         setUser(userData);
 
-        // Contexto relacionado (obra → regional, project, criador) em paralelo
-        const ctx = await carregarContextoRelatorio(checklistData);
-        setObra(ctx.obra);
-        setRegional(ctx.regional);
-        setProject(ctx.project);
-        setCreatorUser(ctx.creatorUser);
+        // Renderiza imediatamente com dados denormalizados do registro.
+        // Se a obra foi excluída, sintetiza um objeto fallback a partir dos
+        // campos obra_name/obra_code salvos no momento da criação.
+        if (checklistData.obra_name || checklistData.obra_code) {
+          setObra(prev => prev || {
+            id: checklistData.obra_id,
+            name: checklistData.obra_name,
+            code: checklistData.obra_code,
+            regional_id: null,
+          });
+        }
 
         setLoading(false);
+
+        // Contexto relacionado (obra → regional, project, criador) em paralelo.
+        // Carregado em segundo plano — não bloqueia a renderização do relatório.
+        // Se a obra foi excluída, carregarContextoRelatorio retorna nulls
+        // e mantemos o objeto fallback sintetizado acima.
+        carregarContextoRelatorio(checklistData)
+          .then(ctx => {
+            // Só sobrescreve se encontrou a obra real; caso contrário,
+            // mantém o fallback denormalizado.
+            if (ctx.obra) setObra(ctx.obra);
+            setRegional(ctx.regional);
+            setProject(ctx.project);
+            setCreatorUser(ctx.creatorUser);
+          })
+          .catch(err => {
+            logger.warn('[RelatorioChecklist] Contexto não carregado:', err);
+          });
       } catch (err) {
         logger.error('[RelatorioChecklist] Erro ao carregar relatório:', err);
         setError(err.message || 'Erro ao carregar o checklist');
