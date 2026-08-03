@@ -1,9 +1,9 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Printer, ArrowLeft, ShieldCheck, CheckCircle } from 'lucide-react';
+import { Printer, ArrowLeft, ShieldCheck, CheckCircle, Loader2 } from 'lucide-react';
 import { formatDate, getRecordTypeName } from '@/utils/relatorioUnificadoUtils';
 
-export default function RelatorioUnificadoToolbar({ obra, filters, recordCount, onGoBack, onPrint, onSign, signature, canSign }) {
+export default function RelatorioUnificadoToolbar({ obra, filters, recordCount, onGoBack, onPrint, onSign, signature, canSign, checkingAccess = false }) {
   const tipoNome = getRecordTypeName(filters.tipo);
 
   return (
@@ -21,9 +21,13 @@ export default function RelatorioUnificadoToolbar({ obra, filters, recordCount, 
             Voltar
           </Button>
           {canSign && !signature && (
-            <Button onClick={onSign} className="bg-blue-600 text-white hover:bg-blue-700">
-              <ShieldCheck className="w-4 h-4 mr-2" />
-              Assinar Eletronicamente
+            <Button onClick={onSign} disabled={checkingAccess} className="bg-blue-600 text-white hover:bg-blue-700">
+              {checkingAccess ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <ShieldCheck className="w-4 h-4 mr-2" />
+              )}
+              {checkingAccess ? 'Verificando...' : 'Assinar Eletronicamente'}
             </Button>
           )}
           {signature && (

@@ -25,6 +25,7 @@ export default function RelatorioUnificado() {
     modalOpen,
     signError,
     canSign,
+    checkingAccess,
     handleSign,
     handleOpenModal,
     handleCloseModal,
@@ -68,6 +69,7 @@ export default function RelatorioUnificado() {
         onSign={handleOpenModal}
         signature={signature}
         canSign={canSign}
+        checkingAccess={checkingAccess}
       />
 
       <div className="report-content-container">

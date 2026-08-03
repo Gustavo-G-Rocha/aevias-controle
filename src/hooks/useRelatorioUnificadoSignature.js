@@ -14,15 +14,18 @@ import { base44 } from '@/api/base44Client';
 import { assinarEletronicamente } from '@/functions/assinarEletronicamente';
 import { getUserAccessLevel } from '@/lib/layoutConstants';
 import { logger } from '@/utils/logger';
+import { useToast } from '@/components/ui/use-toast';
 
 const APPROVER_LEVELS = ['admin', 'sala_tecnica_afirmaevias', 'gestor_contrato', 'cliente_supervisor'];
 
 export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
+  const { toast } = useToast();
   const [signature, setSignature] = useState(null);
   const [loading, setLoading] = useState(false);
   const [signing, setSigning] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [signError, setSignError] = useState('');
+  const [checkingAccess, setCheckingAccess] = useState(false);
 
   const compositeId = filters?.obra_id && filters?.data_inicio && filters?.data_fim
     ? `${filters.obra_id}_${filters.data_inicio}_${filters.data_fim}_${(filters.tipos || []).join('-')}`
@@ -114,10 +117,36 @@ export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
     }
   }, [user, compositeId, filters, recordCount]);
 
-  const handleOpenModal = useCallback(() => {
+  const handleOpenModal = useCallback(async () => {
+    if (!compositeId) return;
     setSignError('');
+    setCheckingAccess(true);
+    try {
+      // Pre-check: verify the backend is accessible before opening the
+      // signing prompt. A lightweight AssinaturaEletronica query confirms
+      // the API is responsive — if it transiently fails, we surface the
+      // error and do NOT open the modal (preventing the signing flow from
+      // starting when the backend can't be reached).
+      await base44.entities.AssinaturaEletronica.filter(
+        { entity_name: 'RelatorioUnificado', entity_id: compositeId, status_assinatura: 'assinado' },
+        '-signed_at',
+        1
+      );
+    } catch (err) {
+      logger.error('[RelatorioUnificado] Pre-check de acesso ao backend falhou:', err);
+      const msg = 'Falha temporária ao acessar o registro. Tente novamente.';
+      setSignError(msg);
+      toast({
+        title: 'Não foi possível iniciar a assinatura',
+        description: msg,
+        variant: 'destructive',
+      });
+      setCheckingAccess(false);
+      return;
+    }
+    setCheckingAccess(false);
     setModalOpen(true);
-  }, []);
+  }, [compositeId, toast]);
 
   const handleCloseModal = useCallback(() => {
     setModalOpen(false);
@@ -131,6 +160,7 @@ export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
     modalOpen,
     signError,
     canSign,
+    checkingAccess,
     compositeId,
     handleSign,
     handleOpenModal,
