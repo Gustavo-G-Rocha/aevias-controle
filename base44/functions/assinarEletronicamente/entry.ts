@@ -5,6 +5,17 @@ import {
   buildCompositeId,
   reconstructRecords,
 } from '../../shared/relatorioUnificadoRecon.ts';
+import {
+  getUserAccessLevel,
+  getEffectiveAccessLevel,
+  canApprove,
+  computeIntegrityHash,
+  sanitizeText,
+  createAuditEntry,
+  extractIpAddress,
+  extractDeviceInfo,
+} from '../../shared/backendCommon.ts';
+import { verifyTenantAccess } from '../../shared/tenantAccess.ts';
 
 /**
  * Backend function: assinarEletronicamente
@@ -31,75 +42,7 @@ import {
  * Retorna: { success: true, data: { record, signature } }
  */
 
-// ── INTEGRITY HASH (espelha src/utils/integrityHash.js e gerenciarAprovacao.ts) ──
-const INTEGRITY_EXCLUDED_FIELDS = new Set([
-  'id', 'created_date', 'updated_date', 'created_by_id', 'created_by',
-  'status',
-  'approved', 'approved_by', 'approved_date', 'approver_details',
-  'rejection_reason', 'was_rejected', 'client_signature',
-  'integrity_hash', 'integrity_hash_date',
-  'pendente_aprovacao_cliente', 'cliente_aprovacao', 'cliente_aprovacao_data',
-  'cliente_aprovacao_responsavel', 'cliente_reprovacao_motivo',
-  'manager_signature',
-]);
-
-function serializeForHash(record: unknown): string {
-  if (record === null || record === undefined) return 'null';
-  if (typeof record !== 'object') return JSON.stringify(record);
-  if (Array.isArray(record)) {
-    return '[' + record.map(serializeForHash).join(',') + ']';
-  }
-  const obj = record as Record<string, unknown>;
-  const keys = Object.keys(obj)
-    .filter((k) => !INTEGRITY_EXCLUDED_FIELDS.has(k))
-    .sort();
-  const parts = keys.map((k) => JSON.stringify(k) + ':' + serializeForHash(obj[k]));
-  return '{' + parts.join(',') + '}';
-}
-
-async function computeIntegrityHash(record: unknown): Promise<string> {
-  const serialized = serializeForHash(record);
-  const subtle = globalThis.crypto?.subtle;
-  if (!subtle) return simpleHash(serialized);
-  const data = new TextEncoder().encode(serialized);
-  const buf = await subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
-}
-
-function simpleHash(str: string): string {
-  let h1 = 0xdeadbeef;
-  let h2 = 0x41c6ce57;
-  for (let i = 0; i < str.length; i++) {
-    const ch = str.charCodeAt(i);
-    h1 = Math.imul(h1 ^ ch, 2654435761);
-    h2 = Math.imul(h2 ^ ch, 1597334677);
-  }
-  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-  const hash = 4294967296 * (2097151 & h2) + (h1 >>> 0);
-  return hash.toString(16).padStart(16, '0').repeat(4).slice(0, 64);
-}
-
-// ── SANITIZAÇÃO XSS (espelha gerenciarAprovacao.ts) ──
-const DANGEROUS_TAGS = 'script|iframe|object|embed|style|svg|math|template|noscript|noframes|applet|xml';
-const DANGEROUS_VOID_TAGS = `${DANGEROUS_TAGS}|link|meta|base|form|input|button`;
-
-function sanitizeText(val: unknown): string {
-  if (typeof val !== 'string' || !val) return val as string;
-  let s = val;
-  s = s.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
-  s = s.replace(new RegExp(`<\\s*(${DANGEROUS_TAGS})\\b[^>]*>[\\s\\S]*?<\\s*\\/\\s*\\1\\s*>`, 'gi'), '');
-  s = s.replace(new RegExp(`<\\s*(?:${DANGEROUS_VOID_TAGS})\\b[^>]*>`, 'gi'), '');
-  s = s.replace(new RegExp(`<\\s*\\/\\s*(?:${DANGEROUS_TAGS})\\s*>`, 'gi'), '');
-  s = s.replace(/\bon\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)?/gi, '');
-  s = s.replace(/javascript:/gi, '').replace(/vbscript:/gi, '').replace(/data:text\/html/gi, '');
-  s = s.replace(/\{\{/g, '{ {').replace(/\}\}/g, '} }');
-  s = s.replace(/<%/g, '< %').replace(/%>/g, '% >');
-  if (s.length > 10000) s = s.substring(0, 10000);
-  return s;
-}
-
-// ── ALLOWED ENTITIES (espelha gerenciarAprovacao.ts) ──
+// ── ALLOWED ENTITIES ──
 const ALLOWED_ENTITIES = [
   'EnsaioCAUQ', 'EnsaioMRAF', 'EnsaioDensidade', 'EnsaioDensidadeInSitu',
   'EnsaioGranulometriaIndividual', 'EnsaioManchaPendulo', 'EnsaioProctor',
@@ -112,137 +55,6 @@ const ALLOWED_ENTITIES = [
   'ChecklistMRAF', 'ChecklistConcretagem', 'ChecklistTerraplanagem',
   'ChecklistReciclagem', 'DiarioObra', 'RelatorioNC', 'RelatorioUnificado',
 ];
-
-const APPROVER_LEVELS = ['admin', 'sala_tecnica_afirmaevias', 'gestor_contrato', 'cliente_supervisor'];
-
-function getUserAccessLevel(user: any): string {
-  if (!user) return 'user';
-  return user.access_level || (user.role === 'admin' ? 'admin' : 'user');
-}
-
-function getEffectiveAccessLevel(user: any): string {
-  const level = getUserAccessLevel(user);
-  if (level === 'cliente_supervisor') return 'cliente';
-  if (level === 'funcionarios_cliente') return 'user';
-  return level;
-}
-
-function canApprove(user: any): boolean {
-  return APPROVER_LEVELS.includes(getUserAccessLevel(user));
-}
-
-// ── TENANT ACCESS (espelha gerenciarAprovacao.ts) ──
-async function verifyTenantAccess(base44: any, user: any, entityName: string, record: any) {
-  const level = getUserAccessLevel(user);
-  const effectiveLevel = getEffectiveAccessLevel(user);
-
-  if (level === 'admin') return { allowed: true };
-  if (!record) return { allowed: false, reason: 'Registro não encontrado', status: 404 };
-
-  if (effectiveLevel === 'user') {
-    if (record.created_by === user.email || record.created_by_id === user.id) return { allowed: true };
-    return { allowed: false, reason: 'Sem permissão sobre este registro', status: 403 };
-  }
-
-  if (!record.obra_id) return { allowed: false, reason: 'Registro sem obra vinculada', status: 403 };
-
-  let obra;
-  try { obra = await base44.asServiceRole.entities.Obra.get(record.obra_id); }
-  catch { return { allowed: false, reason: 'Obra não encontrada', status: 404 }; }
-  if (!obra?.regional_id) return { allowed: false, reason: 'Obra sem regional vinculada', status: 403 };
-
-  let regional;
-  try { regional = await base44.asServiceRole.entities.Regional.get(obra.regional_id); }
-  catch { return { allowed: false, reason: 'Regional não encontrada', status: 404 }; }
-
-  const userEmail = (user.email || '').toLowerCase();
-
-  if (effectiveLevel === 'cliente') {
-    const emails = (regional.clientes_responsaveis || []).map((e: string) => e.toLowerCase());
-    const supervisores = (regional.supervisores_responsaveis || []).map((e: string) => e.toLowerCase());
-    // Estar em supervisores_responsaveis também conta como membro do tenant
-    if (emails.includes(userEmail) || supervisores.includes(userEmail)) {
-      const isSupervisor = level === 'cliente_supervisor' && supervisores.includes(userEmail);
-      return { allowed: true, isSupervisor };
-    }
-  } else if (effectiveLevel === 'sala_tecnica_afirmaevias') {
-    const emails = (regional.salas_tecnicas_responsaveis || []).map((e: string) => e.toLowerCase());
-    if (emails.includes(userEmail)) return { allowed: true };
-  } else if (effectiveLevel === 'gestor_contrato') {
-    const emails = (regional.gestores_contrato_responsaveis || []).map((e: string) => e.toLowerCase());
-    const legacy = (regional.gestor_contrato_responsavel || '').toLowerCase();
-    if (emails.includes(userEmail) || legacy === userEmail) return { allowed: true };
-  }
-
-  return { allowed: false, reason: 'Sem permissão sobre este registro (tenant)', status: 403 };
-}
-
-// ── AUDIT TRAIL (espelha gerenciarAprovacao.ts) ──
-function extractIpAddress(req: Request): string {
-  const xff = req.headers.get('x-forwarded-for');
-  if (xff) {
-    const firstIp = xff.split(',')[0].trim();
-    if (firstIp) return firstIp;
-  }
-  const xRealIp = req.headers.get('x-real-ip');
-  return xRealIp ? xRealIp.trim() : '';
-}
-
-function extractDeviceInfo(req: Request): string {
-  const ua = req.headers.get('user-agent');
-  return ua ? ua.substring(0, 500) : '';
-}
-
-async function computeChainHash(entryData: Record<string, unknown>, previousHash: string | null): Promise<string> {
-  const payload = JSON.stringify(entryData) + (previousHash || '');
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(payload));
-  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
-}
-
-async function createAuditEntry(base44: any, req: Request, user: any, entry: {
-  entity_name: string;
-  entity_id?: string;
-  operation: string;
-  changes?: any[];
-  result?: string;
-  failure_reason?: string;
-}) {
-  const ipAddress = extractIpAddress(req);
-  const deviceInfo = extractDeviceInfo(req);
-  const now = new Date().toISOString();
-  const actorRole = user?.access_level || user?.role || '';
-
-  let previousHash: string | null = null;
-  try {
-    const latest = await base44.asServiceRole.entities.AuditTrail.list('-created_date', 1);
-    if (latest && latest.length > 0) previousHash = latest[0].chain_hash || null;
-  } catch { /* previousHash stays null */ }
-
-  const entryData = {
-    entity_name: entry.entity_name,
-    entity_id: entry.entity_id || null,
-    operation: entry.operation,
-    changed_by: user?.email || '',
-    changed_by_name: user?.laboratorista_name || user?.full_name || '',
-    actor_role: actorRole,
-    ip_address: ipAddress,
-    device_info: deviceInfo,
-    result: entry.result || 'success',
-    failure_reason: entry.failure_reason || null,
-    timestamp: now,
-  };
-
-  const chainHash = await computeChainHash(entryData, previousHash);
-
-  return base44.asServiceRole.entities.AuditTrail.create({
-    ...entryData,
-    changes: entry.changes || [],
-    client_timestamp: null,
-    is_offline_sync: false,
-    chain_hash: chainHash,
-    previous_hash: previousHash,
-  });
-}
 
 // ── HANDLER ──────────────────────────────────────────────────────────────────
 

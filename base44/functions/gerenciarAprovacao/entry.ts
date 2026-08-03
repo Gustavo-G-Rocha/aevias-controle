@@ -1,5 +1,13 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.36';
-import { getUserAccessLevel, verifyTenantAccess } from '../../shared/tenantAccess.ts';
+import {
+  getUserAccessLevel,
+  getEffectiveAccessLevel,
+  canApprove,
+  computeIntegrityHash,
+  computeAuditDiff,
+  createAuditEntry,
+} from '../../shared/backendCommon.ts';
+import { verifyTenantAccess } from '../../shared/tenantAccess.ts';
 
 /**
  * Backend function: gerenciarAprovacao
@@ -12,61 +20,6 @@ import { getUserAccessLevel, verifyTenantAccess } from '../../shared/tenantAcces
  * Payload: { action, entityName, recordId, rejectionReason?, ncStatus?, requestApproval? }
  * Retorna:  { success: true, data: <record> } | { error: <message> }
  */
-
-// ── HASH DE INTEGRIDADE — lógica inlinada (espelha src/utils/integrityHash.js) ──
-// Campos excluídos do hash: mudam legitimamente após a assinatura.
-const INTEGRITY_EXCLUDED_FIELDS = new Set([
-  'id', 'created_date', 'updated_date', 'created_by_id',
-  'status',
-  'approved', 'approved_by', 'approved_date', 'approver_details',
-  'rejection_reason', 'was_rejected', 'client_signature',
-  'integrity_hash', 'integrity_hash_date',
-  'pendente_aprovacao_cliente', 'cliente_aprovacao', 'cliente_aprovacao_data',
-  'cliente_aprovacao_responsavel', 'cliente_reprovacao_motivo',
-  'manager_signature',
-]);
-
-function serializeForHash(record: unknown): string {
-  if (record === null || record === undefined) return 'null';
-  if (typeof record !== 'object') return JSON.stringify(record);
-  if (Array.isArray(record)) {
-    return '[' + record.map(serializeForHash).join(',') + ']';
-  }
-  const obj = record as Record<string, unknown>;
-  const keys = Object.keys(obj)
-    .filter((k) => !INTEGRITY_EXCLUDED_FIELDS.has(k))
-    .sort();
-  const parts = keys.map((k) => JSON.stringify(k) + ':' + serializeForHash(obj[k]));
-  return '{' + parts.join(',') + '}';
-}
-
-async function computeIntegrityHash(record: unknown): Promise<string> {
-  const serialized = serializeForHash(record);
-  const subtle = globalThis.crypto?.subtle;
-  if (!subtle) {
-    // Fallback não-criptográfico (ambientes sem Web Crypto API)
-    return simpleHash(serialized);
-  }
-  const encoder = new TextEncoder();
-  const data = encoder.encode(serialized);
-  const hashBuffer = await subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-}
-
-function simpleHash(str: string): string {
-  let h1 = 0xdeadbeef;
-  let h2 = 0x41c6ce57;
-  for (let i = 0; i < str.length; i++) {
-    const ch = str.charCodeAt(i);
-    h1 = Math.imul(h1 ^ ch, 2654435761);
-    h2 = Math.imul(h2 ^ ch, 1597334677);
-  }
-  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-  const hash = 4294967296 * (2097151 & h2) + (h1 >>> 0);
-  return hash.toString(16).padStart(16, '0').repeat(4).slice(0, 64);
-}
 
 const ALLOWED_ENTITIES = [
   // Ensaios
@@ -104,23 +57,6 @@ const ALLOWED_ENTITIES = [
   'RelatorioNC',
 ];
 
-const APPROVER_LEVELS = ['admin', 'sala_tecnica_afirmaevias', 'gestor_contrato', 'cliente_supervisor'];
-
-// getUserAccessLevel / getEffectiveAccessLevel / verifyTenantAccess
-// agora vivem em base44/shared/tenantAccess.ts (compartilhados com
-// exportarEnsaiosPDF).
-
-function canApprove(user) {
-  const level = getUserAccessLevel(user);
-  return APPROVER_LEVELS.includes(level);
-}
-
-// Para cliente_supervisor: canApprove global é true, mas a verificação
-// per-regional é feada por verifyTenantAccess → isSupervisor.
-// Esta função apenas checa se o nível tem POTENCIAL de aprovar.
-// O enforcement real está no handler: se level === 'cliente_supervisor'
-// e tenantCheck.isSupervisor === false, a aprovação é bloqueada.
-
 function canDelete(user, record, isSupervisor) {
   // admin: pode excluir qualquer registro
   if (getUserAccessLevel(user) === 'admin') return true;
@@ -133,105 +69,12 @@ function canDelete(user, record, isSupervisor) {
   if (level === 'cliente_supervisor') return Boolean(isSupervisor);
 
   // approver-level (sala_tecnica, gestor_contrato): podem excluir registros do seu tenant
-  return APPROVER_LEVELS.includes(level);
+  return canApprove(user);
 }
 
-// ── AUDIT TRAIL: Diff computation ──────────────────────────────────────
-const AUDIT_SYSTEM_FIELDS = new Set([
-  'id', 'created_date', 'updated_date', 'created_by_id', 'created_by', 'is_sample',
-]);
-
-function computeAuditDiff(oldData: any, newData: any) {
-  const changes: Array<{ field: string; old_value: any; new_value: any }> = [];
-  if (!oldData || !newData) return changes;
-
-  const allKeys = new Set([...Object.keys(oldData), ...Object.keys(newData)]);
-  for (const key of allKeys) {
-    if (AUDIT_SYSTEM_FIELDS.has(key)) continue;
-
-    const oldVal = oldData[key];
-    const newVal = newData[key];
-
-    if (oldVal == null && newVal == null) continue;
-
-    if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
-      changes.push({ field: key, old_value: oldVal, new_value: newVal });
-    }
-  }
-  return changes;
-}
-
-// ── AUDIT ENRICHMENT: IP, dispositivo e chain hash ──────────────────
-function extractIpAddress(req: Request): string {
-  const xff = req.headers.get('x-forwarded-for');
-  if (xff) {
-    const firstIp = xff.split(',')[0].trim();
-    if (firstIp) return firstIp;
-  }
-  const xRealIp = req.headers.get('x-real-ip');
-  if (xRealIp) return xRealIp.trim();
-  return '';
-}
-
-function extractDeviceInfo(req: Request): string {
-  const ua = req.headers.get('user-agent');
-  return ua ? ua.substring(0, 500) : '';
-}
-
-async function computeChainHash(entryData: Record<string, unknown>, previousHash: string | null): Promise<string> {
-  const payload = JSON.stringify(entryData) + (previousHash || '');
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(payload));
-  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
-}
-
-async function createAuditEntry(base44: any, req: Request, user: any, entry: {
-  entity_name: string;
-  entity_id?: string;
-  operation: string;
-  changes?: any[];
-  result?: string;
-  failure_reason?: string;
-  client_timestamp?: string | null;
-  is_offline_sync?: boolean;
-}) {
-  const ipAddress = extractIpAddress(req);
-  const deviceInfo = extractDeviceInfo(req);
-  const now = new Date().toISOString();
-  const actorRole = user?.access_level || user?.role || '';
-
-  let previousHash: string | null = null;
-  try {
-    const latest = await base44.asServiceRole.entities.AuditTrail.list('-created_date', 1);
-    if (latest && latest.length > 0) {
-      previousHash = latest[0].chain_hash || null;
-    }
-  } catch { /* previousHash stays null */ }
-
-  const entryData = {
-    entity_name: entry.entity_name,
-    entity_id: entry.entity_id || null,
-    operation: entry.operation,
-    changed_by: user?.email || '',
-    changed_by_name: user?.laboratorista_name || user?.full_name || '',
-    actor_role: actorRole,
-    ip_address: ipAddress,
-    device_info: deviceInfo,
-    result: entry.result || 'success',
-    failure_reason: entry.failure_reason || null,
-    timestamp: now,
-  };
-
-  const chainHash = await computeChainHash(entryData, previousHash);
-
-  return base44.asServiceRole.entities.AuditTrail.create({
-    ...entryData,
-    changes: entry.changes || [],
-    client_timestamp: entry.client_timestamp || null,
-    is_offline_sync: entry.is_offline_sync || false,
-    chain_hash: chainHash,
-    previous_hash: previousHash,
-  });
-}
+// ── SANITIZAÇÃO XSS — defense-in-depth (importado de backendCommon.ts via sanitizeText) ──
+// rejectionReason é texto livre do usuário — sanitiza antes de persistir.
+import { sanitizeText } from '../../shared/backendCommon.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -245,25 +88,8 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { action, entityName, recordId, rejectionReason: rawRejectionReason, ncStatus, requestApproval } = body;
 
-    // ── SANITIZAÇÃO XSS — defense-in-depth (espelha src/utils/dataSanitization.js) ──
-    // rejectionReason é texto livre do usuário — sanitiza antes de persistir.
-    const DANGEROUS_TAGS_R = 'script|iframe|object|embed|style|svg|math|template|noscript|noframes|applet|xml';
-    const DANGEROUS_VOID_TAGS_R = `${DANGEROUS_TAGS_R}|link|meta|base|form|input|button`;
-    const sanitizeTextR = (val: unknown): string => {
-      if (typeof val !== 'string' || !val) return val as string;
-      let s = val;
-      s = s.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
-      s = s.replace(new RegExp(`<\\s*(${DANGEROUS_TAGS_R})\\b[^>]*>[\\s\\S]*?<\\s*\\/\\s*\\1\\s*>`, 'gi'), '');
-      s = s.replace(new RegExp(`<\\s*(?:${DANGEROUS_VOID_TAGS_R})\\b[^>]*>`, 'gi'), '');
-      s = s.replace(new RegExp(`<\\s*\\/\\s*(?:${DANGEROUS_TAGS_R})\\s*>`, 'gi'), '');
-      s = s.replace(/\bon\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)?/gi, '');
-      s = s.replace(/javascript:/gi, '').replace(/vbscript:/gi, '').replace(/data:text\/html/gi, '');
-      s = s.replace(/\{\{/g, '{ {').replace(/\}\}/g, '} }');
-      s = s.replace(/<%/g, '< %').replace(/%>/g, '% >');
-      if (s.length > 10000) s = s.substring(0, 10000);
-      return s;
-    };
-    const rejectionReason = rawRejectionReason ? sanitizeTextR(rawRejectionReason) : rawRejectionReason;
+    // ── SANITIZAÇÃO XSS ──
+    const rejectionReason = rawRejectionReason ? sanitizeText(rawRejectionReason) : rawRejectionReason;
 
     // Whitelist de entidades permitidas
     if (!ALLOWED_ENTITIES.includes(entityName)) {

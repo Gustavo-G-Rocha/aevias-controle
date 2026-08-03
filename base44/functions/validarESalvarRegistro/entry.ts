@@ -1,4 +1,16 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.36';
+import {
+  getUserAccessLevel,
+  getWithRetry,
+  sanitizeTextFields,
+  computeAuditDiff,
+  AUDIT_SYSTEM_FIELDS,
+  extractIpAddress,
+  extractDeviceInfo,
+  createAuditEntry,
+  verifyTenantAccessForRecord,
+  verifyObraTenantAccess,
+} from '../../shared/backendCommon.ts';
 
 /**
  * Backend function: validarESalvarRegistro
@@ -101,241 +113,6 @@ function validateRecord(entityName, data) {
   return { valid: true };
 }
 
-// ── DEFENSE-IN-DEPTH: validação funcional de tenant ──────────────────
-// Funções inlinadas (não é possível compartilhar módulos entre functions).
-// Espelham src/utils/tenantSecurity.js — testado em src/tests/security/.
-
-function getUserAccessLevel(user) {
-  if (!user) return 'user';
-  const raw = user.access_level || (user.role === 'admin' ? 'admin' : 'user');
-  if (raw === 'cliente_supervisor') return 'cliente';
-  if (raw === 'funcionarios_cliente') return 'user';
-  return raw;
-}
-
-// Verifica direito do usuário sobre um registro existente (update).
-async function verifyTenantAccessForRecord(base44, user, record) {
-  const level = getUserAccessLevel(user);
-
-  if (level === 'admin') return { allowed: true };
-
-  if (level === 'user') {
-    if (record.created_by === user.email || record.created_by_id === user.id) {
-      return { allowed: true };
-    }
-    return { allowed: false, reason: 'Sem permissão sobre este registro', status: 403 };
-  }
-
-  if (!record.obra_id) {
-    return { allowed: false, reason: 'Registro sem obra vinculada', status: 403 };
-  }
-
-  const obraFetch = await getWithRetry(() => base44.asServiceRole.entities.Obra.get(record.obra_id));
-  if (obraFetch.transient) {
-    return { allowed: false, reason: 'Falha temporária ao validar a obra. Tente novamente.', status: 503 };
-  }
-  const obra = obraFetch.record;
-  if (!obra || !obra.regional_id) {
-    return { allowed: false, reason: obra ? 'Obra sem regional vinculada' : 'Obra não encontrada', status: obra ? 403 : 404 };
-  }
-
-  const regFetch = await getWithRetry(() => base44.asServiceRole.entities.Regional.get(obra.regional_id));
-  if (regFetch.transient) {
-    return { allowed: false, reason: 'Falha temporária ao validar a regional. Tente novamente.', status: 503 };
-  }
-  const regional = regFetch.record;
-  if (!regional) {
-    return { allowed: false, reason: 'Regional não encontrada', status: 404 };
-  }
-
-  const userEmail = (user.email || '').toLowerCase();
-
-  if (level === 'cliente') {
-    const emails = (regional.clientes_responsaveis || []).map((e) => e.toLowerCase());
-    if (emails.includes(userEmail)) return { allowed: true };
-  } else if (level === 'sala_tecnica_afirmaevias') {
-    const emails = (regional.salas_tecnicas_responsaveis || []).map((e) => e.toLowerCase());
-    if (emails.includes(userEmail)) return { allowed: true };
-  } else if (level === 'gestor_contrato') {
-    const emails = (regional.gestores_contrato_responsaveis || []).map((e) => e.toLowerCase());
-    const legacy = (regional.gestor_contrato_responsavel || '').toLowerCase();
-    if (emails.includes(userEmail) || legacy === userEmail) return { allowed: true };
-  }
-
-  return { allowed: false, reason: 'Sem permissão sobre este registro (tenant)', status: 403 };
-}
-
-// Verifica direito do usuário sobre uma obra (create/update).
-async function verifyObraTenantAccess(base44, user, obraId) {
-  const level = getUserAccessLevel(user);
-
-  if (level === 'admin' || level === 'user') {
-    return { allowed: true };
-  }
-
-  const obraFetch = await getWithRetry(() => base44.asServiceRole.entities.Obra.get(obraId));
-  if (obraFetch.transient) {
-    return { allowed: false, reason: 'Falha temporária ao validar a obra. Tente novamente.', status: 503 };
-  }
-  const obra = obraFetch.record;
-  if (!obra || !obra.regional_id) {
-    return { allowed: false, reason: obra ? 'Obra sem regional vinculada' : 'Obra não encontrada', status: obra ? 403 : 404 };
-  }
-
-  const regFetch = await getWithRetry(() => base44.asServiceRole.entities.Regional.get(obra.regional_id));
-  if (regFetch.transient) {
-    return { allowed: false, reason: 'Falha temporária ao validar a regional. Tente novamente.', status: 503 };
-  }
-  const regional = regFetch.record;
-  if (!regional) {
-    return { allowed: false, reason: 'Regional não encontrada', status: 404 };
-  }
-
-  const userEmail = (user.email || '').toLowerCase();
-
-  if (level === 'cliente') {
-    const emails = (regional.clientes_responsaveis || []).map((e) => e.toLowerCase());
-    if (emails.includes(userEmail)) return { allowed: true, obra };
-  } else if (level === 'sala_tecnica_afirmaevias') {
-    const emails = (regional.salas_tecnicas_responsaveis || []).map((e) => e.toLowerCase());
-    if (emails.includes(userEmail)) return { allowed: true, obra };
-  } else if (level === 'gestor_contrato') {
-    const emails = (regional.gestores_contrato_responsaveis || []).map((e) => e.toLowerCase());
-    const legacy = (regional.gestor_contrato_responsavel || '').toLowerCase();
-    if (emails.includes(userEmail) || legacy === userEmail) return { allowed: true, obra };
-  }
-
-  return { allowed: false, reason: 'Sem permissão sobre a obra (tenant)', status: 403 };
-}
-
-// ── GET resiliente ───────────────────────────────────────────────────
-// Distingue "registro realmente inexistente" (404) de falhas transitórias
-// (rate limit, rede, 5xx). Antes, qualquer erro no get() era reportado como
-// "Registro não encontrado", fazendo salvamentos falharem com mensagem
-// enganosa sob carga. Retenta uma vez antes de desistir.
-function isNotFoundError(e: any): boolean {
-  const status = e?.status ?? e?.response?.status;
-  if (status === 404) return true;
-  return /not\s*found|não\s*encontrad/i.test(String(e?.message || ''));
-}
-
-async function getWithRetry(fetcher: () => Promise<any>): Promise<{ record?: any; notFound?: boolean; transient?: boolean }> {
-  try {
-    const record = await fetcher();
-    return record ? { record } : { notFound: true };
-  } catch (e1) {
-    if (isNotFoundError(e1)) return { notFound: true };
-    await new Promise((r) => setTimeout(r, 500));
-    try {
-      const record = await fetcher();
-      return record ? { record } : { notFound: true };
-    } catch (e2) {
-      if (isNotFoundError(e2)) return { notFound: true };
-      return { transient: true };
-    }
-  }
-}
-
-// ── AUDIT TRAIL: Diff computation ──────────────────────────────────────
-// Campos gerenciados pelo plataforma — nunca aparecem no diff de auditoria.
-const AUDIT_SYSTEM_FIELDS = new Set([
-  'id', 'created_date', 'updated_date', 'created_by_id', 'created_by', 'is_sample',
-]);
-
-function computeAuditDiff(oldData: any, newData: any) {
-  const changes: Array<{ field: string; old_value: any; new_value: any }> = [];
-  if (!oldData || !newData) return changes;
-
-  const allKeys = new Set([...Object.keys(oldData), ...Object.keys(newData)]);
-  for (const key of allKeys) {
-    if (AUDIT_SYSTEM_FIELDS.has(key)) continue;
-
-    const oldVal = oldData[key];
-    const newVal = newData[key];
-
-    // Pular null→null / undefined→undefined
-    if (oldVal == null && newVal == null) continue;
-
-    // Comparação profura via JSON (cobre objetos, arrays, primitivos)
-    if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
-      changes.push({ field: key, old_value: oldVal, new_value: newVal });
-    }
-  }
-  return changes;
-}
-
-// ── AUDIT ENRICHMENT: IP, dispositivo e chain hash ──────────────────
-function extractIpAddress(req: Request): string {
-  const xff = req.headers.get('x-forwarded-for');
-  if (xff) {
-    const firstIp = xff.split(',')[0].trim();
-    if (firstIp) return firstIp;
-  }
-  const xRealIp = req.headers.get('x-real-ip');
-  if (xRealIp) return xRealIp.trim();
-  return '';
-}
-
-function extractDeviceInfo(req: Request): string {
-  const ua = req.headers.get('user-agent');
-  return ua ? ua.substring(0, 500) : '';
-}
-
-async function computeChainHash(entryData: Record<string, unknown>, previousHash: string | null): Promise<string> {
-  const payload = JSON.stringify(entryData) + (previousHash || '');
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(payload));
-  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
-}
-
-async function createAuditEntry(base44: any, req: Request, user: any, entry: {
-  entity_name: string;
-  entity_id?: string;
-  operation: string;
-  changes?: any[];
-  result?: string;
-  failure_reason?: string;
-  client_timestamp?: string | null;
-  is_offline_sync?: boolean;
-}) {
-  const ipAddress = extractIpAddress(req);
-  const deviceInfo = extractDeviceInfo(req);
-  const now = new Date().toISOString();
-  const actorRole = user?.access_level || user?.role || '';
-
-  let previousHash: string | null = null;
-  try {
-    const latest = await base44.asServiceRole.entities.AuditTrail.list('-created_date', 1);
-    if (latest && latest.length > 0) {
-      previousHash = latest[0].chain_hash || null;
-    }
-  } catch { /* previousHash stays null */ }
-
-  const entryData = {
-    entity_name: entry.entity_name,
-    entity_id: entry.entity_id || null,
-    operation: entry.operation,
-    changed_by: user?.email || '',
-    changed_by_name: user?.laboratorista_name || user?.full_name || '',
-    actor_role: actorRole,
-    ip_address: ipAddress,
-    device_info: deviceInfo,
-    result: entry.result || 'success',
-    failure_reason: entry.failure_reason || null,
-    timestamp: now,
-  };
-
-  const chainHash = await computeChainHash(entryData, previousHash);
-
-  return base44.asServiceRole.entities.AuditTrail.create({
-    ...entryData,
-    changes: entry.changes || [],
-    client_timestamp: entry.client_timestamp || null,
-    is_offline_sync: entry.is_offline_sync || false,
-    chain_hash: chainHash,
-    previous_hash: previousHash,
-  });
-}
-
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -379,45 +156,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Sanitização de texto — defense-in-depth contra XSS (espelha src/utils/dataSanitization.js)
-    // Política: texto puro, sem HTML. Tags perigosas removidas com conteúdo.
-    // Event handlers, protocolos perigosos e sintaxe de template neutralizados.
-    const DANGEROUS_TAGS = 'script|iframe|object|embed|style|svg|math|template|noscript|noframes|applet|xml';
-    const DANGEROUS_VOID_TAGS = `${DANGEROUS_TAGS}|link|meta|base|form|input|button`;
-    const sanitizeText = (val: unknown): unknown => {
-      if (typeof val !== 'string' || !val) return val;
-      let s = val;
-      // 1. Remover caracteres de controle (exceto \t \n \r)
-      s = s.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
-      // 2. Remover blocos de tags perigosas com conteúdo
-      s = s.replace(new RegExp(`<\\s*(${DANGEROUS_TAGS})\\b[^>]*>[\\s\\S]*?<\\s*\\/\\s*\\1\\s*>`, 'gi'), '');
-      // 3. Remover tags perigosas sem fechamento
-      s = s.replace(new RegExp(`<\\s*(?:${DANGEROUS_VOID_TAGS})\\b[^>]*>`, 'gi'), '');
-      s = s.replace(new RegExp(`<\\s*\\/\\s*(?:${DANGEROUS_TAGS})\\s*>`, 'gi'), '');
-      // 4. Remover atributos de evento (onerror=, onclick=, onload=, etc.)
-      s = s.replace(/\bon\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)?/gi, '');
-      // 5. Remover protocolos perigosos
-      s = s.replace(/javascript:/gi, '').replace(/vbscript:/gi, '').replace(/data:text\/html/gi, '');
-      // 6. Neutralizar sintaxe de template engine (SSTI)
-      s = s.replace(/\{\{/g, '{ {').replace(/\}\}/g, '} }');
-      s = s.replace(/<%/g, '< %').replace(/%>/g, '% >');
-      // 7. Limite de tamanho
-      if (s.length > 10000) s = s.substring(0, 10000);
-      return s;
-    };
-    const sanitizeTextFields = (obj: unknown): unknown => {
-      if (obj === null || obj === undefined) return obj;
-      if (typeof obj === 'string') return sanitizeText(obj);
-      if (Array.isArray(obj)) return obj.map(sanitizeTextFields);
-      if (typeof obj === 'object') {
-        const result: Record<string, unknown> = {};
-        for (const [key, value] of Object.entries(obj)) {
-          result[key] = sanitizeTextFields(value);
-        }
-        return result;
-      }
-      return obj;
-    };
+    // Sanitização de texto — defense-in-depth contra XSS (importado de backendCommon.ts)
     const sanitizedData = sanitizeTextFields(data);
 
     // ── Buscar registro antigo (para audit + conflict detection + tenant) ──
@@ -586,7 +325,6 @@ Deno.serve(async (req) => {
     // ── AUDIT TRAIL ──────────────────────────────────────────────────
     // Registra diff campo-a-campo. Falhas de auditoria NÃO bloqueiam o salvamento.
     try {
-      const changedByName = user.laboratorista_name || user.full_name || '';
       const isOfflineSync = !!client_updated_at;
 
       if (operation === 'create') {
