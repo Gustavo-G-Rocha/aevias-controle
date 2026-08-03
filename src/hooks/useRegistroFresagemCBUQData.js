@@ -68,7 +68,7 @@ export function useRegistroFresagemCBUQData() {
   const projects = useMemo(() => auxData?.projects ?? [], [auxData?.projects]);
 
   useEffect(() => {
-    if (loadingUser || loadingAux || !user) return;
+    if (loadingUser || !user) return;
 
     const urlParams = new URLSearchParams(location.search);
     const editIdParam = urlParams.get('editId');
@@ -106,9 +106,12 @@ export function useRegistroFresagemCBUQData() {
         laboratorista_name: user.laboratorista_name || user.full_name || "",
       });
     }
-  }, [loadingUser, loadingAux, user?.id, location.search, queryClient]);
+  }, [loadingUser, user?.id, location.search, queryClient]);
 
-  const loading = loadingUser || loadingAux || editLoading;
+  // loadingAux não bloqueia o formulário — os dropdowns (obras, regionais)
+  // populam quando os dados chegarem. Apenas user e editLoading (busca de
+  // registro via API) precisam bloquear a renderização.
+  const loading = loadingUser || editLoading;
 
   return {
     formData, setFormData,
