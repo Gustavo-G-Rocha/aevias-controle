@@ -150,6 +150,16 @@ Deno.serve(async (req) => {
       }
       // Record sintético para verificação de tenant (apenas obra_id é usado).
       existingRecord = { obra_id: filters.obra_id };
+
+      // Defense-in-depth: não assinar um relatório vazio (0 registros).
+      // O frontend já bloqueia, mas se o request chegar aqui diretamente,
+      // rejeitar evita criar assinatura sobre conteúdo inexistente.
+      if (reconRecords.length === 0) {
+        return Response.json(
+          { error: 'O relatório não contém registros para assinar.', errorCategory: 'schema' },
+          { status: 400 }
+        );
+      }
     } else {
       const fetched = await getWithRetry(() => base44.asServiceRole.entities[entityName].get(recordId));
       if (fetched.transient) {

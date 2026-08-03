@@ -62,6 +62,15 @@ export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
       return;
     }
 
+    if (!recordCount || recordCount === 0) {
+      toast({
+        title: 'Não foi possível assinar',
+        description: 'O relatório não contém registros para assinar.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setSigning(true);
     try {
       // Assinatura via sessão ativa — sem reentrada de senha.
@@ -118,6 +127,14 @@ export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
 
   const handleOpenModal = useCallback(async () => {
     if (!compositeId) return;
+    if (!recordCount || recordCount === 0) {
+      toast({
+        title: 'Não foi possível assinar',
+        description: 'O relatório não contém registros para assinar.',
+        variant: 'destructive',
+      });
+      return;
+    }
     setCheckingAccess(true);
     try {
       // Pre-check: verificar acessibilidade do backend antes de assinar.
@@ -140,7 +157,7 @@ export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
     setCheckingAccess(false);
     // Assina diretamente — sem modal de reentrada de senha.
     await handleSign();
-  }, [compositeId, toast, handleSign]);
+  }, [compositeId, toast, handleSign, recordCount]);
 
   return {
     signature,
