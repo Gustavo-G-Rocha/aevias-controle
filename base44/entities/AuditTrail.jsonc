@@ -102,7 +102,11 @@
   ],
   "rls": {
     "create": false,
-    "read": null,
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
     "update": {
       "user_condition": {
         "role": "__append_only__"
