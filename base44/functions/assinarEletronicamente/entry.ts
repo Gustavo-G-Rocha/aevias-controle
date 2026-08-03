@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.41';
 import { getTwoFactorConfig, verifyTwoFactorForUser } from '../../shared/totp.ts';
 import {
   extractFilters,

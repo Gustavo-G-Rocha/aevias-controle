@@ -1,4 +1,9 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.36';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.41';
+import {
+  extractIpAddress,
+  extractDeviceInfo,
+  computeChainHash,
+} from '../../shared/backendCommon.ts';
 
 /**
  * Backend function: registrarAuditoria
@@ -37,29 +42,6 @@ const AUTH_EVENT_TYPES = new Set([
 ]);
 
 /**
- * Extrai o IP de origem da requisição, considerando proxies/load balancers.
- * Prioriza X-Forwarded-For (primeiro IP da cadeia), depois X-Real-IP.
- */
-function extractIpAddress(req: Request): string {
-  const xff = req.headers.get('x-forwarded-for');
-  if (xff) {
-    const firstIp = xff.split(',')[0].trim();
-    if (firstIp) return firstIp;
-  }
-  const xRealIp = req.headers.get('x-real-ip');
-  if (xRealIp) return xRealIp.trim();
-  return '';
-}
-
-/**
- * Extrai o User-Agent da requisição.
- */
-function extractDeviceInfo(req: Request): string {
-  const ua = req.headers.get('user-agent');
-  return ua ? ua.substring(0, 500) : '';
-}
-
-/**
  * Valida formato básico de e-mail para eventos anônimos.
  * Impede forjamento de identidade com strings arbitrárias.
  */
@@ -67,16 +49,6 @@ function isValidEmail(value: unknown): boolean {
   if (typeof value !== 'string') return false;
   if (value.length > 254) return false;
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
-/**
- * Computa hash SHA-256 do conteúdo da entrada + hash anterior (cadeia).
- * Usa Web Crypto API (disponível em Deno Deploy).
- */
-async function computeChainHash(entryData: Record<string, unknown>, previousHash: string | null): Promise<string> {
-  const payload = JSON.stringify(entryData) + (previousHash || '');
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(payload));
-  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 Deno.serve(async (req: Request) => {

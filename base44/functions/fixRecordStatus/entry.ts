@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.41';
 
 const resolverData = (record) =>
   record.data || record.data_ensaio || record.extraction_date || record.date || null;

@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.41';
 
 // Apenas mapeamentos que realmente transformam a chave (antigas -> novas)
 const MAPEAMENTO_MIGRACAO = {

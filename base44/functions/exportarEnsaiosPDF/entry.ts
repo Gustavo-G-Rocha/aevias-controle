@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.41';
 import JSZip from 'npm:jszip@3.10.1';
 import { verifyTenantAccess } from '../../shared/tenantAccess.ts';
 
