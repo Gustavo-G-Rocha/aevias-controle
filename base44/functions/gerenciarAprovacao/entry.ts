@@ -6,6 +6,7 @@ import {
   computeIntegrityHash,
   computeAuditDiff,
   createAuditEntry,
+  getWithRetry,
 } from '../../shared/backendCommon.ts';
 import { verifyTenantAccess } from '../../shared/tenantAccess.ts';
 
@@ -147,21 +148,20 @@ Deno.serve(async (req) => {
     // Busca o registro uma vez (asServiceRole bypassa RLS) e valida o
     // direito do usuário sobre ele ANTES de qualquer mutação.
     // O registro é reutilizado na normalização de fotos mais abaixo.
-    let existingRecord;
-    try {
-      existingRecord = await base44.asServiceRole.entities[entityName].get(recordId);
-    } catch {
+    const fetched = await getWithRetry(() => base44.asServiceRole.entities[entityName].get(recordId));
+    if (fetched.transient) {
       return Response.json(
-        { error: 'Registro não encontrado', errorCategory: 'permission' },
+        { error: 'Falha temporária ao acessar o registro. Tente novamente.', errorCategory: 'network' },
+        { status: 503 }
+      );
+    }
+    if (fetched.notFound) {
+      return Response.json(
+        { error: 'Registro não encontrado. Ele pode ter sido excluído — recarregue a lista.', errorCategory: 'permission' },
         { status: 404 }
       );
     }
-    if (!existingRecord) {
-      return Response.json(
-        { error: 'Registro não encontrado', errorCategory: 'permission' },
-        { status: 404 }
-      );
-    }
+    const existingRecord = fetched.record;
 
     const tenantCheck = await verifyTenantAccess(base44, user, entityName, existingRecord);
     if (!tenantCheck.allowed) {

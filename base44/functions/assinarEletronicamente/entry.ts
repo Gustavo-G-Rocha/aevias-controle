@@ -14,6 +14,7 @@ import {
   createAuditEntry,
   extractIpAddress,
   extractDeviceInfo,
+  getWithRetry,
 } from '../../shared/backendCommon.ts';
 import { verifyTenantAccess } from '../../shared/tenantAccess.ts';
 
@@ -146,20 +147,20 @@ Deno.serve(async (req) => {
       // Record sintético para verificação de tenant (apenas obra_id é usado).
       existingRecord = { obra_id: filters.obra_id };
     } else {
-      try {
-        existingRecord = await base44.asServiceRole.entities[entityName].get(recordId);
-      } catch {
+      const fetched = await getWithRetry(() => base44.asServiceRole.entities[entityName].get(recordId));
+      if (fetched.transient) {
+        return Response.json(
+          { error: 'Falha temporária ao acessar o registro. Tente novamente.', errorCategory: 'network' },
+          { status: 503 }
+        );
+      }
+      if (fetched.notFound) {
         return Response.json(
           { error: 'Registro não encontrado', errorCategory: 'permission' },
           { status: 404 }
         );
       }
-      if (!existingRecord) {
-        return Response.json(
-          { error: 'Registro não encontrado', errorCategory: 'permission' },
-          { status: 404 }
-        );
-      }
+      existingRecord = fetched.record;
     }
 
     // ── VERIFICAR TENANT ──

@@ -227,6 +227,9 @@ Deno.serve(async (req) => {
     } else if (sanitizedData.obra_id) {
       // admin/user: buscar obra apenas para denormalização (sem validação tenant)
       const obraFetch = await getWithRetry(() => base44.asServiceRole.entities.Obra.get(sanitizedData.obra_id));
+      if (obraFetch.transient) {
+        console.warn('[validarESalvarRegistro] Falha transitória ao buscar obra para denormalização — registro será salvo sem obra_name/obra_code');
+      }
       denormObra = obraFetch.record || null;
     }
 

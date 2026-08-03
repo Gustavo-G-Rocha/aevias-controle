@@ -31,17 +31,20 @@ const ALL_RECORD_ENTITIES = [
   'RegistroFresagemCBUQ',
 ];
 
-const PAGE_SIZE = 500;
-const MAX_PAGES = 20;
+const PAGE_SIZE = 100;
+const MAX_PAGES = 3;
+const MAX_TOTAL_RECORDS = 3000;
 
-async function loadEntityRecords(base44, entityType, query) {
-  if (!query) return [];
+async function loadEntityRecords(base44, entityType, query, remainingBudget) {
+  if (!query || remainingBudget <= 0) return [];
   const all = [];
   let skip = 0;
   for (let page = 0; page < MAX_PAGES; page++) {
-    const batch = await base44.entities[entityType].filter(query, '-created_date', PAGE_SIZE, skip);
+    const fetchSize = Math.min(PAGE_SIZE, remainingBudget - all.length);
+    if (fetchSize <= 0) break;
+    const batch = await base44.entities[entityType].filter(query, '-created_date', fetchSize, skip);
     all.push(...batch);
-    if (batch.length < PAGE_SIZE) break;
+    if (batch.length < fetchSize) break;
     skip += PAGE_SIZE;
   }
   return all;
@@ -98,13 +101,24 @@ Deno.serve(async (req) => {
         ? orClauses[0]
         : { $or: orClauses };
 
+    if (!entityQuery) {
+      return Response.json({
+        records: [],
+        obraIds: [...obraIds],
+        subordinateEmails: [...subordinateEmails],
+      });
+    }
+
     const BATCH = 10;
     const allRecords = [];
+    let totalFetched = 0;
 
     for (let i = 0; i < ALL_RECORD_ENTITIES.length; i += BATCH) {
+      if (totalFetched >= MAX_TOTAL_RECORDS) break;
       const batch = ALL_RECORD_ENTITIES.slice(i, i + BATCH);
+      const remainingBudget = MAX_TOTAL_RECORDS - totalFetched;
       const settled = await Promise.allSettled(
-        batch.map(type => loadEntityRecords(base44, type, entityQuery))
+        batch.map(type => loadEntityRecords(base44, type, entityQuery, remainingBudget))
       );
       settled.forEach((r, idx) => {
         if (r.status === 'fulfilled') {
@@ -112,6 +126,7 @@ Deno.serve(async (req) => {
           for (const record of r.value) {
             allRecords.push({ ...record, entityType: type });
           }
+          totalFetched += r.value.length;
         }
       });
     }

@@ -176,8 +176,15 @@ Deno.serve(async (req: Request) => {
 
     const chainHash = await computeChainHash(entryData, previousHash);
 
+    if (!base44) {
+      return Response.json(
+        { error: 'Não foi possível registrar auditoria: sessão indisponível', errorCategory: 'unknown' },
+        { status: 500 }
+      );
+    }
+
     // Cria a entrada (asServiceRole bypassa RLS — create é permitido)
-    const auditEntry = await base44?.asServiceRole.entities.AuditTrail.create({
+    const auditEntry = await base44.asServiceRole.entities.AuditTrail.create({
       ...entryData,
       changes: finalChanges,
       client_timestamp: null,
