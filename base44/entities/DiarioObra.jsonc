@@ -6,26 +6,34 @@
       "type": "string",
       "description": "ID da obra"
     },
+    "obra_name": {
+      "type": "string",
+      "description": "Nome da obra (denormalizado no momento do salvamento para exibi\u00e7\u00e3o mesmo se a obra for exclu\u00edda)"
+    },
+    "obra_code": {
+      "type": "string",
+      "description": "C\u00f3digo da obra (denormalizado no momento do salvamento)"
+    },
     "cliente": {
       "type": "string",
-      "description": "Nome do cliente (copiado da regional no momento da criação)"
+      "description": "Nome do cliente (copiado da regional no momento da cria\u00e7\u00e3o)"
     },
     "data": {
       "type": "string",
       "format": "date",
-      "description": "Data do diário"
+      "description": "Data do di\u00e1rio"
     },
     "jornada": {
       "type": "object",
-      "description": "Jornada de trabalho do funcionário",
+      "description": "Jornada de trabalho do funcion\u00e1rio",
       "properties": {
         "horario_inicio": {
           "type": "string",
-          "description": "Horário de início do turno (HH:mm)"
+          "description": "Hor\u00e1rio de in\u00edcio do turno (HH:mm)"
         },
         "horario_fim": {
           "type": "string",
-          "description": "Horário de fim do turno (HH:mm)"
+          "description": "Hor\u00e1rio de fim do turno (HH:mm)"
         }
       }
     },
@@ -51,7 +59,7 @@
     },
     "trecho": {
       "type": "string",
-      "description": "Descrição do trecho (quando tipo_local = campo)"
+      "description": "Descri\u00e7\u00e3o do trecho (quando tipo_local = campo)"
     },
     "condicoes_climaticas": {
       "type": "string",
@@ -64,22 +72,22 @@
         "vento_forte",
         "neblina"
       ],
-      "description": "Condições climáticas do dia (ceu_limpo substitui ensolarado em jornadas noturnas)"
+      "description": "Condi\u00e7\u00f5es clim\u00e1ticas do dia (ceu_limpo substitui ensolarado em jornadas noturnas)"
     },
     "temperatura": {
       "type": [
         "number",
         "null"
       ],
-      "description": "Temperatura ambiente (°C)"
+      "description": "Temperatura ambiente (\u00b0C)"
     },
     "atividades_realizadas": {
       "type": "string",
-      "description": "Descrição das atividades realizadas no dia"
+      "description": "Descri\u00e7\u00e3o das atividades realizadas no dia"
     },
     "observacoes": {
       "type": "string",
-      "description": "Observações gerais do dia"
+      "description": "Observa\u00e7\u00f5es gerais do dia"
     },
     "acoes_corretivas_realizado": {
       "type": [
@@ -87,15 +95,15 @@
         "null"
       ],
       "default": null,
-      "description": "Se foram realizadas ações corretivas"
+      "description": "Se foram realizadas a\u00e7\u00f5es corretivas"
     },
     "acoes_corretivas_descricao": {
       "type": "string",
-      "description": "Descrição das ações corretivas realizadas"
+      "description": "Descri\u00e7\u00e3o das a\u00e7\u00f5es corretivas realizadas"
     },
     "nao_conformidades": {
       "type": "array",
-      "description": "Lista de não conformidades identificadas",
+      "description": "Lista de n\u00e3o conformidades identificadas",
       "items": {
         "type": "object",
         "properties": {
@@ -109,11 +117,11 @@
           },
           "parametro_nc": {
             "type": "string",
-            "description": "Parâmetro da NC"
+            "description": "Par\u00e2metro da NC"
           },
           "descricao": {
             "type": "string",
-            "description": "Descrição detalhada da NC"
+            "description": "Descri\u00e7\u00e3o detalhada da NC"
           }
         }
       }
@@ -125,7 +133,7 @@
     },
     "efetivo_maquinas": {
       "type": "object",
-      "description": "Efetivo de máquinas operantes",
+      "description": "Efetivo de m\u00e1quinas operantes",
       "properties": {
         "motoniveladora": {
           "type": "number"
@@ -269,7 +277,7 @@
       "items": {
         "type": "string"
       },
-      "description": "URLs das fotos do diário de obra"
+      "description": "URLs das fotos do di\u00e1rio de obra"
     },
     "laboratorista_name": {
       "type": "string",
@@ -282,21 +290,21 @@
         "finalizado"
       ],
       "default": "rascunho",
-      "description": "Status do registro: rascunho (em edição) ou finalizado (pronto para revisão)"
+      "description": "Status do registro: rascunho (em edi\u00e7\u00e3o) ou finalizado (pronto para revis\u00e3o)"
     },
     "approved": {
       "type": "boolean",
       "default": null,
-      "description": "Status de aprovação: true (aprovado), false (reprovado), null (pendente)"
+      "description": "Status de aprova\u00e7\u00e3o: true (aprovado), false (reprovado), null (pendente)"
     },
     "approved_by": {
       "type": "string",
-      "description": "Email do usuário que aprovou/reprovou"
+      "description": "Email do usu\u00e1rio que aprovou/reprovou"
     },
     "approved_date": {
       "type": "string",
       "format": "date-time",
-      "description": "Data e hora da aprovação/reprovação"
+      "description": "Data e hora da aprova\u00e7\u00e3o/reprova\u00e7\u00e3o"
     },
     "approver_details": {
       "type": "object",
@@ -315,7 +323,7 @@
     },
     "rejection_reason": {
       "type": "string",
-      "description": "Motivo da reprovação (quando applicable)"
+      "description": "Motivo da reprova\u00e7\u00e3o (quando applicable)"
     },
     "was_rejected": {
       "type": "boolean",
@@ -344,11 +352,11 @@
     "checklist_veiculo_ativo": {
       "type": "boolean",
       "default": false,
-      "description": "Se o checklist de veículo deve ser preenchido"
+      "description": "Se o checklist de ve\u00edculo deve ser preenchido"
     },
     "checklist_veiculo": {
       "type": "object",
-      "description": "Dados do checklist de veículo de passeio",
+      "description": "Dados do checklist de ve\u00edculo de passeio",
       "properties": {
         "nome_condutor": {
           "type": "string"

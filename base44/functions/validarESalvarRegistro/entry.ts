@@ -195,14 +195,14 @@ async function verifyObraTenantAccess(base44, user, obraId) {
 
   if (level === 'cliente') {
     const emails = (regional.clientes_responsaveis || []).map((e) => e.toLowerCase());
-    if (emails.includes(userEmail)) return { allowed: true };
+    if (emails.includes(userEmail)) return { allowed: true, obra };
   } else if (level === 'sala_tecnica_afirmaevias') {
     const emails = (regional.salas_tecnicas_responsaveis || []).map((e) => e.toLowerCase());
-    if (emails.includes(userEmail)) return { allowed: true };
+    if (emails.includes(userEmail)) return { allowed: true, obra };
   } else if (level === 'gestor_contrato') {
     const emails = (regional.gestores_contrato_responsaveis || []).map((e) => e.toLowerCase());
     const legacy = (regional.gestor_contrato_responsavel || '').toLowerCase();
-    if (emails.includes(userEmail) || legacy === userEmail) return { allowed: true };
+    if (emails.includes(userEmail) || legacy === userEmail) return { allowed: true, obra };
   }
 
   return { allowed: false, reason: 'Sem permissão sobre a obra (tenant)', status: 403 };
@@ -455,6 +455,13 @@ Deno.serve(async (req) => {
     // admin/user, a validação client-side (obra selecionada do dropdown
     // carregado via SDK) é a guarda primária.
 
+    // ── DENORMALIZATION: obra_name / obra_code ──────────────────────────
+    // Salva nome e código da obra no registro para que a lista e o relatório
+    // continuem exibindo a obra mesmo se ela for posteriormente excluída.
+    // Para tenant-scoped users, reutiliza a obra validada em verifyObraTenantAccess;
+    // para admin/user, busca aqui (apenas para denormalização).
+    let denormObra = null;
+
     if (isTenantScoped) {
       if (operation === 'update') {
         const tenantResult = await verifyTenantAccessForRecord(base44, user, oldRecord);
@@ -476,8 +483,21 @@ Deno.serve(async (req) => {
             { status: obraResult.status || 403 }
           );
         }
+        denormObra = obraResult.obra || null;
       }
+    } else if (sanitizedData.obra_id) {
+      // admin/user: buscar obra apenas para denormalização (sem validação tenant)
+      const obraFetch = await getWithRetry(() => base44.asServiceRole.entities.Obra.get(sanitizedData.obra_id));
+      denormObra = obraFetch.record || null;
     }
+
+    if (denormObra) {
+      sanitizedData.obra_name = denormObra.name;
+      sanitizedData.obra_code = denormObra.code;
+    }
+    // Se a obra não existe mais, mantém os valores existentes em sanitizedData
+    // (obra_name/obra_code podem ter sido enviados pelo cliente ou preservados
+    // do registro antigo em um update).
 
     // ── CONFLICT DETECTION (LWW) ──────────────────────────────────────
     // Detecta conflitos quando o cliente está sincronizando uma edição
