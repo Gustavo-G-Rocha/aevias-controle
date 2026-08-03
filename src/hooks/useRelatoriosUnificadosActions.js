@@ -1,7 +1,9 @@
 import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { buildReportParams } from "@/utils/relatoriosUnificadosUtils";
 
 export const useRelatoriosUnificadosActions = () => {
+  const navigate = useNavigate();
 
   const handleGerarRelatorio = useCallback(
     (
@@ -24,9 +26,9 @@ export const useRelatoriosUnificadosActions = () => {
         empreiteiraSelecionada,
         usinaSelecionada
       );
-      window.location.assign(`/RelatorioUnificado?${params.toString()}`);
+      navigate(`/RelatorioUnificado?${params.toString()}`);
     },
-    []
+    [navigate]
   );
 
   return { handleGerarRelatorio };
