@@ -38,10 +38,15 @@ describe('EtiquetasUmidade - contrato de impressão', () => {
     expect(src).toContain("gridTemplateRows: 'repeat(7, 38.1mm)'");
   });
 
-  it('trava a página em A4 exato (210x297mm) com overflow hidden para evitar vazar para a 2ª folha', () => {
-    expect(src).toContain('width: 210mm !important');
-    expect(src).toContain('height: 297mm !important');
-    expect(src).toContain('overflow: hidden !important');
+  it('usa width/height auto no print para não cortar etiquetas em impressoras físicas', () => {
+    // O fix anterior removeu width:210mm/height:297mm/overflow:hidden do
+    // .page-container no print porque a área imprimível real é menor que A4
+    // e a combinação cortava a maior parte das etiquetas.
+    expect(src).toContain('width: auto !important');
+    expect(src).toContain('height: auto !important');
+    expect(src).toContain('overflow: visible !important');
+    // @page cuida do tamanho A4
+    expect(src).toContain('size: A4');
   });
 
   it('respeita gaps e margens exatas da folha A4', () => {

@@ -19,6 +19,10 @@ export default defineConfig({
     // e2e/ contém specs do Playwright (test runner próprio) — não são
     // compatíveis com o vitest e quebram a suíte se incluídos.
     exclude: ['**/node_modules/**', 'e2e/**', 'test-results/**'],
+    // Imports dinâmicos de componentes pesados (relatórios, contextos)
+    // ultrapassam o default de 5s em ambientes com I/O limitado.
+    testTimeout: 30000,
+    hookTimeout: 30000,
   },
   resolve: {
     alias: [
