@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Plus } from "lucide-react";
+import { Plus, AlertTriangle } from "lucide-react";
 import { FilterBarSkeleton, TableSkeleton } from "@/components/skeletons/SkeletonBlocks";
 import { useEnsaiosList } from "@/hooks/useEnsaiosList";
 import { useEnsaiosActions } from "@/hooks/useEnsaiosActions";
@@ -15,7 +15,7 @@ import { useCreateEnsaioDialog } from "@/components/layout/CreateEnsaioDialogCon
 
 export default function MeusEnsaios() {
   const queryClient = useQueryClient();
-  const { ensaios, obras, projects, allUsers, regionais, user, loading, reload } = useEnsaiosList();
+  const { ensaios, obras, projects, allUsers, regionais, user, loading, reload, truncated } = useEnsaiosList();
   const { handleApprove, handleReject, handleDelete } = useEnsaiosActions(user, obras, reload);
   const { openCreateEnsaio } = useCreateEnsaioDialog();
 
@@ -77,6 +77,25 @@ export default function MeusEnsaios() {
           >
             <Plus className="w-7 h-7 text-white" />
           </button>
+        )}
+
+        {truncated && !loading && (
+          <div
+            className="mb-4 flex items-start gap-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm"
+            role="alert"
+          >
+            <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600 mt-0.5" />
+            <div>
+              <p className="font-semibold text-amber-900">
+                Resultados limitados
+              </p>
+              <p className="text-amber-700 mt-1">
+                O sistema retornou apenas parte dos registros encontrados devido a limites de consulta.
+                Use filtros mais específicos para narrowing os resultados ou contate o suporte se precisar
+                de registros mais antigos.
+              </p>
+            </div>
+          </div>
         )}
 
         {loading ? (

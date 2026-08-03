@@ -149,7 +149,7 @@ function useSupervisorRecords(user, enabled) {
         }
         return { records: [], subordinateEmails: [] };
       }
-      const data = await carregarRegistrosSupervisorService();
+        const data = await carregarRegistrosSupervisorService();
       saveDataCache(`supervisorRecords:${user?.email}`, data, 'records').catch(() => {});
       return data;
     },
@@ -228,6 +228,7 @@ export function useEnsaiosList() {
     regionais: regionais ?? [],
     user,
     loading,
+    truncated: useBackendRecords ? (supervisorRecords?.truncated ?? false) : false,
     reload,
   };
 }
