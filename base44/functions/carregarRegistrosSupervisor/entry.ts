@@ -31,23 +31,30 @@ const ALL_RECORD_ENTITIES = [
   'RegistroFresagemCBUQ',
 ];
 
-const PAGE_SIZE = 100;
-const MAX_PAGES = 3;
-const MAX_TOTAL_RECORDS = 3000;
+// 500 registros/página × 6 páginas = até 3.000 registros por entidade.
+// Cobertura: ~6 meses de registros diários mesmo em obras de alto volume
+// (ex: DiarioObra com 5 obras × 180 dias = 900 registros — bem dentro do limite).
+// O problema original era MAX_PAGES=20 (10k/entidade × 28 entidades = 280k)
+// que causava timeout. 6 páginas × 3 rounds de 10 entidades paralelas
+// = ~18 chamadas sequenciais no pior caso — dentro do timeout.
+const PAGE_SIZE = 500;
+const MAX_PAGES = 6;
 
-async function loadEntityRecords(base44, entityType, query, remainingBudget) {
-  if (!query || remainingBudget <= 0) return [];
+async function loadEntityRecords(base44, entityType, query) {
+  if (!query) return { records: [], truncated: false };
   const all = [];
   let skip = 0;
+  let truncated = false;
   for (let page = 0; page < MAX_PAGES; page++) {
-    const fetchSize = Math.min(PAGE_SIZE, remainingBudget - all.length);
-    if (fetchSize <= 0) break;
-    const batch = await base44.entities[entityType].filter(query, '-created_date', fetchSize, skip);
+    const batch = await base44.entities[entityType].filter(query, '-created_date', PAGE_SIZE, skip);
     all.push(...batch);
-    if (batch.length < fetchSize) break;
+    if (batch.length < PAGE_SIZE) break;
     skip += PAGE_SIZE;
+    if (page === MAX_PAGES - 1 && batch.length === PAGE_SIZE) {
+      truncated = true;
+    }
   }
-  return all;
+  return { records: all, truncated };
 }
 
 Deno.serve(async (req) => {
@@ -111,22 +118,20 @@ Deno.serve(async (req) => {
 
     const BATCH = 10;
     const allRecords = [];
-    let totalFetched = 0;
+    let anyTruncated = false;
 
     for (let i = 0; i < ALL_RECORD_ENTITIES.length; i += BATCH) {
-      if (totalFetched >= MAX_TOTAL_RECORDS) break;
       const batch = ALL_RECORD_ENTITIES.slice(i, i + BATCH);
-      const remainingBudget = MAX_TOTAL_RECORDS - totalFetched;
       const settled = await Promise.allSettled(
-        batch.map(type => loadEntityRecords(base44, type, entityQuery, remainingBudget))
+        batch.map(type => loadEntityRecords(base44, type, entityQuery))
       );
       settled.forEach((r, idx) => {
         if (r.status === 'fulfilled') {
           const type = batch[idx];
-          for (const record of r.value) {
+          for (const record of r.value.records) {
             allRecords.push({ ...record, entityType: type });
           }
-          totalFetched += r.value.length;
+          if (r.value.truncated) anyTruncated = true;
         }
       });
     }
@@ -143,6 +148,7 @@ Deno.serve(async (req) => {
       records: deduped,
       obraIds: [...obraIds],
       subordinateEmails: [...subordinateEmails],
+      truncated: anyTruncated,
     });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
