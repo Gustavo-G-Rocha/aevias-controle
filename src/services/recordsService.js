@@ -345,7 +345,18 @@ export async function atualizarRegistro(entityName, id, data) {
  */
 export async function obterRegistro(entityName, id) {
   return withServiceCall(
-    () => base44.entities[entityName].get(id),
+    async () => {
+      try {
+        return await base44.entities[entityName].get(id);
+      } catch (e1) {
+        // 404 = registro realmente não existe; não retentar.
+        const status = e1?.status ?? e1?.response?.status;
+        if (status === 404 || /not\s*found|não\s*encontrad/i.test(String(e1?.message || ''))) throw e1;
+        // Falha transitória (5xx, rede, rate-limit): retenta uma vez.
+        await new Promise(r => setTimeout(r, 500));
+        return await base44.entities[entityName].get(id);
+      }
+    },
     'Falha ao carregar registro'
   );
 }

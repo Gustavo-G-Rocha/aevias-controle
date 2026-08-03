@@ -37,12 +37,28 @@ export async function listarChecklistsPorObra(entityName, obraId) {
   );
 }
 
+function isNotFoundError(error) {
+  const status = error?.status ?? error?.response?.status;
+  if (status === 404) return true;
+  return /not\s*found|não\s*encontrad/i.test(String(error?.message || ''));
+}
+
 export async function obterChecklistById(entityName, id) {
   if (!CHECKLIST_ENTITIES[entityName]) {
     throw new Error(`Entidade checklist desconhecida: ${entityName}`);
   }
   return withServiceCall(
-    () => base44.entities[entityName].get(id),
+    async () => {
+      try {
+        return await base44.entities[entityName].get(id);
+      } catch (e1) {
+        // 404 = registro realmente não existe; não retentar.
+        if (isNotFoundError(e1)) throw e1;
+        // Falha transitória (5xx, rede, rate-limit): retenta uma vez.
+        await new Promise(r => setTimeout(r, 500));
+        return await base44.entities[entityName].get(id);
+      }
+    },
     'Falha ao carregar checklist'
   );
 }
