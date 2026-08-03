@@ -27,6 +27,8 @@ const ALL_RECORD_ENTITIES = [
   'EnsaioRompimentoConcreto',
   'GranuMistura',
   'CertificacaoUsina',
+  'EnsaioTaxaInsumos',
+  'RegistroFresagemCBUQ',
 ];
 
 const PAGE_SIZE = 500;

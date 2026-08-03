@@ -102,7 +102,23 @@ export async function verifyTenantAccess(
     const supervisores = (regional.supervisores_responsaveis || []).map((e: string) => e.toLowerCase());
     // Estar em supervisores_responsaveis também conta como membro do tenant
     if (emails.includes(userEmail) || supervisores.includes(userEmail)) {
-      const isSupervisor = level === 'cliente_supervisor' && supervisores.includes(userEmail);
+      let isSupervisor = level === 'cliente_supervisor' && supervisores.includes(userEmail);
+      // Defense-in-depth: cliente_supervisor só pode APROVAR registros criados
+      // por funcionários do cliente (em clientes_responsaveis), NÃO por staff
+      // da Afirma Evias. Espelha canApproveRecord do frontend (accessControl.js).
+      // Se o registro foi criado por staff Afirma Evias, isSupervisor=false →
+      // gerenciarAprovacao bloqueia a aprovação.
+      if (isSupervisor) {
+        const createdBy = (record.created_by || '').toLowerCase();
+        if (!createdBy) {
+          isSupervisor = false;
+        } else {
+          const clientesEmails = new Set(emails);
+          if (!clientesEmails.has(createdBy)) {
+            isSupervisor = false;
+          }
+        }
+      }
       return { allowed: true, isSupervisor };
     }
   } else if (effectiveLevel === 'sala_tecnica_afirmaevias') {
