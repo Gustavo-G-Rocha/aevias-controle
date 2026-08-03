@@ -9,7 +9,6 @@ import { useRelatorioUnificadoSignature } from '@/hooks/useRelatorioUnificadoSig
 import RelatorioUnificadoToolbar from '@/components/relatorio-unificado/RelatorioUnificadoToolbar';
 import RelatorioUnificadoCapa from '@/components/relatorio-unificado/RelatorioUnificadoCapa';
 import RelatorioUnificadoRecordsList from '@/components/relatorio-unificado/RelatorioUnificadoRecordsList';
-import SignatureReauthModal from '@/components/relatorios/SignatureReauthModal';
 import SignatureSeal from '@/components/relatorios/SignatureSeal';
 
 export default function RelatorioUnificado() {
@@ -22,13 +21,9 @@ export default function RelatorioUnificado() {
   const {
     signature,
     signing,
-    modalOpen,
-    signError,
     canSign,
     checkingAccess,
-    handleSign,
     handleOpenModal,
-    handleCloseModal,
   } = useRelatorioUnificadoSignature({ filters, recordCount: records.length, user });
 
   const loading = dataLoading || recordsLoading;
@@ -70,6 +65,7 @@ export default function RelatorioUnificado() {
         signature={signature}
         canSign={canSign}
         checkingAccess={checkingAccess}
+        signing={signing}
       />
 
       <div className="report-content-container">
@@ -104,15 +100,6 @@ export default function RelatorioUnificado() {
         }
       `}</style>
 
-      <SignatureReauthModal
-        open={modalOpen}
-        onClose={handleCloseModal}
-        onConfirm={handleSign}
-        signerName={user?.laboratorista_name || user?.full_name || user?.email || ''}
-        documentDescription="Relatório Unificado Consolidado"
-        loading={signing}
-        error={signError}
-      />
     </div>
   );
 }

@@ -194,26 +194,28 @@ Deno.serve(async (req) => {
     }
 
     // ── STEP-UP AUTHENTICATION (2FA/TOTP) ─────────────────────────────
-    // Se o signatário tem 2FA ativo, o ato de assinatura exige um código
-    // TOTP (ou de recuperação) válido no momento do ato — reforço do
-    // não repúdio (Lei 14.063/2020).
-    let effectiveReauthFactor = reauthFactor;
-    const twoFactorConfig = await getTwoFactorConfig(base44, user.email);
-    if (twoFactorConfig?.status === 'active') {
-      if (!totpCode) {
-        return Response.json(
-          { error: 'Código de verificação em duas etapas (2FA) é obrigatório para assinar.', errorCategory: 'totp_required' },
-          { status: 403 }
-        );
+    // Só exigir TOTP quando houver reautenticação por senha.
+    // RelatorioUnificado assina via sessão ativa (sem reentrada de senha),
+    // portanto o TOTP não é exigido nesse fluxo.
+    let effectiveReauthFactor = reauthFactor || 'session';
+    if (reauthFactor) {
+      const twoFactorConfig = await getTwoFactorConfig(base44, user.email);
+      if (twoFactorConfig?.status === 'active') {
+        if (!totpCode) {
+          return Response.json(
+            { error: 'Código de verificação em duas etapas (2FA) é obrigatório para assinar.', errorCategory: 'totp_required' },
+            { status: 403 }
+          );
+        }
+        const totpResult = await verifyTwoFactorForUser(base44, twoFactorConfig, String(totpCode));
+        if (!totpResult.ok) {
+          return Response.json(
+            { error: totpResult.reason, errorCategory: 'totp_invalid' },
+            { status: 403 }
+          );
+        }
+        effectiveReauthFactor = `${reauthFactor}+totp`;
       }
-      const totpResult = await verifyTwoFactorForUser(base44, twoFactorConfig, String(totpCode));
-      if (!totpResult.ok) {
-        return Response.json(
-          { error: totpResult.reason, errorCategory: 'totp_invalid' },
-          { status: 403 }
-        );
-      }
-      effectiveReauthFactor = `${reauthFactor}+totp`;
     }
 
     // ── VERIFICAR SE JÁ ESTÁ ASSINADO ──

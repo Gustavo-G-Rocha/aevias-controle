@@ -3,8 +3,7 @@
  *
  * Gerencia:
  * - Carregamento de assinatura existente (busca em AssinaturaEletronica)
- * - Abertura/fechamento do modal de reautenticação por senha
- * - Verificação da senha (re-login) e chamada ao backend assinarEletronicamente
+ * - Assinatura direta via sessão ativa (sem reentrada de senha)
  *
  * O compositeId identifica unicamente um relatório (obra + período + tipos),
  * permitindo que o mesmo relatório seja assinado apenas uma vez.
@@ -23,8 +22,6 @@ export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
   const [signature, setSignature] = useState(null);
   const [loading, setLoading] = useState(false);
   const [signing, setSigning] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [signError, setSignError] = useState('');
   const [checkingAccess, setCheckingAccess] = useState(false);
 
   const compositeId = filters?.obra_id && filters?.data_inicio && filters?.data_fim
@@ -55,29 +52,20 @@ export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
     load();
   }, [compositeId]);
 
-  const handleSign = useCallback(async (password, totpCode) => {
+  const handleSign = useCallback(async () => {
     if (!user?.email) {
-      setSignError('Usuário não carregado. Tente novamente.');
-      return;
-    }
-    if (!password?.trim()) {
-      setSignError('Senha é obrigatória.');
+      toast({
+        title: 'Erro ao assinar',
+        description: 'Usuário não carregado. Tente novamente.',
+        variant: 'destructive',
+      });
       return;
     }
 
-    setSignError('');
     setSigning(true);
     try {
-      // 1. Verificar senha reautenticando (Lei 14.063/2020 — intenção deliberada)
-      try {
-        await base44.auth.loginViaEmailPassword(user.email, password);
-      } catch {
-        setSignError('Senha incorreta. Tente novamente.');
-        setSigning(false);
-        return;
-      }
-
-      // 2. Chamar backend para registrar assinatura
+      // Assinatura via sessão ativa — sem reentrada de senha.
+      // A autenticação do login (com senha/2FA) é suficiente.
       const reportData = {
         obra_id: filters.obra_id,
         data_inicio: filters.data_inicio,
@@ -91,12 +79,8 @@ export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
         recordId: compositeId,
         signatureType: 'approve',
         reportData,
-        reauthFactor: 'password',
-        ...(totpCode ? { totpCode } : {}),
       });
 
-      // Se o backend retornou um erro (status não-2xx), o SDK pode não
-      // lançar exceção em todos os cenários — verifica o corpo da resposta.
       if (response?.data?.error) {
         throw { response: { data: response.data } };
       }
@@ -106,27 +90,29 @@ export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
 
       if (response?.data?.signature) {
         setSignature(response.data.signature);
-        setModalOpen(false);
+        toast({
+          title: 'Relatório assinado',
+          description: 'Assinatura eletrônica registrada com sucesso.',
+        });
       }
     } catch (err) {
       logger.error('[RelatorioUnificado] Erro ao assinar:', err);
       const errorMsg = err?.response?.data?.error || err?.data?.error || err?.error || err?.message || 'Erro ao assinar. Tente novamente.';
-      setSignError(errorMsg);
+      toast({
+        title: 'Erro ao assinar',
+        description: errorMsg,
+        variant: 'destructive',
+      });
     } finally {
       setSigning(false);
     }
-  }, [user, compositeId, filters, recordCount]);
+  }, [user, compositeId, filters, recordCount, toast]);
 
   const handleOpenModal = useCallback(async () => {
     if (!compositeId) return;
-    setSignError('');
     setCheckingAccess(true);
     try {
-      // Pre-check: verify the backend is accessible before opening the
-      // signing prompt. A lightweight AssinaturaEletronica query confirms
-      // the API is responsive — if it transiently fails, we surface the
-      // error and do NOT open the modal (preventing the signing flow from
-      // starting when the backend can't be reached).
+      // Pre-check: verificar acessibilidade do backend antes de assinar.
       await base44.entities.AssinaturaEletronica.filter(
         { entity_name: 'RelatorioUnificado', entity_id: compositeId, status_assinatura: 'assinado' },
         '-signed_at',
@@ -135,7 +121,6 @@ export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
     } catch (err) {
       logger.error('[RelatorioUnificado] Pre-check de acesso ao backend falhou:', err);
       const msg = 'Falha temporária ao acessar o registro. Tente novamente.';
-      setSignError(msg);
       toast({
         title: 'Não foi possível iniciar a assinatura',
         description: msg,
@@ -145,25 +130,18 @@ export function useRelatorioUnificadoSignature({ filters, recordCount, user }) {
       return;
     }
     setCheckingAccess(false);
-    setModalOpen(true);
-  }, [compositeId, toast]);
-
-  const handleCloseModal = useCallback(() => {
-    setModalOpen(false);
-    setSignError('');
-  }, []);
+    // Assina diretamente — sem modal de reentrada de senha.
+    await handleSign();
+  }, [compositeId, toast, handleSign]);
 
   return {
     signature,
     loading,
     signing,
-    modalOpen,
-    signError,
     canSign,
     checkingAccess,
     compositeId,
     handleSign,
     handleOpenModal,
-    handleCloseModal,
   };
 }
