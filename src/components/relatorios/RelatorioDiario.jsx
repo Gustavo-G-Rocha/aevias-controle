@@ -80,7 +80,10 @@ export default function RelatorioDiario({ diario, obra, user, regional, creatorU
           </div>
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-800">Diário de Obra</h1>
-            <p className="text-md text-slate-700">{obra?.name || diario.obra_name}</p>
+            <p className="text-md text-slate-700">{obra?.name || diario.obra_name || 'N/A'}</p>
+            {(obra?.code || diario.obra_code) && (
+              <p className="text-sm text-slate-500">{obra?.code || diario.obra_code}</p>
+            )}
           </div>
           <div className="flex justify-end">
             <div className="border border-gray-400 p-2 rounded-md">
@@ -121,6 +124,9 @@ export default function RelatorioDiario({ diario, obra, user, regional, creatorU
               <div>
                 <p className="text-xs font-semibold text-gray-500 uppercase">Obra</p>
                 <p className="text-gray-800">{obra?.name || diario.obra_name || 'N/A'}</p>
+                {(obra?.code || diario.obra_code) && (
+                  <p className="text-xs text-gray-600">{obra?.code || diario.obra_code}</p>
+                )}
               </div>
 
               {tipoLocal === "campo" && (
