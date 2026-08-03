@@ -2,7 +2,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, PlusCircle, FlaskConical, Gauge, ClipboardList, Download, AlertTriangle } from "lucide-react";
+import { FileText, PlusCircle, FlaskConical, Gauge, ClipboardList, Download, AlertTriangle, Info } from "lucide-react";
 import { bulkExportReports } from "@/utils/bulkExportZip";
 import { useToast } from "@/components/ui/use-toast";
 import { getEnsaioTypeInfo, getReportLink } from "@/components/ensaios/ensaioMappers";

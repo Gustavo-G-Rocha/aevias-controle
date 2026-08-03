@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Plus, AlertTriangle } from "lucide-react";
+import { Plus, AlertTriangle, Info } from "lucide-react";
 import { FilterBarSkeleton, TableSkeleton } from "@/components/skeletons/SkeletonBlocks";
 import { useEnsaiosList } from "@/hooks/useEnsaiosList";
 import { useEnsaiosActions } from "@/hooks/useEnsaiosActions";
@@ -95,6 +95,23 @@ export default function MeusEnsaios() {
                 de registros mais antigos.
               </p>
             </div>
+          </div>
+        )}
+
+        {/* Aviso geral para roles que usam o backend supervisor (com limites de paginação) */}
+        {(userIsClienteSupervisor || userIsCliente) && !loading && !truncated && ensaios.length > 0 && (
+          <div
+            className="mb-4 flex items-start gap-3 rounded-lg border p-3 text-sm"
+            style={{
+              borderColor: 'var(--color-border)',
+              backgroundColor: 'var(--color-surface-muted)',
+            }}
+          >
+            <Info className="h-5 w-5 shrink-0 mt-0.5" style={{ color: 'var(--color-info)' }} />
+            <p style={{ color: 'var(--color-text-muted)' }}>
+              Mostrando os registros mais recentes. Use os filtros acima para refinar a busca
+              ou contate o suporte se precisar de registros mais antigos.
+            </p>
           </div>
         )}
 
