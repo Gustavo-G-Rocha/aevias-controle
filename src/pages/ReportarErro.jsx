@@ -102,6 +102,17 @@ export default function ReportarErro() {
     base44.auth.me().then(setUser).catch(() => {});
   }, []);
 
+  const isAdmin = user && getUserAccessLevel(user) === "admin";
+
+  const { data: bugReports = [], isLoading: loadingReports } = useQuery({
+    queryKey: ["bugReports"],
+    queryFn: async () => {
+      const list = await base44.entities.BugReport.list("-created_date", 200);
+      return list;
+    },
+    enabled: !!user,
+  });
+
   // Rola até e destaca o chamado específico quando acessado via
   // ?chamado=<id> (ex.: clique numa notificação de "chamado respondido").
   useEffect(() => {
@@ -118,17 +129,6 @@ export default function ReportarErro() {
       return () => clearTimeout(timeout);
     }
   }, [bugReports]);
-
-  const isAdmin = user && getUserAccessLevel(user) === "admin";
-
-  const { data: bugReports = [], isLoading: loadingReports } = useQuery({
-    queryKey: ["bugReports"],
-    queryFn: async () => {
-      const list = await base44.entities.BugReport.list("-created_date", 200);
-      return list;
-    },
-    enabled: !!user,
-  });
 
   const handleFileUpload = useCallback(async (files) => {
     if (!files || files.length === 0) return;
