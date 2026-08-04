@@ -72,11 +72,10 @@ export default function GranulometriaSection({
                           value={formData.granulometria.peso_retido_peneiras?.[peneira.key] ?? ''}
                           onChange={(e) => {
                             const raw = e.target.value;
-                            const newPesos = {
-                              ...formData.granulometria.peso_retido_peneiras,
+                            onNestedChange('granulometria', 'peso_retido_peneiras', (prev) => ({
+                              ...prev,
                               [peneira.key]: raw === '' ? null : raw,
-                            };
-                            onNestedChange('granulometria', 'peso_retido_peneiras', newPesos);
+                            }));
                           }}
                           disabled={!canEdit} className="h-8 text-sm" />
                       </td>

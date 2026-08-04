@@ -43,11 +43,17 @@ export function useEnsaioCAUQForm({
     setFormData(prev => ({ ...prev, [field]: value }));
   }, [setFormData]);
 
-  const handleNestedChange = useCallback((section, field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: { ...prev[section], [field]: value },
-    }));
+  const handleNestedChange = useCallback((section, field, valueOrUpdater) => {
+    setFormData(prev => {
+      const currentValue = prev[section]?.[field];
+      const newValue = typeof valueOrUpdater === 'function'
+        ? valueOrUpdater(currentValue)
+        : valueOrUpdater;
+      return {
+        ...prev,
+        [section]: { ...prev[section], [field]: newValue },
+      };
+    });
   }, [setFormData]);
 
   // ── seleção de projeto ───────────────────────────────────────────────────────
