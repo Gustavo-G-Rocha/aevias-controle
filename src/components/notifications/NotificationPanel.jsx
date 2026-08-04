@@ -2,7 +2,7 @@ import React from "react";
 import { X } from "lucide-react";
 import NotificationItem from "./NotificationItem";
 
-export default function NotificationPanel({ notifications, onRead, onClose }) {
+export default function NotificationPanel({ notifications, onRead, onDelete, onClose }) {
   return (
     <div
       className="w-80 max-w-[calc(100vw-2rem)] max-h-96 flex flex-col rounded-xl shadow-xl border overflow-hidden"
@@ -26,7 +26,7 @@ export default function NotificationPanel({ notifications, onRead, onClose }) {
       </div>
       <div className="overflow-y-auto">
         {notifications.map((n) => (
-          <NotificationItem key={n.id} notification={n} onRead={onRead} />
+          <NotificationItem key={n.id} notification={n} onRead={onRead} onDelete={onDelete} />
         ))}
       </div>
     </div>

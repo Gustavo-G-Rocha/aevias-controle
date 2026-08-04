@@ -56,6 +56,15 @@ export default function NotificationProvider({ children }) {
     navigate(getNotificationLink(n));
   }, [navigate]);
 
+  const handleDelete = useCallback((n) => {
+    setNotifications((prev) => {
+      const next = prev.filter((p) => p.id !== n.id);
+      if (next.length === 0) setOpen(false);
+      return next;
+    });
+    base44.entities.Notificacao.delete(n.id).catch(() => {});
+  }, []);
+
   return (
     <NotificationContext.Provider value={{
       count: notifications.length,
@@ -63,6 +72,7 @@ export default function NotificationProvider({ children }) {
       open,
       setOpen,
       handleRead,
+      handleDelete,
     }}>
       {children}
     </NotificationContext.Provider>

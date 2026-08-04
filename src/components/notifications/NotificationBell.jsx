@@ -11,7 +11,7 @@ import NotificationPanel from "./NotificationPanel";
  * Não renderiza nada quando não há notificações pendentes.
  */
 export default function NotificationBell({ variant = "desktop" }) {
-  const { count, notifications, open, setOpen, handleRead } = useNotificationContext();
+  const { count, notifications, open, setOpen, handleRead, handleDelete } = useNotificationContext();
   const isMobile = variant === "mobile";
 
   return (
@@ -23,6 +23,7 @@ export default function NotificationBell({ variant = "desktop" }) {
           <NotificationPanel
             notifications={notifications}
             onRead={handleRead}
+            onDelete={handleDelete}
             onClose={() => setOpen(false)}
           />
         </div>
