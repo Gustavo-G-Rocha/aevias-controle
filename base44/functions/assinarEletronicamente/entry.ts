@@ -236,6 +236,9 @@ Deno.serve(async (req) => {
     // ── VERIFICAR SE JÁ ESTÁ ASSINADO ──
     // Um documento assinado não pode ser assinado novamente sem reprovação
     // explícita e novo evento de auditoria.
+    // EXCEÇÃO: se o registro foi reprovado (was_rejected === true ou
+    // approved === false) após a assinatura, a assinatura anterior foi
+    // invalidada pela reprovação — permitir nova aprovação.
     let existingSignatures: any[] = [];
     try {
       existingSignatures = await base44.asServiceRole.entities.AssinaturaEletronica.filter(
@@ -245,7 +248,8 @@ Deno.serve(async (req) => {
       );
     } catch { /* entity pode não existir ainda em migração */ }
 
-    if (existingSignatures && existingSignatures.length > 0) {
+    const wasRejectedAfterSign = existingRecord?.was_rejected === true || existingRecord?.approved === false;
+    if (existingSignatures && existingSignatures.length > 0 && !wasRejectedAfterSign) {
       return Response.json(
         {
           error: 'Documento já assinado eletronicamente. Para alterar, é necessário reprovar explicitamente e gerar novo evento de auditoria.',

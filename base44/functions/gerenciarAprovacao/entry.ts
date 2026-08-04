@@ -225,6 +225,25 @@ Deno.serve(async (req) => {
         position: level,
         crea_number: user.crea_number || '',
       };
+
+      // ── INVALIDAR ASSINATURAS ELETRÔNICAS ANTERIORES ───────────────
+      // Ao reprovar, as assinaturas eletrônicas vigentes (status 'assinado')
+      // do registro são invalidadas para que o approver possa reaprovar
+      // após o laboratorista re-finalizar. Sem isto, o assinarEletronicamente
+      // bloqueia a reaprovação com "Documento já assinado eletronicamente".
+      try {
+        const oldSigs = await base44.asServiceRole.entities.AssinaturaEletronica.filter(
+          { entity_name: entityName, entity_id: recordId, status_assinatura: 'assinado' },
+          '-signed_at', 50
+        );
+        if (oldSigs && oldSigs.length > 0) {
+          await base44.asServiceRole.entities.AssinaturaEletronica.bulkUpdate(
+            oldSigs.map(s => ({ id: s.id, status_assinatura: 'invalidado' }))
+          );
+        }
+      } catch (sigError) {
+        console.error('[gerenciarAprovacao] Erro ao invalidar assinaturas:', sigError?.message);
+      }
     } else if (action === 'sign') {
       // Assinatura do cliente — requiere nível cliente ou admin/gestor
       if (level !== 'cliente' && !canApprove(user)) {
