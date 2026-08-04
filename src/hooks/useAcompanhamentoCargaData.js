@@ -4,9 +4,10 @@ import { useFormPersistence } from "@/components/hooks/useFormPersistence";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import {
   getInitialFormData,
-  filtrarObras,
   filtrarProjetosDisponiveis,
 } from "@/utils/acompanhamentoCargaUtils";
+import { filtrarObrasPorAcessoRegional } from "@/utils/regionalFilter";
+import { ACCESS_LEVELS, USER_LIKE_LEVELS, getUserAccessLevel } from "@/lib/layoutConstants";
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
 
@@ -25,9 +26,19 @@ export function useAcompanhamentoCargaData() {
   );
 
   const obras = useMemo(() => {
-    if (!auxData?.obras) return [];
-    return filtrarObras(auxData.obras);
-  }, [auxData?.obras]);
+    if (!auxData?.obras || !auxData?.regionais || !user) return [];
+    const userAccessLevel = getUserAccessLevel(user);
+    const isLaboratorista = USER_LIKE_LEVELS.includes(userAccessLevel);
+    const isFuncionarioCliente = userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE;
+    const porAcesso = filtrarObrasPorAcessoRegional(auxData.obras, auxData.regionais, user);
+    // Mantém filtro de tipo (conservacao/implantacao) + status para laboratorista
+    const tiposOk = (o) => o.tipo_obra === 'conservacao' || o.tipo_obra === 'implantacao';
+    if (isLaboratorista) {
+      const statusOk = isFuncionarioCliente ? () => true : (o) => o.status === 'em_andamento';
+      return porAcesso.filter(o => tiposOk(o) && statusOk(o));
+    }
+    return porAcesso.filter(tiposOk);
+  }, [auxData?.obras, auxData?.regionais, user]);
 
   const regionais = useMemo(() => auxData?.regionais ?? [], [auxData?.regionais]);
   const projects = useMemo(() => auxData?.projects ?? [], [auxData?.projects]);
