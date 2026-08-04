@@ -8,6 +8,7 @@
  */
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function GranulometriaSection({
   formData,
@@ -20,11 +21,39 @@ export default function GranulometriaSection({
   const canEdit = isEditable && !isApproved;
   const pesoInicial = parseFloat(formData.extracao_ligante?.amostra_sem_ligante) || 0;
 
+  const handleFillExample = () => {
+    if (!canEdit || peneirasDoProjecto.length === 0) return;
+    // Distribui valores decrescentes de exemplo entre as peneiras
+    const total = peneirasDoProjecto.length;
+    const newValues = {};
+    peneirasDoProjecto.forEach((peneira, index) => {
+      // Primeiras peneiras (maiores aberturas) retêm mais material
+      const baseValue = (total - index) * (pesoInicial / (total * 3));
+      newValues[peneira.key] = baseValue.toFixed(2);
+    });
+    onNestedChange('granulometria', 'peso_retido_peneiras', () => newValues);
+  };
+
   return (
     <Card className="bg-muted/30">
       <CardHeader>
-        <CardTitle className="text-lg">Granulometria *</CardTitle>
-        <CardDescription>DNIT 412/2025</CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-lg">Granulometria *</CardTitle>
+            <CardDescription>DNIT 412/2025</CardDescription>
+          </div>
+          {canEdit && peneirasDoProjecto.length > 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleFillExample}
+              data-testid="fill-sieves-example"
+            >
+              Preencher Exemplo
+            </Button>
+          )}
+        </div>
         {pesoInicial > 0 && (
           <div className="mt-2 p-2 bg-primary/10 border border-primary/20 rounded text-sm text-primary">
             <strong>Peso Inicial da Amostra (sem ligante):</strong> {pesoInicial} g
