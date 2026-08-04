@@ -28,6 +28,9 @@ export default function AprovacaoBar({ entityName, recordId }) {
   const { user } = useAuth();
   const [record, setRecord] = useState(null);
   const [regional, setRegional] = useState(null);
+  // Usuário criador do registro — necessário para saber se é funcionário do
+  // cliente (aprovável por cliente_supervisor) ou staff Afirma Evias.
+  const [creatorUsers, setCreatorUsers] = useState([]);
   const [saving, setSaving] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
@@ -53,6 +56,14 @@ export default function AprovacaoBar({ entityName, recordId }) {
             logger.error('AprovacaoBar: erro ao carregar regional', e);
           }
         }
+        if (data?.created_by) {
+          try {
+            const found = await base44.entities.User.filter({ email: data.created_by }, undefined, 1);
+            setCreatorUsers(found || []);
+          } catch {
+            setCreatorUsers([]);
+          }
+        }
       } catch (err) {
         logger.error('AprovacaoBar: erro ao carregar registro', err);
       }
@@ -65,7 +76,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
   // Verifica se pode aprovar/reprovar neste registro específico.
   // cliente_supervisor: só aprova registros criados por funcionários do cliente
   // em regionais onde é supervisor. Approvers globais aprovam qualquer registro.
-  const canApprove = canApproveRecord(user, record, regional);
+  const canApprove = canApproveRecord(user, record, regional, creatorUsers);
 
 
 
