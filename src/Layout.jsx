@@ -70,7 +70,7 @@ const AppLayout = ({ children, currentPageName }) => {
         <main className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
           <SidebarToggle />
           <MobileBackHeader />
-          <div className="hidden lg:block fixed top-4 right-4 z-40 print:hidden">
+          <div className="hidden lg:block fixed top-4 right-4 z-50 print:hidden">
             <NotificationBell variant="desktop" />
           </div>
           <div className="flex-1 flex flex-col">
