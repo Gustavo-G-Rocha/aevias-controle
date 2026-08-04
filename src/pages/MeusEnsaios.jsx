@@ -15,7 +15,7 @@ import { useCreateEnsaioDialog } from "@/components/layout/CreateEnsaioDialogCon
 
 export default function MeusEnsaios() {
   const queryClient = useQueryClient();
-  const { ensaios, obras, projects, allUsers, regionais, user, loading, reload, truncated } = useEnsaiosList();
+  const { ensaios, obras, projects, allUsers, regionais, user, loading, reload, truncated, approvableIds } = useEnsaiosList();
   const { handleApprove, handleReject, handleDelete } = useEnsaiosActions(user, obras, reload);
   const { openCreateEnsaio } = useCreateEnsaioDialog();
 
@@ -42,12 +42,19 @@ export default function MeusEnsaios() {
   // Outros approvers (admin, sala_tecnica, gestor_contrato) têm canApprove global.
   const obrasMap = React.useMemo(() => new Map((obras || []).map(o => [o.id, o])), [obras]);
   const regionaisMap = React.useMemo(() => new Map((regionais || []).map(r => [r.id, r])), [regionais]);
+  const approvableIdsSet = React.useMemo(
+    () => (approvableIds ? new Set(approvableIds) : null),
+    [approvableIds]
+  );
   const canApproveRecord = React.useCallback((ensaio) => {
     if (!canApprove) return false;
+    // Supervisor do cliente: a permissão por registro é calculada no servidor
+    // (o RLS impede o frontend de ler o nível de acesso de outros usuários).
+    if (userIsClienteSupervisor && approvableIdsSet) return approvableIdsSet.has(ensaio.id);
     const obra = obrasMap.get(ensaio.obra_id);
     const regional = obra ? regionaisMap.get(obra.regional_id) : null;
     return canApproveRecordCheck(user, ensaio, regional, allUsers);
-  }, [canApprove, obrasMap, regionaisMap, user, allUsers]);
+  }, [canApprove, obrasMap, regionaisMap, user, allUsers, userIsClienteSupervisor, approvableIdsSet]);
 
   const subtitle = userIsAdmin || userIsSalaTecnica || userIsGestorContrato
     ? "Gerencie e aprove todos os registros de suas obras."

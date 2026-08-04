@@ -66,6 +66,15 @@ export function filtrarPorAcesso(combinedEnsaios, currentUser, currentUserAccess
   // cliente_supervisor: vê TODOS os registros de suas obras (incl. pendentes)
   // + registros criados por seus funcionarios_cliente subordinados
   if (currentUserAccessLevel === 'cliente_supervisor') {
+    // Com registros vindos do backend, o escopo já está resolvido lá (obras de
+    // todas as regionais do cliente + subordinados). Aqui só ocultamos rascunhos
+    // de terceiros — os demais lotes ficam visíveis em modo consulta.
+    if (backendSubordinateEmails !== null) {
+      const email = (currentUser.email || '').toLowerCase();
+      return combinedEnsaios.filter(e =>
+        e.status !== 'rascunho' || (e.created_by || '').toLowerCase() === email
+      );
+    }
     const obrasIds = getAccessibleObraIds(obrasData, regionaisData, currentUser);
     const userEmail = (currentUser.email || '').toLowerCase();
     // Emails dos subordinados: preferir a lista vinda do backend (asServiceRole),
@@ -229,6 +238,8 @@ export function useEnsaiosList() {
     user,
     loading,
     truncated: useBackendRecords ? (supervisorRecords?.truncated ?? false) : false,
+    // IDs aprováveis calculados no servidor (supervisor do cliente)
+    approvableIds: supervisorRecords?.approvableIds ?? null,
     reload,
   };
 }

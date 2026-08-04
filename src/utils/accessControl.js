@@ -90,7 +90,7 @@ const AFIRMAEVIAS_STAFF_LEVELS = new Set([
  * 1. Se allUsers disponível → checa access_level do criador (mais preciso)
  * 2. Fallback → checa se email está em clientes_responsaveis da regional
  */
-function isCreatorClienteSide(createdByEmail, allUsers, clientesEmails) {
+function isCreatorClienteSide(createdByEmail, allUsers, clientesEmails, staffEmails) {
   if (!createdByEmail) return false;
   const email = createdByEmail.toLowerCase();
   // Se temos allUsers, checamos o access_level do criador
@@ -102,9 +102,11 @@ function isCreatorClienteSide(createdByEmail, allUsers, clientesEmails) {
     }
   }
   // Fallback: checa se email está em clientes_responsaveis (comportamento original)
-  if (clientesEmails) {
-    return clientesEmails.includes(email);
-  }
+  if (clientesEmails && clientesEmails.includes(email)) return true;
+  // Fallback final: o RLS impede o supervisor de ler o access_level dos criadores.
+  // Se o criador não é staff da Afirma Evias vinculado à regional, tratamos como
+  // pessoal do cliente (o backend revalida a permissão na assinatura).
+  if (staffEmails) return !staffEmails.includes(email);
   return false;
 }
 
@@ -136,7 +138,13 @@ export function canApproveRecord(user, record, regional, allUsers) {
     // Só aprova registros criados por funcionários do cliente (não staff Afirma Evias)
     const createdBy = (record?.created_by || '').toLowerCase();
     const clientesEmails = (regional?.clientes_responsaveis || []).map(e => e.toLowerCase());
-    return isCreatorClienteSide(createdBy, allUsers, clientesEmails);
+    const staffEmails = [
+      ...(regional?.laboratoristas_responsaveis || []),
+      ...(regional?.salas_tecnicas_responsaveis || []),
+      ...(regional?.gestores_contrato_responsaveis || []),
+      regional?.gestor_contrato_responsavel,
+    ].filter(Boolean).map(e => e.toLowerCase());
+    return isCreatorClienteSide(createdBy, allUsers, clientesEmails, staffEmails);
   }
 
   return false;

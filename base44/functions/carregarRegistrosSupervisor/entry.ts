@@ -70,23 +70,48 @@ Deno.serve(async (req) => {
 
     const userEmail = (user.email || '').toLowerCase();
 
-    // Regionais onde o usuário está em clientes_responsaveis OU supervisores_responsaveis
-    // Usa o contexto do próprio usuário (RLS filtra apenas suas regionais)
-    const regionais = await base44.entities.Regional.list();
-    const supervisorRegionais = regionais.filter(r =>
+    // Regionais vinculadas ao usuário (clientes_responsaveis OU supervisores_responsaveis)
+    const regionais = await base44.asServiceRole.entities.Regional.list();
+    const minhasRegionais = regionais.filter(r =>
       [...(r.clientes_responsaveis || []), ...(r.supervisores_responsaveis || [])]
         .some(e => e?.toLowerCase() === userEmail)
     );
-    const regionaisIds = new Set(supervisorRegionais.map(r => r.id));
+    const regionaisIds = new Set(minhasRegionais.map(r => r.id));
 
-    // Obras das regionais do supervisor (RLS aplicada sob o contexto do usuário)
-    const obras = await base44.entities.Obra.list('-created_date', 500);
+    // Regionais onde ele é SUPERVISOR (poder de aprovação)
+    const aprovaRegionaisIds = new Set(
+      regionais
+        .filter(r => (r.supervisores_responsaveis || []).some(e => e?.toLowerCase() === userEmail))
+        .map(r => r.id)
+    );
+
+    // Demais lotes/regionais do MESMO cliente → visualização apenas (read-only)
+    const meusClientes = new Set(
+      minhasRegionais.map(r => (r.cliente || '').trim().toLowerCase()).filter(Boolean)
+    );
+    const escopoRegionaisIds = new Set(regionaisIds);
+    regionais.forEach(r => {
+      if (meusClientes.has((r.cliente || '').trim().toLowerCase())) escopoRegionaisIds.add(r.id);
+    });
+
+    // Obras do escopo (todas as regionais do cliente) e obras aprováveis
+    const obras = await base44.asServiceRole.entities.Obra.list('-created_date', 1000);
     const obraIds = new Set(
-      obras.filter(o => regionaisIds.has(o.regional_id)).map(o => o.id)
+      obras.filter(o => escopoRegionaisIds.has(o.regional_id)).map(o => o.id)
+    );
+    const obraIdsAprovaveis = new Set(
+      obras.filter(o => aprovaRegionaisIds.has(o.regional_id)).map(o => o.id)
     );
 
     // Emails dos funcionarios_cliente subordinados
     const users = await base44.asServiceRole.entities.User.list();
+    // Emails de staff da Afirma Evias (registros deles não são aprováveis pelo supervisor do cliente)
+    const STAFF_LEVELS = new Set(['user', 'sala_tecnica_afirmaevias', 'gestor_contrato', 'admin']);
+    const staffEmails = new Set(
+      users
+        .filter(u => STAFF_LEVELS.has(u.access_level || (u.role === 'admin' ? 'admin' : 'user')))
+        .map(u => (u.email || '').toLowerCase())
+    );
     const subordinateEmails = new Set(
       users
         .filter(u => u.access_level === 'funcionarios_cliente' && (u.supervisor_email || '').toLowerCase() === userEmail)
@@ -144,10 +169,22 @@ Deno.serve(async (req) => {
       return true;
     });
 
+    // IDs que o supervisor pode aprovar/reprovar: registros finalizados de obras
+    // das regionais onde é supervisor e criados por pessoal do cliente (não staff).
+    const approvableIds = deduped
+      .filter(r =>
+        r.status !== 'rascunho' &&
+        obraIdsAprovaveis.has(r.obra_id) &&
+        r.created_by &&
+        !staffEmails.has(r.created_by.toLowerCase())
+      )
+      .map(r => r.id);
+
     return Response.json({
       records: deduped,
       obraIds: [...obraIds],
       subordinateEmails: [...subordinateEmails],
+      approvableIds,
       truncated: anyTruncated,
     });
   } catch (error) {
