@@ -362,6 +362,20 @@
     }
   }
 
+  /* ── Hide number input spinners ──
+     Browser-native spinner buttons on type="number" inputs cause
+     accidental decrements (scroll, click-hold). Hide them so numeric
+     entry is stable; values are still validated by step/required. */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
   /* Compact mobile — reduce font sizes globally */
   @media (max-width: 1023px) {
     html {
