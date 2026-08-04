@@ -44,7 +44,7 @@ export default function DadosObraSection({
             <Select value={formData.obra_id || ""}
               onValueChange={onObra}
               disabled={!canEdit || !!editingEnsaio?.id}>
-              <SelectTrigger id="obra_id">
+              <SelectTrigger id="obra_id" data-testid="obra_id">
                 <SelectValue placeholder="Selecione a obra" />
               </SelectTrigger>
               <SelectContent title="Selecione a obra">
@@ -64,7 +64,7 @@ export default function DadosObraSection({
             <Select value={formData.project_id || ""}
               onValueChange={onProject}
               disabled={!canEdit || !formData.obra_id}>
-              <SelectTrigger id="project_id">
+              <SelectTrigger id="project_id" data-testid="project_id">
                 <SelectValue placeholder="Selecione um projeto" />
               </SelectTrigger>
               <SelectContent title="Projeto CAUQ">
