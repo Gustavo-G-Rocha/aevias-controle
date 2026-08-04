@@ -163,7 +163,7 @@ function useSupervisorRecords(user, enabled) {
       return data;
     },
     enabled,
-    staleTime: 10 * 60 * 1000,
+    staleTime: 0,
     gcTime: 15 * 60 * 1000,
   });
 }

@@ -57,7 +57,7 @@ async function loadEntityRecords(base44, entityType, query) {
   return { records: all, truncated };
 }
 
-Deno.serve(async (req) => {
+export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
@@ -119,9 +119,9 @@ Deno.serve(async (req) => {
         .filter(Boolean)
     );
 
-    // Construir query de escopo: obras do supervisor OU registros criados por subordinados.
-    // O filtro é aplicado na query do SDK (nível do banco) sob o contexto do próprio usuário,
-    // aplicando RLS nativa sem elevar privilégios com asServiceRole.
+    // Construir query de escopo: obras do mesmo cliente OU registros criados por subordinados.
+    // O escopo é validado acima e a leitura elevada é necessária para que o RLS da sessão
+    // não esconda os demais lotes que devem permanecer disponíveis somente para consulta.
     const obraIdsArray = [...obraIds];
     const subordinateEmailsArray = [...subordinateEmails];
     const orClauses = [];
@@ -138,6 +138,8 @@ Deno.serve(async (req) => {
         records: [],
         obraIds: [...obraIds],
         subordinateEmails: [...subordinateEmails],
+        approvableIds: [],
+        truncated: false,
       });
     }
 
@@ -148,7 +150,7 @@ Deno.serve(async (req) => {
     for (let i = 0; i < ALL_RECORD_ENTITIES.length; i += BATCH) {
       const batch = ALL_RECORD_ENTITIES.slice(i, i + BATCH);
       const settled = await Promise.allSettled(
-        batch.map(type => loadEntityRecords(base44, type, entityQuery))
+        batch.map(type => loadEntityRecords(base44.asServiceRole, type, entityQuery))
       );
       settled.forEach((r, idx) => {
         if (r.status === 'fulfilled') {
@@ -190,4 +192,4 @@ Deno.serve(async (req) => {
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}
