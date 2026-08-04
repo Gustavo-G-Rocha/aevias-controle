@@ -73,6 +73,43 @@ export default function EnsaioCAUQPage() {
 
   const [saving, setSaving] = useState(false);
 
+  // Preenche todos os campos do formulário com valores de exemplo.
+  // Acelera testes automatizados e serve como template para laboratoristas.
+  const handleFillAllExample = () => {
+    if (!isEditable || isApproved) return;
+
+    // Valores de exemplo para condições ambientais e medições
+    const pesoInicialExemplo = 1175;
+    setFormData(prev => ({
+      ...prev,
+      horario: '09:00',
+      local_coleta: 'KM 45 Rodovia BR-163',
+      pedreira: 'Pedreira Norte',
+      faixa_especificada: 'Faixa C',
+      tipo_ligante: 'CAP 50/70',
+      temperatura_cap: 160,
+      extracao_ligante: {
+        ...prev.extracao_ligante,
+        amostra_com_ligante: 1250,
+        amostra_sem_ligante: pesoInicialExemplo,
+      },
+    }));
+
+    // Preenche peneiras se houver projeto selecionado com faixa
+    if (peneirasDoProjecto.length > 0) {
+      const total = peneirasDoProjecto.length;
+      const newSieves = {};
+      peneirasDoProjecto.forEach((peneira, index) => {
+        const baseValue = (total - index) * (pesoInicialExemplo / (total * 3));
+        newSieves[peneira.key] = baseValue.toFixed(2);
+      });
+      setFormData(prev => ({
+        ...prev,
+        granulometria: { peso_retido_peneiras: newSieves },
+      }));
+    }
+  };
+
   const selectedProject = useMemo(() =>
     projects.find(p => p.id === formData.project_id),
     [projects, formData.project_id]
@@ -118,6 +155,18 @@ export default function EnsaioCAUQPage() {
             </CardDescription>
             <StatusDraftBanner status={formData.status} variant="green" />
             <RejectionBanner rejectionReason={editingEnsaio?.rejection_reason} />
+            {isEditable && !isApproved && (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={handleFillAllExample}
+                data-testid="fill-all-example"
+                className="w-fit"
+              >
+                Preencher Tudo (Exemplo)
+              </Button>
+            )}
           </CardHeader>
 
           <CardContent>
