@@ -14,6 +14,7 @@ export async function carregarRegistrosSupervisorService() {
   return {
     records: response.data?.records ?? [],
     subordinateEmails: response.data?.subordinateEmails ?? [],
+    approvableIds: response.data?.approvableIds ?? [],
     truncated: response.data?.truncated ?? false,
   };
 }
