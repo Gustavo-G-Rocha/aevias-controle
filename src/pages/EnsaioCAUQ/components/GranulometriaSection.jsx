@@ -69,6 +69,7 @@ export default function GranulometriaSection({
                       <td className="border border-border px-2 py-2">{peneira.abertura}</td>
                       <td className="border border-border px-1 py-1">
                         <Input type="number" step="0.01"
+                          aria-label={`Retido peneira ${peneira.label} (g)`}
                           value={formData.granulometria.peso_retido_peneiras?.[peneira.key] ?? ''}
                           onChange={(e) => {
                             const raw = e.target.value;
