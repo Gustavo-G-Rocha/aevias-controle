@@ -66,6 +66,10 @@ export const getStatusInfo = (ensaio) => {
   if (ensaio.approved === false) {
     return { text: STATUS_LABELS.REPROVADO, icon: XCircle, className: STATUS_BADGE_CLASSES.REPROVADO };
   }
+  // Finalizado pelo laboratorista, aguardando aprovação do gestor/admin
+  if (ensaio.status === 'finalizado') {
+    return { text: STATUS_LABELS.FINALIZADO, icon: CheckCircle, className: STATUS_BADGE_CLASSES.FINALIZADO };
+  }
   if (ensaio.was_rejected === true) {
     return { text: STATUS_LABELS.PENDENTE, icon: Clock, className: STATUS_BADGE_CLASSES.PENDENTE_REJEITADO, wasRejected: true };
   }
