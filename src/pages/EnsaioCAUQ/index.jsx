@@ -124,7 +124,7 @@ export default function EnsaioCAUQPage() {
             <form
               onSubmit={handlers.handleSubmit}
               onKeyDown={(e) => { if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.type !== 'submit') e.preventDefault(); }}
-              className="space-y-6"
+              className="space-y-6 pb-24"
             >
               <DadosObraSection
                 formData={formData}
@@ -187,8 +187,10 @@ export default function EnsaioCAUQPage() {
                   disabled={!isEditable || isApproved} rows={3} maxLength="500" />
               </div>
 
-              {/* Rodapé de ações */}
-              <div className="flex justify-end gap-4 mt-6">
+              {/* Rodapé de ações — fixed para sempre visível (acessibilidade/testes) */}
+              <div className="fixed bottom-16 lg:bottom-0 left-0 lg:left-64 right-0 z-40
+                              flex justify-end gap-4 py-3 px-6
+                              bg-background/95 backdrop-blur border-t border-border">
                 <Button type="button" variant="outline"
                   onClick={() => { clearSavedData(); navigate(createPageUrl('MeusEnsaios')); }}
                   disabled={saving}>
