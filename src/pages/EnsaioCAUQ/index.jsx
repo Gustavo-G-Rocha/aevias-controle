@@ -197,14 +197,14 @@ export default function EnsaioCAUQPage() {
 
                 {isEditable && !isApproved && (
                   <>
-                    <Button type="button" variant="outline"
+                    <Button type="button" variant="outline" data-testid="save-progress-btn"
                       onClick={handlers.handleSaveProgress}
                       disabled={saving || !formData.obra_id}
                       >
                       {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                       Salvar Progresso
                     </Button>
-                    <Button type="submit" disabled={saving}>
+                    <Button type="submit" data-testid="finalize-btn" disabled={saving}>
                       {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
                       Finalizar Registro
                     </Button>

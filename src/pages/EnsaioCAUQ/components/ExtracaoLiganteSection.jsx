@@ -60,16 +60,16 @@ export default function ExtracaoLiganteSection({ formData, isEditable, isApprove
 
           {/* Campos principais */}
           <div>
-            <Label>Amostra com Ligante (g){formData.status === 'finalizado' && ' *'}</Label>
-            <Input type="number" step="0.01"
+            <Label htmlFor="amostra-com-ligante">Amostra com Ligante (g){formData.status === 'finalizado' && ' *'}</Label>
+            <Input id="amostra-com-ligante" type="number" step="0.01" data-testid="amostra-com-ligante"
               value={formData.extracao_ligante.amostra_com_ligante ?? ''}
               onChange={(e) => onNestedChange('extracao_ligante', 'amostra_com_ligante', e.target.value === '' ? null : e.target.value)}
               disabled={!canEdit} required={formData.status === 'finalizado'} />
           </div>
 
           <div>
-            <Label>Amostra sem Ligante (g){formData.status === 'finalizado' && ' *'}</Label>
-            <Input type="number" step="0.01"
+            <Label htmlFor="amostra-sem-ligante">Amostra sem Ligante (g){formData.status === 'finalizado' && ' *'}</Label>
+            <Input id="amostra-sem-ligante" type="number" step="0.01" data-testid="amostra-sem-ligante"
               value={formData.extracao_ligante.amostra_sem_ligante ?? ''}
               onChange={(e) => onNestedChange('extracao_ligante', 'amostra_sem_ligante', e.target.value === '' ? null : e.target.value)}
               disabled={!canEdit} required={formData.status === 'finalizado'} />
