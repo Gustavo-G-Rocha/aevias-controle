@@ -46,8 +46,8 @@ export default function MeusEnsaios() {
     if (!canApprove) return false;
     const obra = obrasMap.get(ensaio.obra_id);
     const regional = obra ? regionaisMap.get(obra.regional_id) : null;
-    return canApproveRecordCheck(user, ensaio, regional);
-  }, [canApprove, obrasMap, regionaisMap, user]);
+    return canApproveRecordCheck(user, ensaio, regional, allUsers);
+  }, [canApprove, obrasMap, regionaisMap, user, allUsers]);
 
   const subtitle = userIsAdmin || userIsSalaTecnica || userIsGestorContrato
     ? "Gerencie e aprove todos os registros de suas obras."

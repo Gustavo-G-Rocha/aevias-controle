@@ -78,6 +78,36 @@ export function isSupervisorInRegional(user, regional) {
   return false;
 }
 
+// Níveis de acesso do staff da Afirma Evias (não-cliente)
+const AFIRMAEVIAS_STAFF_LEVELS = new Set([
+  'user', 'sala_tecnica_afirmaevias', 'gestor_contrato', 'admin',
+]);
+
+/**
+ * Verifica se o criador de um registro é staff do cliente (não Afirma Evias).
+ *
+ * Prioridade:
+ * 1. Se allUsers disponível → checa access_level do criador (mais preciso)
+ * 2. Fallback → checa se email está em clientes_responsaveis da regional
+ */
+function isCreatorClienteSide(createdByEmail, allUsers, clientesEmails) {
+  if (!createdByEmail) return false;
+  const email = createdByEmail.toLowerCase();
+  // Se temos allUsers, checamos o access_level do criador
+  if (allUsers && allUsers.length > 0) {
+    const creator = allUsers.find(u => (u.email || '').toLowerCase() === email);
+    if (creator) {
+      const creatorLevel = creator.access_level || (creator.role === 'admin' ? 'admin' : 'user');
+      return !AFIRMAEVIAS_STAFF_LEVELS.has(creatorLevel);
+    }
+  }
+  // Fallback: checa se email está em clientes_responsaveis (comportamento original)
+  if (clientesEmails) {
+    return clientesEmails.includes(email);
+  }
+  return false;
+}
+
 /**
  * Verifica se um usuário pode aprovar/reprovar um registro ESPECÍFICO.
  *
@@ -85,11 +115,10 @@ export function isSupervisorInRegional(user, regional) {
  *   qualquer registro finalizado, independente de quem o criou.
  * - cliente_supervisor: só pode aprovar se:
  *   (a) seu email estiver em supervisores_responsaveis da regional do registro; E
- *   (b) o registro foi criado por um funcionário do cliente (created_by presente
- *       em clientes_responsaveis da regional), não por staff da Afirma Evias.
+ *   (b) o registro foi criado por um funcionário do cliente (não staff Afirma Evias).
  * - Outros níveis: não podem aprovar.
  */
-export function canApproveRecord(user, record, regional) {
+export function canApproveRecord(user, record, regional, allUsers) {
   if (!user) return false;
   const level = getUserAccessLevel(user);
 
@@ -106,9 +135,8 @@ export function canApproveRecord(user, record, regional) {
 
     // Só aprova registros criados por funcionários do cliente (não staff Afirma Evias)
     const createdBy = (record?.created_by || '').toLowerCase();
-    if (!createdBy) return false;
-    const clientes = (regional?.clientes_responsaveis || []).map(e => e.toLowerCase());
-    return clientes.includes(createdBy);
+    const clientesEmails = (regional?.clientes_responsaveis || []).map(e => e.toLowerCase());
+    return isCreatorClienteSide(createdBy, allUsers, clientesEmails);
   }
 
   return false;

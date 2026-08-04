@@ -27,6 +27,46 @@ export interface TenantCheckResult {
   status?: number;
 }
 
+// Níveis de acesso do staff da Afirma Evias (não-cliente)
+const AFIRMAEVIAS_STAFF_LEVELS = new Set([
+  'user', 'sala_tecnica_afirmaevias', 'gestor_contrato', 'admin',
+]);
+
+/**
+ * Verifica se o criador de um registro é staff do cliente (não Afirma Evias).
+ *
+ * Prioridade:
+ * 1. Email em clientes_responsaveis da regional → true
+ * 2. Busca access_level do criador na entidade User → true se cliente-side
+ * 3. Default → false (fail-closed)
+ */
+async function isCreatorClienteSide(
+  base44: any,
+  createdByEmail: string,
+  clientesEmails: string[],
+): Promise<boolean> {
+  if (!createdByEmail) return false;
+  // 1. Email em clientes_responsaveis → cliente
+  if (clientesEmails.includes(createdByEmail)) return true;
+  // 2. Busca access_level do criador
+  try {
+    const creators = await base44.asServiceRole.entities.User.filter(
+      { email: createdByEmail },
+      undefined,
+      1,
+    );
+    const creator = creators?.[0];
+    if (creator) {
+      const creatorLevel = creator.access_level || (creator.role === 'admin' ? 'admin' : 'user');
+      return !AFIRMAEVIAS_STAFF_LEVELS.has(creatorLevel);
+    }
+  } catch {
+    // ignore — fail-closed below
+  }
+  // 3. Fail-closed: não conseguimos confirmar que é cliente
+  return false;
+}
+
 export interface TenantCaches {
   obra: Map<string, any>;
   regional: Map<string, any>;
@@ -104,8 +144,9 @@ export async function verifyTenantAccess(
     if (emails.includes(userEmail) || supervisores.includes(userEmail)) {
       let isSupervisor = level === 'cliente_supervisor' && supervisores.includes(userEmail);
       // Defense-in-depth: cliente_supervisor só pode APROVAR registros criados
-      // por funcionários do cliente (em clientes_responsaveis), NÃO por staff
-      // da Afirma Evias. Espelha canApproveRecord do frontend (accessControl.js).
+      // por funcionários do cliente (access_level cliente-side), NÃO por staff
+      // da Afirma Evias (access_level user/sala_tecnica/gestor_contrato/admin).
+      // Espelha canApproveRecord do frontend (accessControl.js).
       // Se o registro foi criado por staff Afirma Evias, isSupervisor=false →
       // gerenciarAprovacao bloqueia a aprovação.
       if (isSupervisor) {
@@ -113,10 +154,7 @@ export async function verifyTenantAccess(
         if (!createdBy) {
           isSupervisor = false;
         } else {
-          const clientesEmails = new Set(emails);
-          if (!clientesEmails.has(createdBy)) {
-            isSupervisor = false;
-          }
+          isSupervisor = await isCreatorClienteSide(base44, createdBy, emails);
         }
       }
       return { allowed: true, isSupervisor };

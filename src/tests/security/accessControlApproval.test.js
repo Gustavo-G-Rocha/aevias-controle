@@ -147,3 +147,41 @@ describe('canApproveRecord — fail-closed edge cases', () => {
     expect(canApproveRecord(SUPERVISOR, REC_CLIENTE, regSemClientes)).toBe(false);
   });
 });
+
+// ── canApproveRecord com allUsers (access_level do criador) ──────────
+// Quando allUsers está disponível, a checagem usa o access_level do criador
+// em vez de apenas clientes_responsaveis. Isso permite que inspetores de campo
+// (funcionarios_cliente) que NÃO estão em clientes_responsaveis sejam
+// reconhecidos como staff do cliente.
+const ALL_USERS = [
+  { email: 'funcionario@cliente.com', access_level: 'funcionarios_cliente' },
+  { email: 'inspetor@cliente.com', access_level: 'funcionarios_cliente' },
+  { email: 'lab@evias.com', access_level: 'user' },
+  { email: 'sala@evias.com', access_level: 'sala_tecnica_afirmaevias' },
+  { email: 'gestor@evias.com', access_level: 'gestor_contrato' },
+];
+
+describe('canApproveRecord — allUsers lookup (access_level do criador)', () => {
+  it('supervisor aprova registro de funcionarios_cliente NÃO em clientes_responsaveis', () => {
+    const recInspetor = { created_by: 'inspetor@cliente.com' };
+    expect(canApproveRecord(SUPERVISOR, recInspetor, REGIONAL, ALL_USERS)).toBe(true);
+  });
+  it('supervisor NÃO aprova registro de staff Afirma Evias (user)', () => {
+    expect(canApproveRecord(SUPERVISOR, REC_STAFF, REGIONAL, ALL_USERS)).toBe(false);
+  });
+  it('supervisor NÃO aprova registro de staff Afirma Evias (sala_tecnica)', () => {
+    const recSala = { created_by: 'sala@evias.com' };
+    expect(canApproveRecord(SUPERVISOR, recSala, REGIONAL, ALL_USERS)).toBe(false);
+  });
+  it('supervisor aprova registro de funcionarios_cliente em clientes_responsaveis', () => {
+    expect(canApproveRecord(SUPERVISOR, REC_CLIENTE, REGIONAL, ALL_USERS)).toBe(true);
+  });
+  it('sem allUsers → fallback para clientes_responsaveis (comportamento original)', () => {
+    const recInspetor = { created_by: 'inspetor@cliente.com' };
+    expect(canApproveRecord(SUPERVISOR, recInspetor, REGIONAL)).toBe(false);
+  });
+  it('criador não encontrado em allUsers → fallback para clientes_responsaveis', () => {
+    const recDesconhecido = { created_by: 'desconhecido@cliente.com' };
+    expect(canApproveRecord(SUPERVISOR, recDesconhecido, REGIONAL, ALL_USERS)).toBe(false);
+  });
+});
