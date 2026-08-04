@@ -1,11 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { getNotificationLink } from "@/utils/notificationRouting";
-import NotificationPanel from "./NotificationPanel";
 
-export default function NotificationAgent() {
+const NotificationContext = createContext(null);
+export const useNotificationContext = () => useContext(NotificationContext);
+
+/**
+ * Centraliza o estado das notificações in-app: busca inicial,
+ * subscription em tempo real, e ação de "ler e navegar".
+ * Renderiza apenas o provider — nenhum UI.
+ */
+export default function NotificationProvider({ children }) {
   const [open, setOpen] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
   const [notifications, setNotifications] = useState([]);
@@ -40,35 +46,25 @@ export default function NotificationAgent() {
     return unsubscribe;
   }, [userEmail]);
 
-  const handleRead = async (n) => {
-    setNotifications((prev) => prev.filter((p) => p.id !== n.id));
-    if (notifications.length <= 1) setOpen(false);
+  const handleRead = useCallback((n) => {
+    setNotifications((prev) => {
+      const next = prev.filter((p) => p.id !== n.id);
+      if (next.length === 0) setOpen(false);
+      return next;
+    });
     base44.entities.Notificacao.update(n.id, { status: "lida" }).catch(() => {});
     navigate(getNotificationLink(n));
-  };
-
-  if (notifications.length === 0) return null;
+  }, [navigate]);
 
   return (
-    <div className="fixed bottom-20 lg:bottom-6 right-4 z-50 flex flex-col items-end gap-2 print:hidden">
-      {open && (
-        <NotificationPanel
-          notifications={notifications}
-          onRead={handleRead}
-          onClose={() => setOpen(false)}
-        />
-      )}
-      <button
-        onClick={() => setOpen((o) => !o)}
-        aria-label={`Notificações (${notifications.length} pendentes)`}
-        className="relative h-12 w-12 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105"
-        style={{ backgroundColor: "var(--color-primary)", color: "var(--color-text-on-primary)" }}
-      >
-        <Bell className="h-5 w-5" />
-        <span className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 rounded-full bg-red-600 text-white text-xs font-semibold flex items-center justify-center">
-          {notifications.length}
-        </span>
-      </button>
-    </div>
+    <NotificationContext.Provider value={{
+      count: notifications.length,
+      notifications,
+      open,
+      setOpen,
+      handleRead,
+    }}>
+      {children}
+    </NotificationContext.Provider>
   );
 }

@@ -19,7 +19,8 @@ import { CreateEnsaioDialogProvider } from "@/components/layout/CreateEnsaioDial
 import MobileBackHeader from "@/components/layout/MobileBackHeader";
 import PageTransition from "@/components/layout/PageTransition";
 import OfflineStatusBar from "@/components/offline/OfflineStatusBar";
-import NotificationAgent from "@/components/notifications/NotificationAgent";
+import NotificationProvider from "@/components/notifications/NotificationProvider";
+import NotificationBell from "@/components/notifications/NotificationBell";
 import SidebarToggle from "@/components/layout/SidebarToggle";
 import ReportBackBar from "@/components/layout/ReportBackBar";
 import { REPORT_PAGES } from "@/lib/reportPages";
@@ -52,6 +53,7 @@ const AppLayout = ({ children, currentPageName }) => {
   return (
     <SidebarProvider>
       <CreateEnsaioDialogProvider onOpen={setIsCreateEnsaioOpen}>
+      <NotificationProvider>
       <div className="min-h-screen flex w-full overflow-x-hidden" style={{ backgroundColor: 'var(--color-background)' }}>
         <AppSidebar
           user={user}
@@ -68,6 +70,9 @@ const AppLayout = ({ children, currentPageName }) => {
         <main className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
           <SidebarToggle />
           <MobileBackHeader />
+          <div className="hidden lg:block fixed top-4 right-4 z-40 print:hidden">
+            <NotificationBell variant="desktop" />
+          </div>
           <div className="flex-1 flex flex-col">
             <PullToRefresh disabled={isFormPage(currentPageName)}>
               <PageTransition
@@ -83,7 +88,6 @@ const AppLayout = ({ children, currentPageName }) => {
             canManageSystem={canManageSystem}
             pendingTransfers={pendingTransfers} />
           <OfflineStatusBar />
-          <NotificationAgent />
         </main>
       </div>
 
@@ -110,6 +114,7 @@ const AppLayout = ({ children, currentPageName }) => {
           />
         </DialogContent>
       </Dialog>
+      </NotificationProvider>
       </CreateEnsaioDialogProvider>
     </SidebarProvider>
   );

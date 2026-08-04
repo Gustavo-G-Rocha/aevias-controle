@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { getPageTitle } from "@/lib/pageTitles";
 import { TAB_ZONES, getTabZone } from "@/lib/layoutConstants";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 // Rotas raiz (tabs do BottomNav) — não mostram botão voltar
 const ROOT_PATHS = ["/", "/Regionais", "/Projects", "/MeusEnsaios"];
@@ -18,7 +19,7 @@ export default function MobileBackHeader() {
   if (isRoot) {
     return (
       <div
-        className="lg:hidden sticky top-0 z-30 flex items-center justify-center px-2 py-1.5"
+        className="lg:hidden sticky top-0 z-30 flex items-center justify-center px-2 py-1.5 relative"
         style={{
           backgroundColor: "var(--color-sidebar-bg)",
           borderBottom: "1px solid var(--color-sidebar-border)",
@@ -31,6 +32,9 @@ export default function MobileBackHeader() {
           className="h-8 w-auto brightness-200 contrast-110"
           loading="lazy"
         />
+        <div className="absolute right-1 top-1/2 -translate-y-1/2">
+          <NotificationBell variant="mobile" />
+        </div>
       </div>
     );
   }
@@ -74,6 +78,7 @@ export default function MobileBackHeader() {
           {title}
         </span>
       )}
+      <NotificationBell variant="mobile" />
     </div>
   );
 }
