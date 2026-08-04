@@ -50,7 +50,7 @@ export default function MeusEnsaios() {
     if (!canApprove) return false;
     // Supervisor do cliente: a permissão por registro é calculada no servidor
     // (o RLS impede o frontend de ler o nível de acesso de outros usuários).
-    if (userIsClienteSupervisor && approvableIdsSet) return approvableIdsSet.has(ensaio.id);
+    if (userIsClienteSupervisor && approvableIdsSet && approvableIdsSet.size > 0) return approvableIdsSet.has(ensaio.id);
     const obra = obrasMap.get(ensaio.obra_id);
     const regional = obra ? regionaisMap.get(obra.regional_id) : null;
     return canApproveRecordCheck(user, ensaio, regional, allUsers);
