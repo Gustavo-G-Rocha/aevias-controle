@@ -21,7 +21,7 @@ export default function RelatorioUnificadoToolbar({ obra, filters, recordCount, 
             Voltar
           </Button>
           {canSign && !signature && (
-            <Button onClick={onSign} disabled={checkingAccess || signing || !recordCount} className="bg-blue-600 text-white hover:bg-blue-700">
+            <Button onClick={onSign} disabled={checkingAccess || signing} className="bg-blue-600 text-white hover:bg-blue-700">
               {(checkingAccess || signing) ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               ) : (
