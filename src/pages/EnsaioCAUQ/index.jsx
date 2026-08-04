@@ -155,6 +155,14 @@ export default function EnsaioCAUQPage() {
             </CardDescription>
             <StatusDraftBanner status={formData.status} variant="green" />
             <RejectionBanner rejectionReason={editingEnsaio?.rejection_reason} />
+            {editingEnsaio?.id && formData.status === 'rascunho' && (
+              <div data-testid="draft-saved-indicator"
+                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium"
+                   style={{ backgroundColor: 'var(--color-success-bg)', color: 'var(--color-success)' }}>
+                <CheckCircle className="h-4 w-4" />
+                Rascunho salvo
+              </div>
+            )}
             {isEditable && !isApproved && (
               <Button
                 type="button"
