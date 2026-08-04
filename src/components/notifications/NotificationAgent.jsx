@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { getReportLink } from "@/components/ensaios/ensaioMappers";
+import { getNotificationLink } from "@/utils/notificationRouting";
 import NotificationPanel from "./NotificationPanel";
 
 export default function NotificationAgent() {
@@ -44,10 +44,7 @@ export default function NotificationAgent() {
     setNotifications((prev) => prev.filter((p) => p.id !== n.id));
     if (notifications.length <= 1) setOpen(false);
     base44.entities.Notificacao.update(n.id, { status: "lida" }).catch(() => {});
-    const link = n.entity_name === "RelatorioNC"
-      ? `/RelatorioNC?id=${n.entity_id}`
-      : getReportLink({ entityType: n.entity_name, id: n.entity_id });
-    navigate(link);
+    navigate(getNotificationLink(n));
   };
 
   if (notifications.length === 0) return null;

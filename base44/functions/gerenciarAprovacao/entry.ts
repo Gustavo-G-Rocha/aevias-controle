@@ -9,6 +9,7 @@ import {
   getWithRetry,
 } from '../../shared/backendCommon.ts';
 import { verifyTenantAccess } from '../../shared/tenantAccess.ts';
+import { marcarNotificacoesLidas } from '../../shared/notificacoes.ts';
 
 /**
  * Backend function: gerenciarAprovacao
@@ -417,6 +418,13 @@ Deno.serve(async (req) => {
       } catch (notifError) {
         console.error('[gerenciarAprovacao] Notificação error:', notifError?.message);
       }
+    }
+
+    // ── LIMPAR NOTIFICAÇÕES DE ASSINATURA PENDENTE ──────────────────
+    // Quando o documento é assinado, as notificações "aguarda assinatura"
+    // deixam de fazer sentido para todos os destinatários.
+    if (action === 'sign' || action === 'approve_nc') {
+      await marcarNotificacoesLidas(base44, entityName, recordId, 'assinatura_pendente');
     }
 
     // ── AUDIT TRAIL ──────────────────────────────────────────────────

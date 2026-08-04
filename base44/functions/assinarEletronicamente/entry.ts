@@ -17,6 +17,7 @@ import {
   getWithRetry,
 } from '../../shared/backendCommon.ts';
 import { verifyTenantAccess } from '../../shared/tenantAccess.ts';
+import { notificarAssinaturaPendente, marcarNotificacoesLidas } from '../../shared/notificacoes.ts';
 
 /**
  * Backend function: assinarEletronicamente
@@ -385,6 +386,20 @@ Deno.serve(async (req) => {
       });
     } catch (auditError: any) {
       console.error('[assinarEletronicamente] Audit error:', auditError?.message);
+    }
+
+    // ── NOTIFICAÇÕES IN-APP ──────────────────────────────────────────
+    // approve: documento aprovado → notificar clientes responsáveis da
+    // regional de que há assinatura pendente.
+    // sign/approve_nc: documento assinado → limpar notificações de
+    // assinatura pendente (a pendência foi resolvida).
+    // Falhas de notificação NÃO bloqueiam a assinatura (tratadas no shared).
+    if (entityName !== 'RelatorioUnificado') {
+      if (signatureType === 'approve') {
+        await notificarAssinaturaPendente(base44, entityName, recordId, existingRecord, user.email);
+      } else {
+        await marcarNotificacoesLidas(base44, entityName, recordId, 'assinatura_pendente');
+      }
     }
 
     return Response.json({

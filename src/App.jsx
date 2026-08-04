@@ -28,6 +28,7 @@ const ReportarErro = lazy(() => import('@/pages/ReportarErro'));
 const VerificarAssinatura = lazy(() => import('@/pages/VerificarAssinatura'));
 const DocumentacaoSistema = lazy(() => import('@/pages/DocumentacaoSistema'));
 const AuditorTecnico = lazy(() => import('@/pages/AuditorTecnico'));
+const OAuthConsent = lazy(() => import('@/pages/OAuthConsent'));
 
 // Fallback leve exibido enquanto o chunk da página lazy é baixado.
 // O Layout (sidebar/header/bottom-nav) já está renderizado — só o conteúdo suspende.
@@ -53,6 +54,8 @@ function AuthenticatedApp() {
       <Route path="/forgot-password" element={<Suspense fallback={<PageLoadingFallback />}><ForgotPassword /></Suspense>} />
       <Route path="/reset-password" element={<Suspense fallback={<PageLoadingFallback />}><ResetPassword /></Suspense>} />
       <Route path="/verificar-assinatura" element={<Suspense fallback={<PageLoadingFallback />}><VerificarAssinatura /></Suspense>} />
+      <Route path="/oauth-consent" element={<Suspense fallback={<PageLoadingFallback />}><OAuthConsent /></Suspense>} />
+      <Route path="/OAuthConsent" element={<Navigate to="/oauth-consent" replace />} />
       <Route path="/VerificarAssinatura" element={<Navigate to="/verificar-assinatura" replace />} />
 
       {/* Protected app routes */}

@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import RespostaAvaliacao from "@/components/bug-report/RespostaAvaliacao";
+import { notificarRespostaChamado } from "@/functions/notificarRespostaChamado";
 
 const PAGINAS_CONHECIDAS = [
   "Dashboard",
@@ -239,11 +240,16 @@ export default function ReportarErro() {
 
   // Resposta do admin OTIMISTA
   const respostaMutation = useMutation({
-    mutationFn: ({ reportId, resposta_admin }) =>
-      base44.entities.BugReport.update(reportId, {
+    mutationFn: async ({ reportId, resposta_admin }) => {
+      const updated = await base44.entities.BugReport.update(reportId, {
         resposta_admin,
         resposta_admin_date: new Date().toISOString(),
-      }),
+      });
+      // Notificação in-app para o solicitante — fire-and-forget:
+      // falha de notificação não invalida a resposta já gravada.
+      notificarRespostaChamado({ reportId }).catch(() => {});
+      return updated;
+    },
     onMutate: async ({ reportId, resposta_admin }) => {
       await queryClient.cancelQueries({ queryKey: ["bugReports"] });
       const previous = queryClient.getQueryData(["bugReports"]);
