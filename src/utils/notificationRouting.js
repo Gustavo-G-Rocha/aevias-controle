@@ -11,7 +11,7 @@ export function getNotificationLink(notification) {
   if (!notification) return "/";
   const { tipo, entity_name, entity_id } = notification;
   if (tipo === "chamado_respondido" || entity_name === "BugReport") {
-    return "/ReportarErro";
+    return entity_id ? `/ReportarErro?chamado=${entity_id}` : "/ReportarErro";
   }
   if (entity_name === "RelatorioNC") {
     return `/RelatorioNC?id=${entity_id}`;

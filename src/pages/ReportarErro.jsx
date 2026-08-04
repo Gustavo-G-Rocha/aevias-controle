@@ -102,6 +102,23 @@ export default function ReportarErro() {
     base44.auth.me().then(setUser).catch(() => {});
   }, []);
 
+  // Rola até e destaca o chamado específico quando acessado via
+  // ?chamado=<id> (ex.: clique numa notificação de "chamado respondido").
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const chamadoId = params.get("chamado");
+    if (!chamadoId) return;
+    const el = document.getElementById(`chamado-${chamadoId}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.classList.add("ring-2", "ring-blue-400");
+      const timeout = setTimeout(() => {
+        el.classList.remove("ring-2", "ring-blue-400");
+      }, 4000);
+      return () => clearTimeout(timeout);
+    }
+  }, [bugReports]);
+
   const isAdmin = user && getUserAccessLevel(user) === "admin";
 
   const { data: bugReports = [], isLoading: loadingReports } = useQuery({
@@ -510,7 +527,7 @@ export default function ReportarErro() {
                 // para evitar updates contra um id inexistente.
                 const isOptimistic = String(report.id).startsWith("temp-");
                 return (
-                  <Card key={report.id}>
+                  <Card key={report.id} id={`chamado-${report.id}`} className="transition-shadow duration-300">
                     <CardContent className="py-4">
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
