@@ -70,6 +70,7 @@ export default function GranulometriaSection({
                       <td className="border border-border px-1 py-1">
                         <Input type="number" step="0.01"
                           aria-label={`Retido peneira ${peneira.label} (g)`}
+                          data-testid={`sieve-input-${peneira.key}`}
                           value={formData.granulometria.peso_retido_peneiras?.[peneira.key] ?? ''}
                           onChange={(e) => {
                             const raw = e.target.value;

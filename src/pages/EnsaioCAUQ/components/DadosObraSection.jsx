@@ -96,7 +96,7 @@ export default function DadosObraSection({
           </div>
           <div>
             <Label htmlFor="horario">Horário</Label>
-            <Input id="horario" type="time" value={formData.horario}
+            <Input id="horario" type="time" data-testid="horario" value={formData.horario}
               onChange={(e) => onChange('horario', e.target.value)} disabled={!canEdit} />
           </div>
           <div>
@@ -139,7 +139,7 @@ export default function DadosObraSection({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <Label htmlFor="local_coleta">Local de Coleta</Label>
-            <Input id="local_coleta" value={formData.local_coleta}
+            <Input id="local_coleta" data-testid="local_coleta" value={formData.local_coleta}
               onChange={(e) => onChange('local_coleta', e.target.value)} disabled={!canEdit} />
           </div>
           <div>
@@ -184,14 +184,14 @@ export default function DadosObraSection({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div>
             <Label htmlFor="tipo_ligante">Tipo de Ligante</Label>
-            <Input id="tipo_ligante" value={formData.tipo_ligante}
+            <Input id="tipo_ligante" data-testid="tipo_ligante" value={formData.tipo_ligante}
               onChange={(e) => onChange('tipo_ligante', e.target.value)}
               disabled={!canEdit} readOnly={!!selectedProject}
               className={selectedProject ? "bg-muted" : ""} />
           </div>
           <div>
             <Label htmlFor="temperatura_cap">Temperatura CAP (°C)</Label>
-            <Input id="temperatura_cap" type="number"
+            <Input id="temperatura_cap" type="number" data-testid="temperatura_cap"
               value={formData.temperatura_cap ?? ''}
               onChange={(e) => onChange('temperatura_cap', e.target.value === '' ? null : e.target.value)}
               disabled={!canEdit} />
