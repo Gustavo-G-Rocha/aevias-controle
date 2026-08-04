@@ -39,21 +39,21 @@ export default function ExtracaoLiganteSection({ formData, isEditable, isApprove
               <div>
                 <Label>Amostra Úmida (g)</Label>
                 <Input type="number" step="0.01"
-                  value={formData.extracao_ligante.amostra_umida || ''}
-                  onChange={(e) => onNestedChange('extracao_ligante', 'amostra_umida', e.target.value ? parseFloat(e.target.value) : null)}
+                  value={formData.extracao_ligante.amostra_umida ?? ''}
+                  onChange={(e) => onNestedChange('extracao_ligante', 'amostra_umida', e.target.value === '' ? null : e.target.value)}
                   disabled={!canEdit} />
               </div>
               <div>
                 <Label>Amostra Seca (g)</Label>
                 <Input type="number" step="0.01"
-                  value={formData.extracao_ligante.amostra_seca || ''}
-                  onChange={(e) => onNestedChange('extracao_ligante', 'amostra_seca', e.target.value ? parseFloat(e.target.value) : null)}
+                  value={formData.extracao_ligante.amostra_seca ?? ''}
+                  onChange={(e) => onNestedChange('extracao_ligante', 'amostra_seca', e.target.value === '' ? null : e.target.value)}
                   disabled={!canEdit} />
               </div>
               <div>
                 <Label>Umidade (%)</Label>
                 <Input type="number" step="0.01"
-                  value={formData.extracao_ligante.umidade || ''} readOnly className="bg-muted" />
+                  value={formData.extracao_ligante.umidade ?? ''} readOnly className="bg-muted" />
               </div>
             </>
           )}
@@ -62,24 +62,24 @@ export default function ExtracaoLiganteSection({ formData, isEditable, isApprove
           <div>
             <Label>Amostra com Ligante (g){formData.status === 'finalizado' && ' *'}</Label>
             <Input type="number" step="0.01"
-              value={formData.extracao_ligante.amostra_com_ligante || ''}
-              onChange={(e) => onNestedChange('extracao_ligante', 'amostra_com_ligante', e.target.value ? parseFloat(e.target.value) : null)}
+              value={formData.extracao_ligante.amostra_com_ligante ?? ''}
+              onChange={(e) => onNestedChange('extracao_ligante', 'amostra_com_ligante', e.target.value === '' ? null : e.target.value)}
               disabled={!canEdit} required={formData.status === 'finalizado'} />
           </div>
 
           <div>
             <Label>Amostra sem Ligante (g){formData.status === 'finalizado' && ' *'}</Label>
             <Input type="number" step="0.01"
-              value={formData.extracao_ligante.amostra_sem_ligante || ''}
-              onChange={(e) => onNestedChange('extracao_ligante', 'amostra_sem_ligante', e.target.value ? parseFloat(e.target.value) : null)}
+              value={formData.extracao_ligante.amostra_sem_ligante ?? ''}
+              onChange={(e) => onNestedChange('extracao_ligante', 'amostra_sem_ligante', e.target.value === '' ? null : e.target.value)}
               disabled={!canEdit} required={formData.status === 'finalizado'} />
           </div>
 
           <div>
             <Label>Fator de Correção</Label>
             <Input type="number" step="0.01"
-              value={formData.extracao_ligante.fator_correcao || 1.0}
-              onChange={(e) => onNestedChange('extracao_ligante', 'fator_correcao', e.target.value ? parseFloat(e.target.value) : 1.0)}
+              value={formData.extracao_ligante.fator_correcao ?? 1.0}
+              onChange={(e) => onNestedChange('extracao_ligante', 'fator_correcao', e.target.value === '' ? null : e.target.value)}
               disabled={!canEdit} />
           </div>
 

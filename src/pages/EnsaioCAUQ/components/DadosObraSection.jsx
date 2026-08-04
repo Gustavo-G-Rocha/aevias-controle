@@ -192,8 +192,8 @@ export default function DadosObraSection({
           <div>
             <Label htmlFor="temperatura_cap">Temperatura CAP (°C)</Label>
             <Input id="temperatura_cap" type="number"
-              value={formData.temperatura_cap || ''}
-              onChange={(e) => onChange('temperatura_cap', e.target.value ? parseFloat(e.target.value) : null)}
+              value={formData.temperatura_cap ?? ''}
+              onChange={(e) => onChange('temperatura_cap', e.target.value === '' ? null : e.target.value)}
               disabled={!canEdit} />
           </div>
           <div>

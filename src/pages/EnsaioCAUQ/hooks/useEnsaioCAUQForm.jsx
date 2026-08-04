@@ -73,15 +73,20 @@ export function useEnsaioCAUQForm({
   // ── cálculo automático: extração de ligante ─────────────────────────────────
   useEffect(() => {
     const ext = formData.extracao_ligante;
+    const amostraUmida = parseFloat(ext.amostra_umida);
+    const amostraSeca = parseFloat(ext.amostra_seca);
+    const amostraComLigante = parseFloat(ext.amostra_com_ligante);
+    const amostraSemLigante = parseFloat(ext.amostra_sem_ligante);
+    const fatorCorrecao = parseFloat(ext.fator_correcao);
 
-    if (formData.realizar_ensaio_umidade && ext.amostra_umida && ext.amostra_seca) {
-      const umidade = ((ext.amostra_umida - ext.amostra_seca) / ext.amostra_seca) * 100;
+    if (formData.realizar_ensaio_umidade && amostraUmida && amostraSeca) {
+      const umidade = ((amostraUmida - amostraSeca) / amostraSeca) * 100;
       handleNestedChange('extracao_ligante', 'umidade', parseFloat(umidade.toFixed(2)));
     }
 
-    if (ext.amostra_com_ligante && ext.amostra_sem_ligante && ext.fator_correcao) {
-      const pesoLigante = (ext.amostra_com_ligante - ext.amostra_sem_ligante) * ext.fator_correcao;
-      const teorLigante = (pesoLigante / ext.amostra_com_ligante) * 100;
+    if (amostraComLigante && amostraSemLigante && fatorCorrecao) {
+      const pesoLigante = (amostraComLigante - amostraSemLigante) * fatorCorrecao;
+      const teorLigante = (pesoLigante / amostraComLigante) * 100;
       handleNestedChange('extracao_ligante', 'peso_ligante', parseFloat(pesoLigante.toFixed(2)));
       handleNestedChange('extracao_ligante', 'teor_ligante', parseFloat(teorLigante.toFixed(2)));
 
@@ -125,7 +130,7 @@ export function useEnsaioCAUQForm({
 
     if (teorReal && amostraSemLigante > 0) {
       const somaRetidos = Object.values(formData.granulometria.peso_retido_peneiras || {})
-        .reduce((sum, val) => sum + (val || 0), 0);
+        .reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
 
       const pctPassante200 = ((amostraSemLigante - somaRetidos) / amostraSemLigante) * 100;
       const fillerBetume = pctPassante200 / teorReal;

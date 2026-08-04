@@ -18,7 +18,7 @@ export default function GranulometriaSection({
   onNestedChange,
 }) {
   const canEdit = isEditable && !isApproved;
-  const pesoInicial = formData.extracao_ligante?.amostra_sem_ligante || 0;
+  const pesoInicial = parseFloat(formData.extracao_ligante?.amostra_sem_ligante) || 0;
 
   return (
     <Card className="bg-muted/30">
@@ -56,7 +56,8 @@ export default function GranulometriaSection({
                 {peneirasDoProjecto.map((peneira, index) => {
                   let acumuladoRetido = 0;
                   for (let i = 0; i <= index; i++) {
-                    acumuladoRetido += formData.granulometria.peso_retido_peneiras?.[peneirasDoProjecto[i].key] || 0;
+                    const val = formData.granulometria.peso_retido_peneiras?.[peneirasDoProjecto[i].key];
+                    acumuladoRetido += parseFloat(val) || 0;
                   }
                   const percentualPassante = pesoInicial > 0
                     ? ((pesoInicial - acumuladoRetido) / pesoInicial * 100).toFixed(1)
@@ -68,11 +69,12 @@ export default function GranulometriaSection({
                       <td className="border border-border px-2 py-2">{peneira.abertura}</td>
                       <td className="border border-border px-1 py-1">
                         <Input type="number" step="0.01"
-                          value={formData.granulometria.peso_retido_peneiras?.[peneira.key] || ''}
+                          value={formData.granulometria.peso_retido_peneiras?.[peneira.key] ?? ''}
                           onChange={(e) => {
+                            const raw = e.target.value;
                             const newPesos = {
                               ...formData.granulometria.peso_retido_peneiras,
-                              [peneira.key]: e.target.value ? parseFloat(e.target.value) : null,
+                              [peneira.key]: raw === '' ? null : raw,
                             };
                             onNestedChange('granulometria', 'peso_retido_peneiras', newPesos);
                           }}
