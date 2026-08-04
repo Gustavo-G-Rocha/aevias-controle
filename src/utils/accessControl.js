@@ -129,22 +129,12 @@ export function canApproveRecord(user, record, regional, allUsers) {
     return true;
   }
 
-  // cliente_supervisor: checa regional + criador do registro
+  // cliente_supervisor: pode aprovar/reprovar qualquer registro finalizado
+  // das regionais onde é supervisor (todos os lotes sob sua supervisão)
   if (level === 'cliente_supervisor') {
     const userEmail = (user.email || '').toLowerCase();
     const supervisores = (regional?.supervisores_responsaveis || []).map(e => e.toLowerCase());
-    if (!supervisores.includes(userEmail)) return false;
-
-    // Só aprova registros criados por funcionários do cliente (não staff Afirma Evias)
-    const createdBy = (record?.created_by || '').toLowerCase();
-    const clientesEmails = (regional?.clientes_responsaveis || []).map(e => e.toLowerCase());
-    const staffEmails = [
-      ...(regional?.laboratoristas_responsaveis || []),
-      ...(regional?.salas_tecnicas_responsaveis || []),
-      ...(regional?.gestores_contrato_responsaveis || []),
-      regional?.gestor_contrato_responsavel,
-    ].filter(Boolean).map(e => e.toLowerCase());
-    return isCreatorClienteSide(createdBy, allUsers, clientesEmails, staffEmails);
+    return supervisores.includes(userEmail);
   }
 
   return false;

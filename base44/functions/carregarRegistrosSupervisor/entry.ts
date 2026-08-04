@@ -172,13 +172,11 @@ export default async function(req) {
     });
 
     // IDs que o supervisor pode aprovar/reprovar: registros finalizados de obras
-    // das regionais onde é supervisor e criados por pessoal do cliente (não staff).
+    // das regionais onde é supervisor (independente de quem criou).
     const approvableIds = deduped
       .filter(r =>
         r.status !== 'rascunho' &&
-        obraIdsAprovaveis.has(r.obra_id) &&
-        r.created_by &&
-        !staffEmails.has(r.created_by.toLowerCase())
+        obraIdsAprovaveis.has(r.obra_id)
       )
       .map(r => r.id);
 
