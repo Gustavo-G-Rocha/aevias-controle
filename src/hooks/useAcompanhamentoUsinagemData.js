@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { obterEnsaioById } from "@/services/ensaiosService";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { getInitialFormData } from "@/utils/acompanhamentoUsinagemUtils";
+import { filtrarObrasPorAcessoRegional } from "@/utils/regionalFilter";
+import { ACCESS_LEVELS, USER_LIKE_LEVELS, getUserAccessLevel } from "@/lib/layoutConstants";
 
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
@@ -14,7 +16,18 @@ export function useAcompanhamentoUsinagemData() {
   const { data: user, isLoading: loadingUser } = useCurrentUser();
   const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais: true });
 
-  const obras = useMemo(() => auxData?.obras ?? [], [auxData?.obras]);
+  const obras = useMemo(() => {
+    if (!auxData?.obras || !auxData?.regionais || !user) return [];
+    const userAccessLevel = getUserAccessLevel(user);
+    const isLaboratorista = USER_LIKE_LEVELS.includes(userAccessLevel);
+    const isFuncionarioCliente = userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE;
+    const porAcesso = filtrarObrasPorAcessoRegional(auxData.obras, auxData.regionais, user);
+    if (isLaboratorista) {
+      // funcionarios_cliente vê obras de qualquer status; user (laboratorista) apenas em_andamento
+      return isFuncionarioCliente ? porAcesso : porAcesso.filter(o => o.status === 'em_andamento');
+    }
+    return porAcesso;
+  }, [auxData?.obras, auxData?.regionais, user]);
   const regionais = useMemo(() => auxData?.regionais ?? [], [auxData?.regionais]);
   const projects = useMemo(() => auxData?.projects ?? [], [auxData?.projects]);
 
