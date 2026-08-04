@@ -31,13 +31,11 @@ export function useAcompanhamentoCargaData() {
     const isLaboratorista = USER_LIKE_LEVELS.includes(userAccessLevel);
     const isFuncionarioCliente = userAccessLevel === ACCESS_LEVELS.FUNCIONARIOS_CLIENTE;
     const porAcesso = filtrarObrasPorAcessoRegional(auxData.obras, auxData.regionais, user);
-    // Mantém filtro de tipo (conservacao/implantacao) + status para laboratorista
-    const tiposOk = (o) => o.tipo_obra === 'conservacao' || o.tipo_obra === 'implantacao';
     if (isLaboratorista) {
-      const statusOk = isFuncionarioCliente ? () => true : (o) => o.status === 'em_andamento';
-      return porAcesso.filter(o => tiposOk(o) && statusOk(o));
+      // funcionarios_cliente vê obras de qualquer status; user (laboratorista) apenas em_andamento
+      return isFuncionarioCliente ? porAcesso : porAcesso.filter(o => o.status === 'em_andamento');
     }
-    return porAcesso.filter(tiposOk);
+    return porAcesso;
   }, [auxData?.obras, auxData?.regionais, user]);
 
   const regionais = useMemo(() => auxData?.regionais ?? [], [auxData?.regionais]);
