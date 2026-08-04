@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-export default function DashboardFilters({ filters, setFilters, clearFilters, hasActiveFilters, obras }) {
+export default function DashboardFilters({ filters, setFilters, clearFilters, hasActiveFilters, obras, regionais = [] }) {
   const set = (key, value) => setFilters(prev => ({ ...prev, [key]: value === 'todas' || value === 'todos' ? null : value }));
 
   return (
@@ -25,7 +25,19 @@ export default function DashboardFilters({ filters, setFilters, clearFilters, ha
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          {/* Regional */}
+          <div>
+            <span className="text-sm font-medium mb-2 block" style={{ color: 'rgba(255,255,255,0.7)' }}>Regional</span>
+            <Select value={filters.regionalId || 'todas'} onValueChange={v => set('regionalId', v)}>
+              <SelectTrigger className="border" style={{ backgroundColor: 'rgba(255,255,255,0.1)', borderColor: 'rgba(255,255,255,0.2)', color: '#ffffff' }}><SelectValue /></SelectTrigger>
+              <SelectContent style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
+                <SelectItem value="todas">Todas as Regionais</SelectItem>
+                {regionais.map(r => <SelectItem key={r.id} value={r.id}>{r.nome}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Obra */}
           <div>
             <span className="text-sm font-medium mb-2 block" style={{ color: 'rgba(255,255,255,0.7)' }}>Obra</span>
@@ -87,6 +99,12 @@ export default function DashboardFilters({ filters, setFilters, clearFilters, ha
 
         {hasActiveFilters && (
           <div className="flex flex-wrap gap-2 mt-4">
+            {filters.regionalId && (
+              <Badge variant="secondary" className="text-xs" style={{ backgroundColor: 'var(--color-secondary-subtle)', color: 'var(--color-text)' }}>
+                Regional: {regionais.find(r => r.id === filters.regionalId)?.nome}
+                <X className="w-3 h-3 ml-2 cursor-pointer" onClick={() => setFilters(p => ({ ...p, regionalId: null }))} />
+              </Badge>
+            )}
             {filters.obraId && (
               <Badge variant="secondary" className="text-xs" style={{ backgroundColor: 'var(--color-secondary-subtle)', color: 'var(--color-text)' }}>
                 Obra: {obras.find(o => o.id === filters.obraId)?.name}

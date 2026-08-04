@@ -17,6 +17,7 @@ import { useCurrentUser, useAuxData, useAllRecords } from '@/hooks/useQueryData'
 
 const DEFAULT_FILTERS = {
   obraId: null,
+  regionalId: null,
   status: null,
   tipoRegistro: null,
   periodo: '6meses',
@@ -27,7 +28,8 @@ export function useDashboardData() {
 
   const { data: user, isLoading: loadingUser } = useCurrentUser();
   const userAccessLevel = getEffectiveAccessLevel(user);
-  const needsRegionais = ['cliente', 'sala_tecnica_afirmaevias', 'gestor_contrato'].includes(userAccessLevel);
+  // Dashboard always needs regionais for the Regional filter, including admin
+  const needsRegionais = true;
 
   const { data: auxData, isLoading: loadingAux } = useAuxData({ needsRegionais });
   const { data: allRecords = [], isLoading: loadingRecords } = useAllRecords('dashboard');
@@ -73,6 +75,15 @@ export function useDashboardData() {
         : subMonths(now, 6);
 
     let filtered = ensaios.filter(e => new Date(e.created_date) >= startDate);
+
+    // Filtro por Regional: constrói set de obra_ids da regional selecionada
+    if (filters.regionalId) {
+      const obraIdsDaRegional = new Set(
+        obras.filter(o => o.regional_id === filters.regionalId).map(o => o.id)
+      );
+      filtered = filtered.filter(e => obraIdsDaRegional.has(e.obra_id));
+    }
+
     if (filters.obraId) filtered = filtered.filter(e => e.obra_id === filters.obraId);
     if (filters.status === 'approved') filtered = filtered.filter(e => e.approved === true);
     else if (filters.status === 'pending') filtered = filtered.filter(e => e.approved === null);
@@ -80,7 +91,7 @@ export function useDashboardData() {
     if (filters.tipoRegistro) filtered = filtered.filter(e => e.entityType === filters.tipoRegistro);
 
     return filtered;
-  }, [ensaios, filters]);
+  }, [ensaios, filters, obras]);
 
   const isClienteUser = useMemo(() => isCliente(user), [user]);
   const isEngenheiroUser = useMemo(() => isEngenheiroCliente(user), [user]);
@@ -103,7 +114,7 @@ export function useDashboardData() {
   );
 
   const clearFilters = useCallback(() => setFilters(DEFAULT_FILTERS), []);
-  const hasActiveFilters = Boolean(filters.obraId || filters.status || filters.tipoRegistro);
+  const hasActiveFilters = Boolean(filters.obraId || filters.regionalId || filters.status || filters.tipoRegistro || filters.periodo !== DEFAULT_FILTERS.periodo);
 
   return {
     loading,
@@ -116,6 +127,7 @@ export function useDashboardData() {
     charts,
     approvalPercentage,
     obras,
+    regionais: auxData?.regionais ?? [],
     isClienteUser,
     isEngenheiroUser,
   };

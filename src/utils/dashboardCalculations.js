@@ -9,7 +9,7 @@ import { getEntityLabel, getEntityColor, PIE_COLORS } from './entityConfig';
 // Single-pass: conta approved/pending/rejected/assinados em uma única iteração.
 export function calcularStats(ensaios, obras, projects, isClienteUser, isEngenheiroUser) {
   // Acumular tudo em uma passagem
-  let approved = 0, pending = 0, rejected = 0, assinados = 0, aguardando = 0;
+  let approved = 0, pending = 0, rejected = 0, assinados = 0, aguardando = 0, ncs = 0;
   for (const e of ensaios) {
     if (e.client_signature?.signed_by) assinados++;
     if (e.approved === true) {
@@ -19,6 +19,9 @@ export function calcularStats(ensaios, obras, projects, isClienteUser, isEngenhe
       pending++;
     } else if (e.approved === false) {
       rejected++;
+    }
+    if (Array.isArray(e.nao_conformidades)) {
+      ncs += e.nao_conformidades.length;
     }
   }
 
@@ -32,6 +35,7 @@ export function calcularStats(ensaios, obras, projects, isClienteUser, isEngenhe
       rejected: 0,
       assinados,
       aguardando_assinatura: aguardando,
+      ncs,
     };
   }
 
@@ -44,6 +48,7 @@ export function calcularStats(ensaios, obras, projects, isClienteUser, isEngenhe
     rejected,
     assinados,
     aguardando_assinatura: 0,
+    ncs,
   };
 }
 

@@ -12,7 +12,7 @@ import DashboardChartsGrid from '@/components/dashboard/DashboardChartsGrid';
 import DashboardPage from '@/components/dashboard/DashboardPage';
 
 export default function Dashboard() {
-  const { loading, user, filters, setFilters, clearFilters, hasActiveFilters, stats, charts, approvalPercentage, obras, isClienteUser, isEngenheiroUser } = useDashboardData();
+  const { loading, user, filters, setFilters, clearFilters, hasActiveFilters, stats, charts, approvalPercentage, obras, regionais, isClienteUser, isEngenheiroUser } = useDashboardData();
   const { openCreateEnsaio } = useCreateEnsaioDialog();
 
   const handleSliceClick = useCallback((data, chartType) => {
@@ -67,6 +67,7 @@ export default function Dashboard() {
           clearFilters={clearFilters}
           hasActiveFilters={hasActiveFilters}
           obras={obras}
+          regionais={regionais}
         />
       )}
 

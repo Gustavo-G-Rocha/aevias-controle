@@ -1,5 +1,5 @@
 import React from 'react';
-import { Building2, FolderOpen, FlaskConical, CheckCircle, Clock, FileSignature } from 'lucide-react';
+import { Building2, FolderOpen, FlaskConical, CheckCircle, Clock, FileSignature, XCircle, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -59,12 +59,14 @@ export default function DashboardStats({ stats, isClienteUser, isEngenheiroUser,
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-6 mb-8">
       <StatCard title="Obras Ativas" value={stats.obras} icon={Building2} />
-      <StatCard title="Projetos" value={stats.projects} icon={FolderOpen} />
       <StatCard title="Total de Registros" value={stats.ensaios} icon={FlaskConical} />
       <StatCard title="Aprovados" value={stats.approved} icon={CheckCircle} note={`${approvalPercentage}% de aprovação`} />
       <StatCard title="Pendentes" value={stats.pending} icon={Clock} />
+      <StatCard title="Reprovados" value={stats.rejected} icon={XCircle} />
+      <StatCard title="Não Conformidades" value={stats.ncs} icon={AlertTriangle} />
+      <StatCard title="Projetos" value={stats.projects} icon={FolderOpen} />
     </div>
   );
 }
