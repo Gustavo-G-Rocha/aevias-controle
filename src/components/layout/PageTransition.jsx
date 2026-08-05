@@ -1,10 +1,12 @@
 import React from "react";
-import { useLocation, useNavigationType } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTabNavigation } from "@/components/layout/TabNavigationContext";
 
 // Transição de página estilo nativo:
 // - Mobile (<1024px): slide horizontal — PUSH desliza da direita (avançar),
 //   POP desliza da esquerda (voltar), como pilhas de navegação iOS/Android.
+//   Tab switches (zone change) fade instead of sliding.
 // - Desktop: mantém o fade suave original (comportamento web preservado).
 // Modais e drawers não passam por aqui — mantêm suas próprias animações.
 const VARIANTS = {
@@ -18,9 +20,17 @@ const isMobileViewport = () =>
 
 export default function PageTransition({ children, ...divProps }) {
   const location = useLocation();
-  const navigationType = useNavigationType();
+  const tabNav = useTabNavigation();
 
-  const mode = !isMobileViewport() ? "fade" : navigationType === "POP" ? "pop" : "push";
+  const dir = tabNav?.direction || "push";
+  const mode = !isMobileViewport()
+    ? "fade"
+    : dir === "pop"
+      ? "pop"
+      : dir === "push"
+        ? "push"
+        : "fade"; // 'switch' and 'fade' → fade
+
   const variant = VARIANTS[mode];
   const transition = mode === "fade"
     ? { duration: 0.25, ease: "easeOut" }

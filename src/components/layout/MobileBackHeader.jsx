@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { getPageTitle } from "@/lib/pageTitles";
 import { TAB_ZONES, getTabZone } from "@/lib/layoutConstants";
+import { useTabNavigation } from "@/components/layout/TabNavigationContext";
 import NotificationBell from "@/components/notifications/NotificationBell";
 
 // Rotas raiz (tabs do BottomNav) — não mostram botão voltar
@@ -11,6 +12,7 @@ const ROOT_PATHS = ["/", "/Regionais", "/Projects", "/MeusEnsaios"];
 export default function MobileBackHeader() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { popZone } = useTabNavigation();
 
   const isRoot = ROOT_PATHS.includes(location.pathname);
   const title = getPageTitle(location.pathname);
@@ -40,13 +42,15 @@ export default function MobileBackHeader() {
   }
 
   const handleBack = () => {
-    // location.key === "default" indica a primeira entrada do histórico do app
-    // (ex.: deep link / recarregamento): voltar sairia do app. Nesse caso,
-    // vai para a raiz da zona de navegação atual (tab), preservando a pilha.
+    // Try popping the current tab's stack first (native-like behavior):
+    // navigates to the previous screen within the same zone's history.
+    if (popZone && popZone()) return;
+    // Fallback: browser back if there's history
     if (location.key && location.key !== "default") {
       navigate(-1);
       return;
     }
+    // Deep link or no history: go to zone root
     const zone = getTabZone(location.pathname);
     navigate(zone ? TAB_ZONES[zone][0] : "/", { replace: true });
   };

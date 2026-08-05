@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { TabNavigationProvider } from "@/components/layout/TabNavigationContext";
 import PullToRefresh from "@/components/PullToRefresh";
 import { ACCESS_LEVELS, getUserAccessLevel, getTabZone, SESSION_KEYS } from "@/lib/layoutConstants";
 import { isFormPage } from "@/lib/reportPages";
@@ -86,6 +87,7 @@ const AppLayout = ({ children, currentPageName }) => {
 
   return (
     <SidebarProvider>
+      <TabNavigationProvider>
       <CreateEnsaioDialogProvider onOpen={setIsCreateEnsaioOpen}>
       <NotificationProvider>
       <div className="min-h-screen flex w-full overflow-x-hidden" style={{ backgroundColor: 'var(--color-background)' }}>
@@ -150,6 +152,7 @@ const AppLayout = ({ children, currentPageName }) => {
       </Dialog>
       </NotificationProvider>
       </CreateEnsaioDialogProvider>
+      </TabNavigationProvider>
     </SidebarProvider>
   );
 };
