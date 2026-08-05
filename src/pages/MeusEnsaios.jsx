@@ -65,8 +65,8 @@ export default function MeusEnsaios() {
     : "Visualize e gerencie todos os ensaios e diários registrados.";
 
   return (
-    <div className="p-6 space-y-6 bg-transparent min-h-screen">
-      <div className="max-w-7xl mx-auto">
+    <div className="p-4 lg:p-8 space-y-6 bg-transparent min-h-screen">
+      <div className="w-full mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-primary">Ensaios Realizados</h1>
           <p className="text-muted-foreground mt-1">{subtitle}</p>

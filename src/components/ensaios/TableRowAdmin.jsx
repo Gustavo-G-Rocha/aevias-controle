@@ -88,8 +88,8 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
       </td>
       <td className="px-2 py-2 overflow-hidden">{getEmpreiteiraInfo(ensaio) ? <div className="text-muted-foreground text-xs truncate" title={getEmpreiteiraInfo(ensaio)}>{getEmpreiteiraInfo(ensaio)}</div> : <div className="text-muted-foreground/60 text-center text-xs">-</div>}</td>
       <td className="px-2 py-2 overflow-hidden">{projeto ? <div className="text-muted-foreground text-xs truncate" title={projeto.name}>{projeto.name}</div> : <div className="text-muted-foreground/60 text-center text-xs">-</div>}</td>
-      <td className="px-2 py-2">
-        <div className="flex items-center gap-1 flex-nowrap whitespace-nowrap">
+      <td className="px-2 py-2 overflow-hidden">
+        <div className="flex items-center gap-1 flex-nowrap whitespace-nowrap justify-end">
           <Button asChild variant="outline" size="sm" className="text-foreground hover:bg-muted h-7 px-2 shrink-0" title={`Ver relatório de ${name}`} aria-label={`Ver relatório de ${name}`}>
             <RouterLink to={reportUrl} target="_blank" rel="noopener noreferrer"><FileText className="w-3 h-3" /></RouterLink>
           </Button>
@@ -124,7 +124,7 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
               <RouterLink to={createPageUrl(`${ensaio.entityType}?editId=${ensaio.id}`)}><Pencil className="w-3 h-3" /></RouterLink>
             </Button>
           )}
-          {canApprove && ensaio.status === 'rascunho' && <span className="text-xs italic text-muted-foreground ml-1 shrink-0">Em execução</span>}
+          {canApprove && ensaio.status === 'rascunho' && <span className="text-xs italic text-muted-foreground ml-1 shrink-0 hidden xl:inline">Em execução</span>}
           {podeEditarRestrito && (
             <Button asChild size="sm" style={{ backgroundColor: ACTION_COLORS.EDIT }} className="text-white hover:opacity-90 h-7 px-2 shrink-0" title="Editar registro">
               <RouterLink to={createPageUrl(`${ensaio.entityType}?editId=${ensaio.id}`)}><Pencil className="w-3 h-3" /></RouterLink>
