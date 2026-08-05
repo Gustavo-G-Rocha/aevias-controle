@@ -271,10 +271,50 @@ async function fetchRegionalNome(base44, regional_id) {
 
 // ─── Validation ───────────────────────────────────────────────────────────────
 
+/** Allowlist de domínios confiáveis para file_urls passados ao LLM.
+ *  Bloqueia URLs arbitrárias que poderiam expor recursos internos (SSRF). */
+const ALLOWED_FILE_DOMAINS = [
+  'base44.com',
+  'base44.app',
+];
+
+/** Valida a origem de um file_url antes de passá-lo ao InvokeLLM.
+ *  - Deve ser https
+ *  - Domínio deve estar na allowlist (Base44 storage)
+ *  - Bloqueia IPs privados/internos (SSRF protection) */
+function validateFileUrl(url: unknown): string | null {
+  if (typeof url !== 'string' || !url.trim()) return null;
+  let parsed: URL;
+  try {
+    parsed = new URL(url.trim());
+  } catch {
+    return null;
+  }
+  if (parsed.protocol !== 'https:') return null;
+  const hostname = parsed.hostname.toLowerCase();
+  // Bloqueia IPs privados e localhost (SSRF)
+  if (hostname === 'localhost' || hostname === '0.0.0.0') return null;
+  if (/^127\./.test(hostname) || /^10\./.test(hostname)) return null;
+  if (/^192\.168\./.test(hostname)) return null;
+  if (/^172\.(1[6-9]|2\d|3[01])\./.test(hostname)) return null;
+  if (/^169\.254\./.test(hostname)) return null;
+  if (/^::1$/.test(hostname) || /^fe80:/.test(hostname)) return null;
+  // Verifica allowlist de domínios
+  const isAllowed = ALLOWED_FILE_DOMAINS.some(
+    (d) => hostname === d || hostname.endsWith('.' + d)
+  );
+  if (!isAllowed) return null;
+  return parsed.toString();
+}
+
 function validatePayload(payload) {
   const { file_url, tipo_projeto, faixa_id } = payload;
   if (!file_url || !tipo_projeto || !faixa_id) {
     return 'file_url, tipo_projeto e faixa_id são obrigatórios';
+  }
+  const safeUrl = validateFileUrl(file_url);
+  if (!safeUrl) {
+    return 'file_url inválido: deve ser HTTPS e originar de domínio confiável (base44.com)';
   }
   return null;
 }
@@ -296,7 +336,8 @@ Deno.serve(async (req) => {
       return Response.json({ error: validationError }, { status: 400 });
     }
 
-    const { file_url, tipo_projeto, faixa_id, regional_id } = payload;
+    const { tipo_projeto, faixa_id, regional_id } = payload;
+    const safeFileUrl = validateFileUrl(payload.file_url);
 
     const [faixa, regionalNome] = await Promise.all([
       fetchFaixa(base44, faixa_id),
@@ -313,7 +354,7 @@ Deno.serve(async (req) => {
 
     const resultado = await base44.integrations.Core.InvokeLLM({
       prompt,
-      file_urls: [file_url],
+      file_urls: [safeFileUrl],
       response_json_schema: RESPONSE_JSON_SCHEMA,
     });
 
