@@ -81,7 +81,7 @@ export default function BottomNav({ userAccessLevel, canManageSystem, pendingTra
   return (
     <>
     <nav
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-col pb-[env(safe-area-inset-bottom,16px)]"
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex flex-col bottom-nav-safe-area"
       style={{ backgroundColor: 'var(--color-sidebar-bg)' }}>
 
       <div className="flex items-center justify-around"

@@ -4,6 +4,7 @@
 export const SESSION_KEYS = {
   LAST_LOGIN: 'session_login_flag',
   TAB_STACK_PREFIX: 'tab_stack_',
+  TAB_SCROLL_PREFIX: 'tab_scroll_',
 };
 
 export const TAB_ZONES = {

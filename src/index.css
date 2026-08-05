@@ -482,6 +482,14 @@
     margin-top: auto !important;
   }
 
+  /* ── iOS safe area — bottom navigation ──
+     Ensures the tab bar content sits above the home indicator gesture bar.
+     Used by BottomNav on mobile (lg:hidden). viewport-fit=cover in
+     index.html activates env() on iOS notch/home-indicator devices. */
+  .bottom-nav-safe-area {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
   body {
     @apply text-foreground;
     font-family: var(--font-body);

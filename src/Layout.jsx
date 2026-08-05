@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useCallback, useLayoutEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import PullToRefresh from "@/components/PullToRefresh";
-import { ACCESS_LEVELS, getUserAccessLevel } from "@/lib/layoutConstants";
+import { ACCESS_LEVELS, getUserAccessLevel, getTabZone, SESSION_KEYS } from "@/lib/layoutConstants";
 import { isFormPage } from "@/lib/reportPages";
 
 import { useLayoutData } from "@/components/layout/useLayoutData";
@@ -32,6 +32,40 @@ const AppLayout = ({ children, currentPageName }) => {
 
   const { user, obrasDoUsuario, loadingUser, pendingTransfers } = useLayoutData();
   const navigate = useNavigate();
+  const location = useLocation();
+  const prevZoneRef = useRef(null);
+
+  // ── Scroll position restoration per tab zone ──
+  // Saves the scroll position of the previous tab zone before switching,
+  // and restores the saved position when returning to a zone. This keeps
+  // the user's place on long lists when bouncing between bottom tabs.
+  useLayoutEffect(() => {
+    const currentZone = getTabZone(location.pathname);
+    if (!currentZone) {
+      prevZoneRef.current = null;
+      return;
+    }
+
+    if (prevZoneRef.current && prevZoneRef.current !== currentZone) {
+      try {
+        sessionStorage.setItem(
+          `${SESSION_KEYS.TAB_SCROLL_PREFIX}${prevZoneRef.current}`,
+          String(window.scrollY)
+        );
+      } catch { /* storage indisponível no APK */ }
+    }
+
+    try {
+      const saved = sessionStorage.getItem(`${SESSION_KEYS.TAB_SCROLL_PREFIX}${currentZone}`);
+      if (saved !== null) {
+        requestAnimationFrame(() => window.scrollTo(0, parseInt(saved, 10) || 0));
+      } else {
+        window.scrollTo(0, 0);
+      }
+    } catch { /* storage indisponível */ }
+
+    prevZoneRef.current = currentZone;
+  }, [location.pathname, location.search]);
 
   const handleEnsaioSelect = useCallback((url) => {
     if (!url) return;
