@@ -38,20 +38,22 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
   const projectsMap = useMemo(() => new Map(projects.map((p) => [p.id, p])), [projects]);
 
   // Filtra pelo mesmo status exibido no badge (getStatusInfo), garantindo que
-  // registros com status='rascunho' (badge "Execução") nunca apareçam em
-  // "Aprovados"/"Reprovados"/"Assinados", mesmo que approved esteja inconsistente.
+  // registros com status='rascunho' nunca apareçam em "Aprovados"/"Reprovados"/
+  // "Assinados", mesmo que approved esteja inconsistente.
   const applyCustomFilters = useCallback((filtered) => {
     if (statusFilter === 'all') return filtered;
-    const labelByValue = {
-      rascunho: STATUS_LABELS.EXECUCAO,
-      approved: STATUS_LABELS.APROVADO,
-      pending: STATUS_LABELS.PENDENTE,
-      rejected: STATUS_LABELS.REPROVADO,
-      signed: STATUS_LABELS.ASSINADO,
+    // "Pendentes" inclui registros finalizados (aguardando aprovação) e
+    // registros rejeitados que voltaram a ficar pendentes (was_rejected).
+    const labelsByValue = {
+      rascunho: [STATUS_LABELS.RASCUNHO],
+      approved: [STATUS_LABELS.APROVADO],
+      pending: [STATUS_LABELS.PENDENTE, STATUS_LABELS.FINALIZADO],
+      rejected: [STATUS_LABELS.REPROVADO],
+      signed: [STATUS_LABELS.ASSINADO],
     };
-    const target = labelByValue[statusFilter];
-    if (!target) return filtered;
-    return filtered.filter((e) => getStatusInfo(e).text === target);
+    const targets = labelsByValue[statusFilter];
+    if (!targets) return filtered;
+    return filtered.filter((e) => targets.includes(getStatusInfo(e).text));
   }, [statusFilter]);
 
   const {
