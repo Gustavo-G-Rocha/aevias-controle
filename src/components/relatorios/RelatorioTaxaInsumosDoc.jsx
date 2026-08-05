@@ -21,16 +21,16 @@ export default function RelatorioTaxaInsumosDoc({ ensaio, obra, regional }) {
           body, html { margin: 0; padding: 0; background: white !important; }
           .taxa-insumos-document { padding: 0 !important; background: white !important; }
           .print-page {
+            display: block;
             width: 100%;
             max-width: none;
-            min-height: 276mm;
+            min-height: 0;
+            height: auto;
             margin: 0;
             padding: 3mm 2mm;
             box-sizing: border-box;
             box-shadow: none !important;
             border-radius: 0 !important;
-            break-inside: avoid;
-            page-break-inside: avoid;
           }
         }
         @media screen {
