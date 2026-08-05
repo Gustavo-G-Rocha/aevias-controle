@@ -73,9 +73,15 @@ export default async function(req) {
       return Response.json({ error: 'Sem permissão para atualizar este usuário' }, { status: 403 });
     }
 
+    const simpleFields = new Set([
+      'laboratorista_name', 'company', 'position', 'phone', 'crea_number', 'is_active',
+    ]);
+    const editableFields = ['sala_tecnica_afirmaevias', 'gestor_contrato'].includes(actorLevel)
+      ? simpleFields
+      : ALLOWED_FIELDS;
     const updateData = {};
     for (const [key, value] of Object.entries(requestedData)) {
-      if (!ALLOWED_FIELDS.has(key)) continue;
+      if (!editableFields.has(key)) continue;
       if (typeof value === 'string') updateData[key] = value.trim();
       else if (key === 'is_active' && typeof value === 'boolean') updateData[key] = value;
     }

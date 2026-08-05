@@ -1,5 +1,16 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.41';
 
+function publicUser(user) {
+    const allowedFields = [
+        'id', 'email', 'full_name', 'laboratorista_name', 'company', 'position',
+        'phone', 'crea_number', 'is_active', 'access_level', 'supervisor_email',
+        'role', 'last_login', 'created_date', 'updated_date'
+    ];
+    return Object.fromEntries(allowedFields
+        .filter(field => user[field] !== undefined)
+        .map(field => [field, user[field]]));
+}
+
 /**
  * Função de backend para listar usuários filtrados por regional.
  * 
@@ -38,7 +49,7 @@ Deno.serve(async (req) => {
         if (userAccessLevel === 'admin') {
             console.log("👑 Admin - retornando todos os usuários");
             return Response.json({ 
-                users: allUsers,
+                users: allUsers.map(publicUser),
                 total: allUsers.length,
                 filtered: false
             });
@@ -49,9 +60,11 @@ Deno.serve(async (req) => {
 
         if (userAccessLevel === 'gestor_contrato') {
             console.log("🔍 Buscando regionais onde o usuário é gestor...");
-            regionaisDoUsuario = allRegionais.filter(regional => 
-                regional.gestor_contrato_responsavel?.toLowerCase() === user.email.toLowerCase()
-            );
+            regionaisDoUsuario = allRegionais.filter(regional => {
+                const gestores = regional.gestores_contrato_responsaveis || [];
+                return gestores.some(email => email.toLowerCase() === user.email.toLowerCase())
+                    || regional.gestor_contrato_responsavel?.toLowerCase() === user.email.toLowerCase();
+            });
         } else if (userAccessLevel === 'sala_tecnica_afirmaevias') {
             console.log("🔍 Buscando regionais onde o usuário é sala técnica...");
             regionaisDoUsuario = allRegionais.filter(regional => {
@@ -69,7 +82,7 @@ Deno.serve(async (req) => {
             console.log("👤 Laboratorista - retornando apenas o próprio usuário");
             const selfUser = allUsers.find(u => u.email.toLowerCase() === user.email.toLowerCase());
             return Response.json({ 
-                users: selfUser ? [selfUser] : [],
+                users: selfUser ? [publicUser(selfUser)] : [],
                 total: selfUser ? 1 : 0,
                 filtered: true,
                 filterType: 'self'
@@ -95,11 +108,13 @@ Deno.serve(async (req) => {
         regionaisDoUsuario.forEach(regional => {
             console.log(`\n📋 Processando regional: ${regional.nome}`);
             
-            // Adicionar gestor
+            // Adicionar gestores
+            const gestores = regional.gestores_contrato_responsaveis || [];
+            gestores.forEach(email => { emailsNasRegionais.add(email.toLowerCase()); });
             if (regional.gestor_contrato_responsavel) {
                 emailsNasRegionais.add(regional.gestor_contrato_responsavel.toLowerCase());
-                console.log(`  ✓ Gestor: ${regional.gestor_contrato_responsavel}`);
             }
+            console.log(`  ✓ Gestores: ${gestores.length}`);
             
             // Adicionar laboratoristas
             const labs = regional.laboratoristas_responsaveis || [];
@@ -137,7 +152,7 @@ Deno.serve(async (req) => {
         }
 
         return Response.json({ 
-            users: usuariosFiltrados,
+            users: usuariosFiltrados.map(publicUser),
             total: usuariosFiltrados.length,
             filtered: true,
             filterType: 'regional',
