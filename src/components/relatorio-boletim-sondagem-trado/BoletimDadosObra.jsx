@@ -8,9 +8,9 @@ const SECTION_BAND =
   'bg-[#BFCF99] text-[#00233B] border border-[#94a3b8] px-2 py-0.5 font-bold text-center text-[10px] uppercase tracking-wider mb-1';
 
 const Field = ({ label, value }) => (
-  <div className="flex items-baseline gap-1 text-[10px] leading-tight">
+  <div className="flex items-baseline gap-1 text-[10px] leading-tight text-left">
     <span className="font-bold whitespace-nowrap text-[#00233B]">{label}:</span>
-    <span className="flex-1 border-b border-[#94a3b8] text-[#00233B] min-w-0">{value}</span>
+    <span className="flex-1 border-b border-[#94a3b8] text-[#00233B] min-w-0 text-left pb-0.5">{value}</span>
   </div>
 );
 
