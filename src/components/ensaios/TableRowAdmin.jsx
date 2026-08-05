@@ -124,7 +124,11 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
               <RouterLink to={createPageUrl(`${ensaio.entityType}?editId=${ensaio.id}`)}><Pencil className="w-3 h-3" /></RouterLink>
             </Button>
           )}
-          {canApprove && ensaio.status === 'rascunho' && <Clock className="w-3 h-3 text-muted-foreground ml-1 shrink-0" title="Em execução" aria-label="Em execução" />}
+          {canApprove && ensaio.status === 'rascunho' && (
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:bg-muted h-7 px-2 shrink-0" title="Em execução" aria-label="Em execução">
+              <Clock className="w-3 h-3" />
+            </Button>
+          )}
           {podeEditarRestrito && (
             <Button asChild size="sm" style={{ backgroundColor: ACTION_COLORS.EDIT }} className="text-white hover:opacity-90 h-7 px-2 shrink-0" title="Editar registro">
               <RouterLink to={createPageUrl(`${ensaio.entityType}?editId=${ensaio.id}`)}><Pencil className="w-3 h-3" /></RouterLink>

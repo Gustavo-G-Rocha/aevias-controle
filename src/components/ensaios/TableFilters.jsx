@@ -20,7 +20,7 @@ export const CopyIdButton = React.memo(({ id }) => {
       type="button"
       onClick={handleCopy}
       title={`Copiar ID: ${id}`}
-      className="inline-flex items-center gap-1 text-[9px] font-mono bg-muted hover:bg-secondary/20/40 px-1.5 py-0.5 rounded transition-colors text-muted-foreground hover:text-foreground">
+      className="inline-flex items-center gap-1 text-[9px] font-mono bg-muted hover:bg-secondary/20/40 px-1.5 py-0 rounded transition-colors text-muted-foreground hover:text-foreground leading-none">
       <span className="truncate max-w-[40px]">{copied ? '✓' : id.slice(0, 6) + '…'}</span>
     </button>
   );

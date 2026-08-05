@@ -65,7 +65,7 @@ export default function EnsaiosTableHeader({
             <DateRangePicker startDate={dataInicioFilter} endDate={dataFimFilter} onStartChange={setDataInicioFilter} onEndChange={setDataFimFilter} />
           </div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-[11px]" style={{ width: '13%' }}>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-[11px]" style={{ width: '15%' }}>
           <div className="flex items-center justify-between gap-0.5 min-w-0">
             <span className="whitespace-nowrap truncate">Obra</span>
             <TextColumnFilter value={obraFilter} onChange={setObraFilter} placeholder="Filtrar por obra..." />
@@ -83,9 +83,9 @@ export default function EnsaiosTableHeader({
             <TextColumnFilter value={localFilter} onChange={setLocalFilter} placeholder="Filtrar por local..." />
           </div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-[11px]" style={{ width: '13%' }}>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-[11px]" style={{ width: '11%' }}>
           <div className="flex items-center justify-between gap-0.5 min-w-0">
-            <span className="whitespace-nowrap truncate">Empreiteira</span>
+            <span className="whitespace-nowrap truncate">Empreit.</span>
             <TextColumnFilter value={empreiteiraFilter} onChange={setEmpreiteiraFilter} placeholder="Filtrar por empreiteira..." />
           </div>
         </th>
