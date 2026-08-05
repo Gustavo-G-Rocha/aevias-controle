@@ -42,19 +42,19 @@ export default function EnsaiosTableHeader({
             />
           </th>
         )}
-        <th className="text-left px-2 py-2 font-medium text-foreground text-[11px]" style={{ width: '11%' }}>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '11%' }}>
           <div className="flex items-center justify-between gap-0.5 min-w-0">
             <span className="whitespace-nowrap truncate">Tipo</span>
             <SelectColumnFilter value={typeFilter} onChange={setTypeFilter} options={typeOptions} placeholder="Filtrar por tipo" />
           </div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-[11px]" style={{ width: '10%' }}>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '10%' }}>
           <div className="flex items-center justify-between gap-0.5 min-w-0">
             <span className="whitespace-nowrap truncate">Status</span>
             <SelectColumnFilter value={statusFilter} onChange={setStatusFilter} options={statusOptions} placeholder="Filtrar por status" />
           </div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-[11px]" style={{ width: '11%' }}>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '11%' }}>
           <div className="flex items-center gap-1 min-w-0">
             <button type="button" onClick={toggleSortOrder} className="flex items-center gap-0.5 hover:text-secondary transition-colors whitespace-nowrap shrink-0">
               <span>Data</span>
@@ -65,37 +65,37 @@ export default function EnsaiosTableHeader({
             <DateRangePicker startDate={dataInicioFilter} endDate={dataFimFilter} onStartChange={setDataInicioFilter} onEndChange={setDataFimFilter} />
           </div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-[11px]" style={{ width: '15%' }}>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '15%' }}>
           <div className="flex items-center justify-between gap-0.5 min-w-0">
             <span className="whitespace-nowrap truncate">Obra</span>
             <TextColumnFilter value={obraFilter} onChange={setObraFilter} placeholder="Filtrar por obra..." />
           </div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-[11px]" style={{ width: '8%' }}>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '8%' }}>
           <div className="flex items-center justify-between gap-0.5 min-w-0">
             <span className="whitespace-nowrap truncate">Lab.</span>
             <TextColumnFilter value={nomeFilter} onChange={setNomeFilter} placeholder="Filtrar por nome..." />
           </div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-[11px]" style={{ width: '11%' }}>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '11%' }}>
           <div className="flex items-center justify-between gap-0.5 min-w-0">
             <span className="whitespace-nowrap truncate">Local</span>
             <TextColumnFilter value={localFilter} onChange={setLocalFilter} placeholder="Filtrar por local..." />
           </div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-[11px]" style={{ width: '11%' }}>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '11%' }}>
           <div className="flex items-center justify-between gap-0.5 min-w-0">
             <span className="whitespace-nowrap truncate">Empreit.</span>
             <TextColumnFilter value={empreiteiraFilter} onChange={setEmpreiteiraFilter} placeholder="Filtrar por empreiteira..." />
           </div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-[11px]" style={{ width: '10%' }}>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '10%' }}>
           <div className="flex items-center justify-between gap-0.5 min-w-0">
             <span className="whitespace-nowrap truncate">Projeto</span>
             <TextColumnFilter value={projetoFilter} onChange={setProjetoFilter} placeholder="Filtrar por projeto..." />
           </div>
         </th>
-        <th className="text-center px-2 py-2 font-medium text-foreground text-[11px]" style={{ width: acoesWidth }}>{acoesLabel}</th>
+        <th className="text-center px-2 py-2 font-medium text-foreground text-xs" style={{ width: acoesWidth }}>{acoesLabel}</th>
       </tr>
     </thead>
   );
