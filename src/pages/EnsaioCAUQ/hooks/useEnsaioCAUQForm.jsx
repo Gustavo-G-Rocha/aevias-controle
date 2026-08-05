@@ -13,7 +13,9 @@
  */
 
 import { useCallback, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
+import { QUERY_KEYS } from "@/hooks/useQueryData";
 import { createPageUrl } from "@/utils";
 import { validateEnsaioCAUQ, validateEnsaioRascunho } from "@/utils/ensaioValidation";
 import { getFatorCorrecaoEstabilidade, novoCorpoProva } from "@/utils/ensaioCAUQCalculations";
@@ -37,6 +39,7 @@ export function useEnsaioCAUQForm({
   clearSavedData,
   navigate,
 }) {
+  const queryClient = useQueryClient();
 
   // ── handlers simples ────────────────────────────────────────────────────────
   const handleChange = useCallback((field, value) => {
@@ -240,13 +243,14 @@ export function useEnsaioCAUQForm({
         toast({ title: "Progresso salvo com sucesso!" });
       }
       clearSavedData();
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords });
     } catch (error) {
       logger.error("[EnsaioCAUQ] Erro ao salvar progresso:", error?.message || error);
       toast({ title: "Erro ao salvar progresso.", variant: "destructive" });
     } finally {
       setSaving(false);
     }
-  }, [formData, editingEnsaio, setEditingEnsaio, user, setSaving, clearSavedData]);
+  }, [formData, editingEnsaio, setEditingEnsaio, user, setSaving, clearSavedData, queryClient]);
 
   // ── finalizar ensaio ─────────────────────────────────────────────────────────
   const handleSubmit = useCallback(async (e) => {
@@ -280,6 +284,7 @@ export function useEnsaioCAUQForm({
         toast({ title: "Ensaio criado e finalizado com sucesso!" });
       }
       clearSavedData();
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords });
       navigate(createPageUrl('MeusEnsaios'));
     } catch (error) {
       logger.error("[EnsaioCAUQ] Erro ao finalizar ensaio:", error?.message || error);
@@ -287,7 +292,7 @@ export function useEnsaioCAUQForm({
     } finally {
       setSaving(false);
     }
-  }, [formData, editingEnsaio, user, setSaving, clearSavedData, navigate]);
+  }, [formData, editingEnsaio, user, setSaving, clearSavedData, navigate, queryClient]);
 
   return {
     handleChange,
