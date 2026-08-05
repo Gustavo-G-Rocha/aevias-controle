@@ -11,6 +11,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider } from '@/lib/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import TwoFactorGate from '@/components/auth/TwoFactorGate';
+import PasswordResetTokenGuard from '@/components/auth/PasswordResetTokenGuard';
 import { useTheme } from '@/hooks/useTheme';
 import { lazyWithRetry as lazy } from '@/lib/lazyWithRetry';
 
@@ -124,6 +125,7 @@ function App() {
       <QueryClientProvider client={queryClientInstance}>
         <Router>
           <NavigationTracker />
+          <PasswordResetTokenGuard />
           <AndroidBackHandler />
           <AuthenticatedApp />
         </Router>
