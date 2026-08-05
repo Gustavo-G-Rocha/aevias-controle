@@ -14,6 +14,7 @@ import { QUERY_KEYS } from "@/hooks/useQueryData";
 import { toast } from "@/components/ui/use-toast";
 import { SIGN_DIALOG, buildSignDescription, OFFLINE_BADGE_LABEL } from "@/constants/ensaioUi";
 import CriticalActionDialog from "@/components/ensaios/CriticalActionDialog";
+import CauqMeasurementSummary from "@/components/ensaios/CauqMeasurementSummary";
 
 const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
   const queryClient = useQueryClient();
@@ -116,6 +117,8 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
                 </div>
               )}
             </div>
+
+            <CauqMeasurementSummary ensaio={ensaio} />
 
             {ensaio.sample_id && (
               <div className="text-sm">

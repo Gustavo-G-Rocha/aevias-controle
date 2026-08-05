@@ -16,7 +16,8 @@ export default function SaveProgressButton({
   label = "Salvar Progresso",
   savingLabel = "Salvando...",
   savedLabel = "Progresso salvo!",
-  className = ""
+  className = "",
+  testId,
 }) {
   const { showSaved, handleClick } = useOptimisticSave(onClick);
 
@@ -25,6 +26,8 @@ export default function SaveProgressButton({
       type="button"
       disabled={saving || disabled}
       onClick={handleClick}
+      data-testid={testId}
+      aria-live="polite"
       className={`${className} ${showSaved ? "bg-green-600 hover:bg-green-600 text-white" : ""}`}
     >
       {showSaved ? (

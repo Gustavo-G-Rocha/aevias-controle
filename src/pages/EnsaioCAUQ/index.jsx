@@ -18,8 +18,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Loader2, Save, CheckCircle } from "lucide-react";
+import { Loader2, CheckCircle } from "lucide-react";
 import LoadingState from "@/components/LoadingState";
+import SaveProgressButton from "@/components/forms/SaveProgressButton";
 import { createPageUrl } from "@/utils";
 import { useEnsaioForm } from "@/hooks/useEnsaioForm";
 import { PENEIRAS_CONFIG, filtrarPeneirasPorFaixa } from "@/constants/sieves";
@@ -257,13 +258,13 @@ export default function EnsaioCAUQPage() {
 
                 {isEditable && !isApproved && (
                   <>
-                    <Button type="button" variant="outline" data-testid="save-progress-btn"
+                    <SaveProgressButton
                       onClick={handlers.handleSaveProgress}
-                      disabled={saving || !formData.obra_id}
-                      >
-                      {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                      Salvar Progresso
-                    </Button>
+                      saving={saving}
+                      disabled={!formData.obra_id}
+                      testId="save-progress-btn"
+                      className="border border-input bg-background text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground"
+                    />
                     <Button type="submit" data-testid="finalize-btn" disabled={saving}>
                       {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
                       Finalizar Registro
