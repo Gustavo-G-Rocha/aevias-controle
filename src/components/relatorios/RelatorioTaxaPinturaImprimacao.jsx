@@ -234,7 +234,7 @@ export default function RelatorioTaxaPinturaImprimacao({ ensaio, obra, regional 
               </tr>
               <tr>
                 <td className="border border-slate-300 px-1 py-1 font-bold">TAXA DE EMULSÃO APLICADA</td>
-                <td className="border border-slate-300 px-1 py-1 text-center italic text-[8px]">Tᵉ = Tₐ × R%</td>
+                <td className="border border-slate-300 px-1 py-1 text-center italic text-[8px]">Tᵉ = Tₐ</td>
                 <td className="border border-slate-300 px-1 py-1 text-center">l/m²</td>
                 {ensaios.map((e, i) => (
                   <td key={i} className="border border-slate-300 px-1 py-1 text-center font-bold">{e.taxa_emulsao_aplicada?.toFixed(2) || ''}</td>
@@ -242,7 +242,7 @@ export default function RelatorioTaxaPinturaImprimacao({ ensaio, obra, regional 
               </tr>
               <tr>
                 <td className="border border-slate-300 px-1 py-1 font-bold">TAXA RESIDUAL</td>
-                <td className="border border-slate-300 px-1 py-1 text-center italic text-[8px]">Tᵣ = Tₐ × R</td>
+                <td className="border border-slate-300 px-1 py-1 text-center italic text-[8px]">Tᵣ = Tₐ × (R/100)</td>
                 <td className="border border-slate-300 px-1 py-1 text-center">l/m²</td>
                 {ensaios.map((e, i) => (
                   <td key={i} className="border border-slate-300 px-1 py-1 text-center font-bold">{e.taxa_residual?.toFixed(2) || ''}</td>

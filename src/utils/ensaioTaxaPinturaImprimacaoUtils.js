@@ -69,32 +69,30 @@ export function calcularEnsaio(ensaio, areaBandeja) {
   const novo = { ...ensaio, ensaio_residuo: { ...ensaio.ensaio_residuo } };
 
   // Peso da emulsão = Peso bandeja+amostra - Peso bandeja
-  if (ensaio.peso_bandeja_amostra && ensaio.peso_bandeja) {
+  if (ensaio.peso_bandeja_amostra != null && ensaio.peso_bandeja != null) {
     novo.peso_emulsao = parseFloat((ensaio.peso_bandeja_amostra - ensaio.peso_bandeja).toFixed(2));
   }
 
-  // Taxa aplicada = Peso emulsão / (1000 × Área)
-  if (novo.peso_emulsao && areaBandeja) {
-    novo.taxa_aplicada = parseFloat((novo.peso_emulsao / (1000 * areaBandeja)).toFixed(2));
+  // Taxa aplicada = Peso emulsão / (1000 × Área)  [g → l dividindo por 1000]
+  if (novo.peso_emulsao != null && areaBandeja) {
+    novo.taxa_aplicada = parseFloat((novo.peso_emulsao / (1000 * areaBandeja)).toFixed(4));
   }
 
   // Resíduo (%) = ((Peso final - Tara) / (Peso inicial - Tara)) × 100
   const r = ensaio.ensaio_residuo;
-  if (r?.peso_inicial && r?.peso_final && r?.tara) {
+  if (r?.peso_inicial != null && r?.peso_final != null && r?.tara != null) {
     novo.ensaio_residuo.residuo = parseFloat(
       (((r.peso_final - r.tara) / (r.peso_inicial - r.tara)) * 100).toFixed(2)
     );
   }
 
-  // Taxa de emulsão aplicada = Taxa aplicada × (Resíduo / 100)
-  if (novo.taxa_aplicada && novo.ensaio_residuo?.residuo) {
-    novo.taxa_emulsao_aplicada = parseFloat(
-      (novo.taxa_aplicada * (novo.ensaio_residuo.residuo / 100)).toFixed(4)
-    );
+  // Taxa de emulsão aplicada = Taxa aplicada (a emulsão aplicada é a própria taxa)
+  if (novo.taxa_aplicada != null) {
+    novo.taxa_emulsao_aplicada = parseFloat(novo.taxa_aplicada.toFixed(4));
   }
 
-  // Taxa residual = Taxa aplicada × (Resíduo / 100)
-  if (novo.taxa_aplicada && novo.ensaio_residuo?.residuo) {
+  // Taxa residual = Taxa aplicada × (Resíduo / 100)  [ligante residual após evaporação]
+  if (novo.taxa_aplicada != null && novo.ensaio_residuo?.residuo != null) {
     novo.taxa_residual = parseFloat(
       (novo.taxa_aplicada * (novo.ensaio_residuo.residuo / 100)).toFixed(4)
     );
