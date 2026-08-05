@@ -150,7 +150,7 @@ export default function AppSidebar({
                         <SubNavItem to="/ImpressionEtiquetas" icon={FileText} label="Impressão de Etiquetas" isActive={isActive("/ImpressionEtiquetas")} />
                   }
                       {(isGestorContrato || isSalaTecnica || isAdmin) &&
-                        <SubNavItem to="/RelatoriosUnificados" icon={FileText} label="Relatório Consolidado Regional" isActive={isActive("/RelatoriosUnificados")} />
+                        <SubNavItem to="/RelatoriosUnificados" icon={FileText} label="Relatório Consolidado" isActive={isActive("/RelatoriosUnificados")} />
                   }
                     </>
                 }
