@@ -33,7 +33,7 @@ export const STATUS_BADGE_CLASSES = {
   ASSINADO: 'bg-muted/10 text-foreground border border-border/30 hover:bg-muted/20 hover:border-border/40 transition-colors',
   APROVADO: 'bg-green-100 text-green-700 border border-green-300/50 hover:bg-green-200 hover:border-green-400/50 transition-colors',
   REPROVADO: 'bg-red-100 text-destructive border border-red-300/50 hover:bg-red-200 hover:border-red-400/50 transition-colors',
-  FINALIZADO: 'bg-indigo-100 text-indigo-700 border border-indigo-300/50 hover:bg-indigo-200 hover:border-indigo-400/50 transition-colors',
+  FINALIZADO: 'bg-yellow-100 text-yellow-700 border border-yellow-300/50 hover:bg-yellow-200 hover:border-yellow-400/50 transition-colors',
   PENDENTE_REJEITADO: 'bg-orange-100/80 text-orange-800 border border-border/50 hover:bg-orange-200/80 hover:border-orange-400/50 transition-colors',
   PENDENTE: 'bg-yellow-100 text-yellow-700 border border-yellow-300/50 hover:bg-yellow-200 hover:border-yellow-400/50 transition-colors',
 };
