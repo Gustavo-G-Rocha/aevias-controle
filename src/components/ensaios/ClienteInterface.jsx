@@ -75,7 +75,7 @@ const ClienteInterface = React.memo(({ ensaios, obras, projects, user, allUsers 
       <Card className="border-0" style={{ backgroundColor: 'var(--color-surface)', borderRadius: 'var(--card-radius)', boxShadow: 'var(--card-shadow)' }}>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm table-fixed">
               <EnsaiosTableHeader
                 typeFilter={typeFilter} setTypeFilter={setTypeFilter}
                 sortOrder={sortOrder} toggleSortOrder={toggleSortOrder}
