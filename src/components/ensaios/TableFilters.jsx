@@ -37,12 +37,12 @@ export const DateRangePicker = React.memo(({ startDate, endDate, onStartChange, 
     return `${new Date(startDate).toLocaleDateString('pt-BR')} - ${new Date(endDate).toLocaleDateString('pt-BR')}`;
   };
 
+  const hasFilter = startDate || endDate;
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-8 text-xs font-normal hover:bg-black/10">
-          <Filter className={`w-3 h-3 mr-1 ${startDate || endDate ? 'text-secondary' : ''}`} />
-          {formatDateRange()}
+        <Button variant="ghost" size="sm" className="h-5 w-5 p-0 text-xs font-normal hover:bg-black/10 shrink-0">
+          <Filter className={`w-3 h-3 ${hasFilter ? 'text-secondary' : ''}`} />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-3" align="start">
@@ -73,7 +73,7 @@ export const TextColumnFilter = React.memo(({ value, onChange, placeholder }) =>
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-8 text-xs font-normal hover:bg-black/10">
+        <Button variant="ghost" size="sm" className="h-5 w-5 p-0 text-xs font-normal hover:bg-black/10 shrink-0">
           <Filter className={`w-3 h-3 ${value ? 'text-secondary' : ''}`} />
         </Button>
       </PopoverTrigger>
@@ -104,7 +104,7 @@ export const SelectColumnFilter = React.memo(({ value, onChange, options, placeh
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-8 text-xs font-normal hover:bg-black/10">
+        <Button variant="ghost" size="sm" className="h-5 w-5 p-0 text-xs font-normal hover:bg-black/10 shrink-0">
           <Filter className={`w-3 h-3 ${value !== 'all' ? 'text-secondary' : ''}`} />
         </Button>
       </PopoverTrigger>
