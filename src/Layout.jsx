@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useLayoutEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Dialog,
@@ -35,6 +35,19 @@ const AppLayout = ({ children, currentPageName }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const prevZoneRef = useRef(null);
+  // Tracks the live scroll position so it can be saved *before* the page
+  // content is replaced (useLayoutEffect fires after React swaps the DOM,
+  // at which point window.scrollY may already be 0 or clamped).
+  const liveScrollRef = useRef(0);
+
+  // Keep liveScrollRef updated on every scroll event
+  useEffect(() => {
+    const handleScroll = () => {
+      liveScrollRef.current = window.scrollY;
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // ── Scroll position restoration per tab zone ──
   // Saves the scroll position of the previous tab zone before switching,
@@ -47,19 +60,37 @@ const AppLayout = ({ children, currentPageName }) => {
       return;
     }
 
+    // Save the *live* scroll position (captured before DOM swap) of the
+    // previous zone before switching to the new one.
     if (prevZoneRef.current && prevZoneRef.current !== currentZone) {
       try {
         sessionStorage.setItem(
           `${SESSION_KEYS.TAB_SCROLL_PREFIX}${prevZoneRef.current}`,
-          String(window.scrollY)
+          String(liveScrollRef.current)
         );
       } catch { /* storage indisponível no APK */ }
     }
 
+    // Restore saved scroll position for the current zone. Because list
+    // pages load data asynchronously, the page may not be tall enough on
+    // the first frame — retry over several intervals until it fits.
     try {
       const saved = sessionStorage.getItem(`${SESSION_KEYS.TAB_SCROLL_PREFIX}${currentZone}`);
       if (saved !== null) {
-        requestAnimationFrame(() => window.scrollTo(0, parseInt(saved, 10) || 0));
+        const target = parseInt(saved, 10) || 0;
+        let attempts = 0;
+        const tryScroll = () => {
+          // If the page is tall enough to hold the target, restore it.
+          const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+          if (maxScroll >= target || attempts >= 10) {
+            window.scrollTo(0, target);
+          } else {
+            attempts++;
+            setTimeout(tryScroll, 100);
+          }
+        };
+        // Start on next frame, then retry if needed
+        requestAnimationFrame(tryScroll);
       } else {
         window.scrollTo(0, 0);
       }
