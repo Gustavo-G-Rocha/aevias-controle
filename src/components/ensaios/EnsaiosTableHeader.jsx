@@ -21,7 +21,7 @@ export default function EnsaiosTableHeader({
   statusOptions,
   // coluna de ações
   acoesLabel = "Ações",
-  acoesWidth = "140px",
+  acoesWidth = "240px",
   showSelection = false,
   allSelected = false,
   someSelected = false,

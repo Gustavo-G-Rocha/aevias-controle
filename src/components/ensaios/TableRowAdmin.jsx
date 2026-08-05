@@ -89,19 +89,19 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
       <td className="px-2 py-2">{getEmpreiteiraInfo(ensaio) ? <div className="text-muted-foreground text-xs truncate max-w-[100px]">{getEmpreiteiraInfo(ensaio)}</div> : <div className="text-muted-foreground/60 text-center text-xs">-</div>}</td>
       <td className="px-2 py-2">{projeto ? <div className="text-muted-foreground text-xs truncate max-w-[100px]" title={projeto.name}>{projeto.name}</div> : <div className="text-muted-foreground/60 text-center text-xs">-</div>}</td>
       <td className="px-2 py-2">
-        <div className="flex items-center gap-1">
-          <Button asChild variant="outline" size="sm" className="text-foreground hover:bg-muted h-7 px-2" title={`Ver relatório de ${name}`} aria-label={`Ver relatório de ${name}`}>
+        <div className="flex items-center gap-1 flex-nowrap whitespace-nowrap">
+          <Button asChild variant="outline" size="sm" className="text-foreground hover:bg-muted h-7 px-2 shrink-0" title={`Ver relatório de ${name}`} aria-label={`Ver relatório de ${name}`}>
             <RouterLink to={reportUrl} target="_blank" rel="noopener noreferrer"><FileText className="w-3 h-3" /></RouterLink>
           </Button>
           {canApprove && ensaio.status !== 'rascunho' && (
-            <div className="flex gap-1">
+            <div className="flex gap-1 flex-nowrap shrink-0">
               {(ensaio.approved === null || ensaio.approved === false) && (
-                <Button asChild size="sm" style={{ backgroundColor: ACTION_COLORS.APPROVE }} className="text-white hover:opacity-90 h-7 px-2" title="Aprovar (abre relatório para assinatura)">
+                <Button asChild size="sm" style={{ backgroundColor: ACTION_COLORS.APPROVE }} className="text-white hover:opacity-90 h-7 px-2 shrink-0" title="Aprovar (abre relatório para assinatura)">
                   <RouterLink to={reportUrl} target="_blank" rel="noopener noreferrer"><CheckCircle className="w-3 h-3" /></RouterLink>
                 </Button>
               )}
               {ensaio.approved === null && (
-                <Button size="sm" style={{ backgroundColor: ACTION_COLORS.REJECT }} className="text-white hover:opacity-90 h-7 px-2" onClick={() => onReject(ensaio)} title="Reprovar">
+                <Button size="sm" style={{ backgroundColor: ACTION_COLORS.REJECT }} className="text-white hover:opacity-90 h-7 px-2 shrink-0" onClick={() => onReject(ensaio)} title="Reprovar">
                   <XCircle className="w-3 h-3" />
                 </Button>
               )}
@@ -114,24 +114,24 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
               confirmLabel={SIGN_DIALOG.confirmLabel}
               onConfirm={() => onAssinar(ensaio)}
             >
-              <Button size="sm" style={{ backgroundColor: ACTION_COLORS.APPROVE }} className="text-white hover:opacity-90 h-7 px-2" title="Assinar" aria-label="Assinar registro">
+              <Button size="sm" style={{ backgroundColor: ACTION_COLORS.APPROVE }} className="text-white hover:opacity-90 h-7 px-2 shrink-0" title="Assinar" aria-label="Assinar registro">
                 <MessageSquare className="w-3 h-3" />
               </Button>
             </CriticalActionDialog>
           )}
           {podeEditarRegistro && (
-            <Button asChild size="sm" style={{ backgroundColor: ACTION_COLORS.EDIT }} className="text-white hover:opacity-90 h-7 px-2" title="Editar registro">
+            <Button asChild size="sm" style={{ backgroundColor: ACTION_COLORS.EDIT }} className="text-white hover:opacity-90 h-7 px-2 shrink-0" title="Editar registro">
               <RouterLink to={createPageUrl(`${ensaio.entityType}?editId=${ensaio.id}`)}><Pencil className="w-3 h-3" /></RouterLink>
             </Button>
           )}
-          {canApprove && ensaio.status === 'rascunho' && <span className="text-xs italic text-muted-foreground ml-2">Em execução</span>}
+          {canApprove && ensaio.status === 'rascunho' && <span className="text-xs italic text-muted-foreground ml-1 shrink-0">Em execução</span>}
           {podeEditarRestrito && (
-            <Button asChild size="sm" style={{ backgroundColor: ACTION_COLORS.EDIT }} className="text-white hover:opacity-90 h-7 px-2" title="Editar registro">
+            <Button asChild size="sm" style={{ backgroundColor: ACTION_COLORS.EDIT }} className="text-white hover:opacity-90 h-7 px-2 shrink-0" title="Editar registro">
               <RouterLink to={createPageUrl(`${ensaio.entityType}?editId=${ensaio.id}`)}><Pencil className="w-3 h-3" /></RouterLink>
             </Button>
           )}
           {canApprove && (
-            <Button size="sm" variant="destructive" className="h-7 px-2" onClick={() => onDelete(ensaio)} title="Excluir">
+            <Button size="sm" variant="destructive" className="h-7 px-2 shrink-0" onClick={() => onDelete(ensaio)} title="Excluir">
               <Trash2 className="w-3 h-3" />
             </Button>
           )}
