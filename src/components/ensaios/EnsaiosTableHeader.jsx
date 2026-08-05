@@ -55,8 +55,8 @@ export default function EnsaiosTableHeader({
           </div>
         </th>
         <th className="text-left px-2 py-2 font-medium text-foreground text-[11px]" style={{ width: '11%' }}>
-          <div className="flex items-center justify-between gap-0.5 min-w-0">
-            <button type="button" onClick={toggleSortOrder} className="flex items-center gap-0.5 hover:text-secondary transition-colors whitespace-nowrap truncate">
+          <div className="flex items-center gap-1 min-w-0">
+            <button type="button" onClick={toggleSortOrder} className="flex items-center gap-0.5 hover:text-secondary transition-colors whitespace-nowrap shrink-0">
               <span>Data</span>
               {sortOrder === 'desc' && <ArrowDown className="w-3 h-3 shrink-0" />}
               {sortOrder === 'asc' && <ArrowUp className="w-3 h-3 shrink-0" />}
