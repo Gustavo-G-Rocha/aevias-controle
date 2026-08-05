@@ -1,5 +1,6 @@
 import { base44 } from '@/api/base44Client';
 import { excluirMinhaConta } from '@/functions/excluirMinhaConta';
+import { atualizarUsuarioGerenciado } from '@/functions/atualizarUsuarioGerenciado';
 import { withServiceCall } from '@/utils/serviceErrorHandler';
 
 /**
@@ -35,7 +36,7 @@ export async function atualizarUsuarioAtual(data) {
 
 export async function atualizarUsuario(id, data) {
   return withServiceCall(
-    () => base44.entities.User.update(id, data),
+    () => atualizarUsuarioGerenciado({ userId: id, data }),
     'Falha ao atualizar usuário'
   );
 }
