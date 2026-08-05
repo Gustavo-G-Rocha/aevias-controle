@@ -146,9 +146,17 @@ export default function EnsaioCAUQPage() {
   });
 
   const handleSaveProgress = async () => {
+    if (saving) return; // Prevent double-clicks
+    setSaving(true);
     setDraftSaved(false);
-    const saved = await handlers.handleSaveProgress();
-    setDraftSaved(saved === true);
+    try {
+      const saved = await handlers.handleSaveProgress();
+      setDraftSaved(saved === true);
+    } catch {
+      setDraftSaved(false);
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
