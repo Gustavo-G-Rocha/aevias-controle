@@ -80,10 +80,15 @@ export default function EnsaioCAUQPage() {
   const handleFillAllExample = () => {
     if (!isEditable || isApproved) return;
 
+    // Seleciona a primeira obra disponível se nenhuma estiver selecionada,
+    // garantindo que o botão "Salvar Progresso" fique habilitado.
+    const obraId = formData.obra_id || (obras[0]?.id ?? '');
+
     // Valores de exemplo para condições ambientais e medições
     const pesoInicialExemplo = 1175;
     setFormData(prev => ({
       ...prev,
+      obra_id: obraId,
       horario: '09:00',
       local_coleta: 'KM 45 Rodovia BR-163',
       pedreira: 'Pedreira Norte',
@@ -269,7 +274,6 @@ export default function EnsaioCAUQPage() {
                       onClick={handleSaveProgress}
                       saving={saving}
                       saved={draftSaved}
-                      disabled={!formData.obra_id}
                       testId="save-progress-btn"
                       className="border border-input bg-background text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground"
                     />
