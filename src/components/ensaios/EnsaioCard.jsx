@@ -8,7 +8,7 @@ import { FileText, Edit, MessageSquare, MapPin, User as UserIconSmall, Building,
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components/ensaios/ensaioMappers";
-import { getLaboratoristaInfo, getResponsavelInfo, getRodoviaInfo, getTrechoInfo, getNaoConformidades, getStatusInfo } from "@/components/ensaios/utils";
+import { getLaboratoristaInfo, getResponsavelInfo, getRodoviaInfo, getTrechoInfo, getNaoConformidades, getStatusInfo, getLocalInfo } from "@/components/ensaios/utils";
 import { assinarEnsaio } from "@/services/ensaiosService";
 import { QUERY_KEYS } from "@/hooks/useQueryData";
 import { toast } from "@/components/ui/use-toast";
@@ -23,6 +23,7 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
   const reportUrl = getReportLink(ensaio);
   const laboratorista = getLaboratoristaInfo(ensaio, allUsers);
   const dataFormatted = getDataFormatted(ensaio);
+  const localInfo = getLocalInfo(ensaio);
 
   const editLink = createPageUrl(`${ensaio.entityType}?editId=${ensaio.id}`);
   const isCliente = user?.access_level === 'cliente' || user?.access_level === 'cliente_supervisor';
@@ -113,6 +114,12 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
                 <div className="flex items-center gap-1.5" title="Trecho">
                   <MapPin className="w-4 h-4 text-secondary shrink-0" />
                   <span className="text-xs">Trecho: {getTrechoInfo(ensaio)}</span>
+                </div>
+              )}
+              {localInfo && localInfo.detalhes && localInfo.detalhes !== "Não informado" && (
+                <div className="flex items-center gap-1.5" title={localInfo.tipo}>
+                  <localInfo.icon className="w-4 h-4 text-secondary shrink-0" />
+                  <span className="text-xs">{localInfo.tipo}: <span className="font-medium">{localInfo.detalhes}</span></span>
                 </div>
               )}
               {getResponsavelInfo(ensaio) && (
