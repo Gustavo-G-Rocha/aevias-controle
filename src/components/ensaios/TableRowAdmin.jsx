@@ -63,31 +63,31 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
           />
         </td>
       )}
-      <td className="px-2 py-2">
-        <div className="font-medium text-foreground flex items-center gap-1 text-xs">
-          <TypeIcon className="w-3 h-3 text-secondary" />
-          <RouterLink to={primaryUrl} className="truncate max-w-[120px] hover:underline underline-offset-2" title={canEditDraft ? `Editar ${name}` : `Ver relatório de ${name}`} aria-label={canEditDraft ? `Editar ${name}` : `Ver relatório de ${name}`}>{name}</RouterLink>
+      <td className="px-2 py-2 overflow-hidden">
+        <div className="font-medium text-foreground flex items-center gap-1 text-xs min-w-0">
+          <TypeIcon className="w-3 h-3 text-secondary shrink-0" />
+          <RouterLink to={primaryUrl} className="truncate hover:underline underline-offset-2" title={canEditDraft ? `Editar ${name}` : `Ver relatório de ${name}`} aria-label={canEditDraft ? `Editar ${name}` : `Ver relatório de ${name}`}>{name}</RouterLink>
           <CopyIdButton id={ensaio.id} />
-          {naoConformidades.length > 0 && <span role="img" aria-label={`Não conformidades: ${naoConformidades.join(', ')}`} className="text-destructive cursor-help" title={`Não conformidades:\n${naoConformidades.join('\n')}`}>⚠️</span>}
-          {!naoConformidades.length && temDeflexaoExcessiva && <span role="img" aria-label="Pontos com deflexão acima do limite admissível" className="cursor-help" title="Pontos com deflexão acima do limite admissível">🟡</span>}
-          {!naoConformidades.length && !temDeflexaoExcessiva && temAcoesCorretivas && <span role="img" aria-label="Ações corretivas realizadas" className="text-orange-500 cursor-help" title="Ações corretivas realizadas">⚠️</span>}
+          {naoConformidades.length > 0 && <span role="img" aria-label={`Não conformidades: ${naoConformidades.join(', ')}`} className="text-destructive cursor-help shrink-0" title={`Não conformidades:\n${naoConformidades.join('\n')}`}>⚠️</span>}
+          {!naoConformidades.length && temDeflexaoExcessiva && <span role="img" aria-label="Pontos com deflexão acima do limite admissível" className="cursor-help shrink-0" title="Pontos com deflexão acima do limite admissível">🟡</span>}
+          {!naoConformidades.length && !temDeflexaoExcessiva && temAcoesCorretivas && <span role="img" aria-label="Ações corretivas realizadas" className="text-orange-500 cursor-help shrink-0" title="Ações corretivas realizadas">⚠️</span>}
         </div>
       </td>
       <td className="px-2 py-2 text-center">
         <Badge className={`${status.className} text-xs px-2 py-0.5 gap-1`}><status.icon className="w-3 h-3" />{status.text}</Badge>
       </td>
       <td className="px-2 py-2 text-muted-foreground text-xs whitespace-nowrap">{dataFormatted}</td>
-      <td className="px-2 py-2">
-        <div className="font-medium text-foreground text-xs truncate max-w-[140px]" title={obra?.name || ensaio.obra_name}>{obra?.name || ensaio.obra_name || 'N/A'}</div>
-        <div className="text-xs text-muted-foreground">{obra?.code || ensaio.obra_code}</div>
+      <td className="px-2 py-2 overflow-hidden">
+        <div className="font-medium text-foreground text-xs truncate" title={obra?.name || ensaio.obra_name}>{obra?.name || ensaio.obra_name || 'N/A'}</div>
+        <div className="text-xs text-muted-foreground truncate" title={obra?.code || ensaio.obra_code}>{obra?.code || ensaio.obra_code}</div>
       </td>
-      <td className="px-2 py-2 text-muted-foreground text-xs truncate max-w-[100px]" title={laboratorista}>{laboratorista}</td>
-      <td className="px-2 py-2">
+      <td className="px-2 py-2 text-muted-foreground text-xs truncate overflow-hidden" title={laboratorista}>{laboratorista}</td>
+      <td className="px-2 py-2 overflow-hidden">
         <div className="text-muted-foreground text-xs">{localInfo.tipo}</div>
-        <div className="text-xs text-muted-foreground truncate max-w-[120px]" title={localInfo.detalhes}>{localInfo.detalhes}</div>
+        <div className="text-xs text-muted-foreground truncate" title={localInfo.detalhes}>{localInfo.detalhes}</div>
       </td>
-      <td className="px-2 py-2">{getEmpreiteiraInfo(ensaio) ? <div className="text-muted-foreground text-xs truncate max-w-[100px]">{getEmpreiteiraInfo(ensaio)}</div> : <div className="text-muted-foreground/60 text-center text-xs">-</div>}</td>
-      <td className="px-2 py-2">{projeto ? <div className="text-muted-foreground text-xs truncate max-w-[100px]" title={projeto.name}>{projeto.name}</div> : <div className="text-muted-foreground/60 text-center text-xs">-</div>}</td>
+      <td className="px-2 py-2 overflow-hidden">{getEmpreiteiraInfo(ensaio) ? <div className="text-muted-foreground text-xs truncate" title={getEmpreiteiraInfo(ensaio)}>{getEmpreiteiraInfo(ensaio)}</div> : <div className="text-muted-foreground/60 text-center text-xs">-</div>}</td>
+      <td className="px-2 py-2 overflow-hidden">{projeto ? <div className="text-muted-foreground text-xs truncate" title={projeto.name}>{projeto.name}</div> : <div className="text-muted-foreground/60 text-center text-xs">-</div>}</td>
       <td className="px-2 py-2">
         <div className="flex items-center gap-1 flex-nowrap whitespace-nowrap">
           <Button asChild variant="outline" size="sm" className="text-foreground hover:bg-muted h-7 px-2 shrink-0" title={`Ver relatório de ${name}`} aria-label={`Ver relatório de ${name}`}>

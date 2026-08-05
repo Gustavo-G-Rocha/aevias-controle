@@ -224,8 +224,8 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
 
       <Card className="border-0" style={{ backgroundColor: 'var(--color-surface)', borderRadius: 'var(--card-radius)', boxShadow: 'var(--card-shadow)' }}>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <div className="overflow-x-visible">
+            <table className="w-full text-sm table-fixed">
               <EnsaiosTableHeader
                 showSelection
                 allSelected={allSelected}
@@ -242,7 +242,7 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
                 projetoFilter={projetoFilter} setProjetoFilter={setProjetoFilter}
                 statusFilter={statusFilter} setStatusFilter={setStatusFilter}
                 statusOptions={statusOptions}
-                acoesWidth="140px"
+                acoesWidth="200px"
               />
               <tbody>
                 {paginatedEnsaios.map((ensaio, index) => (

@@ -42,21 +42,21 @@ export default function EnsaiosTableHeader({
             />
           </th>
         )}
-        <th className="text-left px-2 py-2 font-medium text-foreground text-xs">
-          <div className="flex items-center gap-1">
-            <span>Tipo</span>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '12%' }}>
+          <div className="flex items-center gap-1 min-w-0">
+            <span className="shrink-0">Tipo</span>
             <SelectColumnFilter value={typeFilter} onChange={setTypeFilter} options={typeOptions} placeholder="Filtrar por tipo" />
           </div>
         </th>
-        <th className="text-center px-2 py-2 font-medium text-foreground text-xs" style={{ width: '90px' }}>
-          <div className="flex items-center justify-center gap-1">
-            <span>Status</span>
+        <th className="text-center px-2 py-2 font-medium text-foreground text-xs" style={{ width: '10%' }}>
+          <div className="flex items-center justify-center gap-1 min-w-0">
+            <span className="shrink-0">Status</span>
             <SelectColumnFilter value={statusFilter} onChange={setStatusFilter} options={statusOptions} placeholder="Filtrar por status" />
           </div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '100px' }}>
-          <div className="flex items-center gap-1">
-            <button type="button" onClick={toggleSortOrder} className="flex items-center gap-1 hover:text-secondary transition-colors">
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '10%' }}>
+          <div className="flex items-center gap-1 min-w-0">
+            <button type="button" onClick={toggleSortOrder} className="flex items-center gap-1 hover:text-secondary transition-colors shrink-0">
               <span>Data</span>
               {sortOrder === 'desc' && <ArrowDown className="w-3 h-3" />}
               {sortOrder === 'asc' && <ArrowUp className="w-3 h-3" />}
@@ -65,20 +65,20 @@ export default function EnsaiosTableHeader({
             <DateRangePicker startDate={dataInicioFilter} endDate={dataFimFilter} onStartChange={setDataInicioFilter} onEndChange={setDataFimFilter} />
           </div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-xs">
-          <div className="flex items-center gap-1"><span>Obra</span><TextColumnFilter value={obraFilter} onChange={setObraFilter} placeholder="Filtrar por obra..." /></div>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '14%' }}>
+          <div className="flex items-center gap-1 min-w-0"><span className="shrink-0">Obra</span><TextColumnFilter value={obraFilter} onChange={setObraFilter} placeholder="Filtrar por obra..." /></div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-xs">
-          <div className="flex items-center gap-1"><span>Lab.</span><TextColumnFilter value={nomeFilter} onChange={setNomeFilter} placeholder="Filtrar por nome..." /></div>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '10%' }}>
+          <div className="flex items-center gap-1 min-w-0"><span className="shrink-0">Lab.</span><TextColumnFilter value={nomeFilter} onChange={setNomeFilter} placeholder="Filtrar por nome..." /></div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-xs">
-          <div className="flex items-center gap-1"><span>Local</span><TextColumnFilter value={localFilter} onChange={setLocalFilter} placeholder="Filtrar por local..." /></div>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '12%' }}>
+          <div className="flex items-center gap-1 min-w-0"><span className="shrink-0">Local</span><TextColumnFilter value={localFilter} onChange={setLocalFilter} placeholder="Filtrar por local..." /></div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-xs">
-          <div className="flex items-center gap-1"><span>Empreiteira</span><TextColumnFilter value={empreiteiraFilter} onChange={setEmpreiteiraFilter} placeholder="Filtrar por empreiteira..." /></div>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '10%' }}>
+          <div className="flex items-center gap-1 min-w-0"><span className="shrink-0">Empreiteira</span><TextColumnFilter value={empreiteiraFilter} onChange={setEmpreiteiraFilter} placeholder="Filtrar por empreiteira..." /></div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-xs">
-          <div className="flex items-center gap-1"><span>Projeto</span><TextColumnFilter value={projetoFilter} onChange={setProjetoFilter} placeholder="Filtrar por projeto..." /></div>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '10%' }}>
+          <div className="flex items-center gap-1 min-w-0"><span className="shrink-0">Projeto</span><TextColumnFilter value={projetoFilter} onChange={setProjetoFilter} placeholder="Filtrar por projeto..." /></div>
         </th>
         <th className="text-center px-2 py-2 font-medium text-foreground text-xs" style={{ width: acoesWidth }}>{acoesLabel}</th>
       </tr>
