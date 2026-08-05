@@ -46,7 +46,7 @@ const TableRowCliente = React.memo(({ ensaio, obra, projeto, index, allUsers, on
         <div className="text-[10px] text-foreground/70 truncate max-w-[120px]" title={localInfo.detalhes}>{localInfo.detalhes}</div>
       </td>
       <td className="px-2 py-2">{getEmpreiteiraInfo(ensaio) ? <div className="text-foreground/90 text-xs truncate max-w-[100px]">{getEmpreiteiraInfo(ensaio)}</div> : <div className="text-foreground/50 text-center text-xs">-</div>}</td>
-      <td className="px-2 py-2">{projeto ? <div className="text-foreground/90 text-xs truncate max-w-[100px]" title={projeto.name}>{projeto.name}</div> : ensaio.furo ? <div className="text-foreground/90 text-xs truncate max-w-[100px]" title={`Furo ${ensaio.furo}`}>Furo {ensaio.furo}</div> : <div className="text-foreground/50 text-center text-xs">-</div>}</td>
+      <td className="px-2 py-2">{projeto ? <div className="text-foreground/90 text-xs truncate max-w-[100px]" title={projeto.name}>{projeto.name}</div> : <div className="text-foreground/50 text-center text-xs">-</div>}</td>
       <td className="px-2 py-2">
         <div className="flex items-center gap-1">
           <Button asChild variant="outline" size="sm" className="text-foreground hover:bg-muted/10 border-white/20 h-7 px-2" title={`Ver relatório de ${name}`} aria-label={`Ver relatório de ${name}`}>

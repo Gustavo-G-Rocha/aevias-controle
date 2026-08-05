@@ -87,7 +87,7 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
         <div className="text-xs text-muted-foreground truncate max-w-[120px]" title={localInfo.detalhes}>{localInfo.detalhes}</div>
       </td>
       <td className="px-2 py-2">{getEmpreiteiraInfo(ensaio) ? <div className="text-muted-foreground text-xs truncate max-w-[100px]">{getEmpreiteiraInfo(ensaio)}</div> : <div className="text-muted-foreground/60 text-center text-xs">-</div>}</td>
-      <td className="px-2 py-2">{projeto ? <div className="text-muted-foreground text-xs truncate max-w-[100px]" title={projeto.name}>{projeto.name}</div> : ensaio.furo ? <div className="text-muted-foreground text-xs truncate max-w-[100px]" title={`Furo ${ensaio.furo}`}>Furo {ensaio.furo}</div> : <div className="text-muted-foreground/60 text-center text-xs">-</div>}</td>
+      <td className="px-2 py-2">{projeto ? <div className="text-muted-foreground text-xs truncate max-w-[100px]" title={projeto.name}>{projeto.name}</div> : <div className="text-muted-foreground/60 text-center text-xs">-</div>}</td>
       <td className="px-2 py-2">
         <div className="flex items-center gap-1">
           <Button asChild variant="outline" size="sm" className="text-foreground hover:bg-muted h-7 px-2" title={`Ver relatório de ${name}`} aria-label={`Ver relatório de ${name}`}>
