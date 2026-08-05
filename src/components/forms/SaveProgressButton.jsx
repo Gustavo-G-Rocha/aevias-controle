@@ -1,35 +1,35 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Save, Loader2, CheckCircle } from "lucide-react";
-import { useOptimisticSave } from "@/hooks/useOptimisticSave";
 
 /**
  * Componente reutilizável para botão de salvar progresso (rascunho).
  * Utilizado em formulários que precisam salvar estado intermediário.
- * Exibe feedback otimista de sucesso imediatamente ao clicar
- * (revertido caso a operação falhe).
+ *
+ * Feedback baseado apenas nos props `saving` e `saved` controlados pelo
+ * parent — sem janelas otimistas temporizadas, evitando conflitos de
+ * timing entre feedback visual e conclusão real da operação.
  */
-export default function SaveProgressButton({ 
-  onClick, 
-  saving = false, 
+export default function SaveProgressButton({
+  onClick,
+  saving = false,
+  saved = false,
   disabled = false,
   label = "Salvar Progresso",
   savingLabel = "Salvando...",
   savedLabel = "Progresso salvo!",
   className = "",
   testId,
-  saved = false,
 }) {
-  const { showSaved, handleClick } = useOptimisticSave(onClick);
-  const isSaved = saved || showSaved;
+  const isSaved = saved && !saving;
 
   return (
     <Button
       type="button"
       disabled={saving || disabled}
-      onClick={handleClick}
+      onClick={onClick}
       data-testid={testId}
-      data-save-status={saved ? "saved" : saving ? "saving" : "idle"}
+      data-save-status={isSaved ? "saved" : saving ? "saving" : "idle"}
       aria-live="polite"
       className={`${className} ${isSaved ? "bg-green-600 hover:bg-green-600 text-white" : ""}`}
     >
