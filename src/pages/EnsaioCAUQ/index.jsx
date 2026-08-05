@@ -73,6 +73,7 @@ export default function EnsaioCAUQPage() {
   } = useEnsaioForm(getInitialFormData, 'EnsaioCAUQ', 'ensaio_cauq');
 
   const [saving, setSaving] = useState(false);
+  const [draftSaved, setDraftSaved] = useState(false);
 
   // Preenche todos os campos do formulário com valores de exemplo.
   // Acelera testes automatizados e serve como template para laboratoristas.
@@ -138,6 +139,12 @@ export default function EnsaioCAUQPage() {
     editingEnsaio, setEditingEnsaio,
     user, setSaving, clearSavedData, navigate,
   });
+
+  const handleSaveProgress = async () => {
+    setDraftSaved(false);
+    const saved = await handlers.handleSaveProgress();
+    setDraftSaved(saved === true);
+  };
 
   if (loading) {
     return <LoadingState />;
@@ -259,8 +266,9 @@ export default function EnsaioCAUQPage() {
                 {isEditable && !isApproved && (
                   <>
                     <SaveProgressButton
-                      onClick={handlers.handleSaveProgress}
+                      onClick={handleSaveProgress}
                       saving={saving}
+                      saved={draftSaved}
                       disabled={!formData.obra_id}
                       testId="save-progress-btn"
                       className="border border-input bg-background text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground"

@@ -224,7 +224,7 @@ export function useEnsaioCAUQForm({
   // ── salvar progresso (rascunho) ──────────────────────────────────────────────
   const handleSaveProgress = useCallback(async () => {
     const validation = validateEnsaioRascunho(formData);
-    if (!validation.valid) { toast({ title: validation.message, variant: "destructive" }); return; }
+    if (!validation.valid) { toast({ title: validation.message, variant: "destructive" }); return false; }
 
     setSaving(true);
     try {
@@ -244,9 +244,11 @@ export function useEnsaioCAUQForm({
       }
       clearSavedData();
       await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords });
+      return true;
     } catch (error) {
       logger.error("[EnsaioCAUQ] Erro ao salvar progresso:", error?.message || error);
       toast({ title: "Erro ao salvar progresso.", variant: "destructive" });
+      return false;
     } finally {
       setSaving(false);
     }

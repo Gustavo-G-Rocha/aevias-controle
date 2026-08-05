@@ -18,8 +18,10 @@ export default function SaveProgressButton({
   savedLabel = "Progresso salvo!",
   className = "",
   testId,
+  saved = false,
 }) {
   const { showSaved, handleClick } = useOptimisticSave(onClick);
+  const isSaved = saved || showSaved;
 
   return (
     <Button
@@ -27,10 +29,11 @@ export default function SaveProgressButton({
       disabled={saving || disabled}
       onClick={handleClick}
       data-testid={testId}
+      data-save-status={saved ? "saved" : saving ? "saving" : "idle"}
       aria-live="polite"
-      className={`${className} ${showSaved ? "bg-green-600 hover:bg-green-600 text-white" : ""}`}
+      className={`${className} ${isSaved ? "bg-green-600 hover:bg-green-600 text-white" : ""}`}
     >
-      {showSaved ? (
+      {isSaved ? (
         <><CheckCircle className="w-4 h-4 mr-2" />{savedLabel}</>
       ) : saving ? (
         <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{savingLabel}</>
