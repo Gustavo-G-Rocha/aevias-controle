@@ -15,11 +15,23 @@ export default function RelatorioTaxaInsumosDoc({ ensaio, obra, regional }) {
     : 'TAXA DE AGREGADO';
 
   return (
-    <div className="bg-slate-200/60 font-sans py-8">
+    <div className="taxa-insumos-document bg-slate-200/60 font-sans py-8">
       <style>{`
         @media print {
           body, html { margin: 0; padding: 0; background: white !important; }
-          .print-page { width: 210mm; min-height: 297mm; margin: 0; padding: 14mm 12mm; box-sizing: border-box; box-shadow: none !important; border-radius: 0 !important; }
+          .taxa-insumos-document { padding: 0 !important; background: white !important; }
+          .print-page {
+            width: 100%;
+            max-width: none;
+            min-height: 276mm;
+            margin: 0;
+            padding: 3mm 2mm;
+            box-sizing: border-box;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            break-inside: avoid;
+            page-break-inside: avoid;
+          }
         }
         @media screen {
           .print-page { width: 210mm; min-height: 297mm; padding: 14mm 12mm; box-sizing: border-box; box-shadow: 0 4px 24px rgba(0,0,0,0.12); border-radius: 2px; }
