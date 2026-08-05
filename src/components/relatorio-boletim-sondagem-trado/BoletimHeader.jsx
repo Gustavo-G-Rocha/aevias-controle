@@ -8,8 +8,8 @@ export default function BoletimHeader({ regional }) {
   const logoUrl = getLogoUrl(regional);
 
   return (
-    <header className="grid grid-cols-3 items-center p-2 border border-[#94a3b8] mb-2">
-      <div>
+    <header className="relative flex items-center p-2 border border-[#94a3b8] mb-2">
+      <div className="relative z-10">
         <picture>
           <source srcSet={logoUrl} />
           <img
@@ -21,7 +21,7 @@ export default function BoletimHeader({ regional }) {
           />
         </picture>
       </div>
-      <div className="text-center col-span-2">
+      <div className="absolute inset-0 flex items-center justify-center">
         <h1 className="text-sm font-bold text-gray-800 uppercase">
           Boletim de Sondagem a Trado
         </h1>
