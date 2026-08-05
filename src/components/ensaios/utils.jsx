@@ -66,11 +66,11 @@ export const getStatusInfo = (ensaio) => {
   if (ensaio.approved === false) {
     return { text: STATUS_LABELS.REPROVADO, icon: XCircle, className: STATUS_BADGE_CLASSES.REPROVADO };
   }
-  // Finalizado pelo laboratorista, aguardando aprovação do gestor/admin.
+  // Pendente: finalizado pelo laboratorista, aguardando aprovação do gestor/admin.
   // Entidades legadas sem campo status (BoletimSondagem, BoletimSondagemTrado,
-  // EnsaioDensidade) com approved=null também são finalizados aguardando aprovação.
+  // EnsaioDensidade) com approved=null também são pendentes aguardando aprovação.
   if (ensaio.status === 'finalizado' || (ensaio.approved == null && ensaio.status !== 'rascunho' && !ensaio.client_signature?.signed_by)) {
-    return { text: STATUS_LABELS.FINALIZADO, icon: CheckCircle, className: STATUS_BADGE_CLASSES.FINALIZADO };
+    return { text: STATUS_LABELS.FINALIZADO, icon: Clock, className: STATUS_BADGE_CLASSES.FINALIZADO };
   }
-  return { text: STATUS_LABELS.PENDENTE, icon: Clock, className: STATUS_BADGE_CLASSES.PENDENTE };
+  return { text: STATUS_LABELS.FINALIZADO, icon: Clock, className: STATUS_BADGE_CLASSES.FINALIZADO };
 };

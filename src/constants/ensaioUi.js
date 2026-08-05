@@ -45,7 +45,7 @@ export const STATUS_LABELS = {
   ASSINADO: 'Assinado',
   APROVADO: 'Aprovado',
   REPROVADO: 'Reprovado',
-  FINALIZADO: 'Finalizado',
+  FINALIZADO: 'Pendente',
   PENDENTE: 'Pendente',
 };
 
