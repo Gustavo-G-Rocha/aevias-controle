@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sun, Trash2 } from "lucide-react";
+import { Sun, Trash2, Loader2, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ThemeSelector from "@/components/settings/ThemeSelector";
 import {
@@ -20,6 +20,7 @@ import { toast } from "@/components/ui/use-toast";
 
 export default function Settings() {
   const [deleting, setDeleting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const handleDeleteAccount = async () => {
     setDeleting(true);
@@ -33,6 +34,7 @@ export default function Settings() {
         variant: "destructive",
       });
       setDeleting(false);
+      setConfirmOpen(false);
     }
   };
 
@@ -65,27 +67,34 @@ export default function Settings() {
           <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Ações irreversíveis para a sua conta</p>
         </CardHeader>
         <CardContent>
-          <AlertDialog>
+          <AlertDialog open={confirmOpen} onOpenChange={(open) => { if (!deleting) setConfirmOpen(open); }}>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" className="w-full sm:w-auto" disabled={deleting}>
-                <Trash2 className="w-4 h-4 mr-2" />
+                {deleting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
                 {deleting ? 'Processando...' : 'Excluir minha conta'}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Tem certeza absoluta?</AlertDialogTitle>
+                <AlertDialogTitle className="flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-destructive" />
+                  Excluir conta permanentemente?
+                </AlertDialogTitle>
                 <AlertDialogDescription>
-                  Esta ação não pode ser desfeita. Sua conta e todos os seus dados serão permanentemente removidos do sistema.
+                  Esta ação é <strong>irreversível</strong>. Todos os seus dados, configurações de conta,
+                  preferências e histórico de atividades serão <strong>permanentemente destruídos</strong>.
+                  Você será desconectado imediatamente após a exclusão e não poderá recuperar esta conta.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={handleDeleteAccount}
+                  onClick={(e) => { e.preventDefault(); handleDeleteAccount(); }}
+                  disabled={deleting}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  Sim, excluir minha conta
+                  {deleting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                  {deleting ? 'Excluindo...' : 'Sim, excluir definitivamente'}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

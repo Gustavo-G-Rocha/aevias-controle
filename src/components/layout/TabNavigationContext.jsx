@@ -24,7 +24,7 @@ import { SESSION_KEYS, TAB_ZONES, getTabZone } from "@/lib/layoutConstants";
 
 const TabNavigationContext = createContext(null);
 
-const MAX_STACK_DEPTH = 10;
+const MAX_STACK_DEPTH = 15;
 const TAB_DIR_STATE_KEY = "__tabDir";
 
 const readSessionStack = (key) => {
@@ -77,7 +77,7 @@ export function TabNavigationProvider({ children }) {
   const navigationType = useNavigationType();
   const navigate = useNavigate();
 
-  const currentPath = location.pathname + location.search;
+  const currentPath = location.pathname + location.search + location.hash;
   const currentZone = getTabZone(location.pathname);
   const stateOverride = location.state?.[TAB_DIR_STATE_KEY] || null;
 
@@ -150,13 +150,26 @@ export function TabNavigationProvider({ children }) {
 
   const switchToZone = useCallback(
     (zone) => {
+      // Belt-and-suspenders: ensure current path is saved to the CURRENT zone's
+      // stack before switching away, so the full sub-routing history is preserved
+      // even if the location effect hasn't flushed yet.
+      if (currentZone && currentZone !== zone) {
+        const curKey = `${SESSION_KEYS.TAB_STACK_PREFIX}${currentZone}`;
+        const curStack = readSessionStack(curKey);
+        if (curStack.length === 0 || curStack[curStack.length - 1] !== currentPath) {
+          curStack.push(currentPath);
+          if (curStack.length > MAX_STACK_DEPTH) curStack.shift();
+          saveSessionStack(curKey, curStack);
+        }
+      }
+
       const zoneRoot = TAB_ZONES[zone]?.[0] || "/";
       const key = `${SESSION_KEYS.TAB_STACK_PREFIX}${zone}`;
       const stack = readSessionStack(key);
       const target = stack.length > 0 ? stack[stack.length - 1] : zoneRoot;
       navigate(target, { state: { [TAB_DIR_STATE_KEY]: "switch" } });
     },
-    [navigate]
+    [navigate, currentZone, currentPath]
   );
 
   const resetZone = useCallback(
