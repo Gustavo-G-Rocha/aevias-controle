@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, Edit, MessageSquare, MapPin, User as UserIconSmall, Building, RotateCcw, PenLine, CloudOff } from "lucide-react";
+import { FileText, Edit, MessageSquare, MapPin, User as UserIconSmall, Building, RotateCcw, PenLine, CloudOff, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { getEnsaioTypeInfo, getReportLink, getDataFormatted } from "@/components/ensaios/ensaioMappers";
@@ -12,7 +12,7 @@ import { getLaboratoristaInfo, getResponsavelInfo, getRodoviaInfo, getTrechoInfo
 import { assinarEnsaio } from "@/services/ensaiosService";
 import { QUERY_KEYS } from "@/hooks/useQueryData";
 import { toast } from "@/components/ui/use-toast";
-import { SIGN_DIALOG, buildSignDescription, OFFLINE_BADGE_LABEL } from "@/constants/ensaioUi";
+import { SIGN_DIALOG, buildSignDescription, OFFLINE_BADGE_LABEL, SYNCING_BADGE_LABEL } from "@/constants/ensaioUi";
 import CriticalActionDialog from "@/components/ensaios/CriticalActionDialog";
 import CauqMeasurementSummary from "@/components/ensaios/CauqMeasurementSummary";
 
@@ -77,6 +77,11 @@ const EnsaioCard = React.memo(({ ensaio, obra, user, allUsers }) => {
                 <status.icon className="w-3 h-3" />
                 {status.text}
               </Badge>
+              {ensaio._syncing && (
+                <Badge className="bg-blue-100 text-blue-800 border border-blue-300/50 text-xs gap-1" data-testid="syncing-badge">
+                  <Loader2 className="w-3 h-3 animate-spin" /> {SYNCING_BADGE_LABEL}
+                </Badge>
+              )}
               {ensaio._offline && (
                 <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-300/50 text-xs gap-1" data-testid="offline-pending-badge">
                   <CloudOff className="w-3 h-3" /> {OFFLINE_BADGE_LABEL}

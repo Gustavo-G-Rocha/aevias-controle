@@ -15,7 +15,7 @@
 import { useCallback, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { criarEnsaio, atualizarEnsaio } from "@/services/ensaiosService";
-import { QUERY_KEYS } from "@/hooks/useQueryData";
+import { QUERY_KEYS, useRecordCacheUpdate } from "@/hooks/useQueryData";
 import { createPageUrl } from "@/utils";
 import { validateEnsaioCAUQ, validateEnsaioRascunho } from "@/utils/ensaioValidation";
 import { getFatorCorrecaoEstabilidade, novoCorpoProva } from "@/utils/ensaioCAUQCalculations";
@@ -40,6 +40,7 @@ export function useEnsaioCAUQForm({
   navigate,
 }) {
   const queryClient = useQueryClient();
+  const { addRecord, updateRecord, removeRecord, snapshotRecords, restoreRecords } = useRecordCacheUpdate();
 
   // ── handlers simples ────────────────────────────────────────────────────────
   const handleChange = useCallback((field, value) => {
@@ -221,80 +222,148 @@ export function useEnsaioCAUQForm({
     });
   }, [setFormData]);
 
-  // ── salvar progresso (rascunho) ──────────────────────────────────────────────
+  // ── salvar progresso (rascunho) — OTIMISTA ─────────────────────────────────
+  // O registro é inserido/atualizado no cache IMEDIATAMENTE (com flag _syncing).
+  // O servidor é sincronizado em background; em caso de erro, rollback.
   const handleSaveProgress = useCallback(async () => {
     const validation = validateEnsaioRascunho(formData);
     if (!validation.valid) { toast({ title: validation.message, variant: "destructive" }); return false; }
 
     setSaving(true);
-    try {
-      const dataToSave = {
-        ...formData,
-        status: "rascunho",
-        laboratorista_name: user?.laboratorista_name || user?.full_name,
-      };
+    const dataToSave = {
+      ...formData,
+      status: "rascunho",
+      laboratorista_name: user?.laboratorista_name || user?.full_name,
+    };
 
-      if (editingEnsaio?.id) {
-        await atualizarEnsaio('EnsaioCAUQ', editingEnsaio.id, dataToSave);
-        toast({ title: "Progresso salvo com sucesso!" });
-      } else {
-        const newEnsaio = await criarEnsaio('EnsaioCAUQ', dataToSave);
-        setEditingEnsaio(newEnsaio);
-        toast({ title: "Progresso salvo com sucesso!" });
-      }
+    if (editingEnsaio?.id) {
+      // UPDATE otimista: snapshot → update cache → sync background
+      const snapshot = snapshotRecords();
+      updateRecord({ ...dataToSave, id: editingEnsaio.id, entityType: 'EnsaioCAUQ', _syncing: true });
+      toast({ title: "Sincronizando alterações..." });
       clearSavedData();
-      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords });
-      return true;
-    } catch (error) {
-      logger.error("[EnsaioCAUQ] Erro ao salvar progresso:", error?.message || error);
-      toast({ title: "Erro ao salvar progresso.", variant: "destructive" });
-      return false;
-    } finally {
-      setSaving(false);
+      try {
+        const savedRecord = await atualizarEnsaio('EnsaioCAUQ', editingEnsaio.id, dataToSave);
+        if (savedRecord?.id) updateRecord({ ...savedRecord, entityType: 'EnsaioCAUQ', _syncing: false });
+        if (savedRecord?._offline) toast({ title: "Registro salvo offline — será enviado quando houver conexão." });
+        else toast({ title: "Progresso salvo com sucesso!" });
+        return true;
+      } catch (error) {
+        restoreRecords(snapshot);
+        logger.error("[EnsaioCAUQ] Erro ao salvar progresso:", error?.message || error);
+        toast({ title: "Erro ao salvar progresso.", variant: "destructive" });
+        return false;
+      } finally {
+        setSaving(false);
+      }
+    } else {
+      // CREATE otimista: temp ID → add cache → sync background → replace
+      const tempId = `optimistic-${crypto.randomUUID()}`;
+      const optimisticRecord = {
+        ...dataToSave,
+        id: tempId,
+        entityType: 'EnsaioCAUQ',
+        _syncing: true,
+        created_date: new Date().toISOString(),
+      };
+      addRecord(optimisticRecord);
+      // Switch to edit mode immediately with the optimistic record
+      setEditingEnsaio(optimisticRecord);
+      toast({ title: "Sincronizando registro..." });
+      clearSavedData();
+      try {
+        const savedRecord = await criarEnsaio('EnsaioCAUQ', dataToSave);
+        if (savedRecord?.id && savedRecord.id !== tempId) {
+          removeRecord(tempId);
+          addRecord({ ...savedRecord, entityType: 'EnsaioCAUQ', _syncing: false });
+          setEditingEnsaio(savedRecord);
+        }
+        if (savedRecord?._offline) toast({ title: "Registro salvo offline — será enviado quando houver conexão." });
+        else toast({ title: "Progresso salvo com sucesso!" });
+        return true;
+      } catch (error) {
+        removeRecord(tempId);
+        logger.error("[EnsaioCAUQ] Erro ao salvar progresso:", error?.message || error);
+        toast({ title: "Erro ao salvar progresso.", variant: "destructive" });
+        return false;
+      } finally {
+        setSaving(false);
+      }
     }
-  }, [formData, editingEnsaio, setEditingEnsaio, user, setSaving, clearSavedData, queryClient]);
+  }, [formData, editingEnsaio, setEditingEnsaio, user, setSaving, clearSavedData, addRecord, updateRecord, removeRecord, snapshotRecords, restoreRecords]);
 
-  // ── finalizar ensaio ─────────────────────────────────────────────────────────
+  // ── finalizar ensaio — OTIMISTA ─────────────────────────────────────────────
+  // Redireciona IMEDIATAMENTE com registro otimista; sincroniza em background.
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     const validation = validateEnsaioCAUQ(formData);
     if (!validation.valid) { toast({ title: validation.message, variant: "destructive" }); return; }
 
     setSaving(true);
-    try {
-      const dataToSave = {
-        ...formData,
-        status: "finalizado",
-        laboratorista_name: user?.laboratorista_name || user?.full_name,
-      };
+    const dataToSave = {
+      ...formData,
+      status: "finalizado",
+      laboratorista_name: user?.laboratorista_name || user?.full_name,
+    };
 
-      if (editingEnsaio?.id) {
-        const updateData = { ...dataToSave };
-        if (editingEnsaio.approved === false) {
-          updateData.approved = null;
-          updateData.rejection_reason = null;
-          updateData.approved_by = null;
-          updateData.approved_date = null;
-          await atualizarEnsaio('EnsaioCAUQ', editingEnsaio.id, updateData);
-          toast({ title: "Ensaio finalizado com sucesso! O registro voltará para análise." });
-        } else {
-          await atualizarEnsaio('EnsaioCAUQ', editingEnsaio.id, updateData);
-          toast({ title: "Ensaio finalizado com sucesso!" });
-        }
-      } else {
-        await criarEnsaio('EnsaioCAUQ', dataToSave);
-        toast({ title: "Ensaio criado e finalizado com sucesso!" });
-      }
-      clearSavedData();
-      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords });
-      navigate(createPageUrl('MeusEnsaios'));
-    } catch (error) {
-      logger.error("[EnsaioCAUQ] Erro ao finalizar ensaio:", error?.message || error);
-      toast({ title: "Erro ao finalizar ensaio.", variant: "destructive" });
-    } finally {
-      setSaving(false);
+    const isRejectedResubmit = editingEnsaio?.approved === false;
+    if (isRejectedResubmit) {
+      dataToSave.approved = null;
+      dataToSave.rejection_reason = null;
+      dataToSave.approved_by = null;
+      dataToSave.approved_date = null;
     }
-  }, [formData, editingEnsaio, user, setSaving, clearSavedData, navigate, queryClient]);
+
+    if (editingEnsaio?.id) {
+      // UPDATE otimista
+      const snapshot = snapshotRecords();
+      updateRecord({ ...dataToSave, id: editingEnsaio.id, entityType: 'EnsaioCAUQ', _syncing: true });
+      navigate(createPageUrl('MeusEnsaios'));
+      toast({ title: "Sincronizando alterações..." });
+      clearSavedData();
+      try {
+        await atualizarEnsaio('EnsaioCAUQ', editingEnsaio.id, dataToSave);
+        // Cache já foi atualizado otimistamente; invalida para buscar dados reais
+        await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords });
+        if (isRejectedResubmit) toast({ title: "Ensaio finalizado com sucesso! O registro voltará para análise." });
+        else toast({ title: "Ensaio finalizado com sucesso!" });
+      } catch (error) {
+        restoreRecords(snapshot);
+        logger.error("[EnsaioCAUQ] Erro ao finalizar ensaio:", error?.message || error);
+        toast({ title: "Erro ao finalizar ensaio.", variant: "destructive" });
+      } finally {
+        setSaving(false);
+      }
+    } else {
+      // CREATE otimista
+      const tempId = `optimistic-${crypto.randomUUID()}`;
+      addRecord({
+        ...dataToSave,
+        id: tempId,
+        entityType: 'EnsaioCAUQ',
+        _syncing: true,
+        created_date: new Date().toISOString(),
+      });
+      navigate(createPageUrl('MeusEnsaios'));
+      toast({ title: "Sincronizando registro..." });
+      clearSavedData();
+      try {
+        const savedRecord = await criarEnsaio('EnsaioCAUQ', dataToSave);
+        if (savedRecord?.id && savedRecord.id !== tempId) {
+          removeRecord(tempId);
+          addRecord({ ...savedRecord, entityType: 'EnsaioCAUQ', _syncing: false });
+        }
+        await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.allRecords });
+        toast({ title: "Ensaio criado e finalizado com sucesso!" });
+      } catch (error) {
+        removeRecord(tempId);
+        logger.error("[EnsaioCAUQ] Erro ao finalizar ensaio:", error?.message || error);
+        toast({ title: "Erro ao finalizar ensaio.", variant: "destructive" });
+      } finally {
+        setSaving(false);
+      }
+    }
+  }, [formData, editingEnsaio, user, setSaving, clearSavedData, navigate, queryClient, addRecord, updateRecord, removeRecord, snapshotRecords, restoreRecords]);
 
   return {
     handleChange,

@@ -51,3 +51,6 @@ export const STATUS_LABELS = {
 
 // ── Badge offline ────────────────────────────────────────────────────────────
 export const OFFLINE_BADGE_LABEL = 'Aguardando sincronização';
+
+// ── Badge de sincronização (optimistic UI) ──────────────────────────────────
+export const SYNCING_BADGE_LABEL = 'Sincronizando';

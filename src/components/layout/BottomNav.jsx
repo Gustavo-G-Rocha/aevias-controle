@@ -12,13 +12,18 @@ const NAV_ITEMS = [
 { label: "Projetos", icon: Grid, path: createPageUrl("Projects"), zone: "projects" },
 { label: "Registros", icon: LayoutDashboard, path: createPageUrl("MeusEnsaios"), zone: "registros" }];
 
-const readSessionPath = (key) => {
-  try { return window.sessionStorage?.getItem(key) || null; } catch { return null; }
+const readSessionStack = (key) => {
+  try {
+    const raw = window.sessionStorage?.getItem(key);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
 };
 
-const saveSessionPath = (key, value) => {
-  try { window.sessionStorage?.setItem(key, value); } catch { /* storage indisponível no APK */ }
+const saveSessionStack = (key, stack) => {
+  try { window.sessionStorage?.setItem(key, JSON.stringify(stack)); } catch { /* storage indisponível no APK */ }
 };
+
+const MAX_STACK_DEPTH = 10;
 
 
 export default function BottomNav({ userAccessLevel, canManageSystem, pendingTransfers }) {
@@ -41,7 +46,16 @@ export default function BottomNav({ userAccessLevel, canManageSystem, pendingTra
 
   useEffect(() => {
     const zone = getTabZone(location.pathname);
-    if (zone) saveSessionPath(`${SESSION_KEYS.TAB_STACK_PREFIX}${zone}`, location.pathname + location.search);
+    if (!zone) return;
+    const key = `${SESSION_KEYS.TAB_STACK_PREFIX}${zone}`;
+    const stack = readSessionStack(key);
+    const current = location.pathname + location.search;
+    // Empilha apenas se for diferente do topo (evita duplicatas consecutivas)
+    if (stack[stack.length - 1] !== current) {
+      stack.push(current);
+      if (stack.length > MAX_STACK_DEPTH) stack.shift();
+      saveSessionStack(key, stack);
+    }
   }, [location]);
 
   const handleTabPress = useCallback((item) => {
@@ -49,17 +63,18 @@ export default function BottomNav({ userAccessLevel, canManageSystem, pendingTra
       setSheetOpen(true);
       return;
     }
+    const key = `${SESSION_KEYS.TAB_STACK_PREFIX}${item.zone}`;
     const currentZone = getTabZone(location.pathname);
     if (currentZone === item.zone) {
-      // Aba já ativa: reseta para a raiz da zona e limpa a pilha persistida,
-      // para que um retorno futuro à aba não restaure a sub-rota descartada.
-      saveSessionPath(`${SESSION_KEYS.TAB_STACK_PREFIX}${item.zone}`, item.path);
+      // Aba já ativa: limpa a pilha e volta para a raiz da zona
+      saveSessionStack(key, [item.path]);
       if (location.pathname + location.search !== item.path) {
         navigate(item.path);
       }
     } else {
-      const saved = readSessionPath(`${SESSION_KEYS.TAB_STACK_PREFIX}${item.zone}`);
-      navigate(saved || item.path);
+      // Troca de aba: restaura o topo da pilha da zona de destino (ou raiz)
+      const stack = readSessionStack(key);
+      navigate(stack[stack.length - 1] || item.path);
     }
   }, [location.pathname, location.search, navigate]);
 

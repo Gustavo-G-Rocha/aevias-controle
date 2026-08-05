@@ -278,5 +278,22 @@ export function useRecordCacheUpdate() {
     );
   }, [queryClient]);
 
-  return { updateRecord, removeRecord, snapshotRecords, restoreRecords };
+  // Upsert otimista: insere um novo registro no topo do cache, ou atualiza
+  // se já existir (por id). Usado para "optimistic create" — o registro
+  // aparece IMEDIATAMENTE na lista com flag _syncing, e é substituído pelo
+  // registro real quando o backend confirma.
+  const addRecord = useCallback((newRecord) => {
+    if (!newRecord?.id) return;
+    const upsert = (oldData) => {
+      if (!Array.isArray(oldData)) return oldData;
+      if (oldData.some(r => r.id === newRecord.id)) {
+        return oldData.map(r => r.id === newRecord.id ? { ...r, ...newRecord } : r);
+      }
+      return [newRecord, ...oldData];
+    };
+    queryClient.setQueriesData({ queryKey: QUERY_KEYS.allRecords }, upsert);
+    queryClient.setQueriesData({ queryKey: ['supervisorRecords'] }, upsert);
+  }, [queryClient]);
+
+  return { updateRecord, removeRecord, addRecord, snapshotRecords, restoreRecords };
 }
