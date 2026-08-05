@@ -21,7 +21,7 @@ export default function BoletimHeader({ regional }) {
           />
         </picture>
       </div>
-      <div className="text-center col-span-2 pr-24">
+      <div className="text-center col-span-2">
         <h1 className="text-sm font-bold text-gray-800 uppercase">
           Boletim de Sondagem a Trado
         </h1>
