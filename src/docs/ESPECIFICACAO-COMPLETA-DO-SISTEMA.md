@@ -350,31 +350,103 @@ Regras:
 - Rascunho é editável só pelo criador; some das visões de aprovação.
 - Registro aprovado fica **imutável** na prática (edição bloqueada na UI; alterações administrativas não entram no hash — o hash exclui campos de status/aprovação).
 - Toda aprovação/reprovação/assinatura passa por **funções de backend** (`gerenciarAprovacao`, `assinarEletronicamente`) que: validam permissão + tenant (regional), reautenticam (senha e/ou TOTP), calculam hash SHA-256 do documento, gravam `AssinaturaEletronica` + `AuditTrail` com IP/dispositivo.
+- **Reprovação invalida assinaturas**: ao reprovar, as `AssinaturaEletronica` vigentes viram `invalidado` — permite reaprovação após correção (sem isso, o anti re-assinatura bloquearia).
+- **Edição de reprovado é server-authoritative**: qualquer save (mesmo rascunho) de um registro com `approved=false` reseta approved/motivo/aprovador para null e marca `was_rejected=true` — o cliente não controla esse reset.
 - O relatório mostra banner de integridade: recalcula o hash atual e compara com o hash assinado — alerta se o documento foi alterado após a assinatura.
 - Verificação pública: QR Code no relatório → `/verificar-assinatura` → função `verificarAssinatura` confirma autenticidade sem login.
 
 ---
 
-## 8. FUNÇÕES DE BACKEND (`base44/functions/`)
+## 8. FUNÇÕES DE BACKEND (`base44/functions/`) — ESPECIFICAÇÃO DETALHADA
 
-| Função | Papel |
+> Runtime: Deno serverless. Todas usam `createClientFromRequest(req)` do SDK Base44 — o cliente herda a sessão do usuário (respeita RLS) e `asServiceRole` bypassa RLS quando a autorização já foi validada em código.
+
+### 8.1 Arquitetura de segurança comum (defense-in-depth, camadas em TODAS as funções de mutação)
+
+1. **Autenticação**: `base44.auth.me()` — 401 se sem sessão (exceção: `verificarAssinatura` e eventos anônimos de auth em `registrarAuditoria`).
+2. **Whitelist de entidades** (`ALLOWED_ENTITIES`): `entityName` fora da lista → 400. Cada função tem sua própria lista (~28 entidades de registro).
+3. **Validação de IDs**: regex `^[a-zA-Z0-9\-_]{1,128}$` (1024 para compositeId do RelatorioUnificado) — anti-injeção.
+4. **Tenant check** (`verifyTenantAccess`): percorre a cadeia registro → obra → regional → listas de emails do papel do usuário. Independe do RLS (anti-IDOR mesmo com RLS mal configurado). Admin bypassa; laboratorista/funcionarios_cliente só o que criou (`created_by`/`created_by_id`).
+5. **Permissão por ação**: `canApprove` = nível em `[admin, sala_tecnica_afirmaevias, gestor_contrato, cliente_supervisor]`; supervisor exige adicionalmente `isSupervisor` do tenant check.
+6. **Field whitelist no update** (`ALLOWED_UPDATE_FIELDS`): só campos de aprovação/assinatura/status chegam ao `asServiceRole.update()` — anti-escalação de privilégio.
+7. **Sanitização XSS/SSTI** (`sanitizeText`): remove tags perigosas, event handlers, protocolos `javascript:`/`data:text/html`, neutraliza `{{ }}`/`<% %>`, limite 10.000 chars.
+8. **Erros com `errorCategory`**: `permission | schema | network | conflict | totp_required | totp_invalid | unknown` — o frontend roteia o tratamento por categoria. Falhas transitórias retornam 503 (retry no cliente); `getWithRetry` distingue 404 real de falha de rede (1 retry com 500ms).
+9. **Auditoria não-bloqueante**: falha ao gravar AuditTrail nunca aborta a operação principal (try/catch com console.error).
+
+### 8.2 `validarESalvarRegistro` — persistência validada (única porta de escrita de registros)
+
+Payload: `{ entityName, data, operation: 'create'|'update', recordId?, client_updated_at?, base_updated_date?, force_overwrite? }`.
+
+Pipeline:
+1. Whitelist de entidade + validação de operação.
+2. **Validação de negócio server-side** (espelha `checklistValidation.js`/`ensaioValidation.js`): `obra_id` sempre obrigatório; quando `status === 'finalizado'` valida campos obrigatórios por entidade (ex.: ChecklistUsina exige project_id/usina/pedreira/faixa/ligante; CAUQ e Granulometria exigem `data_ensaio`; todas exigem campo de data).
+3. Sanitização recursiva de todos os campos de texto.
+4. **Tenant**: usuários tenant-scoped (`cliente`, `sala_tecnica`, `gestor_contrato`) passam por `verifyTenantAccessForRecord` (update) e `verifyObraTenantAccess` (obra do create/update). Admin/user confiam na guarda client-side (dropdown de obras já filtrado).
+5. **Denormalização**: grava `obra_name`/`obra_code` no registro (lista/relatório continuam exibindo a obra mesmo se excluída).
+6. **Detecção de conflito (LWW)** — em update sem `force_overwrite`: (a) `base_updated_date` ≠ `updated_date` do servidor → 409 com `{ conflict: true, serverData }`; (b) `client_updated_at` < `updated_date` do servidor → 409. O cliente resolve via diálogo (usar minha versão = `force_overwrite: true` / manter servidor).
+7. **Campos server-authoritative**: em update, `approved*`, `rejection_reason`, `was_rejected`, `client_signature`, `manager_signature`, `integrity_hash*`, `cliente_aprovacao*` são DELETADOS do payload — mesmo com force_overwrite. Só `gerenciarAprovacao`/`assinarEletronicamente` os escrevem.
+8. **Reset de reprovação**: se o registro antigo tinha `approved === false`, qualquer edição reseta `approved/rejection_reason/approved_by/approved_date/approver_details → null` e `was_rejected → true` (volta a "pendente" automaticamente).
+9. Persistência **user-scoped** (`base44.entities` — respeita RLS de create/update).
+10. Auditoria: create grava todos os campos não-nulos como diff; update grava diff campo-a-campo; marca `is_offline_sync` quando `client_updated_at` presente.
+
+### 8.3 `gerenciarAprovacao` — ciclo de aprovação
+
+Payload: `{ action, entityName, recordId, rejectionReason?, ncStatus?, requestApproval?, totpCode?, geolocation? }`. Ações:
+
+- **`approve`** → delegada ao adapter `assinarEletronicamente` (SignatureAdapter pattern; futuro PAdES/ICP-Brasil = novo adapter, fluxo intacto).
+- **`reject`**: exige `canApprove` (+isSupervisor p/ cliente_supervisor) e motivo obrigatório (sanitizado). Seta `approved=false`, `was_rejected=true`, `approver_details`. **Invalida** todas as `AssinaturaEletronica` vigentes (`status_assinatura → 'invalidado'` via bulkUpdate) — sem isso a reaprovação seria bloqueada por "documento já assinado".
+- **`sign`**: cliente (ou approver) grava `client_signature` {signed_by, signed_date, engineer_name, crea_number, integrity_hash}. Reusa o hash da aprovação se existir (client_signature é excluído do hash — assinar não invalida o hash).
+- **`approve_nc` / `reject_nc` / `solicitar_aprovacao_nc` / `update_nc_status`**: fluxo de NC (campos `pendente_aprovacao_cliente`, `cliente_aprovacao`, `cliente_reprovacao_motivo`, `status` ∈ aberta|em_tratativa|encerrada|cancelada).
+- **`delete`**: criador, admin, approver do tenant, ou supervisor da regional (`canDelete`); audita antes de excluir via service role.
+
+Pós-ação: normaliza campo legado `fotos` (string↔objeto conforme entidade); cria `Notificacao` de reprovação para o criador; ao assinar, marca como lidas as notificações `assinatura_pendente`; auditoria com diff.
+
+### 8.4 `assinarEletronicamente` — núcleo da assinatura (adapter `eletronica_simples_reforcada`)
+
+Payload: `{ entityName, recordId, signatureType: 'approve'|'approve_nc'|'sign', geolocation?, reportData?, reauthFactor?, totpCode? }`.
+
+1. Whitelist + regex de ID (até 1024 chars p/ compositeId).
+2. **RelatorioUnificado (virtual)**: `extractFilters(reportData)` valida `{obra_id, data_inicio, data_fim, tipos[]}` (datas YYYY-MM-DD, tipos na allowlist); o compositeId enviado DEVE bater com `buildCompositeId(filters)` (impede assinar escopo diferente do declarado); `reconstructRecords` busca os registros reais do banco (2000/entidade), filtra pelo período, ordena canonicamente (data → entityType → id) e o hash é calculado sobre ESSE conteúdo — nunca sobre dados do cliente. Relatório vazio (0 registros) → 400.
+3. Tenant check + permissão por signatureType.
+4. **Step-up 2FA**: se o usuário tem TOTP ativo e há reautenticação (`reauthFactor`), exige `totpCode` (erro `totp_required` → frontend abre TotpPromptDialog); valida via `verifyTwoFactorForUser` (lockout incluso); `reauth_factor` gravado como `password+totp`.
+5. **Anti re-assinatura**: se já existe assinatura vigente e o registro NÃO foi reprovado depois → 409. Reprovação posterior (`was_rejected`/`approved===false`) libera nova assinatura.
+6. Calcula hash SHA-256 (`computeIntegrityHash` — exclui campos administrativos, ver §8.8), atualiza o registro (field whitelist; RelatorioUnificado não atualiza nada), cria `AssinaturaEletronica` com evidências `{ip_address, user_agent, geolocation, reauth_factor}` e timestamp DO SERVIDOR, audita com operation `sign`, e notifica clientes responsáveis da regional (`assinatura_pendente`) quando `approve`.
+
+### 8.5 `verificarAssinatura` — verificação pública (sem login)
+
+GET `?entityName=&recordId=` ou POST. Busca o registro (service role), a última `AssinaturaEletronica` vigente, recalcula o hash atual e compara com `signature_hash`. Retorna `{ signed, intact, storedHash, computedHash, signature{signed_by, name, role, crea, signed_at, method, type} }`. Duplica localmente serialização/hash (mesmo algoritmo do shared) para ser autossuficiente.
+
+### 8.6 `gerenciarDoisFatores` — 2FA TOTP
+
+Ações: `status` (enabled/pending/códigos restantes/lockout) · `setup` (gera segredo base32 de 20 bytes, retorna `otpauthUrl` p/ QR — issuer "AfirmaEvias QA", SHA1/6 dígitos/30s) · `activate` (valida 1º código, gera 8 códigos de recuperação XXXXX-XXXXX retornados em claro UMA vez, armazena só hashes SHA-256) · `verify` (TOTP com janela ±1 OU código de recuperação consumível; lockout: 5 tentativas → 15 min) · `disable` (exige código válido) · `admin_reset` (admin remove 2FA de outro usuário — recuperação de lockout). Segredo NUNCA volta ao cliente após setup (entidade com RLS admin-only; acesso real só via service role).
+
+### 8.7 `registrarAuditoria` — eventos iniciados pelo frontend
+
+Para login/logout/password reset/exportação/gestão de usuários (mutações de registro são auditadas inline nas funções de escrita). **Anti-spoofing para eventos anônimos**: identidade nunca vem do payload — `changed_by='Anônimo'` exceto eventos com email-alvo legítimo (`login_failure`, `password_reset_*`, `token_expired`, com validação de formato de email); `entity_name` forçado a `AuthSession`; `changes`/`entity_id` do payload são descartados. Chain hash: `SHA-256(JSON(entrada) + hash_anterior)` — busca a última entrada de AuditTrail para encadear.
+
+### 8.8 Módulos compartilhados (`base44/shared/`)
+
+- **`backendCommon.ts`** — biblioteca central: `canApprove`/`APPROVER_LEVELS`; `getWithRetry` (404 real vs transitório); `sanitizeText/sanitizeTextFields`; **`computeIntegrityHash`** (serialização canônica com chaves ordenadas, excluindo `INTEGRITY_EXCLUDED_FIELDS` = id/datas/status/approved*/client_signature/integrity_hash*/cliente_aprovacao*/manager_signature — por isso aprovar/assinar não invalida hash anterior; fallback não-criptográfico se WebCrypto indisponível); `computeAuditDiff` (diff campo-a-campo por JSON.stringify, ignorando campos de sistema); `extractIpAddress` (X-Forwarded-For → X-Real-IP) / `extractDeviceInfo` (UA, 500 chars); `computeChainHash`/`createAuditEntry`; `verifyTenantAccessForRecord`/`verifyObraTenantAccess`.
+- **`tenantAccess.ts`** — `getUserAccessLevel` (access_level ?? role==='admin' ? admin : user), `getEffectiveAccessLevel` (cliente_supervisor→cliente, funcionarios_cliente→user), `verifyTenantAccess` com caches opcionais (Map obra/regional p/ operações em lote). Regra extra: **cliente_supervisor só aprova registros criados por staff do CLIENTE** — `isCreatorClienteSide` verifica se o criador está em `clientes_responsaveis` ou tem access_level cliente-side (fail-closed); registros de staff Afirma Evias retornam `isSupervisor=false`.
+- **`totp.ts`** — TOTP RFC 6238 puro em WebCrypto (HMAC-SHA1), base32 encode/decode, janela ±1, hash e consumo de códigos de recuperação, lockout.
+- **`relatorioUnificadoRecon.ts`** — allowlist de 28 tipos + mapa `DATE_FIELDS` (espelha ensaioMappers), `extractFilters`, `buildCompositeId`, `reconstructRecords` (fetch paralelo por tipo com falhas individuais toleradas; se TODAS falharem → erro transitório 503 em vez de assinar relatório vazio).
+- **`notificacoes.ts`** — `notificarAssinaturaPendente` (resolve regional → clientes_responsaveis, não duplica pendentes, exclui o ator) e `marcarNotificacoesLidas`; sempre não-bloqueantes.
+
+### 8.9 Demais funções
+
+| Função | Contrato/comportamento |
 |---|---|
-| `assinarEletronicamente` | Núcleo das assinaturas: valida usuário/tenant/entidade, exige reautenticação (senha; TOTP se ativo), calcula hash SHA-256 (para RelatorioUnificado reconstrói o conteúdo do banco via `base44/shared/relatorioUnificadoRecon.ts` — nunca confia em dados do cliente), grava `AssinaturaEletronica` + auditoria, atualiza o registro (approved/client_signature) |
-| `verificarAssinatura` | Verificação pública de autenticidade (QR Code) |
-| `gerenciarAprovacao` | Aprovar/reprovar registro com validação de permissão por regional |
-| `gerenciarDoisFatores` | Setup/ativação/verificação/desativação do TOTP, códigos de recuperação, lockout por tentativas |
-| `registrarAuditoria` | Grava entradas do AuditTrail com hash encadeado (server-side) |
-| `validarESalvarRegistro` | Persistência validada de registros (sanitização XSS, validação de schema) |
-| `validarUploadArquivo` | Validação de uploads (tipo/tamanho) |
-| `exportarEnsaiosPDF` | Exportação em massa de registros para PDF |
-| `extrairDadosProjeto` | Extração de dados de PDF de projeto via LLM |
-| `carregarRegistrosSupervisor` / `carregarObrasFuncionarioCliente` / `getRegionalUsers` | Consultas otimizadas com service role respeitando tenant |
-| `updateLastLogin` | Atualiza `last_login` |
-| `excluirMinhaConta` | Autoexclusão de conta |
-| `notificarBugReport` | Email de notificação de bug |
-| `recalcularFillerBetume`, `recalcularConformidadeChecklistAplicacao`, `fixRecordStatus`, `corrigirNomesDiarioObra`, `migrarPeneirasProjects`, `adicionarPeneirasCAUQ`, `adicionarPeneira10Projetos`, `limparTodasPeneirasProjects`, `cleanRegionalUserInconsistencies` | Utilitários de migração/correção de dados (tela MigracaoDados) |
-
-Módulos compartilhados (`base44/shared/`): `totp.ts` (TOTP RFC 6238), `tenantAccess.ts` (verificação de acesso por regional), `relatorioUnificadoRecon.ts` (reconstrução server-side do relatório unificado).
+| `carregarRegistrosSupervisor` | Só cliente/cliente_supervisor. Resolve regionais do usuário (clientes_responsaveis ∪ supervisores_responsaveis) + demais lotes do MESMO cliente (read-only, casando `regional.cliente`); monta query `$or` {obra_id $in escopo} ∪ {created_by $in subordinados funcionarios_cliente}; pagina 500×6 páginas/entidade em lotes de 10 entidades paralelas; retorna `{records (dedup, com entityType), obraIds, subordinateEmails, approvableIds (finalizados de regionais onde é supervisor), truncated}` |
+| `carregarObrasFuncionarioCliente` | Só funcionarios_cliente. Regionais onde o email próprio OU do supervisor está em clientes_responsaveis + obras dessas regionais (query por regional_id — não traz outros tenants); token sem email → 401 "sessão defasada"; retorna `warning` quando 0 regionais |
+| `getRegionalUsers` | Lista usuários por escopo: admin=todos; gestor/sala técnica/cliente = usuários cujos emails constam nas listas das suas regionais (+`pendingInvites` = emails sem usuário); laboratorista = só ele. Campos expostos via allowlist `publicUser` |
+| `atualizarUsuarioGerenciado` | Update de usuário com autorização em camadas: admin edita tudo; gestor/sala técnica só laboratoristas (`user`) das suas regionais e só campos simples (nome/empresa/cargo/telefone/CREA/is_active — nunca access_level); cliente_supervisor só seus funcionarios_cliente. Deriva `role` (admin p/ níveis aprovadores, senão user). Field whitelist |
+| `exportarEnsaiosPDF` | Níveis admin/sala/gestor/cliente. Valida payload (regex de ID + allowlist de tipos), **anti-IDOR**: verifyTenantAccess por registro (com caches, fail-closed); busca o HTML de cada relatório fazendo fetch da própria app (URL construída server-side — anti-SSRF, origem validada) com o Authorization do chamador; empacota em ZIP (JSZip); audita `report_exported` com chain hash |
+| `extrairDadosProjeto` | Recebe `{file_url, tipo_projeto, faixa_id, regional_id?}`; valida file_url (HTTPS, domínio base44, bloqueio de IPs privados — anti-SSRF); monta prompt especializado por tipo (CAUQ/MRAF/BGS/Camadas Granulares/Carta Traço) com nomenclatura fixa de peneiras (`peneira_19_0mm`...) e JSON schema de resposta; chama `InvokeLLM` com o PDF anexado |
+| `validarUploadArquivo` | Valida imagem por **magic bytes** (JPEG/PNG/GIF/WebP), máx 10MB, e faz o upload via service role — impede spoofing de `file.type` |
+| `updateLastLogin` | Grava `last_login` do próprio usuário |
+| `excluirMinhaConta` | Exclui o próprio User via service role |
+| `notificarBugReport` / `notificarRespostaChamado` | Notificação de chamados: a 2ª é admin-only, busca o BugReport real (nunca confia no payload), sanitiza e cria/atualiza `Notificacao` tipo `chamado_respondido` sem duplicar |
+| `fixRecordStatus`, `corrigirNomesDiarioObra`, `recalcularFillerBetume`, `recalcularConformidadeChecklistAplicacao`, `migrarPeneirasProjects`, `adicionarPeneirasCAUQ`, `adicionarPeneira10Projetos`, `limparTodasPeneirasProjects`, `cleanRegionalUserInconsistencies` | Utilitários one-off de migração/correção (tela MigracaoDados, admin) |
 
 ---
 
@@ -388,8 +460,11 @@ Módulos compartilhados (`base44/shared/`): `totp.ts` (TOTP RFC 6238), `tenantAc
 
 ## 10. ARQUITETURA OFFLINE (PWA)
 
-- Service worker (`public/sw.js`) + fila de operações (`offlineQueue`) + armazenamento local (`offlineStorageService`, `offlineCacheService`, `offlinePhotoService` para fotos pendentes).
-- Registros criados/editados offline entram na fila; `syncService` sincroniza ao reconectar (com resolução de conflitos server-authoritative — `conflictResolution.js` + `ConflictResolutionDialog`).
+- Service worker (`public/sw.js`) + fila de operações em IndexedDB (`offlineStorageService`) + cache de dados (`offlineCacheService`) + fotos pendentes (`offlinePhotoService` — placeholders `local-photo:<id>` no payload, resolvidos por upload no momento do sync).
+- **Fila de sincronização** (`syncService.js`): estados `pending → syncing → synced | failed | conflict`. Deduplicação por `(entityType, operation, dataHash)` — salvar 2× o mesmo formulário atualiza o item existente. Itens do MESMO registro sincronizam em ordem (create antes de update); registros distintos em paralelo (lotes de 5).
+- **Toda escrita passa por `validarESalvarRegistro`** (nunca SDK direto) — validação server-side + detecção de conflito LWW. Envia `client_updated_at` e `base_updated_date` (updated_date do registro quando o formulário foi carregado).
+- **Conflitos (409)**: armazenados em IndexedDB e apresentados no `ConflictResolutionDialog` — "usar minha versão" reenvia com `force_overwrite: true` (campos server-authoritative preservados pelo backend), "manter servidor" descarta o item local. Conflitos não retentam automaticamente.
+- **Retry**: erros 4xx (exceto 408/429) são permanentes → `failed` imediato; transitórios retentam até 5×; botão "Tentar novamente" rearma os failed.
 - Auditoria marca `is_offline_sync=true` e guarda `client_timestamp`.
 - `OfflineStatusBar` mostra estado da fila; `useOfflineDetection` monitora conectividade.
 
