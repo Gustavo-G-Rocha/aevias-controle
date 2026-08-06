@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import LoadingButton from "@/components/ui/loading-button";
-import { CheckCircle, XCircle, Clock, History } from "lucide-react";
+import { CheckCircle, XCircle, Clock, History, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,6 +16,8 @@ import TotpPromptDialog from "@/components/relatorios/TotpPromptDialog";
 import SignatureSeal from "@/components/relatorios/SignatureSeal";
 import { canApproveRecord } from "@/utils/accessControl";
 import { useAuth } from "@/lib/AuthContext";
+import { canUserEditRecord, RESTRICTED_EDIT_ENTITIES, canEditRestrictedRecord } from "@/utils/recordEditPermission";
+import { createPageUrl } from "@/utils";
 
 // Props:
 //   entityName: string (e.g. "ChecklistConcretagem")
@@ -28,6 +30,7 @@ export default function AprovacaoBar({ entityName, recordId }) {
   const { user } = useAuth();
   const [record, setRecord] = useState(null);
   const [regional, setRegional] = useState(null);
+  const [obra, setObra] = useState(null);
   // Usuário criador do registro — necessário para saber se é funcionário do
   // cliente (aprovável por cliente_supervisor) ou staff Afirma Evias.
   const [creatorUsers, setCreatorUsers] = useState([]);
@@ -47,9 +50,10 @@ export default function AprovacaoBar({ entityName, recordId }) {
         // Carrega obra → regional para verificação de supervisor
         if (data?.obra_id) {
           try {
-            const obra = await base44.entities.Obra.get(data.obra_id);
-            if (obra?.regional_id) {
-              const reg = await base44.entities.Regional.get(obra.regional_id);
+            const obraData = await base44.entities.Obra.get(data.obra_id);
+            setObra(obraData);
+            if (obraData?.regional_id) {
+              const reg = await base44.entities.Regional.get(obraData.regional_id);
               setRegional(reg);
             }
           } catch (e) {
@@ -83,6 +87,25 @@ export default function AprovacaoBar({ entityName, recordId }) {
   const isPending = (record.approved === null || record.approved === undefined) && record.status !== 'rascunho';
   const isApproved = record.approved === true;
   const isRejected = record.approved === false;
+
+  // ── Permissão de edição ──
+  // Espelha a lógica do TableRowAdmin: registros restritos (Boletins, Usina)
+  // seguem regras mais rigorosas; demais usam canUserEditRecord.
+  // Mostra "Editar" para rascunhos e reprovados — nunca para aprovados/assinados.
+  const isRestrito = RESTRICTED_EDIT_ENTITIES.has(entityName);
+  const statusPermiteEdicao = record.status === 'rascunho' || record.approved === false || record.approved === null;
+  const jaAssinadoCliente = !!record.client_signature?.signed_by;
+  const podeEditarRestrito =
+    isRestrito &&
+    !jaAssinadoCliente &&
+    canEditRestrictedRecord(user, record, obra);
+  const podeEditarRegistro =
+    !isRestrito &&
+    statusPermiteEdicao &&
+    !jaAssinadoCliente &&
+    canUserEditRecord(user, record, obra, regional ? [regional] : []);
+  const canEdit = podeEditarRestrito || podeEditarRegistro;
+  const editUrl = createPageUrl(`${entityName}?editId=${recordId}`);
 
   const handleApprove = async (totpCode = null) => {
     const previousRecord = record;
@@ -197,6 +220,15 @@ export default function AprovacaoBar({ entityName, recordId }) {
             Histórico
           </Link>
         </Button>
+
+        {canEdit && (
+          <Button size="sm" asChild className="h-8 gap-1" style={{ backgroundColor: '#00233B' }}>
+            <Link to={editUrl}>
+              <Pencil className="w-3.5 h-3.5" />
+              Editar
+            </Link>
+          </Button>
+        )}
 
         {isApproved && <IntegrityBanner record={record} />}
 
