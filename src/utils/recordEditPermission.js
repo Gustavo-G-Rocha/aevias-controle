@@ -70,7 +70,12 @@ export const RESTRICTED_EDIT_ENTITIES = new Set([
 export function canEditRestrictedRecord(user, record, obra) {
   if (!user || !record) return false;
   const isAdmin = getEffectiveAccessLevel(user) === 'admin';
-  if (isAdmin) return obra?.status === 'em_andamento';
+  if (isAdmin) {
+    // Registros reprovados (approved === false) sempre podem ser editados
+    // pelo admin — a reprovação significa que precisam de correção.
+    if (record.approved === false) return true;
+    return obra?.status === 'em_andamento';
+  }
   const isOwner =
     (record.created_by || '').toLowerCase() === (user.email || '').toLowerCase() ||
     (user.id && record.created_by_id === user.id);
