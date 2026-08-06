@@ -35,7 +35,7 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
     isRestrito &&
     !ensaio.client_signature?.signed_by &&
     (
-      (user.role === 'admin' && obra?.status === 'em_andamento') ||
+      (user.role === 'admin' && (obra?.status === 'em_andamento' || ensaio.approved === false)) ||
       (ensaio.created_by === user.email && statusPermiteEdicao) ||
       gestorPodeEditarResultado
     );
