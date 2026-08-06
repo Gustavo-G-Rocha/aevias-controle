@@ -55,13 +55,12 @@ const AppLayout = ({ children, currentPageName }) => {
   // the user's place on long lists when bouncing between bottom tabs.
   useLayoutEffect(() => {
     const currentZone = getTabZone(location.pathname);
-    if (!currentZone) {
-      prevZoneRef.current = null;
-      return;
-    }
 
     // Save the *live* scroll position (captured before DOM swap) of the
-    // previous zone before switching to the new one.
+    // previous zone before switching — even if the new page has no zone
+    // (e.g., Dashboard, ReportarErro). Without this, navigating to a
+    // non-zone page clears prevZoneRef without saving, losing the scroll
+    // position the user had on the previous list page.
     if (prevZoneRef.current && prevZoneRef.current !== currentZone) {
       try {
         sessionStorage.setItem(
@@ -69,6 +68,11 @@ const AppLayout = ({ children, currentPageName }) => {
           String(liveScrollRef.current)
         );
       } catch { /* storage indisponível no APK */ }
+    }
+
+    if (!currentZone) {
+      prevZoneRef.current = null;
+      return;
     }
 
     // Restore saved scroll position for the current zone. Because list
@@ -82,7 +86,7 @@ const AppLayout = ({ children, currentPageName }) => {
         const tryScroll = () => {
           // If the page is tall enough to hold the target, restore it.
           const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-          if (maxScroll >= target || attempts >= 10) {
+          if (maxScroll >= target || attempts >= 30) {
             window.scrollTo(0, target);
           } else {
             attempts++;
