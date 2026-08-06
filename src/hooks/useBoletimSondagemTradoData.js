@@ -73,7 +73,7 @@ export function useBoletimSondagemTradoData() {
         })
         .catch(err => {
           logger.error("Erro ao carregar dados:", err);
-          toast({ title: "Erro ao carregar dados.", variant: "destructive" });
+          toast({ title: "Erro ao carregar dados: " + (err?.message || 'verifique sua conexão e tente novamente'), variant: "destructive" });
           navigate(createPageUrl('MeusEnsaios'));
         })
         .finally(() => setEditLoading(false));

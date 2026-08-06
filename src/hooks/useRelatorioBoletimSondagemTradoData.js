@@ -28,7 +28,7 @@ export const useRelatorioBoletimSondagemTradoData = () => {
       setObra(obraData);
       setRegional(regionalData);
     } catch (err) {
-      setError('Erro ao carregar dados do relatório');
+      setError(`Erro ao carregar dados do relatório: ${err?.message || 'erro desconhecido'}`);
     } finally {
       setLoading(false);
     }
