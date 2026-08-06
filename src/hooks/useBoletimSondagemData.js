@@ -10,6 +10,7 @@ import { obterEnsaioById } from "@/services/ensaiosService";
 import { useCurrentUser, useAuxData } from "@/hooks/useQueryData";
 import { getInitialFormData, getDensidadeInicial, normalizarDensidades } from "@/utils/boletimSondagemUtils";
 import { filtrarObrasPorAcessoRegional } from "@/utils/regionalFilter";
+import { canEditRestrictedRecord } from "@/utils/recordEditPermission";
 
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
@@ -52,11 +53,7 @@ export function useBoletimSondagemData() {
         .then(boletimToEdit => {
           const { obras: curObras, regionais: curReg } = auxRef.current;
           const obraDoBoletim = curObras.find(o => o.id === boletimToEdit.obra_id) || null;
-          const isCreator = boletimToEdit.created_by === user.email;
-          // Boletim de Sondagem: só criador (até ser aprovado) ou admin (obra em andamento)
-          const podeEditar = (user.role === 'admin' && obraDoBoletim?.status === 'em_andamento')
-            || (isCreator && boletimToEdit.approved !== true);
-          if (podeEditar) {
+          if (canEditRestrictedRecord(user, boletimToEdit, obraDoBoletim)) {
             setEditingBoletim(boletimToEdit);
             const initial = getInitialFormData();
             setFormData({

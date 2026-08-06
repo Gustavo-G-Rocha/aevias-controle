@@ -32,6 +32,7 @@ export function useBoletimSondagemActions({ formData, user, editingBoletim }) {
           updateData.rejection_reason = null;
           updateData.approved_by = null;
           updateData.approved_date = null;
+          updateData.approver_details = null;
         }
         await atualizarEnsaio('BoletimSondagem', editingBoletim.id, updateData);
         toast({ title: "Boletim atualizado com sucesso!" });

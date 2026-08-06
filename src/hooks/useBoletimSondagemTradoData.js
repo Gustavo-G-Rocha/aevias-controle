@@ -14,6 +14,7 @@ import {
   getDensidadeInicial,
   filtrarObrasParaTrado,
 } from "@/utils/boletimSondagemTradoUtils";
+import { canEditRestrictedRecord } from "@/utils/recordEditPermission";
 import { toast } from "@/components/ui/use-toast";
 import { logger } from '@/utils/logger';
 
@@ -46,10 +47,7 @@ export function useBoletimSondagemTradoData() {
       obterEnsaioById('BoletimSondagemTrado', editId)
         .then(boletimToEdit => {
           const obraDoBoletim = obras.find(o => o.id === boletimToEdit.obra_id) || null;
-          if (
-            (user.role === 'admin' && obraDoBoletim?.status === 'em_andamento') ||
-            (boletimToEdit.created_by === user.email && boletimToEdit.approved !== true)
-          ) {
+          if (canEditRestrictedRecord(user, boletimToEdit, obraDoBoletim)) {
             setEditingBoletim(boletimToEdit);
             const initial = getInitialFormData();
             const densidades =

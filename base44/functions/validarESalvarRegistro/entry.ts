@@ -313,6 +313,7 @@ Deno.serve(async (req) => {
         sanitizedData.rejection_reason = null;
         sanitizedData.approved_by = null;
         sanitizedData.approved_date = null;
+        sanitizedData.approver_details = null;
         sanitizedData.was_rejected = true;
       }
     }
