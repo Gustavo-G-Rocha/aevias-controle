@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Loader2, CheckCircle } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 import LoadingState from "@/components/LoadingState";
 import SaveProgressButton from "@/components/forms/SaveProgressButton";
 import { createPageUrl } from "@/utils";
@@ -83,12 +84,17 @@ export default function EnsaioCAUQPage() {
     // Seleciona a primeira obra disponível se nenhuma estiver selecionada,
     // garantindo que o botão "Salvar Progresso" fique habilitado.
     const obraId = formData.obra_id || (obras[0]?.id ?? '');
+    if (!obraId) {
+      toast({ title: "Nenhuma obra disponível. Selecione uma obra manualmente.", variant: "destructive" });
+      return;
+    }
 
     // Valores de exemplo para condições ambientais e medições
     const pesoInicialExemplo = 1175;
     setFormData(prev => ({
       ...prev,
       obra_id: obraId,
+      data_ensaio: prev.data_ensaio || todayISO(),
       horario: '09:00',
       local_coleta: 'KM 45 Rodovia BR-163',
       pedreira: 'Pedreira Norte',
