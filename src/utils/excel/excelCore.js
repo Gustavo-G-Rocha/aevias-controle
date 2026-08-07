@@ -3,8 +3,8 @@
  *
  * Cada tipo de registro tem um exportador sob medida em ./exporters, que
  * descreve suas abas com buildSheet() e devolve { filename, sheets }.
- * Este módulo cuida do estilo (header verde-oliva + labels em negrito),
- * das larguras de coluna e da escrita do arquivo.
+ * Este módulo cuida do layout (título mesclado, bloco de identificação,
+ * cabeçalho de tabela com filtro), das larguras de coluna e da escrita.
  */
 
 import * as XLSX from 'xlsx/xlsx.mjs';
@@ -24,28 +24,51 @@ export const boolText = (v) => (v === true ? 'Sim' : v === false ? 'Não' : '-')
 
 /**
  * Monta a descrição de uma aba.
- * meta   → pares [label, valor] no topo (labels ficam em negrito)
- * header → linha de cabeçalho da tabela (recebe fundo verde-oliva)
+ * name   → nome da aba
+ * title  → título do documento (linha mesclada no topo)
+ * meta   → pares [label, valor] de identificação
+ * header → linha de cabeçalho da tabela (recebe filtro automático)
  * rows   → linhas de dados
  * cols   → larguras das colunas
  */
-export function buildSheet({ name, meta = [], header = null, rows = [], cols = [] }) {
-  const aoa = meta.map(([label, value]) => [label, value]);
-  const boldLabels = meta.map((_, i) => i);
+export function buildSheet({ name, title = null, meta = [], header = null, rows = [], cols = [] }) {
+  title = title ?? name;
+  const aoa = [];
+  const merges = [];
+  const boldLabels = [];
   const headerRows = [];
+  const width = Math.max(cols.length, header?.length || 0, 2);
+
+  if (title) {
+    aoa.push([title]);
+    merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: width - 1 } });
+    aoa.push([]);
+  }
+
+  meta.forEach(([label, value]) => {
+    boldLabels.push(aoa.length);
+    aoa.push([label, value]);
+  });
 
   if (header) {
-    aoa.push([]);
+    if (aoa.length) aoa.push([]);
     headerRows.push(aoa.length);
     aoa.push(header);
+    rows.forEach((r) => aoa.push(r));
   }
-  rows.forEach((r) => aoa.push(r));
 
-  return { name, aoa, headerRows, boldLabels, cols };
+  return { name, aoa, headerRows, boldLabels, cols, merges, titleRow: title ? 0 : null };
 }
 
-function applyStyles(ws, { headerRows = [], boldLabels = [], cols = [] }) {
+function applyStyles(ws, { headerRows = [], boldLabels = [], cols = [], merges = [], titleRow = null }) {
   const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
+
+  if (titleRow !== null && ws.A1) {
+    ws.A1.s = {
+      font: { bold: true, sz: 14, color: { rgb: NAVY } },
+      alignment: { horizontal: 'center' },
+    };
+  }
 
   headerRows.forEach((r) => {
     for (let c = range.s.c; c <= range.e.c; c++) {
@@ -58,6 +81,15 @@ function applyStyles(ws, { headerRows = [], boldLabels = [], cols = [] }) {
         };
       }
     }
+    // Filtro automático sobre a tabela — facilita a leitura de listas longas.
+    if (!ws['!autofilter']) {
+      ws['!autofilter'] = {
+        ref: XLSX.utils.encode_range(
+          { r, c: range.s.c },
+          { r: range.e.r, c: range.e.c }
+        ),
+      };
+    }
   });
 
   boldLabels.forEach((r) => {
@@ -65,6 +97,7 @@ function applyStyles(ws, { headerRows = [], boldLabels = [], cols = [] }) {
     if (ws[ref]) ws[ref].s = { font: { bold: true, color: { rgb: NAVY } } };
   });
 
+  if (merges.length) ws['!merges'] = merges;
   if (cols.length) ws['!cols'] = cols.map((wch) => ({ wch }));
 }
 
@@ -85,6 +118,20 @@ export function downloadExcel({ filename, sheets }) {
 export function buildFileName(prefix, dateValue) {
   const d = dateValue ? fmtDate(dateValue).replace(/\//g, '-') : '';
   return `${prefix}${d ? `_${d}` : ''}.xlsx`;
+}
+
+/**
+ * Tabela automática para listas cujo formato é livre: usa as chaves
+ * presentes nos itens como colunas, com rótulos opcionais.
+ */
+export function autoRows(items, labels = {}) {
+  const keys = [];
+  items.forEach((it) => Object.keys(it || {}).forEach((k) => {
+    if (!keys.includes(k)) keys.push(k);
+  }));
+  const header = keys.map((k) => labels[k] || k.replace(/_/g, ' '));
+  const rows = items.map((it) => keys.map((k) => val(it?.[k])));
+  return { header, rows, cols: keys.map(() => 18) };
 }
 
 /** Pares de identificação comuns a praticamente todos os registros. */
