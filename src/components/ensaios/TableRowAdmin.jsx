@@ -14,7 +14,7 @@ import { ACTION_COLORS, SIGN_DIALOG, buildSignDescription } from "@/constants/en
 import CriticalActionDialog from "@/components/ensaios/CriticalActionDialog";
 import ExcelExportButton from "@/components/ensaios/ExcelExportButton";
 
-const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, allUsers, obras: _obras, user, regionais = [], onApprove: _onApprove, onReject, onDelete, onAssinar }) => {
+const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, allUsers, obras: _obras, user, regionais = [], onApprove: _onApprove, onReject, onDelete, onAssinar, selected, onToggleSelect }) => {
   const status = getStatusInfo(ensaio);
   const { name, icon: TypeIcon } = getEnsaioTypeInfo(ensaio);
   const reportUrl = getReportLink(ensaio);
@@ -134,6 +134,18 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
           )}
         </div>
       </td>
+      {onToggleSelect && (
+        <td className="px-2 py-2 text-center">
+          <input
+            type="checkbox"
+            className="h-4 w-4 cursor-pointer align-middle accent-[color:var(--color-primary)]"
+            checked={!!selected}
+            onChange={() => onToggleSelect(ensaio)}
+            aria-label={`Selecionar ${name}`}
+            title={`Selecionar ${name}`}
+          />
+        </td>
+      )}
     </tr>
   );
 });

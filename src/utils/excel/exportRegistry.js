@@ -71,3 +71,25 @@ export async function exportRecordToExcel(record) {
   ]);
   downloadExcel(buildExport(full));
 }
+
+/**
+ * Exporta vários registros em uma única planilha — cada registro em sua
+ * própria aba. Registros sem exportador disponível são ignorados.
+ */
+export async function exportRecordsToExcel(records, filename = 'registros.xlsx') {
+  const exportaveis = (records || []).filter((r) => EXPORTERS[r?.entityType]);
+  if (!exportaveis.length) {
+    throw new Error('Nenhum dos registros selecionados possui exportação para Excel.');
+  }
+  const { downloadExcelWorkbook } = await import('./excelCore');
+  const tabs = [];
+  for (const record of exportaveis) {
+    const [{ default: buildExport }, full] = await Promise.all([
+      EXPORTERS[record.entityType](),
+      withObraInfo(record),
+    ]);
+    const built = buildExport(full);
+    tabs.push({ name: built.filename.replace(/\.xlsx$/i, ''), sheets: built.sheets });
+  }
+  downloadExcelWorkbook({ filename, tabs });
+}

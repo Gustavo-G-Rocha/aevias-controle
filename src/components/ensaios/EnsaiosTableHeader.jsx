@@ -22,11 +22,14 @@ export default function EnsaiosTableHeader({
   // coluna de ações
   acoesLabel = "Ações",
   acoesWidth = "240px",
+  // coluna de seleção (opcional) — só aparece quando onToggleAll é passado
+  onToggleAll,
+  allSelected = false,
 }) {
   return (
     <thead className="bg-muted/40 border-b border-border">
       <tr>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '14%' }}>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '18%' }}>
           <div className="flex items-center justify-between gap-0.5 min-w-0">
             <span className="whitespace-nowrap truncate">Tipo</span>
             <SelectColumnFilter value={typeFilter} onChange={setTypeFilter} options={typeOptions} placeholder="Filtrar por tipo" />
@@ -67,19 +70,31 @@ export default function EnsaiosTableHeader({
             <TextColumnFilter value={localFilter} onChange={setLocalFilter} placeholder="Filtrar por local..." />
           </div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '11%' }}>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '9%' }}>
           <div className="flex items-center justify-between gap-0.5 min-w-0">
-            <span className="whitespace-nowrap truncate">Empreit.</span>
+            <span className="whitespace-nowrap truncate">Empr.</span>
             <TextColumnFilter value={empreiteiraFilter} onChange={setEmpreiteiraFilter} placeholder="Filtrar por empreiteira..." />
           </div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '10%' }}>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '8%' }}>
           <div className="flex items-center justify-between gap-0.5 min-w-0">
             <span className="whitespace-nowrap truncate">Projeto</span>
             <TextColumnFilter value={projetoFilter} onChange={setProjetoFilter} placeholder="Filtrar por projeto..." />
           </div>
         </th>
         <th className="text-center px-2 py-2 font-medium text-foreground text-xs" style={{ width: acoesWidth }}>{acoesLabel}</th>
+        {onToggleAll && (
+          <th className="text-center px-2 py-2 font-medium text-foreground text-xs" style={{ width: '40px' }}>
+            <input
+              type="checkbox"
+              className="h-4 w-4 cursor-pointer align-middle accent-[color:var(--color-primary)]"
+              checked={allSelected}
+              onChange={(e) => onToggleAll(e.target.checked)}
+              title="Selecionar todos desta página"
+              aria-label="Selecionar todos desta página"
+            />
+          </th>
+        )}
       </tr>
     </thead>
   );

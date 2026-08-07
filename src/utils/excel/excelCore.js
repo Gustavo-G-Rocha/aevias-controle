@@ -153,6 +153,34 @@ export function downloadExcel({ filename, sheets }) {
   XLSX.writeFile(wb, filename);
 }
 
+/** Caracteres proibidos em nome de aba + limite de 31 caracteres do Excel. */
+function safeSheetName(name, used) {
+  let base = String(name || 'Registro').replace(/[[\]:*?/\\]/g, ' ').trim().slice(0, 28) || 'Registro';
+  let final = base;
+  let n = 2;
+  while (used.has(final)) {
+    final = `${base.slice(0, 28)} ${n++}`;
+  }
+  used.add(final);
+  return final;
+}
+
+/**
+ * Gera e baixa uma planilha com várias abas — uma por registro.
+ * tabs: [{ name, sheets }] onde sheets é o mesmo formato de downloadExcel.
+ */
+export function downloadExcelWorkbook({ filename, tabs }) {
+  const wb = XLSX.utils.book_new();
+  const used = new Set();
+  tabs.forEach((tab) => {
+    const merged = mergeSheets(tab.sheets);
+    const ws = XLSX.utils.aoa_to_sheet(merged.aoa);
+    applyStyles(ws, merged);
+    XLSX.utils.book_append_sheet(wb, ws, safeSheetName(tab.name, used));
+  });
+  XLSX.writeFile(wb, filename);
+}
+
 /** Nome de arquivo padronizado: prefixo + data do registro. */
 export function buildFileName(prefix, dateValue) {
   const d = dateValue ? fmtDate(dateValue).replace(/\//g, '-') : '';

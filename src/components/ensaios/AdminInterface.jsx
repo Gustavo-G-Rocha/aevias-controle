@@ -16,12 +16,20 @@ import TableRowAdmin from "@/components/ensaios/TableRowAdmin";
 import EnsaiosTableHeader from "@/components/ensaios/EnsaiosTableHeader";
 import { getStatusInfo } from "@/components/ensaios/utils";
 import { STATUS_LABELS } from "@/constants/ensaioUi";
+import BulkExcelExportButton from "@/components/ensaios/BulkExcelExportButton";
 
 const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReject, onDelete, onAssinar, user, canApprove, canApproveRecord, canCreate, allUsers, regionais = [], truncated = false }) => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [reprovingEnsaio, setReprovingEnsaio] = useState(null);
   const [deletingEnsaio, setDeletingEnsaio] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
   const { toast } = useToast();
+
+  const toggleSelect = useCallback((ensaio) => {
+    setSelectedIds((prev) =>
+      prev.includes(ensaio.id) ? prev.filter((id) => id !== ensaio.id) : [...prev, ensaio.id]
+    );
+  }, []);
 
   // Permite chegar à lista já filtrada por tipo via URL (ex: sidebar →
   // /MeusEnsaios?tipo=RegistroFresagemCBUQ), dando acesso direto aos
@@ -71,6 +79,18 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
     clearFilters,
   } = useTableFilters(ensaios, obras, projects, allUsers, applyCustomFilters, initialType);
 
+  const selectedRecords = useMemo(
+    () => ensaios.filter((e) => selectedIds.includes(e.id)),
+    [ensaios, selectedIds]
+  );
+  const allSelected = paginatedEnsaios.length > 0 && paginatedEnsaios.every((e) => selectedIds.includes(e.id));
+  const toggleAll = useCallback((checked) => {
+    const pageIds = paginatedEnsaios.map((e) => e.id);
+    setSelectedIds((prev) =>
+      checked ? [...new Set([...prev, ...pageIds])] : prev.filter((id) => !pageIds.includes(id))
+    );
+  }, [paginatedEnsaios]);
+
   const handleReject = useCallback(async (ensaio, motivo) => {
     await onReject(ensaio, motivo);
     setReprovingEnsaio(null);
@@ -118,6 +138,14 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
           )}
         </div>
         <div className="flex items-center gap-2">
+          {selectedIds.length > 0 && (
+            <>
+              <Button variant="ghost" size="sm" onClick={() => setSelectedIds([])} className="h-9 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                Limpar seleção
+              </Button>
+              <BulkExcelExportButton records={selectedRecords} />
+            </>
+          )}
           {canCreate && (
             <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -157,6 +185,8 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
                 statusFilter={statusFilter} setStatusFilter={setStatusFilter}
                 statusOptions={statusOptions}
                 acoesWidth="240px"
+                onToggleAll={toggleAll}
+                allSelected={allSelected}
               />
               <tbody>
                 {paginatedEnsaios.map((ensaio, index) => (
@@ -175,6 +205,8 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
                     onReject={() => setReprovingEnsaio(ensaio)}
                     onDelete={() => setDeletingEnsaio(ensaio)}
                     onAssinar={onAssinar}
+                    selected={selectedIds.includes(ensaio.id)}
+                    onToggleSelect={toggleSelect}
                   />
                 ))}
               </tbody>
