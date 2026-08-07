@@ -172,6 +172,19 @@ export function processarEnsaio(ensaio, tipo, campos, todosOsProjetos, peneirasR
       resultados.push(gerarLinhaUsina(null, ensaio.id));
     }
 
+  } else if (tipo === 'EnsaioVigaBenkelman') {
+    const linha = criarLinha(ensaio.id, ensaio.data_ensaio || ensaio.data || '-');
+    const kms = (ensaio.levantamentos || []).map(l => l.estaca_km).filter(Boolean).join(', ');
+    campos.forEach(campoKey => {
+      if (campoKey === 'km') {
+        linha['KM'] = kms || '-';
+      } else {
+        const campo = CAMPOS_POR_TIPO[tipo].find(c => c.key === campoKey);
+        linha[campo.label] = formatValue(getNestedValue(ensaio, campoKey), campoKey);
+      }
+    });
+    resultados.push(linha);
+
   } else if (tipo === 'ChecklistTerraplanagem' || tipo === 'ChecklistReciclagem') {
     const linha = criarLinha(ensaio.id, ensaio.data_ensaio || ensaio.data || '-');
     campos.forEach(campoKey => {

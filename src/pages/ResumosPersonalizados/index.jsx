@@ -31,6 +31,33 @@ export default function ResumosPersonalizadosPage() {
     link.click();
   };
 
+  const exportarVigaBenkelman = async (linhaId) => {
+    const ensaio = rawEnsaios.find(e => e.id === linhaId || linhaId?.startsWith(e.id));
+    if (!ensaio) return;
+    const levantamentos = ensaio.levantamentos || [];
+    if (levantamentos.length === 0) { toast({ title: 'Este ensaio não possui levantamentos.', variant: "destructive" }); return; }
+    const wsData = [
+      ['Laboratorista', ensaio.laboratorista_name || '-'],
+      ['Data', ensaio.data_ensaio ? new Date(ensaio.data_ensaio).toLocaleDateString('pt-BR') : '-'],
+      ['Rodovia', ensaio.rodovia || '-'],
+      ['Trecho', ensaio.trecho || '-'],
+      ['Def. Admissível (x10⁻²mm)', ensaio.def_admissivel ?? '-'],
+      [],
+      ['Faixa', 'Local (Estaca/KM)', 'Posição', 'Leitura Inicial (A)', 'Leitura Final (B)', 'Diferença (C = A - B)', 'Deflexão (x10⁻²mm)'],
+      ...levantamentos.flatMap(l => [
+        [l.faixa_nome || '-', l.estaca_km || '-', 'Bordo Esquerdo', l.bordo_esquerdo?.leitura_inicial ?? '-', l.bordo_esquerdo?.leitura_final ?? '-', l.bordo_esquerdo?.diferenca ?? '-', l.bordo_esquerdo?.deflexao ?? '-'],
+        [l.faixa_nome || '-', l.estaca_km || '-', 'Eixo', l.eixo?.leitura_inicial ?? '-', l.eixo?.leitura_final ?? '-', l.eixo?.diferenca ?? '-', l.eixo?.deflexao ?? '-'],
+        [l.faixa_nome || '-', l.estaca_km || '-', 'Bordo Direito', l.bordo_direito?.leitura_inicial ?? '-', l.bordo_direito?.leitura_final ?? '-', l.bordo_direito?.diferenca ?? '-', l.bordo_direito?.deflexao ?? '-'],
+      ])
+    ];
+    const XLSX = await import("xlsx");
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Levantamentos');
+    const dataStr = ensaio.data_ensaio ? new Date(ensaio.data_ensaio).toLocaleDateString('pt-BR') : '';
+    XLSX.writeFile(wb, `viga_benkelman_${dataStr}.xlsx`);
+  };
+
   const exportarMedicaoGeometrica = async (linhaId) => {
     const ensaio = rawEnsaios.find(e => e.id === linhaId || linhaId?.startsWith(e.id));
     if (!ensaio) return;
@@ -99,6 +126,7 @@ export default function ResumosPersonalizadosPage() {
           tipoEnsaioSelecionado={tipoEnsaioSelecionado}
           obraSelecionada={obraSelecionada}
           onExportarMedicaoGeometrica={exportarMedicaoGeometrica}
+          onExportarVigaBenkelman={exportarVigaBenkelman}
         />
 
         {dadosConsolidados.length === 0 && !loadingData && (

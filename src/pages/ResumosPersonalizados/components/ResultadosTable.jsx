@@ -6,7 +6,7 @@ import { formatValue } from "../utils/resumosUtils";
 
 export default function ResultadosTable({
   dadosConsolidados, tipoEnsaioSelecionado, obraSelecionada,
-  onExportarMedicaoGeometrica,
+  onExportarMedicaoGeometrica, onExportarVigaBenkelman,
 }) {
   if (dadosConsolidados.length === 0) return null;
 
@@ -40,9 +40,9 @@ export default function ResultadosTable({
                 <th className="px-3 py-2.5 text-left font-semibold text-white whitespace-nowrap">
                   Data
                 </th>
-                {tipoEnsaioSelecionado === 'ChecklistAplicacao' && (
+                {(tipoEnsaioSelecionado === 'ChecklistAplicacao' || tipoEnsaioSelecionado === 'EnsaioVigaBenkelman') && (
                   <th className="px-3 py-2.5 text-center font-semibold text-white whitespace-nowrap">
-                    Medição Geométrica
+                    Excel
                   </th>
                 )}
                 {colunas.map(key => (
@@ -71,6 +71,19 @@ export default function ResultadosTable({
                         size="sm"
                         variant="outline"
                         onClick={() => onExportarMedicaoGeometrica(linha.id)}
+                        className="h-7 text-xs gap-1"
+                      >
+                        <FileSpreadsheet className="w-3.5 h-3.5 text-green-600" />
+                        Excel
+                      </Button>
+                    </td>
+                  )}
+                  {tipoEnsaioSelecionado === 'EnsaioVigaBenkelman' && (
+                    <td className="px-3 py-2 text-center">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => onExportarVigaBenkelman(linha.id)}
                         className="h-7 text-xs gap-1"
                       >
                         <FileSpreadsheet className="w-3.5 h-3.5 text-green-600" />

@@ -11,5 +11,6 @@ export const TIPOS_ENSAIO = [
   { value: "ChecklistTerraplanagem", label: "Checklist de Terraplanagem" },
   { value: "ChecklistReciclagem", label: "Checklist de Reciclagem" },
   { value: "DiarioObra", label: "Diário de Obra" },
-  { value: "EnsaioMRAF", label: "Ensaio de MRAF" }
+  { value: "EnsaioMRAF", label: "Ensaio de MRAF" },
+  { value: "EnsaioVigaBenkelman", label: "Viga Benkelman" }
 ];

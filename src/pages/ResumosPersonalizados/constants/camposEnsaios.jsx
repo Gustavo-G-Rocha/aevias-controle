@@ -137,5 +137,12 @@ export const CAMPOS_ENSAIOS = {
       { key: "peneira_0_075mm", label: "Nº 200", astm: "Nº 200" }
     ]},
     { key: "approved", label: "Status Aprovação" }
+  ],
+  EnsaioVigaBenkelman: [
+    { key: "laboratorista_name", label: "Laboratorista" },
+    { key: "data_ensaio", label: "Data" },
+    { key: "rodovia", label: "Rodovia" },
+    { key: "trecho", label: "Trecho" },
+    { key: "km", label: "KM" }
   ]
 };
