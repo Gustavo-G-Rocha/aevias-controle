@@ -8,6 +8,7 @@ import { obterRegionalById } from '@/services/regionaisService';
 import { obterProjectById } from '@/services/projectsService';
 import { obterFaixaById } from '@/services/faixasService';
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import ExcelExportButton from '@/components/ensaios/ExcelExportButton';
 
 import RelatorioAcompanhamentoCarga from "@/components/relatorios/RelatorioAcompanhamentoCarga";
 import { RelatorioAcompanhamentoCargaProvider } from "@/components/relatorios/acompanhamento-carga/RelatorioAcompanhamentoCargaContext";
@@ -103,6 +104,17 @@ export default function RelatorioAcompanhamentoCargaPage() {
           </h2>
           <div className="flex items-center gap-2">
             {acompanhamento && <AprovacaoBar entityName="AcompanhamentoCarga" recordId={acompanhamento.id} />}
+            {acompanhamento && (
+              <ExcelExportButton
+                record={{
+                  ...acompanhamento,
+                  entityType: 'AcompanhamentoCarga',
+                  obra_name: obra?.name ?? acompanhamento.obra_name,
+                  obra_code: obra?.code ?? acompanhamento.obra_code,
+                }}
+                variant="full"
+              />
+            )}
             <Button onClick={handlePrint} disabled={downloading} className="bg-[#00233B] text-white hover:bg-[#00233B]/90">
               {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
               {downloading ? 'Gerando...' : 'Imprimir'}

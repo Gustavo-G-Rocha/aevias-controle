@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 import AprovacaoBar from '@/components/relatorios/AprovacaoBar';
+import ExcelExportButton from '@/components/ensaios/ExcelExportButton';
 
 export default function RelatorioDiarioHeader({ diario, onPrint, downloading }) {
   return (
@@ -12,6 +13,9 @@ export default function RelatorioDiarioHeader({ diario, onPrint, downloading }) 
         </h2>
         <div className="flex items-center gap-2">
           {diario && <AprovacaoBar entityName="DiarioObra" recordId={diario?.id} />}
+          {diario && (
+            <ExcelExportButton record={{ ...diario, entityType: 'DiarioObra' }} variant="full" />
+          )}
           <Button onClick={onPrint} disabled={downloading} className="bg-slate-800 text-white hover:bg-slate-700">
             {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
             {downloading ? 'Gerando...' : 'Imprimir'}

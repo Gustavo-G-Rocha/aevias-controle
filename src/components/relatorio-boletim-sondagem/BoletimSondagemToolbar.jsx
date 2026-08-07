@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import AprovacaoBar from "@/components/relatorios/AprovacaoBar";
+import ExcelExportButton from "@/components/ensaios/ExcelExportButton";
 
 export default function BoletimSondagemToolbar({ boletim, onPrint }) {
   return (
@@ -13,6 +14,12 @@ export default function BoletimSondagemToolbar({ boletim, onPrint }) {
         <div className="flex items-center gap-2">
           {boletim && (
             <AprovacaoBar entityName="BoletimSondagem" recordId={boletim.id} />
+          )}
+          {boletim && (
+            <ExcelExportButton
+              record={{ ...boletim, entityType: 'BoletimSondagem' }}
+              variant="full"
+            />
           )}
           <Button
             onClick={onPrint}

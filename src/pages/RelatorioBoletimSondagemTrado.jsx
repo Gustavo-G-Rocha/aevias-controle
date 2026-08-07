@@ -3,6 +3,7 @@ import { useReportMode } from '@/hooks/useReportMode';
 import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 import AprovacaoBar from '@/components/relatorios/AprovacaoBar';
+import ExcelExportButton from '@/components/ensaios/ExcelExportButton';
 import SignatureFooter from '@/components/relatorios/SignatureFooter';
 import { useRelatorioBoletimSondagemTradoData } from '@/hooks/useRelatorioBoletimSondagemTradoData';
 import { useRelatorioBoletimSondagemTradoActions } from '@/hooks/useRelatorioBoletimSondagemTradoActions';
@@ -52,6 +53,12 @@ export default function RelatorioBoletimSondagemTrado() {
               <AprovacaoBar
                 entityName="BoletimSondagemTrado"
                 recordId={boletim.id}
+              />
+            )}
+            {boletim && (
+              <ExcelExportButton
+                record={{ ...boletim, entityType: 'BoletimSondagemTrado' }}
+                variant="full"
               />
             )}
             <Button

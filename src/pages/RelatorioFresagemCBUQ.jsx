@@ -8,6 +8,7 @@ import { obterRegionalById } from '@/services/regionaisService';
 import { obterRegistro } from '@/services/recordsService';
 import { carregarCreatorUser } from '@/services/relatorioContextService';
 import AprovacaoBar from '@/components/relatorios/AprovacaoBar';
+import ExcelExportButton from '@/components/ensaios/ExcelExportButton';
 import RelatorioFresagemCBUQ from "@/components/relatorios/RelatorioFresagemCBUQ";
 import { mapFresagemToPresentation } from "@/utils/relatorioFresagemCBUQMapper";
 import { useReportPdfActions } from '@/hooks/useReportPdfActions';
@@ -111,6 +112,17 @@ export default function RelatorioFresagemCBUQPage() {
           </h2>
           <div className="flex items-center gap-2">
             {registro && <AprovacaoBar entityName="RegistroFresagemCBUQ" recordId={registro.id} />}
+            {registro && (
+              <ExcelExportButton
+                record={{
+                  ...registro,
+                  entityType: 'RegistroFresagemCBUQ',
+                  obra_name: obra?.name ?? registro.obra_name,
+                  obra_code: obra?.code ?? registro.obra_code,
+                }}
+                variant="full"
+              />
+            )}
             <Button onClick={handlePrint} disabled={downloading} className="bg-[#00233B] text-white hover:bg-[#00233B]/90">
               {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
               {downloading ? 'Gerando...' : 'Imprimir'}

@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Loader2, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AprovacaoBar from '@/components/relatorios/AprovacaoBar';
+import ExcelExportButton from '@/components/ensaios/ExcelExportButton';
 import RelatorioTaxaInsumosDoc from '@/components/relatorios/RelatorioTaxaInsumosDoc';
 import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 
@@ -56,6 +57,15 @@ export default function RelatorioTaxaInsumos() {
           </h2>
           <div className="flex flex-wrap items-center gap-2">
             <AprovacaoBar entityName="EnsaioTaxaInsumos" recordId={ensaio.id} />
+            <ExcelExportButton
+              record={{
+                ...ensaio,
+                entityType: 'EnsaioTaxaInsumos',
+                obra_name: obra?.name ?? ensaio.obra_name,
+                obra_code: obra?.code ?? ensaio.obra_code,
+              }}
+              variant="full"
+            />
             <Button onClick={handlePrint} disabled={downloading} className="bg-slate-800 text-white hover:bg-slate-700">
               {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
               {downloading ? 'Gerando...' : 'Imprimir'}

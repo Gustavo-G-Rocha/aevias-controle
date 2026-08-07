@@ -6,6 +6,7 @@ import { obterEnsaioById } from '@/services/ensaiosService';
 import { obterObraById } from '@/services/obrasService';
 import { obterRegionalById } from '@/services/regionaisService';
 import AprovacaoBar from '@/components/relatorios/AprovacaoBar';
+import ExcelExportButton from '@/components/ensaios/ExcelExportButton';
 import RelatorioControleExecucaoServicos from "@/components/relatorios/RelatorioControleExecucaoServicos";
 import { mapControleToPresentation } from "@/utils/relatorioControleExecucaoServicosMapper";
 import { useReportPdfActions } from '@/hooks/useReportPdfActions';
@@ -98,6 +99,17 @@ export default function RelatorioControleExecucaoServicosPage() {
           </h2>
           <div className="flex items-center gap-2">
             {registro && <AprovacaoBar entityName="ControleExecucaoServicos" recordId={registro.id} />}
+            {registro && (
+              <ExcelExportButton
+                record={{
+                  ...registro,
+                  entityType: 'ControleExecucaoServicos',
+                  obra_name: obra?.name ?? registro.obra_name,
+                  obra_code: obra?.code ?? registro.obra_code,
+                }}
+                variant="full"
+              />
+            )}
             <Button onClick={handlePrint} disabled={downloading} className="bg-[#00233B] text-white hover:bg-[#00233B]/90">
               {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
               {downloading ? 'Gerando...' : 'Imprimir'}

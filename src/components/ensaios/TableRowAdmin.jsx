@@ -12,6 +12,7 @@ import { canUserEditRecord, RESTRICTED_EDIT_ENTITIES } from "@/utils/recordEditP
 import { canGestorPreencherResultado } from "@/utils/certificacaoUsinaAccess";
 import { ACTION_COLORS, SIGN_DIALOG, buildSignDescription } from "@/constants/ensaioUi";
 import CriticalActionDialog from "@/components/ensaios/CriticalActionDialog";
+import ExcelExportButton from "@/components/ensaios/ExcelExportButton";
 
 const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, allUsers, obras: _obras, user, regionais = [], onApprove: _onApprove, onReject, onDelete, onAssinar }) => {
   const status = getStatusInfo(ensaio);
@@ -82,6 +83,7 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
           <Button asChild variant="outline" size="sm" className="text-foreground hover:bg-muted h-7 px-2 shrink-0" title={`Ver relatório de ${name}`} aria-label={`Ver relatório de ${name}`}>
             <RouterLink to={reportUrl} target="_blank" rel="noopener noreferrer"><FileText className="w-3 h-3" /></RouterLink>
           </Button>
+          <ExcelExportButton record={ensaio} />
           {canApprove && ensaio.status !== 'rascunho' && (
             <div className="flex gap-1 flex-nowrap shrink-0">
               {(ensaio.approved === null || ensaio.approved === false) && (

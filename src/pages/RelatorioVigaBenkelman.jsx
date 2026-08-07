@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
 import SignatureFooter from '../components/relatorios/SignatureFooter';
+import ExcelExportButton from '@/components/ensaios/ExcelExportButton';
 
 import { useRelatorioVigaBenkelmanData } from '@/hooks/useRelatorioVigaBenkelmanData';
 import { useRelatorioVigaBenkelmanActions } from '@/hooks/useRelatorioVigaBenkelmanActions';
@@ -61,6 +62,7 @@ export default function RelatorioVigaBenkelman() {
           </h2>
           <div className="flex items-center gap-2">
             {ensaio && <AprovacaoBar entityName="EnsaioVigaBenkelman" recordId={ensaio.id} />}
+            <ExcelExportButton record={{ ...ensaio, entityType: 'EnsaioVigaBenkelman' }} variant="full" />
             <Button onClick={handlePrint} className="bg-slate-800 text-white hover:bg-slate-700">
               <Download className="w-4 h-4 mr-2" />
               Imprimir
