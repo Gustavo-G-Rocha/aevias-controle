@@ -53,14 +53,6 @@ export const MAIN_NAVIGATION = [
 
 export const ADMIN_NAVIGATION = [
   { title: "Usuários", url: createPageUrl("Users"), icon: Users, allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias", "cliente", "cliente_supervisor"] },
-  // Acesso direto à lista de rascunhos/finalizados de Fresagem e Lançamento
-  // de CBUQ — antes só era possível chegar via "Ensaios Realizados" e filtro
-  // manual de tipo, o que impedia abrir um rascunho existente pelo menu.
-  { title: "Fresagem e Lançamento de CBUQ", url: `${createPageUrl("MeusEnsaios")}?tipo=RegistroFresagemCBUQ`, icon: ClipboardList, allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias"] },
-  // Acesso direto à lista de Checklist de Usina — mesmo padrão do item acima:
-  // filtra "Ensaios Realizados" por tipo para que usuários (incl. gestor_contrato)
-  // encontrem registros existentes sem precisar usar o filtro manual na tabela.
-  { title: "Checklist de Usina", url: `${createPageUrl("MeusEnsaios")}?tipo=ChecklistUsina`, icon: ClipboardList, allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias"] },
   { title: "Produtividade", url: createPageUrl("Produtividade"), icon: BarChart3, allowedLevels: ["admin", "gestor_contrato", "sala_tecnica_afirmaevias"] },
   { title: "Controle Laboratoristas", url: createPageUrl("ControleLaboratoristas"), icon: Users, allowedLevels: ["admin"] },
   { title: "Faixas Granulométricas", url: createPageUrl("FaixasGranulometricas"), icon: Grid, allowedLevels: ["admin"] },

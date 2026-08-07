@@ -140,7 +140,6 @@ export default function AppSidebar({
                 <>
                       {[
                   { to: createPageUrl("Projects"), icon: FolderOpen, label: "Projetos" },
-                  { to: createPageUrl("MeusEnsaios"), icon: FileText, label: "Ensaios Realizados" },
                   { to: createPageUrl("ResumosPersonalizados"), icon: BarChart3, label: "Resumos" },
                   { to: createPageUrl("SolicitacoesTransferencia"), icon: ArrowLeftRight, label: "Transferências", badge: pendingTransfers > 0 && (isGestorContrato || isSalaTecnica) }].
                   map(({ to, icon, label, badge }) =>
@@ -148,9 +147,6 @@ export default function AppSidebar({
                   )}
                       {(isGestorContrato || isAdmin) &&
                         <SubNavItem to="/ImpressionEtiquetas" icon={FileText} label="Impressão de Etiquetas" isActive={isActive("/ImpressionEtiquetas")} />
-                  }
-                      {(isGestorContrato || isSalaTecnica || isAdmin) &&
-                        <SubNavItem to="/RelatoriosUnificados" icon={FileText} label="Relatório Consolidado" isActive={isActive("/RelatoriosUnificados")} />
                   }
                     </>
                 }
