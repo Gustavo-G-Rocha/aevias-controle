@@ -1,6 +1,5 @@
 import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { useState } from "react";
 import { FilePlus, FolderOpen, FileText, BarChart3, ArrowLeftRight, AlertTriangle, ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -79,11 +78,6 @@ export default function AppSidebar({
   const isCliente = userAccessLevel === ACCESS_LEVELS.CLIENTE || userAccessLevel === ACCESS_LEVELS.CLIENTE_SUPERVISOR;
 
   const location = useLocation();
-  // Rastreia qual item foi clicado para acessar /MeusEnsaios:
-  // 'mainnav' (Registros) ou 'subnav' (Ensaios Realizados).
-  // Garante que apenas um dos dois fique destacado por vez.
-  const [meusEnsaiosSource, setMeusEnsaiosSource] = useState('mainnav');
-  const meusEnsaiosUrl = createPageUrl("MeusEnsaios");
   const isActive = (url) => {
     if (location.pathname === url) return true;
     if (url === '/Dashboard' && location.pathname === '/') return true;
@@ -130,11 +124,10 @@ export default function AppSidebar({
               <NavItem
                 key={item.title}
                 item={item}
-                isActive={item.url === meusEnsaiosUrl ? (isActive(item.url) && meusEnsaiosSource !== 'subnav') : isActive(item.url)}
+                isActive={isActive(item.url)}
                 pendingTransfers={pendingTransfers}
                 isGestorContrato={isGestorContrato}
                 isSalaTecnica={isSalaTecnica}
-                onItemClick={item.url === meusEnsaiosUrl ? () => setMeusEnsaiosSource('mainnav') : undefined}
               />
               )}
 
@@ -165,8 +158,7 @@ export default function AppSidebar({
                       label={label}
                       badge={badge}
                       pendingTransfers={pendingTransfers}
-                      isActive={to === meusEnsaiosUrl ? (isActive(to) && meusEnsaiosSource === 'subnav') : isActive(to)}
-                      onItemClick={to === meusEnsaiosUrl ? () => setMeusEnsaiosSource('subnav') : undefined}
+                      isActive={isActive(to)}
                     />
                   )}
                       {(isGestorContrato || isAdmin) &&
