@@ -7,7 +7,7 @@
  * das larguras de coluna e da escrita do arquivo.
  */
 
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx/xlsx.mjs';
 
 const OLIVE = 'BFCF99';
 const NAVY = '00233B';

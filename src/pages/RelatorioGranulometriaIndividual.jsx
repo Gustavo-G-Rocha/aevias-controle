@@ -12,6 +12,7 @@ import { createPageUrl } from "@/utils";
 import { Loader2, Printer, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import ExcelExportButton from '@/components/ensaios/ExcelExportButton';
 import { canUserEditRecord } from "@/utils/recordEditPermission";
 import { toast } from "@/components/ui/use-toast";
 import { useReportPdfActions } from '@/hooks/useReportPdfActions';
@@ -101,6 +102,12 @@ export default function RelatorioGranulometriaIndividualPage() {
               </Button>
             )}
             {ensaio && <AprovacaoBar entityName="EnsaioGranulometriaIndividual" recordId={ensaio.id} />}
+            {ensaio && (
+              <ExcelExportButton
+                record={{ ...ensaio, entityType: 'EnsaioGranulometriaIndividual' }}
+                variant="full"
+              />
+            )}
             <Button onClick={handlePrint} disabled={downloading} className="bg-slate-800 text-white hover:bg-slate-700">
               {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
               {downloading ? 'Gerando...' : 'Imprimir'}

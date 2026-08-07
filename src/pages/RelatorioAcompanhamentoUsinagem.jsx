@@ -8,6 +8,7 @@ import { Loader2, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import RelatorioAcompanhamentoUsinagem from "../components/relatorios/RelatorioAcompanhamentoUsinagem";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import ExcelExportButton from '@/components/ensaios/ExcelExportButton';
 import { useReportPdfActions } from '@/hooks/useReportPdfActions';
 import { logger } from '@/utils/logger';
 
@@ -85,6 +86,7 @@ export default function RelatorioAcompanhamentoUsinagemPage() {
           <h2 className="text-lg font-semibold text-slate-800">Relatório de Acompanhamento de Usinagem</h2>
           <div className="flex items-center gap-2">
             {ensaio && <AprovacaoBar entityName="AcompanhamentoUsinagem" recordId={ensaio.id} />}
+            <ExcelExportButton record={{ ...ensaio, entityType: 'AcompanhamentoUsinagem' }} variant="full" />
             <Button onClick={handlePrint} disabled={downloading} className="bg-slate-800 text-white hover:bg-slate-700">
               {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
               {downloading ? 'Gerando...' : 'Imprimir'}

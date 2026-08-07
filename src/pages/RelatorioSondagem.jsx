@@ -3,6 +3,7 @@ import { useReportMode } from "@/hooks/useReportMode";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import ExcelExportButton from '@/components/ensaios/ExcelExportButton';
 import SignatureFooter from '../components/relatorios/SignatureFooter';
 import RelatorioSondagemHeader from "@/components/relatorio-sondagem/RelatorioSondagemHeader";
 import RelatorioSondagemDadosObra from "@/components/relatorio-sondagem/RelatorioSondagemDadosObra";
@@ -46,6 +47,7 @@ export default function RelatorioSondagem() {
           </h2>
           <div className="flex items-center gap-2">
             {ensaio && <AprovacaoBar entityName="EnsaioSondagem" recordId={ensaio.id} />}
+            <ExcelExportButton record={{ ...ensaio, entityType: 'EnsaioSondagem' }} variant="full" />
             <Button onClick={handlePrint} className="bg-slate-800 text-white hover:bg-slate-700">
               <Download className="w-4 h-4 mr-2" />
               Imprimir

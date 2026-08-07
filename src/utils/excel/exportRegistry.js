@@ -13,6 +13,11 @@ const EXPORTERS = {
   BoletimSondagem: () => import('./exporters/boletimSondagem'),
   BoletimSondagemTrado: () => import('./exporters/boletimSondagemTrado'),
   DiarioObra: () => import('./exporters/diarioObra'),
+  EnsaioCAUQ: () => import('./exporters/ensaioCAUQ'),
+  AcompanhamentoUsinagem: () => import('./exporters/acompanhamentoUsinagem'),
+  EnsaioTaxaPinturaImprimacao: () => import('./exporters/ensaioTaxaPinturaImprimacao'),
+  EnsaioSondagem: () => import('./exporters/ensaioSondagem'),
+  EnsaioGranulometriaIndividual: () => import('./exporters/ensaioGranulometriaIndividual'),
 };
 
 /** Indica se o tipo já possui exportador sob medida. */

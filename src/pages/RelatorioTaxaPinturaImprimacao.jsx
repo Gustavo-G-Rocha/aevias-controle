@@ -3,6 +3,7 @@ import { useReportMode } from "@/hooks/useReportMode";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import AprovacaoBar from '../components/relatorios/AprovacaoBar';
+import ExcelExportButton from '@/components/ensaios/ExcelExportButton';
 import { obterEnsaioById } from '@/services/ensaiosService';
 import { obterObraById } from '@/services/obrasService';
 import { obterRegionalById } from '@/services/regionaisService';
@@ -95,6 +96,12 @@ export default function RelatorioTaxaPinturaImprimacaoPage() {
           </h2>
           <div className="flex items-center gap-2">
             {state.data && <AprovacaoBar entityName="EnsaioTaxaPinturaImprimacao" recordId={state.data.ensaio?.id} />}
+            {state.data?.ensaio && (
+              <ExcelExportButton
+                record={{ ...state.data.ensaio, entityType: 'EnsaioTaxaPinturaImprimacao' }}
+                variant="full"
+              />
+            )}
             <Button onClick={handlePrint} disabled={downloading} className="bg-slate-800 text-white hover:bg-slate-700">
               {downloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
               {downloading ? 'Gerando...' : 'Imprimir'}

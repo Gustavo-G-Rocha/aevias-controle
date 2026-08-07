@@ -34,7 +34,6 @@ export default defineConfig({
       'input-otp',
       'vaul',
       'html2canvas', 'jspdf', 'pdfjs-dist',
-      'xlsx',
       'uuid',
       'axios',
       'canvas-confetti',
@@ -44,6 +43,9 @@ export default defineConfig({
       'react-hot-toast',
       'next-themes',
     ],
+    // xlsx é ESM puro (xlsx.mjs) e é importado diretamente por esse caminho:
+    // pré-empacotá-lo gera um módulo otimizado que não resolve em runtime.
+    exclude: ['xlsx'],
   },
   // Garante uma única instância de React — previne "dispatcher is null"
   // quando o cache de deps do Vite fica desatualizado e React é split em
