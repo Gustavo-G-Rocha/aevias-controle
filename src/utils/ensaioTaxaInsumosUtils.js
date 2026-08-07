@@ -61,7 +61,7 @@ export function calcularEnsaio(ensaio, areaBandeja) {
 
 // ── Filtro de obras (implantação e conservação) ───────────────────────────────
 
-const TIPOS_OBRA_VALIDOS = ['implantacao', 'conservacao'];
+const TIPOS_OBRA_VALIDOS = ['implantacao', 'conservacao', 'supervisao'];
 
 export function filtrarObrasDisponiveis(obrasData, regionaisData, userData) {
   const accessLevel = userData?.access_level || (userData?.role === 'admin' ? 'admin' : 'user');
