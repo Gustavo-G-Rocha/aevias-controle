@@ -26,16 +26,16 @@ export default function EnsaiosTableHeader({
   return (
     <thead className="bg-muted/40 border-b border-border">
       <tr>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '11%' }}>
+        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '14%' }}>
           <div className="flex items-center justify-between gap-0.5 min-w-0">
             <span className="whitespace-nowrap truncate">Tipo</span>
             <SelectColumnFilter value={typeFilter} onChange={setTypeFilter} options={typeOptions} placeholder="Filtrar por tipo" />
           </div>
         </th>
-        <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '10%' }}>
+        <th className="text-left px-1 py-2 font-medium text-foreground text-xs" style={{ width: '5%' }}>
           <div className="flex items-center justify-between gap-0.5 min-w-0">
-            <span className="whitespace-nowrap truncate">Status</span>
-            <SelectColumnFilter value={statusFilter} onChange={setStatusFilter} options={statusOptions} placeholder="Filtrar por status" />
+            <span className="whitespace-nowrap truncate" title="Status">Status</span>
+            <SelectColumnFilter value={statusFilter} onChange={setStatusFilter} options={statusOptions} placeholder="Status" />
           </div>
         </th>
         <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '11%' }}>

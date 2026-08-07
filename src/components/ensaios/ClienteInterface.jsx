@@ -89,7 +89,7 @@ const ClienteInterface = React.memo(({ ensaios, obras, projects, user, allUsers 
                 statusFilter={statusFilter} setStatusFilter={setStatusFilter}
                 statusOptions={statusOptions}
                 acoesLabel="Ações"
-                acoesWidth="120px"
+                acoesWidth="150px"
               />
               <tbody>
                 {paginatedEnsaios.map((ensaio, index) => (

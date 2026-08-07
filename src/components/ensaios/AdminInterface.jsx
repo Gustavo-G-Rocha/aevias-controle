@@ -156,7 +156,7 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
                 projetoFilter={projetoFilter} setProjetoFilter={setProjetoFilter}
                 statusFilter={statusFilter} setStatusFilter={setStatusFilter}
                 statusOptions={statusOptions}
-                acoesWidth="200px"
+                acoesWidth="240px"
               />
               <tbody>
                 {paginatedEnsaios.map((ensaio, index) => (

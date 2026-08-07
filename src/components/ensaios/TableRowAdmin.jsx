@@ -63,8 +63,10 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
           {!naoConformidades.length && !temDeflexaoExcessiva && temAcoesCorretivas && <span role="img" aria-label="Ações corretivas realizadas" className="text-orange-500 cursor-help shrink-0" title="Ações corretivas realizadas">⚠️</span>}
         </div>
       </td>
-      <td className="px-2 py-2 text-center">
-        <Badge className={`${status.className} text-xs px-2 py-0.5 gap-1`}><status.icon className="w-3 h-3" />{status.text}</Badge>
+      <td className="px-1 py-2 text-center">
+        <span className={`${status.className} inline-flex items-center justify-center rounded-md px-1 py-1 cursor-help`} title={status.text} aria-label={status.text}>
+          <status.icon className="w-3.5 h-3.5" />
+        </span>
       </td>
       <td className="px-2 py-2 text-muted-foreground text-xs whitespace-nowrap">{dataFormatted}</td>
       <td className="px-2 py-2 overflow-hidden">
