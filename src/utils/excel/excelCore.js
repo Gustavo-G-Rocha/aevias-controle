@@ -60,15 +60,18 @@ export function buildSheet({ name, title = null, meta = [], header = null, rows 
   return { name, aoa, headerRows, boldLabels, cols, merges, titleRow: title ? 0 : null };
 }
 
-function applyStyles(ws, { headerRows = [], boldLabels = [], cols = [], merges = [], titleRow = null }) {
+function applyStyles(ws, { headerRows = [], boldLabels = [], cols = [], merges = [], titleRows = [] }) {
   const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
 
-  if (titleRow !== null && ws.A1) {
-    ws.A1.s = {
-      font: { bold: true, sz: 14, color: { rgb: NAVY } },
-      alignment: { horizontal: 'center' },
-    };
-  }
+  titleRows.forEach((r) => {
+    const ref = XLSX.utils.encode_cell({ r, c: 0 });
+    if (ws[ref]) {
+      ws[ref].s = {
+        font: { bold: true, sz: 14, color: { rgb: NAVY } },
+        alignment: { horizontal: 'center' },
+      };
+    }
+  });
 
   headerRows.forEach((r) => {
     for (let c = range.s.c; c <= range.e.c; c++) {
@@ -101,16 +104,52 @@ function applyStyles(ws, { headerRows = [], boldLabels = [], cols = [], merges =
   if (cols.length) ws['!cols'] = cols.map((wch) => ({ wch }));
 }
 
-/** Gera e baixa a planilha. */
-export function downloadExcel({ filename, sheets }) {
-  const wb = XLSX.utils.book_new();
+/**
+ * Junta todas as seções em uma única aba, empilhadas na vertical e
+ * separadas por uma linha em branco. Cada seção mantém seu título,
+ * cabeçalho e destaques — apenas deixam de virar abas separadas.
+ */
+function mergeSheets(sheets) {
+  const aoa = [];
+  const headerRows = [];
+  const boldLabels = [];
+  const merges = [];
+  const titleRows = [];
+  const cols = [];
 
-  sheets.forEach((sheet) => {
-    const ws = XLSX.utils.aoa_to_sheet(sheet.aoa);
-    applyStyles(ws, sheet);
-    XLSX.utils.book_append_sheet(wb, ws, sheet.name.slice(0, 31));
+  sheets.forEach((sheet, i) => {
+    if (i > 0) {
+      aoa.push([]);
+      aoa.push([]);
+    }
+    const offset = aoa.length;
+
+    sheet.aoa.forEach((row) => aoa.push(row));
+    sheet.headerRows.forEach((r) => headerRows.push(r + offset));
+    sheet.boldLabels.forEach((r) => boldLabels.push(r + offset));
+    sheet.merges.forEach((m) =>
+      merges.push({
+        s: { r: m.s.r + offset, c: m.s.c },
+        e: { r: m.e.r + offset, c: m.e.c },
+      })
+    );
+    if (sheet.titleRow !== null) titleRows.push(sheet.titleRow + offset);
+
+    sheet.cols.forEach((w, c) => {
+      cols[c] = Math.max(cols[c] || 0, w);
+    });
   });
 
+  return { aoa, headerRows, boldLabels, merges, titleRows, cols: cols.map((w) => w || 18) };
+}
+
+/** Gera e baixa a planilha — sempre com uma única aba. */
+export function downloadExcel({ filename, sheets }) {
+  const wb = XLSX.utils.book_new();
+  const merged = mergeSheets(sheets);
+  const ws = XLSX.utils.aoa_to_sheet(merged.aoa);
+  applyStyles(ws, merged);
+  XLSX.utils.book_append_sheet(wb, ws, 'Registro');
   XLSX.writeFile(wb, filename);
 }
 
