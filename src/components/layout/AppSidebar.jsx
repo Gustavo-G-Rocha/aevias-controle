@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import { FilePlus, FolderOpen, FileText, BarChart3, ArrowLeftRight, AlertTriangle, ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,10 +36,10 @@ const activeItemCls = "!bg-card [&_span]:!text-black [&_svg]:!text-black";
 const inactiveIconStyle = { color: 'var(--color-sidebar-text-muted)' };
 const inactiveTextStyle = { color: 'var(--color-sidebar-text)' };
 
-const NavItem = ({ item, isActive, pendingTransfers, isGestorContrato, isSalaTecnica }) => {
+const NavItem = ({ item, isActive, pendingTransfers, isGestorContrato, isSalaTecnica, onItemClick }) => {
   const showBadge = item.showBadge && pendingTransfers > 0 && (isGestorContrato || isSalaTecnica);
   return (
-    <SidebarMenuItem>
+    <SidebarMenuItem onClick={onItemClick}>
       <SidebarMenuButton
         asChild
         isActive={isActive}
@@ -54,8 +55,8 @@ const NavItem = ({ item, isActive, pendingTransfers, isGestorContrato, isSalaTec
     </SidebarMenuItem>);
 };
 
-const SubNavItem = ({ to, icon: Icon, label, badge, pendingTransfers, isActive }) => (
-  <SidebarMenuItem>
+const SubNavItem = ({ to, icon: Icon, label, badge, pendingTransfers, isActive, onItemClick }) => (
+  <SidebarMenuItem onClick={onItemClick}>
     <SidebarMenuButton asChild isActive={isActive} className={`rounded-xl mb-0.5 h-auto ${isActive ? activeItemCls : ''}`}>
       <NavLink to={to} className="flex items-center gap-3 pl-10 pr-3 py-2.5">
         <Icon className="w-4 h-4 flex-shrink-0" style={isActive ? undefined : inactiveIconStyle} />
@@ -78,6 +79,11 @@ export default function AppSidebar({
   const isCliente = userAccessLevel === ACCESS_LEVELS.CLIENTE || userAccessLevel === ACCESS_LEVELS.CLIENTE_SUPERVISOR;
 
   const location = useLocation();
+  // Rastreia qual item foi clicado para acessar /MeusEnsaios:
+  // 'mainnav' (Registros) ou 'subnav' (Ensaios Realizados).
+  // Garante que apenas um dos dois fique destacado por vez.
+  const [meusEnsaiosSource, setMeusEnsaiosSource] = useState('mainnav');
+  const meusEnsaiosUrl = createPageUrl("MeusEnsaios");
   const isActive = (url) => {
     if (location.pathname === url) return true;
     if (url === '/Dashboard' && location.pathname === '/') return true;
@@ -121,7 +127,15 @@ export default function AppSidebar({
           <SidebarGroupContent>
             <SidebarMenu>
               {MAIN_NAVIGATION.filter((i) => !i.allowedLevels || i.allowedLevels.includes(userAccessLevel)).map((item) =>
-              <NavItem key={item.title} item={item} isActive={isActive(item.url)} pendingTransfers={pendingTransfers} isGestorContrato={isGestorContrato} isSalaTecnica={isSalaTecnica} />
+              <NavItem
+                key={item.title}
+                item={item}
+                isActive={item.url === meusEnsaiosUrl ? (isActive(item.url) && meusEnsaiosSource !== 'subnav') : isActive(item.url)}
+                pendingTransfers={pendingTransfers}
+                isGestorContrato={isGestorContrato}
+                isSalaTecnica={isSalaTecnica}
+                onItemClick={item.url === meusEnsaiosUrl ? () => setMeusEnsaiosSource('mainnav') : undefined}
+              />
               )}
 
               {/* Minhas Obras — expansível */}
@@ -140,11 +154,20 @@ export default function AppSidebar({
                 <>
                       {[
                   { to: createPageUrl("Projects"), icon: FolderOpen, label: "Projetos" },
-                  { to: createPageUrl("MeusEnsaios"), icon: FileText, label: "Ensaios Realizados", neverActive: true },
+                  { to: createPageUrl("MeusEnsaios"), icon: FileText, label: "Ensaios Realizados" },
                   { to: createPageUrl("ResumosPersonalizados"), icon: BarChart3, label: "Resumos" },
                   { to: createPageUrl("SolicitacoesTransferencia"), icon: ArrowLeftRight, label: "Transferências", badge: pendingTransfers > 0 && (isGestorContrato || isSalaTecnica) }].
-                  map(({ to, icon, label, badge, neverActive }) =>
-                    <SubNavItem key={label} to={to} icon={icon} label={label} badge={badge} pendingTransfers={pendingTransfers} isActive={neverActive ? false : isActive(to)} />
+                  map(({ to, icon, label, badge }) =>
+                    <SubNavItem
+                      key={label}
+                      to={to}
+                      icon={icon}
+                      label={label}
+                      badge={badge}
+                      pendingTransfers={pendingTransfers}
+                      isActive={to === meusEnsaiosUrl ? (isActive(to) && meusEnsaiosSource === 'subnav') : isActive(to)}
+                      onItemClick={to === meusEnsaiosUrl ? () => setMeusEnsaiosSource('subnav') : undefined}
+                    />
                   )}
                       {(isGestorContrato || isAdmin) &&
                         <SubNavItem to="/ImpressionEtiquetas" icon={FileText} label="Impressão de Etiquetas" isActive={isActive("/ImpressionEtiquetas")} />
