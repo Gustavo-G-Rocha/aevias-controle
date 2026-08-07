@@ -33,20 +33,20 @@ export default function ResultadosTable({
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr style={{ backgroundColor: 'var(--color-primary)' }}>
-                <th className="px-3 py-2.5 text-left font-semibold text-white whitespace-nowrap">
+              <tr style={{ backgroundColor: 'var(--color-secondary)' }}>
+                <th className="px-3 py-2.5 text-left font-semibold text-primary whitespace-nowrap">
                   Tipo
                 </th>
-                <th className="px-3 py-2.5 text-left font-semibold text-white whitespace-nowrap">
+                <th className="px-3 py-2.5 text-left font-semibold text-primary whitespace-nowrap">
                   Data
                 </th>
                 {(tipoEnsaioSelecionado === 'ChecklistAplicacao' || tipoEnsaioSelecionado === 'EnsaioVigaBenkelman') && (
-                  <th className="px-3 py-2.5 text-center font-semibold text-white whitespace-nowrap">
+                  <th className="px-3 py-2.5 text-center font-semibold text-primary whitespace-nowrap">
                     Excel
                   </th>
                 )}
                 {colunas.map(key => (
-                  <th key={key} className="px-3 py-2.5 text-left font-semibold text-white whitespace-nowrap">
+                  <th key={key} className="px-3 py-2.5 text-left font-semibold text-primary whitespace-nowrap">
                     {key.replace('granulometria.', '')}
                   </th>
                 ))}

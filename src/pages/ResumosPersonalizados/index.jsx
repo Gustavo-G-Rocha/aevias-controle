@@ -52,6 +52,25 @@ export default function ResumosPersonalizadosPage() {
     ];
     const XLSX = await import("xlsx");
     const ws = XLSX.utils.aoa_to_sheet(wsData);
+    // Estilizar header (linha 7 = índice 6) com verde-oliva do sistema
+    const headerCols = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+    headerCols.forEach(col => {
+      const ref = `${col}7`;
+      if (ws[ref]) {
+        ws[ref].s = {
+          fill: { fgColor: { rgb: "BFCF99" } },
+          font: { bold: true, color: { rgb: "00233B" } },
+          alignment: { horizontal: 'center' }
+        };
+      }
+    });
+    // Estilizar labels de metadata (coluna A, linhas 1-5) em negrito
+    ['A1', 'A2', 'A3', 'A4', 'A5'].forEach(ref => {
+      if (ws[ref]) {
+        ws[ref].s = { font: { bold: true, color: { rgb: "00233B" } } };
+      }
+    });
+    ws['!cols'] = [{ wch: 22 }, { wch: 22 }, { wch: 16 }, { wch: 20 }, { wch: 20 }, { wch: 22 }, { wch: 22 }];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Levantamentos');
     const dataStr = ensaio.data_ensaio ? new Date(ensaio.data_ensaio).toLocaleDateString('pt-BR') : '';
