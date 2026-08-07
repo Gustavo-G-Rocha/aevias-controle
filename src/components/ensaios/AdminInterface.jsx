@@ -2,8 +2,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, PlusCircle, FlaskConical, Gauge, ClipboardList, Download, AlertTriangle, Info } from "lucide-react";
-import { bulkExportReports } from "@/utils/bulkExportZip";
+import { FileText, PlusCircle, FlaskConical, Gauge, ClipboardList, AlertTriangle, Info } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { getEnsaioTypeInfo, getReportLink } from "@/components/ensaios/ensaioMappers";
 import { Link, useSearchParams } from "react-router-dom";
@@ -22,9 +21,6 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
   const [statusFilter, setStatusFilter] = useState('all');
   const [reprovingEnsaio, setReprovingEnsaio] = useState(null);
   const [deletingEnsaio, setDeletingEnsaio] = useState(null);
-  const [selectedIds, setSelectedIds] = useState(new Set());
-  const [exporting, setExporting] = useState(false);
-  const [exportProgress, setExportProgress] = useState('');
   const { toast } = useToast();
 
   // Permite chegar à lista já filtrada por tipo via URL (ex: sidebar →
@@ -85,73 +81,6 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
     setDeletingEnsaio(null);
   }, [onDelete]);
 
-  const handleToggleSelect = useCallback((id) => {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
-
-  const allSelected = filteredEnsaios.length > 0 && filteredEnsaios.every(e => selectedIds.has(e.id));
-  const someSelected = filteredEnsaios.some(e => selectedIds.has(e.id));
-
-  const handleToggleAll = useCallback(() => {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      if (filteredEnsaios.every(e => next.has(e.id))) {
-        filteredEnsaios.forEach(e => next.delete(e.id));
-      } else {
-        filteredEnsaios.forEach(e => next.add(e.id));
-      }
-      return next;
-    });
-  }, [filteredEnsaios]);
-
-  const handleExportZip = async () => {
-    const selected = ensaios
-      .filter(e => selectedIds.has(e.id))
-      .map(e => ({
-        id: e.id,
-        name: getEnsaioTypeInfo(e).name,
-        reportUrl: getReportLink(e),
-      }))
-      .filter(e => e.reportUrl && e.reportUrl !== '#');
-
-    if (selected.length === 0) return;
-
-    setExporting(true);
-    try {
-      const result = await bulkExportReports(selected, (progress) => {
-        setExportProgress(progress || '');
-      });
-
-      if (result?.errors?.length > 0) {
-        toast({
-          title: 'Exportação parcial',
-          description: `${result.success} relatório(s) exportado(s). ${result.errors.length} falha(s).`,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: 'Exportação concluída',
-          description: `${result.success} relatório(s) exportado(s) com sucesso.`,
-        });
-      }
-      setSelectedIds(new Set());
-    } catch (err) {
-      toast({
-        title: 'Erro na exportação',
-        description: err.message || 'Erro ao gerar ZIP de relatórios.',
-        variant: 'destructive',
-      });
-    } finally {
-      setExporting(false);
-      setExportProgress('');
-    }
-  };
-
   const statusOptions = [
     { value: 'all', label: 'Todos os status' },
     { value: 'rascunho', label: 'Rascunho' },
@@ -182,11 +111,6 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>
           <span>{filteredEnsaios.length} registro(s) encontrado(s)</span>
-          {selectedIds.size > 0 && (
-            <span className="font-medium" style={{ color: 'var(--color-secondary)' }}>
-              {selectedIds.size} selecionado(s)
-            </span>
-          )}
           {isAnyFilterActive && (
             <Button variant="ghost" size="sm" onClick={clearFilters} className="h-7 text-xs" style={{ color: 'var(--color-text-muted)' }}>
               Limpar todos os filtros
@@ -194,12 +118,6 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
           )}
         </div>
         <div className="flex items-center gap-2">
-          {selectedIds.size > 0 && (
-            <Button variant="outline" onClick={handleExportZip} disabled={exporting} className="h-9" style={{ color: 'var(--color-text)', borderColor: 'var(--color-border-strong)' }}>
-              <Download className="mr-2 h-4 w-4" />
-              {exporting ? (exportProgress || 'Exportando...') : `Exportar ZIP (${selectedIds.size})`}
-            </Button>
-          )}
           {canCreate && (
             <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -227,10 +145,6 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
           <div className="overflow-x-visible">
             <table className="w-full text-sm table-fixed">
               <EnsaiosTableHeader
-                showSelection
-                allSelected={allSelected}
-                someSelected={someSelected}
-                onToggleAll={handleToggleAll}
                 typeFilter={typeFilter} setTypeFilter={setTypeFilter}
                 sortOrder={sortOrder} toggleSortOrder={toggleSortOrder}
                 dataInicioFilter={dataInicioFilter} setDataInicioFilter={setDataInicioFilter}
@@ -249,9 +163,6 @@ const AdminInterface = React.memo(({ ensaios, obras, projects, onApprove, onReje
                   <TableRowAdmin
                     key={ensaio.id}
                     ensaio={ensaio}
-                    showSelection
-                    isSelected={selectedIds.has(ensaio.id)}
-                    onToggleSelect={handleToggleSelect}
                     obra={obrasMap.get(ensaio.obra_id)}
                     projeto={ensaio.project_id ? projectsMap.get(ensaio.project_id) : null}
                     index={index}
