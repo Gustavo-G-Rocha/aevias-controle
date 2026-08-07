@@ -13,29 +13,40 @@ export default function ResultadosTable({
   const colunas = Object.keys(dadosConsolidados[0]).filter(k => k !== 'tipo' && k !== 'data' && k !== 'id');
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-foreground">
-            Resultados - {dadosConsolidados.length} registro(s)
+    <Card className="overflow-hidden border-border shadow-sm">
+      <CardHeader className="border-b border-border bg-surface-muted">
+        <div className="flex justify-between items-center flex-wrap gap-2">
+          <CardTitle className="text-foreground text-lg">
+            Resultados · {dadosConsolidados.length} registro(s)
           </CardTitle>
           {obraSelecionada && (
-            <Badge className="bg-[#566E3D] text-white">{obraSelecionada.name}</Badge>
+            <Badge
+              className="text-white font-medium"
+              style={{ backgroundColor: 'var(--color-secondary)' }}
+            >
+              {obraSelecionada.name}
+            </Badge>
           )}
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="bg-muted text-white">
-                <th className="border border-white/20 px-2 py-2 text-left">Tipo</th>
-                <th className="border border-white/20 px-2 py-2 text-left">Data</th>
+              <tr style={{ backgroundColor: 'var(--color-primary)' }}>
+                <th className="px-3 py-2.5 text-left font-semibold text-white whitespace-nowrap">
+                  Tipo
+                </th>
+                <th className="px-3 py-2.5 text-left font-semibold text-white whitespace-nowrap">
+                  Data
+                </th>
                 {tipoEnsaioSelecionado === 'ChecklistAplicacao' && (
-                  <th className="border border-white/20 px-2 py-2 text-center">Medição Geométrica</th>
+                  <th className="px-3 py-2.5 text-center font-semibold text-white whitespace-nowrap">
+                    Medição Geométrica
+                  </th>
                 )}
                 {colunas.map(key => (
-                  <th key={key} className="border border-white/20 px-2 py-2 text-left">
+                  <th key={key} className="px-3 py-2.5 text-left font-semibold text-white whitespace-nowrap">
                     {key.replace('granulometria.', '')}
                   </th>
                 ))}
@@ -43,13 +54,22 @@ export default function ResultadosTable({
             </thead>
             <tbody>
               {dadosConsolidados.map((linha, idx) => (
-                <tr key={linha.id ?? `linha-${idx}`} className={idx % 2 === 0 ? 'bg-muted/40' : 'bg-transparent'}>
-                  <td className="border border-border px-2 py-2 font-medium text-foreground">{linha.tipo}</td>
-                  <td className="border border-border px-2 py-2 text-foreground">{formatValue(linha.data, 'data')}</td>
+                <tr
+                  key={linha.id ?? `linha-${idx}`}
+                  className="border-b border-border transition-colors hover:bg-surface-muted"
+                  style={{ backgroundColor: idx % 2 === 0 ? 'transparent' : 'var(--color-surface-muted)' }}
+                >
+                  <td className="px-3 py-2 font-medium text-foreground whitespace-nowrap">
+                    {linha.tipo}
+                  </td>
+                  <td className="px-3 py-2 text-foreground whitespace-nowrap">
+                    {formatValue(linha.data, 'data')}
+                  </td>
                   {tipoEnsaioSelecionado === 'ChecklistAplicacao' && (
-                    <td className="border border-border px-2 py-2 text-center">
+                    <td className="px-3 py-2 text-center">
                       <Button
-                        size="sm" variant="outline"
+                        size="sm"
+                        variant="outline"
                         onClick={() => onExportarMedicaoGeometrica(linha.id)}
                         className="h-7 text-xs gap-1"
                       >
@@ -59,7 +79,9 @@ export default function ResultadosTable({
                     </td>
                   )}
                   {colunas.map(key => (
-                    <td key={key} className="border border-border px-2 py-2 text-foreground">{linha[key]}</td>
+                    <td key={key} className="px-3 py-2 text-foreground whitespace-nowrap">
+                      {linha[key]}
+                    </td>
                   ))}
                 </tr>
               ))}
