@@ -19,6 +19,7 @@ import RelatorioGranulometriaIndividual from '@/components/relatorios/RelatorioG
 import RelatorioGranuMistura from '@/components/relatorios/RelatorioGranuMistura';
 import RelatorioMRAF from '@/components/relatorios/RelatorioMRAF';
 import RelatorioTaxaMRAF from '@/components/relatorios/RelatorioTaxaMRAF';
+import RelatorioVigaBenkelman from '@/components/relatorios/RelatorioVigaBenkelman';
 
 function DefaultRecordCard({ record }) {
   const typeInfo = getEnsaioTypeInfo(record);
@@ -89,6 +90,8 @@ export default function RecordRenderer({ record, obra, regional, project, faixaG
           />
         </div>
       );
+    case 'EnsaioVigaBenkelman':
+      return <RelatorioVigaBenkelman ensaio={record} obra={obra} regional={regional} />;
     default:
       return <DefaultRecordCard record={record} />;
   }
