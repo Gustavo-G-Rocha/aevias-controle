@@ -376,17 +376,15 @@
         }
       ]
     },
-        "read": {
-      "$or": [
-        { "data.status": { "$ne": "rascunho" } },
-        { "created_by": "{{user.email}}" },
-        { "user_condition": { "role": "admin" } }
-      ]
-    },
-    "update": {
+    "read": {
       "$or": [
         {
-          "created_by": "{{user.email}}"
+          "data.status": {
+            "$ne": "rascunho"
+          }
+        },
+        {
+          "created_by_id": "{{user.id}}"
         },
         {
           "user_condition": {
@@ -395,10 +393,32 @@
         }
       ]
     },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
+          }
+        }
+      ]
+    },
     "delete": {
       "$or": [
         {
-          "created_by": "{{user.email}}"
+          "created_by_id": "{{user.id}}"
         },
         {
           "user_condition": {

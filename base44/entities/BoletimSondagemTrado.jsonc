@@ -130,7 +130,7 @@
     },
     "densidades_in_situ": {
       "type": "array",
-      "description": "Array de ensaios de massa específica aparente in situ - DNER-ME 092/94",
+      "description": "Array de ensaios de massa espec\u00edfica aparente in situ - DNER-ME 092/94",
       "items": {
         "type": "object",
         "properties": {
@@ -256,11 +256,21 @@
     "update": {
       "$or": [
         {
-          "created_by": "{{user.email}}"
+          "created_by_id": "{{user.id}}"
         },
         {
           "user_condition": {
             "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "sala_tecnica_afirmaevias"
+          }
+        },
+        {
+          "user_condition": {
+            "data.access_level": "gestor_contrato"
           }
         }
       ]
@@ -268,7 +278,7 @@
     "delete": {
       "$or": [
         {
-          "created_by": "{{user.email}}"
+          "created_by_id": "{{user.id}}"
         },
         {
           "user_condition": {

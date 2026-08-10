@@ -9,7 +9,7 @@
         "DNER 117/94"
       ],
       "default": "DNIT 428/2022",
-      "description": "Método de ensaio utilizado"
+      "description": "M\u00e9todo de ensaio utilizado"
     },
     "obra_id": {
       "type": "string",
@@ -34,7 +34,7 @@
     },
     "servico": {
       "type": "string",
-      "description": "Tipo de serviço"
+      "description": "Tipo de servi\u00e7o"
     },
     "rodovia": {
       "type": "string",
@@ -42,16 +42,16 @@
     },
     "trecho": {
       "type": "string",
-      "description": "Descrição do trecho"
+      "description": "Descri\u00e7\u00e3o do trecho"
     },
     "fator_correcao_prensa": {
       "type": "number",
-      "description": "Fator de correção da prensa",
+      "description": "Fator de corre\u00e7\u00e3o da prensa",
       "default": 1
     },
     "dens_agua_25c": {
       "type": "number",
-      "description": "Densidade da água a 25°C (g/cm³)",
+      "description": "Densidade da \u00e1gua a 25\u00b0C (g/cm\u00b3)",
       "default": 0.9971
     },
     "volume_vazios_projeto": {
@@ -60,11 +60,11 @@
     },
     "dens_aparente_projeto": {
       "type": "number",
-      "description": "Densidade aparente de projeto (g/cm³)"
+      "description": "Densidade aparente de projeto (g/cm\u00b3)"
     },
     "dens_rice_projeto": {
       "type": "number",
-      "description": "Densidade RICE de projeto (g/cm³)"
+      "description": "Densidade RICE de projeto (g/cm\u00b3)"
     },
     "espessura_projeto": {
       "type": "number",
@@ -72,7 +72,7 @@
     },
     "corpos_prova": {
       "type": "array",
-      "description": "Array de corpos de prova (até 20)",
+      "description": "Array de corpos de prova (at\u00e9 20)",
       "items": {
         "type": "object",
         "properties": {
@@ -98,7 +98,7 @@
             "items": {
               "type": "number"
             },
-            "description": "Até 4 medidas de espessura"
+            "description": "At\u00e9 4 medidas de espessura"
           },
           "media_espessura": {
             "type": "number"
@@ -117,11 +117,11 @@
           },
           "volume": {
             "type": "number",
-            "description": "Volume (cm³)"
+            "description": "Volume (cm\u00b3)"
           },
           "densidade": {
             "type": "number",
-            "description": "Densidade (g/cm³)"
+            "description": "Densidade (g/cm\u00b3)"
           },
           "gc_dens_projeto": {
             "type": "number",
@@ -129,7 +129,7 @@
           },
           "dens_rice_do_dia": {
             "type": "number",
-            "description": "Dens. RICE do dia (g/cm³)"
+            "description": "Dens. RICE do dia (g/cm\u00b3)"
           },
           "gc_dens_rice_dia": {
             "type": "number",
@@ -141,18 +141,18 @@
           },
           "leitura": {
             "type": "number",
-            "description": "Leitura (Kgf/cm²)"
+            "description": "Leitura (Kgf/cm\u00b2)"
           },
           "rtcd_25c": {
             "type": "number",
-            "description": "RTCD a 25°C (MPa)"
+            "description": "RTCD a 25\u00b0C (MPa)"
           }
         }
       }
     },
     "observacoes": {
       "type": "string",
-      "description": "Observações gerais"
+      "description": "Observa\u00e7\u00f5es gerais"
     },
     "status": {
       "type": "string",
@@ -161,16 +161,16 @@
         "finalizado"
       ],
       "default": "rascunho",
-      "description": "Status do registro: rascunho (em edição) ou finalizado (pronto para revisão)"
+      "description": "Status do registro: rascunho (em edi\u00e7\u00e3o) ou finalizado (pronto para revis\u00e3o)"
     },
     "approved": {
       "type": "boolean",
       "default": null,
-      "description": "Status de aprovação"
+      "description": "Status de aprova\u00e7\u00e3o"
     },
     "approved_by": {
       "type": "string",
-      "description": "Email do usuário que aprovou/reprovou"
+      "description": "Email do usu\u00e1rio que aprovou/reprovou"
     },
     "approved_date": {
       "type": "string",
@@ -250,17 +250,27 @@
         }
       ]
     },
-        "read": {
+    "read": {
       "$or": [
-        { "data.status": { "$ne": "rascunho" } },
-        { "created_by": "{{user.email}}" },
-        { "user_condition": { "role": "admin" } }
+        {
+          "data.status": {
+            "$ne": "rascunho"
+          }
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
       ]
     },
     "update": {
       "$or": [
         {
-          "created_by": "{{user.email}}"
+          "created_by_id": "{{user.id}}"
         },
         {
           "user_condition": {
@@ -282,7 +292,7 @@
     "delete": {
       "$or": [
         {
-          "created_by": "{{user.email}}"
+          "created_by_id": "{{user.id}}"
         },
         {
           "user_condition": {
