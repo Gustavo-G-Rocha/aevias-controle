@@ -376,7 +376,13 @@
         }
       ]
     },
-    "read": null,
+        "read": {
+      "$or": [
+        { "data.status": { "$ne": "rascunho" } },
+        { "created_by": "{{user.email}}" },
+        { "user_condition": { "role": "admin" } }
+      ]
+    },
     "update": {
       "$or": [
         {

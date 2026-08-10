@@ -205,9 +205,16 @@
           }
         },
         {
-          "user_condition": {
-            "data.access_level": "sala_tecnica_afirmaevias"
-          }
+          "$and": [
+            {
+              "user_condition": {
+                "data.access_level": "sala_tecnica_afirmaevias"
+              }
+            },
+            {
+              "data.status": { "$ne": "rascunho" }
+            }
+          ]
         },
         {
           "user_condition": {
