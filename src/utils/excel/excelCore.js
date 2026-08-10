@@ -7,10 +7,20 @@
  * cabeçalho de tabela com filtro), das larguras de coluna e da escrita.
  */
 
-import * as XLSX from 'xlsx/xlsx.mjs';
+import * as XLSX from 'xlsx-js-style';
 
 const OLIVE = 'BFCF99';
 const NAVY = '00233B';
+const WHITE = 'FFFFFF';
+const LIGHT = 'F0F2F5';
+const BORDER_COLOR = 'C8D0D9';
+
+const thinBorder = {
+  top: { style: 'thin', color: { rgb: BORDER_COLOR } },
+  bottom: { style: 'thin', color: { rgb: BORDER_COLOR } },
+  left: { style: 'thin', color: { rgb: BORDER_COLOR } },
+  right: { style: 'thin', color: { rgb: BORDER_COLOR } },
+};
 
 /** Data no formato pt-BR, sem deslocamento de fuso. */
 export const fmtDate = (v) =>
@@ -37,6 +47,7 @@ export function buildSheet({ name, title = null, meta = [], header = null, rows 
   const merges = [];
   const boldLabels = [];
   const headerRows = [];
+  const tables = [];
   const width = Math.max(cols.length, header?.length || 0, 2);
 
   if (title) {
@@ -53,26 +64,31 @@ export function buildSheet({ name, title = null, meta = [], header = null, rows 
   if (header) {
     if (aoa.length) aoa.push([]);
     headerRows.push(aoa.length);
+    tables.push({ r: aoa.length, rows: rows.length, width: header.length });
     aoa.push(header);
     rows.forEach((r) => aoa.push(r));
   }
 
-  return { name, aoa, headerRows, boldLabels, cols, merges, titleRow: title ? 0 : null };
+  return { name, aoa, headerRows, boldLabels, tables, cols, merges, titleRow: title ? 0 : null };
 }
 
-function applyStyles(ws, { headerRows = [], boldLabels = [], cols = [], merges = [], titleRows = [] }) {
+function applyStyles(ws, { headerRows = [], boldLabels = [], cols = [], merges = [], titleRows = [], tables = [] }) {
   const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
 
+  // Título: faixa navy com texto branco, como o cabeçalho dos PDFs.
   titleRows.forEach((r) => {
-    const ref = XLSX.utils.encode_cell({ r, c: 0 });
-    if (ws[ref]) {
+    for (let c = range.s.c; c <= range.e.c; c++) {
+      const ref = XLSX.utils.encode_cell({ r, c });
+      if (!ws[ref]) ws[ref] = { t: 's', v: '' };
       ws[ref].s = {
-        font: { bold: true, sz: 14, color: { rgb: NAVY } },
-        alignment: { horizontal: 'center' },
+        fill: { fgColor: { rgb: NAVY } },
+        font: { bold: true, sz: 14, color: { rgb: WHITE } },
+        alignment: { horizontal: 'center', vertical: 'center' },
       };
     }
   });
 
+  // Cabeçalho de tabela: verde-oliva com texto navy, como as tabelas dos PDFs.
   headerRows.forEach((r) => {
     for (let c = range.s.c; c <= range.e.c; c++) {
       const ref = XLSX.utils.encode_cell({ r, c });
@@ -80,7 +96,8 @@ function applyStyles(ws, { headerRows = [], boldLabels = [], cols = [], merges =
         ws[ref].s = {
           fill: { fgColor: { rgb: OLIVE } },
           font: { bold: true, color: { rgb: NAVY } },
-          alignment: { horizontal: 'center', wrapText: true },
+          alignment: { horizontal: 'center', wrapText: true, vertical: 'center' },
+          border: thinBorder,
         };
       }
     }
@@ -95,9 +112,41 @@ function applyStyles(ws, { headerRows = [], boldLabels = [], cols = [], merges =
     }
   });
 
+  // Linhas de dados das tabelas: bordas finas + zebra suave, como nos PDFs.
+  tables.forEach(({ r, rows, width }) => {
+    for (let i = 1; i <= rows; i++) {
+      const zebra = i % 2 === 0;
+      for (let c = 0; c < width; c++) {
+        const ref = XLSX.utils.encode_cell({ r: r + i, c });
+        if (!ws[ref]) ws[ref] = { t: 's', v: '' };
+        ws[ref].s = {
+          border: thinBorder,
+          font: { color: { rgb: NAVY } },
+          alignment: { vertical: 'center', wrapText: true },
+          ...(zebra ? { fill: { fgColor: { rgb: LIGHT } } } : {}),
+        };
+      }
+    }
+  });
+
+  // Bloco de identificação: rótulo em navy sobre fundo claro, valor com borda.
   boldLabels.forEach((r) => {
-    const ref = XLSX.utils.encode_cell({ r, c: 0 });
-    if (ws[ref]) ws[ref].s = { font: { bold: true, color: { rgb: NAVY } } };
+    const labelRef = XLSX.utils.encode_cell({ r, c: 0 });
+    if (ws[labelRef]) {
+      ws[labelRef].s = {
+        font: { bold: true, color: { rgb: NAVY } },
+        fill: { fgColor: { rgb: LIGHT } },
+        border: thinBorder,
+        alignment: { vertical: 'center' },
+      };
+    }
+    const valueRef = XLSX.utils.encode_cell({ r, c: 1 });
+    if (!ws[valueRef]) ws[valueRef] = { t: 's', v: '' };
+    ws[valueRef].s = {
+      font: { color: { rgb: NAVY } },
+      border: thinBorder,
+      alignment: { vertical: 'center', wrapText: true },
+    };
   });
 
   if (merges.length) ws['!merges'] = merges;
@@ -115,6 +164,7 @@ function mergeSheets(sheets) {
   const boldLabels = [];
   const merges = [];
   const titleRows = [];
+  const tables = [];
   const cols = [];
 
   sheets.forEach((sheet, i) => {
@@ -127,6 +177,7 @@ function mergeSheets(sheets) {
     sheet.aoa.forEach((row) => aoa.push(row));
     sheet.headerRows.forEach((r) => headerRows.push(r + offset));
     sheet.boldLabels.forEach((r) => boldLabels.push(r + offset));
+    (sheet.tables || []).forEach((t) => tables.push({ ...t, r: t.r + offset }));
     sheet.merges.forEach((m) =>
       merges.push({
         s: { r: m.s.r + offset, c: m.s.c },
@@ -140,7 +191,7 @@ function mergeSheets(sheets) {
     });
   });
 
-  return { aoa, headerRows, boldLabels, merges, titleRows, cols: cols.map((w) => w || 18) };
+  return { aoa, headerRows, boldLabels, merges, titleRows, tables, cols: cols.map((w) => w || 18) };
 }
 
 /** Gera e baixa a planilha — sempre com uma única aba. */

@@ -42,6 +42,7 @@ export default defineConfig({
       'react-resizable-panels',
       'react-hot-toast',
       'next-themes',
+      'xlsx-js-style',
     ],
     // xlsx é ESM puro (xlsx.mjs) e é importado diretamente por esse caminho:
     // pré-empacotá-lo gera um módulo otimizado que não resolve em runtime.
