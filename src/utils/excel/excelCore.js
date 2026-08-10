@@ -2,9 +2,15 @@
  * Núcleo compartilhado da exportação para Excel.
  *
  * Cada tipo de registro tem um exportador sob medida em ./exporters, que
- * descreve suas abas com buildSheet() e devolve { filename, sheets }.
- * Este módulo cuida do layout (título mesclado, bloco de identificação,
- * cabeçalho de tabela com filtro), das larguras de coluna e da escrita.
+ * descreve suas seções com buildSheet() e devolve { filename, sheets }.
+ * Este módulo reproduz a anatomia dos PDFs do sistema:
+ *   1. Faixa navy da empresa (como a barra do logo)
+ *   2. Título do documento (como o cabeçalho central do PDF)
+ *   3. Grade de identificação (pares rótulo/valor, 2 por linha, como o
+ *      bloco "Dados da Obra" dos relatórios)
+ *   4. Seções com faixa verde-oliva (como os títulos de seção dos PDFs)
+ *   5. Tabelas com cabeçalho oliva, bordas e zebrado
+ *   6. Rodapé de assinaturas (Laboratorista | Responsável | Cliente)
  */
 
 import * as XLSX from 'xlsx-js-style';
@@ -14,6 +20,7 @@ const NAVY = '00233B';
 const WHITE = 'FFFFFF';
 const LIGHT = 'F0F2F5';
 const BORDER_COLOR = 'C8D0D9';
+const COMPANY = 'AFIRMA EVIAS — ENGENHARIA VIÁRIA';
 
 const thinBorder = {
   top: { style: 'thin', color: { rgb: BORDER_COLOR } },
@@ -32,11 +39,14 @@ export const val = (v) => (v === null || v === undefined || v === '' ? '-' : v);
 /** Booleano em texto legível. */
 export const boolText = (v) => (v === true ? 'Sim' : v === false ? 'Não' : '-');
 
+/** Valores longos ocupam a linha inteira, como as observações nos PDFs. */
+const isLong = (v) => String(v ?? '').length > 60;
+
 /**
- * Monta a descrição de uma aba.
- * name   → nome da aba
- * title  → título do documento (linha mesclada no topo)
- * meta   → pares [label, valor] de identificação
+ * Monta a descrição de uma seção.
+ * name   → nome da seção (vira faixa de título)
+ * title  → título alternativo (linha mesclada no topo da seção)
+ * meta   → pares [label, valor] de identificação (renderizados em grade 2x2)
  * header → linha de cabeçalho da tabela (recebe filtro automático)
  * rows   → linhas de dados
  * cols   → larguras das colunas
@@ -45,21 +55,39 @@ export function buildSheet({ name, title = null, meta = [], header = null, rows 
   title = title ?? name;
   const aoa = [];
   const merges = [];
-  const boldLabels = [];
+  const labelCells = [];
+  const valueCells = [];
   const headerRows = [];
   const tables = [];
-  const width = Math.max(cols.length, header?.length || 0, 2);
+  const gridWidth = 4;
+  const width = Math.max(cols.length, header?.length || 0, meta.length ? gridWidth : 0, 2);
 
   if (title) {
     aoa.push([title]);
-    merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: width - 1 } });
     aoa.push([]);
   }
 
-  meta.forEach(([label, value]) => {
-    boldLabels.push(aoa.length);
-    aoa.push([label, value]);
-  });
+  // Grade de identificação: 2 pares por linha, como o bloco de dados dos PDFs.
+  // Valores longos ganham linha inteira (valor mesclado até a última coluna da grade).
+  let i = 0;
+  while (i < meta.length) {
+    const [l1, v1] = meta[i];
+    const next = meta[i + 1];
+    if (isLong(v1) || !next || isLong(next[1])) {
+      const r = aoa.length;
+      labelCells.push({ r, c: 0 });
+      valueCells.push({ r, c: 1 });
+      merges.push({ s: { r, c: 1 }, e: { r, c: gridWidth - 1 } });
+      aoa.push([l1, v1]);
+      i += 1;
+    } else {
+      const r = aoa.length;
+      labelCells.push({ r, c: 0 }, { r, c: 2 });
+      valueCells.push({ r, c: 1 }, { r, c: 3 });
+      aoa.push([l1, v1, next[0], next[1]]);
+      i += 2;
+    }
+  }
 
   if (header) {
     if (aoa.length) aoa.push([]);
@@ -69,26 +97,77 @@ export function buildSheet({ name, title = null, meta = [], header = null, rows 
     rows.forEach((r) => aoa.push(r));
   }
 
-  return { name, aoa, headerRows, boldLabels, tables, cols, merges, titleRow: title ? 0 : null };
+  // Larguras: seções só de identificação usam a grade padrão; seções com
+  // tabela garantem o mínimo da grade nas 4 primeiras colunas.
+  let finalCols = cols;
+  if (meta.length && !header) {
+    finalCols = [24, 42, 24, 42];
+  } else if (meta.length) {
+    finalCols = [...cols];
+    [22, 30, 22, 30].forEach((min, c) => {
+      finalCols[c] = Math.max(finalCols[c] || 0, min);
+    });
+  }
+
+  return { name, aoa, headerRows, labelCells, valueCells, tables, cols: finalCols, merges, titleRow: title ? 0 : null };
 }
 
-function applyStyles(ws, { headerRows = [], boldLabels = [], cols = [], merges = [], titleRows = [], tables = [] }) {
+/**
+ * Rodapé de aprovação/assinaturas, espelhando o SignatureFooter dos PDFs
+ * (Laboratorista | Responsável pela Aprovação | Cliente).
+ */
+export function assinaturasSheet(record) {
+  const status =
+    record.approved === true ? 'Aprovado' : record.approved === false ? 'Reprovado' : 'Pendente';
+  const ap = record.approver_details || {};
+  const cs = record.client_signature || {};
+  const meta = [['Status de Aprovação', status]];
+  if (record.rejection_reason) meta.push(['Motivo da Reprovação', record.rejection_reason]);
+
+  return buildSheet({
+    name: 'Assinaturas',
+    meta,
+    header: ['', 'Laboratorista', 'Responsável', 'Cliente'],
+    rows: [
+      ['Nome', val(record.laboratorista_name), val(ap.name), val(cs.engineer_name)],
+      ['E-mail', val(record.created_by), val(record.approved_by), val(cs.signed_by)],
+      ['Cargo / CREA', '-', val(ap.crea_number || ap.position), val(cs.crea_number)],
+      ['Data', fmtDate(record.created_date), fmtDate(record.approved_date), fmtDate(cs.signed_date)],
+    ],
+    cols: [16, 30, 30, 30],
+  });
+}
+
+function applyStyles(ws, {
+  companyRow = null, titleRows = [], sectionRows = [], headerRows = [],
+  labelCells = [], valueCells = [], tables = [], cols = [], merges = [],
+}) {
   const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
 
-  // Título: faixa navy com texto branco, como o cabeçalho dos PDFs.
-  titleRows.forEach((r) => {
+  const bandStyle = (fill, fontColor, sz) => ({
+    fill: { fgColor: { rgb: fill } },
+    font: { bold: true, sz, color: { rgb: fontColor } },
+    alignment: { horizontal: 'center', vertical: 'center' },
+  });
+
+  const styleBand = (r, style) => {
     for (let c = range.s.c; c <= range.e.c; c++) {
       const ref = XLSX.utils.encode_cell({ r, c });
       if (!ws[ref]) ws[ref] = { t: 's', v: '' };
-      ws[ref].s = {
-        fill: { fgColor: { rgb: NAVY } },
-        font: { bold: true, sz: 14, color: { rgb: WHITE } },
-        alignment: { horizontal: 'center', vertical: 'center' },
-      };
+      ws[ref].s = style;
     }
-  });
+  };
 
-  // Cabeçalho de tabela: verde-oliva com texto navy, como as tabelas dos PDFs.
+  // Faixa da empresa: navy com texto branco, como a barra do logo dos PDFs.
+  if (companyRow !== null) styleBand(companyRow, bandStyle(NAVY, WHITE, 12));
+
+  // Título do documento: destaque navy, como o cabeçalho central do PDF.
+  titleRows.forEach((r) => styleBand(r, bandStyle(NAVY, WHITE, 14)));
+
+  // Títulos de seção: faixa verde-oliva, como os títulos de seção dos PDFs.
+  sectionRows.forEach((r) => styleBand(r, bandStyle(OLIVE, NAVY, 11)));
+
+  // Cabeçalho de tabela: verde-oliva com texto navy e bordas.
   headerRows.forEach((r) => {
     for (let c = range.s.c; c <= range.e.c; c++) {
       const ref = XLSX.utils.encode_cell({ r, c });
@@ -100,15 +179,6 @@ function applyStyles(ws, { headerRows = [], boldLabels = [], cols = [], merges =
           border: thinBorder,
         };
       }
-    }
-    // Filtro automático sobre a tabela — facilita a leitura de listas longas.
-    if (!ws['!autofilter']) {
-      ws['!autofilter'] = {
-        ref: XLSX.utils.encode_range(
-          { r, c: range.s.c },
-          { r: range.e.r, c: range.e.c }
-        ),
-      };
     }
   });
 
@@ -129,20 +199,21 @@ function applyStyles(ws, { headerRows = [], boldLabels = [], cols = [], merges =
     }
   });
 
-  // Bloco de identificação: rótulo em navy sobre fundo claro, valor com borda.
-  boldLabels.forEach((r) => {
-    const labelRef = XLSX.utils.encode_cell({ r, c: 0 });
-    if (ws[labelRef]) {
-      ws[labelRef].s = {
-        font: { bold: true, color: { rgb: NAVY } },
-        fill: { fgColor: { rgb: LIGHT } },
-        border: thinBorder,
-        alignment: { vertical: 'center' },
-      };
-    }
-    const valueRef = XLSX.utils.encode_cell({ r, c: 1 });
-    if (!ws[valueRef]) ws[valueRef] = { t: 's', v: '' };
-    ws[valueRef].s = {
+  // Grade de identificação: rótulo destacado + valor com borda.
+  labelCells.forEach(({ r, c }) => {
+    const ref = XLSX.utils.encode_cell({ r, c });
+    if (!ws[ref]) ws[ref] = { t: 's', v: '' };
+    ws[ref].s = {
+      font: { bold: true, color: { rgb: NAVY } },
+      fill: { fgColor: { rgb: LIGHT } },
+      border: thinBorder,
+      alignment: { vertical: 'center' },
+    };
+  });
+  valueCells.forEach(({ r, c }) => {
+    const ref = XLSX.utils.encode_cell({ r, c });
+    if (!ws[ref]) ws[ref] = { t: 's', v: '' };
+    ws[ref].s = {
       font: { color: { rgb: NAVY } },
       border: thinBorder,
       alignment: { vertical: 'center', wrapText: true },
@@ -154,29 +225,29 @@ function applyStyles(ws, { headerRows = [], boldLabels = [], cols = [], merges =
 }
 
 /**
- * Junta todas as seções em uma única aba, empilhadas na vertical e
- * separadas por uma linha em branco. Cada seção mantém seu título,
- * cabeçalho e destaques — apenas deixam de virar abas separadas.
+ * Junta todas as seções em uma única aba, empilhadas na vertical, com a
+ * faixa da empresa no topo — reproduzindo a página do PDF.
  */
 function mergeSheets(sheets) {
-  const aoa = [];
+  const aoa = [[COMPANY]];
+  const companyRow = 0;
   const headerRows = [];
-  const boldLabels = [];
+  const labelCells = [];
+  const valueCells = [];
   const merges = [];
   const titleRows = [];
+  const sectionRows = [];
   const tables = [];
   const cols = [];
 
   sheets.forEach((sheet, i) => {
-    if (i > 0) {
-      aoa.push([]);
-      aoa.push([]);
-    }
+    aoa.push([]);
     const offset = aoa.length;
 
     sheet.aoa.forEach((row) => aoa.push(row));
     sheet.headerRows.forEach((r) => headerRows.push(r + offset));
-    sheet.boldLabels.forEach((r) => boldLabels.push(r + offset));
+    (sheet.labelCells || []).forEach(({ r, c }) => labelCells.push({ r: r + offset, c }));
+    (sheet.valueCells || []).forEach(({ r, c }) => valueCells.push({ r: r + offset, c }));
     (sheet.tables || []).forEach((t) => tables.push({ ...t, r: t.r + offset }));
     sheet.merges.forEach((m) =>
       merges.push({
@@ -184,14 +255,26 @@ function mergeSheets(sheets) {
         e: { r: m.e.r + offset, c: m.e.c },
       })
     );
-    if (sheet.titleRow !== null) titleRows.push(sheet.titleRow + offset);
+    // Primeira seção = título do documento; demais = faixas de seção.
+    if (sheet.titleRow !== null) {
+      (i === 0 ? titleRows : sectionRows).push(sheet.titleRow + offset);
+    }
 
     sheet.cols.forEach((w, c) => {
       cols[c] = Math.max(cols[c] || 0, w);
     });
   });
 
-  return { aoa, headerRows, boldLabels, merges, titleRows, tables, cols: cols.map((w) => w || 18) };
+  // Faixas (empresa, título e seções) mescladas na largura total do documento.
+  const width = Math.max(cols.length, 2);
+  [companyRow, ...titleRows, ...sectionRows].forEach((r) => {
+    merges.push({ s: { r, c: 0 }, e: { r, c: width - 1 } });
+  });
+
+  return {
+    aoa, companyRow, headerRows, labelCells, valueCells, merges,
+    titleRows, sectionRows, tables, cols: cols.map((w) => w || 18),
+  };
 }
 
 /** Gera e baixa a planilha — sempre com uma única aba. */

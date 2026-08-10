@@ -64,12 +64,15 @@ export async function exportRecordToExcel(record) {
   if (!load) {
     throw new Error('Exportação para Excel ainda não disponível para este tipo de registro.');
   }
-  const [{ default: buildExport }, { downloadExcel }, full] = await Promise.all([
+  const [{ default: buildExport }, core, full] = await Promise.all([
     load(),
     import('./excelCore'),
     withObraInfo(record),
   ]);
-  downloadExcel(buildExport(full));
+  const built = buildExport(full);
+  // Rodapé de aprovação/assinaturas, como no PDF de cada registro.
+  built.sheets.push(core.assinaturasSheet(full));
+  core.downloadExcel(built);
 }
 
 /**
@@ -81,7 +84,7 @@ export async function exportRecordsToExcel(records, filename = 'registros.xlsx')
   if (!exportaveis.length) {
     throw new Error('Nenhum dos registros selecionados possui exportação para Excel.');
   }
-  const { downloadExcelWorkbook } = await import('./excelCore');
+  const { downloadExcelWorkbook, assinaturasSheet } = await import('./excelCore');
   const tabs = [];
   for (const record of exportaveis) {
     const [{ default: buildExport }, full] = await Promise.all([
@@ -89,6 +92,8 @@ export async function exportRecordsToExcel(records, filename = 'registros.xlsx')
       withObraInfo(record),
     ]);
     const built = buildExport(full);
+    // Rodapé de aprovação/assinaturas, como no PDF de cada registro.
+    built.sheets.push(assinaturasSheet(full));
     tabs.push({ name: built.filename.replace(/\.xlsx$/i, ''), sheets: built.sheets });
   }
   downloadExcelWorkbook({ filename, tabs });
