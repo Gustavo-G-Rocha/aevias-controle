@@ -53,6 +53,18 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
 
   return (
     <tr className={`border-b border-border hover:bg-muted/50 ${index % 2 === 0 ? 'bg-transparent' : 'bg-muted/20'}`}>
+      {onToggleSelect && (
+        <td className="px-2 py-2 text-center">
+          <input
+            type="checkbox"
+            className="h-4 w-4 cursor-pointer align-middle accent-[color:var(--color-primary)]"
+            checked={!!selected}
+            onChange={() => onToggleSelect(ensaio)}
+            aria-label={`Selecionar ${name}`}
+            title={`Selecionar ${name}`}
+          />
+        </td>
+      )}
       <td className="px-2 py-2 overflow-hidden">
         <div className="font-medium text-foreground flex items-center gap-1 text-xs min-w-0">
           <TypeIcon className="w-3 h-3 text-secondary shrink-0" />
@@ -134,18 +146,6 @@ const TableRowAdmin = React.memo(({ ensaio, obra, projeto, index, canApprove, al
           )}
         </div>
       </td>
-      {onToggleSelect && (
-        <td className="px-2 py-2 text-center">
-          <input
-            type="checkbox"
-            className="h-4 w-4 cursor-pointer align-middle accent-[color:var(--color-primary)]"
-            checked={!!selected}
-            onChange={() => onToggleSelect(ensaio)}
-            aria-label={`Selecionar ${name}`}
-            title={`Selecionar ${name}`}
-          />
-        </td>
-      )}
     </tr>
   );
 });

@@ -29,6 +29,18 @@ export default function EnsaiosTableHeader({
   return (
     <thead className="bg-muted/40 border-b border-border">
       <tr>
+        {onToggleAll && (
+          <th className="text-center px-2 py-2 font-medium text-foreground text-xs" style={{ width: '40px' }}>
+            <input
+              type="checkbox"
+              className="h-4 w-4 cursor-pointer align-middle accent-[color:var(--color-primary)]"
+              checked={allSelected}
+              onChange={(e) => onToggleAll(e.target.checked)}
+              title="Selecionar todos desta página"
+              aria-label="Selecionar todos desta página"
+            />
+          </th>
+        )}
         <th className="text-left px-2 py-2 font-medium text-foreground text-xs" style={{ width: '18%' }}>
           <div className="flex items-center justify-between gap-0.5 min-w-0">
             <span className="whitespace-nowrap truncate">Tipo</span>
@@ -83,18 +95,6 @@ export default function EnsaiosTableHeader({
           </div>
         </th>
         <th className="text-center px-2 py-2 font-medium text-foreground text-xs" style={{ width: acoesWidth }}>{acoesLabel}</th>
-        {onToggleAll && (
-          <th className="text-center px-2 py-2 font-medium text-foreground text-xs" style={{ width: '40px' }}>
-            <input
-              type="checkbox"
-              className="h-4 w-4 cursor-pointer align-middle accent-[color:var(--color-primary)]"
-              checked={allSelected}
-              onChange={(e) => onToggleAll(e.target.checked)}
-              title="Selecionar todos desta página"
-              aria-label="Selecionar todos desta página"
-            />
-          </th>
-        )}
       </tr>
     </thead>
   );
