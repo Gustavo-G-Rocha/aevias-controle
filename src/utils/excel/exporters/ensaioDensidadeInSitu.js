@@ -1,9 +1,37 @@
 import { buildSheet, buildFileName, fmtDate, val, boolText, obraMeta } from '../excelCore';
+import { rawSheet, boldRowCells } from './transposedShared';
+import { fmtN } from '@/utils/relatorioDensidadeInSituUtils';
 
-/** Densidade in situ (frasco de areia) — dados gerais e furos. */
+/**
+ * Seção transposta como no PDF: linhas = parâmetros, colunas = furos.
+ * Cada grupo do PDF vira uma seção com faixa oliva própria.
+ */
+function furosSection({ name, title, linhas, N }) {
+  const width = N + 1;
+  const body = [];
+  const labelCells = [];
+  linhas.forEach(({ label, values, bold }) => {
+    const r = body.length;
+    body.push([label, ...values]);
+    labelCells.push({ r, c: 0 });
+    if (bold) labelCells.push(...boldRowCells(r, width));
+  });
+  return rawSheet({
+    name,
+    title,
+    body,
+    tables: [{ r: -1, rows: body.length, width }],
+    labelCells,
+    cols: [32, ...Array(N).fill(14)],
+  });
+}
+
+/** Densidade in situ (frasco de areia) — clone da tabela transposta do PDF. */
 export default function buildEnsaioDensidadeInSituExport(ensaio) {
   const proctor = ensaio.dados_proctor || {};
   const furos = ensaio.furos || [];
+  const N = furos.length;
+  const per = (fn) => furos.map(fn);
   const sheets = [];
 
   sheets.push(
@@ -22,57 +50,102 @@ export default function buildEnsaioDensidadeInSituExport(ensaio) {
         ['Material', val(ensaio.material)],
         ['Procedência', val(ensaio.procedencia)],
         ['Substituição Retido 3/4"', boolText(ensaio.substituicao_retido_3_4)],
-        ['Densidade Real Retida 3/4" (g/cm³)', val(ensaio.densidade_real_retida_3_4)],
-        ['Densidade da Areia (g/cm³)', val(ensaio.densidade_areia)],
-        ['Peso da Areia no Funil (g)', val(ensaio.peso_areia_funil)],
-        ['Densidade Seca Máx. Proctor (g/cm³)', val(proctor.densidade_seca_max)],
-        ['Umidade Ótima Proctor (%)', val(proctor.umidade_otima)],
       ],
       cols: [34, 30],
     })
   );
 
-  sheets.push(
-    buildSheet({
-      name: 'Furos',
-      title: 'Resultados por Furo',
-      header: [
-        'Furo',
-        'Estaca',
-        'Pista',
-        'Prof. (cm)',
-        'Areia+Garrafa Antes (g)',
-        'Areia+Garrafa Após (g)',
-        'Material Úmido no Furo (g)',
-        'Tara Frigideira (g)',
-        'Úmido + Frigideira (g)',
-        'Seco + Frigideira (g)',
-        'Dens. Úmida (g/cm³)',
-        'Dens. Seca (g/cm³)',
-        'Umidade (%)',
-        'Desvio de Umidade (%)',
-        'Grau de Compactação (%)',
-      ],
-      rows: furos.map((f, i) => [
-        val(f.numero ?? i + 1),
-        val(f.estaca),
-        val(f.pista),
-        val(f.profundidade_furo),
-        val(f.peso_areia_garrafa_antes),
-        val(f.peso_areia_garrafa_apos),
-        val(f.peso_material_umido_furo),
-        val(f.tara_frigideira),
-        val(f.material_umido_frigideira),
-        val(f.material_seco_frigideira),
-        val(f.densidade_umida_furo),
-        val(f.densidade_seca_solo),
-        val(f.umidade),
-        val(f.desvio_umidade),
-        val(f.grau_compactacao),
-      ]),
-      cols: [8, 14, 12, 12, 22, 22, 24, 18, 20, 20, 18, 18, 12, 20, 22],
-    })
-  );
+  if (N) {
+    // ── Estaca / Pista (topo da tabela do PDF) ──
+    sheets.push(
+      furosSection({
+        name: 'Dados de Ensaio',
+        title: 'Dados de Ensaio',
+        N,
+        linhas: [
+          { label: 'ESTACA', values: per((f) => val(f.estaca)) },
+          { label: 'PISTA', values: per((f) => val(f.pista)) },
+        ],
+      })
+    );
+
+    // ── Ensaio de densidade in situ ──
+    const linhasDensidade = [
+      { label: 'PESO AREIA NO FUNIL (g)', values: per(() => fmtN(ensaio.peso_areia_funil, 1)) },
+      { label: 'DENSIDADE DA AREIA (g/cm³)', values: per(() => fmtN(ensaio.densidade_areia, 3)) },
+    ];
+    if (ensaio.substituicao_retido_3_4) {
+      linhasDensidade.push({
+        label: 'DENSIDADE REAL RETIDA 3/4" (g/cm³)',
+        values: per(() => val(ensaio.densidade_real_retida_3_4)),
+      });
+    }
+    linhasDensidade.push(
+      { label: 'PROFUNDIDADE DO FURO (cm)', values: per((f) => val(f.profundidade_furo)) },
+      { label: 'PESO AREIA+GARRAFA, ANTES (g)', values: per((f) => val(f.peso_areia_garrafa_antes)) },
+      { label: 'PESO AREIA+GARRAFA, APÓS (g)', values: per((f) => val(f.peso_areia_garrafa_apos)) },
+      { label: 'PESO MATERIAL ÚMIDO NO FURO (g)', values: per((f) => val(f.peso_material_umido_furo)) }
+    );
+    if (ensaio.substituicao_retido_3_4) {
+      linhasDensidade.push({
+        label: 'PESO SOLO RETIDO 3/4" ÚMIDO (g)',
+        values: per((f) => val(f.peso_solo_retido_3_4_umido)),
+      });
+    }
+    linhasDensidade.push(
+      { label: 'DENSIDADE ÚMIDA DO FURO (g/cm³)', values: per((f) => fmtN(f.densidade_umida_furo, 3)), bold: true },
+      { label: 'DENSIDADE SECA DO SOLO (g/cm³)', values: per((f) => fmtN(f.densidade_seca_solo, 3)), bold: true }
+    );
+    sheets.push(
+      furosSection({
+        name: 'Densidade In Situ',
+        title: 'Ensaio de Densidade "In Situ" — DNIT 458/25',
+        N,
+        linhas: linhasDensidade,
+      })
+    );
+
+    // ── Dados do Proctor ──
+    sheets.push(
+      furosSection({
+        name: 'Dados do Proctor',
+        title: 'Dados do Proctor',
+        N,
+        linhas: [
+          { label: 'DENS. SECA MÁX. (g/cm³)', values: per(() => fmtN(proctor.densidade_seca_max, 3)) },
+          { label: 'UMIDADE ÓTIMA (%)', values: per(() => val(proctor.umidade_otima)) },
+        ],
+      })
+    );
+
+    // ── Resultados ──
+    sheets.push(
+      furosSection({
+        name: 'Resultados',
+        title: 'Resultados',
+        N,
+        linhas: [
+          { label: 'DESVIO DE UMIDADE (%)', values: per((f) => fmtN(f.desvio_umidade, 2)), bold: true },
+          { label: 'GRAU DE COMPACTAÇÃO (%)', values: per((f) => fmtN(f.grau_compactacao, 2)), bold: true },
+        ],
+      })
+    );
+
+    // ── Ensaio de umidade ──
+    sheets.push(
+      furosSection({
+        name: 'Ensaio de Umidade',
+        title: 'Ensaio de Umidade "In Situ" (hₐ) — NBR 16097/2012',
+        N,
+        linhas: [
+          { label: 'TARA DA FRIGIDEIRA (g)', values: per((f) => val(f.tara_frigideira)) },
+          { label: 'MATERIAL ÚMIDO+FRIGIDEIRA (g)', values: per((f) => val(f.material_umido_frigideira)) },
+          { label: 'MATERIAL SECO+FRIGIDEIRA (g)', values: per((f) => val(f.material_seco_frigideira)) },
+          { label: 'UMIDADE (%)', values: per((f) => fmtN(f.umidade, 2)), bold: true },
+        ],
+      })
+    );
+  }
 
   if (ensaio.observacoes) {
     sheets.push(

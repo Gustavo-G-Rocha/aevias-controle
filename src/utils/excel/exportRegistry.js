@@ -69,7 +69,8 @@ export async function exportRecordToExcel(record) {
     import('./excelCore'),
     withObraInfo(record),
   ]);
-  const built = buildExport(full);
+  // Exportadores podem ser assíncronos (ex.: buscam projeto/faixa).
+  const built = await buildExport(full);
   // Rodapé de aprovação/assinaturas, como no PDF de cada registro.
   built.sheets.push(core.assinaturasSheet(full));
   core.downloadExcel(built);
@@ -91,7 +92,8 @@ export async function exportRecordsToExcel(records, filename = 'registros.xlsx')
       EXPORTERS[record.entityType](),
       withObraInfo(record),
     ]);
-    const built = buildExport(full);
+    // Exportadores podem ser assíncronos (ex.: buscam projeto/faixa).
+    const built = await buildExport(full);
     // Rodapé de aprovação/assinaturas, como no PDF de cada registro.
     built.sheets.push(assinaturasSheet(full));
     tabs.push({ name: built.filename.replace(/\.xlsx$/i, ''), sheets: built.sheets });

@@ -1,14 +1,165 @@
 import { buildSheet, buildFileName, fmtDate, val, obraMeta } from '../excelCore';
-import { PENEIRAS } from './peneirasShared';
+import { rawSheet, boldRowCells } from './transposedShared';
+import { calcularGranulometria, calcularMedia } from '@/utils/relatorioCAUQUtils';
+import {
+  fmtNum,
+  temDadosRTCD,
+  temDadosEstabilidade,
+  extrairConstPrensa,
+} from '@/utils/relatorioCAUQTabelasUtils';
+import { carregarProject, carregarFaixaDoProject } from '@/services/relatorioContextService';
 
-const num = (v) => (v === null || v === undefined || v === '' ? null : Number(v));
+/**
+ * Granulometria — clone da tabela do PDF (DNIT 412/2025):
+ * PENEIRAS | RETIDO | PASS. | % PASS. | FAIXA TRABALHO MÍN/MÁX | FAIXA ESPEC. MÍN/MÁX
+ */
+function granulometriaSheet(ensaio, faixa, project) {
+  const dados = calcularGranulometria(ensaio, faixa, project);
+  if (!dados.length) return null;
+
+  const espec = faixa?.especificacao ? ` ${faixa.especificacao}` : '';
+  const body = [
+    ['PENEIRAS ASTM (mm)', 'PESO DA AMOSTRA (g)', '', '', 'FAIXA DE TRABALHO', '', `FAIXA ESPECIFICADA${espec}`, ''],
+    ['', 'RETIDO (g)', 'PASS. (g)', '% PASS.', 'MÍN. (%)', 'MÁX. (%)', 'MÍN. (%)', 'MÁX. (%)'],
+    ...dados.map((d) => [
+      d.astm,
+      val(d.retido),
+      val(d.passante),
+      val(d.percentualPassante),
+      fmtNum(d.faixaTrabalhoMin, 1),
+      fmtNum(d.faixaTrabalhoMax, 1),
+      fmtNum(d.limiteMin, 1),
+      fmtNum(d.limiteMax, 1),
+    ]),
+  ];
+
+  return rawSheet({
+    name: 'Granulometria',
+    title: 'Ensaio de Granulometria — DNIT 412/2025',
+    body,
+    headerRows: [0, 1],
+    tables: [{ r: 1, rows: dados.length, width: 8 }],
+    merges: [
+      { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } },
+      { s: { r: 0, c: 1 }, e: { r: 0, c: 3 } },
+      { s: { r: 0, c: 4 }, e: { r: 0, c: 5 } },
+      { s: { r: 0, c: 6 }, e: { r: 0, c: 7 } },
+    ],
+    labelCells: dados.map((_, i) => ({ r: 2 + i, c: 0 })),
+    cols: [16, 13, 13, 12, 12, 12, 12, 12],
+  });
+}
+
+/**
+ * Marshall — clone da tabela transposta do PDF (DNIT 447/2024):
+ * linhas = parâmetros, colunas = CP 1…6 + Média + Proj. + Mín. + Máx.
+ */
+function marshallSheet(ensaio, project) {
+  const cps = (ensaio.corpos_prova_marshall || []).slice(0, 6);
+  if (!cps.length) return null;
+
+  const media = (campo) => calcularMedia(cps, campo);
+  const cp = (i, campo) => {
+    const v = cps[i]?.[campo];
+    return v === null || v === undefined || v === '' ? '-' : v;
+  };
+  const linha = (label, un, campo, m = '-', proj = '-', mn = '-', mx = '-') => [
+    label, un, cp(0, campo), cp(1, campo), cp(2, campo), cp(3, campo), cp(4, campo), cp(5, campo), m, proj, mn, mx,
+  ];
+
+  const rows = [];
+  const boldDataRows = [];
+  const merges = [
+    { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } },
+    { s: { r: 0, c: 1 }, e: { r: 1, c: 1 } },
+    { s: { r: 0, c: 2 }, e: { r: 0, c: 7 } },
+    { s: { r: 0, c: 8 }, e: { r: 1, c: 8 } },
+    { s: { r: 0, c: 9 }, e: { r: 1, c: 9 } },
+    { s: { r: 0, c: 10 }, e: { r: 1, c: 10 } },
+    { s: { r: 0, c: 11 }, e: { r: 1, c: 11 } },
+  ];
+
+  rows.push(linha('PESO AR', 'g', 'peso_ar'));
+  rows.push(linha('PESO IMERSO', 'g', 'peso_imerso'));
+  rows.push(linha('PESO SSS', 'g', 'peso_sss'));
+  rows.push(linha('VOLUME', 'cm³', 'volume'));
+  boldDataRows.push(rows.length);
+  rows.push(linha('DENSIDADE APARENTE', 'g/cm³', 'densidade_aparente',
+    media('densidade_aparente'), val(project?.massa_especifica_aparente), '-', '-'));
+  boldDataRows.push(rows.length);
+  rows.push(linha('VOLUME DE VAZIOS', '%', 'volume_vazios',
+    media('volume_vazios'),
+    fmtNum(project?.volume_vazios?.min, 1),
+    fmtNum(project?.volume_vazios?.max, 1),
+    fmtNum(project?.volume_vazios?.otimo, 1)));
+  rows.push(linha('V.C.B.', '%', 'vcb'));
+  rows.push(linha('V.A.M.', '%', 'vam', '-',
+    fmtNum(project?.vam?.projeto, 1), fmtNum(project?.vam?.min, 1), '-'));
+  rows.push(linha('R.B.V.', '%', 'rbv', '-',
+    fmtNum(project?.rbv?.projeto, 1), fmtNum(project?.rbv?.min, 1), fmtNum(project?.rbv?.max, 1)));
+  rows.push(linha('ALTURA', 'cm', 'altura'));
+
+  const temDiametral = temDadosRTCD(cps);
+  const temEstabilidade = temDadosEstabilidade(cps);
+  if (temDiametral || temEstabilidade) {
+    const r = rows.length + 2; // índice no body (2 linhas de cabeçalho)
+    rows.push(['CONST. PRENSA', '-', extrairConstPrensa(cps), '', '', '', '', '', '-', '-', '-', '-']);
+    merges.push({ s: { r, c: 2 }, e: { r, c: 7 } });
+  }
+  if (temDiametral) {
+    rows.push(linha('LEITURA (RTCD)', 'Kgf/cm²', 'rtcd_leitura'));
+    boldDataRows.push(rows.length);
+    rows.push(linha('RTCD', 'MPa', 'rtcd_valor', media('rtcd_valor'), '-',
+      project?.rtcd?.min ? fmtNum(project.rtcd.min, 1) : '-', '-'));
+  }
+  if (temEstabilidade) {
+    rows.push(linha('LEITURA (ESTABILIDADE)', 'Kgf/cm²', 'estabilidade_leitura'));
+    boldDataRows.push(rows.length);
+    rows.push(linha('ESTABILIDADE CORRIG.', 'Kgf/cm²', 'estabilidade_corrigida',
+      media('estabilidade_corrigida'),
+      project?.estabilidade?.projeto ? fmtNum(project.estabilidade.projeto, 1) : '-',
+      project?.estabilidade?.min ? fmtNum(project.estabilidade.min, 1) : '-', '-'));
+    boldDataRows.push(rows.length);
+    rows.push(linha('FLUÊNCIA', 'mm', 'fluencia', media('fluencia'),
+      project?.fluencia?.projeto ? fmtNum(project.fluencia.projeto, 1) : '-',
+      project?.fluencia?.min ? fmtNum(project.fluencia.min, 1) : '-',
+      project?.fluencia?.max ? fmtNum(project.fluencia.max, 1) : '-'));
+  }
+
+  const labelCells = rows.map((_, i) => ({ r: 2 + i, c: 0 }));
+  boldDataRows.forEach((i) => labelCells.push(...boldRowCells(2 + i, 12)));
+
+  const body = [
+    ['CORPO DE PROVA', 'UN.', 'CORPO DE PROVA', '', '', '', '', '', 'MÉDIA', 'PROJ.', 'MÍN.', 'MÁX.'],
+    ['', '', 1, 2, 3, 4, 5, 6, '', '', '', ''],
+    ...rows,
+  ];
+
+  return rawSheet({
+    name: 'Marshall',
+    title: 'Ensaio Marshall — Método de Ensaio DNIT 447/2024',
+    body,
+    headerRows: [0, 1],
+    tables: [{ r: 1, rows: rows.length, width: 12 }],
+    merges,
+    labelCells,
+    cols: [24, 9, 10, 10, 10, 10, 10, 10, 11, 10, 10, 10],
+  });
+}
 
 /** Ensaio CAUQ — extração de ligante, granulometria, RICE e Marshall. */
-export default function buildEnsaioCAUQExport(ensaio) {
+export default async function buildEnsaioCAUQExport(ensaio) {
   const ext = ensaio.extracao_ligante || {};
-  const retidos = ensaio.granulometria?.peso_retido_peneiras || {};
   const rice = ensaio.densidade_rice || {};
-  const cps = ensaio.corpos_prova_marshall || [];
+
+  // Contexto do projeto/faixa (colunas de faixa de trabalho e especificada).
+  // Falha isolada não impede a exportação — as colunas ficam com '-'.
+  let project = null;
+  let faixa = null;
+  try {
+    if (ensaio.project_id) project = await carregarProject(ensaio.project_id);
+    if (project) faixa = await carregarFaixaDoProject(project);
+  } catch { /* contexto opcional */ }
 
   const sheets = [];
 
@@ -35,10 +186,11 @@ export default function buildEnsaioCAUQExport(ensaio) {
     })
   );
 
-  // ── Extração de ligante ──
+  // ── Extração de ligante (grade de pares rótulo/valor, como no PDF) ──
   sheets.push(
     buildSheet({
       name: 'Extração de Ligante',
+      title: 'Extração Ligante (Rotarex) — ABNT NBR 16208/2013',
       meta: [
         ['Peso da Amostra (g)', val(ext.peso_amostra)],
         ['Amostra Úmida (g)', val(ext.amostra_umida)],
@@ -56,42 +208,16 @@ export default function buildEnsaioCAUQExport(ensaio) {
     })
   );
 
-  // ── Granulometria: peso retido, % retida e % passante acumulada ──
-  const usadas = PENEIRAS.filter(([key]) => num(retidos[key]) !== null);
-  const total = usadas.reduce((s, [key]) => s + (num(retidos[key]) || 0), 0);
-  let acumulado = 0;
-  const granRows = usadas.map(([key, label]) => {
-    const peso = num(retidos[key]) || 0;
-    acumulado += peso;
-    const retidaPct = total ? (peso / total) * 100 : 0;
-    const acumPct = total ? (acumulado / total) * 100 : 0;
-    return [
-      label,
-      peso,
-      Number(retidaPct.toFixed(2)),
-      Number(acumPct.toFixed(2)),
-      Number((100 - acumPct).toFixed(2)),
-    ];
-  });
-
-  sheets.push(
-    buildSheet({
-      name: 'Granulometria',
-      meta: [
-        ['Faixa Especificada', val(ensaio.faixa_especificada)],
-        ['Peso Total Retido (g)', total ? Number(total.toFixed(2)) : '-'],
-      ],
-      header: ['Peneira', 'Peso Retido (g)', '% Retida', '% Retida Acum.', '% Passante'],
-      rows: granRows,
-      cols: [22, 18, 14, 18, 14],
-    })
-  );
+  // ── Granulometria (clone do PDF, 8 colunas) ──
+  const gran = granulometriaSheet(ensaio, faixa, project);
+  if (gran) sheets.push(gran);
 
   // ── Densidade RICE ──
   if (ensaio.realizar_densidade_rice) {
     sheets.push(
       buildSheet({
         name: 'Densidade RICE',
+        title: 'Ensaio de Densidade RICE (DMT) — DNIT 427/20 - ABNT NBR 15619/16',
         meta: [
           ['Frasco + Água (g)', val(rice.frasco_agua)],
           ['Amostra (g)', val(rice.amostra)],
@@ -105,49 +231,9 @@ export default function buildEnsaioCAUQExport(ensaio) {
     );
   }
 
-  // ── Marshall ──
-  if (cps.length) {
-    sheets.push(
-      buildSheet({
-        name: 'Marshall',
-        header: [
-          'CP',
-          'Método',
-          'Peso ao Ar (g)',
-          'Peso Imerso (g)',
-          'Peso SSS (g)',
-          'Volume (cm³)',
-          'Dens. Aparente (g/cm³)',
-          'Vv (%)',
-          'VCB (%)',
-          'VAM (%)',
-          'RBV (%)',
-          'Altura (mm)',
-          'RTCD (MPa)',
-          'Estabilidade (kgf)',
-          'Fluência (mm)',
-        ],
-        rows: cps.map((cp, i) => [
-          val(cp.numero ?? i + 1),
-          cp.metodo_rompimento === 'diametral' ? 'Compressão Diametral' : 'Estabilidade/Fluência',
-          val(cp.peso_ar),
-          val(cp.peso_imerso),
-          val(cp.peso_sss),
-          val(cp.volume),
-          val(cp.densidade_aparente),
-          val(cp.volume_vazios),
-          val(cp.vcb),
-          val(cp.vam),
-          val(cp.rbv),
-          val(cp.altura),
-          val(cp.rtcd_valor),
-          val(cp.estabilidade_corrigida),
-          val(cp.fluencia),
-        ]),
-        cols: [6, 22, 14, 14, 14, 13, 20, 10, 10, 10, 10, 12, 12, 18, 14],
-      })
-    );
-  }
+  // ── Marshall transposto (clone do PDF) ──
+  const marshall = marshallSheet(ensaio, project);
+  if (marshall) sheets.push(marshall);
 
   if (ensaio.observacoes) {
     sheets.push(

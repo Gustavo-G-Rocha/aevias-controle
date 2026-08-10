@@ -1,4 +1,194 @@
 import { buildSheet, buildFileName, fmtDate, val, boolText, obraMeta } from '../excelCore';
+import { rawSheet, boldRowCells } from './transposedShared';
+import { fmtN } from '@/utils/relatorioProctorUtils';
+
+/**
+ * Compactação — modo Higroscópico, clone da tabela transposta do PDF:
+ * colunas = Umidade Higroscópica (Am.1/Am.2) + N cilindros + trio Cilindros.
+ */
+function compactacaoHigroSheet(ensaio) {
+  const u0 = (ensaio.umidades || [])[0] || {};
+  const densidades = ensaio.densidades || [];
+  const N = densidades.length;
+  if (!N) return null;
+
+  const width = 7 + N;
+  const base = 4 + N;
+
+  const higRows = [
+    ['Cápsula Nº', u0.capsula_numero_1 || '-', u0.capsula_numero_2 || '-'],
+    ['C+S+A (g)', fmtN(u0.capsula_solo_umido_1), fmtN(u0.capsula_solo_umido_2)],
+    ['C+S (g)', fmtN(u0.capsula_solo_seco_1), fmtN(u0.capsula_solo_seco_2)],
+    ['A - Água (g)', fmtN(u0.capsula_solo_umido_1 - u0.capsula_solo_seco_1), fmtN(u0.capsula_solo_umido_2 - u0.capsula_solo_seco_2)],
+    ['C - Cápsula (g)', fmtN(u0.peso_capsula_1), fmtN(u0.peso_capsula_2)],
+    ['S - Solo (g)', fmtN(u0.capsula_solo_seco_1 - u0.peso_capsula_1), fmtN(u0.capsula_solo_seco_2 - u0.peso_capsula_2)],
+    ['Umidade (%)', fmtN(u0.teor_umidade_1), fmtN(u0.teor_umidade_2)],
+    ['Umidade média (%)', fmtN(u0.teor_umidade_media, 2), ''],
+  ];
+
+  const moldeRowLabels = [
+    'Umidade calculada (%)', 'Água adicionada (g)', '% Água adicionada',
+    'M+S+A (g)', 'S+A (g)', 'Dens. úmida (g/cm³)', 'Dens. seca (g/cm³)',
+  ];
+  const moldeRowValues = densidades.map((d) => {
+    const pctAgua = (d.agua_adicionada_ml != null && d.peso_seco > 0)
+      ? parseFloat((d.agua_adicionada_ml / d.peso_seco * 100).toFixed(1)) : null;
+    return [
+      fmtN(d.umidade_calculada, 1), fmtN(d.agua_adicionada_ml, 1), fmtN(pctAgua, 1),
+      fmtN(d.cilindro_solo_umido, 1), fmtN(d.peso_solo_umido, 1),
+      fmtN(d.dens_ap_umida, 3), fmtN(d.dens_ap_seca, 3),
+    ];
+  });
+
+  const h0 = Array(width).fill('');
+  h0[0] = 'UMIDADE HIGROSCÓPICA';
+  h0[3] = `Nº MOLDES — ${densidades.map((d) => d.cilindro_numero || '?').join(' | ')}`;
+  h0[base] = 'CILINDROS';
+  const h1 = [
+    'Campo', 'Am. 1', 'Am. 2', 'Campo',
+    ...densidades.map((d, i) => d.cilindro_numero || i + 1),
+    'Nº', 'Peso (g)', 'Vol (cm³)',
+  ];
+
+  const body = [h0, h1];
+  const merges = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } },
+    { s: { r: 0, c: 3 }, e: { r: 0, c: 3 + N } },
+    { s: { r: 0, c: base }, e: { r: 0, c: base + 2 } },
+  ];
+  const labelCells = [];
+
+  higRows.forEach(([label, am1, am2], ri) => {
+    const isMedia = label === 'Umidade média (%)';
+    const r = body.length;
+    const row = Array(width).fill('');
+    row[0] = label;
+    row[1] = am1;
+    if (!isMedia) row[2] = am2;
+    else {
+      merges.push({ s: { r, c: 1 }, e: { r, c: 2 } });
+      labelCells.push({ r, c: 1 });
+    }
+    row[3] = moldeRowLabels[ri] || '';
+    densidades.forEach((_, di) => { row[4 + di] = moldeRowValues[di]?.[ri] ?? '-'; });
+
+    if (ri < N) {
+      row[base] = densidades[ri].cilindro_numero || ri + 1;
+      row[base + 1] = fmtN(densidades[ri].peso_cilindro, 1);
+      row[base + 2] = fmtN(densidades[ri].volume_cilindro, 1);
+    } else if (ri === N) {
+      row[base] = 'Peso mat. (g)';
+      row[base + 2] = fmtN(densidades[0]?.peso_amostra_umida, 1);
+      merges.push({ s: { r, c: base }, e: { r, c: base + 1 } });
+      labelCells.push({ r, c: base });
+    } else if (ri === N + 1) {
+      row[base] = 'Peso seco (g)';
+      row[base + 2] = fmtN(densidades[0]?.peso_seco, 1);
+      merges.push({ s: { r, c: base }, e: { r, c: base + 1 } });
+      labelCells.push({ r, c: base });
+    } else {
+      merges.push({ s: { r, c: base }, e: { r, c: base + 2 } });
+    }
+
+    labelCells.push({ r, c: 0 }, { r, c: 3 });
+    body.push(row);
+  });
+
+  return rawSheet({
+    name: 'Compactação',
+    title: 'Compactação',
+    body,
+    headerRows: [0, 1],
+    tables: [{ r: 1, rows: higRows.length, width }],
+    merges,
+    labelCells,
+    cols: [22, 11, 11, 22, ...Array(N).fill(12), 9, 11, 11],
+  });
+}
+
+/**
+ * Compactação — modo Ponto a Ponto, clone das duas tabelas transpostas do PDF:
+ * parâmetros nas linhas, cilindros/pontos nas colunas.
+ */
+function compactacaoPontoSheet(ensaio) {
+  const densidades = ensaio.densidades || [];
+  const umidades = ensaio.umidades || [];
+  if (!densidades.length && !umidades.length) return null;
+
+  const densRows = [
+    { label: 'Cilindro+Solo Úmido (g)', field: 'cilindro_solo_umido' },
+    { label: 'Peso do Cilindro (g)', field: 'peso_cilindro' },
+    { label: 'Peso do Solo Úmido (g)', sym: 'C=A-B', field: 'peso_solo_umido', calc: true },
+    { label: 'Volume do Cilindro (cm³)', field: 'volume_cilindro' },
+    { label: 'Dens. Apar. Úmida (g/cm³)', sym: 'E=C/D', field: 'dens_ap_umida', calc: true, dec: 3 },
+  ];
+  const umidRows = [
+    { label: 'Cápsula Nº', field: 'capsula_numero_1', str: true },
+    { label: 'Cápsula+Solo Úmido (g)', field: 'capsula_solo_umido_1' },
+    { label: 'Cápsula+Solo Seco (g)', field: 'capsula_solo_seco_1' },
+    { label: 'Peso da Cápsula (g)', field: 'peso_capsula_1' },
+    { label: 'Teor de Umidade (%)', sym: 'K', field: 'teor_umidade_media', calc: true },
+    { label: 'Dens. Apar. Seca (g/cm³)', sym: 'L=E/(100+K)', field: 'dens_ap_seca', calc: true, dec: 3 },
+  ];
+
+  const simbolos = { cilindro_solo_umido: 'A', peso_cilindro: 'B', volume_cilindro: 'D', capsula_numero_1: '-', capsula_solo_umido_1: 'F', capsula_solo_seco_1: 'G', peso_capsula_1: 'I' };
+
+  const cilRealizado = (d) => d && d.cilindro_solo_umido != null && Number(d.cilindro_solo_umido) > 0;
+  const umRealizado = (u) => u && u.capsula_solo_umido_1 != null && Number(u.capsula_solo_umido_1) > 0;
+
+  const getCilVal = (d, row) => {
+    if (row.str) return d[row.field] || '-';
+    if (!cilRealizado(d)) return '-';
+    const v = d[row.field];
+    return (v != null && !isNaN(v)) ? fmtN(v, row.dec ?? 1) : '-';
+  };
+  const getUmVal = (u, d, row) => {
+    if (row.str) return u[row.field] || '-';
+    if (!umRealizado(u)) return '-';
+    if (row.field === 'dens_ap_seca') {
+      return (d?.dens_ap_seca != null && !isNaN(d.dens_ap_seca)) ? fmtN(d.dens_ap_seca, row.dec ?? 3) : '-';
+    }
+    const v = u[row.field];
+    return (v != null && !isNaN(v)) ? fmtN(v, row.dec ?? 1) : '-';
+  };
+
+  const body = [];
+  const labelCells = [];
+
+  // Tabela de densidades (cilindros nas colunas)
+  body.push(['Campo', 'Fórmula', ...densidades.map((d, i) => `Cil. ${d.cilindro_numero || i + 1}`)]);
+  densRows.forEach((row) => {
+    const r = body.length;
+    body.push([row.label, row.sym || simbolos[row.field] || '-', ...densidades.map((d) => getCilVal(d, row))]);
+    labelCells.push({ r, c: 0 });
+    if (row.calc) labelCells.push(...boldRowCells(r, 2 + densidades.length));
+  });
+
+  body.push([]);
+
+  // Tabela de umidades (pontos nas colunas)
+  const headerUmidRow = body.length;
+  body.push(['Campo', 'Fórmula', ...umidades.map((_, i) => `Ponto ${i + 1}`)]);
+  umidRows.forEach((row) => {
+    const r = body.length;
+    body.push([row.label, row.sym || simbolos[row.field] || '-', ...umidades.map((u, ui) => getUmVal(u, densidades[ui], row))]);
+    labelCells.push({ r, c: 0 });
+    if (row.calc) labelCells.push(...boldRowCells(r, 2 + umidades.length));
+  });
+
+  return rawSheet({
+    name: 'Compactação',
+    title: 'Determinação da Umidade e Densidade',
+    body,
+    headerRows: [0, headerUmidRow],
+    tables: [
+      { r: 0, rows: densRows.length, width: 2 + densidades.length },
+      { r: headerUmidRow, rows: umidRows.length, width: 2 + umidades.length },
+    ],
+    labelCells,
+    cols: [30, 12, ...Array(Math.max(densidades.length, umidades.length)).fill(14)],
+  });
+}
 
 /** Ensaio Proctor — compactação, umidades, densidades, CBR e expansão. */
 export default function buildEnsaioProctorExport(ensaio) {
@@ -35,79 +225,10 @@ export default function buildEnsaioProctorExport(ensaio) {
     })
   );
 
-  const umidades = ensaio.umidades || [];
-  if (umidades.length) {
-    sheets.push(
-      buildSheet({
-        name: 'Umidades',
-        title: 'Determinação de Umidade',
-        header: [
-          'Ponto',
-          'Cápsula 1',
-          'Solo Úmido + Cáps. 1 (g)',
-          'Solo Seco + Cáps. 1 (g)',
-          'Peso Cápsula 1 (g)',
-          'Umidade 1 (%)',
-          'Cápsula 2',
-          'Solo Úmido + Cáps. 2 (g)',
-          'Solo Seco + Cáps. 2 (g)',
-          'Peso Cápsula 2 (g)',
-          'Umidade 2 (%)',
-          'Umidade Média (%)',
-        ],
-        rows: umidades.map((u, i) => [
-          i + 1,
-          val(u.capsula_numero_1),
-          val(u.capsula_solo_umido_1),
-          val(u.capsula_solo_seco_1),
-          val(u.peso_capsula_1),
-          val(u.teor_umidade_1),
-          val(u.capsula_numero_2),
-          val(u.capsula_solo_umido_2),
-          val(u.capsula_solo_seco_2),
-          val(u.peso_capsula_2),
-          val(u.teor_umidade_2),
-          val(u.teor_umidade_media),
-        ]),
-        cols: [8, 12, 22, 22, 18, 14, 12, 22, 22, 18, 14, 18],
-      })
-    );
-  }
-
-  const densidades = ensaio.densidades || [];
-  if (densidades.length) {
-    sheets.push(
-      buildSheet({
-        name: 'Densidades',
-        title: 'Determinação de Densidade',
-        header: [
-          'Ponto',
-          'Cilindro',
-          'Cilindro + Solo Úmido (g)',
-          'Peso do Cilindro (g)',
-          'Solo Úmido (g)',
-          'Volume (cm³)',
-          'Água Adicionada (ml)',
-          'Umidade (%)',
-          'Dens. Ap. Úmida (g/cm³)',
-          'Dens. Ap. Seca (g/cm³)',
-        ],
-        rows: densidades.map((d, i) => [
-          i + 1,
-          val(d.cilindro_numero),
-          val(d.cilindro_solo_umido),
-          val(d.peso_cilindro),
-          val(d.peso_solo_umido),
-          val(d.volume_cilindro),
-          val(d.agua_adicionada_ml),
-          val(d.umidade_calculada),
-          val(d.dens_ap_umida),
-          val(d.dens_ap_seca),
-        ]),
-        cols: [8, 14, 24, 20, 16, 14, 20, 14, 22, 22],
-      })
-    );
-  }
+  // ── Compactação — clone da tabela transposta do PDF ──
+  const isHigro = ensaio.correcao_densidade === 'higroscopica';
+  const compactacao = isHigro ? compactacaoHigroSheet(ensaio) : compactacaoPontoSheet(ensaio);
+  if (compactacao) sheets.push(compactacao);
 
   const cbr = ensaio.cbr_cilindros || [];
   if (cbr.length) {
