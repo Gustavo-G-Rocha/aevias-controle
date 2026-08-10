@@ -21,7 +21,16 @@ export default function RelatoriosUnificadosTipo({
 
   return (
     <div className="space-y-2">
-      <Label>Tipo de Registro * <span className="text-xs text-slate-500 font-normal">(selecione um ou mais)</span></Label>
+      <div className="flex items-center justify-between">
+        <Label>Tipo de Registro * <span className="text-xs text-slate-500 font-normal">(selecione um ou mais)</span></Label>
+        <button
+          type="button"
+          onClick={() => setTipoRegistro([])}
+          className="text-xs text-slate-500 hover:text-slate-700 underline"
+        >
+          Desmarcar todas
+        </button>
+      </div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         {OPTIONS.map((opt) => (
           <label
