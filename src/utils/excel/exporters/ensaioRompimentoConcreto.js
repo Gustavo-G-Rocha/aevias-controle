@@ -1,10 +1,41 @@
 import { buildSheet, buildFileName, fmtDate, val, obraMeta } from '../excelCore';
+import { paramSheet } from './transposedShared';
+import { fmtN, agruparEmSeries, resistenciaExemplar } from '@/utils/relatorioRompimentoConcretoUtils';
 
-/** Rompimento de concreto — compressão axial e tração na flexão. */
+/**
+ * Monta a tabela transposta de um ensaio de rompimento, como no PDF:
+ * linhas = parâmetros, colunas = corpos de prova agrupados em séries.
+ */
+function ensaioSheet({ name, title, series, unidadeCarga, extras = [] }) {
+  const cps = series.flat();
+  if (!cps.length) return null;
+
+  const porCp = (fn) => series.flatMap((s) => s.map(fn));
+  // Resistência do exemplar: valor da série no 1º CP, demais em branco.
+  const exemplar = series.flatMap((s) => s.map((_, i) => (i === 0 ? resistenciaExemplar(s) : '')));
+
+  return paramSheet({
+    name,
+    title,
+    labelHeader: 'PARÂMETRO',
+    columns: cps.map((_, i) => `CP ${i + 1}`),
+    rows: [
+      { label: 'IDADE', unit: 'dias', values: porCp((cp) => val(cp.idade)) },
+      { label: 'N° CP', values: porCp((cp) => val(cp.numero_cp)) },
+      { label: 'DATA DA RUPTURA', values: porCp((cp) => (cp.data_ruptura ? fmtDate(cp.data_ruptura) : '-')) },
+      ...extras.map((ex) => ({ ...ex, values: porCp(ex.value) })),
+      { label: 'CARGA DE RUPTURA', unit: unidadeCarga, values: porCp((cp) => fmtN(cp.carga_ruptura, 2)) },
+      { label: 'RESISTÊNCIA', unit: 'MPa', values: porCp((cp) => fmtN(cp.resistencia, 2)), bold: true },
+      { label: 'RESIST. DO EXEMPLAR', unit: 'MPa', values: exemplar, bold: true },
+    ],
+    labelWidth: 28,
+    colWidth: 13,
+  });
+}
+
+/** Rompimento de concreto — clone das tabelas transpostas do PDF. */
 export default function buildEnsaioRompimentoConcretoExport(ensaio) {
-  const sheets = [];
-
-  sheets.push(
+  const sheets = [
     buildSheet({
       name: 'Dados Gerais',
       title: 'Rompimento de Concreto — Dados Gerais',
@@ -29,62 +60,34 @@ export default function buildEnsaioRompimentoConcretoExport(ensaio) {
         ['Hora de Chegada no Campo', val(ensaio.hora_chegada_campo)],
       ],
       cols: [30, 40],
-    })
-  );
+    }),
+  ];
 
-  const axial = ensaio.compressao_axial || [];
-  if (axial.length) {
-    sheets.push(
-      buildSheet({
-        name: 'Compressão Axial',
-        title: 'Resistência à Compressão Axial',
-        header: ['CP', 'Idade (dias)', 'Dimensão', 'Data da Ruptura', 'Carga (tf)', 'Área (cm²)', 'Resistência (MPa)'],
-        rows: axial.map((c) => [
-          val(c.numero_cp),
-          val(c.idade),
-          val(c.dimensao),
-          fmtDate(c.data_ruptura),
-          val(c.carga_ruptura),
-          val(c.area_cp),
-          val(c.resistencia),
-        ]),
-        cols: [12, 14, 14, 18, 14, 14, 20],
-      })
-    );
-  }
+  const axial = ensaioSheet({
+    name: 'Compressão Axial',
+    title: 'Ensaio de Resistência à Compressão Axial',
+    series: agruparEmSeries(ensaio.compressao_axial),
+    unidadeCarga: 'tf',
+    extras: [
+      { label: 'DIMENSÕES DO CP', unit: 'cm', value: (cp) => val(cp.dimensao) },
+      { label: 'ÁREA DO CORPO DE PROVA', unit: 'cm²', value: (cp) => fmtN(cp.area_cp, 2) },
+    ],
+  });
+  if (axial) sheets.push(axial);
 
-  const flexao = ensaio.tracao_flexao || [];
-  if (flexao.length) {
-    sheets.push(
-      buildSheet({
-        name: 'Tração na Flexão',
-        title: 'Resistência à Tração na Flexão',
-        header: [
-          'CP',
-          'Ponto de Ruptura',
-          'Idade (dias)',
-          'Data da Ruptura',
-          'Carga (kgf)',
-          'Vão Central (mm)',
-          'Altura (mm)',
-          'Largura (mm)',
-          'Resistência (MPa)',
-        ],
-        rows: flexao.map((c) => [
-          val(c.numero_cp),
-          val(c.ponto_ruptura),
-          val(c.idade),
-          fmtDate(c.data_ruptura),
-          val(c.carga_ruptura),
-          val(c.vao_central),
-          val(c.altura_cp),
-          val(c.largura_cp),
-          val(c.resistencia),
-        ]),
-        cols: [12, 22, 14, 18, 14, 18, 14, 14, 20],
-      })
-    );
-  }
+  const flexao = ensaioSheet({
+    name: 'Tração na Flexão',
+    title: 'Ensaio de Resistência à Tração na Flexão — ABNT NBR 12142:2010',
+    series: (ensaio.tracao_flexao || []).map((cp) => [cp]),
+    unidadeCarga: 'kgf',
+    extras: [
+      { label: 'PONTO DE RUPTURA', value: (cp) => val(cp.ponto_ruptura) },
+      { label: 'VÃO CENTRAL DO CP', unit: 'mm', value: (cp) => fmtN(cp.vao_central, 2) },
+      { label: 'ALTURA DO CP', unit: 'mm', value: (cp) => fmtN(cp.altura_cp, 2) },
+      { label: 'LARGURA DO CP', unit: 'mm', value: (cp) => fmtN(cp.largura_cp, 2) },
+    ],
+  });
+  if (flexao) sheets.push(flexao);
 
   if (ensaio.observacoes) {
     sheets.push(

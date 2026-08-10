@@ -1,15 +1,63 @@
 import { buildSheet, buildFileName, fmtDate, val, obraMeta } from '../excelCore';
-import { PENEIRAS } from './peneirasShared';
+import { rawSheet } from './transposedShared';
+import { calcularGranulometria, calcularPercentualEmulsao } from '@/utils/relatorioMRAFUtils';
+import { fmtNum } from '@/utils/relatorioCAUQTabelasUtils';
+import { carregarProject, carregarFaixaDoProject } from '@/services/relatorioContextService';
 
-const num = (v) => (v === null || v === undefined || v === '' ? null : Number(v));
+/**
+ * Granulometria — clone da tabela do PDF (DNIT 412/2025):
+ * PENEIRAS | RETIDO | PASS. | % PASS. | FAIXA DE TRABALHO | FAIXA ESPECIFICADA
+ */
+function granulometriaSheet(ensaio, faixa, project) {
+  const dados = calcularGranulometria(ensaio, faixa, project);
+  if (!dados.length) return null;
 
-/** Ensaio MRAF — extração de ligante e granulometria. */
-export default function buildEnsaioMRAFExport(ensaio) {
+  const espec = faixa?.especificacao ? ` ${faixa.especificacao}` : '';
+  const body = [
+    ['PENEIRAS ASTM (mm)', 'PESO DA AMOSTRA (g)', '', '', 'FAIXA DE TRABALHO', '', `FAIXA ESPECIFICADA${espec}`, ''],
+    ['', 'RETIDO (g)', 'PASS. (g)', '% PASS.', 'MÍN. (%)', 'MÁX. (%)', 'MÍN. (%)', 'MÁX. (%)'],
+    ...dados.map((d) => [
+      d.astm,
+      val(d.retido),
+      val(d.passante),
+      val(d.percentualPassante),
+      fmtNum(d.faixaTrabalhoMin, 1),
+      fmtNum(d.faixaTrabalhoMax, 1),
+      fmtNum(d.limiteMin, 1),
+      fmtNum(d.limiteMax, 1),
+    ]),
+  ];
+
+  return rawSheet({
+    name: 'Granulometria',
+    title: 'Ensaio de Granulometria — DNIT 412/2025',
+    body,
+    headerRows: [0, 1],
+    tables: [{ r: 1, rows: dados.length, width: 8 }],
+    merges: [
+      { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } },
+      { s: { r: 0, c: 1 }, e: { r: 0, c: 3 } },
+      { s: { r: 0, c: 4 }, e: { r: 0, c: 5 } },
+      { s: { r: 0, c: 6 }, e: { r: 0, c: 7 } },
+    ],
+    labelCells: dados.map((_, i) => ({ r: 2 + i, c: 0 })),
+    cols: [16, 13, 13, 12, 12, 12, 12, 12],
+  });
+}
+
+/** Ensaio MRAF — extração de ligante (Rotarex) e granulometria, como no PDF. */
+export default async function buildEnsaioMRAFExport(ensaio) {
   const ext = ensaio.extracao_ligante || {};
-  const retidos = ensaio.granulometria?.peso_retido_peneiras || {};
-  const sheets = [];
 
-  sheets.push(
+  // Contexto opcional do projeto/faixa (colunas de faixa de trabalho e especificada).
+  let project = null;
+  let faixa = null;
+  try {
+    if (ensaio.project_id) project = await carregarProject(ensaio.project_id);
+    if (project) faixa = await carregarFaixaDoProject(project);
+  } catch { /* contexto opcional */ }
+
+  const sheets = [
     buildSheet({
       name: 'Dados Gerais',
       title: 'Ensaio MRAF — Dados Gerais',
@@ -23,17 +71,21 @@ export default function buildEnsaioMRAFExport(ensaio) {
         ['Pedreira', val(ensaio.pedreira)],
         ['Placa do Caminhão', val(ensaio.placa_caminhao)],
         ['Tipo de Ligante', val(ensaio.tipo_ligante)],
+        ['Emulsão Utilizada', val(project?.emulsao_utilizada)],
         ['Faixa Especificada', val(ensaio.faixa_especificada)],
         ['Ensaio Realizado Por', val(ensaio.ensaio_realizado_por)],
       ],
       cols: [28, 44],
-    })
-  );
+    }),
+  ];
+
+  const gran = granulometriaSheet(ensaio, faixa, project);
+  if (gran) sheets.push(gran);
 
   sheets.push(
     buildSheet({
       name: 'Extração de Ligante',
-      title: 'Extração de Ligante (Rotarex)',
+      title: 'Extração Ligante (Rotarex) — ABNT NBR 16208/2013',
       meta: [
         ['Peso da Amostra (g)', val(ext.peso_amostra)],
         ['Amostra Úmida (g)', val(ext.amostra_umida)],
@@ -45,39 +97,9 @@ export default function buildEnsaioMRAFExport(ensaio) {
         ['Peso do Ligante (g)', val(ext.peso_ligante)],
         ['Teor de Ligante (%)', val(ext.teor_ligante)],
         ['Resíduo da Emulsão (%)', val(ext.residuo_emulsao)],
-        ['Percentual de Emulsão (%)', val(ext.percentual_emulsao)],
+        ['% de Emulsão', val(calcularPercentualEmulsao(ext.teor_ligante, ext.residuo_emulsao))],
       ],
       cols: [30, 22],
-    })
-  );
-
-  const usadas = PENEIRAS.filter(([key]) => num(retidos[key]) !== null);
-  const total = usadas.reduce((s, [key]) => s + (num(retidos[key]) || 0), 0);
-  let acumulado = 0;
-  const granRows = usadas.map(([key, label]) => {
-    const peso = num(retidos[key]) || 0;
-    acumulado += peso;
-    const acumPct = total ? (acumulado / total) * 100 : 0;
-    return [
-      label,
-      peso,
-      Number((total ? (peso / total) * 100 : 0).toFixed(2)),
-      Number(acumPct.toFixed(2)),
-      Number((100 - acumPct).toFixed(2)),
-    ];
-  });
-
-  sheets.push(
-    buildSheet({
-      name: 'Granulometria',
-      title: 'Granulometria da Mistura',
-      meta: [
-        ['Faixa Especificada', val(ensaio.faixa_especificada)],
-        ['Peso Total Retido (g)', total ? Number(total.toFixed(2)) : '-'],
-      ],
-      header: ['Peneira', 'Peso Retido (g)', '% Retida', '% Retida Acum.', '% Passante'],
-      rows: granRows,
-      cols: [22, 18, 14, 18, 14],
     })
   );
 
